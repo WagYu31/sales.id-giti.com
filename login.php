@@ -62,10 +62,10 @@ $conn->close();
     
     <style>
         :root {
-            --bg-page: #F4F4F6;
-            --bg-card-left: #FAF7F2;
-            --primary-amber: #F59E0B;
-            --primary-amber-hover: #D97706;
+            --bg-page: #F4F6F9;
+            --bg-card-left: #F8FAFC;
+            --primary-blue: #2563EB;
+            --primary-blue-hover: #1D4ED8;
             --text-dark: #0F172A;
             --text-muted: #64748B;
             --border-color: #E2E8F0;
@@ -88,7 +88,7 @@ $conn->close();
             max-width: 1120px;
             background: #FFFFFF;
             border-radius: 28px;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.07), 0 0 1px 1px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(0, 0, 0, 0.04);
             overflow: hidden;
             display: flex;
             flex-direction: row;
@@ -98,7 +98,7 @@ $conn->close();
         .hero-panel {
             width: 52%;
             background-color: var(--bg-card-left);
-            background-image: radial-gradient(#E2E8F0 1px, transparent 1px);
+            background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
             background-size: 20px 20px;
             padding: 48px 44px;
             display: flex;
@@ -117,8 +117,8 @@ $conn->close();
         }
 
         .pill-badge {
-            background-color: #FEF3C7;
-            color: #B45309;
+            background-color: #EFF6FF;
+            color: #1E40AF;
             font-size: 11px;
             font-weight: 700;
             padding: 6px 14px;
@@ -128,17 +128,19 @@ $conn->close();
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            border: 1px solid #DBEAFE;
         }
 
         .pill-badge-sub {
-            background-color: #FEF9C3;
-            color: #854D0E;
+            background-color: #F0F9FF;
+            color: #0369A1;
+            border-color: #E0F2FE;
         }
 
-        .dot-yellow {
+        .dot-blue {
             width: 8px;
             height: 8px;
-            background-color: #F59E0B;
+            background-color: var(--primary-blue);
             border-radius: 50%;
             display: inline-block;
         }
@@ -153,7 +155,10 @@ $conn->close();
         }
 
         .hero-title .highlight {
-            color: var(--primary-amber);
+            color: var(--primary-blue);
+            background: linear-gradient(120deg, #2563EB, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .hero-subtitle {
@@ -271,7 +276,7 @@ $conn->close();
         }
 
         .bar.active {
-            background: var(--primary-amber);
+            background: var(--primary-blue);
         }
 
         .hero-footer {
@@ -336,7 +341,7 @@ $conn->close();
 
         .custom-input {
             width: 100%;
-            background-color: #F1F5F9;
+            background-color: #F8FAFC;
             border: 1px solid #E2E8F0;
             border-radius: 14px;
             padding: 14px 18px;
@@ -349,8 +354,8 @@ $conn->close();
 
         .custom-input:focus {
             background-color: #FFFFFF;
-            border-color: var(--primary-amber);
-            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
 
         .password-wrapper {
@@ -388,14 +393,14 @@ $conn->close();
         .remember-row input[type="checkbox"] {
             width: 16px;
             height: 16px;
-            accent-color: var(--primary-amber);
+            accent-color: var(--primary-blue);
             border-radius: 4px;
             cursor: pointer;
         }
 
         .btn-submit {
             width: 100%;
-            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
             color: #FFFFFF;
             font-size: 15px;
             font-weight: 700;
@@ -403,7 +408,7 @@ $conn->close();
             border-radius: 14px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.35);
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.35);
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
@@ -413,8 +418,8 @@ $conn->close();
 
         .btn-submit:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 24px -5px rgba(245, 158, 11, 0.45);
-            background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+            box-shadow: 0 14px 24px -5px rgba(37, 99, 235, 0.45);
+            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
         }
 
         .divider {
@@ -498,23 +503,23 @@ $conn->close();
         <div class="hero-panel">
             <div>
                 <div class="badge-group">
-                    <span class="pill-badge"><span class="dot-yellow"></span> LOEWIX SALES • INTERNAL PLATFORM</span>
-                    <span class="pill-badge pill-badge-sub">PLATFORM MANAJEMEN TIM</span>
+                    <span class="pill-badge"><span class="dot-blue"></span> LOEWIX SALES • INTERNAL PLATFORM</span>
+                    <span class="pill-badge pill-badge-sub">PLATFORM PENJUALAN & TIM</span>
                 </div>
 
                 <h1 class="hero-title">
-                    Satu Tempat<br>untuk <span class="highlight">Semua</span><br>Kendali Tim.
+                    Satu Tempat<br>untuk <span class="highlight">Semua</span><br>Kendali Sales.
                 </h1>
 
                 <p class="hero-subtitle">
-                    Dashboard terpadu untuk memantau target penjualan, absensi, progress divisi, dan koordinasi tim Loewix Sales secara real-time.
+                    Dashboard terpadu untuk memantau target penjualan, follow up customer, progress tim, dan koordinasi Loewix Sales secara real-time.
                 </p>
 
                 <div class="feature-chips">
-                    <span class="chip">📈 Target & Sales</span>
+                    <span class="chip">📈 Target Penjualan</span>
                     <span class="chip">👥 Kolaborasi Tim</span>
-                    <span class="chip">📋 Absensi</span>
-                    <span class="chip">🔔 Notifikasi</span>
+                    <span class="chip">📋 Laporan Prospek</span>
+                    <span class="chip">🔔 Notifikasi Real-time</span>
                 </div>
 
                 <!-- PREVIEW DASHBOARD WIDGET -->
@@ -528,20 +533,20 @@ $conn->close();
 
                     <div class="widget-stats">
                         <div class="stat-box">
-                            <div class="stat-label">TARGET BULAN INI</div>
+                            <div class="stat-label">TARGET PENJUALAN</div>
                             <div class="stat-val">87% <span class="badge-inc">↑ +12%</span></div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-label">ANGGOTA AKTIF</div>
+                            <div class="stat-label">TIM SALES AKTIF</div>
                             <div class="stat-val">24 <span class="badge-online">• Online</span></div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-label">TUGAS SELESAI</div>
+                            <div class="stat-label">PROSPEK SELESAI</div>
                             <div class="stat-val">142 <span class="badge-inc">↑ +8%</span></div>
                         </div>
                     </div>
 
-                    <div style="font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;">AKTIVITAS MINGGU INI</div>
+                    <div style="font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;">AKTIVITAS SALES MINGGU INI</div>
                     <div class="chart-mini">
                         <div class="bar" style="height: 40%;"></div>
                         <div class="bar" style="height: 65%;"></div>
@@ -636,7 +641,7 @@ $conn->close();
             
             // Toggle eye icon style
             this.style.opacity = type === 'text' ? '1' : '0.6';
-            this.style.color = type === 'text' ? '#F59E0B' : '#94A3B8';
+            this.style.color = type === 'text' ? '#2563EB' : '#94A3B8';
         });
     </script>
 </body>
