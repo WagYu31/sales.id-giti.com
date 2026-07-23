@@ -53,7 +53,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Loewix Sales</title>
+    <title>Login - Loewix Sales System</title>
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,10 +62,12 @@ $conn->close();
     
     <style>
         :root {
-            --bg-page: #F4F6F9;
-            --bg-card-left: #F8FAFC;
-            --primary-blue: #2563EB;
-            --primary-blue-hover: #1D4ED8;
+            --bg-page: #F0F4FA;
+            --bg-card-left: #F5F8FC;
+            --primary-blue: #2B78C5;
+            --primary-blue-dark: #1A56C6;
+            --primary-blue-light: #EBF3FC;
+            --accent-cyan: #0284C7;
             --text-dark: #0F172A;
             --text-muted: #64748B;
             --border-color: #E2E8F0;
@@ -81,6 +83,9 @@ $conn->close();
             justify-content: center;
             padding: 24px 16px;
             margin: 0;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(43, 120, 197, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(2, 132, 199, 0.08) 0px, transparent 50%);
         }
 
         .login-card {
@@ -88,7 +93,7 @@ $conn->close();
             max-width: 1120px;
             background: #FFFFFF;
             border-radius: 28px;
-            box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.09), 0 0 1px 1px rgba(0, 0, 0, 0.04);
             overflow: hidden;
             display: flex;
             flex-direction: row;
@@ -99,7 +104,7 @@ $conn->close();
             width: 52%;
             background-color: var(--bg-card-left);
             background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-size: 24px 24px;
             padding: 48px 44px;
             display: flex;
             flex-direction: column;
@@ -117,8 +122,8 @@ $conn->close();
         }
 
         .pill-badge {
-            background-color: #EFF6FF;
-            color: #1E40AF;
+            background-color: #E0F2FE;
+            color: #0369A1;
             font-size: 11px;
             font-weight: 700;
             padding: 6px 14px;
@@ -128,19 +133,18 @@ $conn->close();
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            border: 1px solid #DBEAFE;
         }
 
         .pill-badge-sub {
             background-color: #F0F9FF;
-            color: #0369A1;
-            border-color: #E0F2FE;
+            color: #0284C7;
+            border: 1px solid #BAE6FD;
         }
 
         .dot-blue {
             width: 8px;
             height: 8px;
-            background-color: var(--primary-blue);
+            background-color: #0284C7;
             border-radius: 50%;
             display: inline-block;
         }
@@ -156,7 +160,7 @@ $conn->close();
 
         .hero-title .highlight {
             color: var(--primary-blue);
-            background: linear-gradient(120deg, #2563EB, #3B82F6);
+            background: linear-gradient(135deg, #2B78C5 0%, #0284C7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -196,7 +200,7 @@ $conn->close();
             border: 1px solid #E2E8F0;
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.04);
             margin-bottom: 24px;
         }
 
@@ -257,7 +261,7 @@ $conn->close();
         .badge-online {
             font-size: 11px;
             font-weight: 700;
-            color: #16A34A;
+            color: #0284C7;
         }
 
         .chart-mini {
@@ -276,7 +280,7 @@ $conn->close();
         }
 
         .bar.active {
-            background: var(--primary-blue);
+            background: linear-gradient(180deg, #38BDF8 0%, #2B78C5 100%);
         }
 
         .hero-footer {
@@ -295,11 +299,11 @@ $conn->close();
         }
 
         .logo-container {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .logo-img {
-            max-height: 55px;
+            max-height: 60px;
             width: auto;
             object-fit: contain;
         }
@@ -355,7 +359,7 @@ $conn->close();
         .custom-input:focus {
             background-color: #FFFFFF;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 0 0 4px rgba(43, 120, 197, 0.15);
         }
 
         .password-wrapper {
@@ -378,7 +382,7 @@ $conn->close();
         }
 
         .btn-eye:hover {
-            color: #475569;
+            color: #2B78C5;
         }
 
         .remember-row {
@@ -400,7 +404,7 @@ $conn->close();
 
         .btn-submit {
             width: 100%;
-            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+            background: linear-gradient(135deg, #2B78C5 0%, #1A56C6 100%);
             color: #FFFFFF;
             font-size: 15px;
             font-weight: 700;
@@ -408,7 +412,7 @@ $conn->close();
             border-radius: 14px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.35);
+            box-shadow: 0 10px 20px -5px rgba(43, 120, 197, 0.4);
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
@@ -418,8 +422,8 @@ $conn->close();
 
         .btn-submit:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 24px -5px rgba(37, 99, 235, 0.45);
-            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+            box-shadow: 0 14px 24px -5px rgba(43, 120, 197, 0.5);
+            background: linear-gradient(135deg, #3284d7 0%, #1A56C6 100%);
         }
 
         .divider {
@@ -503,23 +507,23 @@ $conn->close();
         <div class="hero-panel">
             <div>
                 <div class="badge-group">
-                    <span class="pill-badge"><span class="dot-blue"></span> LOEWIX SALES • INTERNAL PLATFORM</span>
-                    <span class="pill-badge pill-badge-sub">PLATFORM PENJUALAN & TIM</span>
+                    <span class="pill-badge"><span class="dot-blue"></span> LOEWIX SALES • PLATFORM PROSPEK</span>
+                    <span class="pill-badge pill-badge-sub">MANAJEMEN PENJUALAN</span>
                 </div>
 
                 <h1 class="hero-title">
-                    Satu Tempat<br>untuk <span class="highlight">Semua</span><br>Kendali Sales.
+                    Pusat Kendali<br><span class="highlight">Prospek & Sales</span><br>dalam Satu Tempat.
                 </h1>
 
                 <p class="hero-subtitle">
-                    Dashboard terpadu untuk memantau target penjualan, follow up customer, progress tim, dan koordinasi Loewix Sales secara real-time.
+                    Platform resmi tim Loewix Sales untuk mencatat calon customer, kelola laporan prospek, serta memantau performa penjualan secara real-time.
                 </p>
 
                 <div class="feature-chips">
-                    <span class="chip">📈 Target Penjualan</span>
-                    <span class="chip">👥 Kolaborasi Tim</span>
-                    <span class="chip">📋 Laporan Prospek</span>
-                    <span class="chip">🔔 Notifikasi Real-time</span>
+                    <span class="chip">🎯 Laporan Prospek</span>
+                    <span class="chip">📊 Target Penjualan</span>
+                    <span class="chip">🤝 Follow Up Customer</span>
+                    <span class="chip">📢 Promosi & Broadcast</span>
                 </div>
 
                 <!-- PREVIEW DASHBOARD WIDGET -->
@@ -528,25 +532,25 @@ $conn->close();
                         <span class="dot-control" style="background:#EF4444;"></span>
                         <span class="dot-control" style="background:#F59E0B;"></span>
                         <span class="dot-control" style="background:#10B981;"></span>
-                        <span style="margin-left: 6px;">Loewix Sales - Dashboard Overview</span>
+                        <span style="margin-left: 6px;">Loewix Sales System - Overview</span>
                     </div>
 
                     <div class="widget-stats">
                         <div class="stat-box">
-                            <div class="stat-label">TARGET PENJUALAN</div>
-                            <div class="stat-val">87% <span class="badge-inc">↑ +12%</span></div>
+                            <div class="stat-label">TOTAL PROSPEK</div>
+                            <div class="stat-val">1.28k <span class="badge-inc">↑ +15%</span></div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-label">TIM SALES AKTIF</div>
-                            <div class="stat-val">24 <span class="badge-online">• Online</span></div>
+                            <div class="stat-label">DEAL BULAN INI</div>
+                            <div class="stat-val">42 <span class="badge-online">• Active</span></div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-label">PROSPEK SELESAI</div>
-                            <div class="stat-val">142 <span class="badge-inc">↑ +8%</span></div>
+                            <div class="stat-label">PERFORMA SALES</div>
+                            <div class="stat-val">94% <span class="badge-inc">↑ +6%</span></div>
                         </div>
                     </div>
 
-                    <div style="font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;">AKTIVITAS SALES MINGGU INI</div>
+                    <div style="font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;">AKTIVITAS MINGGU INI</div>
                     <div class="chart-mini">
                         <div class="bar" style="height: 40%;"></div>
                         <div class="bar" style="height: 65%;"></div>
@@ -554,7 +558,7 @@ $conn->close();
                         <div class="bar active" style="height: 85%;"></div>
                         <div class="bar" style="height: 50%;"></div>
                         <div class="bar active" style="height: 90%;"></div>
-                        <div class="bar" style="height: 30%;"></div>
+                        <div class="bar" style="height: 35%;"></div>
                     </div>
                 </div>
             </div>
@@ -570,9 +574,9 @@ $conn->close();
                 <img src="assets/images/loewix_sales_logo.png" alt="Loewix Sales" class="logo-img">
             </div>
 
-            <div class="welcome-text">Selamat datang kembali 👋</div>
-            <h2 class="form-title">Masuk ke Akun Kamu</h2>
-            <p class="form-subtitle">Masukkan email & password untuk melanjutkan</p>
+            <div class="welcome-text">Selamat datang kembali, Team Sales! 👋</div>
+            <h2 class="form-title">Masuk ke Portal Sales</h2>
+            <p class="form-subtitle">Masukkan email & password untuk mengelola laporan prospek</p>
 
             <?php if($error): ?>
                 <div class="alert alert-danger border-0 rounded-4 mb-4 py-3 px-3" style="background-color: #FEF2F2; color: #991B1B; font-size: 13.5px; font-weight: 600;">
@@ -607,7 +611,7 @@ $conn->close();
                 </div>
 
                 <button type="submit" class="btn-submit">
-                    Masuk ke Dashboard <span style="font-size: 18px;">→</span>
+                    Masuk ke Dashboard Sales <span style="font-size: 18px;">→</span>
                 </button>
             </form>
 
@@ -619,7 +623,7 @@ $conn->close();
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                 </svg>
-                Buat Akun Baru
+                Buat Akun Sales Baru
             </a>
 
             <div class="footer-security">
@@ -641,7 +645,7 @@ $conn->close();
             
             // Toggle eye icon style
             this.style.opacity = type === 'text' ? '1' : '0.6';
-            this.style.color = type === 'text' ? '#2563EB' : '#94A3B8';
+            this.style.color = type === 'text' ? '#2B78C5' : '#94A3B8';
         });
     </script>
 </body>
