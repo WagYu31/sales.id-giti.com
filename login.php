@@ -54,589 +54,629 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Loewix Sales</title>
-    <!-- Google Fonts: Plus Jakarta Sans -->
+    <meta name="description" content="Login ke dashboard Loewix Sales - Platform manajemen tim sales terpadu">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-page: #F4F4F6;
-            --bg-card-left: #FAF7F2;
-            --primary-amber: #E68A00;
-            --primary-amber-gradient: linear-gradient(135deg, #E68A00 0%, #CC7A00 100%);
-            --text-dark: #0F172A;
-            --text-muted: #64748B;
-            --border-color: #E2E8F0;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            background: #0B1120;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: 
+                radial-gradient(ellipse 80% 60% at 20% 80%, rgba(56, 189, 248, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 80% 20%, rgba(168, 85, 247, 0.07) 0%, transparent 55%),
+                radial-gradient(ellipse 90% 70% at 50% 50%, rgba(14, 165, 233, 0.04) 0%, transparent 70%),
+                linear-gradient(180deg, #0B1120 0%, #0F172A 40%, #131C2E 100%);
+        }
+
+        /* Animated grid */
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background-image: 
+                linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridShift 20s linear infinite;
+        }
+
+        @keyframes gridShift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 1;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: rgba(56, 189, 248, 0.06);
+            top: -10%; left: -5%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 350px; height: 350px;
+            background: rgba(168, 85, 247, 0.05);
+            bottom: -15%; right: -5%;
+            animation-delay: -3s;
+        }
+
+        .orb-3 {
+            width: 250px; height: 250px;
+            background: rgba(245, 158, 11, 0.04);
+            top: 40%; right: 20%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -20px) scale(1.05); }
+            66% { transform: translate(-20px, 15px) scale(0.95); }
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .login-wrapper {
+            position: relative;
+            z-index: 10;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px 20px;
-            margin: 0;
+            padding: 24px;
         }
 
-        .login-card {
+        .login-container {
             width: 100%;
-            max-width: 1140px;
-            background: #FFFFFF;
-            border-radius: 28px;
-            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(0, 0, 0, 0.03);
-            overflow: hidden;
-            display: flex;
-            flex-direction: row;
-        }
-
-        /* LEFT HERO PANEL */
-        .hero-panel {
-            width: 53%;
-            background-color: var(--bg-card-left);
-            background-image: radial-gradient(#E2E8F0 1.2px, transparent 1.2px);
-            background-size: 22px 22px;
-            padding: 52px 48px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border-right: 1px solid rgba(226, 232, 240, 0.9);
-            position: relative;
-        }
-
-        .badge-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .pill-badge {
-            background-color: #FEF3C7;
-            color: #92400E;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 9999px;
-            letter-spacing: 0.4px;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .pill-badge-sub {
-            background-color: #FEF9C3;
-            color: #854D0E;
-        }
-
-        .dot-yellow {
-            width: 8px;
-            height: 8px;
-            background-color: #F59E0B;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .hero-title {
-            font-size: 2.45rem;
-            font-weight: 800;
-            line-height: 1.22;
-            color: #0F172A;
-            margin-bottom: 16px;
-            letter-spacing: -0.6px;
-        }
-
-        .hero-title .highlight {
-            color: #D97706;
-        }
-
-        .hero-subtitle {
-            font-size: 14.5px;
-            line-height: 1.65;
-            color: var(--text-muted);
-            margin-bottom: 28px;
             max-width: 480px;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
         }
 
-        .feature-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 32px;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .chip {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #334155;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        /* ===== LOGO SECTION ===== */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 36px;
+            animation: fadeIn 1s ease 0.3s forwards;
+            opacity: 0;
         }
 
-        /* DASHBOARD PREVIEW WIDGET */
-        .preview-widget {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 20px;
-            padding: 22px;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
-            margin-bottom: 24px;
+        @keyframes fadeIn {
+            to { opacity: 1; }
         }
 
-        .widget-header {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #94A3B8;
-            margin-bottom: 18px;
-        }
-
-        .dot-control {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-        }
-
-        .widget-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .stat-box {
-            background: #F8FAFC;
-            border: 1px solid #F1F5F9;
-            border-radius: 14px;
-            padding: 12px 14px;
-        }
-
-        .stat-label {
-            font-size: 9.5px;
-            font-weight: 700;
-            color: #94A3B8;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-
-        .stat-val {
-            font-size: 19px;
-            font-weight: 800;
-            color: #0F172A;
-            display: flex;
-            align-items: baseline;
-            gap: 5px;
-        }
-
-        .badge-inc {
-            font-size: 11px;
-            font-weight: 700;
-            color: #16A34A;
-        }
-
-        .badge-online {
-            font-size: 11px;
-            font-weight: 700;
-            color: #16A34A;
-        }
-
-        .chart-mini {
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            height: 38px;
-            padding-top: 6px;
-        }
-
-        .bar {
-            flex: 1;
-            background: #E2E8F0;
-            border-radius: 6px;
-        }
-
-        .bar.active {
-            background: #E68A00;
-        }
-
-        .hero-footer {
-            font-size: 12px;
-            color: #94A3B8;
-            font-weight: 500;
-        }
-
-        /* RIGHT FORM PANEL */
-        .form-panel {
-            width: 47%;
-            padding: 52px 48px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .logo-container {
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-        }
-
-        .logo-img {
-            height: 60px;
+        .logo-section img {
+            height: 56px;
             width: auto;
             object-fit: contain;
+            filter: brightness(1.1) drop-shadow(0 0 20px rgba(56, 189, 248, 0.15));
+            margin-bottom: 12px;
         }
 
-        .welcome-text {
-            font-size: 14px;
-            color: var(--text-muted);
+        .logo-tagline {
+            font-size: 13px;
             font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .form-title {
-            font-size: 1.7rem;
-            font-weight: 800;
-            color: #0F172A;
-            margin-bottom: 6px;
-            letter-spacing: -0.4px;
-        }
-
-        .form-subtitle {
-            font-size: 13.5px;
-            color: var(--text-muted);
-            margin-bottom: 28px;
-        }
-
-        .input-group-custom {
-            margin-bottom: 20px;
-        }
-
-        .input-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #64748B;
-            letter-spacing: 0.6px;
+            color: rgba(148, 163, 184, 0.7);
+            letter-spacing: 3px;
             text-transform: uppercase;
-            margin-bottom: 8px;
-            display: block;
         }
 
-        .custom-input {
-            width: 100%;
-            background-color: #F1F5F9;
-            border: 1px solid #E2E8F0;
+        /* ===== GLASS CARD ===== */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(40px) saturate(150%);
+            -webkit-backdrop-filter: blur(40px) saturate(150%);
+            border: 1px solid rgba(148, 163, 184, 0.08);
+            border-radius: 24px;
+            padding: 44px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 80px -20px rgba(56, 189, 248, 0.06);
+        }
+
+        /* Top glow line */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), rgba(168, 85, 247, 0.3), transparent);
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .card-header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #F1F5F9;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .card-header p {
+            font-size: 14px;
+            color: #64748B;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        /* ===== ERROR ALERT ===== */
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
             border-radius: 14px;
             padding: 14px 18px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #0F172A;
-            outline: none;
-            transition: all 0.2s ease;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #FCA5A5;
+            animation: shake 0.5s ease;
         }
 
-        .custom-input:focus {
-            background-color: #FFFFFF;
-            border-color: #D97706;
-            box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15);
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
 
-        .password-wrapper {
+        /* ===== FORM FIELDS ===== */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94A3B8;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .input-wrapper {
             position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #475569;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 14px;
+            padding: 15px 16px 15px 48px;
+            font-size: 14.5px;
+            font-weight: 500;
+            color: #F1F5F9;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input::placeholder {
+            color: #475569;
+            font-weight: 400;
+        }
+
+        .form-input:focus {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.08), 0 0 20px -5px rgba(56, 189, 248, 0.15);
+        }
+
+        .form-input:focus + .input-icon,
+        .form-input:focus ~ .input-icon {
+            color: #38BDF8;
         }
 
         .btn-eye {
             position: absolute;
-            right: 16px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #94A3B8;
+            color: #475569;
             cursor: pointer;
-            padding: 4px;
+            padding: 6px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s ease;
         }
 
         .btn-eye:hover {
-            color: #475569;
+            color: #94A3B8;
+            background: rgba(148, 163, 184, 0.1);
         }
 
-        .remember-row {
+        /* ===== REMEMBER + FORGOT ===== */
+        .options-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 24px;
-            font-size: 13.5px;
-            color: #475569;
+            margin-bottom: 28px;
         }
 
-        .remember-row input[type="checkbox"] {
-            width: 17px;
-            height: 17px;
-            accent-color: #D97706;
-            border-radius: 4px;
+        .remember-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             cursor: pointer;
+            font-size: 13.5px;
+            color: #94A3B8;
+            font-weight: 500;
         }
 
-        .btn-submit {
+        .custom-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid rgba(71, 85, 105, 0.5);
+            border-radius: 6px;
+            background: rgba(30, 41, 59, 0.5);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .custom-checkbox:checked {
+            background: linear-gradient(135deg, #0EA5E9, #38BDF8);
+            border-color: #38BDF8;
+        }
+
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 9px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .forgot-link {
+            font-size: 13px;
+            color: #38BDF8;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .forgot-link:hover {
+            color: #7DD3FC;
+        }
+
+        /* ===== SUBMIT BUTTON ===== */
+        .btn-login {
             width: 100%;
-            background: var(--primary-amber-gradient);
-            color: #FFFFFF;
+            position: relative;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
             font-size: 15px;
             font-weight: 700;
-            padding: 15px;
-            border-radius: 14px;
-            border: none;
+            font-family: 'Inter', sans-serif;
+            color: #FFFFFF;
             cursor: pointer;
-            box-shadow: 0 10px 20px -4px rgba(230, 138, 0, 0.35);
-            transition: all 0.2s ease;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 50%, #0EA5E9 100%);
+            background-size: 200% auto;
+            box-shadow: 0 8px 24px -4px rgba(14, 165, 233, 0.35), 0 0 0 1px rgba(56, 189, 248, 0.15) inset;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            letter-spacing: 0.3px;
         }
 
-        .btn-submit:hover {
+        .btn-login:hover {
+            background-position: right center;
+            box-shadow: 0 12px 32px -4px rgba(14, 165, 233, 0.45), 0 0 0 1px rgba(56, 189, 248, 0.2) inset;
             transform: translateY(-1px);
-            box-shadow: 0 14px 24px -4px rgba(230, 138, 0, 0.45);
         }
 
-        .divider {
+        .btn-login:active {
+            transform: translateY(0px) scale(0.99);
+        }
+
+        /* Shimmer effect on button */
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            50%, 100% { left: 100%; }
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider-row {
             display: flex;
             align-items: center;
-            text-align: center;
-            margin: 24px 0;
-            color: #CBD5E1;
-            font-size: 12px;
-            font-weight: 600;
+            margin: 28px 0;
         }
 
-        .divider::before, .divider::after {
+        .divider-row::before, .divider-row::after {
             content: '';
             flex: 1;
-            border-bottom: 1px solid #E2E8F0;
+            height: 1px;
+            background: rgba(71, 85, 105, 0.3);
         }
 
-        .divider span {
-            padding: 0 12px;
-            color: #94A3B8;
-        }
-
-        .btn-secondary-signup {
-            width: 100%;
-            background-color: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            color: #334155;
-            font-size: 14px;
+        .divider-row span {
+            padding: 0 16px;
+            font-size: 11px;
             font-weight: 700;
-            padding: 14px;
-            border-radius: 14px;
-            text-decoration: none;
-            text-align: center;
+            color: #475569;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        /* ===== SECONDARY BUTTON ===== */
+        .btn-signup {
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: all 0.2s ease;
+            padding: 15px;
+            border-radius: 14px;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            background: rgba(30, 41, 59, 0.3);
+            color: #CBD5E1;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .btn-secondary-signup:hover {
-            background-color: #F8FAFC;
-            border-color: #CBD5E1;
-            color: #0F172A;
+        .btn-signup:hover {
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(100, 116, 139, 0.4);
+            color: #F1F5F9;
         }
 
-        .footer-security {
-            margin-top: 24px;
+        /* ===== FOOTER ===== */
+        .card-footer {
             text-align: center;
-            font-size: 12px;
-            color: #94A3B8;
+            margin-top: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
+            font-size: 12px;
+            color: #475569;
+            font-weight: 500;
         }
 
-        /* RESPONSIVE DESIGN */
-        @media (max-width: 992px) {
-            .login-card {
-                flex-direction: column;
-                max-width: 520px;
+        /* ===== BOTTOM TEXT ===== */
+        .bottom-text {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 12px;
+            color: rgba(100, 116, 139, 0.5);
+            font-weight: 400;
+            animation: fadeIn 1s ease 0.6s forwards;
+            opacity: 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 540px) {
+            .glass-card {
+                padding: 32px 24px;
+                border-radius: 20px;
             }
-            .hero-panel, .form-panel {
-                width: 100%;
+            .card-header h1 {
+                font-size: 22px;
             }
-            .hero-panel {
-                padding: 36px 28px;
-            }
-            .form-panel {
-                padding: 36px 28px;
+            .login-container {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <!-- LEFT HERO PANEL -->
-        <div class="hero-panel">
-            <div>
-                <div class="badge-group">
-                    <span class="pill-badge"><span class="dot-yellow"></span> LOEWIX SALES • INTERNAL PLATFORM</span>
-                    <span class="pill-badge pill-badge-sub">PLATFORM MANAJEMEN TIM</span>
+    <!-- Animated Background -->
+    <div class="bg-layer"></div>
+    <div class="grid-overlay"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Main Content -->
+    <div class="login-wrapper">
+        <div class="login-container">
+
+            <!-- Logo -->
+            <div class="logo-section">
+                <img src="assets/images/loewix_sales_logo.png" alt="Loewix Sales">
+                <div class="logo-tagline">Sales Management Platform</div>
+            </div>
+
+            <!-- Glass Card -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <h1>Selamat Datang 👋</h1>
+                    <p>Masukkan kredensial Anda untuk mengakses dashboard</p>
                 </div>
 
-                <h1 class="hero-title">
-                    Satu Tempat<br>untuk <span class="highlight">Semua</span><br>Kendali Tim.
-                </h1>
+                <?php if($error): ?>
+                    <div class="alert-error">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                        </svg>
+                        <?php echo htmlspecialchars($error); ?>
+                    </div>
+                <?php endif; ?>
 
-                <p class="hero-subtitle">
-                    Dashboard terpadu untuk memantau target penjualan, absensi, progress divisi, dan koordinasi tim Loewix Sales secara real-time.
-                </p>
+                <form action="login.php" method="POST" autocomplete="on">
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <div class="input-wrapper">
+                            <input type="email" class="form-input" id="email" name="email" placeholder="nama@loewix.com" required autocomplete="email">
+                            <div class="input-icon">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="feature-chips">
-                    <span class="chip">📈 Target & Sales</span>
-                    <span class="chip">👥 Kolaborasi Tim</span>
-                    <span class="chip">📋 Absensi</span>
-                    <span class="chip">🔔 Notifikasi</span>
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" class="form-input" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <div class="input-icon">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </div>
+                            <button type="button" class="btn-eye" id="togglePassword" aria-label="Toggle password">
+                                <svg id="eyeIcon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Options Row -->
+                    <div class="options-row">
+                        <label class="remember-label">
+                            <input type="checkbox" class="custom-checkbox" name="remember" checked>
+                            Ingat saya
+                        </label>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn-login" id="btnLogin">
+                        <span>Masuk ke Dashboard</span>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="divider-row">
+                    <span>atau</span>
                 </div>
 
-                <!-- PREVIEW DASHBOARD WIDGET -->
-                <div class="preview-widget">
-                    <div class="widget-header">
-                        <span class="dot-control" style="background:#EF4444;"></span>
-                        <span class="dot-control" style="background:#F59E0B;"></span>
-                        <span class="dot-control" style="background:#10B981;"></span>
-                        <span style="margin-left: 6px;">Loewix Sales - Dashboard Overview</span>
-                    </div>
+                <!-- Signup Link -->
+                <a href="signup.php" class="btn-signup">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    Buat Akun Baru
+                </a>
 
-                    <div class="widget-stats">
-                        <div class="stat-box">
-                            <div class="stat-label">TARGET BULAN INI</div>
-                            <div class="stat-val">87% <span class="badge-inc">↑ +12%</span></div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">ANGGOTA AKTIF</div>
-                            <div class="stat-val">24 <span class="badge-online">• Online</span></div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">TUGAS SELESAI</div>
-                            <div class="stat-val">142 <span class="badge-inc">↑ +8%</span></div>
-                        </div>
-                    </div>
-
-                    <div style="font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;">AKTIVITAS MINGGU INI</div>
-                    <div class="chart-mini">
-                        <div class="bar" style="height: 40%;"></div>
-                        <div class="bar" style="height: 65%;"></div>
-                        <div class="bar active" style="height: 100%;"></div>
-                        <div class="bar active" style="height: 85%;"></div>
-                        <div class="bar" style="height: 50%;"></div>
-                        <div class="bar active" style="height: 90%;"></div>
-                        <div class="bar" style="height: 30%;"></div>
-                    </div>
+                <!-- Security Footer -->
+                <div class="card-footer">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    Dilindungi enkripsi end-to-end
                 </div>
             </div>
 
-            <div class="hero-footer">
+            <!-- Bottom -->
+            <div class="bottom-text">
                 © 2026 Loewix Sales. All rights reserved.
             </div>
-        </div>
 
-        <!-- RIGHT FORM PANEL -->
-        <div class="form-panel">
-            <div class="logo-container">
-                <img src="assets/images/loewix_sales_logo.png" alt="Loewix Sales" class="logo-img">
-            </div>
-
-            <div class="welcome-text">Selamat datang kembali 👋</div>
-            <h2 class="form-title">Masuk ke Akun Kamu</h2>
-            <p class="form-subtitle">Masukkan email & password untuk melanjutkan</p>
-
-            <?php if($error): ?>
-                <div class="alert alert-danger border-0 rounded-4 mb-4 py-3 px-3" style="background-color: #FEF2F2; color: #991B1B; font-size: 13.5px; font-weight: 600;">
-                    ⚠️ <?php echo htmlspecialchars($error); ?>
-                </div>
-            <?php endif; ?>
-
-            <form action="login.php" method="POST">
-                <div class="input-group-custom">
-                    <label for="email" class="input-label">EMAIL ADDRESS</label>
-                    <input type="email" class="custom-input" id="email" name="email" placeholder="wahyuwutomo31@gmail.com" required autocomplete="email">
-                </div>
-
-                <div class="input-group-custom">
-                    <label for="password" class="input-label">PASSWORD</label>
-                    <div class="password-wrapper">
-                        <input type="password" class="custom-input" id="password" name="password" placeholder="••••••••••••" required autocomplete="current-password">
-                        <button type="button" class="btn-eye" id="togglePassword" aria-label="Toggle password visibility">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="remember-row">
-                    <label class="d-flex align-items-center gap-2 cursor-pointer">
-                        <input type="checkbox" name="remember" id="remember" checked>
-                        <span>Ingat saya selama 30 hari</span>
-                    </label>
-                </div>
-
-                <button type="submit" class="btn-submit">
-                    Masuk ke Dashboard <span style="font-size: 18px;">→</span>
-                </button>
-            </form>
-
-            <div class="divider">
-                <span>ATAU</span>
-            </div>
-
-            <a href="signup.php" class="btn-secondary-signup">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                </svg>
-                Buat Akun Baru
-            </a>
-
-            <div class="footer-security">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-                Dilindungi sistem keamanan Loewix Sales
-            </div>
         </div>
     </div>
 
     <script>
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
+        // Toggle password visibility
+        const toggle = document.getElementById('togglePassword');
+        const pwInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
 
-        togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
+        toggle.addEventListener('click', () => {
+            const isPassword = pwInput.type === 'password';
+            pwInput.type = isPassword ? 'text' : 'password';
             
-            // Toggle eye icon style
-            this.style.opacity = type === 'text' ? '1' : '0.6';
-            this.style.color = type === 'text' ? '#D97706' : '#94A3B8';
+            if (isPassword) {
+                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>';
+                toggle.style.color = '#38BDF8';
+            } else {
+                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+                toggle.style.color = '#475569';
+            }
+        });
+
+        // Add subtle parallax to orbs on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            document.querySelectorAll('.orb').forEach((orb, i) => {
+                const speed = (i + 1) * 0.5;
+                orb.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
         });
     </script>
 </body>
