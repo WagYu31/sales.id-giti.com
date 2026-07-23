@@ -202,11 +202,7 @@ $conn->close();
         }
 
         /* Logo for form panel */
-        .form-logo{
-            height:48px;
-            width:auto;
-            margin-bottom:32px;
-        }
+
 
         .form-greeting{
             font-size:13px;
@@ -493,7 +489,7 @@ $conn->close();
     <div class="form-panel">
         <div class="form-container">
 
-            <img src="assets/images/loewix_sales_logo.png?v=<?php echo time(); ?>" alt="Loewix Sales" class="form-logo">
+
 
             <div class="form-greeting">Selamat datang kembali</div>
             <h2 class="form-title">Masuk ke akun Anda</h2>
