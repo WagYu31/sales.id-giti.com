@@ -550,7 +550,7 @@ $conn->close();
 
             <!-- Logo -->
             <div class="logo-section">
-                <img src="assets/images/loewix_sales_logo.png" alt="Loewix Sales">
+                <img src="assets/images/loewix_sales_logo.png?v=<?php echo time(); ?>" alt="Loewix Sales">
                 <div class="logo-tagline">Sales Management Platform</div>
             </div>
 
