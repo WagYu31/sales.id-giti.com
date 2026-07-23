@@ -64,8 +64,8 @@ $conn->close();
         :root {
             --bg-page: #F4F4F6;
             --bg-card-left: #FAF7F2;
-            --primary-amber: #F59E0B;
-            --primary-amber-hover: #D97706;
+            --primary-amber: #E68A00;
+            --primary-amber-gradient: linear-gradient(135deg, #E68A00 0%, #CC7A00 100%);
             --text-dark: #0F172A;
             --text-muted: #64748B;
             --border-color: #E2E8F0;
@@ -79,16 +79,16 @@ $conn->close();
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 24px 16px;
+            padding: 30px 20px;
             margin: 0;
         }
 
         .login-card {
             width: 100%;
-            max-width: 1120px;
+            max-width: 1140px;
             background: #FFFFFF;
             border-radius: 28px;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.07), 0 0 1px 1px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(0, 0, 0, 0.03);
             overflow: hidden;
             display: flex;
             flex-direction: row;
@@ -96,34 +96,34 @@ $conn->close();
 
         /* LEFT HERO PANEL */
         .hero-panel {
-            width: 52%;
+            width: 53%;
             background-color: var(--bg-card-left);
-            background-image: radial-gradient(#E2E8F0 1px, transparent 1px);
-            background-size: 20px 20px;
-            padding: 48px 44px;
+            background-image: radial-gradient(#E2E8F0 1.2px, transparent 1.2px);
+            background-size: 22px 22px;
+            padding: 52px 48px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border-right: 1px solid rgba(226, 232, 240, 0.8);
+            border-right: 1px solid rgba(226, 232, 240, 0.9);
             position: relative;
         }
 
         .badge-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 24px;
             flex-wrap: wrap;
         }
 
         .pill-badge {
             background-color: #FEF3C7;
-            color: #B45309;
+            color: #92400E;
             font-size: 11px;
             font-weight: 700;
             padding: 6px 14px;
             border-radius: 9999px;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             text-transform: uppercase;
             display: inline-flex;
             align-items: center;
@@ -144,20 +144,20 @@ $conn->close();
         }
 
         .hero-title {
-            font-size: 2.35rem;
+            font-size: 2.45rem;
             font-weight: 800;
-            line-height: 1.25;
+            line-height: 1.22;
             color: #0F172A;
             margin-bottom: 16px;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.6px;
         }
 
         .hero-title .highlight {
-            color: var(--primary-amber);
+            color: #D97706;
         }
 
         .hero-subtitle {
-            font-size: 14px;
+            font-size: 14.5px;
             line-height: 1.65;
             color: var(--text-muted);
             margin-bottom: 28px;
@@ -190,8 +190,8 @@ $conn->close();
             background: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+            padding: 22px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
             margin-bottom: 24px;
         }
 
@@ -202,7 +202,7 @@ $conn->close();
             font-size: 12px;
             font-weight: 600;
             color: #94A3B8;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .dot-control {
@@ -215,7 +215,7 @@ $conn->close();
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .stat-box {
@@ -226,7 +226,7 @@ $conn->close();
         }
 
         .stat-label {
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 700;
             color: #94A3B8;
             letter-spacing: 0.5px;
@@ -235,12 +235,12 @@ $conn->close();
         }
 
         .stat-val {
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 800;
             color: #0F172A;
             display: flex;
             align-items: baseline;
-            gap: 6px;
+            gap: 5px;
         }
 
         .badge-inc {
@@ -259,19 +259,18 @@ $conn->close();
             display: flex;
             align-items: flex-end;
             gap: 8px;
-            height: 36px;
-            padding-top: 8px;
+            height: 38px;
+            padding-top: 6px;
         }
 
         .bar {
             flex: 1;
             background: #E2E8F0;
             border-radius: 6px;
-            transition: all 0.3s ease;
         }
 
         .bar.active {
-            background: var(--primary-amber);
+            background: #E68A00;
         }
 
         .hero-footer {
@@ -282,19 +281,21 @@ $conn->close();
 
         /* RIGHT FORM PANEL */
         .form-panel {
-            width: 48%;
-            padding: 48px 44px;
+            width: 47%;
+            padding: 52px 48px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
         .logo-container {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
         }
 
         .logo-img {
-            max-height: 55px;
+            height: 60px;
             width: auto;
             object-fit: contain;
         }
@@ -307,11 +308,11 @@ $conn->close();
         }
 
         .form-title {
-            font-size: 1.65rem;
+            font-size: 1.7rem;
             font-weight: 800;
             color: #0F172A;
             margin-bottom: 6px;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.4px;
         }
 
         .form-subtitle {
@@ -349,8 +350,8 @@ $conn->close();
 
         .custom-input:focus {
             background-color: #FFFFFF;
-            border-color: var(--primary-amber);
-            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+            border-color: #D97706;
+            box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15);
         }
 
         .password-wrapper {
@@ -386,16 +387,16 @@ $conn->close();
         }
 
         .remember-row input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--primary-amber);
+            width: 17px;
+            height: 17px;
+            accent-color: #D97706;
             border-radius: 4px;
             cursor: pointer;
         }
 
         .btn-submit {
             width: 100%;
-            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            background: var(--primary-amber-gradient);
             color: #FFFFFF;
             font-size: 15px;
             font-weight: 700;
@@ -403,7 +404,7 @@ $conn->close();
             border-radius: 14px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.35);
+            box-shadow: 0 10px 20px -4px rgba(230, 138, 0, 0.35);
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
@@ -413,8 +414,7 @@ $conn->close();
 
         .btn-submit:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 24px -5px rgba(245, 158, 11, 0.45);
-            background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+            box-shadow: 0 14px 24px -4px rgba(230, 138, 0, 0.45);
         }
 
         .divider {
@@ -636,7 +636,7 @@ $conn->close();
             
             // Toggle eye icon style
             this.style.opacity = type === 'text' ? '1' : '0.6';
-            this.style.color = type === 'text' ? '#F59E0B' : '#94A3B8';
+            this.style.color = type === 'text' ? '#D97706' : '#94A3B8';
         });
     </script>
 </body>
