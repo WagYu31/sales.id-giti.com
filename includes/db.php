@@ -1,6 +1,7 @@
 <?php
 
-$is_local = (in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1']) || php_sapi_name() === 'cli');
+$host_only = explode(':', $_SERVER['HTTP_HOST'] ?? '')[0];
+$is_local = (in_array($host_only, ['localhost', '127.0.0.1']) || php_sapi_name() === 'cli');
 
 if ($is_local) {
     $host = 'localhost';
