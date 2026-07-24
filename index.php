@@ -263,13 +263,7 @@ if ($_SESSION['role'] !== 'sales') {
 
 <div class="card border-0 shadow-sm" style="border-radius:20px;">
     <div class="card-body p-0">
-        <div id="table-loading-spinner" class="text-center p-5">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <h5 class="mt-3 text-muted">Memuat data customer...</h5>
-        </div>
-        <div class="table-responsive" id="customer-table-container" style="display: none;">
+        <div class="table-responsive" id="customer-table-container">
             <table class="table table-hover align-middle sortable-table mb-0">
                 <thead class="table-dark-header">
                     <tr>
@@ -420,14 +414,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-window.onload = function() {
-    const loader = document.getElementById('table-loading-spinner');
-    const tableContainer = document.getElementById('customer-table-container');
-
-    if (loader && tableContainer) {
-        loader.style.display = 'none';
-        tableContainer.style.display = 'block';
-    }
-};
 </script>
