@@ -184,10 +184,44 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
     box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
 }
 
+.respon-fu {
+    background: linear-gradient(135deg, #4338CA 0%, #6366F1 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+.respon-info {
+    background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+}
+
 .respon-default {
-    background: #F1F5F9;
-    color: #475569;
-    border: 1px solid #E2E8F0;
+    background: linear-gradient(135deg, #475569 0%, #64748B 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.25);
+}
+
+.table-dark-header, .table-dark-header tr, .table-dark-header th {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;
+    color: #FFFFFF !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 15px 18px !important;
+    border: none !important;
+}
+
+.table-dark-header a {
+    color: #93C5FD !important;
+    text-decoration: none !important;
+    font-weight: 700;
+}
+
+.table-dark-header a:hover {
+    color: #FFFFFF !important;
 }
 
 .inv-badge {
@@ -313,7 +347,7 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle">
-                <thead>
+                <thead class="table-dark-header">
                     <tr>
                         <th style="width: 12%;"><?php echo create_sort_link('tgl_follow_up', 'Tanggal', $sort_by, $sort_dir, $base_link_params); ?></th>
                         <th style="width: 22%;"><?php echo create_sort_link('nama_toko', 'Customer', $sort_by, $sort_dir, $base_link_params); ?></th>
@@ -368,6 +402,7 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
                                     $respon = htmlspecialchars($fu['respon']);
                                     $pillClass = 'respon-default';
                                     $icon = 'bi-chat-text-fill';
+                                    $responLower = strtolower($respon);
                                     if(in_array($respon, ['Tidak ada respon', 'Tidak tertarik'])) {
                                         $pillClass = 'respon-no'; $icon = 'bi-x-circle-fill';
                                     } elseif($respon == 'Hanya bertanya') {
@@ -376,6 +411,10 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
                                         $pillClass = 'respon-beli'; $icon = 'bi-arrow-up-right-circle-fill';
                                     } elseif($respon == 'Deal untuk beli') {
                                         $pillClass = 'respon-deal'; $icon = 'bi-check-all';
+                                    } elseif($respon == 'Follow Up') {
+                                        $pillClass = 'respon-fu'; $icon = 'bi-arrow-repeat';
+                                    } elseif(str_contains($responLower, 'informasi') || str_contains($responLower, 'menginformasikan')) {
+                                        $pillClass = 'respon-info'; $icon = 'bi-info-circle-fill';
                                     }
                                     ?>
                                     <span class="respon-pill <?php echo $pillClass; ?>">
