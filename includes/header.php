@@ -4,6 +4,26 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 $userInitials = strtoupper(substr($_SESSION['nama_lengkap'] ?? 'U', 0, 2));
 $userName = htmlspecialchars($_SESSION['nama_lengkap'] ?? 'User');
 $userRole = $_SESSION['role'] ?? '';
+
+// Live Notifications Calculation
+$notif_pending_fu = 0;
+$notif_kandidat = 0;
+$notif_maintenance = 0;
+
+if (isset($conn) && isset($_SESSION['user_id'])) {
+    $n_sales_where = ($_SESSION['role'] === 'sales') ? " AND sales_id = " . intval($_SESSION['user_id']) : "";
+    
+    $rn1 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE status_fu = 'Pending' AND deleted_at IS NULL {$n_sales_where}");
+    if ($rn1) $notif_pending_fu = $rn1->fetch_assoc()['t'] ?? 0;
+    
+    $rn2 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE kandidat = 'Y' AND deleted_at IS NULL {$n_sales_where}");
+    if ($rn2) $notif_kandidat = $rn2->fetch_assoc()['t'] ?? 0;
+
+    $rn3 = $conn->query("SELECT tlp_pic FROM customer_pics WHERE deleted_at IS NULL AND tlp_pic != '' GROUP BY tlp_pic HAVING COUNT(id) > 1");
+    if ($rn3) $notif_maintenance = $rn3->num_rows;
+}
+
+$total_notif_count = $notif_pending_fu + $notif_kandidat + $notif_maintenance;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -515,10 +535,77 @@ table tr td { font-size: 0.85em; }
             <span class="topbar-time" id="liveTime">--:--</span>
         </div>
         <div class="topbar-actions">
-            <button class="topbar-btn" title="Notifikasi">
-                <i class="bi bi-bell"></i>
-                <span class="notif-dot"></span>
-            </button>
+            <!-- Notification Dropdown -->
+            <div class="dropdown">
+                <button class="topbar-btn dropdown-toggle border-0" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi Sistem" style="outline:none;">
+                    <i class="bi bi-bell-fill text-warning"></i>
+                    <?php if ($total_notif_count > 0): ?>
+                        <span class="notif-dot"></span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:10px; padding:3px 6px;">
+                            <?php echo $total_notif_count; ?>
+                        </span>
+                    <?php endif; ?>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="notifDropdown" style="width: 320px; border-radius: 16px; border: 1px solid #E2E8F0; padding: 0; overflow: hidden; margin-top: 10px;">
+                    <li class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold" style="font-size:14px; font-family:'Plus Jakarta Sans', sans-serif;"><i class="bi bi-bell-fill me-2 text-warning"></i>Notifikasi System</span>
+                        <span class="badge bg-primary rounded-pill"><?php echo $total_notif_count; ?> Baru</span>
+                    </li>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <?php if ($notif_pending_fu > 0): ?>
+                        <li>
+                            <a class="dropdown-item p-3 border-bottom d-flex align-items-start gap-3" href="followup_report.php" style="white-space: normal;">
+                                <div class="bg-warning-subtle text-warning p-2 rounded-circle flex-shrink-0" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="bi bi-clock-history fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size:13px;">Follow Up Pending</div>
+                                    <div class="small text-muted"><?php echo $notif_pending_fu; ?> Customer butuh tindak lanjut follow up.</div>
+                                </div>
+                            </a>
+                        </li>
+                        <?php endif; ?>
+
+                        <?php if ($notif_kandidat > 0): ?>
+                        <li>
+                            <a class="dropdown-item p-3 border-bottom d-flex align-items-start gap-3" href="kandidat_customer.php" style="white-space: normal;">
+                                <div class="bg-primary-subtle text-primary p-2 rounded-circle flex-shrink-0" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="bi bi-star-fill fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size:13px;">Kandidat Potensial</div>
+                                    <div class="small text-muted"><?php echo $notif_kandidat; ?> Customer kandidat perlu ditinjau.</div>
+                                </div>
+                            </a>
+                        </li>
+                        <?php endif; ?>
+
+                        <?php if ($notif_maintenance > 0): ?>
+                        <li>
+                            <a class="dropdown-item p-3 border-bottom d-flex align-items-start gap-3" href="customer_maintenance.php" style="white-space: normal;">
+                                <div class="bg-danger-subtle text-danger p-2 rounded-circle flex-shrink-0" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="bi bi-tools fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size:13px;">Perbaikan Data</div>
+                                    <div class="small text-muted"><?php echo $notif_maintenance; ?> Nomor duplikat/salah format terdeteksi.</div>
+                                </div>
+                            </a>
+                        </li>
+                        <?php endif; ?>
+
+                        <?php if ($total_notif_count == 0): ?>
+                        <li class="p-4 text-center text-muted">
+                            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                            <div class="small mt-2 fw-semibold">Tidak ada notifikasi baru saat ini</div>
+                        </li>
+                        <?php endif; ?>
+                    </div>
+                    <li class="p-2 bg-light text-center border-top">
+                        <a href="customer_management.php" class="small fw-bold text-primary text-decoration-none">Lihat Dashboard Utama →</a>
+                    </li>
+                </ul>
+            </div>
             <div class="dropdown">
                 <a class="topbar-user dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="text-decoration:none;">
                     <div class="topbar-user-avatar"><?php echo $userInitials; ?></div>
