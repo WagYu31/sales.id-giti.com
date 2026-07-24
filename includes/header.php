@@ -50,7 +50,8 @@ table tr td { font-size: 0.85em; }
 .sidebar-logo {
     padding: 28px 24px 24px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
-    text-align: center;
+    text-align: left;
+    padding-left: 28px;
     position: relative;
 }
 
