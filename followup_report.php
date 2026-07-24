@@ -152,12 +152,13 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
 .respon-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 30px;
-    font-size: 12px;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
     font-weight: 700;
     font-family: 'Plus Jakarta Sans', sans-serif;
+    white-space: nowrap;
 }
 
 .respon-deal {
@@ -413,22 +414,29 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
                                     $pillClass = 'respon-default';
                                     $icon = 'bi-chat-text-fill';
                                     $responLower = strtolower($respon);
+                                    $display_respon = $respon;
+
                                     if(in_array($respon, ['Tidak ada respon', 'Tidak tertarik'])) {
                                         $pillClass = 'respon-no'; $icon = 'bi-x-circle-fill';
+                                        $display_respon = ($respon === 'Tidak ada respon') ? 'No Respon' : 'Tidak Tertarik';
                                     } elseif($respon == 'Hanya bertanya') {
                                         $pillClass = 'respon-tanya'; $icon = 'bi-question-circle-fill';
+                                        $display_respon = 'Tanya Produk';
                                     } elseif($respon == 'Muncul keinginan membeli') {
                                         $pillClass = 'respon-beli'; $icon = 'bi-arrow-up-right-circle-fill';
+                                        $display_respon = 'Potensi Beli';
                                     } elseif($respon == 'Deal untuk beli') {
                                         $pillClass = 'respon-deal'; $icon = 'bi-check-all';
+                                        $display_respon = 'Deal / Beli';
                                     } elseif($respon == 'Follow Up') {
                                         $pillClass = 'respon-fu'; $icon = 'bi-arrow-repeat';
                                     } elseif(str_contains($responLower, 'informasi') || str_contains($responLower, 'menginformasikan')) {
                                         $pillClass = 'respon-info'; $icon = 'bi-info-circle-fill';
+                                        $display_respon = 'Info Customer';
                                     }
                                     ?>
-                                    <span class="respon-pill <?php echo $pillClass; ?>" style="white-space:normal; max-width:180px; line-height:1.3;">
-                                        <i class="bi <?php echo $icon; ?>"></i> <?php echo $respon; ?>
+                                    <span class="respon-pill <?php echo $pillClass; ?>" title="<?php echo $respon; ?>">
+                                        <i class="bi <?php echo $icon; ?>"></i> <?php echo $display_respon; ?>
                                     </span>
                                     <?php if ($fu['no_inv']): ?>
                                         <div class="inv-badge mt-1"><i class="bi bi-receipt"></i> <?php echo htmlspecialchars($fu['no_inv']); ?></div>
