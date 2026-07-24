@@ -189,7 +189,7 @@ if ($_SESSION['role'] !== 'sales') {
         </div>
         <div class="mt-3 mt-md-0">
             <a href="customer_add.php" class="btn btn-light text-dark fw-extrabold shadow-lg px-4 py-2.5 rounded-pill d-inline-flex align-items-center gap-2" style="font-weight:800; background:#FFFFFF; border:none; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
-                <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle" style="width:26px; height:26px;"><i class="bi bi-plus-lg fs-6"></i></span>
+                <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle fw-bold" style="width:26px; height:26px; font-size:18px; line-height:1;">+</span>
                 <span>Tambah Customer Baru</span>
             </a>
         </div>
@@ -236,7 +236,7 @@ if ($_SESSION['role'] !== 'sales') {
                 <i class="bi bi-person-badge-fill text-info me-1"></i> Filter Sales
             </label>
             <select name="filter_sales" id="filter_sales" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
-                <option value="0">Semua Sales</option>
+                <option value="">Semua Sales</option>
                 <?php foreach ($all_sales as $s): ?>
                     <option value="<?php echo $s['id']; ?>" <?php if ($filter_sales === intval($s['id'])) echo 'selected'; ?>>
                         👤 <?php echo htmlspecialchars($s['nama_lengkap']); ?>
