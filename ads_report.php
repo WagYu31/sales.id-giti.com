@@ -114,18 +114,18 @@ $total_omzet_real = (float)($conn->query("SELECT SUM(total_amount) FROM sales_re
     <div class="col-md-5">
         <div class="row g-2 h-100">
             <div class="col-6">
-                <div class="card bg-success text-white h-100 border-0 shadow-sm" style="border-radius:16px;">
+                <div class="card h-100 shadow-sm" style="background: linear-gradient(135deg, #047857 0%, #10B981 100%); color: #FFFFFF !important; border-radius:16px; border:none;">
                     <div class="card-body p-3 text-center d-flex flex-column justify-content-center">
-                        <span class="small text-uppercase fw-bold opacity-85">Omzet (<?php echo $label_filter; ?>)</span>
-                        <h5 class="fw-extrabold mb-0 mt-1" style="font-family:'Plus Jakarta Sans', sans-serif;">Rp <?php echo number_format($total_omzet_real, 0, ',', '.'); ?></h5>
+                        <span class="small text-uppercase fw-bold" style="opacity:0.9; font-size:11px; letter-spacing:0.5px;">Omzet (<?php echo $label_filter; ?>)</span>
+                        <h4 class="fw-extrabold mb-0 mt-1" style="font-family:'Plus Jakarta Sans', sans-serif; color:#FFFFFF !important; font-size:18px;">Rp <?php echo number_format($total_omzet_real, 0, ',', '.'); ?></h4>
                     </div>
                 </div>
             </div>
             <div class="col-6">
-                <div class="card bg-primary text-white h-100 border-0 shadow-sm" style="border-radius:16px;">
+                <div class="card h-100 shadow-sm" style="background: linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%); color: #FFFFFF !important; border-radius:16px; border:none;">
                     <div class="card-body p-3 text-center d-flex flex-column justify-content-center">
-                        <span class="small text-uppercase fw-bold opacity-85">Top-Up (<?php echo $label_filter; ?>)</span>
-                        <h5 class="fw-extrabold mb-0 mt-1" style="font-family:'Plus Jakarta Sans', sans-serif;">Rp <?php echo number_format($tot_topup, 0, ',', '.'); ?></h5>
+                        <span class="small text-uppercase fw-bold" style="opacity:0.9; font-size:11px; letter-spacing:0.5px;">Top-Up (<?php echo $label_filter; ?>)</span>
+                        <h4 class="fw-extrabold mb-0 mt-1" style="font-family:'Plus Jakarta Sans', sans-serif; color:#FFFFFF !important; font-size:18px;">Rp <?php echo number_format($tot_topup, 0, ',', '.'); ?></h4>
                     </div>
                 </div>
             </div>
