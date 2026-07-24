@@ -388,29 +388,35 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
 </div>
 
 <!-- Table Header Actions & Limit Select Toolbar -->
-<div class="card border-0 shadow-sm mb-3" style="border-radius:14px; background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%); border: 1.5px solid #DBEAFE !important;">
-    <div class="card-body py-2.5 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-primary text-white fw-bold d-inline-flex align-items-center gap-1" style="font-size:11px; padding:6px 10px; border-radius:8px;">
-                <i class="bi bi-layers-fill"></i> TAMPILKAN
+<div class="card border-0 shadow-sm mb-3" style="border-radius:16px; background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%); border: 2px solid #BFDBFE !important;">
+    <div class="card-body py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex align-items-center gap-2.5">
+            <span class="badge bg-primary text-white fw-extrabold d-inline-flex align-items-center gap-1.5 shadow-sm" style="font-size:13px; padding:9px 14px; border-radius:10px; letter-spacing:0.5px;">
+                <i class="bi bi-layers-fill fs-6"></i> TAMPILKAN
             </span>
-            <select id="limit-select" class="form-select form-select-sm fw-bold border-primary-subtle text-primary shadow-2sm" style="width: 90px; border-radius:10px; padding:5px 12px; font-size:13px; background-color:#FFFFFF;">
+            <select id="limit-select" class="form-select fw-extrabold border-primary text-primary shadow-sm" style="width: 105px; border-radius:12px; padding:8px 16px; font-size:15px; background-color:#FFFFFF; border-width:2px;">
                 <option value="20" <?php if ($limit == '20') echo 'selected'; ?>>20</option>
                 <option value="40" <?php if ($limit == '40') echo 'selected'; ?>>40</option>
                 <option value="60" <?php if ($limit == '60') echo 'selected'; ?>>60</option>
                 <option value="80" <?php if ($limit == '80') echo 'selected'; ?>>80</option>
                 <option value="100" <?php if ($limit == '100') echo 'selected'; ?>>100</option>
             </select>
-            <span class="text-muted small fw-semibold">entri per halaman</span>
+            <span class="text-dark fw-bold" style="font-size:14px;">entri per halaman</span>
         </div>
 
         <div class="d-flex align-items-center gap-2">
-            <div class="badge shadow-2sm d-inline-flex align-items-center gap-1.5" style="background:#FFFFFF; color:#1E3A8A; border:1px solid #BFDBFE; font-size:12.5px; font-weight:700; padding:7px 14px; border-radius:20px;">
-                <i class="bi bi-card-text text-primary"></i> 
+            <div class="shadow-sm d-inline-flex align-items-center gap-2" style="background:#FFFFFF; color:#0F172A; border:2px solid #93C5FD; font-size:15px; font-weight:800; padding:9px 22px; border-radius:30px; font-family:'Plus Jakarta Sans', sans-serif;">
+                <i class="bi bi-card-text text-primary fs-5"></i> 
                 <?php if ($limit != 'all' && $total_records > 0): ?>
-                    Menampilkan <span class="text-primary fw-extrabold" style="font-size:13px;"><?php echo number_format($offset + 1); ?> - <?php echo number_format(min($offset + $limit, $total_records)); ?></span> dari <span class="text-dark fw-extrabold" style="font-size:13px;"><?php echo number_format($total_records); ?></span> data
+                    <span>Menampilkan</span> 
+                    <span class="badge bg-primary text-white px-2.5 py-1 fw-extrabold" style="font-size:15px; border-radius:8px;"><?php echo number_format($offset + 1); ?> - <?php echo number_format(min($offset + $limit, $total_records)); ?></span> 
+                    <span>dari</span> 
+                    <span class="badge bg-dark text-white px-2.5 py-1 fw-extrabold" style="font-size:15px; border-radius:8px;"><?php echo number_format($total_records); ?></span> 
+                    <span>data</span>
                 <?php elseif ($total_records > 0): ?>
-                    Menampilkan semua <span class="text-primary fw-extrabold" style="font-size:13px;"><?php echo number_format($total_records); ?></span> data
+                    <span>Menampilkan semua</span> 
+                    <span class="badge bg-primary text-white px-2.5 py-1 fw-extrabold" style="font-size:15px; border-radius:8px;"><?php echo number_format($total_records); ?></span> 
+                    <span>data</span>
                 <?php endif; ?>
             </div>
         </div>
