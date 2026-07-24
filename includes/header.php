@@ -54,8 +54,6 @@ table tr td { font-size: 0.85em; }
 .sidebar-logo img {
     height: 52px;
     width: auto;
-    filter: grayscale(1) invert(1);
-    mix-blend-mode: screen;
 }
 
 .sidebar-nav {
@@ -345,7 +343,7 @@ table tr td { font-size: 0.85em; }
 <!-- ===== SIDEBAR ===== -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-        <img src="assets/images/loewix_sales_logo.png" alt="Loewix Sales">
+        <img src="assets/images/loewix_sales_logo_white.png" alt="Loewix Sales">
     </div>
 
     <nav class="sidebar-nav">

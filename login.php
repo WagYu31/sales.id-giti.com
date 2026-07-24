@@ -93,8 +93,6 @@ $conn->close();
 
         .hero-logo-img{
             height:56px;width:auto;
-            filter:grayscale(1) invert(1);
-            mix-blend-mode:screen;
         }
 
         .hero-headline{
@@ -341,7 +339,7 @@ $conn->close();
 
     <div class="hero-content">
         <div class="hero-logo">
-            <img src="assets/images/loewix_sales_logo.png?v=<?php echo time(); ?>" alt="Loewix Sales" class="hero-logo-img">
+            <img src="assets/images/loewix_sales_logo_white.png?v=<?php echo time(); ?>" alt="Loewix Sales" class="hero-logo-img">
         </div>
 
         <h1 class="hero-headline">
