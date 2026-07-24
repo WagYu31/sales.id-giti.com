@@ -16,12 +16,28 @@
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('.sortable-table').DataTable({
-        "order": [],
-        "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json"
-        }
-    });
+    if ($('.sortable-table').length) {
+        $('.sortable-table').DataTable({
+            "order": [],
+            "deferRender": true,
+            "pageLength": 25,
+            "language": {
+                "sProcessing":   "Sedang memproses...",
+                "sLengthMenu":   "Tampilkan _MENU_ entri",
+                "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+                "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                "sSearch":       "Cari:",
+                "oPaginate": {
+                    "sFirst":    "Pertama",
+                    "sPrevious": "Sebelumnya",
+                    "sNext":     "Selanjutnya",
+                    "sLast":     "Terakhir"
+                }
+            }
+        });
+    }
 });
 </script>
 </body>
