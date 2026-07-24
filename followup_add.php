@@ -8,6 +8,8 @@ if (!isset($_GET['customer_id'])) {
 $customer_id = $_GET['customer_id'];
 $error = '';
 
+$is_sales = ($_SESSION['role'] === 'sales');
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $respon_radio = $_POST['respon_radio'] ?? '';
     $respon_lainnya = trim($_POST['respon_lainnya'] ?? '');
@@ -19,7 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (empty($error)) {
-        $tgl_follow_up = $_POST['tgl_follow_up'];
+        // Jika role sales, PAKSA tanggal & waktu realtime dari server (tidak bisa diubah DevTools/form)
+        if ($is_sales) {
+            $tgl_follow_up = date('Y-m-d H:i:s');
+        } else {
+            $tgl_follow_up = $_POST['tgl_follow_up'] ?? date('Y-m-d H:i:s');
+        }
+
         $keterangan = $_POST['keterangan'];
         $no_inv = $_POST['no_inv'];
         $sales_id_fu = $_SESSION['user_id'];
@@ -106,66 +114,134 @@ require_once 'includes/header.php';
 $file_accept_types = "image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx";
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1><i class="bi bi-chat-left-dots-fill"></i> Tambah Follow Up</h1>
-        <h5 class="text-muted">Untuk Customer: <?php echo htmlspecialchars($customer['nama_toko']); ?></h5>
+<style>
+.fu-hero {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%);
+    border-radius: 20px;
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.4);
+}
+
+.fu-hero-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.fu-hero-subtitle {
+    font-size: 14px;
+    color: rgba(226, 232, 240, 0.85);
+    margin: 0;
+}
+</style>
+
+<!-- Hero Header -->
+<div class="fu-hero">
+    <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
+                <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
+                <span>›</span>
+                <a href="followup_view.php?customer_id=<?php echo $customer_id; ?>" style="color:inherit; text-decoration:none;">Follow Up</a>
+                <span>›</span>
+                <span>Tambah Follow Up</span>
+            </div>
+            <h1 class="fu-hero-title">Tambah Follow Up Baru 💬</h1>
+            <p class="fu-hero-subtitle">Customer: <strong><?php echo htmlspecialchars($customer['nama_toko']); ?></strong></p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="followup_view.php?customer_id=<?php echo $customer_id; ?>" class="btn btn-light border fw-bold px-4">
+                Batal
+            </a>
+        </div>
     </div>
-    <a href="followup_view.php?customer_id=<?php echo $customer_id; ?>" class="btn btn-secondary">Batal</a>
 </div>
 
 <?php if ($error): ?>
-    <div class="alert alert-danger"><?php echo $error; ?></div>
+    <div class="alert alert-danger shadow-sm border-0 mb-4" style="border-radius:14px;"><?php echo $error; ?></div>
 <?php endif; ?>
 
-<div class="card">
-    <div class="card-body">
+<div class="card border-0 shadow-sm" style="border-radius:20px;">
+    <div class="card-body p-4 p-md-5">
         <form action="followup_add.php?customer_id=<?php echo $customer_id; ?>" method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="tgl_follow_up" class="form-label">Tanggal & Waktu Follow Up</label>
-                <input type="datetime-local" class="form-control" id="tgl_follow_up" name="tgl_follow_up" value="<?php echo date('Y-m-d\TH:i'); ?>" required>
+            
+            <!-- Tanggal & Waktu Follow Up -->
+            <div class="mb-4">
+                <label for="tgl_follow_up" class="form-label fw-bold text-dark d-flex align-items-center justify-content-between">
+                    <span>Tanggal & Waktu Follow Up</span>
+                    <?php if ($is_sales): ?>
+                        <span class="badge bg-primary-subtle text-primary border border-primary fw-bold" style="font-size:11px;">
+                            🔒 Otomatis Terisi Realtime (Khusus Sales Tidak Dapat Diubah)
+                        </span>
+                    <?php endif; ?>
+                </label>
+                <?php if ($is_sales): ?>
+                    <input type="text" class="form-control bg-light fw-bold text-primary" value="<?php echo date('d/m/Y, H:i'); ?> WIB" readonly style="font-size:15px; cursor:not-allowed;">
+                    <input type="hidden" name="tgl_follow_up" value="<?php echo date('Y-m-d\TH:i'); ?>">
+                <?php else: ?>
+                    <input type="datetime-local" class="form-control" id="tgl_follow_up" name="tgl_follow_up" value="<?php echo date('Y-m-d\TH:i'); ?>" required>
+                <?php endif; ?>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Respon Customer</label>
-                <div>
-                    <div class="form-check"><input class="form-check-input" type="radio" name="respon_radio" id="respon1" value="Tidak ada respon" checked><label class="form-check-label" for="respon1">Tidak ada respon</label></div>
-                    <div class="form-check"><input class="form-check-input" type="radio" name="respon_radio" id="respon2" value="Tidak tertarik"><label class="form-check-label" for="respon2">Tidak tertarik</label></div>
-                    <div class="form-check"><input class="form-check-input" type="radio" name="respon_radio" id="respon3" value="Hanya bertanya"><label class="form-check-label" for="respon3">Hanya bertanya</label></div>
-                    <div class="form-check"><input class="form-check-input" type="radio" name="respon_radio" id="respon4" value="Muncul keinginan membeli"><label class="form-check-label" for="respon4">Muncul keinginan membeli</label></div>
-                    <div class="form-check"><input class="form-check-input" type="radio" name="respon_radio" id="respon5" value="Deal untuk beli"><label class="form-check-label" for="respon5">Deal untuk beli</label></div>
-                    <div class="form-check"><input class="form-check-input" type="radio" name="respon_radio" id="respon6" value="Lainnya"><label class="form-check-label" for="respon6">Lainnya</label></div>
+
+            <!-- Respon Customer -->
+            <div class="mb-4">
+                <label class="form-label fw-bold text-dark">Respon Customer <span class="text-danger">*</span></label>
+                <div class="p-3 bg-light rounded-4 border">
+                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon1" value="Tidak ada respon" checked><label class="form-check-label fw-semibold" for="respon1">Tidak ada respon</label></div>
+                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon2" value="Tidak tertarik"><label class="form-check-label fw-semibold" for="respon2">Tidak tertarik</label></div>
+                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon3" value="Hanya bertanya"><label class="form-check-label fw-semibold" for="respon3">Hanya bertanya</label></div>
+                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon4" value="Muncul keinginan membeli"><label class="form-check-label fw-semibold text-primary" for="respon4">Muncul keinginan membeli</label></div>
+                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon5" value="Deal untuk beli"><label class="form-check-label fw-bold text-success" for="respon5">🎉 Deal untuk beli</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="respon_radio" id="respon6" value="Lainnya"><label class="form-check-label fw-semibold" for="respon6">Lainnya</label></div>
                 </div>
             </div>
-            <div class="mb-3" id="respon_lainnya_container" style="display: none;">
-                <label for="respon_lainnya" class="form-label">Respon Lainnya</label>
-                <input type="text" class="form-control" id="respon_lainnya" name="respon_lainnya">
+
+            <div class="mb-4" id="respon_lainnya_container" style="display: none;">
+                <label for="respon_lainnya" class="form-label fw-bold text-dark">Respon Lainnya <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="respon_lainnya" name="respon_lainnya" placeholder="Tulis respon customer...">
             </div>
-            <div class="mb-3">
-                <label for="keterangan" class="form-label">Keterangan / Tindak Lanjut</label>
-                <textarea class="form-control" id="keterangan" name="keterangan" rows="3"></textarea>
+
+            <!-- Keterangan / Tindak Lanjut -->
+            <div class="mb-4">
+                <label for="keterangan" class="form-label fw-bold text-dark">Keterangan / Tindak Lanjut</label>
+                <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Masukkan detail pembicaraan atau rencana tindak lanjut..."></textarea>
             </div>
-            <div class="mb-3">
-                <label for="no_inv" class="form-label">Nomor Invoice (Opsional)</label>
+
+            <!-- Nomor Invoice -->
+            <div class="mb-4">
+                <label for="no_inv" class="form-label fw-bold text-dark">Nomor Invoice (Opsional)</label>
                 <input type="text" class="form-control" id="no_inv" name="no_inv" placeholder="Masukkan nomor invoice jika ada">
             </div>
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label for="media1" class="form-label">Media 1 <span class="text-danger">*</span></label>
+
+            <!-- Upload Media 1, 2, 3 -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <label for="media1" class="form-label fw-bold text-dark">Media 1 <span class="text-danger">*</span></label>
                     <input class="form-control" type="file" id="media1" name="media1" accept="<?php echo $file_accept_types; ?>" required>
-                    <small style="font-size:0.8em;" class="text-danger">*Max 10mb</small>
+                    <small style="font-size:11px;" class="text-danger fw-semibold">*Format Gambar/Video/Dokumen/Audio (Max 10MB)</small>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="media2" class="form-label">Media 2 (Opsional)</label>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <label for="media2" class="form-label fw-bold text-dark">Media 2 (Opsional)</label>
                     <input class="form-control" type="file" id="media2" name="media2" accept="<?php echo $file_accept_types; ?>">
-                    <small style="font-size:0.8em;" class="text-danger">*Max 10mb</small>
+                    <small style="font-size:11px;" class="text-muted">*Opsional (Max 10MB)</small>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="media3" class="form-label">Media 3 (Opsional)</label>
+                <div class="col-md-4">
+                    <label for="media3" class="form-label fw-bold text-dark">Media 3 (Opsional)</label>
                     <input class="form-control" type="file" id="media3" name="media3" accept="<?php echo $file_accept_types; ?>">
-                    <small style="font-size:0.8em;" class="text-danger">*Max 10mb</small>
+                    <small style="font-size:11px;" class="text-muted">*Opsional (Max 10MB)</small>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Simpan Follow Up</button>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a href="followup_view.php?customer_id=<?php echo $customer_id; ?>" class="btn btn-light border fw-bold px-4">Batal</a>
+                <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm"><i class="bi bi-check-circle-fill me-1"></i> Simpan Follow Up</button>
+            </div>
         </form>
     </div>
 </div>
