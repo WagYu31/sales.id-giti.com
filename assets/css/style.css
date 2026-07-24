@@ -1,36 +1,292 @@
-/* assets/css/style.css */
+/* assets/css/style.css - Loewix Sales Design System 2.0 */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #2563EB;
+    --primary-gradient: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    --primary-glow: rgba(37, 99, 235, 0.35);
+    
+    --dark-navy: #0F172A;
+    --header-gradient: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    
+    --bg-body: #F4F7FB;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(226, 232, 240, 0.8);
+    --card-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+    --card-hover-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.12);
+    
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-body);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.04) 0px, transparent 50%);
+    color: #1E293B;
+    -webkit-font-smoothing: antialiased;
 }
 
-.navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
+/* ============ CARDS ============ */
 .card {
-    border: none;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    border-radius: 10px;
+    border: 1px solid var(--card-border) !important;
+    box-shadow: var(--card-shadow) !important;
+    border-radius: var(--radius-lg) !important;
+    background: var(--card-bg) !important;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    overflow: hidden;
 }
 
-.table-hover tbody tr:hover {
-    background-color: #f1f1f1;
+.card-header {
+    background: #FFFFFF !important;
+    border-bottom: 1px solid #F1F5F9 !important;
+    padding: 18px 24px !important;
+    border-top-left-radius: var(--radius-lg) !important;
+    border-top-right-radius: var(--radius-lg) !important;
 }
 
-.btn {
-    border-radius: 20px;
-    padding: 8px 20px;
-    font-weight: 500;
+.card-header h5 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800 !important;
+    font-size: 16px !important;
+    color: #0F172A !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.btn-sm {
-    padding: 5px 10px;
+.card-header h5 i {
+    color: var(--primary);
+    font-size: 18px;
 }
 
-.table thead {
+.card-body {
+    padding: 24px !important;
+}
+
+/* ============ TABLES ============ */
+.table-responsive {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.table {
+    margin-bottom: 0 !important;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead, .table thead tr, .table thead th, .table-light {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;
+    color: #F8FAFC !important;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 14px 18px !important;
+    border: none !important;
     vertical-align: middle;
 }
 
+.table thead a {
+    color: #93C5FD !important;
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s ease;
+}
+
+.table thead a:hover {
+    color: #FFFFFF !important;
+}
+
+.table tbody tr {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #FFFFFF;
+}
+
+.table tbody tr:hover {
+    background-color: #F0F7FF !important;
+}
+
+.table tbody td {
+    padding: 16px 18px !important;
+    border-bottom: 1px solid #F1F5F9 !important;
+    vertical-align: middle !important;
+    font-size: 13.5px;
+    color: #334155;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: rgba(248, 250, 252, 0.6);
+}
+
+/* ============ FORM CONTROLS ============ */
+.form-label {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    margin-bottom: 7px;
+}
+
+.form-control, .form-select {
+    height: 44px;
+    border-radius: var(--radius-sm) !important;
+    border: 1.5px solid #E2E8F0 !important;
+    background-color: #F8FAFC !important;
+    font-size: 13.5px !important;
+    color: #0F172A !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    padding: 0 14px;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #FFFFFF !important;
+    border-color: #3B82F6 !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+    outline: none !important;
+}
+
+.form-control::placeholder {
+    color: #94A3B8;
+}
+
+/* ============ BUTTONS ============ */
+.btn {
+    border-radius: var(--radius-sm);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: var(--primary-gradient) !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    height: 44px;
+    padding: 0 22px;
+    box-shadow: 0 4px 14px var(--primary-glow) !important;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45) !important;
+    color: #FFFFFF !important;
+}
+
+.btn-secondary {
+    background: #F1F5F9 !important;
+    border: 1px solid #CBD5E1 !important;
+    color: #334155 !important;
+    height: 44px;
+    padding: 0 20px;
+}
+
+.btn-secondary:hover {
+    background: #E2E8F0 !important;
+    color: #0F172A !important;
+    transform: translateY(-1px);
+}
+
+.btn-sm {
+    height: 34px !important;
+    padding: 0 14px !important;
+    font-size: 12.5px !important;
+    border-radius: 8px !important;
+}
+
+.btn-outline-danger {
+    border-color: #FECDD3 !important;
+    color: #E11D48 !important;
+    background: #FFF1F2 !important;
+}
+
+.btn-outline-danger:hover {
+    background: #E11D48 !important;
+    color: #FFFFFF !important;
+    border-color: #E11D48 !important;
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+}
+
+.btn-outline-secondary {
+    border: 1.5px solid #E2E8F0 !important;
+    color: #475569 !important;
+    background: #FFFFFF !important;
+    border-radius: 10px !important;
+}
+
+.btn-outline-secondary:hover {
+    background: #F8FAFC !important;
+    border-color: #3B82F6 !important;
+    color: #2563EB !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+}
+
+/* ============ BADGES ============ */
 .badge {
-    font-size: 0.8em;
+    border-radius: 30px !important;
+    font-weight: 700 !important;
+    padding: 5px 12px !important;
+    font-size: 11px !important;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.28);
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.28);
+}
+
+.badge.bg-info {
+    background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.28);
+}
+
+/* ============ PAGINATION ============ */
+.pagination .page-item .page-link {
+    border-radius: 10px;
+    margin: 0 3px;
+    border: 1px solid #E2E8F0;
+    color: #475569;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 8px 14px;
+    transition: all 0.2s ease;
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--primary-gradient);
+    border-color: transparent;
+    color: #FFF;
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.pagination .page-item .page-link:hover {
+    background: #F1F5F9;
+    color: var(--primary);
 }
