@@ -120,9 +120,9 @@ if($result_cust) {
             <p class="assign-hero-subtitle">Tugaskan atau alihkan tanggung jawab customer ke tim sales secara massal dengan cepat.</p>
         </div>
         <div class="flex-shrink-0">
-            <div class="bg-white bg-opacity-15 backdrop-blur rounded-4 p-3 px-4 border border-white border-opacity-20 text-center shadow-sm">
-                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.85); font-weight:700;">Customer Tersedia</div>
-                <div style="font-size:24px; font-weight:800; color:#FFF; font-family:'Plus Jakarta Sans', sans-serif;"><?php echo number_format(count($customers)); ?></div>
+            <div class="rounded-4 p-3 px-4 border text-center shadow-sm" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.25) !important; min-width: 150px;">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color: #DBEAFE; font-weight:700;">Customer Tersedia</div>
+                <div style="font-size:26px; font-weight:800; color: #FFFFFF; font-family:'Plus Jakarta Sans', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"><?php echo number_format(count($customers)); ?></div>
             </div>
         </div>
     </div>

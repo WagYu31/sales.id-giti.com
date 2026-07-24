@@ -277,6 +277,8 @@ table tr td { font-size: 0.85em; }
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    max-width: calc(100vw - 260px);
+    overflow-x: hidden;
 }
 
 /* ============ TOP BAR ============ */
@@ -287,10 +289,12 @@ table tr td { font-size: 0.85em; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 32px;
+    padding: 0 24px;
     position: sticky;
     top: 0;
     z-index: 1030;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .topbar-left {
@@ -412,17 +416,15 @@ table tr td { font-size: 0.85em; }
 }
 
 /* ============ RESPONSIVE ============ */
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
     .sidebar { transform: translateX(-100%); }
     .sidebar.open { transform: translateX(0); }
-    .main-wrapper { margin-left: 0; }
-
+    .main-wrapper { margin-left: 0 !important; max-width: 100vw !important; width: 100% !important; }
 }
 
 @media (max-width: 576px) {
-    .content-area { padding: 20px 16px; }
-    .topbar { padding: 0 16px; }
-
+    .content-area { padding: 20px 14px; }
+    .topbar { padding: 0 12px; }
 }
 </style>
 </head>
