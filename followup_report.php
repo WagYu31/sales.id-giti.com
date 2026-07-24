@@ -386,15 +386,15 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
         <form action="" method="GET" id="filter-form">
             <!-- Row 1: Search, Dari Tanggal, Sampai Tanggal -->
             <div class="row g-3 mb-3">
-                <div class="col-md-6 col-12">
+                <div class="col-lg-6 col-md-12 col-12">
                     <label for="search" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">🔍 Cari Kata Kunci / Toko / Invoice</label>
                     <input type="text" class="form-control" id="search" name="search" placeholder="Ketik nama toko, no invoice, atau kata kunci catatan..." value="<?php echo htmlspecialchars($search_keyword); ?>">
                 </div>
-                <div class="col-md-3 col-sm-6">
+                <div class="col-lg-3 col-md-6 col-12">
                     <label for="tgl_mulai" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">📅 Dari Tanggal</label>
                     <input type="date" class="form-control" id="tgl_mulai" name="tgl_mulai" value="<?php echo htmlspecialchars($tgl_mulai); ?>">
                 </div>
-                <div class="col-md-3 col-sm-6">
+                <div class="col-lg-3 col-md-6 col-12">
                     <label for="tgl_akhir" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">📅 Sampai Tanggal</label>
                     <input type="date" class="form-control" id="tgl_akhir" name="tgl_akhir" value="<?php echo htmlspecialchars($tgl_akhir); ?>">
                 </div>
@@ -402,7 +402,7 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
 
             <!-- Row 2: Sales, Respon, Status, Buttons -->
             <div class="row g-3 align-items-end">
-                <div class="col-md-3 col-sm-6">
+                <div class="col-lg-3 col-md-6 col-12">
                     <label for="sales_id" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">👤 Pilih Sales</label>
                     <select id="sales_id" name="sales_id" class="form-select">
                         <option value="">Semua Sales</option>
@@ -414,7 +414,7 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
                         <?php endwhile; ?>
                     </select>
                 </div>
-                <div class="col-md-3 col-sm-6">
+                <div class="col-lg-3 col-md-6 col-12">
                     <label for="respon" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">💬 Respon Follow Up</label>
                     <select id="respon" name="respon" class="form-select">
                         <option value="">Semua Respon</option>
@@ -426,7 +426,7 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
                         <option value="no_respon" <?php if ($respon_filter == 'no_respon') echo 'selected'; ?>>❌ Tidak Ada Respon / Tertarik</option>
                     </select>
                 </div>
-                <div class="col-md-3 col-sm-6">
+                <div class="col-lg-3 col-md-6 col-12">
                     <label for="status" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">🏷️ Status Customer</label>
                     <select id="status" name="status" class="form-select">
                         <option value="">Semua Status</option>
@@ -435,11 +435,11 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
                         <option value="kandidat" <?php if ($status_filter == 'kandidat') echo 'selected'; ?>>👤 Kandidat</option>
                     </select>
                 </div>
-                <div class="col-md-3 col-sm-6 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary fw-bold flex-grow-1 shadow-sm">
-                        <i class="bi bi-search me-1"></i> Terapkan Filter
+                <div class="col-lg-3 col-md-6 col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-extrabold flex-grow-1 shadow-sm d-inline-flex align-items-center justify-content-center gap-1.5" style="height:42px; border-radius:12px; white-space:nowrap; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
+                        <i class="bi bi-search"></i> Terapkan Filter
                     </button>
-                    <a href="followup_report.php" class="btn btn-secondary fw-bold" title="Reset Filter">
+                    <a href="followup_report.php" class="btn btn-light border border-slate fw-bold d-inline-flex align-items-center justify-content-center gap-1" title="Reset Filter" style="height:42px; padding:0 16px; border-radius:12px; white-space:nowrap;">
                         <i class="bi bi-arrow-counterclockwise"></i> Reset
                     </a>
                 </div>
