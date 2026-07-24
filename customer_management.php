@@ -21,144 +21,216 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 ?>
 
 <style>
-/* ============ PAGE HEADER ============ */
-.page-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 32px;
+/* ============ ANIMATIONS ============ */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.page-breadcrumb {
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    50% { transform: scale(1.05); opacity: 0.3; }
+    100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.animate-in {
+    opacity: 0;
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-in:nth-child(1) { animation-delay: 0.05s; }
+.animate-in:nth-child(2) { animation-delay: 0.1s; }
+.animate-in:nth-child(3) { animation-delay: 0.15s; }
+.animate-in:nth-child(4) { animation-delay: 0.2s; }
+.animate-in:nth-child(5) { animation-delay: 0.25s; }
+.animate-in:nth-child(6) { animation-delay: 0.3s; }
+.animate-in:nth-child(7) { animation-delay: 0.35s; }
+.animate-in:nth-child(8) { animation-delay: 0.4s; }
+
+/* ============ HERO WELCOME BANNER ============ */
+.welcome-banner {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #1E40AF 100%);
+    border-radius: 20px;
+    padding: 36px 40px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInScale 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+    animation: pulse-ring 6s ease-in-out infinite;
+}
+
+.welcome-banner::after {
+    content: '';
+    position: absolute;
+    bottom: -30%; left: 10%;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%);
+    animation: pulse-ring 8s ease-in-out infinite reverse;
+}
+
+.welcome-content { position: relative; z-index: 2; }
+
+.welcome-breadcrumb {
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: 12px;
     font-weight: 500;
-    color: #94A3B8;
-    margin-bottom: 8px;
+    color: rgba(148,163,184,0.7);
+    margin-bottom: 14px;
     font-family: 'Inter', sans-serif;
 }
 
-.page-breadcrumb a { color: #3B82F6; text-decoration: none; }
-.page-breadcrumb span { color: #CBD5E1; }
+.welcome-breadcrumb a { color: rgba(147,197,253,0.8); text-decoration: none; }
+.welcome-breadcrumb span { color: rgba(148,163,184,0.4); }
 
-.page-title {
-    font-size: 26px;
+.welcome-title {
+    font-size: 28px;
     font-weight: 800;
-    color: #0F172A;
+    color: #FFFFFF;
     letter-spacing: -0.5px;
-    margin: 0 0 4px 0;
+    margin: 0 0 8px 0;
     font-family: 'Inter', sans-serif;
+    line-height: 1.2;
 }
 
-.page-subtitle {
-    font-size: 14px;
-    color: #64748B;
+.welcome-subtitle {
+    font-size: 14.5px;
+    color: rgba(203,213,225,0.7);
     font-weight: 400;
-    line-height: 1.5;
+    line-height: 1.6;
     margin: 0;
     font-family: 'Inter', sans-serif;
+    max-width: 600px;
 }
 
 /* ============ STAT CARDS ============ */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    gap: 20px;
     margin-bottom: 36px;
 }
 
 .stat-card {
-    border-radius: 16px;
-    padding: 24px 26px;
+    background: #FFFFFF;
+    border: 1px solid #EEF2F6;
+    border-radius: 18px;
+    padding: 26px 28px;
     position: relative;
     overflow: hidden;
-    min-height: 120px;
+    min-height: 130px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.stat-card::before {
-    content: '';
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.08);
+    border-color: transparent;
+}
+
+.stat-card .stat-accent {
     position: absolute;
-    top: -30px; right: -30px;
-    width: 100px; height: 100px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.06);
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: 18px 0 0 18px;
 }
 
-.stat-card::after {
-    content: '';
-    position: absolute;
-    bottom: -20px; right: 30px;
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.04);
-}
+.stat-card.blue .stat-accent { background: linear-gradient(180deg, #3B82F6, #2563EB); }
+.stat-card.teal .stat-accent { background: linear-gradient(180deg, #14B8A6, #0D9488); }
+.stat-card.navy .stat-accent { background: linear-gradient(180deg, #6366F1, #4F46E5); }
 
-.stat-card.blue {
-    background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
-    box-shadow: 0 4px 20px -4px rgba(37,99,235,0.3);
-}
-
-.stat-card.teal {
-    background: linear-gradient(135deg, #115E59 0%, #0D9488 100%);
-    box-shadow: 0 4px 20px -4px rgba(13,148,136,0.3);
-}
-
-.stat-card.navy {
-    background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
-    box-shadow: 0 4px 20px -4px rgba(15,23,42,0.3);
-}
-
-.stat-value {
-    font-size: 34px;
-    font-weight: 800;
-    color: #FFFFFF;
-    letter-spacing: -1px;
-    line-height: 1;
-    font-family: 'Inter', sans-serif;
-}
-
-.stat-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.55);
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin-top: 8px;
-    font-family: 'Inter', sans-serif;
-}
-
-.stat-badge {
-    display: inline-flex;
+.stat-card-header {
+    display: flex;
     align-items: center;
-    gap: 3px;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 6px;
-    margin-top: 12px;
-    width: fit-content;
+    justify-content: space-between;
+    margin-bottom: 14px;
 }
 
-.stat-badge.up { background: rgba(52,211,153,0.15); color: #34D399; }
-.stat-badge.down { background: rgba(248,113,113,0.15); color: #F87171; }
+.stat-card-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748B;
+    font-family: 'Inter', sans-serif;
+}
 
-.stat-icon {
-    position: absolute;
-    top: 22px; right: 22px;
+.stat-card-icon {
     width: 42px; height: 42px;
     border-radius: 12px;
-    background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255,255,255,0.7);
     font-size: 18px;
+}
+
+.stat-card.blue .stat-card-icon { background: #EFF6FF; color: #2563EB; }
+.stat-card.teal .stat-card-icon { background: #F0FDFA; color: #0D9488; }
+.stat-card.navy .stat-card-icon { background: #EEF2FF; color: #4F46E5; }
+
+.stat-card-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -1px;
+    line-height: 1;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 6px;
+}
+
+.stat-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.stat-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+}
+
+.stat-trend.up { background: #F0FDF4; color: #16A34A; }
+.stat-trend.down { background: #FEF2F2; color: #EF4444; }
+
+.stat-trend-label {
+    font-size: 12px;
+    color: #94A3B8;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
 }
 
 /* ============ SECTION HEADER ============ */
@@ -166,21 +238,22 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
 .section-title {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 700;
-    color: #1E293B;
+    color: #0F172A;
     font-family: 'Inter', sans-serif;
+    letter-spacing: -0.3px;
 }
 
 .section-subtitle {
     font-size: 13px;
     color: #94A3B8;
     font-weight: 500;
-    margin-top: 2px;
+    margin-top: 3px;
     font-family: 'Inter', sans-serif;
 }
 
@@ -188,54 +261,72 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: 18px;
 }
 
 .mc-link { text-decoration: none; color: inherit; display: block; }
 
 .mc {
     background: #FFFFFF;
-    border: 1px solid #EDF0F4;
-    border-radius: 16px;
-    padding: 24px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #EEF2F6;
+    border-radius: 18px;
+    padding: 28px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: hidden;
 }
 
+.mc::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--mc-color, #3B82F6), var(--mc-color-end, #60A5FA));
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.mc:hover::before { opacity: 1; }
+
 .mc:hover {
-    border-color: #E0E7FF;
-    background: #FAFBFF;
-    box-shadow: 0 8px 30px -8px rgba(59,130,246,0.12), 0 2px 8px -2px rgba(0,0,0,0.04);
-    transform: translateY(-4px);
+    border-color: transparent;
+    background: #FFFFFF;
+    box-shadow: 0 12px 40px -8px rgba(0,0,0,0.1), 0 4px 12px -4px rgba(0,0,0,0.04);
+    transform: translateY(-5px);
 }
 
 .mc-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
+    width: 52px; height: 52px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 19px;
-    margin-bottom: 16px;
+    font-size: 22px;
+    margin-bottom: 18px;
     flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.mc:hover .mc-icon {
+    transform: scale(1.08);
 }
 
 .mc-title {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
-    color: #1E293B;
-    margin-bottom: 6px;
+    color: #0F172A;
+    margin-bottom: 8px;
     letter-spacing: -0.2px;
     font-family: 'Inter', sans-serif;
 }
 
 .mc-desc {
-    font-size: 12.5px;
+    font-size: 13px;
     color: #94A3B8;
-    line-height: 1.55;
+    line-height: 1.6;
     font-weight: 400;
     flex-grow: 1;
     font-family: 'Inter', sans-serif;
@@ -244,40 +335,54 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 .mc-arrow {
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin-top: 16px;
-    font-size: 12px;
+    gap: 6px;
+    margin-top: 18px;
+    font-size: 13px;
     font-weight: 600;
     color: #3B82F6;
-    transition: all 0.25s ease;
+    transition: all 0.3s ease;
     font-family: 'Inter', sans-serif;
 }
 
-.mc:hover .mc-arrow { gap: 10px; color: #2563EB; }
+.mc:hover .mc-arrow {
+    gap: 12px;
+    color: #1D4ED8;
+}
 
-/* Icon colors */
-.i-red    { background: #FEF2F2; color: #DC2626; }
-.i-blue   { background: #EFF6FF; color: #2563EB; }
-.i-cyan   { background: #ECFEFF; color: #0891B2; }
-.i-sky    { background: #F0F9FF; color: #0284C7; }
-.i-green  { background: #F0FDF4; color: #16A34A; }
-.i-amber  { background: #FFFBEB; color: #D97706; }
-.i-violet { background: #F5F3FF; color: #7C3AED; }
-.i-slate  { background: #F1F5F9; color: #334155; }
+/* Icon backgrounds & colors - softer pastels */
+.i-red    { background: linear-gradient(135deg, #FEF2F2, #FECACA); color: #DC2626; }
+.i-blue   { background: linear-gradient(135deg, #EFF6FF, #BFDBFE); color: #2563EB; }
+.i-cyan   { background: linear-gradient(135deg, #ECFEFF, #A5F3FC); color: #0891B2; }
+.i-sky    { background: linear-gradient(135deg, #F0F9FF, #BAE6FD); color: #0284C7; }
+.i-green  { background: linear-gradient(135deg, #F0FDF4, #BBF7D0); color: #16A34A; }
+.i-amber  { background: linear-gradient(135deg, #FFFBEB, #FDE68A); color: #D97706; }
+.i-violet { background: linear-gradient(135deg, #F5F3FF, #DDD6FE); color: #7C3AED; }
+.i-slate  { background: linear-gradient(135deg, #F1F5F9, #CBD5E1); color: #334155; }
+
+/* Menu card accent colors */
+.mc-link:nth-child(1) .mc { --mc-color: #DC2626; --mc-color-end: #F87171; }
+.mc-link:nth-child(2) .mc { --mc-color: #2563EB; --mc-color-end: #60A5FA; }
+.mc-link:nth-child(3) .mc { --mc-color: #0891B2; --mc-color-end: #22D3EE; }
+.mc-link:nth-child(4) .mc { --mc-color: #0284C7; --mc-color-end: #38BDF8; }
+.mc-link:nth-child(5) .mc { --mc-color: #16A34A; --mc-color-end: #4ADE80; }
+.mc-link:nth-child(6) .mc { --mc-color: #D97706; --mc-color-end: #FBBF24; }
+.mc-link:nth-child(7) .mc { --mc-color: #7C3AED; --mc-color-end: #A78BFA; }
+.mc-link:nth-child(8) .mc { --mc-color: #334155; --mc-color-end: #64748B; }
 
 /* Badge */
 .mc-badge {
     display: inline-block;
     font-size: 9px;
     font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 5px;
-    background: linear-gradient(135deg, #DBEAFE, #C7D2FE);
-    color: #1D4ED8;
-    margin-left: 6px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #818CF8, #6366F1);
+    color: #FFFFFF;
+    margin-left: 8px;
     vertical-align: middle;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    box-shadow: 0 2px 6px rgba(99,102,241,0.3);
 }
 
 /* ============ RESPONSIVE ============ */
@@ -285,46 +390,67 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 @media (max-width: 991px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .menu-grid { grid-template-columns: repeat(2, 1fr); }
+    .welcome-banner { padding: 28px 24px; }
+    .welcome-title { font-size: 24px; }
 }
 @media (max-width: 576px) {
     .stats-grid, .menu-grid { grid-template-columns: 1fr; }
-    .page-title { font-size: 22px; }
-    .stat-value { font-size: 28px; }
+    .welcome-title { font-size: 20px; }
+    .stat-card-value { font-size: 26px; }
+    .welcome-banner { padding: 24px 20px; border-radius: 14px; }
 }
 </style>
 
-<!-- PAGE HEADER -->
-<div class="page-header">
-    <div>
-        <div class="page-breadcrumb">
+<!-- WELCOME BANNER -->
+<div class="welcome-banner">
+    <div class="welcome-content">
+        <div class="welcome-breadcrumb">
             <a href="customer_management.php">Dashboard</a>
-            <span>/</span>
+            <span>›</span>
             Customer Management
         </div>
-        <h1 class="page-title">Selamat Datang, <?php echo htmlspecialchars($firstName); ?> 👋</h1>
-        <p class="page-subtitle">Kelola seluruh data customer, prospek, dan laporan tim sales Anda dalam satu dashboard terpusat.</p>
+        <h1 class="welcome-title">Selamat Datang, <?php echo htmlspecialchars($firstName); ?> 👋</h1>
+        <p class="welcome-subtitle">Kelola seluruh data customer, prospek, dan laporan tim sales Anda dalam satu dashboard terpusat.</p>
     </div>
 </div>
 
 <!-- STATS -->
 <div class="stats-grid">
-    <div class="stat-card blue">
-        <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
-        <div class="stat-value"><?php echo number_format($totalCustomers); ?></div>
-        <div class="stat-label">Total Customer</div>
-        <div class="stat-badge up"><i class="bi bi-arrow-up-short"></i> 12%</div>
+    <div class="stat-card blue animate-in">
+        <div class="stat-accent"></div>
+        <div class="stat-card-header">
+            <span class="stat-card-label">Total Customer</span>
+            <div class="stat-card-icon"><i class="bi bi-people-fill"></i></div>
+        </div>
+        <div class="stat-card-value"><?php echo number_format($totalCustomers); ?></div>
+        <div class="stat-card-footer">
+            <span class="stat-trend up"><i class="bi bi-arrow-up-short"></i> 12%</span>
+            <span class="stat-trend-label">vs bulan lalu</span>
+        </div>
     </div>
-    <div class="stat-card teal">
-        <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
-        <div class="stat-value"><?php echo number_format($pendingFU); ?></div>
-        <div class="stat-label">Pending Follow Up</div>
-        <div class="stat-badge down"><i class="bi bi-arrow-down-short"></i> 2</div>
+    <div class="stat-card teal animate-in">
+        <div class="stat-accent"></div>
+        <div class="stat-card-header">
+            <span class="stat-card-label">Pending Follow Up</span>
+            <div class="stat-card-icon"><i class="bi bi-clock-history"></i></div>
+        </div>
+        <div class="stat-card-value"><?php echo number_format($pendingFU); ?></div>
+        <div class="stat-card-footer">
+            <span class="stat-trend down"><i class="bi bi-arrow-down-short"></i> 2</span>
+            <span class="stat-trend-label">perlu ditindak</span>
+        </div>
     </div>
-    <div class="stat-card navy">
-        <div class="stat-icon"><i class="bi bi-person-plus-fill"></i></div>
-        <div class="stat-value"><?php echo number_format($thisMonthNew); ?></div>
-        <div class="stat-label">Customer Baru</div>
-        <div class="stat-badge up"><i class="bi bi-arrow-up-short"></i> 8%</div>
+    <div class="stat-card navy animate-in">
+        <div class="stat-accent"></div>
+        <div class="stat-card-header">
+            <span class="stat-card-label">Customer Baru</span>
+            <div class="stat-card-icon"><i class="bi bi-person-plus-fill"></i></div>
+        </div>
+        <div class="stat-card-value"><?php echo number_format($thisMonthNew); ?></div>
+        <div class="stat-card-footer">
+            <span class="stat-trend up"><i class="bi bi-arrow-up-short"></i> 8%</span>
+            <span class="stat-trend-label">bulan ini</span>
+        </div>
     </div>
 </div>
 
@@ -338,66 +464,66 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 
 <div class="menu-grid">
     <a href="index.php" class="mc-link" target="_blank">
-        <div class="mc">
+        <div class="mc animate-in">
             <div class="mc-icon i-red"><i class="bi bi-people-fill"></i></div>
             <div class="mc-title">Daftar Customer</div>
-            <div class="mc-desc">Daftar customer dan detail informasi lengkap.</div>
+            <div class="mc-desc">Lihat daftar customer dan detail informasi lengkap.</div>
             <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
     <a href="kandidat_report_view.php" class="mc-link" target="_blank">
-        <div class="mc">
+        <div class="mc animate-in">
             <div class="mc-icon i-blue"><i class="bi bi-person-check-fill"></i></div>
             <div class="mc-title">Potensial Customer</div>
-            <div class="mc-desc">Potensial customer dengan peluang konversi tinggi.</div>
+            <div class="mc-desc">Customer potensial dengan peluang konversi tinggi.</div>
             <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
     <a href="customer_add.php" class="mc-link" target="_blank">
-        <div class="mc">
+        <div class="mc animate-in">
             <div class="mc-icon i-cyan"><i class="bi bi-person-plus-fill"></i></div>
             <div class="mc-title">Tambah Customer</div>
-            <div class="mc-desc">Tambah customer baru ke dalam sistem.</div>
+            <div class="mc-desc">Tambah customer baru ke dalam sistem database.</div>
             <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
     <a href="<?php echo ($userRole == 'superadmin') ? 'customer_io.php' : 'customer_io_sales.php'; ?>" class="mc-link" target="_blank">
-        <div class="mc">
+        <div class="mc animate-in">
             <div class="mc-icon i-sky"><i class="bi bi-cloud-upload-fill"></i></div>
             <div class="mc-title">Unggah Data Customer</div>
-            <div class="mc-desc">Unggah data customer dari file Excel (XLSX).</div>
+            <div class="mc-desc">Import data customer dari file Excel (XLSX).</div>
             <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
     <a href="customer_export.php" class="mc-link" target="_blank">
-        <div class="mc">
+        <div class="mc animate-in">
             <div class="mc-icon i-green"><i class="bi bi-cloud-download-fill"></i></div>
             <div class="mc-title">Unduh Data Customer</div>
-            <div class="mc-desc">Unduh data customer ke format file Excel.</div>
+            <div class="mc-desc">Export data customer ke format file Excel.</div>
             <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
     <a href="customer_maintenance.php" class="mc-link" target="_blank">
-        <div class="mc">
+        <div class="mc animate-in">
             <div class="mc-icon i-amber"><i class="bi bi-clipboard-check-fill"></i></div>
             <div class="mc-title">Kualitas Data Customer</div>
-            <div class="mc-desc">Kualitas data customer dan validasi format.</div>
+            <div class="mc-desc">Audit kualitas data dan validasi format.</div>
             <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
     <a href="invoice_followup_report.php" class="mc-link" target="_blank">
-        <div class="mc">
+        <div class="mc animate-in">
             <div class="mc-icon i-violet"><i class="bi bi-receipt"></i></div>
             <div class="mc-title">Laporan Invoice FU</div>
-            <div class="mc-desc">Laporan Invoice FU dan riwayat follow up.</div>
+            <div class="mc-desc">Laporan invoice dan riwayat follow up.</div>
             <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
     <a href="sales_assistant.html" target="_blank" class="mc-link">
-        <div class="mc">
+        <div class="mc animate-in">
             <div class="mc-icon i-slate"><i class="bi bi-robot"></i></div>
             <div class="mc-title">Asisten Loewix <span class="mc-badge">Beta</span></div>
-            <div class="mc-desc">Asisten Loewix AI untuk menjawab pertanyaan customer.</div>
+            <div class="mc-desc">AI assistant untuk menjawab pertanyaan customer.</div>
             <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
