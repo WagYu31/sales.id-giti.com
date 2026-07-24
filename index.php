@@ -40,24 +40,16 @@ $sql = "
     SELECT 
         c.id, c.tgl_input, c.nama_toko, c.deal, c.kandidat, c.sales_id, c.kategori,
         s.nama_lengkap AS nama_sales,
-        GROUP_CONCAT(DISTINCT cp.nama_pic ORDER BY cp.id SEPARATOR '||') AS all_pics,
-        GROUP_CONCAT(DISTINCT cp.tlp_pic ORDER BY cp.id SEPARATOR '||') AS all_phones,
-        GROUP_CONCAT(DISTINCT ca.kota ORDER BY ca.id SEPARATOR ', ') AS all_cities,
-        MIN(ca.link_google_map) AS primary_map_link,
-        COUNT(DISTINCT fu.id) AS fu_count
+        (SELECT GROUP_CONCAT(DISTINCT cp.nama_pic ORDER BY cp.id SEPARATOR '||') FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL) AS all_pics,
+        (SELECT GROUP_CONCAT(DISTINCT cp.tlp_pic ORDER BY cp.id SEPARATOR '||') FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL) AS all_phones,
+        (SELECT GROUP_CONCAT(DISTINCT ca.kota ORDER BY ca.id SEPARATOR ', ') FROM customer_addresses ca WHERE ca.customer_id = c.id AND ca.deleted_at IS NULL) AS all_cities,
+        (SELECT ca.link_google_map FROM customer_addresses ca WHERE ca.customer_id = c.id AND ca.deleted_at IS NULL AND ca.link_google_map IS NOT NULL AND ca.link_google_map != '' LIMIT 1) AS primary_map_link,
+        (SELECT COUNT(*) FROM follow_ups fu WHERE fu.customer_id = c.id AND fu.deleted_at IS NULL) AS fu_count
     FROM 
         customers c
     LEFT JOIN 
         sales s ON c.sales_id = s.id
-    LEFT JOIN 
-        customer_pics cp ON c.id = cp.customer_id AND cp.deleted_at IS NULL
-    LEFT JOIN 
-        customer_addresses ca ON c.id = ca.customer_id AND ca.deleted_at IS NULL
-    LEFT JOIN
-        follow_ups fu ON c.id = fu.customer_id AND fu.deleted_at IS NULL
     {$where_clause}
-    GROUP BY 
-        c.id
     ORDER BY 
         c.id DESC
 ";
@@ -295,11 +287,17 @@ if ($_SESSION['role'] !== 'sales') {
                                 if (!empty($pics)) {
                                     foreach ($pics as $key => $pic_name) {
                                         $phone_number = $phones[$key] ?? '';
-                                        echo '<div class="small fw-semibold text-dark"><i class="bi bi-person-fill text-muted me-1"></i>' . htmlspecialchars($pic_name);
+                                        $display_pic = trim($pic_name);
+                                        $show_name = ($display_pic !== '' && strtolower($display_pic) !== 'unknown' && strtolower($display_pic) !== strtolower(trim($customer['nama_toko'])));
+                                        
+                                        echo '<div class="small fw-semibold text-dark mb-1">';
+                                        if ($show_name) {
+                                            echo '<i class="bi bi-person-fill text-muted me-1"></i>' . htmlspecialchars($display_pic) . ' ';
+                                        }
                                         if (!empty($phone_number)) {
                                             $cleaned_tel = preg_replace('/[^0-9]/', '', $phone_number);
                                             $wa_number = (substr($cleaned_tel, 0, 1) === '0') ? '62' . substr($cleaned_tel, 1) : $cleaned_tel;
-                                            echo ' <a href="https://wa.me/' . $wa_number . '" target="_blank" class="badge bg-light text-success border text-decoration-none ms-1"><i class="bi bi-whatsapp me-1"></i>' . htmlspecialchars($phone_number) . '</a>';
+                                            echo '<a href="https://wa.me/' . $wa_number . '" target="_blank" class="badge text-success border text-decoration-none" style="background:#F0FDF4; border-color:#BBF7D0 !important; border-radius:20px; padding:4px 8px;"><i class="bi bi-whatsapp me-1"></i>' . htmlspecialchars($phone_number) . '</a>';
                                         }
                                         echo '</div>';
                                     }
@@ -323,8 +321,8 @@ if ($_SESSION['role'] !== 'sales') {
                             </td>
                             <td>
                                 <?php if ($customer['nama_sales']): ?>
-                                    <div class="d-flex align-items-center">
-                                        <div class="sales-avatar-badge-small">
+                                    <div class="d-flex align-items-center gap-1" style="white-space:nowrap;">
+                                        <div class="sales-avatar-badge-small flex-shrink-0">
                                             <?php echo strtoupper(substr($customer['nama_sales'], 0, 1)); ?>
                                         </div>
                                         <span class="fw-semibold text-dark" style="font-size:12.5px;"><?php echo htmlspecialchars($customer['nama_sales']); ?></span>
