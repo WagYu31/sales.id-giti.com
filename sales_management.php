@@ -239,8 +239,11 @@ foreach ($kpi_data as $data) {
         </div>
         <div class="mt-3 mt-md-0">
             <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'superadmin'): ?>
-            <a href="sales_add.php" class="btn btn-primary shadow-lg">
-                <i class="bi bi-person-plus-fill"></i> Tambah Sales Baru
+            <a href="sales_add.php" class="btn btn-light fw-extrabold shadow-lg border-0 d-inline-flex align-items-center gap-2" style="background:#FFFFFF; color:#1D4ED8; font-weight:800; font-size:14px; padding: 10px 20px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3) !important; transition: all 0.25s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width:28px; height:28px; border-radius:8px; background:#EFF6FF; display:inline-flex; align-items:center; justify-content:center;">
+                    <i class="bi bi-person-plus-fill text-primary" style="font-size:16px;"></i>
+                </div>
+                <span>+ Tambah Sales Baru</span>
             </a>
             <?php endif; ?>
         </div>
