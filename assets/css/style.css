@@ -290,3 +290,55 @@ body {
     background: #F1F5F9;
     color: var(--primary);
 }
+
+/* ============ RESPONSIVE MEDIA QUERIES & SCROLLBARS ============ */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-lg);
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+.table-responsive::-webkit-scrollbar-track {
+    background: #F1F5F9;
+    border-radius: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
+@media (max-width: 991.98px) {
+    .content-area {
+        padding: 20px 16px !important;
+    }
+    .topbar {
+        padding: 0 16px !important;
+    }
+    .cust-hero, .assign-hero, .kandidat-hero, .io-hero, .maint-hero, .fu-hero, .welcome-banner {
+        padding: 24px 20px !important;
+        border-radius: 16px !important;
+    }
+    .cust-hero-title, .assign-hero-title, .kandidat-hero-title, .io-hero-title, .maint-hero-title, .fu-hero-title, .welcome-title {
+        font-size: 22px !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .topbar-left .topbar-date {
+        display: none;
+    }
+    .topbar-left span {
+        display: none;
+    }
+    .btn-sm {
+        height: 30px !important;
+        padding: 0 8px !important;
+        font-size: 11px !important;
+    }
+}

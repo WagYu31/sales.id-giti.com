@@ -542,7 +542,7 @@ table tr td { font-size: 0.85em; }
                 <button class="topbar-btn border-0 shadow-sm" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi Sistem" style="outline:none; position:relative; background:#FFFFFF; border:1px solid #E2E8F0; width:42px; height:42px; border-radius:12px;">
                     <i class="bi bi-bell-fill text-warning" style="font-size:18px;"></i>
                     <?php if ($total_notif_count > 0): ?>
-                        <span class="position-absolute translate-middle badge rounded-pill bg-danger border border-white" style="top: 2px; right: -12px; font-size: 10px; font-weight:800; padding: 3px 7px; box-shadow:0 3px 8px rgba(239,68,68,0.4);">
+                        <span class="position-absolute badge rounded-pill bg-danger border border-white" style="top: -4px; right: -4px; font-size: 10px; font-weight:800; padding: 3px 6px; box-shadow:0 3px 8px rgba(239,68,68,0.4);">
                             <?php echo ($total_notif_count > 99) ? '99+' : $total_notif_count; ?>
                         </span>
                     <?php endif; ?>

@@ -109,8 +109,8 @@ if($result_cust) {
 
 <!-- Hero Banner -->
 <div class="assign-hero">
-    <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
-        <div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 position-relative" style="z-index:2;">
+        <div style="flex: 1; min-width: 280px;">
             <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
                 <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
                 <span>›</span>
@@ -119,10 +119,10 @@ if($result_cust) {
             <h1 class="assign-hero-title">Penugasan Sales Cepat 👥</h1>
             <p class="assign-hero-subtitle">Tugaskan atau alihkan tanggung jawab customer ke tim sales secara massal dengan cepat.</p>
         </div>
-        <div class="mt-3 mt-md-0">
-            <div class="bg-white bg-opacity-10 backdrop-blur rounded-4 p-3 px-4 border border-white border-opacity-10 text-center">
-                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.7); font-weight:700;">Customer Tersedia</div>
-                <div style="font-size:24px; font-weight:800; color:#FFF;"><?php echo number_format(count($customers)); ?></div>
+        <div class="flex-shrink-0">
+            <div class="bg-white bg-opacity-15 backdrop-blur rounded-4 p-3 px-4 border border-white border-opacity-20 text-center shadow-sm">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.85); font-weight:700;">Customer Tersedia</div>
+                <div style="font-size:24px; font-weight:800; color:#FFF; font-family:'Plus Jakarta Sans', sans-serif;"><?php echo number_format(count($customers)); ?></div>
             </div>
         </div>
     </div>
