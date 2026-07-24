@@ -5,22 +5,34 @@ $userInitials = strtoupper(substr($_SESSION['nama_lengkap'] ?? 'U', 0, 2));
 $userName = htmlspecialchars($_SESSION['nama_lengkap'] ?? 'User');
 $userRole = $_SESSION['role'] ?? '';
 
-// Live Notifications Calculation
+// Live Notifications Calculation (Cached for 30s for ultra-fast performance)
 $notif_pending_fu = 0;
 $notif_kandidat = 0;
 $notif_maintenance = 0;
 
 if (isset($conn) && isset($_SESSION['user_id'])) {
-    $n_sales_where = ($_SESSION['role'] === 'sales') ? " AND sales_id = " . intval($_SESSION['user_id']) : "";
-    
-    $rn1 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE status_fu = 'Pending' AND deleted_at IS NULL {$n_sales_where}");
-    if ($rn1) $notif_pending_fu = $rn1->fetch_assoc()['t'] ?? 0;
-    
-    $rn2 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE kandidat = 'Y' AND deleted_at IS NULL {$n_sales_where}");
-    if ($rn2) $notif_kandidat = $rn2->fetch_assoc()['t'] ?? 0;
+    $now_ts = time();
+    if (!isset($_SESSION['notif_cache_time']) || ($now_ts - $_SESSION['notif_cache_time']) > 30 || isset($_GET['refresh_notif'])) {
+        $n_sales_where = ($_SESSION['role'] === 'sales') ? " AND sales_id = " . intval($_SESSION['user_id']) : "";
+        
+        $rn1 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE status_fu = 'Pending' AND deleted_at IS NULL {$n_sales_where}");
+        if ($rn1) $notif_pending_fu = $rn1->fetch_assoc()['t'] ?? 0;
+        
+        $rn2 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE kandidat = 'Y' AND deleted_at IS NULL {$n_sales_where}");
+        if ($rn2) $notif_kandidat = $rn2->fetch_assoc()['t'] ?? 0;
 
-    $rn3 = $conn->query("SELECT tlp_pic FROM customer_pics WHERE deleted_at IS NULL AND tlp_pic != '' GROUP BY tlp_pic HAVING COUNT(id) > 1");
-    if ($rn3) $notif_maintenance = $rn3->num_rows;
+        $rn3 = $conn->query("SELECT tlp_pic FROM customer_pics WHERE deleted_at IS NULL AND tlp_pic != '' GROUP BY tlp_pic HAVING COUNT(id) > 1 LIMIT 100");
+        if ($rn3) $notif_maintenance = $rn3->num_rows;
+
+        $_SESSION['notif_cache_time'] = $now_ts;
+        $_SESSION['notif_pending_fu'] = $notif_pending_fu;
+        $_SESSION['notif_kandidat'] = $notif_kandidat;
+        $_SESSION['notif_maintenance'] = $notif_maintenance;
+    } else {
+        $notif_pending_fu = $_SESSION['notif_pending_fu'] ?? 0;
+        $notif_kandidat = $_SESSION['notif_kandidat'] ?? 0;
+        $notif_maintenance = $_SESSION['notif_maintenance'] ?? 0;
+    }
 }
 
 $total_notif_count = $notif_pending_fu + $notif_kandidat + $notif_maintenance;

@@ -43,7 +43,7 @@ $sql = "
         GROUP_CONCAT(DISTINCT cp.nama_pic ORDER BY cp.id SEPARATOR '||') AS all_pics,
         GROUP_CONCAT(DISTINCT cp.tlp_pic ORDER BY cp.id SEPARATOR '||') AS all_phones,
         GROUP_CONCAT(DISTINCT ca.kota ORDER BY ca.id SEPARATOR ', ') AS all_cities,
-        (SELECT ca_inner.link_google_map FROM customer_addresses ca_inner WHERE ca_inner.customer_id = c.id AND ca_inner.deleted_at IS NULL ORDER BY ca_inner.id LIMIT 1) AS primary_map_link,
+        MIN(ca.link_google_map) AS primary_map_link,
         COUNT(DISTINCT fu.id) AS fu_count
     FROM 
         customers c
@@ -59,7 +59,7 @@ $sql = "
     GROUP BY 
         c.id
     ORDER BY 
-        c.tgl_input DESC
+        c.id DESC
 ";
 
 $stmt = $conn->prepare($sql);
@@ -76,22 +76,32 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-// Fetch list of distinct cities
+// Fetch list of distinct cities (Cached in Session)
 $cities = [];
-$r_city = $conn->query("SELECT DISTINCT TRIM(kota) AS nama_kota FROM customer_addresses WHERE deleted_at IS NULL AND kota IS NOT NULL AND TRIM(kota) != '' ORDER BY TRIM(kota) ASC");
-if ($r_city) {
-    while($row = $r_city->fetch_assoc()) {
-        $cities[] = $row['nama_kota'];
+if (!isset($_SESSION['cities_cache']) || isset($_GET['refresh_filter'])) {
+    $r_city = $conn->query("SELECT DISTINCT TRIM(kota) AS nama_kota FROM customer_addresses WHERE deleted_at IS NULL AND kota IS NOT NULL AND TRIM(kota) != '' ORDER BY TRIM(kota) ASC");
+    if ($r_city) {
+        while($row = $r_city->fetch_assoc()) {
+            $cities[] = $row['nama_kota'];
+        }
     }
+    $_SESSION['cities_cache'] = $cities;
+} else {
+    $cities = $_SESSION['cities_cache'];
 }
 
-// Fetch list of distinct categories
+// Fetch list of distinct categories (Cached in Session)
 $categories = [];
-$r_cat = $conn->query("SELECT DISTINCT TRIM(kategori) AS nama_kategori FROM customers WHERE deleted_at IS NULL AND kategori IS NOT NULL AND TRIM(kategori) != '' ORDER BY TRIM(kategori) ASC");
-if ($r_cat) {
-    while($row = $r_cat->fetch_assoc()) {
-        $categories[] = $row['nama_kategori'];
+if (!isset($_SESSION['categories_cache']) || isset($_GET['refresh_filter'])) {
+    $r_cat = $conn->query("SELECT DISTINCT TRIM(kategori) AS nama_kategori FROM customers WHERE deleted_at IS NULL AND kategori IS NOT NULL AND TRIM(kategori) != '' ORDER BY TRIM(kategori) ASC");
+    if ($r_cat) {
+        while($row = $r_cat->fetch_assoc()) {
+            $categories[] = $row['nama_kategori'];
+        }
     }
+    $_SESSION['categories_cache'] = $categories;
+} else {
+    $categories = $_SESSION['categories_cache'];
 }
 
 // Fetch list of sales for filter
