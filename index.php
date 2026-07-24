@@ -56,15 +56,80 @@ if ($result && $result->num_rows > 0) {
 }
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Daftar Customer</h1>
-    <a href="customer_add.php" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Tambah Customer</a>
+<style>
+.cust-hero {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%);
+    border-radius: 20px;
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.4);
+}
+
+.cust-hero::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+}
+
+.cust-hero-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.cust-hero-subtitle {
+    font-size: 14px;
+    color: rgba(226, 232, 240, 0.85);
+    margin: 0;
+    max-width: 600px;
+}
+
+.sales-avatar-badge-small {
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+    color: #FFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    margin-right: 8px;
+}
+</style>
+
+<!-- Hero Header -->
+<div class="cust-hero">
+    <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
+                <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
+                <span>›</span>
+                <span>Daftar Customer</span>
+            </div>
+            <h1 class="cust-hero-title">Daftar Customer 👥</h1>
+            <p class="cust-hero-subtitle">Kelola database seluruh customer, PIC kontak, status follow up, dan penugasan sales.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="customer_add.php" class="btn btn-primary shadow-lg">
+                <i class="bi bi-person-plus-fill"></i> Tambah Customer Baru
+            </a>
+        </div>
+    </div>
 </div>
 
 <div id="notification" class="alert" style="display:none;"></div>
 
 <div class="card">
-    <div class="card-body">
+    <div class="card-body p-0">
         <div id="table-loading-spinner" class="text-center p-5">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -72,26 +137,31 @@ if ($result && $result->num_rows > 0) {
             <h5 class="mt-3 text-muted">Memuat data customer...</h5>
         </div>
         <div class="table-responsive" id="customer-table-container" style="display: none;">
-            <table class="table table-striped table-hover sortable-table">
-                <thead class="table-dark" style="font-size:13px;">
+            <table class="table table-hover align-middle sortable-table">
+                <thead class="table-dark-header">
                     <tr>
-                        <th>Nama Toko</th>
-                        <th>PIC & Kontak</th>
-                        <th>Kategori</th>
-                        <th>Kota</th>
-                        <th>Sales</th>
-                        <th>FollowUp</th>
-                        <th>Kandidat</th>
-                        <th>Deal</th>
-                        <th>Link Maps</th>
-                        <th>Aksi</th>
+                        <th style="width: 18%;">NAMA TOKO</th>
+                        <th style="width: 20%;">PIC & KONTAK</th>
+                        <th style="width: 10%;">KATEGORI</th>
+                        <th style="width: 12%;">KOTA</th>
+                        <th style="width: 14%;">SALES</th>
+                        <th class="text-center" style="width: 7%;">FU</th>
+                        <th class="text-center" style="width: 6%;">KANDIDAT</th>
+                        <th class="text-center" style="width: 6%;">DEAL</th>
+                        <th class="text-center" style="width: 4%;">MAPS</th>
+                        <th class="text-center" style="width: 8%;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!empty($customers)): ?>
                         <?php foreach ($customers as $customer): ?>
                         <tr id="customer-row-<?php echo $customer['id']; ?>">
-                            <td class="text-wrap"><?php echo htmlspecialchars($customer['nama_toko']); ?></td>
+                            <td>
+                                <div class="fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif;">
+                                    <i class="bi bi-shop text-primary me-1"></i>
+                                    <?php echo htmlspecialchars($customer['nama_toko']); ?>
+                                </div>
+                            </td>
                             <td>
                                 <?php
                                 $pics = !empty($customer['all_pics']) ? explode('||', $customer['all_pics']) : [];
@@ -99,48 +169,65 @@ if ($result && $result->num_rows > 0) {
                                 if (!empty($pics)) {
                                     foreach ($pics as $key => $pic_name) {
                                         $phone_number = $phones[$key] ?? '';
-                                        echo '<div>' . htmlspecialchars($pic_name);
+                                        echo '<div class="small fw-semibold text-dark"><i class="bi bi-person-fill text-muted me-1"></i>' . htmlspecialchars($pic_name);
                                         if (!empty($phone_number)) {
                                             $cleaned_tel = preg_replace('/[^0-9]/', '', $phone_number);
                                             $wa_number = (substr($cleaned_tel, 0, 1) === '0') ? '62' . substr($cleaned_tel, 1) : $cleaned_tel;
-                                            echo ' (<a href="https://wa.me/' . $wa_number . '" target="_blank">' . htmlspecialchars($phone_number) . '</a>)';
+                                            echo ' <a href="https://wa.me/' . $wa_number . '" target="_blank" class="badge bg-light text-success border text-decoration-none ms-1"><i class="bi bi-whatsapp me-1"></i>' . htmlspecialchars($phone_number) . '</a>';
                                         }
                                         echo '</div>';
                                     }
-                                } else { echo '-'; }
+                                } else { echo '<span class="text-muted small">-</span>'; }
                                 ?>
                             </td>
-                            <td><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></td>
-                            <td><?php echo htmlspecialchars($customer['all_cities'] ?? '-'); ?></td>
-                            <td><?php echo $customer['nama_sales'] ? htmlspecialchars($customer['nama_sales']) : '<span class="badge bg-warning">Belum Di-assign</span>'; ?></td>
-                            <td class="text-center"><?php echo $customer['fu_count']; ?></td>
+                            <td>
+                                <span class="badge bg-light text-dark border fw-semibold"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span>
+                            </td>
+                            <td class="small fw-semibold text-muted"><?php echo htmlspecialchars($customer['all_cities'] ?? '-'); ?></td>
+                            <td>
+                                <?php if ($customer['nama_sales']): ?>
+                                    <div class="d-flex align-items-center">
+                                        <div class="sales-avatar-badge-small">
+                                            <?php echo strtoupper(substr($customer['nama_sales'], 0, 1)); ?>
+                                        </div>
+                                        <span class="fw-semibold text-dark" style="font-size:12.5px;"><?php echo htmlspecialchars($customer['nama_sales']); ?></span>
+                                    </div>
+                                <?php else: ?>
+                                    <span class="badge bg-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>Belum Di-assign</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center fw-bold">
+                                <span class="badge bg-primary rounded-pill px-2 py-1"><?php echo $customer['fu_count']; ?></span>
+                            </td>
                             <td class="text-center">
                                 <div class="form-check form-switch d-flex justify-content-center"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="kandidat" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['kandidat'] == 'Y') echo 'checked'; ?>></div>
                             </td>
                             <td class="text-center">
                                <div class="form-check form-switch d-flex justify-content-center"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="deal" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['deal'] == 'Y') echo 'checked'; ?>></div>
                             </td>
-                            <td>
+                            <td class="text-center">
                                 <?php if (!empty($customer['primary_map_link'])): ?>
-                                    <a href="<?php echo htmlspecialchars($customer['primary_map_link']); ?>" target="_blank" class="btn btn-sm btn-success" title="Buka di Google Maps"><i class="bi bi-geo-alt-fill"></i></a>
+                                    <a href="<?php echo htmlspecialchars($customer['primary_map_link']); ?>" target="_blank" class="btn btn-sm btn-outline-success" title="Buka di Google Maps"><i class="bi bi-geo-alt-fill"></i></a>
                                 <?php else: ?>
-                                    <button class="btn btn-sm btn-secondary" disabled><i class="bi bi-geo-alt-fill"></i></button>
+                                    <button class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-geo-alt"></i></button>
                                 <?php endif; ?>
                             </td>
-                            <td style="width:10%;">
-                                <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-info p-2 py-1" title="Lihat Follow Up"><i class="bi bi-eye"></i></a>
-                                <?php 
-                                $can_edit_delete = ($_SESSION['role'] == 'superadmin') || ($_SESSION['role'] == 'sales' && $_SESSION['user_id'] == $customer['sales_id']);
-                                if ($can_edit_delete): 
-                                ?>
-                                    <a href="customer_edit.php?id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-warning p-2 py-1" title="Edit Customer"><i class="bi bi-pencil-square"></i></a>
-                                    <a href="customer_delete.php?id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-danger p-2 py-1" title="Hapus Customer" onclick="return confirm('Yakin hapus customer ini?')"><i class="bi bi-trash"></i></a>
-                                <?php endif; ?>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-outline-primary" title="Lihat Follow Up"><i class="bi bi-eye-fill"></i></a>
+                                    <?php 
+                                    $can_edit_delete = ($_SESSION['role'] == 'superadmin') || ($_SESSION['role'] == 'sales' && $_SESSION['user_id'] == $customer['sales_id']);
+                                    if ($can_edit_delete): 
+                                    ?>
+                                        <a href="customer_edit.php?id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-outline-secondary" title="Edit Customer"><i class="bi bi-pencil-fill"></i></a>
+                                        <a href="customer_delete.php?id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-outline-danger" title="Hapus Customer" onclick="return confirm('Yakin hapus customer ini?')"><i class="bi bi-trash-fill"></i></a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="10" class="text-center">Belum ada data customer.</td></tr>
+                        <tr><td colspan="10" class="text-center p-5 text-muted">Belum ada data customer.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -202,9 +289,7 @@ window.onload = function() {
     const tableContainer = document.getElementById('customer-table-container');
 
     if (loader && tableContainer) {
-        // Sembunyikan loader
         loader.style.display = 'none';
-        // Tampilkan tabel
         tableContainer.style.display = 'block';
     }
 };
