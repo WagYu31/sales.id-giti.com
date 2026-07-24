@@ -245,7 +245,7 @@ $customers = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
                 </div>
             </div>
 
-            <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+            <div class="table-responsive" style="min-height: 550px; max-height: calc(100vh - 280px); overflow-y: auto;">
                 <table class="table table-hover align-middle sortable-table mb-0" id="customerTable">
                     <thead class="table-dark-header">
                         <tr>
