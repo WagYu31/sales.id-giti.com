@@ -261,11 +261,9 @@ table tr td { font-size: 0.85em; }
 
 /* ============ TOP BAR ============ */
 .topbar {
-    height: 68px;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(226,232,240,0.8);
+    height: 64px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #E8ECF1;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -275,84 +273,30 @@ table tr td { font-size: 0.85em; }
     z-index: 1030;
 }
 
-/* Left side: Greeting + DateTime */
 .topbar-left {
     display: flex;
     align-items: center;
-    gap: 20px;
-}
-
-.topbar-greeting {
-    display: flex;
-    flex-direction: column;
-}
-
-.topbar-greeting-text {
-    font-size: 11px;
-    font-weight: 500;
-    color: #94A3B8;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-family: 'Inter', sans-serif;
-    line-height: 1.2;
-}
-
-.topbar-greeting-name {
-    font-size: 17px;
-    font-weight: 700;
-    color: #0F172A;
-    font-family: 'Inter', sans-serif;
-    letter-spacing: -0.3px;
-    line-height: 1.3;
-}
-
-.topbar-divider {
-    width: 1px;
-    height: 36px;
-    background: linear-gradient(180deg, transparent, #CBD5E1, transparent);
-}
-
-.topbar-datetime {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 14px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #F8FAFC, #F1F5F9);
-    border: 1px solid rgba(226,232,240,0.6);
-}
-
-.topbar-datetime .datetime-icon {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #3B82F6, #2563EB);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 14px;
-    box-shadow: 0 2px 6px rgba(59,130,246,0.25);
-}
-
-.topbar-datetime .datetime-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.topbar-datetime .datetime-time {
-    font-size: 15px;
-    font-weight: 700;
-    color: #0F172A;
-    font-family: 'Inter', sans-serif;
-    letter-spacing: -0.3px;
-    line-height: 1.2;
-}
-
-.topbar-datetime .datetime-date {
-    font-size: 11px;
-    font-weight: 500;
+    gap: 8px;
     color: #64748B;
     font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.topbar-left i {
+    font-size: 15px;
+    color: #94A3B8;
+}
+
+.topbar-left .topbar-date {
+    color: #334155;
+    font-weight: 600;
+}
+
+.topbar-left .topbar-time {
+    color: #3B82F6;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Right side: Actions */
@@ -563,20 +507,11 @@ table tr td { font-size: 0.85em; }
     <!-- Top Bar -->
     <header class="topbar">
         <div class="topbar-left">
-            <div class="topbar-greeting">
-                <span class="topbar-greeting-text" id="greetingText">Selamat Datang</span>
-                <span class="topbar-greeting-name"><?php echo $userName; ?></span>
-            </div>
-            <div class="topbar-divider"></div>
-            <div class="topbar-datetime">
-                <div class="datetime-icon">
-                    <i class="bi bi-clock"></i>
-                </div>
-                <div class="datetime-info">
-                    <span class="datetime-time" id="liveTime">--:--:--</span>
-                    <span class="datetime-date" id="liveDate">Loading...</span>
-                </div>
-            </div>
+            <i class="bi bi-calendar-event"></i>
+            <span class="topbar-date" id="liveDate">Loading...</span>
+            <span style="color:#CBD5E1;">|</span>
+            <i class="bi bi-clock" style="color:#3B82F6;"></i>
+            <span class="topbar-time" id="liveTime">--:--</span>
         </div>
         <div class="topbar-actions">
             <button class="topbar-btn" title="Notifikasi">
@@ -725,25 +660,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
         const mins = String(now.getMinutes()).padStart(2, '0');
-        const secs = String(now.getSeconds()).padStart(2, '0');
-        const h = now.getHours();
         
         const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
         const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
         
         const timeEl = document.getElementById('liveTime');
         const dateEl = document.getElementById('liveDate');
-        const greetEl = document.getElementById('greetingText');
         
-        if (timeEl) timeEl.textContent = hours + ':' + mins + ':' + secs;
+        if (timeEl) timeEl.textContent = hours + ':' + mins;
         if (dateEl) dateEl.textContent = days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
-        
-        if (greetEl) {
-            if (h >= 5 && h < 11) greetEl.textContent = '🌤️ Selamat Pagi';
-            else if (h >= 11 && h < 15) greetEl.textContent = '☀️ Selamat Siang';
-            else if (h >= 15 && h < 18) greetEl.textContent = '🌅 Selamat Sore';
-            else greetEl.textContent = '🌙 Selamat Malam';
-        }
     }
     updateDateTime();
     setInterval(updateDateTime, 1000);
