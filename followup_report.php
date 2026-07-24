@@ -252,6 +252,11 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
 }
 </style>
 
+<?php
+$fu_today_res = $conn->query("SELECT COUNT(*) as t FROM follow_ups WHERE DATE(tgl_follow_up) = CURRENT_DATE() AND deleted_at IS NULL");
+$fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
+?>
+
 <!-- Hero Header -->
 <div class="report-hero">
     <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
@@ -266,8 +271,12 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
         </div>
         <div class="d-flex align-items-center gap-3 mt-3 mt-md-0">
             <div class="bg-white bg-opacity-10 backdrop-blur rounded-4 p-3 px-4 border border-white border-opacity-10 text-center">
-                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.7); font-weight:700;">Total Records</div>
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.7); font-weight:700;">Total Laporan</div>
                 <div style="font-size:24px; font-weight:800; color:#FFF;"><?php echo number_format($total_records); ?></div>
+            </div>
+            <div class="bg-white bg-opacity-10 backdrop-blur rounded-4 p-3 px-4 border border-white border-opacity-10 text-center">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(52,211,153,0.9); font-weight:700;">Follow Up Hari Ini</div>
+                <div style="font-size:24px; font-weight:800; color:#34D399;"><?php echo number_format($fu_today_count); ?></div>
             </div>
         </div>
     </div>
@@ -362,42 +371,43 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
                     <?php if ($followups_result->num_rows > 0): ?>
                         <?php while($fu = $followups_result->fetch_assoc()): ?>
                             <tr id="followup-row-<?php echo $fu['id']; ?>">
-                                <td class="text-nowrap" style="font-size:12.5px; font-weight:600; color:#64748B;">
-                                    <i class="bi bi-clock me-1 text-primary"></i>
-                                    <?php echo date('d M Y', strtotime($fu['tgl_follow_up'])); ?>
-                                    <div style="font-size:11px; color:#94A3B8; margin-top:2px; font-weight:500;">
-                                        <?php echo date('H:i', strtotime($fu['tgl_follow_up'])); ?> WIB
+                                <td class="text-nowrap" style="vertical-align:top;">
+                                    <div class="fw-extrabold text-dark" style="font-size:13px; font-family:'Plus Jakarta Sans', sans-serif;">
+                                        <i class="bi bi-calendar-event-fill text-primary me-1"></i><?php echo date('d M Y', strtotime($fu['tgl_follow_up'])); ?>
+                                    </div>
+                                    <div class="badge bg-light text-slate border fw-bold mt-1" style="font-size:11px; color:#475569; border-radius:12px; padding:3px 8px;">
+                                        <i class="bi bi-clock-fill text-muted me-1"></i><?php echo date('H:i', strtotime($fu['tgl_follow_up'])); ?> WIB
                                     </div>
                                 </td>
-                                <td>
+                                <td style="vertical-align:top;">
                                     <div class="fw-bold mb-1">
                                         <a href="followup_view.php?customer_id=<?php echo $fu['customer_id']; ?>" class="text-decoration-none text-dark hover-primary" style="font-size:14px; font-family:'Plus Jakarta Sans', sans-serif;">
-                                            <?php echo htmlspecialchars($fu['nama_toko']); ?>
+                                            <i class="bi bi-shop text-primary me-1"></i><?php echo htmlspecialchars($fu['nama_toko']); ?>
                                         </a>
                                     </div>
                                     <div class="d-flex gap-1 flex-wrap mt-1">
                                         <?php if ($fu['acc_boss'] == 'Y'): ?>
-                                            <span class="badge bg-success" title="<?php echo htmlspecialchars($fu['acc_boss_note']); ?>"><i class="bi bi-check-circle-fill"></i> Acc Boss</span>
+                                            <span class="badge bg-success" style="border-radius:12px; padding:3px 8px;" title="<?php echo htmlspecialchars($fu['acc_boss_note']); ?>"><i class="bi bi-check-circle-fill me-1"></i>Acc Boss</span>
                                         <?php endif; ?>
                                         <?php if ($fu['potensial'] == 'Y'): ?>
-                                            <span class="badge bg-warning"><i class="bi bi-star-fill"></i> Potensial</span>
+                                            <span class="badge bg-warning text-dark" style="border-radius:12px; padding:3px 8px;"><i class="bi bi-star-fill me-1"></i>Potensial</span>
                                         <?php endif; ?>
                                         <?php if ($fu['kandidat'] == 'Y'): ?>
-                                            <span class="badge bg-info"><i class="bi bi-person-fill"></i> Kandidat</span>
+                                            <span class="badge bg-info text-dark" style="border-radius:12px; padding:3px 8px;"><i class="bi bi-person-fill me-1"></i>Kandidat</span>
                                         <?php endif; ?>
                                     </div>
                                 </td>
-                                <td class="text-nowrap">
-                                    <div class="d-flex align-items-center">
-                                        <div class="sales-avatar-badge">
+                                <td class="text-nowrap" style="vertical-align:top;">
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <div class="sales-avatar-badge flex-shrink-0">
                                             <?php echo strtoupper(substr($fu['nama_sales_fu'], 0, 1)); ?>
                                         </div>
-                                        <span style="font-weight:600; font-size:13px; color:#1E293B;">
+                                        <span style="font-weight:700; font-size:13px; color:#1E293B;">
                                             <?php echo htmlspecialchars($fu['nama_sales_fu']); ?>
                                         </span>
                                     </div>
                                 </td>
-                                <td>
+                                <td style="vertical-align:top;">
                                     <?php 
                                     $respon = htmlspecialchars($fu['respon']);
                                     $pillClass = 'respon-default';
@@ -417,27 +427,31 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
                                         $pillClass = 'respon-info'; $icon = 'bi-info-circle-fill';
                                     }
                                     ?>
-                                    <span class="respon-pill <?php echo $pillClass; ?>">
+                                    <span class="respon-pill <?php echo $pillClass; ?>" style="white-space:normal; max-width:180px; line-height:1.3;">
                                         <i class="bi <?php echo $icon; ?>"></i> <?php echo $respon; ?>
                                     </span>
                                     <?php if ($fu['no_inv']): ?>
-                                        <div class="inv-badge"><i class="bi bi-receipt"></i> <?php echo htmlspecialchars($fu['no_inv']); ?></div>
+                                        <div class="inv-badge mt-1"><i class="bi bi-receipt"></i> <?php echo htmlspecialchars($fu['no_inv']); ?></div>
                                     <?php endif; ?>
                                 </td>
-                                <td style="font-size:13px; color:#475569; line-height:1.5;">
-                                    <?php echo nl2br(htmlspecialchars($fu['keterangan'])); ?>
+                                <td style="vertical-align:top;">
+                                    <div class="p-2.5 rounded-3 border text-dark fw-medium" style="font-size:13px; line-height:1.5; font-family:'Inter', sans-serif; background:#F8FAFC; border-color:#E2E8F0 !important;">
+                                        <?php echo nl2br(htmlspecialchars($fu['keterangan'])); ?>
+                                    </div>
                                 </td>
-                                <td>
+                                <td style="vertical-align:top;">
                                     <div class="d-flex flex-column gap-1">
-                                    <?php for ($i = 1; $i <= 3; $i++): $media_file = $fu['media'.$i]; if ($media_file): ?>
-                                        <a href="#" class="btn btn-outline-secondary btn-sm text-truncate" style="max-width: 140px; font-size:11px;" data-bs-toggle="modal" data-bs-target="#mediaModal" data-file-url="assets/uploads/<?php echo htmlspecialchars($media_file); ?>" data-file-name="<?php echo htmlspecialchars($media_file); ?>">
-                                            <i class="bi <?php echo get_file_icon($media_file); ?>"></i> <?php echo htmlspecialchars(substr($media_file, 14)); ?>
+                                    <?php for ($i = 1; $i <= 3; $i++): $media_file = $fu['media'.$i]; if ($media_file): 
+                                        $ext = strtolower(pathinfo($media_file, PATHINFO_EXTENSION));
+                                    ?>
+                                        <a href="#" class="btn btn-sm shadow-2sm text-truncate fw-bold d-inline-flex align-items-center gap-1" style="max-width:140px; font-size:11px; background:#F0FDF4; color:#15803D; border:1px solid #86EFAC; border-radius:20px; padding:4px 10px;" data-bs-toggle="modal" data-bs-target="#mediaModal" data-file-url="assets/uploads/<?php echo htmlspecialchars($media_file); ?>" data-file-name="<?php echo htmlspecialchars($media_file); ?>" title="Klik untuk lihat Bukti Chat">
+                                            <i class="bi bi-whatsapp text-success"></i> 📄 Bukti (<?php echo strtoupper($ext); ?>)
                                         </a>
                                     <?php endif; endfor; ?>
                                     </div>
                                 </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-danger delete-followup-btn" data-followup-id="<?php echo $fu['id']; ?>" title="Hapus catatan">
+                                <td class="text-center" style="vertical-align:top;">
+                                    <button class="btn btn-sm rounded-circle shadow-sm delete-followup-btn" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; background:#FEF2F2; color:#DC2626; border:1px solid #FECACA;" data-followup-id="<?php echo $fu['id']; ?>" title="Hapus catatan">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
                                 </td>
