@@ -303,13 +303,22 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
             <p class="report-hero-subtitle">Pantau seluruh aktivitas komunikasi, respon customer, dan konversi sales secara terpusat.</p>
         </div>
         <div class="d-flex align-items-center gap-3 mt-3 mt-md-0">
-            <div class="bg-white bg-opacity-10 backdrop-blur rounded-4 p-3 px-4 border border-white border-opacity-10 text-center">
-                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.7); font-weight:700;">Total Laporan</div>
-                <div style="font-size:24px; font-weight:800; color:#FFF;"><?php echo number_format($total_records); ?></div>
+            <div class="p-3 px-4 text-center rounded-4 shadow-sm" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid rgba(255, 255, 255, 0.25); min-width: 145px;">
+                <div style="font-size:11.5px; text-transform:uppercase; letter-spacing:1px; color: #DBEAFE; font-weight:800; margin-bottom: 2px;">
+                    📊 TOTAL LAPORAN
+                </div>
+                <div style="font-size:28px; font-weight:900; color: #FFFFFF; font-family:'Plus Jakarta Sans', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.25);">
+                    <?php echo number_format($total_records); ?>
+                </div>
             </div>
-            <div class="bg-white bg-opacity-10 backdrop-blur rounded-4 p-3 px-4 border border-white border-opacity-10 text-center">
-                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(52,211,153,0.9); font-weight:700;">Follow Up Hari Ini</div>
-                <div style="font-size:24px; font-weight:800; color:#34D399;"><?php echo number_format($fu_today_count); ?></div>
+            
+            <div class="p-3 px-4 text-center rounded-4 shadow-sm" style="background: rgba(16, 185, 129, 0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid rgba(52, 211, 153, 0.5); min-width: 155px;">
+                <div style="font-size:11.5px; text-transform:uppercase; letter-spacing:1px; color: #A7F3D0; font-weight:800; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">
+                    ⚡ HARI INI
+                </div>
+                <div style="font-size:28px; font-weight:900; color: #6EE7B7; font-family:'Plus Jakarta Sans', sans-serif; text-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+                    <?php echo number_format($fu_today_count); ?>
+                </div>
             </div>
         </div>
     </div>
