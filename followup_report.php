@@ -31,6 +31,9 @@ $allowed_sort_columns = [
 $tgl_mulai = $_GET['tgl_mulai'] ?? '';
 $tgl_akhir = $_GET['tgl_akhir'] ?? '';
 $selected_sales_id = isset($_GET['sales_id']) && is_numeric($_GET['sales_id']) ? (int)$_GET['sales_id'] : '';
+$search_keyword = trim($_GET['search'] ?? '');
+$respon_filter = trim($_GET['respon'] ?? '');
+$status_filter = trim($_GET['status'] ?? '');
 $limit = $_GET['limit'] ?? 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $sort_by = isset($_GET['sort_by']) && array_key_exists($_GET['sort_by'], $allowed_sort_columns) ? $_GET['sort_by'] : 'tgl_follow_up';
@@ -55,6 +58,32 @@ if ($selected_sales_id) {
     $conditions[] = "fu.sales_id = ?";
     $params[] = $selected_sales_id;
     $types .= 'i';
+}
+if ($respon_filter) {
+    if ($respon_filter === 'info') {
+        $conditions[] = "(LOWER(fu.respon) LIKE '%informasi%' OR LOWER(fu.respon) LIKE '%menginformasikan%')";
+    } elseif ($respon_filter === 'no_respon') {
+        $conditions[] = "(fu.respon LIKE '%Tidak ada respon%' OR fu.respon LIKE '%Tidak tertarik%')";
+    } else {
+        $conditions[] = "fu.respon = ?";
+        $params[] = $respon_filter;
+        $types .= 's';
+    }
+}
+if ($status_filter) {
+    if ($status_filter === 'acc_boss') {
+        $conditions[] = "c.acc_boss = 'Y'";
+    } elseif ($status_filter === 'potensial') {
+        $conditions[] = "c.potensial = 'Y'";
+    } elseif ($status_filter === 'kandidat') {
+        $conditions[] = "c.kandidat = 'Y'";
+    }
+}
+if ($search_keyword) {
+    $conditions[] = "(c.nama_toko LIKE ? OR fu.keterangan LIKE ? OR fu.no_inv LIKE ?)";
+    $like_search = '%' . $search_keyword . '%';
+    array_push($params, $like_search, $like_search, $like_search);
+    $types .= 'sss';
 }
 
 $where_clause = " WHERE " . implode(' AND ', $conditions);
@@ -98,6 +127,9 @@ $base_link_params = [
     'tgl_mulai' => $tgl_mulai,
     'tgl_akhir' => $tgl_akhir,
     'sales_id' => $selected_sales_id,
+    'search' => $search_keyword,
+    'respon' => $respon_filter,
+    'status' => $status_filter,
     'limit' => $limit
 ];
 
@@ -284,23 +316,32 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
 </div>
 
 <!-- Filter Card -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="bi bi-funnel-fill"></i> Filter Laporan Follow Up</h5>
+<div class="card mb-4 border-0 shadow-sm" style="border-radius:16px;">
+    <div class="card-header bg-white py-3 border-bottom">
+        <h5 class="mb-0 text-dark fw-bold" style="font-size:15px;"><i class="bi bi-funnel-fill text-primary me-1"></i> Filter Laporan Follow Up</h5>
     </div>
-    <div class="card-body">
+    <div class="card-body p-4">
         <form action="" method="GET" id="filter-form">
-            <div class="row g-3 align-items-end">
+            <!-- Row 1: Search, Dari Tanggal, Sampai Tanggal -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-6 col-12">
+                    <label for="search" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">🔍 Cari Kata Kunci / Toko / Invoice</label>
+                    <input type="text" class="form-control" id="search" name="search" placeholder="Ketik nama toko, no invoice, atau kata kunci catatan..." value="<?php echo htmlspecialchars($search_keyword); ?>">
+                </div>
                 <div class="col-md-3 col-sm-6">
-                    <label for="tgl_mulai" class="form-label">Dari Tanggal</label>
+                    <label for="tgl_mulai" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">📅 Dari Tanggal</label>
                     <input type="date" class="form-control" id="tgl_mulai" name="tgl_mulai" value="<?php echo htmlspecialchars($tgl_mulai); ?>">
                 </div>
                 <div class="col-md-3 col-sm-6">
-                    <label for="tgl_akhir" class="form-label">Sampai Tanggal</label>
+                    <label for="tgl_akhir" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">📅 Sampai Tanggal</label>
                     <input type="date" class="form-control" id="tgl_akhir" name="tgl_akhir" value="<?php echo htmlspecialchars($tgl_akhir); ?>">
                 </div>
+            </div>
+
+            <!-- Row 2: Sales, Respon, Status, Buttons -->
+            <div class="row g-3 align-items-end">
                 <div class="col-md-3 col-sm-6">
-                    <label for="sales_id" class="form-label">Pilih Sales</label>
+                    <label for="sales_id" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">👤 Pilih Sales</label>
                     <select id="sales_id" name="sales_id" class="form-select">
                         <option value="">Semua Sales</option>
                         <?php mysqli_data_seek($sales_list_result, 0); ?>
@@ -311,11 +352,32 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
                         <?php endwhile; ?>
                     </select>
                 </div>
+                <div class="col-md-3 col-sm-6">
+                    <label for="respon" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">💬 Respon Follow Up</label>
+                    <select id="respon" name="respon" class="form-select">
+                        <option value="">Semua Respon</option>
+                        <option value="Deal untuk beli" <?php if ($respon_filter == 'Deal untuk beli') echo 'selected'; ?>>🏆 Deal untuk beli</option>
+                        <option value="Muncul keinginan membeli" <?php if ($respon_filter == 'Muncul keinginan membeli') echo 'selected'; ?>>🚀 Muncul Keinginan Membeli</option>
+                        <option value="Follow Up" <?php if ($respon_filter == 'Follow Up') echo 'selected'; ?>>🔄 Follow Up Berjalan</option>
+                        <option value="Hanya bertanya" <?php if ($respon_filter == 'Hanya bertanya') echo 'selected'; ?>>❓ Hanya Bertanya</option>
+                        <option value="info" <?php if ($respon_filter == 'info') echo 'selected'; ?>>ℹ️ Info Customer</option>
+                        <option value="no_respon" <?php if ($respon_filter == 'no_respon') echo 'selected'; ?>>❌ Tidak Ada Respon / Tertarik</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label for="status" class="form-label fw-bold text-slate" style="font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">🏷️ Status Customer</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="">Semua Status</option>
+                        <option value="acc_boss" <?php if ($status_filter == 'acc_boss') echo 'selected'; ?>>✔ Acc Boss</option>
+                        <option value="potensial" <?php if ($status_filter == 'potensial') echo 'selected'; ?>>⭐ Potensial</option>
+                        <option value="kandidat" <?php if ($status_filter == 'kandidat') echo 'selected'; ?>>👤 Kandidat</option>
+                    </select>
+                </div>
                 <div class="col-md-3 col-sm-6 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">
-                        <i class="bi bi-search"></i> Filter
+                    <button type="submit" class="btn btn-primary fw-bold flex-grow-1 shadow-sm">
+                        <i class="bi bi-search me-1"></i> Terapkan Filter
                     </button>
-                    <a href="followup_report.php" class="btn btn-secondary" title="Reset Filter">
+                    <a href="followup_report.php" class="btn btn-secondary fw-bold" title="Reset Filter">
                         <i class="bi bi-arrow-counterclockwise"></i> Reset
                     </a>
                 </div>
