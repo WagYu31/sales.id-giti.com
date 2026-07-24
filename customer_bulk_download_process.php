@@ -1,6 +1,10 @@
 <?php
-require '../vendor/autoload.php';
-require_once 'includes/db.php';
+require_once __DIR__ . '/includes/db.php';
+
+$vendor_autoload = __DIR__ . '/vendor/autoload.php';
+if (file_exists($vendor_autoload)) {
+    require_once $vendor_autoload;
+}
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -43,7 +47,7 @@ if (isset($_POST['customer_ids']) && is_array($_POST['customer_ids'])) {
     
     $where_clause = implode(' AND ', $sql_where_conditions);
 
-    // --- Query Diperbarui untuk Memisahkan Alamat, Kota, Provinsi ---
+    // --- Query untuk Memisahkan Alamat, Kota, Provinsi ---
     $sql = "
         SELECT 
             c.nama_toko,
@@ -67,48 +71,71 @@ if (isset($_POST['customer_ids']) && is_array($_POST['customer_ids'])) {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    $spreadsheet = new Spreadsheet();
-    $sheet = $spreadsheet->getActiveSheet();
-    $sheet->setTitle('Data Customer');
-
-    // --- Header Diperbarui ---
-    $headers = ['Nama Toko', 'Kategori', 'PIC', 'Telepon', 'Alamat', 'Kota', 'Provinsi', 'Sales Penanggung Jawab'];
-    $sheet->fromArray($headers, NULL, 'A1');
-    
-    foreach (range('A', 'H') as $columnID) {
-        $sheet->getColumnDimension($columnID)->setAutoSize(true);
-    }
-
-    $row_num = 2;
-    while ($row = $result->fetch_assoc()) {
-        $sheet->setCellValue('A' . $row_num, $row['nama_toko']);
-        $sheet->setCellValue('B' . $row_num, $row['kategori']);
-        $sheet->setCellValue('C' . $row_num, $row['pics']);
-        $sheet->setCellValue('D' . $row_num, $row['phones']);
-        $sheet->setCellValue('E' . $row_num, $row['addresses']);
-        $sheet->setCellValue('F' . $row_num, $row['cities']);
-        $sheet->setCellValue('G' . $row_num, $row['provinces']);
-        $sheet->setCellValue('H' . $row_num, $row['sales_pj']);
-        $row_num++;
-    }
-
-    // --- Hapus Cookie Tanda Download Berhasil ---
+    // Hapus Cookie Tanda Download Berhasil
     if (isset($_POST['download_token'])) {
         $token = $_POST['download_token'];
-        setcookie('download_token', $token, time() - 3600, "/"); // Hapus cookie
+        setcookie('download_token', $token, time() - 3600, "/");
     }
 
-    $filename = "data_customer_" . date('Ymd_His') . ".xlsx";
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment;filename="' . $filename . '"');
-    header('Cache-Control: max-age=0');
+    $filename = "data_customer_" . date('Ymd_His');
 
-    $writer = new Xlsx($spreadsheet);
-    $writer->save('php://output');
-    exit();
+    // Jika PhpSpreadsheet tersedia, generate file XLSX
+    if (class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet')) {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Data Customer');
 
-} else {
-    $_SESSION['flash_message_error'] = "Tidak ada customer yang dipilih.";
-    header("Location: customer_export.php");
-    exit();
+        $headers = ['Nama Toko', 'Kategori', 'PIC', 'Telepon', 'Alamat', 'Kota', 'Provinsi', 'Sales Penanggung Jawab'];
+        $sheet->fromArray($headers, NULL, 'A1');
+        
+        foreach (range('A', 'H') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $row_num = 2;
+        while ($row = $result->fetch_assoc()) {
+            $sheet->setCellValue('A' . $row_num, $row['nama_toko']);
+            $sheet->setCellValue('B' . $row_num, $row['kategori']);
+            $sheet->setCellValue('C' . $row_num, $row['pics']);
+            $sheet->setCellValue('D' . $row_num, $row['phones']);
+            $sheet->setCellValue('E' . $row_num, $row['addresses']);
+            $sheet->setCellValue('F' . $row_num, $row['cities']);
+            $sheet->setCellValue('G' . $row_num, $row['provinces']);
+            $sheet->setCellValue('H' . $row_num, $row['sales_pj']);
+            $row_num++;
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    } else {
+        // Fallback ke CSV jika composer / vendor PhpSpreadsheet belum di-load
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+        
+        $output = fopen('php://output', 'w');
+        // Add BOM for Excel UTF-8 compatibility
+        fputs($output, "\xEF\xBB\xBF");
+        fputcsv($output, ['Nama Toko', 'Kategori', 'PIC', 'Telepon', 'Alamat', 'Kota', 'Provinsi', 'Sales Penanggung Jawab']);
+        
+        while ($row = $result->fetch_assoc()) {
+            fputcsv($output, [
+                $row['nama_toko'],
+                $row['kategori'],
+                $row['pics'],
+                $row['phones'],
+                $row['addresses'],
+                $row['cities'],
+                $row['provinces'],
+                $row['sales_pj']
+            ]);
+        }
+        fclose($output);
+        exit;
+    }
 }
+?>
