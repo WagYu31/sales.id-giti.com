@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($respon_radio === 'Lainnya' && empty($respon_lainnya)) {
         $error = "Respon Lainnya wajib diisi jika Anda memilih opsi 'Lainnya'.";
-    } elseif (!isset($_FILES['media1']) || $_FILES['media1']['error'] != 0) {
-        $error = "Media 1 wajib diunggah.";
+    } elseif (!isset($_FILES['media1']) || $_FILES['media1']['error'] != 0 || empty($_FILES['media1']['tmp_name'])) {
+        $error = "❌ BUKTI CHAT WAJIB DIUNGGAH! Anda harus mengunggah Bukti Chat / Screenshot WA (Media 1) terlebih dahulu untuk dapat menyimpan data Follow Up.";
     }
 
     if (empty($error)) {
@@ -222,9 +222,11 @@ $file_accept_types = "image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx";
             <!-- Upload Media 1, 2, 3 -->
             <div class="row mb-4">
                 <div class="col-md-4 mb-3 mb-md-0">
-                    <label for="media1" class="form-label fw-bold text-dark">Media 1 <span class="text-danger">*</span></label>
-                    <input class="form-control" type="file" id="media1" name="media1" accept="<?php echo $file_accept_types; ?>" required>
-                    <small style="font-size:11px;" class="text-danger fw-semibold">*Format Gambar/Video/Dokumen/Audio (Max 10MB)</small>
+                    <label for="media1" class="form-label fw-bold text-danger">
+                        <i class="bi bi-chat-left-text-fill me-1"></i> Bukti Chat / Screenshot WA (Media 1) <span class="badge bg-danger ms-1">WAJIB UPLOAD</span>
+                    </label>
+                    <input class="form-control border-danger border-2" type="file" id="media1" name="media1" accept="<?php echo $file_accept_types; ?>" required>
+                    <small style="font-size:11px;" class="text-danger fw-bold">*Wajib upload screenshot / foto bukti chat WA (Max 10MB)</small>
                 </div>
                 <div class="col-md-4 mb-3 mb-md-0">
                     <label for="media2" class="form-label fw-bold text-dark">Media 2 (Opsional)</label>
@@ -251,6 +253,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const responRadios = document.querySelectorAll('input[name="respon_radio"]');
     const lainnyaContainer = document.getElementById('respon_lainnya_container');
     const lainnyaInput = document.getElementById('respon_lainnya');
+    const fuForm = document.querySelector('form');
+    const media1Input = document.getElementById('media1');
 
     responRadios.forEach(radio => {
         radio.addEventListener('change', function() {
@@ -264,6 +268,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    if (fuForm && media1Input) {
+        fuForm.addEventListener('submit', function(e) {
+            if (!media1Input.files || media1Input.files.length === 0) {
+                e.preventDefault();
+                alert('❌ GAGAL SIMPAN: Anda WAJIB mengunggah Bukti Chat / Screenshot WA (Media 1) terlebih dahulu sebelum dapat menyimpan Follow Up!');
+                media1Input.focus();
+                media1Input.classList.add('is-invalid');
+            }
+        });
+    }
 });
 </script>
 
