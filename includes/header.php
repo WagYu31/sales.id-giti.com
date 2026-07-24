@@ -388,6 +388,7 @@ table tr td { font-size: 0.85em; }
 .content-area {
     flex: 1;
     padding: 28px 32px;
+    background: #F8FAFC;
 }
 
 /* ============ RESPONSIVE ============ */
