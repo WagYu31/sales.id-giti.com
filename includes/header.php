@@ -457,7 +457,7 @@ table tr td { font-size: 0.85em; }
             </a>
             <?php endif; ?>
             <a href="sales_management.php" class="sidebar-link <?php echo in_array($currentPage,['sales_management.php'])?'active':''; ?>">
-                <i class="bi bi-graph-up-arrow"></i> Sales Performance
+                <i class="bi bi-graph-up-arrow"></i> Data Sales
             </a>
             <?php if ($userRole == 'superadmin'): ?>
             <a href="sales_assignment.php" class="sidebar-link <?php echo $currentPage=='sales_assignment.php'?'active':''; ?>">

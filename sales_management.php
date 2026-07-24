@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Manajemen & KPI Sales';
+$page_title = 'Data Sales';
 require_once 'includes/db.php';
 require_once 'includes/header.php';
 
