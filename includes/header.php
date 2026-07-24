@@ -273,39 +273,42 @@ table tr td { font-size: 0.85em; }
     z-index: 1030;
 }
 
-.topbar-search {
-    position: relative;
-    width: 320px;
+.topbar-datetime {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.topbar-search input {
-    width: 100%;
-    padding: 9px 14px 9px 40px;
-    border: 1.5px solid #E2E8F0;
+.topbar-datetime .datetime-icon {
+    width: 38px; height: 38px;
     border-radius: 10px;
-    font-size: 13px;
-    font-weight: 500;
+    background: linear-gradient(135deg, #EEF2FF, #E0E7FF);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3B82F6;
+    font-size: 16px;
+}
+
+.topbar-datetime .datetime-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar-datetime .datetime-time {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
     font-family: 'Inter', sans-serif;
-    color: #1E293B;
-    background: #F8FAFC;
-    outline: none;
-    transition: all 0.2s ease;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
 }
 
-.topbar-search input::placeholder { color: #94A3B8; }
-.topbar-search input:focus {
-    border-color: #3B82F6;
-    background: #FFFFFF;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
-}
-
-.topbar-search i {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94A3B8;
-    font-size: 14px;
+.topbar-datetime .datetime-date {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748B;
+    font-family: 'Inter', sans-serif;
 }
 
 .topbar-actions {
@@ -385,13 +388,13 @@ table tr td { font-size: 0.85em; }
     .sidebar { transform: translateX(-100%); }
     .sidebar.open { transform: translateX(0); }
     .main-wrapper { margin-left: 0; }
-    .topbar-search { width: 200px; }
+
 }
 
 @media (max-width: 576px) {
     .content-area { padding: 20px 16px; }
     .topbar { padding: 0 16px; }
-    .topbar-search { width: 150px; }
+
 }
 </style>
 </head>
@@ -496,9 +499,14 @@ table tr td { font-size: 0.85em; }
 <div class="main-wrapper">
     <!-- Top Bar -->
     <header class="topbar">
-        <div class="topbar-search">
-            <i class="bi bi-search"></i>
-            <input type="text" placeholder="Cari menu, customer, atau fitur..." id="globalSearch">
+        <div class="topbar-datetime">
+            <div class="datetime-icon">
+                <i class="bi bi-calendar3"></i>
+            </div>
+            <div class="datetime-info">
+                <span class="datetime-time" id="liveTime">--:--:--</span>
+                <span class="datetime-date" id="liveDate">Loading...</span>
+            </div>
         </div>
         <div class="topbar-actions">
             <button class="topbar-btn" title="Notifikasi">
@@ -641,5 +649,24 @@ document.addEventListener('DOMContentLoaded', function () {
     if (toggler) {
         toggler.addEventListener('click', () => sidebar.classList.toggle('open'));
     }
+
+    // Live Clock & Date
+    function updateDateTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const secs = String(now.getSeconds()).padStart(2, '0');
+        
+        const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+        const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        
+        const timeEl = document.getElementById('liveTime');
+        const dateEl = document.getElementById('liveDate');
+        
+        if (timeEl) timeEl.textContent = hours + ':' + mins + ':' + secs;
+        if (dateEl) dateEl.textContent = days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
 });
 </script>
