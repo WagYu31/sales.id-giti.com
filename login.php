@@ -437,28 +437,35 @@ tog.addEventListener('click',()=>{
         :'<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>';
 });
 
-// Particle Network Animation
+// Globe + Network Animation
 (function(){
     const canvas=document.getElementById('particleCanvas');
     const ctx=canvas.getContext('2d');
-    let w,h,particles=[];
-    const PARTICLE_COUNT=80;
-    const MAX_DIST=150;
+    let w,h;
+    let angle=0;
 
     function resize(){
         w=canvas.width=canvas.offsetWidth;
         h=canvas.height=canvas.offsetHeight;
     }
 
+    // Globe parameters
+    const GLOBE_RADIUS_RATIO=0.28;
+    const MERIDIANS=12;
+    const PARALLELS=8;
+
+    // Floating particles
+    const particles=[];
+    const PARTICLE_COUNT=60;
+
     class Particle{
-        constructor(){this.reset()}
-        reset(){
-            this.x=Math.random()*w;
-            this.y=Math.random()*h;
-            this.vx=(Math.random()-0.5)*0.4;
-            this.vy=(Math.random()-0.5)*0.4;
-            this.r=Math.random()*2+1;
-            this.alpha=Math.random()*0.4+0.1;
+        constructor(){
+            this.x=Math.random()*2000;
+            this.y=Math.random()*2000;
+            this.vx=(Math.random()-0.5)*0.3;
+            this.vy=(Math.random()-0.5)*0.3;
+            this.r=Math.random()*1.5+0.5;
+            this.alpha=Math.random()*0.3+0.05;
         }
         update(){
             this.x+=this.vx;
@@ -474,41 +481,159 @@ tog.addEventListener('click',()=>{
         }
     }
 
-    function init(){
-        resize();
-        particles=[];
-        for(let i=0;i<PARTICLE_COUNT;i++)particles.push(new Particle());
+    function initParticles(){
+        particles.length=0;
+        for(let i=0;i<PARTICLE_COUNT;i++){
+            const p=new Particle();
+            p.x=Math.random()*w;
+            p.y=Math.random()*h;
+            particles.push(p);
+        }
     }
 
-    function animate(){
-        ctx.clearRect(0,0,w,h);
-        
-        // Draw connections
+    function drawGlobe(cx,cy,R,rot){
+        ctx.strokeStyle='rgba(80,160,255,0.12)';
+        ctx.lineWidth=0.8;
+
+        // Draw parallels (horizontal circles)
+        for(let i=1;i<PARALLELS;i++){
+            const lat=Math.PI*i/PARALLELS-Math.PI/2;
+            const r=Math.cos(lat)*R;
+            const y=cy+Math.sin(lat)*R;
+            ctx.beginPath();
+            ctx.ellipse(cx,y,r,r*0.15,0,0,Math.PI*2);
+            ctx.stroke();
+        }
+
+        // Draw meridians (vertical arcs)
+        for(let i=0;i<MERIDIANS;i++){
+            const lon=Math.PI*2*i/MERIDIANS+rot;
+            const x1=Math.cos(lon)*R*0.05;
+            ctx.beginPath();
+            for(let j=0;j<=40;j++){
+                const lat=Math.PI*j/40-Math.PI/2;
+                const px=cx+Math.cos(lat)*Math.sin(lon)*R;
+                const py=cy+Math.sin(lat)*R;
+                if(j===0)ctx.moveTo(px,py);
+                else ctx.lineTo(px,py);
+            }
+            ctx.stroke();
+        }
+
+        // Outer circle
+        ctx.beginPath();
+        ctx.arc(cx,cy,R,0,Math.PI*2);
+        ctx.strokeStyle='rgba(80,160,255,0.2)';
+        ctx.lineWidth=1;
+        ctx.stroke();
+
+        // Inner glow
+        const grad=ctx.createRadialGradient(cx,cy,R*0.1,cx,cy,R*1.3);
+        grad.addColorStop(0,'rgba(0,82,204,0.15)');
+        grad.addColorStop(0.5,'rgba(0,82,204,0.05)');
+        grad.addColorStop(1,'transparent');
+        ctx.fillStyle=grad;
+        ctx.beginPath();
+        ctx.arc(cx,cy,R*1.3,0,Math.PI*2);
+        ctx.fill();
+
+        // Bright dots on globe surface (data points)
+        const dots=16;
+        for(let i=0;i<dots;i++){
+            const lat=Math.random()*Math.PI-Math.PI/2;
+            const lon=Math.random()*Math.PI*2+rot*2;
+            const px=cx+Math.cos(lat)*Math.sin(lon)*R;
+            const py=cy+Math.sin(lat)*R;
+            const frontFacing=Math.cos(lat)*Math.cos(lon-rot);
+            if(frontFacing>0){
+                const alpha=frontFacing*0.6;
+                ctx.beginPath();
+                ctx.arc(px,py,1.5,0,Math.PI*2);
+                ctx.fillStyle=`rgba(120,200,255,${alpha})`;
+                ctx.fill();
+            }
+        }
+    }
+
+    // Network rays from globe to edges
+    function drawRays(cx,cy,R){
+        const rayCount=20;
+        for(let i=0;i<rayCount;i++){
+            const a=Math.PI*2*i/rayCount+angle*0.2;
+            const startR=R*1.05;
+            const endR=R*2.5+Math.sin(angle+i)*R*0.5;
+            const x1=cx+Math.cos(a)*startR;
+            const y1=cy+Math.sin(a)*startR;
+            const x2=cx+Math.cos(a)*endR;
+            const y2=cy+Math.sin(a)*endR;
+
+            const grad=ctx.createLinearGradient(x1,y1,x2,y2);
+            grad.addColorStop(0,'rgba(80,160,255,0.2)');
+            grad.addColorStop(1,'rgba(80,160,255,0)');
+            ctx.beginPath();
+            ctx.moveTo(x1,y1);
+            ctx.lineTo(x2,y2);
+            ctx.strokeStyle=grad;
+            ctx.lineWidth=0.5;
+            ctx.stroke();
+
+            // End dot
+            ctx.beginPath();
+            ctx.arc(x2,y2,1.2,0,Math.PI*2);
+            ctx.fillStyle='rgba(100,180,255,0.15)';
+            ctx.fill();
+        }
+    }
+
+    // Particle connections
+    function drawConnections(){
+        const maxDist=120;
         for(let i=0;i<particles.length;i++){
             for(let j=i+1;j<particles.length;j++){
                 const dx=particles[i].x-particles[j].x;
                 const dy=particles[i].y-particles[j].y;
                 const dist=Math.sqrt(dx*dx+dy*dy);
-                if(dist<MAX_DIST){
-                    const alpha=(1-dist/MAX_DIST)*0.15;
+                if(dist<maxDist){
                     ctx.beginPath();
                     ctx.moveTo(particles[i].x,particles[i].y);
                     ctx.lineTo(particles[j].x,particles[j].y);
-                    ctx.strokeStyle=`rgba(100,180,255,${alpha})`;
-                    ctx.lineWidth=0.6;
+                    ctx.strokeStyle=`rgba(80,160,255,${(1-dist/maxDist)*0.08})`;
+                    ctx.lineWidth=0.5;
                     ctx.stroke();
                 }
             }
         }
+    }
 
-        // Update and draw particles
+    function animate(){
+        ctx.clearRect(0,0,w,h);
+
+        const cx=w*0.5;
+        const cy=h*0.65;
+        const R=Math.min(w,h)*GLOBE_RADIUS_RATIO;
+
+        // Draw rays behind globe
+        drawRays(cx,cy,R);
+
+        // Draw globe
+        drawGlobe(cx,cy,R,angle);
+
+        // Draw particles and connections
+        drawConnections();
         particles.forEach(p=>{p.update();p.draw()});
+
+        angle+=0.003;
         requestAnimationFrame(animate);
     }
 
-    window.addEventListener('resize',()=>{resize()});
+    function init(){
+        resize();
+        initParticles();
+        animate();
+    }
+
+    window.addEventListener('resize',()=>{resize();initParticles()});
     init();
-    animate();
 })();
 </script>
 </body>
