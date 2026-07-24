@@ -47,31 +47,14 @@ table tr td { font-size: 0.85em; }
 }
 
 .sidebar-logo {
-    padding: 28px 24px 20px;
+    padding: 24px 24px 20px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-.sidebar-logo .logo-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.sidebar-logo .logo-main {
-    font-size: 28px;
-    font-weight: 800;
-    color: #FFFFFF;
-    letter-spacing: -0.5px;
-    line-height: 1;
-    font-style: italic;
-}
-
-.sidebar-logo .logo-sub {
-    font-size: 11px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.4);
-    letter-spacing: 4px;
-    text-transform: uppercase;
+.sidebar-logo img {
+    height: 52px;
+    width: auto;
+    mix-blend-mode: screen;
 }
 
 .sidebar-nav {
@@ -361,10 +344,7 @@ table tr td { font-size: 0.85em; }
 <!-- ===== SIDEBAR ===== -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-        <div class="logo-text">
-            <span class="logo-main">Loewix</span>
-            <span class="logo-sub">Sales</span>
-        </div>
+        <img src="assets/images/loewix_sales_logo.png" alt="Loewix Sales">
     </div>
 
     <nav class="sidebar-nav">
