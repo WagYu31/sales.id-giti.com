@@ -3,6 +3,11 @@ $page_title = 'Dashboard Customer';
 require_once 'includes/db.php';
 require_once 'includes/header.php';
 
+// Filter params
+$filter_kota = trim($_GET['filter_kota'] ?? '');
+$filter_kategori = trim($_GET['filter_kategori'] ?? '');
+$filter_sales = intval($_GET['filter_sales'] ?? 0);
+
 $sql_where_conditions = ["c.deleted_at IS NULL"];
 $params = [];
 $types = '';
@@ -11,6 +16,22 @@ if (isset($_SESSION['role']) && $_SESSION['role'] == 'sales') {
     $sql_where_conditions[] = "c.sales_id = ?";
     $params[] = $_SESSION['user_id'];
     $types .= 'i';
+} elseif ($filter_sales > 0) {
+    $sql_where_conditions[] = "c.sales_id = ?";
+    $params[] = $filter_sales;
+    $types .= 'i';
+}
+
+if (!empty($filter_kota)) {
+    $sql_where_conditions[] = "c.id IN (SELECT customer_id FROM customer_addresses WHERE deleted_at IS NULL AND kota LIKE ?)";
+    $params[] = "%" . $filter_kota . "%";
+    $types .= 's';
+}
+
+if (!empty($filter_kategori)) {
+    $sql_where_conditions[] = "c.kategori = ?";
+    $params[] = $filter_kategori;
+    $types .= 's';
 }
 
 $where_clause = "WHERE " . implode(' AND ', $sql_where_conditions);
@@ -54,6 +75,35 @@ if ($result && $result->num_rows > 0) {
         $customers[] = $row;
     }
 }
+
+// Fetch list of distinct cities
+$cities = [];
+$r_city = $conn->query("SELECT DISTINCT TRIM(kota) AS nama_kota FROM customer_addresses WHERE deleted_at IS NULL AND kota IS NOT NULL AND TRIM(kota) != '' ORDER BY TRIM(kota) ASC");
+if ($r_city) {
+    while($row = $r_city->fetch_assoc()) {
+        $cities[] = $row['nama_kota'];
+    }
+}
+
+// Fetch list of distinct categories
+$categories = [];
+$r_cat = $conn->query("SELECT DISTINCT TRIM(kategori) AS nama_kategori FROM customers WHERE deleted_at IS NULL AND kategori IS NOT NULL AND TRIM(kategori) != '' ORDER BY TRIM(kategori) ASC");
+if ($r_cat) {
+    while($row = $r_cat->fetch_assoc()) {
+        $categories[] = $row['nama_kategori'];
+    }
+}
+
+// Fetch list of sales for filter
+$all_sales = [];
+if ($_SESSION['role'] !== 'sales') {
+    $r_sales = $conn->query("SELECT id, nama_lengkap FROM sales WHERE role = 'sales' ORDER BY nama_lengkap ASC");
+    if ($r_sales) {
+        while($row = $r_sales->fetch_assoc()) {
+            $all_sales[] = $row;
+        }
+    }
+}
 ?>
 
 <style>
@@ -61,7 +111,7 @@ if ($result && $result->num_rows > 0) {
     background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%);
     border-radius: 20px;
     padding: 32px 36px;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     color: #FFFFFF;
     position: relative;
     overflow: hidden;
@@ -104,6 +154,15 @@ if ($result && $result->num_rows > 0) {
     font-weight: 800;
     margin-right: 8px;
 }
+
+.filter-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+}
 </style>
 
 <!-- Hero Header -->
@@ -119,16 +178,80 @@ if ($result && $result->num_rows > 0) {
             <p class="cust-hero-subtitle">Kelola database seluruh customer, PIC kontak, status follow up, dan penugasan sales.</p>
         </div>
         <div class="mt-3 mt-md-0">
-            <a href="customer_add.php" class="btn btn-primary shadow-lg">
-                <i class="bi bi-person-plus-fill"></i> Tambah Customer Baru
+            <a href="customer_add.php" class="btn btn-primary shadow-lg fw-bold">
+                <i class="bi bi-person-plus-fill me-1"></i> Tambah Customer Baru
             </a>
         </div>
     </div>
 </div>
 
+<!-- Filter Toolbar Card -->
+<div class="filter-card">
+    <form method="GET" action="index.php" class="row g-3 align-items-end">
+        <!-- Filter Kota -->
+        <div class="col-md-3 col-sm-6">
+            <label for="filter_kota" class="form-label small text-muted fw-bold mb-1">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Filter Kota
+            </label>
+            <select name="filter_kota" id="filter_kota" class="form-select fw-semibold" style="border-radius:10px;">
+                <option value="">Semua Kota (<?php echo count($cities); ?> Kota)</option>
+                <?php foreach ($cities as $city): ?>
+                    <option value="<?php echo htmlspecialchars($city); ?>" <?php if ($filter_kota === $city) echo 'selected'; ?>>
+                        📍 <?php echo htmlspecialchars($city); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <!-- Filter Kategori -->
+        <div class="col-md-3 col-sm-6">
+            <label for="filter_kategori" class="form-label small text-muted fw-bold mb-1">
+                <i class="bi bi-tags-fill text-primary me-1"></i> Filter Kategori
+            </label>
+            <select name="filter_kategori" id="filter_kategori" class="form-select fw-semibold" style="border-radius:10px;">
+                <option value="">Semua Kategori</option>
+                <?php foreach ($categories as $cat): ?>
+                    <option value="<?php echo htmlspecialchars($cat); ?>" <?php if ($filter_kategori === $cat) echo 'selected'; ?>>
+                        🏷️ <?php echo htmlspecialchars($cat); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <!-- Filter Sales (Superadmin/Adminsales only) -->
+        <?php if ($_SESSION['role'] !== 'sales'): ?>
+        <div class="col-md-3 col-sm-6">
+            <label for="filter_sales" class="form-label small text-muted fw-bold mb-1">
+                <i class="bi bi-person-badge-fill text-info me-1"></i> Filter Sales
+            </label>
+            <select name="filter_sales" id="filter_sales" class="form-select fw-semibold" style="border-radius:10px;">
+                <option value="0">Semua Sales</option>
+                <?php foreach ($all_sales as $s): ?>
+                    <option value="<?php echo $s['id']; ?>" <?php if ($filter_sales === intval($s['id'])) echo 'selected'; ?>>
+                        👤 <?php echo htmlspecialchars($s['nama_lengkap']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <?php endif; ?>
+
+        <!-- Action Buttons -->
+        <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-md-3' : 'col-md-6'; ?> col-sm-6 d-flex gap-2">
+            <button type="submit" class="btn btn-primary fw-bold flex-grow-1" style="border-radius:10px;">
+                <i class="bi bi-funnel-fill me-1"></i> Terapkan Filter
+            </button>
+            <?php if (!empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0): ?>
+                <a href="index.php" class="btn btn-light border fw-bold" title="Reset Filter" style="border-radius:10px;">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </a>
+            <?php endif; ?>
+        </div>
+    </form>
+</div>
+
 <div id="notification" class="alert" style="display:none;"></div>
 
-<div class="card">
+<div class="card border-0 shadow-sm" style="border-radius:20px;">
     <div class="card-body p-0">
         <div id="table-loading-spinner" class="text-center p-5">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
@@ -137,7 +260,7 @@ if ($result && $result->num_rows > 0) {
             <h5 class="mt-3 text-muted">Memuat data customer...</h5>
         </div>
         <div class="table-responsive" id="customer-table-container" style="display: none;">
-            <table class="table table-hover align-middle sortable-table">
+            <table class="table table-hover align-middle sortable-table mb-0">
                 <thead class="table-dark-header">
                     <tr>
                         <th style="width: 18%;">NAMA TOKO</th>
@@ -183,7 +306,11 @@ if ($result && $result->num_rows > 0) {
                             <td>
                                 <span class="badge bg-light text-dark border fw-semibold"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span>
                             </td>
-                            <td class="small fw-semibold text-muted"><?php echo htmlspecialchars($customer['all_cities'] ?? '-'); ?></td>
+                            <td>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold" style="font-size:11px;">
+                                    <i class="bi bi-geo-alt-fill me-1"></i><?php echo htmlspecialchars($customer['all_cities'] ?? '-'); ?>
+                                </span>
+                            </td>
                             <td>
                                 <?php if ($customer['nama_sales']): ?>
                                     <div class="d-flex align-items-center">
@@ -227,7 +354,7 @@ if ($result && $result->num_rows > 0) {
                         </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="10" class="text-center p-5 text-muted">Belum ada data customer.</td></tr>
+                        <tr><td colspan="10" class="text-center p-5 text-muted">Belum ada data customer yang sesuai dengan filter ini.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
