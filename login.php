@@ -44,15 +44,16 @@ $conn->close();
     <title>Login — Loewix Sales</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{height:100%}
         body{
-            font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+            font-family:'Inter','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;
             height:100%;display:flex;
-            background:#FFFFFF;color:#1E293B;
+            background:#FFFFFF;color:#0F172A;
             -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
         }
 
         /* ============ LEFT HERO ============ */
@@ -97,18 +98,23 @@ $conn->close();
         }
 
         .hero-headline{
-            font-size:40px;font-weight:800;
+            font-size:40px;font-weight:700;
             color:#FFFFFF;line-height:1.2;
             letter-spacing:-1px;margin-bottom:20px;
         }
 
         .hero-headline span{
-            color:#0052CC;
+            font-weight:800;
+            background:linear-gradient(135deg,#3B82F6,#06B6D4);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
         }
 
         .hero-desc{
             font-size:15px;line-height:1.7;
-            color:rgba(255,255,255,0.5);
+            color:#94A3B8;
+            font-weight:500;
             margin-bottom:48px;max-width:400px;
         }
 
@@ -143,14 +149,14 @@ $conn->close();
         }
 
         .stat-glass-value{
-            font-size:28px;font-weight:800;
+            font-size:24px;font-weight:700;
             color:#FFFFFF;letter-spacing:-0.5px;
             line-height:1;
         }
 
         .stat-glass-label{
-            font-size:10px;font-weight:700;
-            color:rgba(255,255,255,0.35);
+            font-size:10px;font-weight:600;
+            color:#94A3B8;
             text-transform:uppercase;
             letter-spacing:1.2px;
             margin-top:6px;
@@ -181,19 +187,20 @@ $conn->close();
         }
 
         .form-greeting{
-            font-size:12px;font-weight:700;
-            color:#0052CC;text-transform:uppercase;
-            letter-spacing:1.2px;margin-bottom:8px;
+            font-size:12px;font-weight:600;
+            color:#2563EB;text-transform:uppercase;
+            letter-spacing:1.5px;margin-bottom:8px;
         }
 
         .form-title{
-            font-size:28px;font-weight:800;
+            font-size:28px;font-weight:700;
             color:#0F172A;margin-bottom:8px;
             letter-spacing:-0.5px;
         }
 
         .form-subtitle{
-            font-size:14px;color:#64748B;
+            font-size:14px;color:#475569;
+            font-weight:500;
             margin-bottom:32px;line-height:1.5;
         }
 
@@ -210,7 +217,7 @@ $conn->close();
         /* Fields */
         .field{margin-bottom:18px}
         .field-label{
-            display:block;font-size:13px;font-weight:600;
+            display:block;font-size:14px;font-weight:500;
             color:#334155;margin-bottom:6px;
         }
         .input-wrap{position:relative}
@@ -223,16 +230,16 @@ $conn->close();
         .field-input{
             width:100%;padding:13px 14px 13px 44px;
             border:1.5px solid #E2E8F0;border-radius:12px;
-            font-size:14px;font-weight:500;color:#1E293B;
-            background:#FFFFFF;font-family:'Plus Jakarta Sans',sans-serif;
+            font-size:14px;font-weight:500;color:#0F172A;
+            background:#FFFFFF;font-family:'Inter','Plus Jakarta Sans',sans-serif;
             outline:none;transition:all .2s ease;
         }
-        .field-input::placeholder{color:#94A3B8;font-weight:400}
+        .field-input::placeholder{color:#94A3B8;font-weight:400;font-size:14px}
         .field-input:focus{
-            border-color:#0052CC;
-            box-shadow:0 0 0 3px rgba(0,82,204,0.08);
+            border-color:#2563EB;
+            box-shadow:0 0 0 3px rgba(37,99,235,0.12);
         }
-        .field-input:focus ~ .ico{color:#0052CC}
+        .field-input:focus ~ .ico{color:#2563EB}
 
         .btn-toggle{
             position:absolute;right:12px;top:50%;
@@ -255,7 +262,7 @@ $conn->close();
             border-radius:5px;background:#FFFFFF;cursor:pointer;
             position:relative;transition:all .2s;
         }
-        .checkbox-label input:checked{background:#0052CC;border-color:#0052CC}
+        .checkbox-label input:checked{background:#2563EB;border-color:#2563EB}
         .checkbox-label input:checked::after{
             content:'';position:absolute;left:5px;top:2px;
             width:5px;height:9px;border:solid #fff;
@@ -266,12 +273,12 @@ $conn->close();
         .btn-submit{
             width:100%;padding:14px;border:none;border-radius:12px;
             font-size:15px;font-weight:700;
-            font-family:'Plus Jakarta Sans',sans-serif;
+            font-family:'Inter','Plus Jakarta Sans',sans-serif;
             color:#FFFFFF;cursor:pointer;
-            background:linear-gradient(135deg,#001D4A 0%,#0052CC 100%);
+            background:linear-gradient(135deg,#001D4A 0%,#1E40AF 100%);
             display:flex;align-items:center;justify-content:center;gap:8px;
             transition:all .25s ease;
-            box-shadow:0 2px 8px rgba(0,29,74,0.2);
+            box-shadow:0 2px 8px rgba(0,29,74,0.25);
         }
         .btn-submit:hover{
             box-shadow:0 6px 20px rgba(0,29,74,0.3);
@@ -288,8 +295,8 @@ $conn->close();
         .btn-secondary{
             width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
             padding:13px;border-radius:12px;border:1.5px solid #E2E8F0;
-            background:#FFFFFF;color:#334155;font-size:14px;font-weight:600;
-            font-family:'Plus Jakarta Sans',sans-serif;text-decoration:none;
+            background:#FFFFFF;color:#0F172A;font-size:14px;font-weight:600;
+            font-family:'Inter','Plus Jakarta Sans',sans-serif;text-decoration:none;
             cursor:pointer;transition:all .2s;
         }
         .btn-secondary:hover{background:#F8FAFC;border-color:#CBD5E1}
