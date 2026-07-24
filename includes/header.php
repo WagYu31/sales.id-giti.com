@@ -261,9 +261,11 @@ table tr td { font-size: 0.85em; }
 
 /* ============ TOP BAR ============ */
 .topbar {
-    height: 64px;
-    background: #FFFFFF;
-    border-bottom: 1px solid #E2E8F0;
+    height: 68px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226,232,240,0.8);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -273,21 +275,63 @@ table tr td { font-size: 0.85em; }
     z-index: 1030;
 }
 
+/* Left side: Greeting + DateTime */
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.topbar-greeting {
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar-greeting-text {
+    font-size: 11px;
+    font-weight: 500;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.2;
+}
+
+.topbar-greeting-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0F172A;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+}
+
+.topbar-divider {
+    width: 1px;
+    height: 36px;
+    background: linear-gradient(180deg, transparent, #CBD5E1, transparent);
+}
+
 .topbar-datetime {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #F8FAFC, #F1F5F9);
+    border: 1px solid rgba(226,232,240,0.6);
 }
 
 .topbar-datetime .datetime-icon {
-    width: 38px; height: 38px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #EEF2FF, #E0E7FF);
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #3B82F6;
-    font-size: 16px;
+    color: #fff;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(59,130,246,0.25);
 }
 
 .topbar-datetime .datetime-info {
@@ -296,7 +340,7 @@ table tr td { font-size: 0.85em; }
 }
 
 .topbar-datetime .datetime-time {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     color: #0F172A;
     font-family: 'Inter', sans-serif;
@@ -305,42 +349,55 @@ table tr td { font-size: 0.85em; }
 }
 
 .topbar-datetime .datetime-date {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: #64748B;
     font-family: 'Inter', sans-serif;
 }
 
+/* Right side: Actions */
 .topbar-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .topbar-btn {
-    width: 38px; height: 38px;
-    border-radius: 10px;
-    border: none;
-    background: #F1F5F9;
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
     color: #64748B;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 17px;
     transition: all 0.2s ease;
     position: relative;
 }
 
-.topbar-btn:hover { background: #E2E8F0; color: #1E293B; }
+.topbar-btn:hover {
+    background: #F1F5F9;
+    color: #3B82F6;
+    border-color: #CBD5E1;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
 
 .topbar-btn .notif-dot {
     position: absolute;
     top: 8px; right: 8px;
-    width: 7px; height: 7px;
+    width: 8px; height: 8px;
     border-radius: 50%;
     background: #EF4444;
-    border: 1.5px solid #FFFFFF;
+    border: 2px solid #FFFFFF;
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    50% { box-shadow: 0 0 0 4px rgba(239,68,68,0); }
 }
 
 .topbar-user {
@@ -348,8 +405,8 @@ table tr td { font-size: 0.85em; }
     align-items: center;
     gap: 10px;
     padding: 5px 14px 5px 5px;
-    border-radius: 12px;
-    background: #F8FAFC;
+    border-radius: 14px;
+    background: #FFFFFF;
     border: 1px solid #E2E8F0;
     cursor: pointer;
     text-decoration: none;
@@ -357,11 +414,16 @@ table tr td { font-size: 0.85em; }
     transition: all 0.2s ease;
 }
 
-.topbar-user:hover { background: #F1F5F9; border-color: #CBD5E1; }
+.topbar-user:hover {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+}
 
 .topbar-user-avatar {
-    width: 32px; height: 32px;
-    border-radius: 8px;
+    width: 34px; height: 34px;
+    border-radius: 10px;
     background: linear-gradient(135deg, #3B82F6, #1D4ED8);
     color: #fff;
     display: flex;
@@ -369,12 +431,13 @@ table tr td { font-size: 0.85em; }
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
+    box-shadow: 0 2px 6px rgba(59,130,246,0.25);
 }
 
 .topbar-user-name {
     font-size: 13px;
     font-weight: 600;
-    color: #334155;
+    color: #1E293B;
 }
 
 /* ============ CONTENT AREA ============ */
@@ -499,13 +562,20 @@ table tr td { font-size: 0.85em; }
 <div class="main-wrapper">
     <!-- Top Bar -->
     <header class="topbar">
-        <div class="topbar-datetime">
-            <div class="datetime-icon">
-                <i class="bi bi-calendar3"></i>
+        <div class="topbar-left">
+            <div class="topbar-greeting">
+                <span class="topbar-greeting-text" id="greetingText">Selamat Datang</span>
+                <span class="topbar-greeting-name"><?php echo $userName; ?></span>
             </div>
-            <div class="datetime-info">
-                <span class="datetime-time" id="liveTime">--:--:--</span>
-                <span class="datetime-date" id="liveDate">Loading...</span>
+            <div class="topbar-divider"></div>
+            <div class="topbar-datetime">
+                <div class="datetime-icon">
+                    <i class="bi bi-clock"></i>
+                </div>
+                <div class="datetime-info">
+                    <span class="datetime-time" id="liveTime">--:--:--</span>
+                    <span class="datetime-date" id="liveDate">Loading...</span>
+                </div>
             </div>
         </div>
         <div class="topbar-actions">
@@ -656,15 +726,24 @@ document.addEventListener('DOMContentLoaded', function () {
         const hours = String(now.getHours()).padStart(2, '0');
         const mins = String(now.getMinutes()).padStart(2, '0');
         const secs = String(now.getSeconds()).padStart(2, '0');
+        const h = now.getHours();
         
         const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
         const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
         
         const timeEl = document.getElementById('liveTime');
         const dateEl = document.getElementById('liveDate');
+        const greetEl = document.getElementById('greetingText');
         
         if (timeEl) timeEl.textContent = hours + ':' + mins + ':' + secs;
         if (dateEl) dateEl.textContent = days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+        
+        if (greetEl) {
+            if (h >= 5 && h < 11) greetEl.textContent = '🌤️ Selamat Pagi';
+            else if (h >= 11 && h < 15) greetEl.textContent = '☀️ Selamat Siang';
+            else if (h >= 15 && h < 18) greetEl.textContent = '🌅 Selamat Sore';
+            else greetEl.textContent = '🌙 Selamat Malam';
+        }
     }
     updateDateTime();
     setInterval(updateDateTime, 1000);
