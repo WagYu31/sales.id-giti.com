@@ -188,8 +188,9 @@ if ($_SESSION['role'] !== 'sales') {
             <p class="cust-hero-subtitle">Kelola database seluruh customer, PIC kontak, status follow up, dan penugasan sales.</p>
         </div>
         <div class="mt-3 mt-md-0">
-            <a href="customer_add.php" class="btn btn-primary shadow-lg fw-bold">
-                <i class="bi bi-person-plus-fill me-1"></i> Tambah Customer Baru
+            <a href="customer_add.php" class="btn btn-light text-dark fw-extrabold shadow-lg px-4 py-2.5 rounded-pill d-inline-flex align-items-center gap-2" style="font-weight:800; background:#FFFFFF; border:none; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+                <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle" style="width:26px; height:26px;"><i class="bi bi-plus-lg fs-6"></i></span>
+                <span>Tambah Customer Baru</span>
             </a>
         </div>
     </div>
@@ -200,10 +201,10 @@ if ($_SESSION['role'] !== 'sales') {
     <form method="GET" action="index.php" class="row g-3 align-items-end">
         <!-- Filter Kota -->
         <div class="col-md-3 col-sm-6">
-            <label for="filter_kota" class="form-label small text-muted fw-bold mb-1">
+            <label for="filter_kota" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                 <i class="bi bi-geo-alt-fill text-danger me-1"></i> Filter Kota
             </label>
-            <select name="filter_kota" id="filter_kota" class="form-select fw-semibold" style="border-radius:10px;">
+            <select name="filter_kota" id="filter_kota" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
                 <option value="">Semua Kota (<?php echo count($cities); ?> Kota)</option>
                 <?php foreach ($cities as $city): ?>
                     <option value="<?php echo htmlspecialchars($city); ?>" <?php if ($filter_kota === $city) echo 'selected'; ?>>
@@ -215,10 +216,10 @@ if ($_SESSION['role'] !== 'sales') {
 
         <!-- Filter Kategori -->
         <div class="col-md-3 col-sm-6">
-            <label for="filter_kategori" class="form-label small text-muted fw-bold mb-1">
+            <label for="filter_kategori" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                 <i class="bi bi-tags-fill text-primary me-1"></i> Filter Kategori
             </label>
-            <select name="filter_kategori" id="filter_kategori" class="form-select fw-semibold" style="border-radius:10px;">
+            <select name="filter_kategori" id="filter_kategori" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
                 <option value="">Semua Kategori</option>
                 <?php foreach ($categories as $cat): ?>
                     <option value="<?php echo htmlspecialchars($cat); ?>" <?php if ($filter_kategori === $cat) echo 'selected'; ?>>
@@ -231,10 +232,10 @@ if ($_SESSION['role'] !== 'sales') {
         <!-- Filter Sales (Superadmin/Adminsales only) -->
         <?php if ($_SESSION['role'] !== 'sales'): ?>
         <div class="col-md-3 col-sm-6">
-            <label for="filter_sales" class="form-label small text-muted fw-bold mb-1">
+            <label for="filter_sales" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                 <i class="bi bi-person-badge-fill text-info me-1"></i> Filter Sales
             </label>
-            <select name="filter_sales" id="filter_sales" class="form-select fw-semibold" style="border-radius:10px;">
+            <select name="filter_sales" id="filter_sales" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
                 <option value="0">Semua Sales</option>
                 <?php foreach ($all_sales as $s): ?>
                     <option value="<?php echo $s['id']; ?>" <?php if ($filter_sales === intval($s['id'])) echo 'selected'; ?>>
@@ -247,12 +248,12 @@ if ($_SESSION['role'] !== 'sales') {
 
         <!-- Action Buttons -->
         <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-md-3' : 'col-md-6'; ?> col-sm-6 d-flex gap-2">
-            <button type="submit" class="btn btn-primary fw-bold flex-grow-1" style="border-radius:10px;">
+            <button type="submit" class="btn btn-primary fw-bold flex-grow-1 shadow-sm d-inline-flex align-items-center justify-content-center gap-1" style="border-radius:12px; height:42px; font-weight:700;">
                 <i class="bi bi-funnel-fill me-1"></i> Terapkan Filter
             </button>
             <?php if (!empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0): ?>
-                <a href="index.php" class="btn btn-light border fw-bold" title="Reset Filter" style="border-radius:10px;">
-                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                <a href="index.php" class="btn btn-light border fw-bold d-inline-flex align-items-center justify-content-center" title="Reset Filter" style="border-radius:12px; height:42px;">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
                 </a>
             <?php endif; ?>
         </div>
@@ -308,11 +309,11 @@ if ($_SESSION['role'] !== 'sales') {
                                 ?>
                             </td>
                             <td>
-                                <span class="badge bg-light text-dark border fw-semibold"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span>
+                                <span class="badge bg-light text-dark border fw-semibold" style="border-radius:20px; padding:5px 12px; font-size:11.5px;"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span>
                             </td>
                             <td>
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold" style="font-size:11px;">
-                                    <i class="bi bi-geo-alt-fill me-1"></i><?php echo htmlspecialchars($customer['all_cities'] ?? '-'); ?>
+                                <span class="badge fw-bold" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; border-radius:20px; padding:5px 12px; font-size:11.5px;">
+                                    📍 <?php echo htmlspecialchars($customer['all_cities'] ?? '-'); ?>
                                 </span>
                             </td>
                             <td>
