@@ -93,8 +93,8 @@ $conn->close();
 
         .hero-logo-img{
             height:56px;width:auto;
-            filter:brightness(0) invert(1);
-            opacity:0.95;
+            filter:grayscale(1) invert(1);
+            mix-blend-mode:screen;
         }
 
         .hero-headline{

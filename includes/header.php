@@ -54,8 +54,8 @@ table tr td { font-size: 0.85em; }
 .sidebar-logo img {
     height: 52px;
     width: auto;
-    filter: brightness(0) invert(1);
-    opacity: 0.95;
+    filter: grayscale(1) invert(1);
+    mix-blend-mode: screen;
 }
 
 .sidebar-nav {
