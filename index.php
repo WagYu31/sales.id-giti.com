@@ -371,16 +371,6 @@ if ($_SESSION['role'] !== 'sales') {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Searchable Select2 for Filter Kota, Filter Kategori, and Filter Sales
-    if (typeof $.fn.select2 !== 'undefined') {
-        $('#filter_kota, #filter_kategori, #filter_sales').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: 'Pilih atau ketik pencarian...',
-            allowClear: true
-        });
-    }
-
     const tableBody = document.querySelector('.sortable-table tbody');
     const notification = document.getElementById('notification');
 
