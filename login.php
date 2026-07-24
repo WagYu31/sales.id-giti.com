@@ -340,7 +340,7 @@ $conn->close();
         </h1>
 
         <p class="hero-desc">
-            Pantau target, absensi, dan performa tim secara real-time. Semua yang Anda butuhkan untuk mengoptimalkan operasional sales.
+            Kelola data customer, lacak follow-up, dan pantau performa tim sales dari satu dashboard. Solusi lengkap untuk meningkatkan konversi penjualan Anda.
         </p>
 
         <div class="stat-row">
