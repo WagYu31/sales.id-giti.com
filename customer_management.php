@@ -475,7 +475,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 </div>
 
 <div class="menu-grid">
-    <a href="customer_list.php" class="mc-link animate-in">
+    <a href="index.php" class="mc-link animate-in">
         <div class="mc">
             <div class="mc-icon i-red"><i class="bi bi-people-fill"></i></div>
             <div class="mc-title">Daftar Customer</div>
@@ -484,7 +484,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
         </div>
     </a>
 
-    <a href="customer_potensial.php" class="mc-link animate-in">
+    <a href="kandidat_customer.php" class="mc-link animate-in">
         <div class="mc">
             <div class="mc-icon i-blue"><i class="bi bi-person-check-fill"></i></div>
             <div class="mc-title">Potensial Customer</div>
@@ -502,7 +502,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
         </div>
     </a>
 
-    <a href="customer_import.php" class="mc-link animate-in">
+    <a href="customer_io.php" class="mc-link animate-in">
         <div class="mc">
             <div class="mc-icon i-sky"><i class="bi bi-cloud-arrow-up-fill"></i></div>
             <div class="mc-title">Unggah Data Customer</div>
@@ -520,7 +520,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
         </div>
     </a>
 
-    <a href="customer_quality.php" class="mc-link animate-in">
+    <a href="customer_maintenance.php" class="mc-link animate-in">
         <div class="mc">
             <div class="mc-icon i-amber"><i class="bi bi-clipboard-check-fill"></i></div>
             <div class="mc-title">Kualitas Data Customer</div>
@@ -538,7 +538,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
         </div>
     </a>
 
-    <a href="ai_assistant.php" class="mc-link animate-in">
+    <a href="sales_assistant.html" class="mc-link animate-in">
         <div class="mc">
             <div class="mc-icon i-slate"><i class="bi bi-robot"></i></div>
             <div class="mc-title">Asisten Loewix <span class="mc-badge">BETA</span></div>
