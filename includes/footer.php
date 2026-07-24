@@ -1,13 +1,14 @@
 <?php
 // includes/footer.php
 ?>
-</main>
+    </main><!-- end content-area -->
 
-<footer style="text-align:center;padding:24px 0 20px;margin-top:48px;border-top:1px solid #E2E8F0;">
-    <p style="margin:0;font-size:12px;font-weight:500;color:#94A3B8;font-family:'Inter',sans-serif;">
-        &copy; <?php echo date('Y'); ?> Loewix Sales. All Rights Reserved.
-    </p>
-</footer>
+    <footer style="text-align:center;padding:20px 32px;border-top:1px solid #E2E8F0;">
+        <p style="margin:0;font-size:12px;font-weight:500;color:#94A3B8;font-family:'Inter',sans-serif;">
+            &copy; <?php echo date('Y'); ?> Loewix Sales. All Rights Reserved.
+        </p>
+    </footer>
+</div><!-- end main-wrapper -->
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

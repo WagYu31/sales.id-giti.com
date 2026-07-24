@@ -1,5 +1,9 @@
 <?php
-require_once 'auth.php'; // Cek apakah user sudah login
+require_once 'auth.php';
+$currentPage = basename($_SERVER['PHP_SELF']);
+$userInitials = strtoupper(substr($_SESSION['nama_lengkap'] ?? 'U', 0, 2));
+$userName = htmlspecialchars($_SESSION['nama_lengkap'] ?? 'User');
+$userRole = $_SESSION['role'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -15,258 +19,491 @@ require_once 'auth.php'; // Cek apakah user sudah login
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
 <style>
-    /* ============ GLOBAL OVERRIDES ============ */
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background: #F8FAFC;
-        color: #1E293B;
-        -webkit-font-smoothing: antialiased;
-    }
+/* ============ RESET & GLOBALS ============ */
+*,*::before,*::after { box-sizing: border-box; }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #F1F5F9;
+    color: #1E293B;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    min-height: 100vh;
+}
+table tr td { font-size: 0.85em; }
+.input-group-text { cursor: pointer; }
 
-    table tr td { font-size: 0.85em; }
-    .input-group-text { cursor: pointer; }
+/* ============ SIDEBAR ============ */
+.sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #0B1D3A 0%, #0F2847 100%);
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 1040;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+}
 
-    /* ============ PREMIUM NAVBAR ============ */
-    .navbar-loewix {
-        background: #FFFFFF;
-        border-bottom: 1px solid #E2E8F0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        padding: 0 24px;
-        height: 64px;
-    }
+.sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
 
-    .navbar-loewix .navbar-brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 800;
-        font-size: 16px;
-        color: #0F172A;
-        letter-spacing: -0.3px;
-        text-decoration: none;
-        padding: 0;
-    }
+.sidebar-logo img {
+    height: 36px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    opacity: 0.95;
+}
 
-    .navbar-loewix .navbar-brand img {
-        height: 32px;
-        width: auto;
-    }
+.sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    overflow-y: auto;
+}
 
-    .navbar-loewix .navbar-brand .brand-divider {
-        width: 1px;
-        height: 24px;
-        background: #E2E8F0;
-        margin: 0 4px;
-    }
+.nav-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 16px 14px 8px;
+}
 
-    .navbar-loewix .navbar-brand .brand-sub {
-        font-weight: 600;
-        font-size: 13px;
-        color: #64748B;
-    }
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+    position: relative;
+}
 
-    .navbar-loewix .navbar-nav .nav-link {
-        color: #64748B;
-        font-weight: 500;
-        font-size: 13.5px;
-        padding: 20px 14px;
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s ease;
-        white-space: nowrap;
-    }
+.sidebar-link i {
+    font-size: 17px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
 
-    .navbar-loewix .navbar-nav .nav-link:hover {
-        color: #1E40AF;
-    }
+.sidebar-link:hover {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.9);
+}
 
-    .navbar-loewix .navbar-nav .nav-link.active {
-        color: #1E40AF;
-        font-weight: 700;
-        border-bottom-color: #1E40AF;
-    }
+.sidebar-link.active {
+    background: rgba(59,130,246,0.15);
+    color: #60A5FA;
+    font-weight: 600;
+}
 
-    .navbar-loewix .dropdown-menu {
-        border: 1px solid #E2E8F0;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-        padding: 8px;
-        margin-top: 4px;
-    }
+.sidebar-link.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: #3B82F6;
+}
 
-    .navbar-loewix .dropdown-item {
-        font-size: 13.5px;
-        font-weight: 500;
-        padding: 8px 14px;
-        border-radius: 8px;
-        color: #475569;
-        transition: all 0.15s ease;
-    }
+/* Sidebar dropdown */
+.sidebar-dropdown-btn {
+    cursor: pointer;
+}
 
-    .navbar-loewix .dropdown-item:hover {
-        background: #F1F5F9;
-        color: #1E293B;
-    }
+.sidebar-dropdown-btn .chevron {
+    margin-left: auto;
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
 
-    .navbar-loewix .dropdown-item i {
-        margin-right: 8px;
-        font-size: 14px;
-    }
+.sidebar-dropdown-btn.open .chevron {
+    transform: rotate(180deg);
+}
 
-    .navbar-loewix .dropdown-item.text-danger:hover {
-        background: #FEF2F2;
-        color: #DC2626;
-    }
+.sidebar-submenu {
+    display: none;
+    padding-left: 20px;
+}
 
-    /* User avatar badge */
-    .user-badge {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 12px 6px 6px;
-        border-radius: 100px;
-        background: #F1F5F9;
-        font-size: 13px;
-        font-weight: 600;
-        color: #334155;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        border: none;
-    }
+.sidebar-submenu.show { display: block; }
 
-    .user-badge:hover {
-        background: #E2E8F0;
-    }
+.sidebar-submenu .sidebar-link {
+    font-size: 13px;
+    padding: 9px 14px;
+}
 
-    .user-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #1E40AF, #3B82F6);
-        color: #FFFFFF;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: 700;
-    }
+/* Sidebar footer */
+.sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.sidebar-user:hover { background: rgba(255,255,255,0.08); }
+
+.sidebar-user-avatar {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.sidebar-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-user-role {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+/* ============ MAIN WRAPPER ============ */
+.main-wrapper {
+    margin-left: 260px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ============ TOP BAR ============ */
+.topbar {
+    height: 64px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+.topbar-search {
+    position: relative;
+    width: 320px;
+}
+
+.topbar-search input {
+    width: 100%;
+    padding: 9px 14px 9px 40px;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    color: #1E293B;
+    background: #F8FAFC;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.topbar-search input::placeholder { color: #94A3B8; }
+.topbar-search input:focus {
+    border-color: #3B82F6;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+}
+
+.topbar-search i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    font-size: 14px;
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topbar-btn {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    border: none;
+    background: #F1F5F9;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.topbar-btn:hover { background: #E2E8F0; color: #1E293B; }
+
+.topbar-btn .notif-dot {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #EF4444;
+    border: 1.5px solid #FFFFFF;
+}
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 14px 5px 5px;
+    border-radius: 12px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+
+.topbar-user:hover { background: #F1F5F9; border-color: #CBD5E1; }
+
+.topbar-user-avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.topbar-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* ============ CONTENT AREA ============ */
+.content-area {
+    flex: 1;
+    padding: 28px 32px;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 991px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main-wrapper { margin-left: 0; }
+    .topbar-search { width: 200px; }
+}
+
+@media (max-width: 576px) {
+    .content-area { padding: 20px 16px; }
+    .topbar { padding: 0 16px; }
+    .topbar-search { width: 150px; }
+}
 </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-loewix sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="customer_management.php">
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
         <img src="assets/images/loewix_sales_logo.png" alt="Loewix Sales">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'adminsales'): ?>
-            <li class="nav-item">
-                <a class="nav-link" href="promosi_management.php">Promosi</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="sales_ads.php">Laporan Ads</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="ads_report.php">Report Saldo & Ads</a>
-            </li>
-        <?php else: ?>
-            <li class="nav-item">
-                <a class="nav-link" href="customer_management.php">Customer Management</a>
-            </li>
-            <?php if ($_SESSION['role'] == 'superadmin'): ?>
-            <li class="nav-item">
-              <a class="nav-link" href="followup_report.php">Follow Up Report</a>
-            </li>
-            <?php endif; ?>
-            <li class="nav-item">
-              <a class="nav-link" href="sales_management.php">Sales Performance</a>
-            </li>
-            <?php if ($_SESSION['role'] == 'superadmin'): ?>
-            <li class="nav-item">
-              <a class="nav-link" href="sales_assignment.php">Sales Management</a>
-            </li>
-            <?php endif; ?>
-            <li class="nav-item">
-                <a class="nav-link" href="sales_qa.php">Forum Q&A Sales</a>
-            </li>
-             <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarSalesTools" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Sales Tools
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarSalesTools">
-                        <li><a class="dropdown-item" href="broadcast_schedule.php"><i class="bi bi-megaphone"></i> Broadcast</a></li>
-                        <li><a class="dropdown-item" href="promosi_management.php"><i class="bi bi-tags"></i> Promosi</a></li>
-                        <li><a class="dropdown-item" href="price_list.php"><i class="bi bi-ui-checks"></i> Price List</a></li>
-                        <li><a class="dropdown-item" href="calculator_sales.php"><i class="bi bi-calculator"></i> Kalkulator Sales</a></li>
-                        <li><a class="dropdown-item" href="online_tools.php"><i class="bi bi-123"></i> Kalkulator Online</a></li>
-                        
-                        <?php if (in_array($_SESSION['role'], ['superadmin', 'adminsales'])): ?>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="sales_ads.php"><i class="bi bi-cart-check"></i> Laporan Ads Online</a></li>
-                            <li><a class="dropdown-item" href="ads_report.php"><i class="bi bi-bar-chart-line"></i> Report Saldo & Ads</a></li>
-                        <?php endif; ?>
-                    </ul>
-                </li>
-        <?php endif; ?>
-      </ul>
-      <ul class="navbar-nav">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle user-badge" href="#" role="button" data-bs-toggle="dropdown">
-            <span class="user-avatar"><?php echo strtoupper(substr($_SESSION['nama_lengkap'], 0, 2)); ?></span>
-            <?php echo htmlspecialchars($_SESSION['nama_lengkap']); ?>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i class="bi bi-key"></i> Ganti Password</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
-          </ul>
-        </li>
-      </ul>
     </div>
-  </div>
-</nav>
 
-<main class="container-fluid px-5 mt-4">
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Menu</div>
 
+        <?php if ($userRole == 'adminsales'): ?>
+            <a href="promosi_management.php" class="sidebar-link <?php echo $currentPage=='promosi_management.php'?'active':''; ?>">
+                <i class="bi bi-tags-fill"></i> Promosi
+            </a>
+            <a href="sales_ads.php" class="sidebar-link <?php echo $currentPage=='sales_ads.php'?'active':''; ?>">
+                <i class="bi bi-cart-check-fill"></i> Laporan Ads
+            </a>
+            <a href="ads_report.php" class="sidebar-link <?php echo $currentPage=='ads_report.php'?'active':''; ?>">
+                <i class="bi bi-bar-chart-line-fill"></i> Report Saldo & Ads
+            </a>
+        <?php else: ?>
+            <a href="customer_management.php" class="sidebar-link <?php echo $currentPage=='customer_management.php'?'active':''; ?>">
+                <i class="bi bi-grid-1x2-fill"></i> Customer Management
+            </a>
+            <?php if ($userRole == 'superadmin'): ?>
+            <a href="followup_report.php" class="sidebar-link <?php echo $currentPage=='followup_report.php'?'active':''; ?>">
+                <i class="bi bi-journal-check"></i> Follow Up Report
+            </a>
+            <?php endif; ?>
+            <a href="sales_management.php" class="sidebar-link <?php echo in_array($currentPage,['sales_management.php'])?'active':''; ?>">
+                <i class="bi bi-graph-up-arrow"></i> Sales Performance
+            </a>
+            <?php if ($userRole == 'superadmin'): ?>
+            <a href="sales_assignment.php" class="sidebar-link <?php echo $currentPage=='sales_assignment.php'?'active':''; ?>">
+                <i class="bi bi-people-fill"></i> Sales Management
+            </a>
+            <?php endif; ?>
+            <a href="sales_qa.php" class="sidebar-link <?php echo $currentPage=='sales_qa.php'?'active':''; ?>">
+                <i class="bi bi-chat-left-dots-fill"></i> Forum Q&A Sales
+            </a>
+
+            <div class="nav-section-label" style="margin-top:8px;">Tools</div>
+
+            <div>
+                <a href="#" class="sidebar-link sidebar-dropdown-btn" id="toolsDropdown">
+                    <i class="bi bi-tools"></i> Sales Tools
+                    <i class="bi bi-chevron-down chevron"></i>
+                </a>
+                <div class="sidebar-submenu" id="toolsSubmenu">
+                    <a href="broadcast_schedule.php" class="sidebar-link <?php echo $currentPage=='broadcast_schedule.php'?'active':''; ?>">
+                        <i class="bi bi-megaphone"></i> Broadcast
+                    </a>
+                    <a href="promosi_management.php" class="sidebar-link <?php echo ($currentPage=='promosi_management.php' && $userRole!='adminsales')?'active':''; ?>">
+                        <i class="bi bi-tags"></i> Promosi
+                    </a>
+                    <a href="price_list.php" class="sidebar-link <?php echo $currentPage=='price_list.php'?'active':''; ?>">
+                        <i class="bi bi-ui-checks"></i> Price List
+                    </a>
+                    <a href="calculator_sales.php" class="sidebar-link <?php echo $currentPage=='calculator_sales.php'?'active':''; ?>">
+                        <i class="bi bi-calculator"></i> Kalkulator Sales
+                    </a>
+                    <a href="online_tools.php" class="sidebar-link <?php echo $currentPage=='online_tools.php'?'active':''; ?>">
+                        <i class="bi bi-123"></i> Kalkulator Online
+                    </a>
+                    <?php if (in_array($userRole, ['superadmin', 'adminsales'])): ?>
+                    <a href="sales_ads.php" class="sidebar-link <?php echo ($currentPage=='sales_ads.php' && $userRole!='adminsales')?'active':''; ?>">
+                        <i class="bi bi-cart-check"></i> Laporan Ads
+                    </a>
+                    <a href="ads_report.php" class="sidebar-link <?php echo ($currentPage=='ads_report.php' && $userRole!='adminsales')?'active':''; ?>">
+                        <i class="bi bi-bar-chart-line"></i> Report Saldo & Ads
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="nav-section-label" style="margin-top:8px;">Akun</div>
+            <a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                <i class="bi bi-key-fill"></i> Ganti Password
+            </a>
+            <a href="logout.php" class="sidebar-link" style="color:rgba(248,113,113,0.7);">
+                <i class="bi bi-box-arrow-left"></i> Logout
+            </a>
+        <?php endif; ?>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="sidebar-user-avatar"><?php echo $userInitials; ?></div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name"><?php echo $userName; ?></div>
+                <div class="sidebar-user-role"><?php echo $userRole; ?></div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ===== MAIN WRAPPER ===== -->
+<div class="main-wrapper">
+    <!-- Top Bar -->
+    <header class="topbar">
+        <div class="topbar-search">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Cari menu, customer, atau fitur..." id="globalSearch">
+        </div>
+        <div class="topbar-actions">
+            <button class="topbar-btn" title="Notifikasi">
+                <i class="bi bi-bell"></i>
+                <span class="notif-dot"></span>
+            </button>
+            <div class="dropdown">
+                <a class="topbar-user dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="text-decoration:none;">
+                    <div class="topbar-user-avatar"><?php echo $userInitials; ?></div>
+                    <span class="topbar-user-name"><?php echo $userName; ?></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" style="border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.1);padding:8px;">
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal" style="font-size:13px;padding:8px 14px;border-radius:8px;"><i class="bi bi-key me-2"></i>Ganti Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="logout.php" style="font-size:13px;padding:8px 14px;border-radius:8px;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="content-area">
+
+<!-- Change Password Modal -->
 <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="changePasswordModalLabel"><i class="bi bi-key-fill"></i> Ganti Password</h5>
+    <div class="modal-content" style="border-radius:16px;border:none;">
+      <div class="modal-header" style="border-bottom:1px solid #E2E8F0;">
+        <h5 class="modal-title" id="changePasswordModalLabel" style="font-weight:700;font-size:16px;"><i class="bi bi-key-fill me-2"></i>Ganti Password</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="changePasswordForm">
             <div id="passwordChangeAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-                <label for="old_password" class="form-label">Password Lama</label>
+                <label for="old_password" class="form-label" style="font-size:13px;font-weight:600;">Password Lama</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="old_password" name="old_password" required>
-                    <span class="input-group-text toggle-password"><i class="bi bi-eye-slash"></i></span>
+                    <input type="password" class="form-control" id="old_password" name="old_password" required style="border-radius:10px 0 0 10px;">
+                    <span class="input-group-text toggle-password" style="border-radius:0 10px 10px 0;"><i class="bi bi-eye-slash"></i></span>
                 </div>
             </div>
             <div class="mb-3">
-                <label for="new_password" class="form-label">Password Baru</label>
+                <label for="new_password" class="form-label" style="font-size:13px;font-weight:600;">Password Baru</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="new_password" name="new_password" required>
-                    <span class="input-group-text toggle-password"><i class="bi bi-eye-slash"></i></span>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required style="border-radius:10px 0 0 10px;">
+                    <span class="input-group-text toggle-password" style="border-radius:0 10px 10px 0;"><i class="bi bi-eye-slash"></i></span>
                 </div>
             </div>
             <div class="mb-3">
-                <label for="confirm_password" class="form-label">Konfirmasi Password Baru</label>
+                <label for="confirm_password" class="form-label" style="font-size:13px;font-weight:600;">Konfirmasi Password Baru</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                    <span class="input-group-text toggle-password"><i class="bi bi-eye-slash"></i></span>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required style="border-radius:10px 0 0 10px;">
+                    <span class="input-group-text toggle-password" style="border-radius:0 10px 10px 0;"><i class="bi bi-eye-slash"></i></span>
                 </div>
             </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-        <button type="submit" form="changePasswordForm" class="btn btn-primary">Simpan Perubahan</button>
+      <div class="modal-footer" style="border-top:1px solid #E2E8F0;">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius:10px;">Tutup</button>
+        <button type="submit" form="changePasswordForm" class="btn btn-primary" style="border-radius:10px;">Simpan</button>
       </div>
     </div>
   </div>
@@ -274,37 +511,38 @@ require_once 'auth.php'; // Cek apakah user sudah login
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const currentPage = window.location.pathname.split("/").pop();
-    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-
-    navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (!href) return;
-        const linkPage = href.split("/").pop();
-        if (!link.classList.contains('dropdown-toggle')) {
-            link.classList.remove('active');
-        }
-        if (linkPage === currentPage) {
-            link.classList.add('active');
-        }
-    });
-
+    // Toggle password visibility
     document.querySelectorAll('.toggle-password').forEach(item => {
-        item.addEventListener('click', function (e) {
-            const passwordInput = this.previousElementSibling;
+        item.addEventListener('click', function () {
+            const input = this.previousElementSibling;
             const icon = this.querySelector('i');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
             } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
+                input.type = 'password';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
             }
         });
     });
 
+    // Sidebar dropdown toggle
+    const toolsBtn = document.getElementById('toolsDropdown');
+    const toolsSub = document.getElementById('toolsSubmenu');
+    if (toolsBtn && toolsSub) {
+        // Auto-open if a submenu item is active
+        if (toolsSub.querySelector('.sidebar-link.active')) {
+            toolsSub.classList.add('show');
+            toolsBtn.classList.add('open');
+        }
+        toolsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            toolsSub.classList.toggle('show');
+            this.classList.toggle('open');
+        });
+    }
+
+    // Change password form
     const passwordForm = document.getElementById('changePasswordForm');
     if (passwordForm) {
         const alertBox = document.getElementById('passwordChangeAlert');
@@ -313,7 +551,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         passwordForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            
             const formData = new FormData(this);
             alertBox.className = 'alert d-none';
 
@@ -323,31 +560,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            fetch('change_password.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
+            fetch('change_password.php', { method: 'POST', body: formData })
+            .then(r => r.json())
             .then(data => {
                 if (data.success) {
                     alertBox.className = 'alert alert-success';
                     alertBox.textContent = data.message;
                     passwordForm.reset();
-                    setTimeout(() => {
-                        modal.hide();
-                        alertBox.className = 'alert d-none';
-                    }, 2000);
+                    setTimeout(() => { modal.hide(); alertBox.className = 'alert d-none'; }, 2000);
                 } else {
                     alertBox.className = 'alert alert-danger';
                     alertBox.textContent = data.message;
                 }
             })
-            .catch(error => {
+            .catch(() => {
                 alertBox.className = 'alert alert-danger';
                 alertBox.textContent = 'Terjadi kesalahan jaringan.';
-                console.error('Error:', error);
             });
         });
+    }
+
+    // Mobile sidebar toggle
+    const toggler = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (toggler) {
+        toggler.addEventListener('click', () => sidebar.classList.toggle('open'));
     }
 });
 </script>

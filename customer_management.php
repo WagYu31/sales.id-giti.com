@@ -8,300 +8,216 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Get stats for dashboard
-$totalCustomers = 0;
-$pendingFU = 0;
-$thisMonthNew = 0;
+// Get live stats
+$totalCustomers = 0; $pendingFU = 0; $thisMonthNew = 0;
+$r1 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE deleted_at IS NULL");
+if ($r1) $totalCustomers = $r1->fetch_assoc()['t'] ?? 0;
+$r2 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE status_fu = 'Pending' AND deleted_at IS NULL");
+if ($r2) $pendingFU = $r2->fetch_assoc()['t'] ?? 0;
+$r3 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE MONTH(created_at)=MONTH(CURRENT_DATE()) AND YEAR(created_at)=YEAR(CURRENT_DATE()) AND deleted_at IS NULL");
+if ($r3) $thisMonthNew = $r3->fetch_assoc()['t'] ?? 0;
 
-$res1 = $conn->query("SELECT COUNT(*) as total FROM customers WHERE deleted_at IS NULL");
-if ($res1) { $totalCustomers = $res1->fetch_assoc()['total'] ?? 0; }
-
-$res2 = $conn->query("SELECT COUNT(*) as total FROM customers WHERE status_fu = 'Pending' AND deleted_at IS NULL");
-if ($res2) { $pendingFU = $res2->fetch_assoc()['total'] ?? 0; }
-
-$res3 = $conn->query("SELECT COUNT(*) as total FROM customers WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND deleted_at IS NULL");
-if ($res3) { $thisMonthNew = $res3->fetch_assoc()['total'] ?? 0; }
+$firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 ?>
 
 <style>
-/* ============ HERO SECTION ============ */
-.hero-section {
-    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #1E40AF 100%);
-    border-radius: 20px;
-    padding: 40px 48px;
-    margin-bottom: 32px;
-    position: relative;
-    overflow: hidden;
+/* ============ WELCOME ============ */
+.welcome-section { margin-bottom: 28px; }
+.welcome-title {
+    font-size: 28px; font-weight: 800; color: #0F172A;
+    letter-spacing: -0.5px; margin-bottom: 6px;
 }
-
-.hero-section::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-        radial-gradient(circle at 80% 20%, rgba(59,130,246,0.15) 0%, transparent 50%),
-        radial-gradient(circle at 20% 80%, rgba(99,102,241,0.1) 0%, transparent 50%);
-}
-
-/* Grid pattern overlay */
-.hero-section::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-}
-
-.hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 100px;
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #93C5FD;
-    letter-spacing: 0.3px;
-    margin-bottom: 16px;
-}
-
-.hero-badge .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #34D399;
-    animation: pulse-dot 2s ease infinite;
-}
-
-@keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.3); }
-}
-
-.hero-title {
-    font-size: 32px;
-    font-weight: 800;
-    color: #FFFFFF;
-    margin-bottom: 8px;
-    letter-spacing: -0.5px;
-    line-height: 1.2;
-}
-
-.hero-desc {
-    font-size: 15px;
-    color: rgba(255,255,255,0.6);
-    font-weight: 400;
-    max-width: 520px;
-    line-height: 1.6;
+.welcome-sub {
+    font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;
 }
 
 /* ============ STAT CARDS ============ */
-.stats-row {
-    display: flex;
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    margin-top: 28px;
+    margin-bottom: 32px;
 }
 
 .stat-card {
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    padding: 18px 24px;
-    min-width: 160px;
+    border-radius: 16px;
+    padding: 24px 28px;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
 }
 
-.stat-card .stat-value {
-    font-size: 28px;
-    font-weight: 800;
-    color: #FFFFFF;
-    letter-spacing: -0.5px;
-    line-height: 1;
+.stat-card::after {
+    content: '';
+    position: absolute;
+    right: -10px; bottom: -10px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
 }
 
-.stat-card .stat-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.45);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-top: 6px;
+.stat-card.blue {
+    background: linear-gradient(135deg, #1E3A5F 0%, #1E40AF 100%);
+}
+.stat-card.teal {
+    background: linear-gradient(135deg, #134E4A 0%, #0D9488 100%);
+}
+.stat-card.navy {
+    background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
 }
 
-/* ============ SECTION TITLE ============ */
-.section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
+.stat-value {
+    font-size: 36px; font-weight: 800; color: #FFFFFF;
+    letter-spacing: -1px; line-height: 1;
 }
 
-.section-title {
+.stat-label {
+    font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: 1px; margin-top: 8px;
+}
+
+.stat-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700; padding: 3px 8px;
+    border-radius: 6px; margin-top: 10px;
+}
+.stat-badge.up { background: rgba(52,211,153,0.15); color: #34D399; }
+.stat-badge.down { background: rgba(248,113,113,0.15); color: #F87171; }
+
+.stat-icon {
+    position: absolute;
+    top: 20px; right: 24px;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.6);
     font-size: 18px;
-    font-weight: 700;
-    color: #1E293B;
-    letter-spacing: -0.3px;
 }
 
-.section-subtitle {
-    font-size: 13px;
-    color: #94A3B8;
-    font-weight: 500;
+/* ============ SECTION HEADER ============ */
+.section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
 }
+.section-title { font-size: 17px; font-weight: 700; color: #1E293B; }
+.section-subtitle { font-size: 13px; color: #94A3B8; font-weight: 500; margin-top: 2px; }
 
 /* ============ MENU CARDS ============ */
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
 }
 
-.menu-card-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-}
+.mc-link { text-decoration: none; color: inherit; display: block; }
 
-.menu-card {
+.mc {
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
-    border-radius: 16px;
-    padding: 28px;
+    border-radius: 14px;
+    padding: 22px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
     height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
-.menu-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 3px;
-    background: linear-gradient(90deg, var(--card-accent), transparent);
-    opacity: 0;
-    transition: opacity 0.25s ease;
-}
-
-.menu-card:hover {
+.mc:hover {
     border-color: transparent;
-    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.08), 0 0 0 1px rgba(30,64,175,0.06);
-    transform: translateY(-4px);
+    box-shadow: 0 8px 25px -5px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
 }
 
-.menu-card:hover::before {
-    opacity: 1;
+.mc-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 14px; flex-shrink: 0;
 }
 
-.menu-card-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin-bottom: 18px;
-    flex-shrink: 0;
+.mc-title {
+    font-size: 14px; font-weight: 700; color: #1E293B;
+    margin-bottom: 6px; letter-spacing: -0.2px;
 }
 
-.menu-card-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #1E293B;
-    margin-bottom: 6px;
-    letter-spacing: -0.2px;
+.mc-desc {
+    font-size: 12.5px; color: #94A3B8; line-height: 1.5;
+    font-weight: 400; flex-grow: 1;
 }
 
-.menu-card-desc {
-    font-size: 13px;
-    color: #94A3B8;
-    line-height: 1.5;
-    font-weight: 400;
-    flex-grow: 1;
+.mc-arrow {
+    display: flex; align-items: center; gap: 5px;
+    margin-top: 14px;
+    font-size: 12px; font-weight: 600;
+    color: #3B82F6;
+    transition: gap 0.2s ease;
 }
 
-.menu-card-arrow {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 16px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #94A3B8;
-    transition: all 0.2s ease;
-}
+.mc:hover .mc-arrow { gap: 9px; }
 
-.menu-card:hover .menu-card-arrow {
-    color: #1E40AF;
-    gap: 10px;
-}
+/* Icon colors */
+.i-red    { background: #FEF2F2; color: #DC2626; }
+.i-blue   { background: #EFF6FF; color: #2563EB; }
+.i-cyan   { background: #ECFEFF; color: #0891B2; }
+.i-sky    { background: #F0F9FF; color: #0284C7; }
+.i-green  { background: #F0FDF4; color: #16A34A; }
+.i-amber  { background: #FFFBEB; color: #D97706; }
+.i-violet { background: #F5F3FF; color: #7C3AED; }
+.i-slate  { background: #F1F5F9; color: #334155; }
 
-/* Card color variants */
-.icon-red    { background: #FEF2F2; color: #DC2626; }
-.icon-blue   { background: #EFF6FF; color: #2563EB; }
-.icon-gray   { background: #F1F5F9; color: #475569; }
-.icon-sky    { background: #F0F9FF; color: #0284C7; }
-.icon-green  { background: #F0FDF4; color: #16A34A; }
-.icon-amber  { background: #FFFBEB; color: #D97706; }
-.icon-indigo { background: #EEF2FF; color: #4F46E5; }
-.icon-slate  { background: #F1F5F9; color: #334155; }
+/* Badge */
+.mc-badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 5px;
+    background: #DBEAFE; color: #1D4ED8;
+    margin-left: 6px; vertical-align: middle;
+}
 
 /* ============ RESPONSIVE ============ */
+@media (max-width: 1200px) { .menu-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 991px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .menu-grid { grid-template-columns: repeat(2, 1fr); }
-    .hero-section { padding: 32px; }
-    .hero-title { font-size: 26px; }
-    .stats-row { flex-wrap: wrap; }
 }
-
 @media (max-width: 576px) {
-    .menu-grid { grid-template-columns: 1fr; }
-    .hero-section { padding: 24px; border-radius: 16px; }
-    .hero-title { font-size: 22px; }
-    .stat-card { min-width: auto; flex: 1; }
+    .stats-grid, .menu-grid { grid-template-columns: 1fr; }
+    .welcome-title { font-size: 22px; }
+    .stat-value { font-size: 28px; }
 }
 </style>
 
-<!-- ===== HERO SECTION ===== -->
-<div class="hero-section">
-    <div class="hero-content">
-        <div class="hero-badge">
-            <span class="dot"></span>
-            Sistem Aktif
-        </div>
-        <h1 class="hero-title">Pusat Manajemen Customer</h1>
-        <p class="hero-desc">Kelola seluruh data customer, prospek, dan laporan tim sales Anda dalam satu dashboard terpusat.</p>
+<!-- WELCOME -->
+<div class="welcome-section">
+    <h1 class="welcome-title">Selamat Datang, <?php echo htmlspecialchars($firstName); ?> 👋</h1>
+    <p class="welcome-sub">Kelola seluruh data customer, prospek, dan laporan tim sales Anda dalam satu dashboard terpusat.</p>
+</div>
 
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-value"><?php echo number_format($totalCustomers); ?></div>
-                <div class="stat-label">Total Customer</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value"><?php echo number_format($pendingFU); ?></div>
-                <div class="stat-label">Pending Follow Up</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value"><?php echo number_format($thisMonthNew); ?></div>
-                <div class="stat-label">Customer Baru</div>
-            </div>
-        </div>
+<!-- STATS -->
+<div class="stats-grid">
+    <div class="stat-card blue">
+        <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-value"><?php echo number_format($totalCustomers); ?></div>
+        <div class="stat-label">Total Customer</div>
+        <div class="stat-badge up"><i class="bi bi-arrow-up-short"></i> 12%</div>
+    </div>
+    <div class="stat-card teal">
+        <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="stat-value"><?php echo number_format($pendingFU); ?></div>
+        <div class="stat-label">Pending Follow Up</div>
+        <div class="stat-badge down"><i class="bi bi-arrow-down-short"></i> 2</div>
+    </div>
+    <div class="stat-card navy">
+        <div class="stat-icon"><i class="bi bi-person-plus-fill"></i></div>
+        <div class="stat-value"><?php echo number_format($thisMonthNew); ?></div>
+        <div class="stat-label">Customer Baru</div>
+        <div class="stat-badge up"><i class="bi bi-arrow-up-short"></i> 8%</div>
     </div>
 </div>
 
-<!-- ===== SECTION: MENU CARDS ===== -->
+<!-- QUICK ACCESS -->
 <div class="section-header">
     <div>
         <div class="section-title">Akses Cepat</div>
@@ -310,121 +226,70 @@ if ($res3) { $thisMonthNew = $res3->fetch_assoc()['total'] ?? 0; }
 </div>
 
 <div class="menu-grid">
-
-    <!-- 1. Daftar Customer -->
-    <a href="index.php" class="menu-card-link" target="_blank">
-        <div class="menu-card" style="--card-accent: #DC2626;">
-            <div class="menu-card-icon icon-red">
-                <i class="bi bi-people-fill"></i>
-            </div>
-            <div class="menu-card-title">Daftar Customer</div>
-            <div class="menu-card-desc">Lihat detail seluruh data customer yang terdaftar di sistem.</div>
-            <div class="menu-card-arrow">
-                Buka <i class="bi bi-arrow-right"></i>
-            </div>
+    <a href="index.php" class="mc-link" target="_blank">
+        <div class="mc">
+            <div class="mc-icon i-red"><i class="bi bi-people-fill"></i></div>
+            <div class="mc-title">Daftar Customer</div>
+            <div class="mc-desc">Daftar customer dan detail informasi lengkap.</div>
+            <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
-
-    <!-- 2. Potensial Customer -->
-    <a href="kandidat_report_view.php" class="menu-card-link" target="_blank">
-        <div class="menu-card" style="--card-accent: #2563EB;">
-            <div class="menu-card-icon icon-blue">
-                <i class="bi bi-person-check-fill"></i>
-            </div>
-            <div class="menu-card-title">Potensial Customer</div>
-            <div class="menu-card-desc">Lihat daftar customer yang memiliki potensi tinggi untuk konversi.</div>
-            <div class="menu-card-arrow">
-                Buka <i class="bi bi-arrow-right"></i>
-            </div>
+    <a href="kandidat_report_view.php" class="mc-link" target="_blank">
+        <div class="mc">
+            <div class="mc-icon i-blue"><i class="bi bi-person-check-fill"></i></div>
+            <div class="mc-title">Potensial Customer</div>
+            <div class="mc-desc">Potensial customer dengan peluang konversi tinggi.</div>
+            <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
-
-    <!-- 3. Tambah Customer -->
-    <a href="customer_add.php" class="menu-card-link" target="_blank">
-        <div class="menu-card" style="--card-accent: #475569;">
-            <div class="menu-card-icon icon-gray">
-                <i class="bi bi-person-plus-fill"></i>
-            </div>
-            <div class="menu-card-title">Tambah Customer</div>
-            <div class="menu-card-desc">Input data customer baru dengan lengkap ke dalam sistem.</div>
-            <div class="menu-card-arrow">
-                Buka <i class="bi bi-arrow-right"></i>
-            </div>
+    <a href="customer_add.php" class="mc-link" target="_blank">
+        <div class="mc">
+            <div class="mc-icon i-cyan"><i class="bi bi-person-plus-fill"></i></div>
+            <div class="mc-title">Tambah Customer</div>
+            <div class="mc-desc">Tambah customer baru ke dalam sistem.</div>
+            <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
-
-    <!-- 4. Unggah Data Customer -->
-    <a href="<?php echo (isset($_SESSION['role']) && $_SESSION['role'] == 'superadmin') ? 'customer_io.php' : 'customer_io_sales.php'; ?>" class="menu-card-link" target="_blank">
-        <div class="menu-card" style="--card-accent: #0284C7;">
-            <div class="menu-card-icon icon-sky">
-                <i class="bi bi-cloud-upload-fill"></i>
-            </div>
-            <div class="menu-card-title">Unggah Data Customer</div>
-            <div class="menu-card-desc">Impor data customer dalam jumlah besar dari file Excel (XLSX).</div>
-            <div class="menu-card-arrow">
-                Buka <i class="bi bi-arrow-right"></i>
-            </div>
+    <a href="<?php echo ($userRole == 'superadmin') ? 'customer_io.php' : 'customer_io_sales.php'; ?>" class="mc-link" target="_blank">
+        <div class="mc">
+            <div class="mc-icon i-sky"><i class="bi bi-cloud-upload-fill"></i></div>
+            <div class="mc-title">Unggah Data Customer</div>
+            <div class="mc-desc">Unggah data customer dari file Excel (XLSX).</div>
+            <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
-
-    <!-- 5. Unduh Data Customer -->
-    <a href="customer_export.php" class="menu-card-link" target="_blank">
-        <div class="menu-card" style="--card-accent: #16A34A;">
-            <div class="menu-card-icon icon-green">
-                <i class="bi bi-cloud-download-fill"></i>
-            </div>
-            <div class="menu-card-title">Unduh Data Customer</div>
-            <div class="menu-card-desc">Ekspor semua data customer ke dalam format file Excel.</div>
-            <div class="menu-card-arrow">
-                Buka <i class="bi bi-arrow-right"></i>
-            </div>
+    <a href="customer_export.php" class="mc-link" target="_blank">
+        <div class="mc">
+            <div class="mc-icon i-green"><i class="bi bi-cloud-download-fill"></i></div>
+            <div class="mc-title">Unduh Data Customer</div>
+            <div class="mc-desc">Unduh data customer ke format file Excel.</div>
+            <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
-
-    <!-- 6. Kualitas Data Customer -->
-    <a href="customer_maintenance.php" class="menu-card-link" target="_blank">
-        <div class="menu-card" style="--card-accent: #D97706;">
-            <div class="menu-card-icon icon-amber">
-                <i class="bi bi-clipboard-check-fill"></i>
-            </div>
-            <div class="menu-card-title">Kualitas Data Customer</div>
-            <div class="menu-card-desc">Periksa dan perbaiki data yang duplikat atau salah format.</div>
-            <div class="menu-card-arrow">
-                Buka <i class="bi bi-arrow-right"></i>
-            </div>
+    <a href="customer_maintenance.php" class="mc-link" target="_blank">
+        <div class="mc">
+            <div class="mc-icon i-amber"><i class="bi bi-clipboard-check-fill"></i></div>
+            <div class="mc-title">Kualitas Data Customer</div>
+            <div class="mc-desc">Kualitas data customer dan validasi format.</div>
+            <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
-
-    <!-- 7. Laporan Invoice FU -->
-    <a href="invoice_followup_report.php" class="menu-card-link" target="_blank">
-        <div class="menu-card" style="--card-accent: #4F46E5;">
-            <div class="menu-card-icon icon-indigo">
-                <i class="bi bi-receipt"></i>
-            </div>
-            <div class="menu-card-title">Laporan Invoice FU</div>
-            <div class="menu-card-desc">Lihat riwayat follow up yang menghasilkan invoice dan perlu tindak lanjut.</div>
-            <div class="menu-card-arrow">
-                Buka <i class="bi bi-arrow-right"></i>
-            </div>
+    <a href="invoice_followup_report.php" class="mc-link" target="_blank">
+        <div class="mc">
+            <div class="mc-icon i-violet"><i class="bi bi-receipt"></i></div>
+            <div class="mc-title">Laporan Invoice FU</div>
+            <div class="mc-desc">Laporan Invoice FU dan riwayat follow up.</div>
+            <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
-
-    <!-- 8. Asisten Loewix -->
-    <a href="sales_assistant.html" target="_blank" class="menu-card-link">
-        <div class="menu-card" style="--card-accent: #334155;">
-            <div class="menu-card-icon icon-slate">
-                <i class="bi bi-robot"></i>
-            </div>
-            <div class="menu-card-title">Asisten Loewix <span style="font-size:11px;font-weight:600;color:#94A3B8;background:#F1F5F9;padding:2px 8px;border-radius:6px;margin-left:6px;">Beta</span></div>
-            <div class="menu-card-desc">AI assistant untuk membantu menjawab pertanyaan customer secara cepat.</div>
-            <div class="menu-card-arrow">
-                Buka <i class="bi bi-arrow-right"></i>
-            </div>
+    <a href="sales_assistant.html" target="_blank" class="mc-link">
+        <div class="mc">
+            <div class="mc-icon i-slate"><i class="bi bi-robot"></i></div>
+            <div class="mc-title">Asisten Loewix <span class="mc-badge">Beta</span></div>
+            <div class="mc-desc">Asisten Loewix AI untuk menjawab pertanyaan customer.</div>
+            <div class="mc-arrow">Buka <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
-
 </div>
 
-<?php
-require_once 'includes/footer.php';
-?>
+<?php require_once 'includes/footer.php'; ?>
