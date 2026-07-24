@@ -6,56 +6,157 @@ require_once 'auth.php'; // Cek apakah user sudah login
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title ?? 'Dashboard'; ?> - Laporan Prospek</title>
+    <title><?php echo $page_title ?? 'Dashboard'; ?> — Loewix Sales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
 <style>
-    table tr td {
-        font-size: 0.85em;
+    /* ============ GLOBAL OVERRIDES ============ */
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #F8FAFC;
+        color: #1E293B;
+        -webkit-font-smoothing: antialiased;
     }
-    .input-group-text {
-        cursor: pointer;
+
+    table tr td { font-size: 0.85em; }
+    .input-group-text { cursor: pointer; }
+
+    /* ============ PREMIUM NAVBAR ============ */
+    .navbar-loewix {
+        background: #FFFFFF;
+        border-bottom: 1px solid #E2E8F0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        padding: 0 24px;
+        height: 64px;
     }
-    .navbar {
-        border-bottom: 1px solid #dee2e6;
+
+    .navbar-loewix .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        font-size: 16px;
+        color: #0F172A;
+        letter-spacing: -0.3px;
+        text-decoration: none;
+        padding: 0;
     }
-    .navbar-brand {
+
+    .navbar-loewix .navbar-brand img {
+        height: 32px;
+        width: auto;
+    }
+
+    .navbar-loewix .navbar-brand .brand-divider {
+        width: 1px;
+        height: 24px;
+        background: #E2E8F0;
+        margin: 0 4px;
+    }
+
+    .navbar-loewix .navbar-brand .brand-sub {
         font-weight: 600;
-        color: #212529;
+        font-size: 13px;
+        color: #64748B;
     }
-    .navbar-nav .nav-link {
-        color: #6c757d;
+
+    .navbar-loewix .navbar-nav .nav-link {
+        color: #64748B;
         font-weight: 500;
-        padding-left: 0.8rem;
-        padding-right: 0.8rem;
+        font-size: 13.5px;
+        padding: 20px 14px;
         border-bottom: 2px solid transparent;
-        transition: all 0.2s ease-in-out;
+        transition: all 0.2s ease;
+        white-space: nowrap;
     }
-    .navbar-nav .nav-link:hover {
-        color: #0d6efd;
+
+    .navbar-loewix .navbar-nav .nav-link:hover {
+        color: #1E40AF;
     }
-    .navbar-nav .nav-link.active {
-        color: #0d6efd;
+
+    .navbar-loewix .navbar-nav .nav-link.active {
+        color: #1E40AF;
         font-weight: 700;
-        border-bottom: 2px solid #0d6efd;
+        border-bottom-color: #1E40AF;
     }
-    .dropdown-menu {
-        border-radius: 0.5rem;
-        border: 1px solid #dee2e6;
-        box-shadow: 0 0.5rem 1rem rgba(0,0,0,.1);
+
+    .navbar-loewix .dropdown-menu {
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        padding: 8px;
+        margin-top: 4px;
     }
-    .dropdown-menu { border: none; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-    a.nav-link{
+
+    .navbar-loewix .dropdown-item {
+        font-size: 13.5px;
+        font-weight: 500;
+        padding: 8px 14px;
+        border-radius: 8px;
+        color: #475569;
+        transition: all 0.15s ease;
+    }
+
+    .navbar-loewix .dropdown-item:hover {
+        background: #F1F5F9;
+        color: #1E293B;
+    }
+
+    .navbar-loewix .dropdown-item i {
+        margin-right: 8px;
         font-size: 14px;
+    }
+
+    .navbar-loewix .dropdown-item.text-danger:hover {
+        background: #FEF2F2;
+        color: #DC2626;
+    }
+
+    /* User avatar badge */
+    .user-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px 6px 6px;
+        border-radius: 100px;
+        background: #F1F5F9;
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        border: none;
+    }
+
+    .user-badge:hover {
+        background: #E2E8F0;
+    }
+
+    .user-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1E40AF, #3B82F6);
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
     }
 </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+<nav class="navbar navbar-expand-lg navbar-loewix sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="index.php"><i class="bi bi-graph-up-arrow"></i> ProspekApp</a>
+    <a class="navbar-brand" href="customer_management.php">
+        <img src="assets/images/loewix_sales_logo.png" alt="Loewix Sales">
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -72,9 +173,6 @@ require_once 'auth.php'; // Cek apakah user sudah login
                 <a class="nav-link" href="ads_report.php">Report Saldo & Ads</a>
             </li>
         <?php else: ?>
-            <!--<li class="nav-item">-->
-            <!--    <a class="nav-link" href="index.php">Dashboard Customer</a>-->
-            <!--</li>-->
             <li class="nav-item">
                 <a class="nav-link" href="customer_management.php">Customer Management</a>
             </li>
@@ -98,7 +196,7 @@ require_once 'auth.php'; // Cek apakah user sudah login
                     <a class="nav-link dropdown-toggle" href="#" id="navbarSalesTools" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Sales Tools
                     </a>
-                    <ul class="dropdown-menu border-0 shadow-sm" aria-labelledby="navbarSalesTools">
+                    <ul class="dropdown-menu" aria-labelledby="navbarSalesTools">
                         <li><a class="dropdown-item" href="broadcast_schedule.php"><i class="bi bi-megaphone"></i> Broadcast</a></li>
                         <li><a class="dropdown-item" href="promosi_management.php"><i class="bi bi-tags"></i> Promosi</a></li>
                         <li><a class="dropdown-item" href="price_list.php"><i class="bi bi-ui-checks"></i> Price List</a></li>
@@ -116,13 +214,14 @@ require_once 'auth.php'; // Cek apakah user sudah login
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-            <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($_SESSION['nama_lengkap']); ?>
+          <a class="nav-link dropdown-toggle user-badge" href="#" role="button" data-bs-toggle="dropdown">
+            <span class="user-avatar"><?php echo strtoupper(substr($_SESSION['nama_lengkap'], 0, 2)); ?></span>
+            <?php echo htmlspecialchars($_SESSION['nama_lengkap']); ?>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i class="bi bi-key me-2"></i> Ganti Password</a></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i class="bi bi-key"></i> Ganti Password</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+            <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
           </ul>
         </li>
       </ul>
@@ -179,7 +278,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
 
     navLinks.forEach(link => {
-        const linkPage = link.getAttribute('href').split("/").pop();
+        const href = link.getAttribute('href');
+        if (!href) return;
+        const linkPage = href.split("/").pop();
         if (!link.classList.contains('dropdown-toggle')) {
             link.classList.remove('active');
         }

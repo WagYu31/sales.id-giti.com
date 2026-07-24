@@ -2,8 +2,11 @@
 // includes/footer.php
 ?>
 </main>
-<footer class="text-center mt-5 mb-3">
-    <p>&copy; <?php echo date('Y'); ?> ProspekApp. All Rights Reserved.</p>
+
+<footer style="text-align:center;padding:24px 0 20px;margin-top:48px;border-top:1px solid #E2E8F0;">
+    <p style="margin:0;font-size:12px;font-weight:500;color:#94A3B8;font-family:'Inter',sans-serif;">
+        &copy; <?php echo date('Y'); ?> Loewix Sales. All Rights Reserved.
+    </p>
 </footer>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -11,7 +14,6 @@
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 <script>
-// Inisialisasi semua tabel dengan class .sortable-table
 $(document).ready(function() {
     $('.sortable-table').DataTable({
         "language": {
