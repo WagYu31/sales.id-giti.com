@@ -147,48 +147,72 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
 <style>
 /* Page Specific Enhancements */
 .report-hero {
-    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%);
-    border-radius: 20px;
-    padding: 32px 36px;
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 40%, #1D4ED8 100%);
+    border-radius: 22px;
+    padding: 32px 38px;
     margin-bottom: 28px;
     color: #FFFFFF;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 12px 35px -8px rgba(29, 78, 216, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .report-hero::before {
     content: '';
     position: absolute;
-    top: -50px; right: -50px;
-    width: 250px; height: 250px;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, transparent 70%);
 }
 
 .report-hero-title {
-    font-size: 26px;
-    font-weight: 800;
-    margin-bottom: 6px;
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 8px;
     font-family: 'Plus Jakarta Sans', sans-serif;
     letter-spacing: -0.5px;
+    color: #FFFFFF;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .report-hero-subtitle {
-    font-size: 14px;
-    color: rgba(226, 232, 240, 0.85);
+    font-size: 14.5px;
+    color: rgba(226, 232, 240, 0.9);
     margin: 0;
-    max-width: 600px;
+    max-width: 620px;
+    font-weight: 500;
+}
+
+/* Form & Input Enhancements */
+#filter-form .form-control, 
+#filter-form .form-select {
+    border: 1.5px solid #CBD5E1 !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    background-color: #FAFAFA !important;
+    color: #0F172A !important;
+    transition: all 0.2s ease-in-out;
+}
+
+#filter-form .form-control:focus, 
+#filter-form .form-select:focus {
+    background-color: #FFFFFF !important;
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15) !important;
 }
 
 .respon-pill {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 20px;
-    font-size: 11.5px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 800;
     font-family: 'Plus Jakarta Sans', sans-serif;
     white-space: nowrap;
 }
@@ -196,25 +220,25 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
 .respon-deal {
     background: linear-gradient(135deg, #059669 0%, #10B981 100%);
     color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
 }
 
 .respon-beli {
     background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
     color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
 }
 
 .respon-tanya {
     background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
     color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
 }
 
 .respon-no {
     background: linear-gradient(135deg, #E11D48 0%, #F43F5E 100%);
     color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.35);
 }
 
 .respon-fu {
@@ -239,11 +263,11 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
     background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;
     color: #FFFFFF !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 11.5px !important;
+    font-size: 12px !important;
     font-weight: 800 !important;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    padding: 15px 18px !important;
+    padding: 16px 18px !important;
     border: none !important;
 }
 
@@ -272,16 +296,45 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
 }
 
 .sales-avatar-badge {
-    width: 28px; height: 28px;
+    width: 30px; height: 30px;
     border-radius: 8px;
     background: linear-gradient(135deg, #475569, #1E293B);
     color: #FFF;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 800;
     margin-right: 8px;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 991.98px) {
+    .report-hero {
+        padding: 24px 20px !important;
+        border-radius: 16px !important;
+    }
+    .hero-stat-container {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        margin-top: 16px !important;
+    }
+    .hero-stat-card {
+        flex: 1 1 calc(50% - 8px) !important;
+        min-width: 140px !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .report-hero-title {
+        font-size: 22px !important;
+    }
+    .report-hero-subtitle {
+        font-size: 13px !important;
+    }
+    .hero-stat-card {
+        flex: 1 1 100% !important;
+    }
 }
 </style>
 
@@ -302,21 +355,21 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
             <h1 class="report-hero-title">Laporan Follow Up Sales 📊</h1>
             <p class="report-hero-subtitle">Pantau seluruh aktivitas komunikasi, respon customer, dan konversi sales secara terpusat.</p>
         </div>
-        <div class="d-flex align-items-center gap-3 mt-3 mt-md-0">
-            <div class="p-3 px-4 text-center rounded-4 shadow-sm" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid rgba(255, 255, 255, 0.25); min-width: 145px;">
-                <div style="font-size:11.5px; text-transform:uppercase; letter-spacing:1px; color: #DBEAFE; font-weight:800; margin-bottom: 2px;">
+        <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0 hero-stat-container">
+            <div class="p-3 px-4 text-center rounded-4 shadow-lg hero-stat-card" style="background: #FFFFFF; border: 2px solid #BFDBFE; min-width: 155px; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25) !important;">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color: #334155; font-weight:800; margin-bottom: 2px;">
                     📊 TOTAL LAPORAN
                 </div>
-                <div style="font-size:28px; font-weight:900; color: #FFFFFF; font-family:'Plus Jakarta Sans', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.25);">
+                <div style="font-size:32px; font-weight:900; color: #1E40AF; font-family:'Plus Jakarta Sans', sans-serif;">
                     <?php echo number_format($total_records); ?>
                 </div>
             </div>
             
-            <div class="p-3 px-4 text-center rounded-4 shadow-sm" style="background: rgba(16, 185, 129, 0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid rgba(52, 211, 153, 0.5); min-width: 155px;">
-                <div style="font-size:11.5px; text-transform:uppercase; letter-spacing:1px; color: #A7F3D0; font-weight:800; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">
+            <div class="p-3 px-4 text-center rounded-4 shadow-lg hero-stat-card" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); border: 2px solid #6EE7B7; min-width: 165px; box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.45) !important;">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color: #E0F2FE; font-weight:800; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
                     ⚡ HARI INI
                 </div>
-                <div style="font-size:28px; font-weight:900; color: #6EE7B7; font-family:'Plus Jakarta Sans', sans-serif; text-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+                <div style="font-size:32px; font-weight:900; color: #FFFFFF; font-family:'Plus Jakarta Sans', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
                     <?php echo number_format($fu_today_count); ?>
                 </div>
             </div>
