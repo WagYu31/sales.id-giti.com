@@ -204,14 +204,12 @@ if ($_SESSION['role'] !== 'sales') {
             <label for="filter_kota" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                 <i class="bi bi-geo-alt-fill text-danger me-1"></i> Filter Kota
             </label>
-            <select name="filter_kota" id="filter_kota" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
-                <option value="">Semua Kota (<?php echo count($cities); ?> Kota)</option>
+            <input list="kota_list" name="filter_kota" id="filter_kota" class="form-control fw-semibold" placeholder="Pilih atau ketik kota..." value="<?php echo htmlspecialchars($filter_kota); ?>" style="border-radius:12px; height:42px;">
+            <datalist id="kota_list">
                 <?php foreach ($cities as $city): ?>
-                    <option value="<?php echo htmlspecialchars($city); ?>" <?php if ($filter_kota === $city) echo 'selected'; ?>>
-                        📍 <?php echo htmlspecialchars($city); ?>
-                    </option>
+                    <option value="<?php echo htmlspecialchars($city); ?>">
                 <?php endforeach; ?>
-            </select>
+            </datalist>
         </div>
 
         <!-- Filter Kategori -->
@@ -312,9 +310,16 @@ if ($_SESSION['role'] !== 'sales') {
                                 <span class="badge bg-light text-dark border fw-semibold" style="border-radius:20px; padding:5px 12px; font-size:11.5px;"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span>
                             </td>
                             <td>
-                                <span class="badge fw-bold" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; border-radius:20px; padding:5px 12px; font-size:11.5px;">
-                                    📍 <?php echo htmlspecialchars($customer['all_cities'] ?? '-'); ?>
-                                </span>
+                                <?php 
+                                $city_val = trim($customer['all_cities'] ?? '');
+                                if (!empty($city_val) && $city_val !== '-'): 
+                                ?>
+                                    <span class="badge fw-bold" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; border-radius:20px; padding:5px 12px; font-size:11.5px;">
+                                        📍 <?php echo htmlspecialchars($city_val); ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span class="text-muted small">-</span>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <?php if ($customer['nama_sales']): ?>
