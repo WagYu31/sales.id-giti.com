@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Customer Management';
+$page_title = 'Dashboard Sales';
 require_once 'includes/db.php';
 require_once 'includes/header.php';
 

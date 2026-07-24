@@ -449,7 +449,7 @@ table tr td { font-size: 0.85em; }
             </a>
         <?php else: ?>
             <a href="customer_management.php" class="sidebar-link <?php echo $currentPage=='customer_management.php'?'active':''; ?>">
-                <i class="bi bi-grid-1x2-fill"></i> Customer Management
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard Sales
             </a>
             <?php if ($userRole == 'superadmin'): ?>
             <a href="followup_report.php" class="sidebar-link <?php echo $currentPage=='followup_report.php'?'active':''; ?>">
