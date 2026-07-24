@@ -53,7 +53,7 @@ table tr td { font-size: 0.85em; }
 }
 
 .sidebar-logo img {
-    height: 52px;
+    height: 72px;
     width: auto;
 }
 
