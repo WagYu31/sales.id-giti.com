@@ -95,28 +95,89 @@ $json_fees = json_encode($fees);
 ?>
 
 <style>
-    .input-nominal { font-weight: bold; color: #2c3e50; }
-    .table-fees td { vertical-align: middle; }
-    .bg-calc-base { background-color: #e3f2fd; }
+.net-hero {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%);
+    border-radius: 20px;
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.4);
+}
+
+.net-hero::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+}
+
+.net-hero-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.net-hero-subtitle {
+    font-size: 14px;
+    color: rgba(226, 232, 240, 0.85);
+    margin: 0;
+    max-width: 600px;
+}
+
+.input-nominal { 
+    font-weight: 700; 
+    color: #0F172A; 
+    font-size: 16px;
+}
+
+.table-fees td { vertical-align: middle; }
+
+.net-received-card {
+    background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+    border-radius: 16px;
+    padding: 24px;
+    color: #FFF;
+    box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+}
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="bi bi-calculator"></i> Kalkulator Net Sales</h1>
-    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#settingsModal">
-        <i class="bi bi-gear-fill"></i> Pengaturan Biaya
-    </button>
+<!-- Hero Header -->
+<div class="net-hero">
+    <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
+                <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
+                <span>›</span>
+                <span>Kalkulator Net Sales</span>
+            </div>
+            <h1 class="net-hero-title">Kalkulator Net Sales Marketplace 🛒</h1>
+            <p class="net-hero-subtitle">Hitung estimasi hasil penjualan bersih marketplace (Shopee, Tokopedia, TikTok Ads, dll) setelah dipotong komisi & biaya admin.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <button class="btn btn-outline-light border-2 fw-bold" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                <i class="bi bi-gear-fill me-1"></i> Pengaturan Biaya
+            </button>
+        </div>
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-md-5 mb-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white">
+<div class="row g-4">
+    <!-- Input Card -->
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header">
                 <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Input Transaksi</h5>
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <label for="platformSelect" class="form-label">Pilih Platform</label>
-                    <select class="form-select form-select-lg bg-light" id="platformSelect">
+                    <label for="platformSelect" class="form-label">Pilih Platform Marketplace</label>
+                    <select class="form-select form-select-lg" id="platformSelect">
                         <option value="" selected disabled>-- Pilih Platform --</option>
                         <?php foreach ($platform_options as $p): ?>
                             <option value="<?php echo htmlspecialchars($p); ?>"><?php echo htmlspecialchars($p); ?></option>
@@ -125,57 +186,62 @@ $json_fees = json_encode($fees);
                 </div>
 
                 <div class="mb-3">
-                    <label for="sellingPrice" class="form-label fw-bold">Harga Jual Barang (Rp)</label>
+                    <label for="sellingPrice" class="form-label">Harga Jual Barang (Rp)</label>
                     <div class="input-group input-group-lg">
-                        <span class="input-group-text bg-primary text-white">Rp</span>
+                        <span class="input-group-text bg-white text-primary fw-bold">Rp</span>
                         <input type="text" class="form-control input-nominal" id="sellingPrice" placeholder="0" onkeyup="formatRupiah(this)">
                     </div>
                 </div>
 
-                <div class="row g-2">
+                <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="voucherCost" class="form-label small text-muted">Voucher Diskon (Ditanggung Penjual)</label>
+                        <label for="voucherCost" class="form-label small">Voucher Diskon (Penjual)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted small">Rp</span>
                             <input type="text" class="form-control input-nominal" id="voucherCost" placeholder="0" onkeyup="formatRupiah(this)">
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="cashbackCost" class="form-label small text-muted">Biaya Cashback (Ditanggung Penjual)</label>
+                        <label for="cashbackCost" class="form-label small">Biaya Cashback (Penjual)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted small">Rp</span>
                             <input type="text" class="form-control input-nominal" id="cashbackCost" placeholder="0" onkeyup="formatRupiah(this)">
                         </div>
                     </div>
                 </div>
 
-                <div class="d-grid mt-3">
-                    <button class="btn btn-primary btn-lg" onclick="calculate()">Hitung Estimasi</button>
+                <div class="d-grid mt-4">
+                    <button class="btn btn-primary btn-lg shadow-sm" onclick="calculate()">
+                        <i class="bi bi-calculator-fill me-1"></i> Hitung Estimasi Bersih
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-7 mb-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white">
+    <!-- Calculation Results Card -->
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-header">
                 <h5 class="mb-0"><i class="bi bi-list-check"></i> Rincian Perhitungan</h5>
             </div>
             <div class="card-body">
                 <div id="emptyState" class="text-center py-5 text-muted">
-                    <i class="bi bi-arrow-left-circle display-1 text-light"></i>
-                    <p class="mt-3">Masukkan data di sebelah kiri untuk melihat hasil.</p>
+                    <i class="bi bi-arrow-left-circle-fill display-3 text-primary opacity-25"></i>
+                    <h5 class="mt-3 text-dark fw-bold">Belum Ada Perhitungan</h5>
+                    <p class="small text-muted mb-0">Pilih platform dan masukkan harga jual di panel sebelah kiri.</p>
                 </div>
 
                 <div id="resultState" style="display: none;">
-                    
-                    <div class="alert alert-info py-2 px-3 mb-3 d-flex justify-content-between align-items-center small">
+                    <div class="alert alert-primary py-2 px-3 mb-3 d-flex justify-content-between align-items-center small rounded-3">
                         <span>Harga Produk: <strong id="displayPrice">Rp 0</strong></span>
                         <span><i class="bi bi-arrow-right"></i></span>
-                        <span>Harga Dasar (Setelah Voucher): <strong id="displayBasePrice">Rp 0</strong></span>
+                        <span>Dasar Hitung (Setelah Voucher): <strong id="displayBasePrice">Rp 0</strong></span>
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle table-sm">
-                            <thead class="table-light">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark-header">
                                 <tr>
                                     <th>Komponen Biaya</th>
                                     <th class="text-center">Rumus</th>
@@ -187,19 +253,19 @@ $json_fees = json_encode($fees);
                             <tfoot class="table-light fw-bold border-top">
                                 <tr>
                                     <td colspan="2">Total Potongan</td>
-                                    <td class="text-end text-danger" id="totalDeduction">Rp 0</td>
+                                    <td class="text-end text-danger fw-bold" id="totalDeduction" style="font-size:16px;">Rp 0</td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
 
-                    <div class="card bg-success text-white mt-3">
-                        <div class="card-body d-flex justify-content-between align-items-center">
+                    <div class="net-received-card mt-4">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-uppercase mb-0 opacity-75">Estimasi Diterima Bersih</h6>
-                                <small class="opacity-75">Net Revenue</small>
+                                <h6 class="text-uppercase mb-1 opacity-85 fw-bold" style="letter-spacing:0.5px; font-size:13px;">Estimasi Diterima Bersih</h6>
+                                <small class="opacity-75">Net Revenue Marketplace</small>
                             </div>
-                            <h2 class="fw-bold m-0" id="netAmount">Rp 0</h2>
+                            <h2 class="fw-extrabold m-0" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:32px;" id="netAmount">Rp 0</h2>
                         </div>
                     </div>
                 </div>
@@ -208,27 +274,28 @@ $json_fees = json_encode($fees);
     </div>
 </div>
 
+<!-- Modal Settings -->
 <div class="modal fade" id="settingsModal" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Pengaturan Master Biaya</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden;">
+            <div class="modal-header" style="background:#0F172A; color:#FFF;">
+                <h5 class="modal-title fw-bold"><i class="bi bi-gear-fill me-2"></i>Pengaturan Master Biaya Marketplace</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body bg-light">
-                <div class="row">
-                    <div class="col-lg-8 mb-3">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
-                                <span>Daftar Biaya Aktif</span>
-                                <small class="text-muted fw-normal">Update Terakhir: <?php echo $last_update ? date('d M Y', strtotime($last_update)) : '-'; ?></small>
+            <div class="modal-body p-4 bg-light">
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="bi bi-list-stars text-primary me-2"></i>Daftar Biaya Aktif</span>
+                                <small class="text-muted">Update: <?php echo $last_update ? date('d M Y', strtotime($last_update)) : '-'; ?></small>
                             </div>
                             <div class="card-body p-0">
                                 <form method="POST" id="updateForm">
                                     <input type="hidden" name="action" value="update">
-                                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-striped table-hover mb-0 align-middle text-nowrap table-fees" id="feesTable">
-                                            <thead class="table-light sticky-top">
+                                    <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+                                        <table class="table table-hover align-middle mb-0 text-nowrap table-fees" id="feesTable">
+                                            <thead class="table-dark-header sticky-top">
                                                 <tr>
                                                     <th>Platform</th>
                                                     <th>Label Biaya</th>
@@ -242,7 +309,7 @@ $json_fees = json_encode($fees);
                                                 <?php foreach ($fees as $platform => $items): ?>
                                                     <?php foreach ($items as $item): ?>
                                                         <tr id="row-<?php echo $item['id']; ?>">
-                                                            <td class="small fw-bold text-muted"><?php echo htmlspecialchars($platform); ?></td>
+                                                            <td class="small fw-bold text-dark"><?php echo htmlspecialchars($platform); ?></td>
                                                             <td><?php echo htmlspecialchars($item['fee_label']); ?></td>
                                                             <td>
                                                                 <input type="number" step="0.01" name="fees[<?php echo $item['id']; ?>][value]" class="form-control form-control-sm text-end" value="<?php echo $item['fee_value']; ?>" required>
@@ -261,7 +328,7 @@ $json_fees = json_encode($fees);
                                                                 <?php endif; ?>
                                                             </td>
                                                             <td class="text-center">
-                                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteFee(<?php echo $item['id']; ?>)"><i class="bi bi-trash"></i></button>
+                                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteFee(<?php echo $item['id']; ?>)"><i class="bi bi-trash-fill"></i></button>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
@@ -270,7 +337,7 @@ $json_fees = json_encode($fees);
                                         </table>
                                     </div>
                                     <div class="p-3 border-top text-end bg-white">
-                                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Simpan Perubahan Nilai</button>
+                                        <button type="submit" class="btn btn-primary"><i class="bi bi-save-fill"></i> Simpan Perubahan Nilai</button>
                                     </div>
                                 </form>
                             </div>
@@ -278,8 +345,8 @@ $json_fees = json_encode($fees);
                     </div>
 
                     <div class="col-lg-4">
-                        <div class="card shadow-sm border-primary">
-                            <div class="card-header bg-primary text-white fw-bold"><i class="bi bi-plus-circle"></i> Tambah Biaya Baru</div>
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white fw-bold"><i class="bi bi-plus-circle-fill me-2"></i>Tambah Biaya Baru</div>
                             <div class="card-body">
                                 <form id="addFeeForm">
                                     <input type="hidden" name="ajax_action" value="add_fee">
@@ -317,7 +384,7 @@ $json_fees = json_encode($fees);
                                     </div>
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-primary" id="btnAddSubmit">
-                                            <span id="btnAddText">Tambahkan</span>
+                                            <span id="btnAddText"><i class="bi bi-plus-circle-fill"></i> Tambahkan</span>
                                             <span id="btnAddSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
                                         </button>
                                     </div>
@@ -328,7 +395,7 @@ $json_fees = json_encode($fees);
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer border-top-0 pt-0">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
@@ -380,7 +447,6 @@ $json_fees = json_encode($fees);
                 // 1. Update Global Data Variable
                 if (!feesData[data.platform]) {
                     feesData[data.platform] = [];
-                    // Add to dropdowns if new platform
                     addOptionToSelect('platformSelect', data.platform);
                     addOptionToSelect('newPlatformSelect', data.platform);
                 }
@@ -448,7 +514,7 @@ $json_fees = json_encode($fees);
             <td><span class="badge bg-secondary">${typeLabel}</span></td>
             <td class="text-center">${taxInput}</td>
             <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteFee(${item.id})"><i class="bi bi-trash"></i></button>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteFee(${item.id})"><i class="bi bi-trash-fill"></i></button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -523,7 +589,6 @@ $json_fees = json_encode($fees);
             return;
         }
 
-        // --- CORE LOGIC (FIXED) ---
         let calculationBase = price - voucher; 
         
         displayPriceEl.innerText = formatCurrency(price);
@@ -536,7 +601,6 @@ $json_fees = json_encode($fees);
         const platformFees = feesData[platform] || [];
         let affiliateFeeAmount = 0;
 
-        // 1. Tampilkan Voucher & Cashback Manual
         if (voucher > 0) {
             totalDeduction += voucher;
             htmlManual += `<tr>

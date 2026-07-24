@@ -538,41 +538,41 @@ table tr td { font-size: 0.85em; }
 
 <!-- Change Password Modal -->
 <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content" style="border-radius:16px;border:none;">
-      <div class="modal-header" style="border-bottom:1px solid #E2E8F0;">
-        <h5 class="modal-title" id="changePasswordModalLabel" style="font-weight:700;font-size:16px;"><i class="bi bi-key-fill me-2"></i>Ganti Password</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden;">
+      <div class="modal-header" style="background:#0F172A; color:#FFF;">
+        <h5 class="modal-title fw-bold" id="changePasswordModalLabel" style="font-size:16px;"><i class="bi bi-key-fill text-primary me-2"></i>Ganti Password</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body p-4">
         <form id="changePasswordForm">
             <div id="passwordChangeAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-                <label for="old_password" class="form-label" style="font-size:13px;font-weight:600;">Password Lama</label>
+                <label for="old_password" class="form-label">Password Lama</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="old_password" name="old_password" required style="border-radius:10px 0 0 10px;">
-                    <span class="input-group-text toggle-password" style="border-radius:0 10px 10px 0;"><i class="bi bi-eye-slash"></i></span>
+                    <input type="password" class="form-control" id="old_password" name="old_password" required placeholder="Masukkan password saat ini">
+                    <span class="input-group-text toggle-password" style="cursor:pointer;"><i class="bi bi-eye-slash"></i></span>
                 </div>
             </div>
             <div class="mb-3">
-                <label for="new_password" class="form-label" style="font-size:13px;font-weight:600;">Password Baru</label>
+                <label for="new_password" class="form-label">Password Baru</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="new_password" name="new_password" required style="border-radius:10px 0 0 10px;">
-                    <span class="input-group-text toggle-password" style="border-radius:0 10px 10px 0;"><i class="bi bi-eye-slash"></i></span>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required placeholder="Minimal 6 karakter">
+                    <span class="input-group-text toggle-password" style="cursor:pointer;"><i class="bi bi-eye-slash"></i></span>
                 </div>
             </div>
             <div class="mb-3">
-                <label for="confirm_password" class="form-label" style="font-size:13px;font-weight:600;">Konfirmasi Password Baru</label>
+                <label for="confirm_password" class="form-label">Konfirmasi Password Baru</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required style="border-radius:10px 0 0 10px;">
-                    <span class="input-group-text toggle-password" style="border-radius:0 10px 10px 0;"><i class="bi bi-eye-slash"></i></span>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required placeholder="Ulangi password baru">
+                    <span class="input-group-text toggle-password" style="cursor:pointer;"><i class="bi bi-eye-slash"></i></span>
                 </div>
             </div>
         </form>
       </div>
-      <div class="modal-footer" style="border-top:1px solid #E2E8F0;">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius:10px;">Tutup</button>
-        <button type="submit" form="changePasswordForm" class="btn btn-primary" style="border-radius:10px;">Simpan</button>
+      <div class="modal-footer border-top-0 pt-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        <button type="submit" form="changePasswordForm" class="btn btn-primary"><i class="bi bi-check-circle-fill me-1"></i> Simpan Password Baru</button>
       </div>
     </div>
   </div>

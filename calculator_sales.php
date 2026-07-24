@@ -9,36 +9,96 @@ while ($row = $settings_query->fetch_assoc()) { $config[$row['setting_key']] = $
 $products_query = $conn->query("SELECT * FROM product_prices ORDER BY type ASC");
 ?>
 
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-lg border-0">
-            <div class="card-header bg-dark text-white py-3">
-                <h4 class="mb-0 text-center"><i class="bi bi-calculator"></i> Kalkulator Sales</h4>
+<style>
+.calc-hero {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%);
+    border-radius: 20px;
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.4);
+}
+
+.calc-hero::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+}
+
+.calc-hero-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.calc-hero-subtitle {
+    font-size: 14px;
+    color: rgba(226, 232, 240, 0.85);
+    margin: 0;
+    max-width: 600px;
+}
+
+.result-box-v2 {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    border-radius: 18px;
+    padding: 28px;
+    color: #FFFFFF;
+    box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.3);
+}
+</style>
+
+<!-- Hero Header -->
+<div class="calc-hero">
+    <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
+                <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
+                <span>›</span>
+                <span>Kalkulator Sales</span>
             </div>
-            <div class="card-body p-4">
+            <h1 class="calc-hero-title">Kalkulator Sales 🧮</h1>
+            <p class="calc-hero-subtitle">Hitung estimasi harga produk berdasarkan level customer (Dealer/Master Dealer), ongkir, & diskon tambahan.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calculator-fill"></i> Simulator Perhitungan Harga</h5>
+            </div>
+            <div class="card-body">
                 <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label fw-bold">Pilih Produk (Database)</label>
+                        <label class="form-label">Pilih Produk (Database)</label>
                         <select id="calc_product" class="form-select form-select-lg">
                             <option value="0" data-msrp="0">-- Pilih Produk --</option>
                             <?php while ($p = $products_query->fetch_assoc()): ?>
                                 <option value="<?php echo $p['id']; ?>" data-msrp="<?php echo $p['msrp']; ?>">
-                                    <?php echo $p['type']; ?>
+                                    <?php echo htmlspecialchars($p['type']); ?>
                                 </option>
                             <?php endwhile; ?>
                         </select>
                     </div>
 
                     <div class="col-md-12">
-                        <label class="form-label fw-bold text-primary">Harga Dasar (MSRP)</label>
+                        <label class="form-label text-primary">Harga Dasar (MSRP)</label>
                         <div class="input-group input-group-lg">
-                            <span class="input-group-text">Rp</span>
-                            <input type="number" id="manual_price" class="form-control fw-bold" value="0">
+                            <span class="input-group-text fw-bold bg-white">Rp</span>
+                            <input type="number" id="manual_price" class="form-control fw-bold" value="0" style="font-size:20px; color:#2563EB;">
                         </div>
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-bold">Level Customer</label>
+                        <label class="form-label">Level Customer</label>
                         <select id="calc_level" class="form-select">
                             <option value="user">User (Tanpa Diskon)</option>
                             <option value="dealer">Dealer</option>
@@ -47,34 +107,34 @@ $products_query = $conn->query("SELECT * FROM product_prices ORDER BY type ASC")
                     </div>
 
                     <div id="div_disc_dealer" class="col-md-4 d-none">
-                        <label class="form-label fw-bold">Diskon Dealer (%)</label>
+                        <label class="form-label">Diskon Dealer (%)</label>
                         <div class="input-group">
-                            <input type="number" id="disc_dealer_pct" class="form-control" value="<?php echo $config['dealer_discount']; ?>">
-                            <span class="input-group-text">%</span>
+                            <input type="number" id="disc_dealer_pct" class="form-control" value="<?php echo htmlspecialchars($config['dealer_discount'] ?? 0); ?>">
+                            <span class="input-group-text bg-white">%</span>
                         </div>
                     </div>
 
                     <div id="div_disc_master" class="col-md-4 d-none">
-                        <label class="form-label fw-bold">Diskon Master (%)</label>
+                        <label class="form-label">Diskon Master (%)</label>
                         <div class="input-group">
-                            <input type="number" id="disc_master_pct" class="form-control" value="<?php echo $config['master_dealer_discount']; ?>">
-                            <span class="input-group-text">%</span>
+                            <input type="number" id="disc_master_pct" class="form-control" value="<?php echo htmlspecialchars($config['master_dealer_discount'] ?? 0); ?>">
+                            <span class="input-group-text bg-white">%</span>
                         </div>
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-bold">Quantity</label>
-                        <input type="number" id="calc_qty" class="form-control" value="1">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" id="calc_qty" class="form-control" value="1" min="1">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold">Ongkir (Rp)</label>
+                        <label class="form-label">Ongkir (Rp)</label>
                         <input type="number" id="calc_ongkir" class="form-control" value="0">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold">Diskon Tambahan</label>
+                        <label class="form-label">Diskon Tambahan</label>
                         <div class="input-group">
                             <input type="number" id="calc_extra" class="form-control" value="0">
-                            <select id="extra_type" class="form-select" style="max-width: 70px;">
+                            <select id="extra_type" class="form-select" style="max-width: 80px;">
                                 <option value="rp">Rp</option>
                                 <option value="pct">%</option>
                             </select>
@@ -82,15 +142,27 @@ $products_query = $conn->query("SELECT * FROM product_prices ORDER BY type ASC")
                     </div>
                 </div>
 
-                <div class="mt-4 p-4 bg-light rounded-3 border">
-                    <div class="row mb-2"><div class="col-7">Harga Satuan (Setelah Level):</div><div class="col-5 text-end fw-bold" id="res_unit_price">Rp 0</div></div>
-                    <div class="row mb-2 text-muted"><div class="col-7">Subtotal Produk:</div><div class="col-5 text-end" id="res_subtotal">Rp 0</div></div>
-                    <div class="row mb-2 text-success"><div class="col-7">Ongkir (+):</div><div class="col-5 text-end" id="res_ongkir">Rp 0</div></div>
-                    <div class="row mb-3 text-danger"><div class="col-7">Diskon Tambahan (-):</div><div class="col-5 text-end" id="res_extra_label">Rp 0</div></div>
-                    <hr>
+                <div class="result-box-v2 mt-4">
+                    <div class="row mb-2" style="font-size:14px; opacity:0.85;">
+                        <div class="col-7">Harga Satuan (Setelah Level):</div>
+                        <div class="col-5 text-end fw-bold" id="res_unit_price">Rp 0</div>
+                    </div>
+                    <div class="row mb-2" style="font-size:14px; opacity:0.85;">
+                        <div class="col-7">Subtotal Produk:</div>
+                        <div class="col-5 text-end fw-bold" id="res_subtotal">Rp 0</div>
+                    </div>
+                    <div class="row mb-2 text-emerald" style="color:#34D399; font-size:14px;">
+                        <div class="col-7">Ongkir (+):</div>
+                        <div class="col-5 text-end fw-bold" id="res_ongkir">Rp 0</div>
+                    </div>
+                    <div class="row mb-3 text-rose" style="color:#FCA5A5; font-size:14px;">
+                        <div class="col-7">Diskon Tambahan (-):</div>
+                        <div class="col-5 text-end fw-bold" id="res_extra_label">Rp 0</div>
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.2);">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="fw-bold mb-0 text-dark">TOTAL AKHIR</h3>
-                        <h2 class="fw-bold mb-0 text-primary" id="res_total">Rp 0</h2>
+                        <h4 class="fw-bold mb-0 text-white" style="font-family:'Plus Jakarta Sans', sans-serif;">TOTAL AKHIR</h4>
+                        <h2 class="fw-extrabold mb-0" style="color:#60A5FA; font-family:'Plus Jakarta Sans', sans-serif; font-size:32px;" id="res_total">Rp 0</h2>
                     </div>
                 </div>
             </div>
