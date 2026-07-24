@@ -297,7 +297,7 @@ if ($_SESSION['role'] !== 'sales') {
                                         if (!empty($phone_number)) {
                                             $cleaned_tel = preg_replace('/[^0-9]/', '', $phone_number);
                                             $wa_number = (substr($cleaned_tel, 0, 1) === '0') ? '62' . substr($cleaned_tel, 1) : $cleaned_tel;
-                                            echo '<a href="https://wa.me/' . $wa_number . '" target="_blank" class="badge text-success border text-decoration-none" style="background:#F0FDF4; border-color:#BBF7D0 !important; border-radius:20px; padding:4px 8px;"><i class="bi bi-whatsapp me-1"></i>' . htmlspecialchars($phone_number) . '</a>';
+                                            echo '<a href="https://wa.me/' . $wa_number . '" target="_blank" class="badge text-success border text-decoration-none shadow-2sm ms-1" style="background:#F0FDF4; color:#15803D !important; border-color:#86EFAC !important; border-radius:20px; padding:4px 10px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:3px;"><i class="bi bi-whatsapp"></i> ' . htmlspecialchars($phone_number) . '</a>';
                                         }
                                         echo '</div>';
                                     }
@@ -321,41 +321,41 @@ if ($_SESSION['role'] !== 'sales') {
                             </td>
                             <td>
                                 <?php if ($customer['nama_sales']): ?>
-                                    <div class="d-flex align-items-center gap-1" style="white-space:nowrap;">
+                                    <div class="d-flex align-items-center gap-1.5" style="white-space:nowrap;">
                                         <div class="sales-avatar-badge-small flex-shrink-0">
                                             <?php echo strtoupper(substr($customer['nama_sales'], 0, 1)); ?>
                                         </div>
                                         <span class="fw-semibold text-dark" style="font-size:12.5px;"><?php echo htmlspecialchars($customer['nama_sales']); ?></span>
                                     </div>
                                 <?php else: ?>
-                                    <span class="badge bg-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>Belum Di-assign</span>
+                                    <span class="badge bg-warning text-dark fw-bold" style="border-radius:20px; padding:4px 10px;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Belum Di-assign</span>
                                 <?php endif; ?>
                             </td>
                             <td class="text-center fw-bold">
-                                <span class="badge bg-primary rounded-pill px-2 py-1"><?php echo $customer['fu_count']; ?></span>
+                                <span class="badge bg-primary rounded-pill px-2.5 py-1" style="font-size:12px;"><?php echo $customer['fu_count']; ?></span>
                             </td>
                             <td class="text-center">
-                                <div class="form-check form-switch d-flex justify-content-center"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="kandidat" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['kandidat'] == 'Y') echo 'checked'; ?>></div>
+                                <div class="form-check form-switch d-flex justify-content-center mb-0"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="kandidat" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['kandidat'] == 'Y') echo 'checked'; ?>></div>
                             </td>
                             <td class="text-center">
-                               <div class="form-check form-switch d-flex justify-content-center"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="deal" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['deal'] == 'Y') echo 'checked'; ?>></div>
+                               <div class="form-check form-switch d-flex justify-content-center mb-0"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="deal" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['deal'] == 'Y') echo 'checked'; ?>></div>
                             </td>
                             <td class="text-center">
                                 <?php if (!empty($customer['primary_map_link'])): ?>
-                                    <a href="<?php echo htmlspecialchars($customer['primary_map_link']); ?>" target="_blank" class="btn btn-sm btn-outline-success" title="Buka di Google Maps"><i class="bi bi-geo-alt-fill"></i></a>
+                                    <a href="<?php echo htmlspecialchars($customer['primary_map_link']); ?>" target="_blank" class="btn btn-sm rounded-circle shadow-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; background:#ECFDF5; color:#059669; border:1px solid #A7F3D0;" title="Buka di Google Maps"><i class="bi bi-geo-alt-fill"></i></a>
                                 <?php else: ?>
-                                    <button class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-geo-alt"></i></button>
+                                    <button class="btn btn-sm rounded-circle border" disabled style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; background:#F8FAFC; color:#CBD5E1;"><i class="bi bi-geo-alt"></i></button>
                                 <?php endif; ?>
                             </td>
                             <td class="text-center">
-                                <div class="d-flex justify-content-center gap-1">
-                                    <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-outline-primary" title="Lihat Follow Up"><i class="bi bi-eye-fill"></i></a>
+                                <div class="d-flex justify-content-center gap-1.5">
+                                    <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" class="btn btn-sm rounded-circle shadow-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE;" title="Lihat Follow Up"><i class="bi bi-eye-fill"></i></a>
                                     <?php 
                                     $can_edit_delete = ($_SESSION['role'] == 'superadmin') || ($_SESSION['role'] == 'sales' && $_SESSION['user_id'] == $customer['sales_id']);
                                     if ($can_edit_delete): 
                                     ?>
-                                        <a href="customer_edit.php?id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-outline-secondary" title="Edit Customer"><i class="bi bi-pencil-fill"></i></a>
-                                        <a href="customer_delete.php?id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-outline-danger" title="Hapus Customer" onclick="return confirm('Yakin hapus customer ini?')"><i class="bi bi-trash-fill"></i></a>
+                                        <a href="customer_edit.php?id=<?php echo $customer['id']; ?>" class="btn btn-sm rounded-circle shadow-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; background:#F8FAFC; color:#475569; border:1px solid #CBD5E1;" title="Edit Customer"><i class="bi bi-pencil-fill"></i></a>
+                                        <a href="customer_delete.php?id=<?php echo $customer['id']; ?>" class="btn btn-sm rounded-circle shadow-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; background:#FEF2F2; color:#DC2626; border:1px solid #FECACA;" title="Hapus Customer" onclick="return confirm('Yakin hapus customer ini?')"><i class="bi bi-trash-fill"></i></a>
                                     <?php endif; ?>
                                 </div>
                             </td>

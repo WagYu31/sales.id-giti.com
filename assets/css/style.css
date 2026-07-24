@@ -378,3 +378,34 @@ body {
     background-color: #2563EB !important;
     color: #FFFFFF !important;
 }
+
+/* ============ TABLE RESPONSIVE & POLISH ============ */
+.table-dark-header th {
+    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%) !important;
+    color: #F8FAFC !important;
+    font-size: 11px !important;
+    letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+    font-weight: 800 !important;
+    border-bottom: 2px solid #334155 !important;
+    padding: 14px 12px !important;
+    white-space: nowrap;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #F8FAFC !important;
+}
+
+@media (max-width: 767.98px) {
+    .filter-card {
+        padding: 16px !important;
+    }
+    .table td, .table th {
+        font-size: 12px !important;
+        padding: 10px 8px !important;
+    }
+}
