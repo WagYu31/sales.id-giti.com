@@ -92,15 +92,15 @@ $conn->close();
         }
 
         .hero-logo-img{
-            height:36px;width:auto;
+            height:56px;width:auto;
             filter:brightness(0) invert(1);
             opacity:0.95;
         }
 
         .hero-headline{
-            font-size:40px;font-weight:700;
-            color:#FFFFFF;line-height:1.2;
-            letter-spacing:-1px;margin-bottom:20px;
+            font-size:38px;font-weight:700;
+            color:#FFFFFF;line-height:1.25;
+            letter-spacing:-0.8px;margin-bottom:16px;
         }
 
         .hero-headline span{
@@ -112,10 +112,10 @@ $conn->close();
         }
 
         .hero-desc{
-            font-size:15px;line-height:1.7;
+            font-size:14px;line-height:1.7;
             color:#94A3B8;
-            font-weight:500;
-            margin-bottom:48px;max-width:400px;
+            font-weight:400;
+            margin-bottom:40px;max-width:380px;
         }
 
         /* Glassmorphism Stat Cards */
