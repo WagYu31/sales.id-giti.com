@@ -187,17 +187,69 @@ if($result_cust) {
                     <?php foreach($customers as $cust): ?>
                     <tr data-customer-id="<?php echo $cust['id']; ?>">
                         <td class="text-center"><input class="form-check-input customer-checkbox" type="checkbox"></td>
-                        <td class="fw-bold" style="font-family:'Plus Jakarta Sans', sans-serif; color:#0F172A;"><?php echo htmlspecialchars($cust['nama_toko']); ?></td>
-                        <td><?php echo htmlspecialchars($cust['nama_pic'] ?? '-'); ?></td>
-                        <td class="small text-muted"><?php echo htmlspecialchars($cust['tlp_pic'] ?? '-'); ?></td>
-                        <td><span class="badge bg-info"><?php echo htmlspecialchars($cust['kategori'] ?? 'Umum'); ?></span></td>
-                        <td class="text-wrap small text-muted"><?php echo htmlspecialchars($cust['alamat'] ?? '-'); ?></td>
-                        <td class="small fw-semibold"><?php echo htmlspecialchars($cust['kota'] ?? '-'); ?></td>
+                        <td>
+                            <div class="fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:13.5px;">
+                                <i class="bi bi-shop text-primary me-1"></i><?php echo htmlspecialchars($cust['nama_toko']); ?>
+                            </div>
+                        </td>
+                        <td>
+                            <?php 
+                            $pic_name = trim($cust['nama_pic'] ?? '');
+                            $show_pic = ($pic_name !== '' && strtolower($pic_name) !== 'unknown' && strtolower($pic_name) !== strtolower(trim($cust['nama_toko'])));
+                            if ($show_pic): 
+                            ?>
+                                <span class="small fw-semibold text-dark"><i class="bi bi-person-fill text-muted me-1"></i><?php echo htmlspecialchars($pic_name); ?></span>
+                            <?php else: ?>
+                                <span class="text-muted small">-</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php 
+                            $phone_number = trim($cust['tlp_pic'] ?? '');
+                            if (!empty($phone_number) && $phone_number !== '-'):
+                                $cleaned_tel = preg_replace('/[^0-9]/', '', $phone_number);
+                                $wa_number = (substr($cleaned_tel, 0, 1) === '0') ? '62' . substr($cleaned_tel, 1) : $cleaned_tel;
+                            ?>
+                                <a href="https://wa.me/<?php echo $wa_number; ?>" target="_blank" class="badge text-success border text-decoration-none shadow-2sm" style="background:#F0FDF4; color:#15803D !important; border-color:#86EFAC !important; border-radius:20px; padding:4px 10px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:3px;">
+                                    <i class="bi bi-whatsapp"></i> <?php echo htmlspecialchars($phone_number); ?>
+                                </a>
+                            <?php else: ?>
+                                <span class="text-muted small">-</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php 
+                            $kat = strtoupper(trim($cust['kategori'] ?? 'UMUM'));
+                            $kat_bg = '#F1F5F9'; $kat_fg = '#475569'; $kat_bd = '#CBD5E1';
+                            if ($kat === 'INSTALLER') { $kat_bg = '#EEF2FF'; $kat_fg = '#4338CA'; $kat_bd = '#C7D2FE'; }
+                            elseif ($kat === 'DEALER') { $kat_bg = '#ECFEFF'; $kat_fg = '#0891B2'; $kat_bd = '#A5F3FC'; }
+                            elseif ($kat === 'USER') { $kat_bg = '#FEF3C7'; $kat_fg = '#D97706'; $kat_bd = '#FDE68A'; }
+                            ?>
+                            <span class="badge fw-bold" style="background:<?php echo $kat_bg; ?>; color:<?php echo $kat_fg; ?>; border:1px solid <?php echo $kat_bd; ?>; border-radius:20px; padding:4px 10px; font-size:11px;"><?php echo htmlspecialchars($kat); ?></span>
+                        </td>
+                        <td class="text-wrap small text-muted" style="max-width:220px; line-height:1.4;">
+                            <?php echo htmlspecialchars($cust['alamat'] ?? '-'); ?>
+                        </td>
+                        <td>
+                            <?php 
+                            $city = trim($cust['kota'] ?? '');
+                            if (!empty($city) && $city !== '-'):
+                            ?>
+                                <span class="badge fw-bold" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; border-radius:20px; padding:4px 10px; font-size:11px;">📍 <?php echo htmlspecialchars($city); ?></span>
+                            <?php else: ?>
+                                <span class="text-muted small">-</span>
+                            <?php endif; ?>
+                        </td>
                         <td class="sales-name-cell">
                             <?php if ($cust['sales_penanggung_jawab']): ?>
-                                <span class="sales-badge-assigned"><i class="bi bi-person-fill me-1"></i> <?php echo htmlspecialchars($cust['sales_penanggung_jawab']); ?></span>
+                                <div class="d-flex align-items-center gap-1.5" style="white-space:nowrap;">
+                                    <div class="sales-avatar-badge-small flex-shrink-0">
+                                        <?php echo strtoupper(substr($cust['sales_penanggung_jawab'], 0, 1)); ?>
+                                    </div>
+                                    <span class="fw-bold text-dark" style="font-size:12.5px;"><?php echo htmlspecialchars($cust['sales_penanggung_jawab']); ?></span>
+                                </div>
                             <?php else: ?>
-                                <span class="sales-badge-unassigned"><i class="bi bi-exclamation-circle me-1"></i> Belum ada</span>
+                                <span class="badge bg-warning text-dark fw-bold" style="border-radius:20px; padding:4px 10px; font-size:11px;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Belum ada</span>
                             <?php endif; ?>
                         </td>
                     </tr>
