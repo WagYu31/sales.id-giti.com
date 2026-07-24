@@ -50,38 +50,136 @@ while ($row = $result->fetch_assoc()) {
 ?>
 
 <style>
-    .answer-card { border-left: 3px solid #0d6efd; }
-    .question-meta, .answer-meta { font-size: 0.8rem; color: #6c757d; }
-    #questionsTable tbody tr { cursor: pointer; }
+.qa-hero {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%);
+    border-radius: 20px;
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.4);
+}
+
+.qa-hero::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+}
+
+.qa-hero-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.qa-hero-subtitle {
+    font-size: 14px;
+    color: rgba(226, 232, 240, 0.85);
+    margin: 0;
+    max-width: 600px;
+}
+
+.answer-card {
+    border: 1.5px solid #E2E8F0;
+    border-left: 4px solid #2563EB !important;
+    border-radius: 14px !important;
+    background: #F8FAFC;
+    transition: all 0.2s ease;
+}
+
+.answer-card:hover {
+    background: #FFFFFF;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+.question-meta, .answer-meta {
+    font-size: 12px;
+    color: #64748B;
+    font-weight: 600;
+}
+
+#questionsTable tbody tr {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.answer-pill-btn {
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    color: #FFF;
+    border-radius: 30px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.sales-avatar-badge-small {
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+    color: #FFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    margin-right: 8px;
+}
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-2">
-    <h1><i class="bi bi-patch-question-fill"></i> Forum Q&A Sales</h1>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addQuestionModal"><i class="bi bi-plus-circle"></i> Buat Pertanyaan</button>
-</div>
-<p class="lead text-muted mb-4"><strong>Dari Sales untuk Sales</strong>. Ini adalah tempat kita berbagi pengetahuan dan tumbuh bersama. Setiap jawaban adalah langkah menuju kesuksesan tim.</p>
-
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span>Daftar Pertanyaan</span>
-        <input type="text" id="liveSearchInput" class="form-control w-50" placeholder="Cari pertanyaan, jawaban, atau nama sales...">
+<!-- Hero Header -->
+<div class="qa-hero">
+    <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
+                <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
+                <span>›</span>
+                <span>Forum Q&A Sales</span>
+            </div>
+            <h1 class="qa-hero-title">Forum Q&A Sales 💬</h1>
+            <p class="qa-hero-subtitle">Dari Sales untuk Sales. Tempat berbagi solusi produk, penanganan customer, dan pengetahuan tim.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <button class="btn btn-primary shadow-lg" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                <i class="bi bi-plus-circle-fill"></i> Buat Pertanyaan Baru
+            </button>
+        </div>
     </div>
-    <div class="card-body">
+</div>
+
+<!-- Main Card -->
+<div class="card">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <h5 class="mb-0"><i class="bi bi-chat-left-dots-fill"></i> Daftar Pertanyaan</h5>
+        <div class="position-relative style-search" style="min-width: 280px;">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="liveSearchInput" class="form-control border-start-0 ps-0" placeholder="Cari pertanyaan atau sales...">
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover" id="questionsTable">
-                <thead class="table-light">
+            <table class="table table-hover align-middle" id="questionsTable">
+                <thead class="table-dark-header">
                     <tr>
-                        <th>Pertanyaan</th>
-                        <th>Detail Pertanyaan</th>
-                        <th>Ditanyakan Oleh</th>
-                        <th class="text-center">Jumlah Jawaban</th>
-                        <th>Dibuat</th>
-                        <th style="width: 5%;">Aksi</th>
+                        <th style="width: 22%;">Pertanyaan</th>
+                        <th style="width: 32%;">Detail Pertanyaan</th>
+                        <th style="width: 18%;">Ditanyakan Oleh</th>
+                        <th class="text-center" style="width: 13%;">Jumlah Jawaban</th>
+                        <th style="width: 10%;">Dibuat</th>
+                        <th class="text-center" style="width: 5%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($questions)): ?>
-                        <tr><td colspan="5" class="text-center p-5"><h5>Belum ada pertanyaan. Jadilah yang pertama!</h5></td></tr>
+                        <tr><td colspan="6" class="text-center p-5 text-muted"><h5>Belum ada pertanyaan. Jadilah yang pertama bertanya!</h5></td></tr>
                     <?php endif; ?>
                     <?php foreach ($questions as $q): ?>
                     <tr class="question-row" id="question-row-<?php echo $q['id']; ?>"
@@ -93,26 +191,36 @@ while ($row = $result->fetch_assoc()) {
                         data-answers='<?php echo json_encode($q['answers']); ?>'>
                         
                         <td class="question-data" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
-                            <strong><?php echo htmlspecialchars($q['title']); ?></strong>
+                            <span class="fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif;">
+                                <i class="bi bi-question-circle-fill text-primary me-1"></i>
+                                <?php echo htmlspecialchars($q['title']); ?>
+                            </span>
+                        </td>
+                        
+                        <td class="question-data text-muted small" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
+                            <?php echo htmlspecialchars(substr($q['body'], 0, 80)) . (strlen($q['body']) > 80 ? '...' : ''); ?>
                         </td>
                         
                         <td class="question-data" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
-                            <?php echo htmlspecialchars($q['body']); ?>
-                        </td>
-                        
-                        <td class="question-data" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
-                            <?php echo htmlspecialchars($q['author']); ?>
+                            <div class="d-flex align-items-center">
+                                <div class="sales-avatar-badge-small">
+                                    <?php echo strtoupper(substr($q['author'], 0, 1)); ?>
+                                </div>
+                                <span class="fw-semibold text-dark" style="font-size:13px;"><?php echo htmlspecialchars($q['author']); ?></span>
+                            </div>
                         </td>
                         <td class="text-center question-data" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
-                            <span class="badge bg-primary rounded-pill">Lihat <?php echo count($q['answers']); ?> Jawaban</span>
+                            <span class="answer-pill-btn">
+                                <i class="bi bi-chat-right-text-fill me-1"></i> <?php echo count($q['answers']); ?> Jawaban
+                            </span>
                         </td>
-                        <td class="question-data" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
+                        <td class="question-data small text-muted" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
                             <?php echo date('d M Y', strtotime($q['created_at'])); ?>
                         </td>
                         <td class="text-center">
                             <?php if ($_SESSION['user_id'] == $q['author_id'] || $_SESSION['role'] === 'superadmin'): ?>
                                 <button class="btn btn-sm btn-outline-danger delete-btn" data-id="<?php echo $q['id']; ?>" data-type="question" title="Hapus Pertanyaan">
-                                    <i class="bi bi-trash"></i>
+                                    <i class="bi bi-trash-fill"></i>
                                 </button>
                             <?php endif; ?>
                         </td>
@@ -124,55 +232,59 @@ while ($row = $result->fetch_assoc()) {
     </div>
 </div>
 
+<!-- Modal View Question -->
 <div class="modal fade" id="viewQuestionModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="q-modal-title"></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden;">
+      <div class="modal-header" style="background:#0F172A; color:#FFF;">
+        <h5 class="modal-title fw-bold" id="q-modal-title" style="font-size:16px;"></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        <div class="mb-3">
-            <p class="mb-1" id="q-modal-body"></p>
-            <small class="question-meta">Ditanyakan oleh <span id="q-modal-author"></span> pada <span id="q-modal-date"></span></small>
+      <div class="modal-body p-4">
+        <div class="bg-light rounded-3 p-3 mb-3 border">
+            <p class="mb-2 fw-semibold text-dark" id="q-modal-body" style="font-size:14.5px; line-height:1.6;"></p>
+            <div class="question-meta"><i class="bi bi-person-fill text-primary"></i> Ditanyakan oleh <span id="q-modal-author" class="fw-bold text-dark"></span> pada <span id="q-modal-date"></span></div>
         </div>
-        <hr>
-        <h6 class="mb-3">Jawaban</h6>
+        <hr class="my-3">
+        <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-chat-square-text-fill text-primary me-2"></i>Jawaban Tim Sales</h6>
         <div id="q-modal-answers-list"></div>
-        <form class="add-answer-form mt-4">
+        <form class="add-answer-form mt-4 bg-white p-3 border rounded-3">
             <input type="hidden" id="q-modal-question-id" name="question_id">
-            <div class="mb-2"><textarea name="body" class="form-control" rows="3" placeholder="Tulis jawaban Anda..." required></textarea></div>
-            <button type="submit" class="btn btn-primary btn-sm">Kirim Jawaban</button>
+            <div class="mb-3">
+                <label class="form-label">Tulis Jawaban Anda</label>
+                <textarea name="body" class="form-control" rows="3" placeholder="Bantu rekan sales Anda dengan jawaban yang jelas..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-send-fill"></i> Kirim Jawaban</button>
         </form>
       </div>
     </div>
   </div>
 </div>
 
-
+<!-- Modal Add Question -->
 <div class="modal fade" id="addQuestionModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Buat Pertanyaan Baru</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden;">
+      <div class="modal-header" style="background:#0F172A; color:#FFF;">
+        <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Buat Pertanyaan Baru</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body p-4">
         <form id="addQuestionForm">
           <input type="hidden" name="action" value="add_question">
           <div class="mb-3">
             <label for="q_title" class="form-label">Judul Pertanyaan</label>
-            <input type="text" class="form-control" id="q_title" name="title" required>
+            <input type="text" class="form-control" id="q_title" name="title" placeholder="mis. Password standar IP CAM Loewix?" required>
           </div>
           <div class="mb-3">
             <label for="q_body" class="form-label">Detail Pertanyaan</label>
-            <textarea class="form-control" id="q_body" name="body" rows="5"></textarea>
+            <textarea class="form-control" id="q_body" name="body" rows="4" placeholder="Jelaskan detail pertanyaan Anda..."></textarea>
           </div>
         </form>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer border-top-0 pt-0">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" form="addQuestionForm" class="btn btn-primary">Kirim</button>
+        <button type="submit" form="addQuestionForm" class="btn btn-primary"><i class="bi bi-send-fill"></i> Kirim Pertanyaan</button>
       </div>
     </div>
   </div>
@@ -193,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Event listener untuk seluruh tabel (lihat detail & hapus pertanyaan)
+    // Event listener untuk seluruh tabel
     questionsTable.addEventListener('click', function(e) {
         const deleteButton = e.target.closest('.delete-btn[data-type="question"]');
         const viewTrigger = e.target.closest('.question-data');
@@ -221,21 +333,21 @@ document.addEventListener('DOMContentLoaded', function () {
         if (answers.length > 0) {
             answers.forEach(a => {
                 const canDelete = isSuperAdmin || currentUserId == a.author_id;
-                const deleteButtonHtml = canDelete ? `<button class="btn btn-sm btn-outline-danger delete-btn" data-id="${a.id}" data-type="answer"><i class="bi bi-trash"></i></button>` : '';
+                const deleteButtonHtml = canDelete ? `<button class="btn btn-sm btn-outline-danger delete-btn" data-id="${a.id}" data-type="answer"><i class="bi bi-trash-fill"></i></button>` : '';
                 const answerDate = new Date(a.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
                 answersList.innerHTML += `
                     <div class="card answer-card mb-3" id="answer-${a.id}">
                         <div class="card-body">
-                            <p class="card-text">${a.body.replace(/\n/g, '<br>')}</p>
+                            <p class="card-text text-dark mb-2" style="font-size:14px; line-height:1.5;">${a.body.replace(/\n/g, '<br>')}</p>
                             <div class="d-flex justify-content-between align-items-center">
-                                <small class="answer-meta">Dijawab oleh ${a.author} pada ${answerDate}</small>
+                                <small class="answer-meta"><i class="bi bi-person-circle text-primary me-1"></i> Dijawab oleh ${a.author} pada ${answerDate}</small>
                                 <div>${deleteButtonHtml}</div>
                             </div>
                         </div>
                     </div>`;
             });
         } else {
-            answersList.innerHTML = '<p class="text-muted">Belum ada jawaban.</p>';
+            answersList.innerHTML = '<p class="text-muted fst-italic p-3 text-center">Belum ada jawaban. Jadilah yang pertama memberikan solusi!</p>';
         }
     }
 
@@ -253,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // Event listener untuk seluruh body modal (untuk submit jawaban dan hapus jawaban)
+    // Event listener untuk seluruh body modal
     viewQuestionModal.addEventListener('submit', function(e) {
         if (e.target.classList.contains('add-answer-form')) {
             e.preventDefault();
