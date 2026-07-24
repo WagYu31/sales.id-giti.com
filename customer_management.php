@@ -147,53 +147,66 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
     flex-direction: column;
     justify-content: space-between;
     transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-    border: none;
+    border: 1px solid rgba(255,255,255,0.12);
     cursor: default;
 }
 
 .stat-card:hover {
-    transform: translateY(-6px);
+    transform: translateY(-6px) scale(1.02);
 }
 
-/* Organic wave shapes */
+/* Moving shine effect */
 .stat-card::before {
     content: '';
     position: absolute;
-    top: -60%; right: -30%;
-    width: 200px; height: 200px;
-    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-    background: rgba(255,255,255,0.08);
-    animation: float 8s ease-in-out infinite;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.08),
+        rgba(255,255,255,0.15),
+        rgba(255,255,255,0.08),
+        transparent
+    );
+    transform: skewX(-20deg);
+    transition: left 0.8s ease;
+    z-index: 3;
 }
 
+.stat-card:hover::before {
+    left: 130%;
+}
+
+/* Glass overlay panel */
 .stat-card::after {
     content: '';
     position: absolute;
-    bottom: -40%; left: -10%;
-    width: 180px; height: 180px;
-    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-    background: rgba(255,255,255,0.05);
-    animation: float 10s ease-in-out infinite reverse;
+    top: 12px; right: 12px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 70%, transparent 100%);
+    filter: blur(1px);
 }
 
 /* Gradient backgrounds with glow */
 .stat-card.blue {
-    background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #60A5FA 100%);
-    box-shadow: 0 8px 32px -6px rgba(59,130,246,0.35);
+    background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #3B82F6 100%);
+    box-shadow: 0 10px 40px -8px rgba(37,99,235,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
 }
-.stat-card.blue:hover { box-shadow: 0 20px 50px -10px rgba(59,130,246,0.45); }
+.stat-card.blue:hover { box-shadow: 0 20px 50px -10px rgba(37,99,235,0.5), inset 0 1px 0 rgba(255,255,255,0.12); }
 
 .stat-card.teal {
-    background: linear-gradient(135deg, #134E4A 0%, #0D9488 50%, #2DD4BF 100%);
-    box-shadow: 0 8px 32px -6px rgba(20,184,166,0.3);
+    background: linear-gradient(135deg, #134E4A 0%, #0D9488 50%, #14B8A6 100%);
+    box-shadow: 0 10px 40px -8px rgba(13,148,136,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
 }
-.stat-card.teal:hover { box-shadow: 0 20px 50px -10px rgba(20,184,166,0.4); }
+.stat-card.teal:hover { box-shadow: 0 20px 50px -10px rgba(13,148,136,0.45), inset 0 1px 0 rgba(255,255,255,0.12); }
 
 .stat-card.navy {
-    background: linear-gradient(135deg, #312E81 0%, #6D28D9 50%, #A78BFA 100%);
-    box-shadow: 0 8px 32px -6px rgba(109,40,217,0.3);
+    background: linear-gradient(135deg, #312E81 0%, #6D28D9 50%, #8B5CF6 100%);
+    box-shadow: 0 10px 40px -8px rgba(109,40,217,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
 }
-.stat-card.navy:hover { box-shadow: 0 20px 50px -10px rgba(109,40,217,0.4); }
+.stat-card.navy:hover { box-shadow: 0 20px 50px -10px rgba(109,40,217,0.45), inset 0 1px 0 rgba(255,255,255,0.12); }
 
 /* Card top row */
 .stat-card-header {
@@ -304,11 +317,11 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 .mc-link { text-decoration: none; color: inherit; display: block; }
 
 .mc {
-    background: #FFFFFF;
-    border: 1px solid #EEF2F6;
-    border-radius: 18px;
+    background: linear-gradient(160deg, #FFFFFF 0%, #F8FAFF 100%);
+    border: 1px solid rgba(226,232,240,0.8);
+    border-radius: 20px;
     padding: 28px;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -328,10 +341,23 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 
 .mc:hover::before { opacity: 1; }
 
+.mc::after {
+    content: '';
+    position: absolute;
+    top: -50%; right: -50%;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--mc-color-end, rgba(59,130,246,0.06)), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.mc:hover::after { opacity: 1; }
+
 .mc:hover {
-    border-color: transparent;
-    background: #FFFFFF;
-    box-shadow: 0 12px 40px -8px rgba(0,0,0,0.1), 0 4px 12px -4px rgba(0,0,0,0.04);
+    border-color: rgba(59,130,246,0.15);
+    background: linear-gradient(160deg, #FFFFFF 0%, #F0F4FF 100%);
+    box-shadow: 0 16px 48px -12px rgba(0,0,0,0.1), 0 4px 12px -4px rgba(0,0,0,0.03);
     transform: translateY(-5px);
 }
 
