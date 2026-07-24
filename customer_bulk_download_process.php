@@ -9,6 +9,18 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['superadmin', 
     die("Akses ditolak.");
 }
 
+// Cek Wajib Izin Superadmin Khusus Sales
+if ($_SESSION['role'] === 'sales') {
+    $chk_perm = $conn->prepare("SELECT id FROM download_requests WHERE sales_id = ? AND status = 'Approved' ORDER BY id DESC LIMIT 1");
+    $chk_perm->bind_param('i', $_SESSION['user_id']);
+    $chk_perm->execute();
+    $res_perm = $chk_perm->get_result();
+    if ($res_perm->num_rows === 0) {
+        die("AKSES DITOLAK: Anda belum memiliki izin dari Superadmin untuk mengunduh data customer.");
+    }
+    $chk_perm->close();
+}
+
 if (isset($_POST['customer_ids']) && is_array($_POST['customer_ids'])) {
     $customer_ids = array_map('intval', $_POST['customer_ids']);
     if (empty($customer_ids)) {
