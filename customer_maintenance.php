@@ -141,6 +141,14 @@ $bad_format_count = count($bad_format_customers);
             <h1 class="maint-hero-title">Perbaikan & Kualitas Data Customer 🛠️</h1>
             <p class="maint-hero-subtitle">Audit otomatis nomor telepon duplikat dan koreksi format nomor telepon yang tidak diawali angka 0.</p>
         </div>
+        <?php if ($duplicate_count > 0): ?>
+        <div class="mt-3 mt-md-0">
+            <button id="btn-auto-clean-all" class="btn btn-warning fw-extrabold shadow-lg px-4 py-2.5 rounded-3 d-inline-flex align-items-center gap-2" style="font-weight:800;">
+                <i class="bi bi-magic fs-5"></i>
+                <span>⚡ Otomatis Rapikan Semua (<?php echo $duplicate_count; ?> Grup)</span>
+            </button>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -162,7 +170,14 @@ $bad_format_count = count($bad_format_customers);
     <div class="card border-0 shadow-sm" style="border-radius:20px;">
         <div class="card-body p-4">
             <?php if ($duplicate_count > 0): ?>
-                <p class="text-muted small fw-semibold mb-3">Data di bawah dikelompokkan berdasarkan nomor telepon yang sama. Pilih satu data untuk dipertahankan, maka data lainnya akan dihapus otomatis.</p>
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-3 border-bottom gap-2">
+                    <p class="text-muted small fw-semibold mb-0">
+                        Data di bawah dikelompokkan berdasarkan nomor telepon yang sama. Pilih data yang ingin dipertahankan, atau klik tombol <strong>Otomatis Rapikan Semua</strong> di atas.
+                    </p>
+                    <button class="btn btn-sm btn-outline-warning fw-bold px-3 btn-auto-clean-all-sub">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Bersihkan <?php echo $duplicate_count; ?> Duplikat Otomatis
+                    </button>
+                </div>
                 <div id="duplicate-container">
                     <?php foreach ($duplicate_groups as $phone => $customers): ?>
                         <div class="card mb-3 border-0 shadow-sm overflow-hidden" id="group-<?php echo md5($phone); ?>" style="border-radius:16px;">
@@ -312,6 +327,42 @@ $bad_format_count = count($bad_format_customers);
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const btnAutoCleanMain = document.getElementById('btn-auto-clean-all');
+    const btnAutoCleanSub = document.querySelector('.btn-auto-clean-all-sub');
+
+    function handleAutoCleanAll() {
+        if (confirm('⚡ OTOMATIS RAPIKAN SEMUA DUPLIKAT?\n\nSistem akan secara otomatis mempertahankan 1 data toko terbaik/terlengkap di setiap grup dan menghapus data duplikat lainnya.\n\nApakah Anda yakin ingin melanjutkan?')) {
+            const btn = btnAutoCleanMain || btnAutoCleanSub;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Memproses...';
+            }
+
+            fetch('resolve_duplicates.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'auto_clean_all=1'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('🎉 SUKSES!\n\n' + data.message);
+                    window.location.reload();
+                } else {
+                    alert('Gagal memproses: ' + (data.message || 'Error tidak diketahui'));
+                    if (btn) btn.disabled = false;
+                }
+            })
+            .catch(error => {
+                alert('Terjadi kesalahan jaringan.');
+                if (btn) btn.disabled = false;
+            });
+        }
+    }
+
+    if (btnAutoCleanMain) btnAutoCleanMain.addEventListener('click', handleAutoCleanAll);
+    if (btnAutoCleanSub) btnAutoCleanSub.addEventListener('click', handleAutoCleanAll);
+
     const duplicateContainer = document.getElementById('duplicate-container');
     if (duplicateContainer) {
         duplicateContainer.addEventListener('click', function(e) {
