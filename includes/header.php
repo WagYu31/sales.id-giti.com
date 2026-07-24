@@ -528,21 +528,22 @@ table tr td { font-size: 0.85em; }
     <!-- Top Bar -->
     <header class="topbar">
         <div class="topbar-left">
-            <i class="bi bi-calendar-event"></i>
-            <span class="topbar-date" id="liveDate">Loading...</span>
-            <span style="color:#CBD5E1;">|</span>
-            <i class="bi bi-clock" style="color:#3B82F6;"></i>
-            <span class="topbar-time" id="liveTime">--:--</span>
+            <div class="d-flex align-items-center gap-2 bg-light border px-3 py-1.5" style="border-radius:30px; font-size:13px;">
+                <i class="bi bi-calendar-event text-primary"></i>
+                <span class="topbar-date fw-semibold text-dark" id="liveDate">Loading...</span>
+                <span style="color:#CBD5E1;">|</span>
+                <i class="bi bi-clock-fill text-primary"></i>
+                <span class="topbar-time fw-bold text-primary" id="liveTime">--:--</span>
+            </div>
         </div>
         <div class="topbar-actions">
             <!-- Notification Dropdown -->
-            <div class="dropdown">
-                <button class="topbar-btn dropdown-toggle border-0" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi Sistem" style="outline:none;">
-                    <i class="bi bi-bell-fill text-warning"></i>
+            <div class="dropdown position-relative">
+                <button class="topbar-btn border-0 shadow-sm" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi Sistem" style="outline:none; position:relative; background:#FFFFFF; border:1px solid #E2E8F0; width:42px; height:42px; border-radius:12px;">
+                    <i class="bi bi-bell-fill text-warning" style="font-size:18px;"></i>
                     <?php if ($total_notif_count > 0): ?>
-                        <span class="notif-dot"></span>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:10px; padding:3px 6px;">
-                            <?php echo $total_notif_count; ?>
+                        <span class="position-absolute translate-middle badge rounded-pill bg-danger border border-white" style="top: 2px; right: -12px; font-size: 10px; font-weight:800; padding: 3px 7px; box-shadow:0 3px 8px rgba(239,68,68,0.4);">
+                            <?php echo ($total_notif_count > 99) ? '99+' : $total_notif_count; ?>
                         </span>
                     <?php endif; ?>
                 </button>
