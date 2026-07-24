@@ -138,78 +138,112 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 }
 
 .stat-card {
-    background: #FFFFFF;
-    border: 1px solid #EEF2F6;
-    border-radius: 18px;
-    padding: 26px 28px;
+    border-radius: 20px;
+    padding: 28px 30px;
     position: relative;
     overflow: hidden;
-    min-height: 130px;
+    min-height: 150px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    justify-content: space-between;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
 }
 
 .stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.08);
-    border-color: transparent;
+    transform: translateY(-4px) scale(1.01);
 }
 
-.stat-card .stat-accent {
+/* Decorative orbs */
+.stat-card::before {
+    content: '';
     position: absolute;
-    top: 0; left: 0;
-    width: 4px; height: 100%;
-    border-radius: 18px 0 0 18px;
+    top: -40px; right: -30px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
 }
 
-.stat-card.blue .stat-accent { background: linear-gradient(180deg, #3B82F6, #2563EB); }
-.stat-card.teal .stat-accent { background: linear-gradient(180deg, #14B8A6, #0D9488); }
-.stat-card.navy .stat-accent { background: linear-gradient(180deg, #6366F1, #4F46E5); }
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 20%;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+}
 
+/* Gradient backgrounds with glow */
+.stat-card.blue {
+    background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+    box-shadow: 0 8px 32px -6px rgba(59,130,246,0.4);
+}
+.stat-card.blue:hover { box-shadow: 0 16px 48px -8px rgba(59,130,246,0.5); }
+
+.stat-card.teal {
+    background: linear-gradient(135deg, #134E4A 0%, #14B8A6 100%);
+    box-shadow: 0 8px 32px -6px rgba(20,184,166,0.35);
+}
+.stat-card.teal:hover { box-shadow: 0 16px 48px -8px rgba(20,184,166,0.45); }
+
+.stat-card.navy {
+    background: linear-gradient(135deg, #312E81 0%, #7C3AED 100%);
+    box-shadow: 0 8px 32px -6px rgba(124,58,237,0.35);
+}
+.stat-card.navy:hover { box-shadow: 0 16px 48px -8px rgba(124,58,237,0.45); }
+
+/* Card top row */
 .stat-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
 }
 
 .stat-card-label {
     font-size: 13px;
     font-weight: 600;
-    color: #64748B;
+    color: rgba(255,255,255,0.65);
     font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
 }
 
 .stat-card-icon {
-    width: 42px; height: 42px;
-    border-radius: 12px;
+    width: 46px; height: 46px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
+    color: rgba(255,255,255,0.9);
 }
 
-.stat-card.blue .stat-card-icon { background: #EFF6FF; color: #2563EB; }
-.stat-card.teal .stat-card-icon { background: #F0FDFA; color: #0D9488; }
-.stat-card.navy .stat-card-icon { background: #EEF2FF; color: #4F46E5; }
-
+/* Value */
 .stat-card-value {
-    font-size: 32px;
+    font-size: 38px;
     font-weight: 800;
-    color: #0F172A;
-    letter-spacing: -1px;
+    color: #FFFFFF;
+    letter-spacing: -1.5px;
     line-height: 1;
     font-family: 'Inter', sans-serif;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 2;
 }
 
+/* Footer */
 .stat-card-footer {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 4px;
+    gap: 8px;
+    position: relative;
+    z-index: 2;
 }
 
 .stat-trend {
@@ -218,17 +252,17 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
     gap: 2px;
     font-size: 12px;
     font-weight: 700;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 8px;
     font-family: 'Inter', sans-serif;
 }
 
-.stat-trend.up { background: #F0FDF4; color: #16A34A; }
-.stat-trend.down { background: #FEF2F2; color: #EF4444; }
+.stat-trend.up { background: rgba(52,211,153,0.2); color: #6EE7B7; }
+.stat-trend.down { background: rgba(248,113,113,0.2); color: #FCA5A5; }
 
 .stat-trend-label {
     font-size: 12px;
-    color: #94A3B8;
+    color: rgba(255,255,255,0.5);
     font-weight: 500;
     font-family: 'Inter', sans-serif;
 }
@@ -417,7 +451,6 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 <!-- STATS -->
 <div class="stats-grid">
     <div class="stat-card blue animate-in">
-        <div class="stat-accent"></div>
         <div class="stat-card-header">
             <span class="stat-card-label">Total Customer</span>
             <div class="stat-card-icon"><i class="bi bi-people-fill"></i></div>
@@ -429,7 +462,6 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
         </div>
     </div>
     <div class="stat-card teal animate-in">
-        <div class="stat-accent"></div>
         <div class="stat-card-header">
             <span class="stat-card-label">Pending Follow Up</span>
             <div class="stat-card-icon"><i class="bi bi-clock-history"></i></div>
@@ -441,7 +473,6 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
         </div>
     </div>
     <div class="stat-card navy animate-in">
-        <div class="stat-accent"></div>
         <div class="stat-card-header">
             <span class="stat-card-label">Customer Baru</span>
             <div class="stat-card-icon"><i class="bi bi-person-plus-fill"></i></div>
