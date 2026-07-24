@@ -138,59 +138,62 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 }
 
 .stat-card {
-    border-radius: 20px;
-    padding: 28px 30px;
+    border-radius: 24px;
+    padding: 30px 32px;
     position: relative;
     overflow: hidden;
-    min-height: 150px;
+    min-height: 155px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     border: none;
+    cursor: default;
 }
 
 .stat-card:hover {
-    transform: translateY(-4px) scale(1.01);
+    transform: translateY(-6px);
 }
 
-/* Decorative orbs */
+/* Organic wave shapes */
 .stat-card::before {
     content: '';
     position: absolute;
-    top: -40px; right: -30px;
-    width: 140px; height: 140px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.07);
+    top: -60%; right: -30%;
+    width: 200px; height: 200px;
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    background: rgba(255,255,255,0.08);
+    animation: float 8s ease-in-out infinite;
 }
 
 .stat-card::after {
     content: '';
     position: absolute;
-    bottom: -30px; left: 20%;
-    width: 100px; height: 100px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.04);
+    bottom: -40%; left: -10%;
+    width: 180px; height: 180px;
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    background: rgba(255,255,255,0.05);
+    animation: float 10s ease-in-out infinite reverse;
 }
 
 /* Gradient backgrounds with glow */
 .stat-card.blue {
-    background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
-    box-shadow: 0 8px 32px -6px rgba(59,130,246,0.4);
+    background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #60A5FA 100%);
+    box-shadow: 0 8px 32px -6px rgba(59,130,246,0.35);
 }
-.stat-card.blue:hover { box-shadow: 0 16px 48px -8px rgba(59,130,246,0.5); }
+.stat-card.blue:hover { box-shadow: 0 20px 50px -10px rgba(59,130,246,0.45); }
 
 .stat-card.teal {
-    background: linear-gradient(135deg, #134E4A 0%, #14B8A6 100%);
-    box-shadow: 0 8px 32px -6px rgba(20,184,166,0.35);
+    background: linear-gradient(135deg, #134E4A 0%, #0D9488 50%, #2DD4BF 100%);
+    box-shadow: 0 8px 32px -6px rgba(20,184,166,0.3);
 }
-.stat-card.teal:hover { box-shadow: 0 16px 48px -8px rgba(20,184,166,0.45); }
+.stat-card.teal:hover { box-shadow: 0 20px 50px -10px rgba(20,184,166,0.4); }
 
 .stat-card.navy {
-    background: linear-gradient(135deg, #312E81 0%, #7C3AED 100%);
-    box-shadow: 0 8px 32px -6px rgba(124,58,237,0.35);
+    background: linear-gradient(135deg, #312E81 0%, #6D28D9 50%, #A78BFA 100%);
+    box-shadow: 0 8px 32px -6px rgba(109,40,217,0.3);
 }
-.stat-card.navy:hover { box-shadow: 0 16px 48px -8px rgba(124,58,237,0.45); }
+.stat-card.navy:hover { box-shadow: 0 20px 50px -10px rgba(109,40,217,0.4); }
 
 /* Card top row */
 .stat-card-header {
