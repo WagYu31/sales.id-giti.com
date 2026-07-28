@@ -94,10 +94,12 @@ table tr td { font-size: 0.85em; }
 }
 
 .sidebar-logo {
-    padding: 28px 24px 24px;
+    padding: 24px 20px 20px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
-    text-align: left;
-    padding-left: 28px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
 }
 
@@ -105,15 +107,18 @@ table tr td { font-size: 0.85em; }
     content: '';
     position: absolute;
     bottom: -1px;
-    left: 20%;
-    width: 60%;
+    left: 10%;
+    width: 80%;
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(59,130,246,0.3), transparent);
 }
 
 .sidebar-logo img {
-    height: 72px;
+    height: 86px;
+    max-width: 210px;
     width: auto;
+    object-fit: contain;
+    transition: transform 0.2s ease;
 }
 
 .sidebar-nav {
