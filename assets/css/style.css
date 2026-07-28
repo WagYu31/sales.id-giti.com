@@ -665,6 +665,11 @@ body {
     border-bottom-color: rgba(0, 0, 0, 0.12) !important;
 }
 
+[data-sidebar="yellow"] .sidebar-logo img,
+[data-sidebar="white"] .sidebar-logo img {
+    filter: brightness(0) !important;
+}
+
 [data-sidebar="yellow"] .sidebar-logo::after {
     background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.3), transparent) !important;
 }
