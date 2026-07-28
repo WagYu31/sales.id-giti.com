@@ -1,85 +1,112 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+/**
+ * Asisten Sales Loewix AI Handler Engine
+ * Multi-Model Fallback & Smart Sales Template Backup
+ */
+
+ini_set('display_errors', 0);
+error_reporting(0);
 
 header('Content-Type: application/json');
 
-// --- KONFIGURASI PENTING ---
 $apiKey = 'AIzaSyC9WgTHoRv5qREa5R7LVyOEL58lgn-UaWs';
 
 $input = json_decode(file_get_contents('php://input'), true);
-$customerQuestion = $input['question'] ?? '';
+$customerQuestion = trim($input['question'] ?? '');
 
 if (empty($customerQuestion)) {
-    echo json_encode(['error' => 'Pertanyaan tidak boleh kosong.']);
+    echo json_encode(['answers' => [
+        "Halo Kak! Terima kasih sudah menghubungi Sales Loewix CCTV. Ada yang bisa kami bantu terkait kebutuhan keamanan hari ini?",
+        "Halo Kak! Salam hangat dari Loewix CCTV. Apakah ada tipe kamera atau lokasi pemasangan yang ingin dikonsultasikan?",
+        "Halo Kak! Kami siap membantu memberikan info produk & rekomendasi paket CCTV Loewix terbaik. Silakan informasikan kebutuhannya ya Kak."
+    ]]);
     exit;
 }
 
-$prompt = "Anda adalah asisten sales yang sangat ahli untuk merek CCTV bernama 'Loewix'. Anda selalu memberikan jawaban yang sopan, profesional, membantu, namun tidak kaku.
-Berdasarkan pertanyaan dari customer berikut, berikan 3 opsi jawaban yang berbeda dan relevan untuk digunakan oleh seorang sales. Jangan seperti AI. Jawaban harus ramah, friendly, tidak kaku, tapi tetap sopan khas sales profesional
+$prompt = "Anda adalah asisten sales profesional Loewix CCTV Indonesia.
+Berdasarkan pertanyaan dari customer berikut, berikan 3 opsi cara menjawab yang berbeda, ramah, profesional, dan mudah dipahami.
 
-Pertanyaan Customer: '{$customerQuestion}'
+Pertanyaan Customer: \"{$customerQuestion}\"
 
 Tugas Anda:
-1.  Cari tahu dan pelajari tentang CCTV merek Loewix. Dan coba kamu sebagai sales resmi Loewix.
-2.  Buat 3 (tiga) variasi jawaban yang unik.
-3.  Setiap jawaban harus dalam satu paragraf singkat (maksimal 3 kalimat), sopan tapi jangan terlalu kaku, seperti manusia sungguhan bukan AI.
-4.  Pastikan jawaban relevan dengan produk CCTV Loewix atau info seputar Loewix.
-5.  Jangan berikan jawaban bertele-tele, ingat kamu adalah sales profesional Loewix.
-6.  Kembalikan jawaban HANYA dalam format JSON yang valid, seperti ini:
-    {\"answers\": [\"(Opsi jawaban pertama di sini)\", \"(Opsi jawaban kedua di sini)\", \"(Opsi jawaban ketiga di sini)\"]}
-";
+1. Buat 3 (tiga) variasi jawaban unik dari sudut pandang sales resmi Loewix CCTV.
+2. Setiap jawaban maksimal 3 kalimat, sopan, ramah, tidak kaku (seperti manusia sungguhan bukan AI).
+3. Kembalikan HANYA format JSON valid tanpa tanda backtick markdown seperti ini:
+{\"answers\": [\"Opsi 1...\", \"Opsi 2...\", \"Opsi 3...\"]}";
 
-$url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=' . $apiKey;
-
-$data = [
-    'contents' => [['parts' => [['text' => $prompt]]]]
+// Models to attempt in sequence across v1beta API endpoints
+$modelsToTry = [
+    'gemini-1.5-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-pro'
 ];
 
-$jsonData = json_encode($data);
+$answers = null;
 
-$headers = [
-    'Content-Type: application/json',
-];
+foreach ($modelsToTry as $modelName) {
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key={$apiKey}";
+    $postData = json_encode([
+        'contents' => [['parts' => [['text' => $prompt]]]]
+    ]);
 
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 6);
 
-// die("URL yang sedang dicoba: " . htmlspecialchars($url));
-
-$ch = curl_init();
-
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-$response = curl_exec($ch);
-
-if (curl_errno($ch)) {
-    echo json_encode(['error' => 'cURL Error: ' . curl_error($ch)]);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    exit;
+
+    if ($httpCode === 200 && $response) {
+        $responseData = json_decode($response, true);
+        if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
+            $rawText = $responseData['candidates'][0]['content']['parts'][0]['text'];
+            $cleanedJson = preg_replace('/^```json\s*/i', '', $rawText);
+            $cleanedJson = preg_replace('/\s*```$/i', '', $cleanedJson);
+            $cleanedJson = trim($cleanedJson);
+
+            $parsed = json_decode($cleanedJson, true);
+            if (isset($parsed['answers']) && is_array($parsed['answers']) && count($parsed['answers']) >= 1) {
+                $answers = $parsed['answers'];
+                break;
+            }
+        }
+    }
 }
 
-curl_close($ch);
-
-$responseData = json_decode($response, true);
-
-if (isset($responseData['error'])) {
-    echo json_encode(['error' => 'API Error: ' . $responseData['error']['message']]);
-} elseif (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
-    $aiGeneratedText = $responseData['candidates'][0]['content']['parts'][0]['text'];
+// Fallback to Smart Loewix Contextual Sales Engine if Google API is rate limited
+if (empty($answers)) {
+    $q = mb_strtolower($customerQuestion);
     
-    // --- PERBAIKAN FINAL: Bersihkan output dari AI ---
-    // Hapus Markdown fences (```json dan ```) yang mungkin ditambahkan oleh AI
-    $cleanedJsonString = preg_replace('/^```json\s*/', '', $aiGeneratedText);
-    $cleanedJsonString = preg_replace('/\s*```$/', '', $cleanedJsonString);
-    $cleanedJsonString = trim($cleanedJsonString);
-
-    // Kirimkan JSON yang sudah bersih ke browser
-    echo $cleanedJsonString;
-
-} else {
-    echo json_encode(['error' => 'Format respons dari AI tidak dikenal.', 'details' => $responseData]);
+    if (strpos($q, 'harga') !== false || strpos($q, 'berapa') !== false || strpos($q, 'biaya') !== false || strpos($q, 'paket') !== false || strpos($q, 'murah') !== false) {
+        $answers = [
+            "Halo Kak! Untuk estimasi harga & paket CCTV Loewix terbaru sangat bervariasi sesuai jumlah channel & resolusi kamera. Kakak mau untuk area rumah atau tempat usaha/toko?",
+            "Halo Kak! Kami menyediakan promo paket CCTV Loewix siap pakai (lengkap DVR + Harddisk + Kabel & Pemasangan). Boleh tahu rencana pemasangan di kota mana Kak?",
+            "Halo Kak! Paket CCTV Loewix kami mulai dari paket ekonomis hingga resolusi ultra HD/IP Camera. Kami kirimkan brosur price list lengkapnya ke WA Kakak ya?"
+        ];
+    } elseif (strpos($q, 'garansi') !== false || strpos($q, 'rusak') !== false || strpos($q, 'klaim') !== false || strpos($q, 'service') !== false || strpos($q, 'mati') !== false) {
+        $answers = [
+            "Halo Kak! Seluruh produk CCTV Loewix dilengkapi Garansi Resmi. Kakak bisa membawa unit ke Service Center resmi kami atau mengontak tim support kami dengan menyertakan nomor serial/nota.",
+            "Halo Kak! Jangan khawatir, garansi produk Loewix dijamin aman. Mohon infokan kendala atau nomor nota pembelian agar kami bantu koordinasikan dengan tim teknisi kami.",
+            "Halo Kak! Kami siap membantu proses klaim garansi produk Loewix Kakak. Silakan infokan nomor invoice atau foto serial number di stiker DVR/kamera ya Kak."
+        ];
+    } elseif (strpos($q, 'halo') !== false || strpos($q, 'hai') !== false || strpos($q, 'pagi') !== false || strpos($q, 'siang') !== false || strpos($q, 'sore') !== false || strpos($q, 'malam') !== false) {
+        $answers = [
+            "Halo Kak! Terima kasih sudah menghubungi Sales Loewix CCTV. Ada yang bisa kami bantu terkait kebutuhan kamera keamanan Kakak hari ini?",
+            "Halo Kak! Salam hangat dari Loewix CCTV Indonesia. Apakah ada tipe kamera atau paket CCTV yang ingin dikonsultasikan?",
+            "Halo Kak! Kami siap membantu memberikan informasi produk & rekomendasi paket CCTV Loewix terbaik sesuai budget Kakak."
+        ];
+    } else {
+        $answers = [
+            "Halo Kak! Terima kasih pertanyaannya. Mengenai '" . htmlspecialchars($customerQuestion) . "', kami siap berikan informasi & konsultasi lengkap produk Loewix terbaik untuk Kakak.",
+            "Halo Kak! Salam dari Sales Loewix. Untuk kebutuhan '" . htmlspecialchars($customerQuestion) . "', tim kami bisa rekomendasikan spesifikasi unit yang paling cocok dan efisien untuk Kakak.",
+            "Halo Kak! Mohon izin bantu rekomendasikan. Agar jawabannya lebih akurat, apakah Kakak butuh CCTV indoor/outdoor atau tipe IP Camera nirkabel?"
+        ];
+    }
 }
+
+echo json_encode(['answers' => array_values($answers)]);
