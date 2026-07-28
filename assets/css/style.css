@@ -669,10 +669,13 @@ body {
     background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.3), transparent) !important;
 }
 
+[data-sidebar="yellow"] .nav-section-label,
 [data-sidebar="yellow"] .sidebar-section-title {
-    color: #451A03 !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.8px;
+    color: #000000 !important;
+    font-weight: 900 !important;
+    letter-spacing: 1.5px !important;
+    font-size: 11px !important;
+    opacity: 1 !important;
 }
 
 [data-sidebar="yellow"] .sidebar-link {
@@ -736,8 +739,11 @@ body {
     border-right: 1px solid #E2E8F0 !important;
 }
 
+[data-sidebar="white"] .nav-section-label,
 [data-sidebar="white"] .sidebar-section-title {
-    color: #64748B !important;
+    color: #475569 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
 }
 
 [data-sidebar="white"] .sidebar-link {
