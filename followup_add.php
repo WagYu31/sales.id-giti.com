@@ -1,5 +1,6 @@
 <?php
 require_once 'includes/db.php';
+require_once 'includes/media_compressor.php';
 
 if (!isset($_GET['customer_id'])) {
     header("Location: index.php");
@@ -36,22 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $media_paths = [null, null, null];
         $allowed_types = [
-            'image/jpeg', 'image/png', 'image/gif',
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp',
             'video/mp4', 'video/webm',
             'application/pdf',
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/vnd.ms-excel',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'audio/mpeg',
-            'audio/mp4',
-            'audio/x-m4a',
-            'audio/wav',
-            'audio/x-wav',
-            'audio/ogg',
-            'audio/aac',
-            'audio/flac',
-            'audio/x-ms-wma'
+            'audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/aac', 'audio/flac', 'audio/x-ms-wma'
         ];
         
         for ($i = 1; $i <= 3; $i++) {
@@ -68,7 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     $target_file = $target_dir . $filename;
                     if (move_uploaded_file($_FILES[$file_key]["tmp_name"], $target_file)) {
-                        $media_paths[$i-1] = $filename;
+                        // Server-side Automatic Image WebP Optimization & Compression
+                        $finalFilename = optimizeUploadedImage($target_file, 80, 1920);
+                        $media_paths[$i-1] = $finalFilename;
                     } else {
                         $error .= "Gagal mengunggah {$file_key}. ";
                     }
@@ -323,25 +318,96 @@ $file_accept_types = "image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx";
 function handleFileSelect(input, previewId, zoneId) {
     const previewEl = document.getElementById(previewId);
     const zoneEl = document.getElementById(zoneId);
-    if (!previewEl || !zoneEl) return;
+    if (!previewEl || !zoneEl || !input.files || !input.files[0]) return;
 
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-        zoneEl.classList.add('has-file');
+    const file = input.files[0];
+    const originalSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    zoneEl.classList.add('has-file');
 
-        let iconClass = 'bi-file-earmark-check-fill text-success';
-        if (file.type.startsWith('image/')) iconClass = 'bi-file-earmark-image-fill text-success';
-        else if (file.type.startsWith('video/')) iconClass = 'bi-file-earmark-play-fill text-primary';
-        else if (file.type.includes('pdf')) iconClass = 'bi-file-earmark-pdf-fill text-danger';
-
+    // Auto Client-Side WebP Canvas Compression for images (except GIF)
+    if (file.type.startsWith('image/') && !file.type.includes('gif')) {
         previewEl.innerHTML = `
-            <i class="bi ${iconClass} fs-1 mb-1"></i>
-            <div class="fw-bold text-dark text-truncate px-2" style="font-size:13px;" title="${file.name}">${file.name}</div>
-            <div class="badge bg-success-subtle text-success fw-bold mt-1" style="font-size:11px;">✓ Selected (${fileSizeMB} MB)</div>
-            <div class="text-muted mt-1" style="font-size:10px;">Klik atau lepas file lain untuk mengganti</div>
+            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+            <div class="fw-bold text-primary" style="font-size:12px;">⚡ Mengompresi Gambar (${originalSizeMB} MB)...</div>
         `;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                const maxWidth = 1920;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth || height > maxWidth) {
+                    if (width >= height) {
+                        height = Math.round((height / width) * maxWidth);
+                        width = maxWidth;
+                    } else {
+                        width = Math.round((width / height) * maxWidth);
+                        height = maxWidth;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        renderFilePreview(file, originalSizeMB, previewEl);
+                        return;
+                    }
+
+                    const rawName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                    const newFilename = rawName + '.webp';
+                    const compressedFile = new File([blob], newFilename, {
+                        type: 'image/webp',
+                        lastModified: Date.now()
+                    });
+
+                    // Assign compressed file to File Input using DataTransfer API
+                    try {
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(compressedFile);
+                        input.files = dataTransfer.files;
+                    } catch(err) {
+                        console.warn("DataTransfer fallback:", err);
+                    }
+
+                    const newSizeMB = (compressedFile.size / (1024 * 1024)).toFixed(2);
+                    const savedPct = Math.max(0, Math.round((1 - (compressedFile.size / file.size)) * 100));
+
+                    previewEl.innerHTML = `
+                        <i class="bi bi-file-earmark-image-fill text-success fs-1 mb-1"></i>
+                        <div class="fw-bold text-dark text-truncate px-2" style="font-size:13px;" title="${newFilename}">${newFilename}</div>
+                        <div class="badge bg-success text-white fw-bold mt-1" style="font-size:11px;">⚡ Auto-WebP (${newSizeMB} MB)</div>
+                        <div class="text-success fw-bold mt-1" style="font-size:10.5px;">Ukuran Berkurang -${savedPct}% (${originalSizeMB} MB ➔ ${newSizeMB} MB)</div>
+                    `;
+                }, 'image/webp', 0.82);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        renderFilePreview(file, originalSizeMB, previewEl);
     }
+}
+
+function renderFilePreview(file, sizeMB, previewEl) {
+    let iconClass = 'bi-file-earmark-check-fill text-success';
+    if (file.type.startsWith('video/')) iconClass = 'bi-file-earmark-play-fill text-primary';
+    else if (file.type.includes('pdf')) iconClass = 'bi-file-earmark-pdf-fill text-danger';
+
+    previewEl.innerHTML = `
+        <i class="bi ${iconClass} fs-1 mb-1"></i>
+        <div class="fw-bold text-dark text-truncate px-2" style="font-size:13px;" title="${file.name}">${file.name}</div>
+        <div class="badge bg-primary-subtle text-primary fw-bold mt-1" style="font-size:11px;">✓ Selected (${sizeMB} MB)</div>
+        <div class="text-muted mt-1" style="font-size:10px;">Klik atau lepas file lain untuk mengganti</div>
+    `;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
