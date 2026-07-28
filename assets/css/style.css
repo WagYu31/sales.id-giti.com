@@ -990,6 +990,86 @@ body {
 }
 
 
+/* ============ SELECT2 INTEGRATION INSIDE CUSTOM FILTER GROUP ============ */
+.custom-filter-group .select2-container--bootstrap-5 {
+    flex: 1 1 auto;
+    width: 1% !important;
+}
+
+.custom-filter-group .select2-container--bootstrap-5 .select2-selection {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    height: 100% !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.custom-filter-group .select2-container--bootstrap-5 .select2-selection__rendered {
+    color: inherit !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    padding-left: 0 !important;
+}
+
+/* Select2 Dropdown Popup Universal High Contrast & Theme Styling */
+.select2-container--bootstrap-5 .select2-dropdown {
+    border-radius: 14px !important;
+    border: 1px solid #CBD5E1 !important;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.2) !important;
+    z-index: 1080 !important;
+}
+
+.select2-container--bootstrap-5 .select2-search__field {
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    padding: 8px 12px !important;
+}
+
+/* Dark Mode Select2 Popup Overrides */
+[data-theme="crimson-velvet"] .select2-dropdown,
+[data-theme="hyperion-gold"] .select2-dropdown,
+[data-theme="obsidian-diamond"] .select2-dropdown,
+[data-theme="cyber-dark"] .select2-dropdown {
+    background-color: #0F172A !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    color: #FFFFFF !important;
+}
+
+[data-theme="crimson-velvet"] .select2-search__field,
+[data-theme="hyperion-gold"] .select2-search__field,
+[data-theme="obsidian-diamond"] .select2-search__field,
+[data-theme="cyber-dark"] .select2-search__field {
+    background-color: #1E293B !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #FFFFFF !important;
+}
+
+[data-theme="crimson-velvet"] .select2-results__option,
+[data-theme="hyperion-gold"] .select2-results__option,
+[data-theme="obsidian-diamond"] .select2-results__option,
+[data-theme="cyber-dark"] .select2-results__option {
+    color: #F8FAFC !important;
+}
+
+[data-theme="crimson-velvet"] .select2-results__option--highlighted,
+[data-theme="hyperion-gold"] .select2-results__option--highlighted,
+[data-theme="obsidian-diamond"] .select2-results__option--highlighted,
+[data-theme="cyber-dark"] .select2-results__option--highlighted {
+    background-color: #2563EB !important;
+    color: #FFFFFF !important;
+}
+
+[data-theme="crimson-velvet"] .select2-results__group,
+[data-theme="hyperion-gold"] .select2-results__group,
+[data-theme="obsidian-diamond"] .select2-results__group,
+[data-theme="cyber-dark"] .select2-results__group {
+    color: #FACC15 !important;
+    font-weight: 800 !important;
+}
+
+
 /* ============ DYNAMIC SIDEBAR COLOR PRESETS ============ */
 
 /* 1. RICH VIBRANT GOLDEN YELLOW SIDEBAR (#FACC15 / #EAB308) */

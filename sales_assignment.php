@@ -449,7 +449,18 @@ $(document).ready(function() {
         });
     }
 
-    $('#searchInput, #filterKota, #filterKategori, #filterSalesStatus').on('keyup change input', applyAssignmentFilters);
+    if ($.fn.select2) {
+        $('#filterKota, #filterKategori, #filterSalesStatus').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownAutoWidth: true
+        }).on('select2:select select2:clear change', function() {
+            applyAssignmentFilters();
+        });
+    }
+
+    $('#searchInput').on('keyup input', applyAssignmentFilters);
+    $('#filterKota, #filterKategori, #filterSalesStatus').on('change', applyAssignmentFilters);
 
     $('#selectAll').on('change', function() {
         $('#assignmentTable tbody tr:visible .customer-checkbox').prop('checked', this.checked);
