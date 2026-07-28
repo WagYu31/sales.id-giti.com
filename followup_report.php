@@ -630,19 +630,6 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
 </nav>
 <?php endif; ?>
 
-<div class="modal fade" id="mediaModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content" style="border-radius:20px; overflow:hidden; border:none;">
-      <div class="modal-header" style="background:#0F172A; color:#FFF;">
-        <h5 class="modal-title" id="mediaModalLabel" style="font-weight:700; font-size:15px;">Media Viewer</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body bg-dark d-flex justify-content-center align-items-center" id="mediaModalBody" style="min-height: 350px;">
-      </div>
-    </div>
-  </div>
-</div>
-
 <?php 
 $stmt->close();
 require_once 'includes/footer.php'; 
@@ -650,64 +637,8 @@ require_once 'includes/footer.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const mediaModal = document.getElementById('mediaModal');
-    const modalTitle = document.getElementById('mediaModalLabel');
-    const modalBody = document.getElementById('mediaModalBody');
     const tableBody = document.querySelector('tbody');
-
-    mediaModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const fileUrl = button.getAttribute('data-file-url');
-        const fileName = button.getAttribute('data-file-name');
-        const fileExtension = fileName.split('.').pop().toLowerCase();
-        
-        modalTitle.textContent = fileName;
-        modalBody.innerHTML = ''; 
-
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
-            modalBody.innerHTML = `<img src="${fileUrl}" class="img-fluid rounded" style="max-height: 80vh;" alt="${fileName}">`;
-        } else if (fileExtension === 'pdf') {
-            modalBody.innerHTML = `<iframe src="${fileUrl}" style="width:100%; height:75vh; border:none;" frameborder="0"></iframe>`;
-        } else if (['mp4', 'webm', 'mkv', 'mov'].includes(fileExtension)) {
-            modalBody.innerHTML = `
-                <video controls autoplay class="w-100 rounded" style="max-height: 80vh;">
-                    <source src="${fileUrl}" type="video/${fileExtension === 'mkv' ? 'x-matroska' : fileExtension}">
-                    Browser Anda tidak mendukung elemen video ini.
-                </video>`;
-        } else if (['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(fileExtension)) {
-            let mimeType = 'audio/mpeg';
-            if(fileExtension === 'wav') mimeType = 'audio/wav';
-            if(fileExtension === 'ogg') mimeType = 'audio/ogg';
-            if(fileExtension === 'm4a' || fileExtension === 'aac') mimeType = 'audio/mp4';
-
-            modalBody.innerHTML = `
-                <div class="text-center p-4 w-100">
-                    <div class="mb-4"><i class="bi bi-music-note-beamed text-light" style="font-size: 4rem;"></i></div>
-                    <h5 class="text-light mb-3">${fileName}</h5>
-                    <audio controls autoplay class="w-100">
-                        <source src="${fileUrl}" type="${mimeType}">
-                        Browser Anda tidak mendukung elemen audio ini.
-                    </audio>
-                </div>`;
-        } else {
-            modalBody.innerHTML = `
-                <div class="text-center p-5 bg-white rounded">
-                    <p class="mb-3 text-dark">Pratinjau tidak tersedia untuk format ini.</p>
-                    <a href="${fileUrl}" class="btn btn-primary" download><i class="bi bi-download"></i> Download ${fileName}</a>
-                </div>`;
-        }
-    });
-
-    mediaModal.addEventListener('hidden.bs.modal', function () {
-        const mediaElement = modalBody.querySelector('video, audio');
-        if (mediaElement) {
-            mediaElement.pause();
-            mediaElement.src = '';
-        }
-        modalBody.innerHTML = ''; 
-    });
-
-    tableBody.addEventListener('click', function(event) {
+    if (!tableBody) return;
         const deleteButton = event.target.closest('.delete-followup-btn');
         if (deleteButton) {
             if (confirm('Anda yakin ingin menghapus catatan follow-up ini?')) {

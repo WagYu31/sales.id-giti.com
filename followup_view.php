@@ -171,18 +171,6 @@ $followups_result = $stmt_fu->get_result();
     </div>
 </div>
 
-<div class="modal fade" id="mediaModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="mediaModalLabel">Tampilan Media</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="mediaModalBody"></div>
-    </div>
-  </div>
-</div>
-
 <?php 
 $stmt_cust->close();
 $stmt_fu->close();
@@ -190,31 +178,9 @@ require_once 'includes/footer.php';
 ?>
 
 <script>
-// Javascript di file ini tidak berubah
 document.addEventListener('DOMContentLoaded', function () {
-    const mediaModal = document.getElementById('mediaModal');
-    const modalTitle = document.getElementById('mediaModalLabel');
-    const modalBody = document.getElementById('mediaModalBody');
     const tableBody = document.querySelector('tbody');
-
-    mediaModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const fileUrl = button.getAttribute('data-file-url');
-        const fileName = button.getAttribute('data-file-name');
-        const fileExtension = fileName.split('.').pop().toLowerCase();
-        modalTitle.textContent = fileName;
-        modalBody.innerHTML = '';
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-            modalBody.innerHTML = `<img src="${fileUrl}" class="img-fluid w-100" alt="${fileName}">`;
-        } else if (fileExtension === 'pdf') {
-            modalBody.innerHTML = `<iframe src="${fileUrl}" style="width:100%; height:75vh;" frameborder="0"></iframe>`;
-        } else if (['mp4', 'webm'].includes(fileExtension)) {
-            modalBody.innerHTML = `<video controls autoplay class="w-100"><source src="${fileUrl}" type="video/${fileExtension}"></video>`;
-        } else {
-            modalBody.innerHTML = `<div class="text-center p-5"><p>Pratinjau tidak tersedia.</p><a href="${fileUrl}" class="btn btn-primary" download><i class="bi bi-download"></i> Download ${fileName}</a></div>`;
-        }
-    });
-    mediaModal.addEventListener('hidden.bs.modal', () => { modalBody.innerHTML = ''; });
+    if (!tableBody) return;
 
     tableBody.addEventListener('click', function(event) {
         const deleteButton = event.target.closest('.delete-followup-btn');

@@ -378,19 +378,6 @@ $is_superadmin = ($_SESSION['role'] === 'superadmin');
 </nav>
 <?php endif; ?>
 
-<div class="modal fade" id="mediaModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="mediaModalLabel">Media Viewer</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body bg-dark d-flex justify-content-center align-items-center" id="mediaModalBody" style="min-height: 300px;">
-      </div>
-    </div>
-  </div>
-</div>
-
 <?php 
 $stmt->close();
 require_once 'includes/footer.php'; 
@@ -399,67 +386,12 @@ require_once 'includes/footer.php';
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const mediaModal = document.getElementById('mediaModal');
-    const modalTitle = document.getElementById('mediaModalLabel');
-    const modalBody = document.getElementById('mediaModalBody');
     const isSuperAdmin = <?php echo $is_superadmin ? 'true' : 'false'; ?>;
     const notification = document.getElementById('notification');
     
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl)
-    });
-
-    mediaModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const fileUrl = button.getAttribute('data-file-url');
-        const fileName = button.getAttribute('data-file-name');
-        const fileExtension = fileName.split('.').pop().toLowerCase();
-        
-        modalTitle.textContent = fileName;
-        modalBody.innerHTML = ''; 
-
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
-            modalBody.innerHTML = `<img src="${fileUrl}" class="img-fluid" style="max-height: 80vh;" alt="${fileName}">`;
-        } else if (fileExtension === 'pdf') {
-            modalBody.innerHTML = `<iframe src="${fileUrl}" style="width:100%; height:75vh; border:none;" frameborder="0"></iframe>`;
-        } else if (['mp4', 'webm', 'mkv', 'mov'].includes(fileExtension)) {
-            modalBody.innerHTML = `
-                <video controls autoplay class="w-100" style="max-height: 80vh;">
-                    <source src="${fileUrl}" type="video/${fileExtension === 'mkv' ? 'x-matroska' : fileExtension}">
-                    Browser Anda tidak mendukung elemen video ini.
-                </video>`;
-        } else if (['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(fileExtension)) {
-            let mimeType = 'audio/mpeg';
-            if(fileExtension === 'wav') mimeType = 'audio/wav';
-            if(fileExtension === 'ogg') mimeType = 'audio/ogg';
-            if(fileExtension === 'm4a' || fileExtension === 'aac') mimeType = 'audio/mp4';
-
-            modalBody.innerHTML = `
-                <div class="text-center p-4 w-100">
-                    <div class="mb-4"><i class="bi bi-music-note-beamed text-light" style="font-size: 4rem;"></i></div>
-                    <h5 class="text-light mb-3">${fileName}</h5>
-                    <audio controls autoplay class="w-100">
-                        <source src="${fileUrl}" type="${mimeType}">
-                        Browser Anda tidak mendukung elemen audio ini.
-                    </audio>
-                </div>`;
-        } else {
-            modalBody.innerHTML = `
-                <div class="text-center p-5 bg-white rounded">
-                    <p class="mb-3 text-dark">Pratinjau tidak tersedia untuk format ini.</p>
-                    <a href="${fileUrl}" class="btn btn-primary" download><i class="bi bi-download"></i> Download ${fileName}</a>
-                </div>`;
-        }
-    });
-
-    mediaModal.addEventListener('hidden.bs.modal', function () {
-        const mediaElement = modalBody.querySelector('video, audio');
-        if (mediaElement) {
-            mediaElement.pause();
-            mediaElement.src = '';
-        }
-        modalBody.innerHTML = ''; 
     });
 
     const limitSelect = document.getElementById('limit-select');
