@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let html = `
             <div class="message-source">
-                <i class="bi bi-cpu-fill text-primary"></i> Asisten Loewix AI &nbsp;•&nbsp; 3 Taktik Negosiasi & Closing Sales
+                <i class="bi bi-award-fill text-primary"></i> Senior Sales Director Loewix AI &nbsp;•&nbsp; 3 Strategi Taktis Negosiasi & Closing
             </div>
             <div class="option-cards-grid">
         `;
@@ -457,20 +457,39 @@ document.addEventListener('DOMContentLoaded', function() {
         const badgeClasses = ['badge-opt1', 'badge-opt2', 'badge-opt3'];
         const badgeTitles = ['Opsi 1 (Penawaran Value & Closing)', 'Opsi 2 (Teknik Negosiasi & Bonus Value)', 'Opsi 3 (Strategi Upselling & Offer Upgrade)'];
 
-        answers.forEach((answerText, idx) => {
+        answers.forEach((ans, idx) => {
             const bClass = badgeClasses[idx % 3];
-            const bTitle = badgeTitles[idx % 3] || `Opsi ${idx + 1}`;
-            const escapedText = escapeHtml(answerText);
+            
+            // Handle both string and structured object format
+            let itemType = (typeof ans === 'object' && ans.type) ? ans.type : badgeTitles[idx % 3];
+            let itemStrategy = (typeof ans === 'object' && ans.strategy) ? ans.strategy : '';
+            let itemText = (typeof ans === 'object' && ans.text) ? ans.text : (typeof ans === 'string' ? ans : '');
+            let itemProduct = (typeof ans === 'object' && ans.product_recommendation) ? ans.product_recommendation : '';
+
+            const escapedText = escapeHtml(itemText);
 
             html += `
                 <div class="answer-card">
                     <div class="answer-card-header">
-                        <span class="answer-badge ${bClass}">${bTitle}</span>
+                        <span class="answer-badge ${bClass}">${escapeHtml(itemType)}</span>
                         <button type="button" class="btn-copy-option" onclick="copyAnswerText(this, \`${escapedText.replace(/`/g, '\\`')}\`)">
                             <i class="bi bi-clipboard"></i> Salin Jawaban
                         </button>
                     </div>
-                    <p class="answer-card-text">${escapedText}</p>
+
+                    ${itemStrategy ? `
+                        <div class="p-2 mb-2 rounded-3 bg-light border-start border-3 border-primary" style="font-size:12px; color:#475569;">
+                            <strong>💡 Tips Strategi Sales:</strong> ${escapeHtml(itemStrategy)}
+                        </div>
+                    ` : ''}
+
+                    <p class="answer-card-text mb-2"><strong>💬 Teks WA Siap Kirim:</strong><br>${escapedText}</p>
+
+                    ${itemProduct ? `
+                        <div class="d-flex align-items-center gap-1.5 mt-2 text-primary fw-bold" style="font-size:11.5px; font-family:'Plus Jakarta Sans', sans-serif;">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">📦 Produk Disarankan: ${escapeHtml(itemProduct)}</span>
+                        </div>
+                    ` : ''}
                 </div>
             `;
         });
