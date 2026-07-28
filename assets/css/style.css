@@ -594,3 +594,27 @@ body {
     background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
     border-color: #B45309 !important;
 }
+
+
+/* 5. SOLAR NEON YELLOW (#FFFF00) */
+[data-theme="solar-yellow"] body {
+    background-color: #FEFCE8 !important;
+    background-image: radial-gradient(at 0% 0%, rgba(253, 224, 71, 0.2) 0px, transparent 50%) !important;
+}
+
+[data-theme="solar-yellow"] .sidebar {
+    background: linear-gradient(180deg, #1C1917 0%, #451A03 50%, #78350F 100%) !important;
+}
+
+[data-theme="solar-yellow"] .cust-hero,
+[data-theme="solar-yellow"] .report-hero {
+    background: linear-gradient(135deg, #1C1917 0%, #854D0E 50%, #CA8A04 100%) !important;
+    color: #FFFFFF !important;
+}
+
+[data-theme="solar-yellow"] .btn-primary {
+    background: linear-gradient(135deg, #EAB308 0%, #CA8A04 100%) !important;
+    border-color: #CA8A04 !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+}
