@@ -17,27 +17,6 @@ if ($r2) $pendingFU = $r2->fetch_assoc()['t'] ?? 0;
 $r3 = $conn->query("SELECT COUNT(*) as t FROM customers WHERE MONTH(created_at)=MONTH(CURRENT_DATE()) AND YEAR(created_at)=YEAR(CURRENT_DATE()) AND deleted_at IS NULL");
 if ($r3) $thisMonthNew = $r3->fetch_assoc()['t'] ?? 0;
 
-// Category Breakdown for Analytics Widget
-$catCounts = ['DEALER' => 0, 'INSTALLER' => 0, 'USER' => 0, 'UMUM' => 0];
-$rc = $conn->query("SELECT kategori, COUNT(*) as c FROM customers WHERE deleted_at IS NULL GROUP BY kategori");
-if ($rc) {
-    while ($row = $rc->fetch_assoc()) {
-        $k = strtoupper(trim($row['kategori'] ?? 'UMUM'));
-        if (isset($catCounts[$k])) $catCounts[$k] = (int)$row['c'];
-        else $catCounts['UMUM'] += (int)$row['c'];
-    }
-}
-$sumCats = array_sum($catCounts) ?: 1;
-
-// Top Cities Breakdown
-$topCities = [];
-$rCity = $conn->query("SELECT kota, COUNT(*) as total FROM customer_addresses WHERE deleted_at IS NULL AND kota != '' AND kota != '-' GROUP BY kota ORDER BY total DESC LIMIT 4");
-if ($rCity) {
-    while ($row = $rCity->fetch_assoc()) {
-        $topCities[] = $row;
-    }
-}
-
 $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 ?>
 
@@ -469,40 +448,9 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
     box-shadow: 0 2px 8px rgba(99,102,241,0.4);
 }
 
-/* ============ EXECUTIVE INSIGHTS WIDGET GRID ============ */
-.executive-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 24px;
-    margin-top: 20px;
-}
-
-.insight-card {
-    background: #FFFFFF;
-    border-radius: 26px;
-    padding: 30px 34px;
-    border: 1.5px solid #E2E8F0;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.03);
-}
-
-.cat-meter-bar {
-    height: 10px;
-    border-radius: 20px;
-    background: #F1F5F9;
-    overflow: hidden;
-    display: flex;
-    margin: 16px 0 24px 0;
-}
-
-.cat-meter-fill {
-    height: 100%;
-    transition: width 0.6s ease;
-}
-
 @media (max-width: 1200px) {
     .menu-grid { grid-template-columns: repeat(2, 1fr); }
     .stats-grid { grid-template-columns: repeat(3, 1fr); }
-    .executive-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
@@ -658,83 +606,6 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
             <div class="mc-btn-pill"><span>Buka Menu</span> <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
-</div>
-
-<!-- EXECUTIVE ANALYTICS INSIGHTS -->
-<div class="executive-grid animate-in">
-    <div class="insight-card">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-            <div>
-                <h3 class="fw-extrabold text-dark m-0" style="font-size:18px; font-family:'Plus Jakarta Sans', sans-serif;">📊 Distibusi Kategori Customer</h3>
-                <p class="text-muted small m-0">Ringkasan komposisi segmen customer di database</p>
-            </div>
-            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill">Total: <?php echo number_format($totalCustomers, 0, ',', '.'); ?></span>
-        </div>
-
-        <div class="cat-meter-bar">
-            <?php 
-            $pctDealer = round(($catCounts['DEALER'] / $sumCats) * 100, 1);
-            $pctInstaller = round(($catCounts['INSTALLER'] / $sumCats) * 100, 1);
-            $pctUser = round(($catCounts['USER'] / $sumCats) * 100, 1);
-            $pctUmum = round(($catCounts['UMUM'] / $sumCats) * 100, 1);
-            ?>
-            <div class="cat-meter-fill" style="width: <?php echo $pctDealer; ?>%; background: #0891B2;" title="Dealer: <?php echo $pctDealer; ?>%"></div>
-            <div class="cat-meter-fill" style="width: <?php echo $pctInstaller; ?>%; background: #4338CA;" title="Installer: <?php echo $pctInstaller; ?>%"></div>
-            <div class="cat-meter-fill" style="width: <?php echo $pctUser; ?>%; background: #D97706;" title="User: <?php echo $pctUser; ?>%"></div>
-            <div class="cat-meter-fill" style="width: <?php echo $pctUmum; ?>%; background: #64748B;" title="Umum: <?php echo $pctUmum; ?>%"></div>
-        </div>
-
-        <div class="row g-3">
-            <div class="col-6 col-md-3">
-                <div class="p-3 rounded-4" style="background:#ECFEFF; border:1px solid #A5F3FC;">
-                    <div class="small fw-bold text-muted mb-1">DEALER</div>
-                    <div class="fs-5 fw-extrabold text-dark"><?php echo number_format($catCounts['DEALER'], 0, ',', '.'); ?></div>
-                    <div class="small fw-bold text-info" style="color:#0891B2 !important;"><?php echo $pctDealer; ?>%</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-3 rounded-4" style="background:#EEF2FF; border:1px solid #C7D2FE;">
-                    <div class="small fw-bold text-muted mb-1">INSTALLER</div>
-                    <div class="fs-5 fw-extrabold text-dark"><?php echo number_format($catCounts['INSTALLER'], 0, ',', '.'); ?></div>
-                    <div class="small fw-bold text-indigo" style="color:#4338CA !important;"><?php echo $pctInstaller; ?>%</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-3 rounded-4" style="background:#FEF3C7; border:1px solid #FDE68A;">
-                    <div class="small fw-bold text-muted mb-1">USER</div>
-                    <div class="fs-5 fw-extrabold text-dark"><?php echo number_format($catCounts['USER'], 0, ',', '.'); ?></div>
-                    <div class="small fw-bold text-warning" style="color:#D97706 !important;"><?php echo $pctUser; ?>%</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-3 rounded-4" style="background:#F1F5F9; border:1px solid #CBD5E1;">
-                    <div class="small fw-bold text-muted mb-1">UMUM</div>
-                    <div class="fs-5 fw-extrabold text-dark"><?php echo number_format($catCounts['UMUM'], 0, ',', '.'); ?></div>
-                    <div class="small fw-bold text-secondary"><?php echo $pctUmum; ?>%</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="insight-card">
-        <h3 class="fw-extrabold text-dark mb-2" style="font-size:18px; font-family:'Plus Jakarta Sans', sans-serif;">📍 Top Wilayah Customer</h3>
-        <p class="text-muted small mb-3">Kota dengan konsentrasi customer terbanyak</p>
-        <div class="d-flex flex-column gap-2.5">
-            <?php if (!empty($topCities)): ?>
-                <?php foreach($topCities as $idx => $tc): ?>
-                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3" style="background:#F8FAFC; border:1px solid #E2E8F0;">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary text-white fw-bold" style="width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px;"><?php echo $idx+1; ?></span>
-                            <span class="fw-bold text-dark small">📍 <?php echo htmlspecialchars($tc['kota']); ?></span>
-                        </div>
-                        <span class="badge bg-primary-subtle text-primary fw-extrabold" style="font-size:12px;"><?php echo number_format($tc['total'], 0, ',', '.'); ?> Stores</span>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="text-muted small italic">Belum ada data wilayah.</div>
-            <?php endif; ?>
-        </div>
-    </div>
 </div>
 
 <?php require_once 'includes/footer.php'; ?>
