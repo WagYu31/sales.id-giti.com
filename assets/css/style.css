@@ -795,6 +795,22 @@ body {
     box-shadow: 0 8px 25px rgba(244, 63, 94, 0.5) !important;
 }
 
+/* Action Bar Box Dark Mode Harmony */
+[data-theme="crimson-velvet"] .action-bar-box,
+[data-theme="hyperion-gold"] .action-bar-box,
+[data-theme="obsidian-diamond"] .action-bar-box,
+[data-theme="cyber-dark"] .action-bar-box {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+[data-theme="crimson-velvet"] .action-bar-box span,
+[data-theme="hyperion-gold"] .action-bar-box span,
+[data-theme="obsidian-diamond"] .action-bar-box span,
+[data-theme="cyber-dark"] .action-bar-box span {
+    color: #FFFFFF !important;
+}
+
 
 /* ============ DYNAMIC SIDEBAR COLOR PRESETS ============ */
 

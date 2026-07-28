@@ -184,9 +184,9 @@ if ($res_kat) {
         </div>
 
         <!-- Filter Bar -->
-        <div class="row g-2 align-items-center mb-3">
+        <div class="row g-2.5 align-items-center mb-3">
             <!-- Search Text -->
-            <div class="col-lg-4 col-md-12 col-12">
+            <div class="col-xl-3 col-lg-3 col-md-6 col-12">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-search text-muted"></i></span>
                     <input type="text" id="searchInput" class="form-control border-start-0 ps-0 fw-semibold" placeholder="Cari nama toko, PIC, atau hp..." style="border-radius:0 12px 12px 0; height:42px;">
@@ -194,7 +194,7 @@ if ($res_kat) {
             </div>
             
             <!-- Filter Daerah / Provinsi -->
-            <div class="col-lg-3 col-md-4 col-12">
+            <div class="col-xl-3 col-lg-3 col-md-6 col-12">
                 <div class="input-group">
                     <span class="input-group-text bg-white" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-geo-alt-fill text-danger"></i></span>
                     <select id="filterKota" class="form-select fw-semibold" style="border-radius:0 12px 12px 0; height:42px;">
@@ -231,7 +231,7 @@ if ($res_kat) {
             </div>
 
             <!-- Filter Kategori -->
-            <div class="col-lg-2.5 col-md-4 col-12">
+            <div class="col-xl-3 col-lg-3 col-md-6 col-12">
                 <div class="input-group">
                     <span class="input-group-text bg-white" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-tags-fill text-primary"></i></span>
                     <select id="filterKategori" class="form-select fw-semibold" style="border-radius:0 12px 12px 0; height:42px;">
@@ -244,7 +244,7 @@ if ($res_kat) {
             </div>
 
             <!-- Filter Status Sales -->
-            <div class="col-lg-2.5 col-md-4 col-12">
+            <div class="col-xl-3 col-lg-3 col-md-6 col-12">
                 <select id="filterSalesStatus" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
                     <option value="">Semua Penugasan</option>
                     <option value="unassigned">⚠️ Belum Ada Sales</option>
