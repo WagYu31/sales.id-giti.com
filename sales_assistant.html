@@ -3,123 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asisten Sales Loewix</title>
+    <title>Asisten Sales Loewix - Executive AI Assistant</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; }
         body {
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background: linear-gradient(135deg, #030712 0%, #0F172A 50%, #1E3A8A 100%);
+            min-height: 100vh;
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
         }
-        .chat-container {
+
+        .chat-app-card {
             width: 100%;
-            max-width: 800px;
+            max-width: 960px;
             height: 90vh;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
+        /* Top Executive Glass Header */
         .chat-header {
-            background-color: #0c2340;
-            color: white;
-            padding: 1.25rem;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-            text-align: center;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .chat-header h4 {
-            margin: 0;
-            font-weight: 600;
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
+
+        .ai-avatar-badge {
+            width: 46px; height: 46px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #2563EB 0%, #38BDF8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-size: 24px;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .status-dot-online {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #34D399;
+            box-shadow: 0 0 10px #34D399;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .btn-back-nav {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .btn-back-nav:hover {
+            background: #FFFFFF;
+            color: #0F172A;
+            transform: translateY(-2px);
+        }
+
+        /* Chat Window Canvas */
         .chat-window {
             flex-grow: 1;
-            padding: 1.5rem;
+            padding: 28px;
             overflow-y: auto;
-            background-color: #e5e5e5;
-        }
-        .message {
-            margin-bottom: 1.5rem;
+            background: #F8FAFC;
             display: flex;
             flex-direction: column;
+            gap: 20px;
         }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* User Message Bubble */
+        .user-message { align-items: flex-end; }
         .user-message .message-bubble {
-            background-color: #007bff;
-            color: white;
-            align-self: flex-end;
-            border-radius: 20px 20px 5px 20px;
-            padding: 10px 18px;
-            max-width: 70%;
+            background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%);
+            color: #FFFFFF;
+            border-radius: 20px 20px 4px 20px;
+            padding: 14px 20px;
+            max-width: 75%;
+            font-size: 14.5px;
+            font-weight: 600;
+            box-shadow: 0 8px 22px rgba(37, 99, 235, 0.25);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
         }
+
+        /* Bot Message Cards */
+        .bot-message { align-items: flex-start; }
         .bot-message .message-source {
-            font-size: 0.8rem;
-            color: #555;
-            margin-bottom: 5px;
-            margin-left: 5px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748B;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        .bot-message .answer-card {
-            background-color: #ffffff;
-            border-radius: 5px 20px 20px 20px;
-            padding: 12px 18px;
-            margin-bottom: 10px;
-            border: 1px solid #d1d1d1;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            max-width: 90%;
+
+        .option-cards-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 860px;
         }
-        .bot-message .answer-card strong {
-            display: block;
-            margin-bottom: 5px;
-            color: #0c2340;
+
+        .answer-card {
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 18px 22px;
+            border: 1.5px solid #E2E8F0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
+
+        .answer-card:hover {
+            border-color: #2563EB;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.12);
+        }
+
+        .answer-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .answer-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .badge-opt1 { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+        .badge-opt2 { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+        .badge-opt3 { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
+
+        .btn-copy-option {
+            background: #F1F5F9;
+            border: 1px solid #CBD5E1;
+            color: #334155;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .btn-copy-option:hover {
+            background: #2563EB;
+            color: #FFFFFF;
+            border-color: #2563EB;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .answer-card-text {
+            font-size: 14px;
+            color: #1E293B;
+            line-height: 1.6;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* Quick Prompt Suggestion Chips */
+        .quick-prompts-bar {
+            padding: 10px 28px;
+            background: #FFFFFF;
+            border-top: 1px solid #E2E8F0;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .prompt-chip {
+            background: #F1F5F9;
+            border: 1px solid #E2E8F0;
+            color: #475569;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .prompt-chip:hover {
+            background: #EFF6FF;
+            color: #2563EB;
+            border-color: #BFDBFE;
+        }
+
+        /* Chat Input Form */
         .chat-input-form {
             display: flex;
-            padding: 1rem;
-            border-top: 1px solid #ddd;
-            background-color: #f8f9fa;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 28px;
+            background: #FFFFFF;
+            border-top: 1px solid #E2E8F0;
         }
+
         .chat-input-form input {
             flex-grow: 1;
-            border-radius: 20px;
-            border: 1px solid #ccc;
-            padding: 8px 15px;
+            border-radius: 30px;
+            border: 1.5px solid #CBD5E1;
+            padding: 14px 22px;
+            font-size: 14.5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            outline: none;
         }
-        .chat-input-form button {
+
+        .chat-input-form input:focus {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-send-chat {
+            width: 48px; height: 48px;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            margin-left: 10px;
+            background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%);
+            color: #FFFFFF;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+            flex-shrink: 0;
+        }
+
+        .btn-send-chat:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45);
+        }
+
+        /* Toast Notification */
+        .toast-copy {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #0F172A;
+            color: #34D399;
+            padding: 12px 22px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            z-index: 9999;
+            display: none;
+            animation: fadeInUp 0.3s ease forwards;
         }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
-        <a href="customer_management.php" class="btn btn-primary mb-3">Kembali ke Customer Management</a>
+    <div class="chat-app-card">
+        <!-- Top Executive Glass Header -->
         <div class="chat-header">
-            <h4><i class="bi bi-robot"></i> Asisten Sales Loewix (Uji Coba)</h4>
+            <div class="header-title-group">
+                <div class="ai-avatar-badge">
+                    <i class="bi bi-robot"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center">
+                        <span class="status-dot-online"></span>
+                        <h4 class="text-white fw-extrabold m-0" style="font-size:18px; font-family:'Plus Jakarta Sans', sans-serif;">Asisten Sales Loewix AI</h4>
+                    </div>
+                    <small class="text-slate-300 opacity-75" style="font-size:12px;">Real-Time Sales Response Generator</small>
+                </div>
+            </div>
+            <a href="customer_management.php" class="btn-back-nav">
+                <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
+            </a>
         </div>
+
+        <!-- Chat Window Canvas -->
         <div class="chat-window" id="chat-window">
             <div class="message bot-message">
                 <div class="message-source">
-                    <i class="bi bi-cpu-fill"></i> Asisten Loewix
+                    <i class="bi bi-cpu-fill text-primary"></i> Asisten Loewix AI
                 </div>
-                <div class="answer-card">
-                    <strong>Halo! Ada yang bisa saya bantu?</strong>
-                    <p class="mb-0">Silakan ketik pertanyaan dari customer Anda di bawah. Saya akan berikan 3 opsi jawaban sebagai referensi. 
-                    <strong class="mb-0">PERINGATAN!</strong> Jawaban yang saya berikan hanya berupa REFERENSI CARA MENJAWAB, cek kembali jawaban, karena data yang saya miliki tidak sebanyak pengetahuan Anda.</p>
+                <div class="option-cards-grid">
+                    <div class="answer-card" style="border-left: 4px solid #2563EB;">
+                        <div class="answer-card-header">
+                            <span class="answer-badge badge-opt1">👋 Selamat Datang</span>
+                        </div>
+                        <p class="answer-card-text">
+                            <strong>Halo! Ada yang bisa saya bantu?</strong><br>
+                            Silakan ketik pertanyaan dari customer Anda di bawah. Saya akan berikan 3 variasi opsi jawaban profesional khas Sales Loewix yang siap disalin.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Quick Prompt Suggestion Bar -->
+        <div class="quick-prompts-bar">
+            <span class="prompt-chip" onclick="sendQuickPrompt('Berapa harga paket CCTV Loewix terbaru?')">💡 Harga Paket CCTV</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Bagaimana prosedur garansi & servis produk Loewix?')">🛡️ Garansi & Servis</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Rekomendasi paket CCTV untuk ruko/toko 4 kamera')">🏪 Rekomendasi Ruko</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Syarat menjadi dealer / installer resmi Loewix')">🤝 Syarat Dealer</span>
+        </div>
+
+        <!-- Chat Input Form -->
         <form class="chat-input-form" id="chat-form">
-            <input type="text" id="user-input" class="form-control" placeholder="Ketik pertanyaan customer di sini..." autocomplete="off">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-send-fill"></i></button>
+            <input type="text" id="user-input" placeholder="Ketik pertanyaan customer di sini..." autocomplete="off">
+            <button type="submit" class="btn-send-chat" title="Kirim Pertanyaan"><i class="bi bi-send-fill"></i></button>
         </form>
+    </div>
+
+    <div class="toast-copy" id="toastCopy">
+        <i class="bi bi-check-circle-fill me-1"></i> Jawaban Berhasil Disalin ke Clipboard!
     </div>
 
 <script>
@@ -134,57 +385,61 @@ document.addEventListener('DOMContentLoaded', function() {
         if (userText === "") return;
 
         displayUserMessage(userText);
-        userInput.value = ""; // Langsung kosongkan input
+        userInput.value = "";
         generateAiResponse(userText);
     });
+
+    window.sendQuickPrompt = function(promptText) {
+        userInput.value = promptText;
+        chatForm.dispatchEvent(new Event('submit'));
+    };
 
     function displayUserMessage(text) {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message user-message';
-        messageDiv.innerHTML = `<div class="message-bubble">${text}</div>`;
+        messageDiv.innerHTML = `<div class="message-bubble">${escapeHtml(text)}</div>`;
         chatWindow.appendChild(messageDiv);
         scrollToBottom();
     }
 
     function generateAiResponse(text) {
-        // Tampilkan pesan "sedang mengetik..."
         const thinkingDiv = document.createElement('div');
         thinkingDiv.className = 'message bot-message';
         thinkingDiv.id = 'thinking-indicator';
         thinkingDiv.innerHTML = `
             <div class="message-source">
-                <i class="bi bi-cpu-fill"></i> Asisten AI sedang berpikir...
+                <i class="bi bi-cpu-fill text-primary"></i> Asisten Loewix AI sedang berpikir...
             </div>
-            <div class="answer-card">
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
+            <div class="option-cards-grid">
+                <div class="answer-card">
+                    <div class="d-flex align-items-center gap-2 text-primary fw-bold" style="font-size:13.5px;">
+                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                        <span>Menganalisis pertanyaan & memformulasi 3 opsi jawaban...</span>
+                    </div>
                 </div>
             </div>
         `;
         chatWindow.appendChild(thinkingDiv);
         scrollToBottom();
 
-        // Kirim pertanyaan ke backend (ai_handler.php)
         fetch('ai_handler.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question: text })
         })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('thinking-indicator').remove(); // Hapus indikator "berpikir"
+            document.getElementById('thinking-indicator')?.remove();
             if (data.answers && data.answers.length > 0) {
                 displayBotMessage(data.answers);
             } else {
-                displayBotMessage([{ title: "Error", text: data.error || "Gagal mendapatkan jawaban dari AI." }]);
+                displayBotMessage(["Halo Kak! Mohon maaf ada kendala jaringan, silakan tanyakan kembali ya Kak."]);
             }
         })
         .catch(error => {
-            document.getElementById('thinking-indicator').remove();
+            document.getElementById('thinking-indicator')?.remove();
             console.error('Error:', error);
-            displayBotMessage([{ title: "Koneksi Gagal", text: "Tidak dapat terhubung ke server. Mohon periksa koneksi Anda." }]);
+            displayBotMessage(["Halo Kak! Mohon periksa koneksi Anda dan coba kembali."]);
         });
     }
 
@@ -194,27 +449,62 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let html = `
             <div class="message-source">
-                <i class="bi bi-cpu-fill"></i> Asisten AI &nbsp;&nbsp;•&nbsp;&nbsp; 3 Opsi Jawaban
+                <i class="bi bi-cpu-fill text-primary"></i> Asisten Loewix AI &nbsp;•&nbsp; 3 Variasi Jawaban Sales
             </div>
+            <div class="option-cards-grid">
         `;
 
-        // Handle jika hanya ada 1 jawaban (untuk error)
-        if (answers.length === 1) {
-             html += `<div class="answer-card"><strong>${answers[0].title}</strong><p class="mb-0">${answers[0].text}</p></div>`;
-        } else {
-            answers.forEach((answer, index) => {
-                html += `
-                    <div class="answer-card">
-                        <strong>Opsi ${index + 1}</strong>
-                        <p class="mb-0">${answer}</p>
+        const badgeClasses = ['badge-opt1', 'badge-opt2', 'badge-opt3'];
+        const badgeTitles = ['Opsi 1 (Formal & Sopan)', 'Opsi 2 (Friendly & Proaktif)', 'Opsi 3 (Solutif & Ringkas)'];
+
+        answers.forEach((answerText, idx) => {
+            const bClass = badgeClasses[idx % 3];
+            const bTitle = badgeTitles[idx % 3] || `Opsi ${idx + 1}`;
+            const escapedText = escapeHtml(answerText);
+
+            html += `
+                <div class="answer-card">
+                    <div class="answer-card-header">
+                        <span class="answer-badge ${bClass}">${bTitle}</span>
+                        <button type="button" class="btn-copy-option" onclick="copyAnswerText(this, \`${escapedText.replace(/`/g, '\\`')}\`)">
+                            <i class="bi bi-clipboard"></i> Salin Jawaban
+                        </button>
                     </div>
-                `;
-            });
-        }
-        
+                    <p class="answer-card-text">${escapedText}</p>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
         messageDiv.innerHTML = html;
         chatWindow.appendChild(messageDiv);
         scrollToBottom();
+    }
+
+    window.copyAnswerText = function(btnEl, text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const originalHTML = btnEl.innerHTML;
+            btnEl.innerHTML = '<i class="bi bi-check2"></i> Disalin!';
+            btnEl.classList.add('bg-success', 'text-white', 'border-success');
+
+            const toast = document.getElementById('toastCopy');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2500);
+
+            setTimeout(() => {
+                btnEl.innerHTML = originalHTML;
+                btnEl.classList.remove('bg-success', 'text-white', 'border-success');
+            }, 2000);
+        });
+    };
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     function scrollToBottom() {
