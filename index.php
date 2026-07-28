@@ -3,10 +3,16 @@ $page_title = 'Dashboard Customer';
 require_once 'includes/db.php';
 require_once 'includes/header.php';
 
-// Filter params
+// Filter & Pagination params
 $filter_kota = trim($_GET['filter_kota'] ?? '');
 $filter_kategori = trim($_GET['filter_kategori'] ?? '');
 $filter_sales = intval($_GET['filter_sales'] ?? 0);
+$search_keyword = trim($_GET['search'] ?? '');
+
+$limit = isset($_GET['limit']) && is_numeric($_GET['limit']) ? (int)$_GET['limit'] : 25;
+if ($limit <= 0) $limit = 25;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page <= 0) $page = 1;
 
 $sql_where_conditions = ["c.deleted_at IS NULL"];
 $params = [];
@@ -34,8 +40,30 @@ if (!empty($filter_kategori)) {
     $types .= 's';
 }
 
+if (!empty($search_keyword)) {
+    $sql_where_conditions[] = "(c.nama_toko LIKE ? OR c.id IN (SELECT customer_id FROM customer_pics WHERE deleted_at IS NULL AND (nama_pic LIKE ? OR tlp_pic LIKE ?)))";
+    $like_kw = '%' . $search_keyword . '%';
+    array_push($params, $like_kw, $like_kw, $like_kw);
+    $types .= 'sss';
+}
+
 $where_clause = "WHERE " . implode(' AND ', $sql_where_conditions);
 
+// 1. Get total record count (Fast count query!)
+$count_sql = "SELECT COUNT(*) as total FROM customers c {$where_clause}";
+$count_stmt = $conn->prepare($count_sql);
+if (!empty($params)) {
+    $count_stmt->bind_param($types, ...$params);
+}
+$count_stmt->execute();
+$total_records = $count_stmt->get_result()->fetch_assoc()['total'] ?? 0;
+$count_stmt->close();
+
+$total_pages = ceil($total_records / $limit);
+$page = max(1, min($page, max(1, $total_pages)));
+$offset = ($page - 1) * $limit;
+
+// 2. Fetch paginated records only (Only 25 rows!)
 $sql = "
     SELECT 
         c.id, c.tgl_input, c.nama_toko, c.deal, c.kandidat, c.sales_id, c.kategori,
@@ -52,11 +80,18 @@ $sql = "
     {$where_clause}
     ORDER BY 
         c.id DESC
+    LIMIT ?, ?
 ";
 
+$main_params = $params;
+$main_types = $types;
+$main_params[] = $offset;
+$main_params[] = $limit;
+$main_types .= 'ii';
+
 $stmt = $conn->prepare($sql);
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
+if (!empty($main_params)) {
+    $stmt->bind_param($main_types, ...$main_params);
 }
 $stmt->execute();
 $result = $stmt->get_result();
@@ -190,62 +225,87 @@ if ($_SESSION['role'] !== 'sales') {
 
 <!-- Filter Toolbar Card -->
 <div class="filter-card">
-    <form method="GET" action="index.php" class="row g-3 align-items-end">
-        <!-- Filter Kota -->
-        <div class="col-md-3 col-sm-6">
-            <label for="filter_kota" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
-                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Filter Kota
-            </label>
-            <input list="kota_list" name="filter_kota" id="filter_kota" class="form-control fw-semibold" placeholder="Pilih atau ketik kota..." value="<?php echo htmlspecialchars($filter_kota); ?>" style="border-radius:12px; height:42px;">
-            <datalist id="kota_list">
-                <?php foreach ($cities as $city): ?>
-                    <option value="<?php echo htmlspecialchars($city); ?>">
-                <?php endforeach; ?>
-            </datalist>
+    <form method="GET" action="index.php" id="index-filter-form">
+        <div class="row g-3 align-items-end mb-3">
+            <!-- Cari Kata Kunci / Toko / PIC -->
+            <div class="col-lg-6 col-md-12 col-12">
+                <label for="search" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <i class="bi bi-search text-primary me-1"></i> Cari Kata Kunci / Toko / PIC / No HP
+                </label>
+                <input type="text" name="search" id="search" class="form-control fw-semibold" placeholder="Ketik nama toko, nama PIC, atau no HP..." value="<?php echo htmlspecialchars($search_keyword); ?>" style="border-radius:12px; height:42px;">
+            </div>
+
+            <!-- Filter Kota -->
+            <div class="col-lg-3 col-md-6 col-12">
+                <label for="filter_kota" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> Filter Kota
+                </label>
+                <input list="kota_list" name="filter_kota" id="filter_kota" class="form-control fw-semibold" placeholder="Pilih atau ketik kota..." value="<?php echo htmlspecialchars($filter_kota); ?>" style="border-radius:12px; height:42px;">
+                <datalist id="kota_list">
+                    <?php foreach ($cities as $city): ?>
+                        <option value="<?php echo htmlspecialchars($city); ?>">
+                    <?php endforeach; ?>
+                </datalist>
+            </div>
+
+            <!-- Filter Kategori -->
+            <div class="col-lg-3 col-md-6 col-12">
+                <label for="filter_kategori" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <i class="bi bi-tags-fill text-primary me-1"></i> Filter Kategori
+                </label>
+                <select name="filter_kategori" id="filter_kategori" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                    <option value="">Semua Kategori</option>
+                    <?php foreach ($categories as $cat): ?>
+                        <option value="<?php echo htmlspecialchars($cat); ?>" <?php if ($filter_kategori === $cat) echo 'selected'; ?>>
+                            🏷️ <?php echo htmlspecialchars($cat); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
 
-        <!-- Filter Kategori -->
-        <div class="col-md-3 col-sm-6">
-            <label for="filter_kategori" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
-                <i class="bi bi-tags-fill text-primary me-1"></i> Filter Kategori
-            </label>
-            <select name="filter_kategori" id="filter_kategori" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
-                <option value="">Semua Kategori</option>
-                <?php foreach ($categories as $cat): ?>
-                    <option value="<?php echo htmlspecialchars($cat); ?>" <?php if ($filter_kategori === $cat) echo 'selected'; ?>>
-                        🏷️ <?php echo htmlspecialchars($cat); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-
-        <!-- Filter Sales (Superadmin/Adminsales only) -->
-        <?php if ($_SESSION['role'] !== 'sales'): ?>
-        <div class="col-md-3 col-sm-6">
-            <label for="filter_sales" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
-                <i class="bi bi-person-badge-fill text-info me-1"></i> Filter Sales
-            </label>
-            <select name="filter_sales" id="filter_sales" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
-                <option value="">Semua Sales</option>
-                <?php foreach ($all_sales as $s): ?>
-                    <option value="<?php echo $s['id']; ?>" <?php if ($filter_sales === intval($s['id'])) echo 'selected'; ?>>
-                        👤 <?php echo htmlspecialchars($s['nama_lengkap']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <?php endif; ?>
-
-        <!-- Action Buttons -->
-        <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-md-3' : 'col-md-6'; ?> col-sm-6 d-flex gap-2">
-            <button type="submit" class="btn btn-primary fw-bold flex-grow-1 shadow-sm d-inline-flex align-items-center justify-content-center gap-1" style="border-radius:12px; height:42px; font-weight:700;">
-                <i class="bi bi-funnel-fill me-1"></i> Terapkan Filter
-            </button>
-            <?php if (!empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0): ?>
-                <a href="index.php" class="btn btn-light border fw-bold d-inline-flex align-items-center justify-content-center" title="Reset Filter" style="border-radius:12px; height:42px;">
-                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
-                </a>
+        <div class="row g-3 align-items-end">
+            <!-- Filter Sales (Superadmin/Adminsales only) -->
+            <?php if ($_SESSION['role'] !== 'sales'): ?>
+            <div class="col-lg-3 col-md-6 col-12">
+                <label for="filter_sales" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <i class="bi bi-person-badge-fill text-info me-1"></i> Filter Sales
+                </label>
+                <select name="filter_sales" id="filter_sales" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                    <option value="">Semua Sales</option>
+                    <?php foreach ($all_sales as $s): ?>
+                        <option value="<?php echo $s['id']; ?>" <?php if ($filter_sales === intval($s['id'])) echo 'selected'; ?>>
+                            👤 <?php echo htmlspecialchars($s['nama_lengkap']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             <?php endif; ?>
+
+            <!-- Entri Per Halaman -->
+            <div class="col-lg-3 col-md-6 col-12">
+                <label for="limit" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <i class="bi bi-layers-fill text-primary me-1"></i> Entri Per Halaman
+                </label>
+                <select name="limit" id="limit" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                    <option value="20" <?php if ($limit == 20) echo 'selected'; ?>>20 data per halaman</option>
+                    <option value="25" <?php if ($limit == 25) echo 'selected'; ?>>25 data per halaman</option>
+                    <option value="50" <?php if ($limit == 50) echo 'selected'; ?>>50 data per halaman</option>
+                    <option value="100" <?php if ($limit == 100) echo 'selected'; ?>>100 data per halaman</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-6 col-md-12' : 'col-lg-9 col-md-12'; ?> col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary fw-extrabold flex-grow-1 shadow-sm d-inline-flex align-items-center justify-content-center gap-1.5" style="border-radius:12px; height:42px; font-weight:800; white-space:nowrap; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
+                    <i class="bi bi-funnel-fill"></i> Terapkan Filter
+                </button>
+                <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0 || $limit != 25): ?>
+                    <a href="index.php" class="btn btn-light border border-slate fw-bold d-inline-flex align-items-center justify-content-center gap-1" title="Reset Filter" style="border-radius:12px; height:42px; padding:0 18px; white-space:nowrap;">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
     </form>
 </div>
@@ -367,6 +427,55 @@ if ($_SESSION['role'] !== 'sales') {
                 </tbody>
             </table>
         </div>
+    </div>
+    <!-- Pagination Footer -->
+    <div class="card-footer bg-white py-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="small text-muted fw-semibold">
+            Menampilkan <span class="text-dark fw-bold"><?php echo number_format($offset + 1); ?> - <?php echo number_format(min($offset + $limit, $total_records)); ?></span> dari <span class="text-primary fw-bold"><?php echo number_format($total_records); ?></span> customer
+        </div>
+        <?php if ($total_pages > 1): ?>
+        <nav>
+            <ul class="pagination pagination-sm mb-0 gap-1">
+                <?php
+                $link_base_params = [
+                    'filter_kota' => $filter_kota,
+                    'filter_kategori' => $filter_kategori,
+                    'filter_sales' => $filter_sales,
+                    'search' => $search_keyword,
+                    'limit' => $limit
+                ];
+                
+                // Previous link
+                if ($page > 1):
+                    $prev_params = array_merge($link_base_params, ['page' => $page - 1]);
+                ?>
+                    <li class="page-item"><a class="page-link px-3 py-1.5 rounded-3 fw-bold border bg-light text-dark" href="index.php?<?php echo http_build_query($prev_params); ?>"><i class="bi bi-chevron-left me-1"></i> Sebelumnya</a></li>
+                <?php endif; ?>
+
+                <?php
+                $start_p = max(1, $page - 2);
+                $end_p = min($total_pages, $page + 2);
+                for ($p = $start_p; $p <= $end_p; $p++):
+                    $p_params = array_merge($link_base_params, ['page' => $p]);
+                    $is_act = ($p == $page);
+                ?>
+                    <li class="page-item">
+                        <a class="page-link px-3 py-1.5 rounded-3 fw-bold border <?php echo $is_act ? 'bg-primary text-white border-primary shadow-sm' : 'bg-white text-dark'; ?>" href="index.php?<?php echo http_build_query($p_params); ?>">
+                            <?php echo $p; ?>
+                        </a>
+                    </li>
+                <?php endfor; ?>
+
+                <?php
+                // Next link
+                if ($page < $total_pages):
+                    $next_params = array_merge($link_base_params, ['page' => $page + 1]);
+                ?>
+                    <li class="page-item"><a class="page-link px-3 py-1.5 rounded-3 fw-bold border bg-light text-dark" href="index.php?<?php echo http_build_query($next_params); ?>">Selanjutnya <i class="bi bi-chevron-right ms-1"></i></a></li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+        <?php endif; ?>
     </div>
 </div>
 
