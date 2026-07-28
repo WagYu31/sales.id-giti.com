@@ -167,56 +167,100 @@ $file_accept_types = "image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx";
     <div class="alert alert-danger shadow-sm border-0 mb-4" style="border-radius:14px;"><?php echo $error; ?></div>
 <?php endif; ?>
 
-<div class="card border-0 shadow-sm" style="border-radius:20px;">
+<div class="card border-0 shadow-sm" style="border-radius:24px; border: 1.5px solid #E2E8F0;">
     <div class="card-body p-4 p-md-5">
         <form action="followup_add.php?customer_id=<?php echo $customer_id; ?>" method="POST" enctype="multipart/form-data">
             
-            <!-- Tanggal & Waktu Follow Up -->
-            <div class="mb-4">
-                <label for="tgl_follow_up" class="form-label fw-bold text-dark d-flex align-items-center justify-content-between">
-                    <span>Tanggal & Waktu Follow Up</span>
+            <!-- Row 1: Tanggal & Waktu Follow Up + Nomor Invoice (2-Column) -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="tgl_follow_up" class="form-label fw-bold text-dark d-flex align-items-center justify-content-between">
+                        <span>Tanggal & Waktu Follow Up</span>
+                        <?php if ($is_sales): ?>
+                            <span class="badge bg-primary-subtle text-primary border border-primary fw-bold" style="font-size:10.5px;">
+                                🔒 Realtime Server
+                            </span>
+                        <?php endif; ?>
+                    </label>
                     <?php if ($is_sales): ?>
-                        <span class="badge bg-primary-subtle text-primary border border-primary fw-bold" style="font-size:11px;">
-                            🔒 Otomatis Terisi Realtime (Khusus Sales Tidak Dapat Diubah)
-                        </span>
+                        <input type="text" class="form-control bg-light fw-bold text-primary" value="<?php echo date('d/m/Y, H:i'); ?> WIB" readonly style="font-size:14.5px; cursor:not-allowed; border-radius:14px; padding: 12px 16px;">
+                        <input type="hidden" name="tgl_follow_up" value="<?php echo date('Y-m-d\TH:i'); ?>">
+                    <?php else: ?>
+                        <input type="datetime-local" class="form-control" id="tgl_follow_up" name="tgl_follow_up" value="<?php echo date('Y-m-d\TH:i'); ?>" required style="border-radius:14px; padding: 12px 16px;">
                     <?php endif; ?>
-                </label>
-                <?php if ($is_sales): ?>
-                    <input type="text" class="form-control bg-light fw-bold text-primary" value="<?php echo date('d/m/Y, H:i'); ?> WIB" readonly style="font-size:15px; cursor:not-allowed;">
-                    <input type="hidden" name="tgl_follow_up" value="<?php echo date('Y-m-d\TH:i'); ?>">
-                <?php else: ?>
-                    <input type="datetime-local" class="form-control" id="tgl_follow_up" name="tgl_follow_up" value="<?php echo date('Y-m-d\TH:i'); ?>" required>
-                <?php endif; ?>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="no_inv" class="form-label fw-bold text-dark">Nomor Invoice (Opsional)</label>
+                    <input type="text" class="form-control" id="no_inv" name="no_inv" placeholder="Masukkan nomor invoice jika ada" style="border-radius:14px; padding: 12px 16px;">
+                </div>
             </div>
 
-            <!-- Respon Customer -->
+            <!-- Respon Customer (Interactive Segmented Option Chips Grid) -->
             <div class="mb-4">
-                <label class="form-label fw-bold text-dark">Respon Customer <span class="text-danger">*</span></label>
-                <div class="p-3 bg-light rounded-4 border">
-                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon1" value="Tidak ada respon" checked><label class="form-check-label fw-semibold" for="respon1">Tidak ada respon</label></div>
-                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon2" value="Tidak tertarik"><label class="form-check-label fw-semibold" for="respon2">Tidak tertarik</label></div>
-                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon3" value="Hanya bertanya"><label class="form-check-label fw-semibold" for="respon3">Hanya bertanya</label></div>
-                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon4" value="Muncul keinginan membeli"><label class="form-check-label fw-semibold text-primary" for="respon4">Muncul keinginan membeli</label></div>
-                    <div class="form-check mb-2"><input class="form-check-input" type="radio" name="respon_radio" id="respon5" value="Deal untuk beli"><label class="form-check-label fw-bold text-success" for="respon5">🎉 Deal untuk beli</label></div>
-                    <div class="form-check"><input class="form-check-input" type="radio" name="respon_radio" id="respon6" value="Lainnya"><label class="form-check-label fw-semibold" for="respon6">Lainnya</label></div>
+                <label class="form-label fw-bold text-dark d-block mb-2.5">
+                    Respon Customer <span class="text-danger">*</span>
+                </label>
+                <div class="respon-chip-grid">
+                    <label class="respon-chip-card active">
+                        <input type="radio" name="respon_radio" value="Tidak ada respon" checked>
+                        <div class="chip-content">
+                            <i class="bi bi-dash-circle text-secondary fs-5"></i>
+                            <span>Tidak Ada Respon</span>
+                        </div>
+                    </label>
+                    
+                    <label class="respon-chip-card">
+                        <input type="radio" name="respon_radio" value="Tidak tertarik">
+                        <div class="chip-content">
+                            <i class="bi bi-x-circle text-danger fs-5"></i>
+                            <span>Tidak Tertarik</span>
+                        </div>
+                    </label>
+
+                    <label class="respon-chip-card">
+                        <input type="radio" name="respon_radio" value="Hanya bertanya">
+                        <div class="chip-content">
+                            <i class="bi bi-question-circle text-info fs-5"></i>
+                            <span>Hanya Bertanya</span>
+                        </div>
+                    </label>
+
+                    <label class="respon-chip-card">
+                        <input type="radio" name="respon_radio" value="Muncul keinginan membeli">
+                        <div class="chip-content">
+                            <i class="bi bi-bag-check text-primary fs-5"></i>
+                            <span>Muncul Keinginan Membeli</span>
+                        </div>
+                    </label>
+
+                    <label class="respon-chip-card highlight-deal">
+                        <input type="radio" name="respon_radio" value="Deal untuk beli">
+                        <div class="chip-content">
+                            <i class="bi bi-trophy-fill text-success fs-5"></i>
+                            <span>🎉 Deal Untuk Beli</span>
+                        </div>
+                    </label>
+
+                    <label class="respon-chip-card">
+                        <input type="radio" name="respon_radio" value="Lainnya">
+                        <div class="chip-content">
+                            <i class="bi bi-pencil-square text-warning fs-5"></i>
+                            <span>Lainnya...</span>
+                        </div>
+                    </label>
                 </div>
             </div>
 
             <div class="mb-4" id="respon_lainnya_container" style="display: none;">
                 <label for="respon_lainnya" class="form-label fw-bold text-dark">Respon Lainnya <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="respon_lainnya" name="respon_lainnya" placeholder="Tulis respon customer...">
+                <input type="text" class="form-control" id="respon_lainnya" name="respon_lainnya" placeholder="Tulis rincian respon customer..." style="border-radius:14px; padding: 12px 16px;">
             </div>
 
             <!-- Keterangan / Tindak Lanjut -->
             <div class="mb-4">
                 <label for="keterangan" class="form-label fw-bold text-dark">Keterangan / Tindak Lanjut</label>
-                <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Masukkan detail pembicaraan atau rencana tindak lanjut..."></textarea>
-            </div>
-
-            <!-- Nomor Invoice -->
-            <div class="mb-4">
-                <label for="no_inv" class="form-label fw-bold text-dark">Nomor Invoice (Opsional)</label>
-                <input type="text" class="form-control" id="no_inv" name="no_inv" placeholder="Masukkan nomor invoice jika ada">
+                <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Masukkan detail pembicaraan atau rencana tindak lanjut..." style="border-radius:16px; padding: 14px 16px;"></textarea>
             </div>
 
             <!-- Upload Media 1, 2, 3 (Interactive Drag & Drop Upload Zone) -->

@@ -1452,3 +1452,110 @@ label {
 [data-theme="cyber-dark"] .drop-zone-box .text-dark {
     color: #FFFFFF !important;
 }
+
+
+/* ============ RESPON CUSTOMER SEGMENTED CHIPS ============ */
+.respon-chip-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.respon-chip-card {
+    position: relative;
+    border: 1.5px solid #E2E8F0;
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+.respon-chip-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+}
+
+.respon-chip-card .chip-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 13.5px;
+    color: #334155;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    width: 100%;
+}
+
+.respon-chip-card:hover {
+    border-color: #2563EB;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+}
+
+.respon-chip-card.active,
+.respon-chip-card:has(input[type="radio"]:checked) {
+    border-color: #2563EB !important;
+    background: #EFF6FF !important;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.2) !important;
+}
+
+.respon-chip-card.active .chip-content,
+.respon-chip-card:has(input[type="radio"]:checked) .chip-content {
+    color: #1D4ED8 !important;
+}
+
+.respon-chip-card.highlight-deal:has(input[type="radio"]:checked),
+.respon-chip-card.highlight-deal.active {
+    border-color: #10B981 !important;
+    background: #ECFDF5 !important;
+    box-shadow: 0 8px 22px rgba(16, 185, 129, 0.22) !important;
+}
+
+.respon-chip-card.highlight-deal:has(input[type="radio"]:checked) .chip-content,
+.respon-chip-card.highlight-deal.active .chip-content {
+    color: #047857 !important;
+}
+
+/* Dark Theme Support for Respon Chips */
+[data-theme="crimson-velvet"] .respon-chip-card,
+[data-theme="hyperion-gold"] .respon-chip-card,
+[data-theme="obsidian-diamond"] .respon-chip-card,
+[data-theme="cyber-dark"] .respon-chip-card {
+    background: #1E293B !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="crimson-velvet"] .respon-chip-card .chip-content,
+[data-theme="hyperion-gold"] .respon-chip-card .chip-content,
+[data-theme="obsidian-diamond"] .respon-chip-card .chip-content,
+[data-theme="cyber-dark"] .respon-chip-card .chip-content {
+    color: #F8FAFC !important;
+}
+
+[data-theme="crimson-velvet"] .respon-chip-card:has(input[type="radio"]:checked),
+[data-theme="hyperion-gold"] .respon-chip-card:has(input[type="radio"]:checked),
+[data-theme="obsidian-diamond"] .respon-chip-card:has(input[type="radio"]:checked),
+[data-theme="cyber-dark"] .respon-chip-card:has(input[type="radio"]:checked) {
+    background: #1E3A8A !important;
+    border-color: #3B82F6 !important;
+}
+
+[data-theme="crimson-velvet"] .respon-chip-card:has(input[type="radio"]:checked) .chip-content,
+[data-theme="hyperion-gold"] .respon-chip-card:has(input[type="radio"]:checked) .chip-content,
+[data-theme="obsidian-diamond"] .respon-chip-card:has(input[type="radio"]:checked) .chip-content,
+[data-theme="cyber-dark"] .respon-chip-card:has(input[type="radio"]:checked) .chip-content {
+    color: #93C5FD !important;
+}
+
+@media (max-width: 992px) {
+    .respon-chip-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 576px) {
+    .respon-chip-grid { grid-template-columns: 1fr; }
+}
