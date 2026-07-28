@@ -1007,10 +1007,30 @@ body {
 }
 
 .custom-filter-group .select2-container--bootstrap-5 .select2-selection__rendered {
-    color: inherit !important;
+    color: #0F172A !important;
     font-size: 13.5px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     padding-left: 0 !important;
+}
+
+.custom-filter-group .select2-container--bootstrap-5 .select2-selection__placeholder {
+    color: #64748B !important;
+    font-weight: 600 !important;
+}
+
+/* Force Pure White Select2 Text in Dark & VIP Modes */
+[data-theme="crimson-velvet"] .custom-filter-group .select2-container--bootstrap-5 .select2-selection__rendered,
+[data-theme="hyperion-gold"] .custom-filter-group .select2-container--bootstrap-5 .select2-selection__rendered,
+[data-theme="obsidian-diamond"] .custom-filter-group .select2-container--bootstrap-5 .select2-selection__rendered,
+[data-theme="cyber-dark"] .custom-filter-group .select2-container--bootstrap-5 .select2-selection__rendered,
+[data-theme="crimson-velvet"] .custom-filter-group .select2-container--bootstrap-5 .select2-selection__placeholder,
+[data-theme="hyperion-gold"] .custom-filter-group .select2-container--bootstrap-5 .select2-selection__placeholder,
+[data-theme="obsidian-diamond"] .custom-filter-group .select2-container--bootstrap-5 .select2-selection__placeholder,
+[data-theme="cyber-dark"] .custom-filter-group .select2-container--bootstrap-5 .select2-selection__placeholder {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Select2 Dropdown Popup Universal High Contrast & Theme Styling */
