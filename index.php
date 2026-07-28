@@ -320,9 +320,9 @@ if ($_SESSION['role'] !== 'sales') {
                     <tr>
                         <th style="width: 18%;">NAMA TOKO</th>
                         <th style="width: 20%;">PIC & KONTAK</th>
-                        <th style="width: 10%;">KATEGORI</th>
-                        <th style="width: 12%;">KOTA</th>
-                        <th style="width: 14%;">SALES</th>
+                        <th class="text-center" style="width: 10%;">KATEGORI</th>
+                        <th class="text-center" style="width: 12%;">KOTA</th>
+                        <th class="text-center" style="width: 14%;">SALES</th>
                         <th class="text-center" style="width: 7%;">FU</th>
                         <th class="text-center" style="width: 6%;">KANDIDAT</th>
                         <th class="text-center" style="width: 6%;">DEAL</th>
@@ -364,10 +364,10 @@ if ($_SESSION['role'] !== 'sales') {
                                 } else { echo '<span class="text-muted small">-</span>'; }
                                 ?>
                             </td>
-                            <td>
+                            <td class="text-center">
                                 <span class="badge bg-light text-dark border fw-semibold" style="border-radius:20px; padding:5px 12px; font-size:11.5px;"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span>
                             </td>
-                            <td>
+                            <td class="text-center">
                                 <?php 
                                 $city_val = trim($customer['all_cities'] ?? '');
                                 if (!empty($city_val) && $city_val !== '-'): 
@@ -379,9 +379,9 @@ if ($_SESSION['role'] !== 'sales') {
                                     <span class="text-muted small">-</span>
                                 <?php endif; ?>
                             </td>
-                            <td>
+                            <td class="text-center">
                                 <?php if ($customer['nama_sales']): ?>
-                                    <div class="d-flex align-items-center gap-1.5" style="white-space:nowrap;">
+                                    <div class="d-flex align-items-center justify-content-center gap-1.5" style="white-space:nowrap;">
                                         <div class="sales-avatar-badge-small flex-shrink-0">
                                             <?php echo strtoupper(substr($customer['nama_sales'], 0, 1)); ?>
                                         </div>
