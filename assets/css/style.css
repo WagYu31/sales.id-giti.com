@@ -651,3 +651,104 @@ body {
     color: #000000 !important;
     font-weight: 800 !important;
 }
+
+
+/* ============ DYNAMIC SIDEBAR COLOR PRESETS ============ */
+
+/* 1. SOLAR YELLOW SIDEBAR (#FFFF00) */
+[data-sidebar="yellow"] .sidebar {
+    background: linear-gradient(180deg, #CA8A04 0%, #EAB308 50%, #FFE600 100%) !important;
+    border-right: 1px solid #A16207 !important;
+}
+
+[data-sidebar="yellow"] .sidebar-logo {
+    border-bottom-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-sidebar="yellow"] .sidebar-section-title {
+    color: #451A03 !important;
+    font-weight: 800 !important;
+}
+
+[data-sidebar="yellow"] .sidebar-link {
+    color: #1E1B4B !important;
+    font-weight: 700 !important;
+}
+
+[data-sidebar="yellow"] .sidebar-link i {
+    color: #451A03 !important;
+}
+
+[data-sidebar="yellow"] .sidebar-link:hover,
+[data-sidebar="yellow"] .sidebar-link.active {
+    background: rgba(0, 0, 0, 0.15) !important;
+    color: #000000 !important;
+    border-left-color: #000000 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-sidebar="yellow"] .sidebar-user {
+    background: rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-sidebar="yellow"] .sidebar-user-name {
+    color: #000000 !important;
+    font-weight: 800 !important;
+}
+
+[data-sidebar="yellow"] .sidebar-user-role {
+    color: #451A03 !important;
+    font-weight: 600 !important;
+}
+
+/* 2. PURE WHITE SIDEBAR */
+[data-sidebar="white"] .sidebar {
+    background: #FFFFFF !important;
+    border-right: 1px solid #E2E8F0 !important;
+}
+
+[data-sidebar="white"] .sidebar-section-title {
+    color: #64748B !important;
+}
+
+[data-sidebar="white"] .sidebar-link {
+    color: #334155 !important;
+    font-weight: 600 !important;
+}
+
+[data-sidebar="white"] .sidebar-link i {
+    color: #64748B !important;
+}
+
+[data-sidebar="white"] .sidebar-link:hover,
+[data-sidebar="white"] .sidebar-link.active {
+    background: #EFF6FF !important;
+    color: #2563EB !important;
+    border-left-color: #2563EB !important;
+}
+
+[data-sidebar="white"] .sidebar-user {
+    background: #F8FAFC !important;
+    border-color: #E2E8F0 !important;
+}
+
+[data-sidebar="white"] .sidebar-user-name {
+    color: #0F172A !important;
+}
+
+[data-sidebar="white"] .sidebar-user-role {
+    color: #64748B !important;
+}
+
+/* 3. EMERALD GREEN SIDEBAR */
+[data-sidebar="emerald"] .sidebar {
+    background: linear-gradient(180deg, #022C22 0%, #064E3B 50%, #047857 100%) !important;
+    border-right-color: #047857 !important;
+}
+
+/* 4. ROYAL VIOLET SIDEBAR */
+[data-sidebar="violet"] .sidebar {
+    background: linear-gradient(180deg, #1E0A2A 0%, #311042 50%, #4C1D95 100%) !important;
+    border-right-color: #6D28D9 !important;
+}

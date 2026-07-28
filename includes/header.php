@@ -623,6 +623,27 @@ table tr td { font-size: 0.85em; }
                             <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace" style="font-size:10px;">Warm Gold</span>
                         </button>
                     </li>
+                    <li class="px-2 py-1 mt-2 mb-2 border-top border-bottom pt-2 pb-2 d-flex align-items-center justify-content-between">
+                        <span class="fw-extrabold text-dark" style="font-size:13px; font-family:'Plus Jakarta Sans', sans-serif;"><i class="bi bi-layout-sidebar-inset me-1.5 text-warning"></i>Warna Sidebar</span>
+                        <span class="badge bg-warning-subtle text-dark fw-bold" style="font-size:10px;">Custom</span>
+                    </li>
+                    <div class="d-flex align-items-center justify-content-between px-1 gap-1.5 my-1">
+                        <button type="button" class="btn btn-sm shadow-sm flex-grow-1 d-flex align-items-center justify-content-center" onclick="setSidebarColor('yellow')" title="Sidebar Kuning (#FFFF00)" style="background:#FFE600; border:1px solid #CA8A04; height:32px; border-radius:10px;">
+                            <span class="fw-extrabold text-dark" style="font-size:11px;">💛</span>
+                        </button>
+                        <button type="button" class="btn btn-sm shadow-sm flex-grow-1 d-flex align-items-center justify-content-center" onclick="setSidebarColor('default')" title="Sidebar Dark Navy (Default)" style="background:#0F172A; border:1px solid #1E293B; height:32px; border-radius:10px; color:#FFF;">
+                            <span style="font-size:11px;">🖤</span>
+                        </button>
+                        <button type="button" class="btn btn-sm shadow-sm flex-grow-1 d-flex align-items-center justify-content-center" onclick="setSidebarColor('white')" title="Sidebar Putih Bersih" style="background:#FFFFFF; border:1px solid #CBD5E1; height:32px; border-radius:10px; color:#000;">
+                            <span style="font-size:11px;">🤍</span>
+                        </button>
+                        <button type="button" class="btn btn-sm shadow-sm flex-grow-1 d-flex align-items-center justify-content-center" onclick="setSidebarColor('emerald')" title="Sidebar Hijau Emerald" style="background:#059669; border:1px solid #047857; height:32px; border-radius:10px; color:#FFF;">
+                            <span style="font-size:11px;">💚</span>
+                        </button>
+                        <button type="button" class="btn btn-sm shadow-sm flex-grow-1 d-flex align-items-center justify-content-center" onclick="setSidebarColor('violet')" title="Sidebar Ungu Violet" style="background:#7C3AED; border:1px solid #6D28D9; height:32px; border-radius:10px; color:#FFF;">
+                            <span style="font-size:11px;">💜</span>
+                        </button>
+                    </div>
                 </ul>
             </div>
 
@@ -859,6 +880,16 @@ function setAppTheme(themeVal) {
     } else {
         document.documentElement.setAttribute('data-theme', themeVal);
         localStorage.setItem('loewix_theme', themeVal);
+    }
+}
+
+function setSidebarColor(colorVal) {
+    if (!colorVal || colorVal === 'default') {
+        document.documentElement.removeAttribute('data-sidebar');
+        localStorage.removeItem('loewix_sidebar');
+    } else {
+        document.documentElement.setAttribute('data-sidebar', colorVal);
+        localStorage.setItem('loewix_sidebar', colorVal);
     }
 }
 </script>
