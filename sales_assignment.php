@@ -21,6 +21,7 @@ $sql = "
         c.id, 
         c.nama_toko,
         c.kategori,
+        c.sales_id,
         ca.alamat,
         ca.kota,
         cp.nama_pic,
@@ -37,6 +38,28 @@ $result_cust = $conn->query($sql);
 if($result_cust) {
     while($row = $result_cust->fetch_assoc()){
         $customers[] = $row;
+    }
+}
+
+// Fetch list of unique Cities (Daerah) for Filter
+$cities_list = [];
+$res_cities = $conn->query("SELECT DISTINCT TRIM(kota) AS kota FROM customer_addresses WHERE kota IS NOT NULL AND TRIM(kota) != '' AND deleted_at IS NULL ORDER BY TRIM(kota) ASC");
+if ($res_cities) {
+    while ($r = $res_cities->fetch_assoc()) {
+        if (!empty($r['kota'])) {
+            $cities_list[] = $r['kota'];
+        }
+    }
+}
+
+// Fetch list of unique Categories for Filter
+$kategori_list = [];
+$res_kat = $conn->query("SELECT DISTINCT TRIM(kategori) AS kat FROM customers WHERE kategori IS NOT NULL AND TRIM(kategori) != '' AND deleted_at IS NULL ORDER BY TRIM(kategori) ASC");
+if ($res_kat) {
+    while ($r = $res_kat->fetch_assoc()) {
+        if (!empty($r['kat'])) {
+            $kategori_list[] = $r['kat'];
+        }
     }
 }
 ?>
@@ -160,11 +183,52 @@ if($result_cust) {
             </div>
         </div>
 
-        <!-- Search Input -->
-        <div class="mb-3">
-            <div class="input-group">
-                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Cari customer, kategori, kota, PIC, atau nama sales...">
+        <!-- Filter Bar -->
+        <div class="row g-2 align-items-center mb-3">
+            <!-- Search Text -->
+            <div class="col-lg-4 col-md-12 col-12">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="searchInput" class="form-control border-start-0 ps-0 fw-semibold" placeholder="Cari nama toko, PIC, atau hp..." style="border-radius:0 12px 12px 0; height:42px;">
+                </div>
+            </div>
+            
+            <!-- Filter Daerah / Kota -->
+            <div class="col-lg-3 col-md-4 col-12">
+                <div class="input-group">
+                    <span class="input-group-text bg-white" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-geo-alt-fill text-danger"></i></span>
+                    <select id="filterKota" class="form-select fw-semibold" style="border-radius:0 12px 12px 0; height:42px;">
+                        <option value="">Semua Daerah / Kota</option>
+                        <?php foreach ($cities_list as $city): ?>
+                            <option value="<?php echo htmlspecialchars($city); ?>">📍 <?php echo htmlspecialchars($city); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Filter Kategori -->
+            <div class="col-lg-2.5 col-md-4 col-12">
+                <div class="input-group">
+                    <span class="input-group-text bg-white" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-tags-fill text-primary"></i></span>
+                    <select id="filterKategori" class="form-select fw-semibold" style="border-radius:0 12px 12px 0; height:42px;">
+                        <option value="">Semua Kategori</option>
+                        <?php foreach ($kategori_list as $kat): ?>
+                            <option value="<?php echo htmlspecialchars($kat); ?>">🏷️ <?php echo htmlspecialchars($kat); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Filter Status Sales -->
+            <div class="col-lg-2.5 col-md-4 col-12">
+                <select id="filterSalesStatus" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                    <option value="">Semua Penugasan</option>
+                    <option value="unassigned">⚠️ Belum Ada Sales</option>
+                    <option value="assigned">✅ Sudah Ada Sales</option>
+                    <?php foreach ($sales_list as $s): ?>
+                        <option value="sales_<?php echo $s['id']; ?>">👤 <?php echo htmlspecialchars($s['nama_lengkap']); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
         </div>
 
@@ -185,7 +249,7 @@ if($result_cust) {
                 </thead>
                 <tbody>
                     <?php foreach($customers as $cust): ?>
-                    <tr data-customer-id="<?php echo $cust['id']; ?>">
+                    <tr data-customer-id="<?php echo $cust['id']; ?>" data-sales-id="<?php echo $cust['sales_id'] ?? ''; ?>" data-kota="<?php echo htmlspecialchars(strtolower(trim($cust['kota'] ?? ''))); ?>" data-kategori="<?php echo htmlspecialchars(strtolower(trim($cust['kategori'] ?? ''))); ?>">
                         <td class="text-center"><input class="form-check-input customer-checkbox" type="checkbox"></td>
                         <td>
                             <div class="fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:13.5px;">
@@ -275,14 +339,42 @@ $(document).ready(function() {
         setTimeout(() => notif.alert('close'), 3000);
     }
 
-    $('#searchInput').on('keyup', function() {
+    function applyAssignmentFilters() {
         $('#selectAll').prop('checked', false);
-        const filter = $(this).val().toLowerCase();
+        const searchVal = $('#searchInput').val().toLowerCase().trim();
+        const kotaVal = $('#filterKota').val().toLowerCase().trim();
+        const katVal = $('#filterKategori').val().toLowerCase().trim();
+        const salesStatusVal = $('#filterSalesStatus').val();
+
         $('#assignmentTable tbody tr').each(function() {
             const rowText = $(this).text().toLowerCase();
-            $(this).toggle(rowText.includes(filter));
+            const rowKota = ($(this).attr('data-kota') || '').toString().toLowerCase();
+            const rowKat = ($(this).attr('data-kategori') || '').toString().toLowerCase();
+            const salesId = ($(this).attr('data-sales-id') || '').toString();
+
+            const matchSearch = !searchVal || rowText.includes(searchVal);
+            const matchKota = !kotaVal || rowKota.includes(kotaVal);
+            const matchKat = !katVal || rowKat === katVal;
+
+            let matchSales = true;
+            if (salesStatusVal === 'unassigned') {
+                matchSales = !salesId || salesId === '' || salesId === '0';
+            } else if (salesStatusVal === 'assigned') {
+                matchSales = salesId && salesId !== '' && salesId !== '0';
+            } else if (salesStatusVal && salesStatusVal.startsWith('sales_')) {
+                const targetSalesId = salesStatusVal.replace('sales_', '');
+                matchSales = (salesId === targetSalesId);
+            }
+
+            if (matchSearch && matchKota && matchKat && matchSales) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
         });
-    });
+    }
+
+    $('#searchInput, #filterKota, #filterKategori, #filterSalesStatus').on('keyup change input', applyAssignmentFilters);
 
     $('#selectAll').on('change', function() {
         $('#assignmentTable tbody tr:visible .customer-checkbox').prop('checked', this.checked);
