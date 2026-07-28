@@ -655,71 +655,79 @@ body {
 
 /* ============ DYNAMIC SIDEBAR COLOR PRESETS ============ */
 
-/* 1. SOLAR GOLD ACCENT SIDEBAR (MEWAH & ELEGANKAN DARI SILAU) */
+/* 1. RICH VIBRANT GOLDEN YELLOW SIDEBAR (#FACC15 / #EAB308) */
 [data-sidebar="yellow"] .sidebar {
-    background: linear-gradient(180deg, #090D16 0%, #0F172A 50%, #1A1F2C 100%) !important;
-    border-right: 1px solid #CA8A04 !important;
+    background: linear-gradient(180deg, #FACC15 0%, #EAB308 50%, #CA8A04 100%) !important;
+    border-right: 1px solid #B45309 !important;
 }
 
 [data-sidebar="yellow"] .sidebar-logo {
-    border-bottom-color: rgba(234, 179, 8, 0.2) !important;
+    border-bottom-color: rgba(0, 0, 0, 0.12) !important;
 }
 
 [data-sidebar="yellow"] .sidebar-logo::after {
-    background: linear-gradient(90deg, transparent, rgba(250, 204, 21, 0.6), transparent) !important;
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.3), transparent) !important;
 }
 
 [data-sidebar="yellow"] .sidebar-section-title {
-    color: #FACC15 !important;
+    color: #451A03 !important;
     font-weight: 800 !important;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
 }
 
 [data-sidebar="yellow"] .sidebar-link {
-    color: rgba(255, 255, 255, 0.75) !important;
-    font-weight: 600 !important;
+    color: #0F172A !important;
+    font-weight: 700 !important;
 }
 
 [data-sidebar="yellow"] .sidebar-link i {
-    color: #EAB308 !important;
+    color: #1E1B4B !important;
 }
 
 [data-sidebar="yellow"] .sidebar-link:hover {
-    background: rgba(250, 204, 21, 0.12) !important;
-    color: #FDE047 !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+    color: #000000 !important;
 }
 
 [data-sidebar="yellow"] .sidebar-link.active {
-    background: linear-gradient(135deg, #FFE600 0%, #EAB308 100%) !important;
-    color: #000000 !important;
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;
+    color: #FFFFFF !important;
     font-weight: 800 !important;
-    border-left-color: #FFFFFF !important;
-    box-shadow: 0 6px 20px rgba(250, 204, 21, 0.45) !important;
+    border-left-color: #FACC15 !important;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3) !important;
 }
 
 [data-sidebar="yellow"] .sidebar-link.active i {
-    color: #000000 !important;
+    color: #FACC15 !important;
+}
+
+[data-sidebar="yellow"] .sidebar-footer {
+    border-top-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-sidebar="yellow"] .sidebar-footer::before {
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.2), transparent) !important;
 }
 
 [data-sidebar="yellow"] .sidebar-user {
-    background: rgba(250, 204, 21, 0.08) !important;
-    border-color: rgba(250, 204, 21, 0.25) !important;
+    background: rgba(0, 0, 0, 0.12) !important;
+    border-color: rgba(0, 0, 0, 0.18) !important;
 }
 
 [data-sidebar="yellow"] .sidebar-user-avatar {
-    background: linear-gradient(135deg, #FFE600, #CA8A04) !important;
-    color: #000000 !important;
+    background: linear-gradient(135deg, #0F172A, #1E293B) !important;
+    color: #FACC15 !important;
     font-weight: 800 !important;
 }
 
 [data-sidebar="yellow"] .sidebar-user-name {
-    color: #FFFFFF !important;
-    font-weight: 700 !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
 }
 
 [data-sidebar="yellow"] .sidebar-user-role {
-    color: #FDE047 !important;
-    font-weight: 600 !important;
+    color: #451A03 !important;
+    font-weight: 700 !important;
 }
 
 /* 2. PURE WHITE SIDEBAR */
