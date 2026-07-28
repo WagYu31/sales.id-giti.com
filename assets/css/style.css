@@ -1299,3 +1299,100 @@ body {
     background: linear-gradient(180deg, #1E0A2A 0%, #311042 50%, #4C1D95 100%) !important;
     border-right-color: #6D28D9 !important;
 }
+
+
+/* ============ ISO STANDARD HIGH-CONTRAST DYNAMIC THEME SYSTEM ============ */
+
+/* Global Light Mode Contrast Guarantees */
+body {
+    color: #1E293B;
+}
+
+.form-label,
+label {
+    color: #0F172A;
+    font-weight: 700;
+}
+
+.form-check-label {
+    color: #1E293B !important;
+}
+
+/* Global Dark & VIP Theme Scoped Overrides */
+[data-theme="crimson-velvet"],
+[data-theme="hyperion-gold"],
+[data-theme="obsidian-diamond"],
+[data-theme="cyber-dark"] {
+
+    /* High-contrast Headers & Form Labels */
+    .form-label,
+    .card-title,
+    .section-title,
+    .welcome-title,
+    .modal-title,
+    h1, h2, h3, h4, h5, h6 {
+        color: #FFFFFF !important;
+    }
+
+    .form-label.text-dark,
+    .text-dark {
+        color: #F8FAFC !important;
+    }
+
+    /* Subtitles, Muted Text */
+    .form-text,
+    .welcome-subtitle,
+    .section-subtitle,
+    .text-muted {
+        color: #CBD5E1 !important;
+    }
+
+    /* Input Controls & Textareas in Dark Themes */
+    .form-control,
+    .form-select,
+    textarea {
+        background-color: #1E293B !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        color: #FFFFFF !important;
+    }
+
+    .form-control::placeholder,
+    textarea::placeholder {
+        color: #94A3B8 !important;
+        opacity: 1 !important;
+    }
+
+    /* Containers & Radio Option Cards inside Forms */
+    .bg-light,
+    .p-3.bg-light,
+    .p-4.bg-light {
+        background-color: #1E293B !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    /* Radio Checkbox Labels in Dark Themes */
+    .form-check-label {
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+    }
+
+    .form-check-label.text-primary {
+        color: #60A5FA !important;
+    }
+
+    .form-check-label.text-success {
+        color: #4ADE80 !important;
+    }
+
+    /* File Inputs */
+    input[type="file"].form-control {
+        background-color: #1E293B !important;
+        color: #FFFFFF !important;
+    }
+
+    input[type="file"]::file-selector-button {
+        background-color: #334155 !important;
+        color: #FFFFFF !important;
+        border-color: rgba(255,255,255,0.2) !important;
+    }
+}
