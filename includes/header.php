@@ -49,6 +49,12 @@ $total_notif_count = $notif_pending_fu + $notif_kandidat + $notif_maintenance;
         if (savedTheme && savedTheme !== 'default') {
             document.documentElement.setAttribute('data-theme', savedTheme);
         }
+        var savedSidebar = localStorage.getItem('loewix_sidebar');
+        if (savedSidebar && savedSidebar !== 'default') {
+            document.documentElement.setAttribute('data-sidebar', savedSidebar);
+        } else if (savedTheme === 'solar-yellow') {
+            document.documentElement.setAttribute('data-sidebar', 'yellow');
+        }
     })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -880,6 +886,9 @@ function setAppTheme(themeVal) {
     } else {
         document.documentElement.setAttribute('data-theme', themeVal);
         localStorage.setItem('loewix_theme', themeVal);
+    }
+    if (themeVal === 'solar-yellow') {
+        setSidebarColor('yellow');
     }
 }
 
