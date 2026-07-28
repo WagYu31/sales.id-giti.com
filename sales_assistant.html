@@ -356,15 +356,15 @@
 
         <!-- Quick Prompt Suggestion Bar -->
         <div class="quick-prompts-bar">
-            <span class="prompt-chip" onclick="sendQuickPrompt('Berapa harga paket CCTV Loewix terbaru?')">💡 Harga Paket CCTV</span>
-            <span class="prompt-chip" onclick="sendQuickPrompt('Bagaimana prosedur garansi & servis produk Loewix?')">🛡️ Garansi & Servis</span>
-            <span class="prompt-chip" onclick="sendQuickPrompt('Rekomendasi paket CCTV untuk ruko/toko 4 kamera')">🏪 Rekomendasi Ruko</span>
-            <span class="prompt-chip" onclick="sendQuickPrompt('Syarat menjadi dealer / installer resmi Loewix')">🤝 Syarat Dealer</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Customer minta diskon 20%, bagaimana cara negosiasi agar margin tetap aman?')">🤝 Negosiasi Diskon</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Customer membandingkan harga Loewix dengan merek lain yang lebih murah')">⚖️ Komparasi Merek Lain</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Bagaimana strategi menawarkan upgrade dari Paket Analog ke Paket IP Camera 4K?')">🚀 Upselling IP Camera 4K</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Customer ragu garansi & purna jual produk Loewix, cara meyakinkannya?')">🛡️ Handling Objection Garansi</span>
         </div>
 
         <!-- Chat Input Form -->
         <form class="chat-input-form" id="chat-form">
-            <input type="text" id="user-input" placeholder="Ketik pertanyaan customer di sini..." autocomplete="off">
+            <input type="text" id="user-input" placeholder="Ketik situasi customer / negosiasi di sini..." autocomplete="off">
             <button type="submit" class="btn-send-chat" title="Kirim Pertanyaan"><i class="bi bi-send-fill"></i></button>
         </form>
     </div>
@@ -408,13 +408,13 @@ document.addEventListener('DOMContentLoaded', function() {
         thinkingDiv.id = 'thinking-indicator';
         thinkingDiv.innerHTML = `
             <div class="message-source">
-                <i class="bi bi-cpu-fill text-primary"></i> Asisten Loewix AI sedang berpikir...
+                <i class="bi bi-cpu-fill text-primary"></i> Asisten Loewix AI sedang memformulasi strategi negosiasi & closing...
             </div>
             <div class="option-cards-grid">
                 <div class="answer-card">
                     <div class="d-flex align-items-center gap-2 text-primary fw-bold" style="font-size:13.5px;">
                         <div class="spinner-border spinner-border-sm" role="status"></div>
-                        <span>Menganalisis pertanyaan & memformulasi 3 opsi jawaban...</span>
+                        <span>Menganalisis situasi & menyusun 3 taktik negosiasi sales...</span>
                     </div>
                 </div>
             </div>
@@ -449,13 +449,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let html = `
             <div class="message-source">
-                <i class="bi bi-cpu-fill text-primary"></i> Asisten Loewix AI &nbsp;•&nbsp; 3 Variasi Jawaban Sales
+                <i class="bi bi-cpu-fill text-primary"></i> Asisten Loewix AI &nbsp;•&nbsp; 3 Taktik Negosiasi & Closing Sales
             </div>
             <div class="option-cards-grid">
         `;
 
         const badgeClasses = ['badge-opt1', 'badge-opt2', 'badge-opt3'];
-        const badgeTitles = ['Opsi 1 (Formal & Sopan)', 'Opsi 2 (Friendly & Proaktif)', 'Opsi 3 (Solutif & Ringkas)'];
+        const badgeTitles = ['Opsi 1 (Penawaran Value & Closing)', 'Opsi 2 (Teknik Negosiasi & Bonus Value)', 'Opsi 3 (Strategi Upselling & Offer Upgrade)'];
 
         answers.forEach((answerText, idx) => {
             const bClass = badgeClasses[idx % 3];

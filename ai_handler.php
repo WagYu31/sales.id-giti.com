@@ -1,7 +1,7 @@
 <?php
 /**
  * Asisten Sales Loewix AI Handler Engine
- * Multi-Model Fallback & Smart Sales Template Backup
+ * Elite Negotiation & Product Upselling Coach for Sales Representatives
  */
 
 ini_set('display_errors', 0);
@@ -16,23 +16,34 @@ $customerQuestion = trim($input['question'] ?? '');
 
 if (empty($customerQuestion)) {
     echo json_encode(['answers' => [
-        "Halo Kak! Terima kasih sudah menghubungi Sales Loewix CCTV. Ada yang bisa kami bantu terkait kebutuhan keamanan hari ini?",
-        "Halo Kak! Salam hangat dari Loewix CCTV. Apakah ada tipe kamera atau lokasi pemasangan yang ingin dikonsultasikan?",
-        "Halo Kak! Kami siap membantu memberikan info produk & rekomendasi paket CCTV Loewix terbaik. Silakan informasikan kebutuhannya ya Kak."
+        "Halo Kak! Terima kasih sudah menghubungi Sales Loewix CCTV. Ada kebutuhan kamera keamanan atau spesifikasi area yang ingin dikonsultasikan hari ini?",
+        "Halo Kak! Salam hangat dari Loewix CCTV Indonesia. Kami menyediakan solusi paket CCTV siap pakai dari paket ekonomis hingga sistem IP Camera 4K pintar. Mau kami rekomendasikan paket terbaik?",
+        "Halo Kak! Siap membantu konsultasi & estimasi biaya pemasangan CCTV Loewix. Silakan informasikan lokasi & jumlah titik kamera yang dibutuhkan ya Kak."
     ]]);
     exit;
 }
 
-$prompt = "Anda adalah asisten sales profesional Loewix CCTV Indonesia.
-Berdasarkan pertanyaan dari customer berikut, berikan 3 opsi cara menjawab yang berbeda, ramah, profesional, dan mudah dipahami.
+$prompt = "Anda adalah Senior Sales Director & Expert Negotiation Coach untuk merek CCTV terkemuka 'Loewix CCTV Indonesia'. 
+Tugas Anda adalah melatih dan memberikan 3 strategi & respons siap pakai untuk tim Sales Loewix dalam menghadapi customer, mengatasi penolakan (handling objections), melakukan negosiasi harga, dan menawarkan produk unggulan/upselling.
 
-Pertanyaan Customer: \"{$customerQuestion}\"
+Konteks Pertanyaan / Keluhan / Situasi Customer: \"{$customerQuestion}\"
 
-Tugas Anda:
-1. Buat 3 (tiga) variasi jawaban unik dari sudut pandang sales resmi Loewix CCTV.
-2. Setiap jawaban maksimal 3 kalimat, sopan, ramah, tidak kaku (seperti manusia sungguhan bukan AI).
-3. Kembalikan HANYA format JSON valid tanpa tanda backtick markdown seperti ini:
-{\"answers\": [\"Opsi 1...\", \"Opsi 2...\", \"Opsi 3...\"]}";
+Berikan 3 variasi respons taktis yang dapat langsung dikirimkan Sales ke WhatsApp Customer:
+
+1. Opsi 1 (Penawaran Value & Closing Persuasif):
+   Fokus menonjolkan value produk Loewix (sensor chipset HD, garansi resmi ganti baru, fitur Full Color Night Vision) daripada sekadar memotong harga. Ramah, meyakinkan, dan mendorong closing.
+
+2. Opsi 2 (Teknik Negosiasi & Handling Objection):
+   Fokus meredam keberatan customer (seperti minta diskon besar / merek lain lebih murah) dengan menawarkan bonus value (bebas biaya setting / bonus kabel / paket promo) agar margin sales tetap terjaga.
+
+3. Opsi 3 (Strategi Upselling & Penawaran Produk Unggulan):
+   Fokus menawarkan upgrade unit/paket yang lebih tinggi (seperti upgrade ke IP Camera 4K, Smart AI Motion Detection, atau Harddisk lebih besar) dengan argumen investasi jangka panjang.
+
+Aturan Penulisan:
+- Gunakan bahasa sales profesional khas Indonesia yang ramah, sopan, persuasif, dan alami (seperti obrolan WhatsApp sales ahli, BUKAN seperti robot/AI).
+- Maksimal 3-4 kalimat per opsi.
+- Kembalikan HANYA format JSON valid tanpa tanda markdown:
+{\"answers\": [\"(Opsi 1...)\", \"(Opsi 2...)\", \"(Opsi 3...)\"]}";
 
 // Models to attempt in sequence across v1beta API endpoints
 $modelsToTry = [
@@ -78,33 +89,33 @@ foreach ($modelsToTry as $modelName) {
     }
 }
 
-// Fallback to Smart Loewix Contextual Sales Engine if Google API is rate limited
+// Fallback to Loewix Negotiation & Product Offering Engine if API is rate limited
 if (empty($answers)) {
     $q = mb_strtolower($customerQuestion);
     
-    if (strpos($q, 'harga') !== false || strpos($q, 'berapa') !== false || strpos($q, 'biaya') !== false || strpos($q, 'paket') !== false || strpos($q, 'murah') !== false) {
+    if (strpos($q, 'diskon') !== false || strpos($q, 'kurang') !== false || strpos($q, 'mahal') !== false || strpos($q, 'potong') !== false) {
         $answers = [
-            "Halo Kak! Untuk estimasi harga & paket CCTV Loewix terbaru sangat bervariasi sesuai jumlah channel & resolusi kamera. Kakak mau untuk area rumah atau tempat usaha/toko?",
-            "Halo Kak! Kami menyediakan promo paket CCTV Loewix siap pakai (lengkap DVR + Harddisk + Kabel & Pemasangan). Boleh tahu rencana pemasangan di kota mana Kak?",
-            "Halo Kak! Paket CCTV Loewix kami mulai dari paket ekonomis hingga resolusi ultra HD/IP Camera. Kami kirimkan brosur price list lengkapnya ke WA Kakak ya?"
+            "Halo Kak! Untuk harga paket CCTV Loewix ini sudah merupakan harga promo terbaik dengan garansi ganti baru resmi 1 tahun. Agar lebih hemat, mohon izin kami berikan bonus gratis kabel & jaminan free setting online ya Kak!",
+            "Halo Kak! Kami paham budget sangat penting. Khusus transaksi minggu ini, jika Kakak ambil paket 4 Kamera Loewix, kami berikan potongan khusus pendaftaran member installer + bonus kabel HDMI gratis Kak!",
+            "Halo Kak! Daripada ambil spesifikasi standar, kami sangat sarankan paket Loewix Full Color Night Vision ini karena hasil rekaman malam harinya tetap berwarna terang. Investasi jangka panjangnya jauh lebih menguntungkan Kak."
         ];
-    } elseif (strpos($q, 'garansi') !== false || strpos($q, 'rusak') !== false || strpos($q, 'klaim') !== false || strpos($q, 'service') !== false || strpos($q, 'mati') !== false) {
+    } elseif (strpos($q, 'merek') !== false || strpos($q, 'sebelah') !== false || strpos($q, 'lain') !== false || strpos($q, 'banding') !== false) {
         $answers = [
-            "Halo Kak! Seluruh produk CCTV Loewix dilengkapi Garansi Resmi. Kakak bisa membawa unit ke Service Center resmi kami atau mengontak tim support kami dengan menyertakan nomor serial/nota.",
-            "Halo Kak! Jangan khawatir, garansi produk Loewix dijamin aman. Mohon infokan kendala atau nomor nota pembelian agar kami bantu koordinasikan dengan tim teknisi kami.",
-            "Halo Kak! Kami siap membantu proses klaim garansi produk Loewix Kakak. Silakan infokan nomor invoice atau foto serial number di stiker DVR/kamera ya Kak."
+            "Halo Kak! Loewix CCTV mengunggulkan kualitas sensor chipset terbaru dengan daya tahan cuaca ekstrem dan garansi replace ganti baru tanpa ribet. Kualitas rekaman kami jauh lebih jernih di kelasnya Kak.",
+            "Halo Kak! Merek lain mungkin menawarkan harga sedikit di bawah, namun Loewix memberikan layanan purna jual Service Center resmi dan gratis aplikasi pemantauan HP selamanya tanpa biaya langganan bulanan.",
+            "Halo Kak! Jika dibandingkan spesifikasinya, Loewix sudah dilengkapi fitur Smart Human Motion Detection yang mengurangi salah alarm hingga 95%. Sangat disarankan untuk keamanan maksimal tempat usaha Kakak."
         ];
-    } elseif (strpos($q, 'halo') !== false || strpos($q, 'hai') !== false || strpos($q, 'pagi') !== false || strpos($q, 'siang') !== false || strpos($q, 'sore') !== false || strpos($q, 'malam') !== false) {
+    } elseif (strpos($q, 'paket') !== false || strpos($q, 'rekomendasi') !== false || strpos($q, 'toko') !== false || strpos($q, 'rumah') !== false) {
         $answers = [
-            "Halo Kak! Terima kasih sudah menghubungi Sales Loewix CCTV. Ada yang bisa kami bantu terkait kebutuhan kamera keamanan Kakak hari ini?",
-            "Halo Kak! Salam hangat dari Loewix CCTV Indonesia. Apakah ada tipe kamera atau paket CCTV yang ingin dikonsultasikan?",
-            "Halo Kak! Kami siap membantu memberikan informasi produk & rekomendasi paket CCTV Loewix terbaik sesuai budget Kakak."
+            "Halo Kak! Untuk ruko/toko, kami rekomendasikan Paket Loewix 4 Kamera Full Color 2MP (lengkap DVR + Harddisk 1TB + Power Supply). Gambar tetap berwarna jernih meski kondisi malam gelap gulita!",
+            "Halo Kak! Jika ingin hasil rekaman ekstra tajam yang bisa zoom plat nomor kendaraan, kami sarankan Upgrade ke Paket IP Camera Loewix 4K 5MP. Kualitas rekamannya sangat detail dan tahan lama.",
+            "Halo Kak! Kami menyediakan paket custom sesuai titik lokasi. Boleh kami kirimkan brosur perbandingan Paket Analog HD vs Paket IP Camera Loewix ke WhatsApp Kakak?"
         ];
     } else {
         $answers = [
-            "Halo Kak! Terima kasih pertanyaannya. Mengenai '" . htmlspecialchars($customerQuestion) . "', kami siap berikan informasi & konsultasi lengkap produk Loewix terbaik untuk Kakak.",
-            "Halo Kak! Salam dari Sales Loewix. Untuk kebutuhan '" . htmlspecialchars($customerQuestion) . "', tim kami bisa rekomendasikan spesifikasi unit yang paling cocok dan efisien untuk Kakak.",
-            "Halo Kak! Mohon izin bantu rekomendasikan. Agar jawabannya lebih akurat, apakah Kakak butuh CCTV indoor/outdoor atau tipe IP Camera nirkabel?"
+            "Halo Kak! Mengenai '" . htmlspecialchars($customerQuestion) . "', kami siap berikan penawaran harga terbaik serta garansi resmi ganti baru khusus pemesanan hari ini.",
+            "Halo Kak! Untuk kebutuhan '" . htmlspecialchars($customerQuestion) . "', kami bisa sertakan bonus pemasangan & free konfig pemantauan HP agar Kakak tinggal terima beres.",
+            "Halo Kak! Kami sarankan ambil tipe Loewix IP Camera Series untuk '" . htmlspecialchars($customerQuestion) . "' agar hasil rekaman lebih jernih dan dapat dipantau dari mana saja secara realtime."
         ];
     }
 }
