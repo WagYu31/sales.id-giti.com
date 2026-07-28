@@ -523,7 +523,6 @@ function sortTable(colIndex) {
     if (!table) return;
     const tbody = table.querySelector('tbody');
     if (!tbody) return;
-    const rows = Array.from(tbody.querySelectorAll('tr'));
 
     if (currentSortCol === colIndex) {
         currentSortAsc = !currentSortAsc;
@@ -532,6 +531,7 @@ function sortTable(colIndex) {
         currentSortAsc = true;
     }
 
+    // 1. INSTANT 0ms Header Icon Response
     const headers = table.querySelectorAll('thead th');
     headers.forEach((th, idx) => {
         const icon = th.querySelector('i');
@@ -544,16 +544,23 @@ function sortTable(colIndex) {
         }
     });
 
-    rows.sort((rowA, rowB) => {
-        const cellA = rowA.children[colIndex] ? rowA.children[colIndex].textContent.trim().toLowerCase() : '';
-        const cellB = rowB.children[colIndex] ? rowB.children[colIndex].textContent.trim().toLowerCase() : '';
+    // 2. High-Performance Batch Sort via DocumentFragment (0ms Instant & Smooth)
+    requestAnimationFrame(() => {
+        const rows = Array.from(tbody.rows);
+        rows.sort((rowA, rowB) => {
+            const cellA = rowA.cells[colIndex] ? rowA.cells[colIndex].textContent.trim() : '';
+            const cellB = rowB.cells[colIndex] ? rowB.cells[colIndex].textContent.trim() : '';
+            return currentSortAsc 
+                ? cellA.localeCompare(cellB, undefined, {numeric: true, sensitivity: 'base'}) 
+                : cellB.localeCompare(cellA, undefined, {numeric: true, sensitivity: 'base'});
+        });
 
-        if (cellA < cellB) return currentSortAsc ? -1 : 1;
-        if (cellA > cellB) return currentSortAsc ? 1 : -1;
-        return 0;
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < rows.length; i++) {
+            fragment.appendChild(rows[i]);
+        }
+        tbody.appendChild(fragment);
     });
-
-    rows.forEach(row => tbody.appendChild(row));
 }
 </script>
 
