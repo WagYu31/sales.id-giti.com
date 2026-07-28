@@ -812,6 +812,56 @@ body {
 }
 
 
+/* ============ ISO 9241-303 & WCAG 2.1 AAA HIGH CONTRAST TEXT STANDARDS ============ */
+.text-slate, .form-label, label, .text-muted.fw-bold {
+    color: #0F172A !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+
+[data-theme="crimson-velvet"] .text-slate,
+[data-theme="hyperion-gold"] .text-slate,
+[data-theme="obsidian-diamond"] .text-slate,
+[data-theme="cyber-dark"] .text-slate,
+[data-theme="crimson-velvet"] .form-label,
+[data-theme="hyperion-gold"] .form-label,
+[data-theme="obsidian-diamond"] .form-label,
+[data-theme="cyber-dark"] .form-label,
+[data-theme="crimson-velvet"] label,
+[data-theme="hyperion-gold"] label,
+[data-theme="obsidian-diamond"] label,
+[data-theme="cyber-dark"] label,
+[data-theme="crimson-velvet"] .text-muted,
+[data-theme="hyperion-gold"] .text-muted,
+[data-theme="obsidian-diamond"] .text-muted,
+[data-theme="cyber-dark"] .text-muted {
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Card Header & Footer Dark Theme ISO Compliance */
+[data-theme="crimson-velvet"] .card-header,
+[data-theme="hyperion-gold"] .card-header,
+[data-theme="obsidian-diamond"] .card-header,
+[data-theme="cyber-dark"] .card-header {
+    background-color: transparent !important;
+    border-bottom-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="crimson-velvet"] .card-header h5,
+[data-theme="hyperion-gold"] .card-header h5,
+[data-theme="obsidian-diamond"] .card-header h5,
+[data-theme="cyber-dark"] .card-header h5,
+[data-theme="crimson-velvet"] .card-footer,
+[data-theme="hyperion-gold"] .card-footer,
+[data-theme="obsidian-diamond"] .card-footer,
+[data-theme="cyber-dark"] .card-footer {
+    color: #FFFFFF !important;
+}
+
+
 /* ============ DYNAMIC SIDEBAR COLOR PRESETS ============ */
 
 /* 1. RICH VIBRANT GOLDEN YELLOW SIDEBAR (#FACC15 / #EAB308) */
