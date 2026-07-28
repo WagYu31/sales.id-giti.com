@@ -238,14 +238,38 @@ if ($_SESSION['role'] !== 'sales') {
             <!-- Filter Kota -->
             <div class="col-lg-3 col-md-6 col-12">
                 <label for="filter_kota" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
-                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> Filter Kota
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> Filter Kota / Daerah
                 </label>
-                <input list="kota_list" name="filter_kota" id="filter_kota" class="form-control fw-semibold" placeholder="Pilih atau ketik kota..." value="<?php echo htmlspecialchars($filter_kota); ?>" style="border-radius:12px; height:42px;">
-                <datalist id="kota_list">
-                    <?php foreach ($cities as $city): ?>
-                        <option value="<?php echo htmlspecialchars($city); ?>">
-                    <?php endforeach; ?>
-                </datalist>
+                <select name="filter_kota" id="filter_kota" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                    <option value="">Semua Daerah / Kota</option>
+                    <optgroup label="📍 REGION & PROVINSI UTAMA">
+                        <option value="Jawa Barat" <?php if ($filter_kota === 'Jawa Barat') echo 'selected'; ?>>🏞️ Jawa Barat</option>
+                        <option value="Jawa Tengah" <?php if ($filter_kota === 'Jawa Tengah') echo 'selected'; ?>>🏯 Jawa Tengah</option>
+                        <option value="Jawa Timur" <?php if ($filter_kota === 'Jawa Timur') echo 'selected'; ?>>🌊 Jawa Timur</option>
+                        <option value="Jakarta Timur" <?php if ($filter_kota === 'Jakarta Timur') echo 'selected'; ?>>📍 Jakarta Timur</option>
+                        <option value="Jakarta Barat" <?php if ($filter_kota === 'Jakarta Barat') echo 'selected'; ?>>📍 Jakarta Barat</option>
+                        <option value="Jakarta Selatan" <?php if ($filter_kota === 'Jakarta Selatan') echo 'selected'; ?>>📍 Jakarta Selatan</option>
+                        <option value="Jakarta Utara" <?php if ($filter_kota === 'Jakarta Utara') echo 'selected'; ?>>📍 Jakarta Utara</option>
+                        <option value="Jakarta Pusat" <?php if ($filter_kota === 'Jakarta Pusat') echo 'selected'; ?>>📍 Jakarta Pusat</option>
+                        <option value="Jakarta" <?php if ($filter_kota === 'Jakarta') echo 'selected'; ?>>🏢 DKI Jakarta (Semua)</option>
+                        <option value="Banten" <?php if ($filter_kota === 'Banten') echo 'selected'; ?>>🏙️ Banten</option>
+                        <option value="Yogyakarta" <?php if ($filter_kota === 'Yogyakarta') echo 'selected'; ?>>🏰 DI Yogyakarta</option>
+                        <option value="Sumatera Utara" <?php if ($filter_kota === 'Sumatera Utara') echo 'selected'; ?>>🌲 Sumatera Utara</option>
+                        <option value="Sumatera Selatan" <?php if ($filter_kota === 'Sumatera Selatan') echo 'selected'; ?>>🌴 Sumatera Selatan</option>
+                        <option value="Riau" <?php if ($filter_kota === 'Riau') echo 'selected'; ?>>🌴 Riau & Kep. Riau</option>
+                        <option value="Lampung" <?php if ($filter_kota === 'Lampung') echo 'selected'; ?>>🐘 Lampung</option>
+                        <option value="Bali" <?php if ($filter_kota === 'Bali') echo 'selected'; ?>>🏝️ Bali & Nusa Tenggara</option>
+                        <option value="Kalimantan" <?php if ($filter_kota === 'Kalimantan') echo 'selected'; ?>>🌲 Kalimantan</option>
+                        <option value="Sulawesi" <?php if ($filter_kota === 'Sulawesi') echo 'selected'; ?>>🏝️ Sulawesi</option>
+                    </optgroup>
+                    <optgroup label="🏙️ DAFTAR KOTA SPESIFIK">
+                        <?php foreach ($cities as $city): ?>
+                            <option value="<?php echo htmlspecialchars($city); ?>" <?php if ($filter_kota === $city) echo 'selected'; ?>>
+                                🏙️ <?php echo htmlspecialchars($city); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                </select>
             </div>
 
             <!-- Filter Kategori -->
@@ -531,5 +555,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    if ($.fn.select2) {
+        $('#filter_kota, #filter_kategori, #filter_sales, #limit').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownAutoWidth: true
+        });
+    }
 });
 </script>
