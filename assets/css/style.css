@@ -1396,3 +1396,59 @@ label {
         border-color: rgba(255,255,255,0.2) !important;
     }
 }
+
+
+/* ============ DRAG & DROP UPLOAD ZONE CARDS ============ */
+.drop-zone-box {
+    border: 2px dashed #CBD5E1;
+    border-radius: 18px;
+    padding: 24px 16px;
+    text-align: center;
+    background: rgba(248, 250, 252, 0.8);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.drop-zone-box:hover,
+.drop-zone-box.dragover {
+    border-color: #2563EB !important;
+    background: rgba(37, 99, 235, 0.06) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15) !important;
+}
+
+.drop-zone-box.border-danger {
+    border-color: #FCA5A5 !important;
+    background: rgba(254, 242, 242, 0.6);
+}
+
+.drop-zone-box.border-danger:hover,
+.drop-zone-box.border-danger.dragover {
+    border-color: #EF4444 !important;
+    background: rgba(239, 68, 68, 0.08) !important;
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.15) !important;
+}
+
+.drop-zone-box.has-file {
+    border-style: solid !important;
+    border-color: #10B981 !important;
+    background: rgba(16, 185, 129, 0.08) !important;
+}
+
+/* Dark Mode Overrides for Drag & Drop Zones */
+[data-theme="crimson-velvet"] .drop-zone-box,
+[data-theme="hyperion-gold"] .drop-zone-box,
+[data-theme="obsidian-diamond"] .drop-zone-box,
+[data-theme="cyber-dark"] .drop-zone-box {
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+}
+
+[data-theme="crimson-velvet"] .drop-zone-box .text-dark,
+[data-theme="hyperion-gold"] .drop-zone-box .text-dark,
+[data-theme="obsidian-diamond"] .drop-zone-box .text-dark,
+[data-theme="cyber-dark"] .drop-zone-box .text-dark {
+    color: #FFFFFF !important;
+}

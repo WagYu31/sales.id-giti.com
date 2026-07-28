@@ -219,24 +219,51 @@ $file_accept_types = "image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx";
                 <input type="text" class="form-control" id="no_inv" name="no_inv" placeholder="Masukkan nomor invoice jika ada">
             </div>
 
-            <!-- Upload Media 1, 2, 3 -->
+            <!-- Upload Media 1, 2, 3 (Interactive Drag & Drop Upload Zone) -->
             <div class="row mb-4">
+                <!-- Media 1 (Wajib Upload) -->
                 <div class="col-md-4 mb-3 mb-md-0">
-                    <label for="media1" class="form-label fw-bold text-danger">
-                        <i class="bi bi-chat-left-text-fill me-1"></i> Bukti Chat / Screenshot WA (Media 1) <span class="badge bg-danger ms-1">WAJIB UPLOAD</span>
+                    <label class="form-label fw-bold text-danger d-flex align-items-center justify-content-between mb-2">
+                        <span><i class="bi bi-chat-left-text-fill me-1"></i> Bukti Chat WA (Media 1)</span>
+                        <span class="badge bg-danger">WAJIB UPLOAD</span>
                     </label>
-                    <input class="form-control border-danger border-2" type="file" id="media1" name="media1" accept="<?php echo $file_accept_types; ?>" required>
-                    <small style="font-size:11px;" class="text-danger fw-bold">*Wajib upload screenshot / foto bukti chat WA (Max 10MB)</small>
+                    <div class="drop-zone-box border-danger" id="dropZone1" onclick="document.getElementById('media1').click();">
+                        <input type="file" id="media1" name="media1" accept="<?php echo $file_accept_types; ?>" required style="display:none;" onchange="handleFileSelect(this, 'preview1', 'dropZone1')">
+                        <div class="drop-zone-content" id="preview1">
+                            <i class="bi bi-cloud-arrow-up-fill text-danger fs-1 mb-1"></i>
+                            <div class="fw-bold text-dark" style="font-size:13.5px;">Tarik & Lepas File Di Sini</div>
+                            <div class="text-muted" style="font-size:11.5px;">atau <span class="text-danger fw-bold">Klik untuk memilih file</span></div>
+                            <div class="text-danger fw-bold mt-1" style="font-size:10.5px;">*Wajib Upload Screenshot WA (Max 10MB)</div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Media 2 (Opsional) -->
                 <div class="col-md-4 mb-3 mb-md-0">
-                    <label for="media2" class="form-label fw-bold text-dark">Media 2 (Opsional)</label>
-                    <input class="form-control" type="file" id="media2" name="media2" accept="<?php echo $file_accept_types; ?>">
-                    <small style="font-size:11px;" class="text-muted">*Opsional (Max 10MB)</small>
+                    <label class="form-label fw-bold text-dark mb-2">Media 2 (Opsional)</label>
+                    <div class="drop-zone-box" id="dropZone2" onclick="document.getElementById('media2').click();">
+                        <input type="file" id="media2" name="media2" accept="<?php echo $file_accept_types; ?>" style="display:none;" onchange="handleFileSelect(this, 'preview2', 'dropZone2')">
+                        <div class="drop-zone-content" id="preview2">
+                            <i class="bi bi-cloud-arrow-up text-primary fs-1 mb-1"></i>
+                            <div class="fw-bold text-dark" style="font-size:13.5px;">Tarik & Lepas File Di Sini</div>
+                            <div class="text-muted" style="font-size:11.5px;">atau <span class="text-primary fw-bold">Klik untuk memilih file</span></div>
+                            <div class="text-muted mt-1" style="font-size:10.5px;">*Opsional (Max 10MB)</div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Media 3 (Opsional) -->
                 <div class="col-md-4">
-                    <label for="media3" class="form-label fw-bold text-dark">Media 3 (Opsional)</label>
-                    <input class="form-control" type="file" id="media3" name="media3" accept="<?php echo $file_accept_types; ?>">
-                    <small style="font-size:11px;" class="text-muted">*Opsional (Max 10MB)</small>
+                    <label class="form-label fw-bold text-dark mb-2">Media 3 (Opsional)</label>
+                    <div class="drop-zone-box" id="dropZone3" onclick="document.getElementById('media3').click();">
+                        <input type="file" id="media3" name="media3" accept="<?php echo $file_accept_types; ?>" style="display:none;" onchange="handleFileSelect(this, 'preview3', 'dropZone3')">
+                        <div class="drop-zone-content" id="preview3">
+                            <i class="bi bi-cloud-arrow-up text-primary fs-1 mb-1"></i>
+                            <div class="fw-bold text-dark" style="font-size:13.5px;">Tarik & Lepas File Di Sini</div>
+                            <div class="text-muted" style="font-size:11.5px;">atau <span class="text-primary fw-bold">Klik untuk memilih file</span></div>
+                            <div class="text-muted mt-1" style="font-size:10.5px;">*Opsional (Max 10MB)</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -249,6 +276,30 @@ $file_accept_types = "image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx";
 </div>
 
 <script>
+function handleFileSelect(input, previewId, zoneId) {
+    const previewEl = document.getElementById(previewId);
+    const zoneEl = document.getElementById(zoneId);
+    if (!previewEl || !zoneEl) return;
+
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        zoneEl.classList.add('has-file');
+
+        let iconClass = 'bi-file-earmark-check-fill text-success';
+        if (file.type.startsWith('image/')) iconClass = 'bi-file-earmark-image-fill text-success';
+        else if (file.type.startsWith('video/')) iconClass = 'bi-file-earmark-play-fill text-primary';
+        else if (file.type.includes('pdf')) iconClass = 'bi-file-earmark-pdf-fill text-danger';
+
+        previewEl.innerHTML = `
+            <i class="bi ${iconClass} fs-1 mb-1"></i>
+            <div class="fw-bold text-dark text-truncate px-2" style="font-size:13px;" title="${file.name}">${file.name}</div>
+            <div class="badge bg-success-subtle text-success fw-bold mt-1" style="font-size:11px;">✓ Selected (${fileSizeMB} MB)</div>
+            <div class="text-muted mt-1" style="font-size:10px;">Klik atau lepas file lain untuk mengganti</div>
+        `;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const responRadios = document.querySelectorAll('input[name="respon_radio"]');
     const lainnyaContainer = document.getElementById('respon_lainnya_container');
@@ -269,13 +320,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Drag & Drop Listeners Setup
+    ['dropZone1', 'dropZone2', 'dropZone3'].forEach((zoneId, idx) => {
+        const zone = document.getElementById(zoneId);
+        const input = document.getElementById('media' + (idx + 1));
+        const previewId = 'preview' + (idx + 1);
+        if (!zone || !input) return;
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            zone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            zone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('dragover');
+            }, false);
+        });
+
+        zone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files.length > 0) {
+                input.files = files;
+                handleFileSelect(input, previewId, zoneId);
+            }
+        }, false);
+    });
+
     if (fuForm && media1Input) {
         fuForm.addEventListener('submit', function(e) {
             if (!media1Input.files || media1Input.files.length === 0) {
                 e.preventDefault();
                 alert('❌ GAGAL SIMPAN: Anda WAJIB mengunggah Bukti Chat / Screenshot WA (Media 1) terlebih dahulu sebelum dapat menyimpan Follow Up!');
                 media1Input.focus();
-                media1Input.classList.add('is-invalid');
             }
         });
     }
