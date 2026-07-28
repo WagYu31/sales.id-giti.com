@@ -597,6 +597,15 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
             <div class="mc-btn-pill"><span>Buka Menu</span> <i class="bi bi-arrow-right"></i></div>
         </div>
     </a>
+
+    <a href="javascript:void(0)" onclick="if(document.getElementById('aiFloatingBtn')) document.getElementById('aiFloatingBtn').click();" class="mc-link animate-in">
+        <div class="mc">
+            <div class="mc-icon i-slate"><i class="bi bi-robot"></i></div>
+            <div class="mc-title">Asisten Loewix AI</div>
+            <div class="mc-desc">Konsultasi sales & taktik negosiasi realtime.</div>
+            <div class="mc-btn-pill"><span>Buka Chat AI</span> <i class="bi bi-arrow-right"></i></div>
+        </div>
+    </a>
 </div>
 
 <?php require_once 'includes/footer.php'; ?>
