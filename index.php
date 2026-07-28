@@ -334,10 +334,10 @@ if ($_SESSION['role'] !== 'sales') {
                     <?php if (!empty($customers)): ?>
                         <?php foreach ($customers as $customer): ?>
                         <tr id="customer-row-<?php echo $customer['id']; ?>">
-                            <td>
-                                <div class="fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif;">
-                                    <i class="bi bi-shop text-primary me-1"></i>
-                                    <?php echo htmlspecialchars($customer['nama_toko']); ?>
+                            <td style="font-family:'Plus Jakarta Sans', sans-serif;">
+                                <div class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size:13.5px; color:#0F172A; line-height:1.35;">
+                                    <i class="bi bi-shop text-primary me-1 flex-shrink-0" style="font-size:14px;"></i>
+                                    <span><?php echo htmlspecialchars($customer['nama_toko']); ?></span>
                                 </div>
                             </td>
                             <td>

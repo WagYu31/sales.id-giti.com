@@ -116,8 +116,8 @@ body {
 }
 
 .table tbody td {
-    padding: 16px 18px !important;
-    border-bottom: 1px solid #F1F5F9 !important;
+    padding: 11px 16px !important;
+    border-bottom: 1px solid #E2E8F0 !important;
     vertical-align: middle !important;
     font-size: 13.5px;
     color: #334155;
