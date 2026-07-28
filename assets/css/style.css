@@ -813,12 +813,13 @@ body {
 
 
 /* ============ ISO 9241-303 & WCAG 2.1 AAA HIGH CONTRAST TEXT STANDARDS ============ */
-.text-slate, .form-label, label, .text-muted.fw-bold {
+.text-slate, .form-label, label, .filter-card .text-muted, .card-header .text-muted {
     color: #0F172A !important;
     font-weight: 800 !important;
     opacity: 1 !important;
 }
 
+/* Dark & VIP Themes Outer Labels (Non-Table) */
 [data-theme="crimson-velvet"] .text-slate,
 [data-theme="hyperion-gold"] .text-slate,
 [data-theme="obsidian-diamond"] .text-slate,
@@ -831,14 +832,47 @@ body {
 [data-theme="hyperion-gold"] label,
 [data-theme="obsidian-diamond"] label,
 [data-theme="cyber-dark"] label,
-[data-theme="crimson-velvet"] .text-muted,
-[data-theme="hyperion-gold"] .text-muted,
-[data-theme="obsidian-diamond"] .text-muted,
-[data-theme="cyber-dark"] .text-muted {
+[data-theme="crimson-velvet"] .filter-card .text-muted,
+[data-theme="hyperion-gold"] .filter-card .text-muted,
+[data-theme="obsidian-diamond"] .filter-card .text-muted,
+[data-theme="cyber-dark"] .filter-card .text-muted,
+[data-theme="crimson-velvet"] .card-header .text-muted,
+[data-theme="hyperion-gold"] .card-header .text-muted,
+[data-theme="obsidian-diamond"] .card-header .text-muted,
+[data-theme="cyber-dark"] .card-header .text-muted {
     color: #FFFFFF !important;
     font-weight: 800 !important;
     opacity: 1 !important;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* TABLE CELL DYNAMIC HIGH CONTRAST (ISO 9241-303 GUARANTEE) */
+.table td,
+.table td span:not(.badge),
+.table td div:not(.badge) {
+    color: #0F172A !important;
+    font-weight: 600 !important;
+}
+
+.table td .text-muted,
+.table td small,
+.table td .text-secondary {
+    color: #334155 !important;
+    font-weight: 500 !important;
+    opacity: 1 !important;
+}
+
+/* Force crisp dark text inside white table cells across ALL dark/light themes */
+[data-theme] .table td,
+[data-theme] .table td span:not(.badge) {
+    color: #0F172A !important;
+}
+
+[data-theme] .table td .text-muted,
+[data-theme] .table td small,
+[data-theme] .table td .text-secondary {
+    color: #334155 !important;
+    opacity: 1 !important;
 }
 
 /* Card Header & Footer Dark Theme ISO Compliance */
