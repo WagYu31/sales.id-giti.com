@@ -193,15 +193,39 @@ if ($res_kat) {
                 </div>
             </div>
             
-            <!-- Filter Daerah / Kota -->
+            <!-- Filter Daerah / Provinsi -->
             <div class="col-lg-3 col-md-4 col-12">
                 <div class="input-group">
                     <span class="input-group-text bg-white" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-geo-alt-fill text-danger"></i></span>
                     <select id="filterKota" class="form-select fw-semibold" style="border-radius:0 12px 12px 0; height:42px;">
-                        <option value="">Semua Daerah / Kota</option>
-                        <?php foreach ($cities_list as $city): ?>
-                            <option value="<?php echo htmlspecialchars($city); ?>">📍 <?php echo htmlspecialchars($city); ?></option>
-                        <?php endforeach; ?>
+                        <option value="">Semua Daerah / Provinsi</option>
+                        
+                        <optgroup label="📍 REGION & PROVINSI UTAMA">
+                            <option value="prov_jabar">🏞️ Jawa Barat</option>
+                            <option value="prov_jateng">🌾 Jawa Tengah</option>
+                            <option value="prov_jatim">🌊 Jawa Timur</option>
+                            <option value="area_jaktim">📍 Jakarta Timur</option>
+                            <option value="area_jakbar">📍 Jakarta Barat</option>
+                            <option value="area_jaksel">📍 Jakarta Selatan</option>
+                            <option value="area_jakut">📍 Jakarta Utara</option>
+                            <option value="area_jakpus">📍 Jakarta Pusat</option>
+                            <option value="prov_dki">🏢 DKI Jakarta (Semua)</option>
+                            <option value="prov_banten">🏙️ Banten</option>
+                            <option value="prov_jogja">🌴 DI Yogyakarta</option>
+                            <option value="prov_sumut">🏔️ Sumatera Utara</option>
+                            <option value="prov_sumsel">🌴 Sumatera Selatan</option>
+                            <option value="prov_riau">🌊 Riau & Kep. Riau</option>
+                            <option value="prov_lampung">🌾 Lampung</option>
+                            <option value="prov_bali">🏖️ Bali & Nusa Tenggara</option>
+                            <option value="prov_kalimantan">🌲 Kalimantan</option>
+                            <option value="prov_sulawesi">🌺 Sulawesi</option>
+                        </optgroup>
+
+                        <optgroup label="🏙️ DAFTAR KOTA SPESIFIK">
+                            <?php foreach ($cities_list as $city): ?>
+                                <option value="city_<?php echo htmlspecialchars($city); ?>">🏙️ <?php echo htmlspecialchars($city); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
                     </select>
                 </div>
             </div>
@@ -339,21 +363,69 @@ $(document).ready(function() {
         setTimeout(() => notif.alert('close'), 3000);
     }
 
+    const REGION_MAP = {
+        'area_jakbar': ['jakarta barat', 'jakbar'],
+        'area_jaktim': ['jakarta timur', 'jaktim'],
+        'area_jaksel': ['jakarta selatan', 'jaksel'],
+        'area_jakut': ['jakarta utara', 'jakut'],
+        'area_jakpus': ['jakarta pusat', 'jakpus'],
+        'prov_dki': ['jakarta', 'dki'],
+        'prov_jabar': [
+            'jawa barat', 'jabar', 'bekasi', 'bogor', 'depok', 'bandung', 'cirebon', 
+            'karawang', 'sukabumi', 'tasikmalaya', 'garut', 'cianjur', 'indramayu', 
+            'subang', 'majalengka', 'sumedang', 'purwakarta', 'cimahi', 'banjar'
+        ],
+        'prov_jateng': [
+            'jawa tengah', 'jateng', 'semarang', 'solo', 'surakarta', 'kendal', 'magelang', 
+            'tegal', 'kudus', 'purwokerto', 'banyumas', 'klaten', 'pati', 'jepara', 
+            'pekalongan', 'cilacap', 'boyolali', 'sragen', 'wonogiri', 'brebes', 
+            'salatiga', 'rembang', 'blora', 'demak', 'grobogan', 'temanggung', 'wonosobo'
+        ],
+        'prov_jatim': [
+            'jawa timur', 'jatim', 'surabaya', 'malang', 'sidoarjo', 'gresik', 'kediri', 
+            'jember', 'banyuwangi', 'pasuruan', 'mojokerto', 'madiun', 'probolinggo', 
+            'tuban', 'lamongan', 'blitar', 'batu', 'lumajang', 'bondowoso', 'situbondo', 
+            'ponorogo', 'pacitan', 'trenggalek', 'tulungagung', 'nganjuk', 'jombang', 
+            'bangkalan', 'sampang', 'pamekasan', 'sumenep'
+        ],
+        'prov_banten': ['banten', 'tangerang', 'serang', 'cilegon', 'pandeglang', 'lebak'],
+        'prov_jogja': ['yogyakarta', 'jogja', 'sleman', 'bantul', 'gunungkidul', 'kulon progo'],
+        'prov_sumut': ['sumatera utara', 'sumut', 'medan', 'padangsidimpuan', 'labuhanbatu', 'labuhan batu', 'deli serdang', 'pematangsiantar'],
+        'prov_sumsel': ['sumatera selatan', 'sumsel', 'palembang', 'lubuklinggau', 'prabumulih'],
+        'prov_riau': ['riau', 'pekanbaru', 'batam', 'dumai'],
+        'prov_lampung': ['lampung', 'bandar lampung', 'metro'],
+        'prov_bali': ['bali', 'denpasar', 'badung', 'mataram', 'lombok'],
+        'prov_kalimantan': ['kalimantan', 'pontianak', 'samarinda', 'balikpapan', 'banjarmasin', 'palangkaraya'],
+        'prov_sulawesi': ['sulawesi', 'makassar', 'manado', 'palu', 'kendari', 'gorontalo']
+    };
+
     function applyAssignmentFilters() {
         $('#selectAll').prop('checked', false);
         const searchVal = $('#searchInput').val().toLowerCase().trim();
-        const kotaVal = $('#filterKota').val().toLowerCase().trim();
+        const filterKotaVal = $('#filterKota').val();
         const katVal = $('#filterKategori').val().toLowerCase().trim();
         const salesStatusVal = $('#filterSalesStatus').val();
 
         $('#assignmentTable tbody tr').each(function() {
             const rowText = $(this).text().toLowerCase();
             const rowKota = ($(this).attr('data-kota') || '').toString().toLowerCase();
+            const rowAlamat = ($(this).find('td:nth-child(6)').text() || '').toString().toLowerCase();
             const rowKat = ($(this).attr('data-kategori') || '').toString().toLowerCase();
             const salesId = ($(this).attr('data-sales-id') || '').toString();
 
             const matchSearch = !searchVal || rowText.includes(searchVal);
-            const matchKota = !kotaVal || rowKota.includes(kotaVal);
+
+            let matchKota = true;
+            if (filterKotaVal) {
+                if (filterKotaVal.startsWith('city_')) {
+                    const targetCity = filterKotaVal.replace('city_', '').toLowerCase();
+                    matchKota = rowKota.includes(targetCity) || rowAlamat.includes(targetCity);
+                } else if (REGION_MAP[filterKotaVal]) {
+                    const keywords = REGION_MAP[filterKotaVal];
+                    matchKota = keywords.some(kw => rowKota.includes(kw) || rowAlamat.includes(kw));
+                }
+            }
+
             const matchKat = !katVal || rowKat === katVal;
 
             let matchSales = true;
