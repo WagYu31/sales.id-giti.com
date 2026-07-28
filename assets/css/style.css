@@ -1135,6 +1135,31 @@ body {
     background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
 }
 
+/* ============ MINIMALIST NETWORK SPEED PULSE DOT ============ */
+.network-dot-pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.network-dot-pulse.fast {
+    background-color: #10B981;
+    box-shadow: 0 0 8px #10B981;
+}
+
+.network-dot-pulse.medium {
+    background-color: #F59E0B;
+    box-shadow: 0 0 8px #F59E0B;
+}
+
+.network-dot-pulse.slow,
+.network-dot-pulse.offline {
+    background-color: #EF4444;
+    box-shadow: 0 0 8px #EF4444;
+}
+
 
 /* ============ DYNAMIC SIDEBAR COLOR PRESETS ============ */
 

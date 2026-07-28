@@ -569,6 +569,12 @@ table tr td { font-size: 0.85em; }
                 <span style="color:#CBD5E1;">|</span>
                 <i class="bi bi-clock-fill text-primary"></i>
                 <span class="topbar-time fw-bold text-primary" id="liveTime">--:--</span>
+                <span style="color:#CBD5E1;">|</span>
+                <div class="d-inline-flex align-items-center gap-1.5" id="netSpeedContainer" title="Status & Kecepatan Jaringan Realtime">
+                    <span class="network-dot-pulse fast" id="netDot"></span>
+                    <i class="bi bi-wifi text-success" id="netIcon" style="font-size:12px;"></i>
+                    <span class="fw-bold text-dark" id="netSpeedText" style="font-size:12px; font-family:'Plus Jakarta Sans', sans-serif;">-- ms</span>
+                </div>
             </div>
         </div>
         <div class="topbar-actions">
@@ -911,6 +917,65 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     updateDateTime();
     setInterval(updateDateTime, 1000);
+
+    // Realtime Minimalist Network Speed Monitor
+    function checkNetworkSpeed() {
+        const startTime = performance.now();
+        fetch('assets/css/style.css?ping=' + Date.now(), { method: 'HEAD', cache: 'no-store' })
+            .then(res => {
+                const latency = Math.round(performance.now() - startTime);
+                updateNetUI(latency, true);
+            })
+            .catch(() => {
+                updateNetUI(0, false);
+            });
+    }
+
+    function updateNetUI(latency, isOnline) {
+        const netIcon = document.getElementById('netIcon');
+        const netText = document.getElementById('netSpeedText');
+        const netDot = document.getElementById('netDot');
+        if (!netText || !netDot) return;
+
+        if (!isOnline || !navigator.onLine) {
+            netDot.className = 'network-dot-pulse offline';
+            if (netIcon) netIcon.className = 'bi bi-wifi-off text-danger';
+            netText.textContent = 'Offline';
+            netText.className = 'fw-bold text-danger';
+            return;
+        }
+
+        let speedInfo = latency + ' ms';
+        let connInfo = '';
+        if (navigator.connection && navigator.connection.downlink) {
+            connInfo = ' (' + navigator.connection.downlink + ' Mbps)';
+        }
+
+        if (latency < 120) {
+            netDot.className = 'network-dot-pulse fast';
+            if (netIcon) netIcon.className = 'bi bi-wifi text-success';
+            netText.className = 'fw-bold text-success';
+            netText.textContent = speedInfo;
+            netText.title = 'Koneksi Sangat Cepat & Stabil' + connInfo;
+        } else if (latency < 350) {
+            netDot.className = 'network-dot-pulse medium';
+            if (netIcon) netIcon.className = 'bi bi-wifi text-warning';
+            netText.className = 'fw-bold text-warning';
+            netText.textContent = speedInfo;
+            netText.title = 'Koneksi Cukup Stabil' + connInfo;
+        } else {
+            netDot.className = 'network-dot-pulse slow';
+            if (netIcon) netIcon.className = 'bi bi-wifi text-danger';
+            netText.className = 'fw-bold text-danger';
+            netText.textContent = speedInfo;
+            netText.title = 'Koneksi Lambat' + connInfo;
+        }
+    }
+
+    checkNetworkSpeed();
+    setInterval(checkNetworkSpeed, 4000);
+    window.addEventListener('online', checkNetworkSpeed);
+    window.addEventListener('offline', checkNetworkSpeed);
 });
 
 function setAppTheme(themeVal) {
