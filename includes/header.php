@@ -43,6 +43,14 @@ $total_notif_count = $notif_pending_fu + $notif_kandidat + $notif_maintenance;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title ?? 'Dashboard'; ?> — Loewix Sales</title>
+    <script>
+    (function() {
+        var savedTheme = localStorage.getItem('loewix_theme');
+        if (savedTheme && savedTheme !== 'default') {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+    })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -551,6 +559,64 @@ table tr td { font-size: 0.85em; }
             </div>
         </div>
         <div class="topbar-actions">
+            <!-- Theme Switcher Dropdown -->
+            <div class="dropdown position-relative me-1">
+                <button class="topbar-btn border-0 shadow-sm d-flex align-items-center justify-content-center" type="button" id="themeDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Ganti Mode Tema & Warna UI" style="outline:none; position:relative; background:#FFFFFF; border:1px solid #E2E8F0; width:42px; height:42px; border-radius:12px; transition:all 0.2s ease;">
+                    <i class="bi bi-palette-fill text-primary" style="font-size:18px;"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="themeDropdown" style="width: 280px; border-radius: 18px; border: 1px solid #E2E8F0; padding: 12px; overflow: hidden; margin-top: 10px;">
+                    <li class="px-2 py-1 mb-2 border-bottom pb-2 d-flex align-items-center justify-content-between">
+                        <span class="fw-extrabold text-dark" style="font-size:13px; font-family:'Plus Jakarta Sans', sans-serif;"><i class="bi bi-palette2 me-1.5 text-primary"></i>Pilih Tema UI</span>
+                        <span class="badge bg-primary-subtle text-primary fw-bold" style="font-size:10px;">5 Preset</span>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('default')">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #0F172A, #2563EB); display:inline-block; border:1px solid rgba(0,0,0,0.1);"></span>
+                                <span class="fw-bold" style="font-size:12.5px;">Royal Sapphire</span>
+                            </div>
+                            <span class="badge bg-light text-muted border font-monospace" style="font-size:10px;">Default</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('cyber-dark')">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #0B0F19, #3B82F6); display:inline-block; border:1px solid rgba(255,255,255,0.2);"></span>
+                                <span class="fw-bold" style="font-size:12.5px;">Cyber Executive</span>
+                            </div>
+                            <span class="badge bg-dark text-white border border-secondary font-monospace" style="font-size:10px;">Dark Mode</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('emerald-luxury')">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #064E3B, #10B981); display:inline-block; border:1px solid rgba(0,0,0,0.1);"></span>
+                                <span class="fw-bold" style="font-size:12.5px;">Emerald Luxury</span>
+                            </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace" style="font-size:10px;">Forest Teal</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('royal-nebula')">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #311042, #7C3AED); display:inline-block; border:1px solid rgba(0,0,0,0.1);"></span>
+                                <span class="fw-bold" style="font-size:12.5px;">Royal Nebula</span>
+                            </div>
+                            <span class="badge bg-purple-subtle text-purple border font-monospace" style="font-size:10px; background:#F3E8FF; color:#6B21A8;">Violet Purple</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between" onclick="setAppTheme('sunset-amber')">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #451A03, #EA580C); display:inline-block; border:1px solid rgba(0,0,0,0.1);"></span>
+                                <span class="fw-bold" style="font-size:12.5px;">Sunset Amber</span>
+                            </div>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace" style="font-size:10px;">Warm Gold</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
             <!-- Notification Dropdown -->
             <div class="dropdown position-relative">
                 <button class="topbar-btn border-0 shadow-sm" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi Sistem" style="outline:none; position:relative; background:#FFFFFF; border:1px solid #E2E8F0; width:42px; height:42px; border-radius:12px;">
@@ -776,4 +842,14 @@ document.addEventListener('DOMContentLoaded', function () {
     updateDateTime();
     setInterval(updateDateTime, 1000);
 });
+
+function setAppTheme(themeVal) {
+    if (!themeVal || themeVal === 'default') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.removeItem('loewix_theme');
+    } else {
+        document.documentElement.setAttribute('data-theme', themeVal);
+        localStorage.setItem('loewix_theme', themeVal);
+    }
+}
 </script>

@@ -450,3 +450,147 @@ body {
     border-color: #3B82F6 !important;
     box-shadow: 0 3px 10px rgba(59, 130, 246, 0.5) !important;
 }
+
+/* ============ LOEWIX DYNAMIC THEME ENGINE (5 PRESETS) ============ */
+
+/* 1. CYBER EXECUTIVE (DARK MODE) */
+[data-theme="cyber-dark"] body {
+    background-color: #0B0F19 !important;
+    background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%) !important;
+    color: #F3F4F6 !important;
+}
+
+[data-theme="cyber-dark"] .sidebar {
+    background: linear-gradient(180deg, #030712 0%, #0B0F19 50%, #111827 100%) !important;
+    border-right-color: #1F2937 !important;
+}
+
+[data-theme="cyber-dark"] .topbar {
+    background: #111827 !important;
+    border-bottom-color: #1F2937 !important;
+    color: #F9FAFB !important;
+}
+
+[data-theme="cyber-dark"] .topbar-btn {
+    background: #1F2937 !important;
+    border-color: #374151 !important;
+    color: #9CA3AF !important;
+}
+
+[data-theme="cyber-dark"] .card,
+[data-theme="cyber-dark"] .filter-card,
+[data-theme="cyber-dark"] .card-header,
+[data-theme="cyber-dark"] .card-footer {
+    background-color: #111827 !important;
+    border-color: #1F2937 !important;
+    color: #F3F4F6 !important;
+}
+
+[data-theme="cyber-dark"] .cust-hero,
+[data-theme="cyber-dark"] .report-hero {
+    background: linear-gradient(135deg, #030712 0%, #111827 50%, #1F2937 100%) !important;
+    border: 1px solid #374151 !important;
+}
+
+[data-theme="cyber-dark"] .stat-card-white {
+    background: #1F2937 !important;
+    border-color: #374151 !important;
+    color: #F3F4F6 !important;
+}
+
+[data-theme="cyber-dark"] .text-dark,
+[data-theme="cyber-dark"] h1,
+[data-theme="cyber-dark"] h2,
+[data-theme="cyber-dark"] h3,
+[data-theme="cyber-dark"] h4,
+[data-theme="cyber-dark"] h5,
+[data-theme="cyber-dark"] h6 {
+    color: #F9FAFB !important;
+}
+
+[data-theme="cyber-dark"] .text-muted {
+    color: #9CA3AF !important;
+}
+
+[data-theme="cyber-dark"] .form-control,
+[data-theme="cyber-dark"] .form-select {
+    background-color: #1F2937 !important;
+    border-color: #374151 !important;
+    color: #F9FAFB !important;
+}
+
+[data-theme="cyber-dark"] .table tbody tr {
+    background-color: #111827 !important;
+}
+
+[data-theme="cyber-dark"] .table tbody tr:hover {
+    background-color: #1F2937 !important;
+}
+
+[data-theme="cyber-dark"] .table tbody td {
+    border-bottom-color: #1F2937 !important;
+    color: #E5E7EB !important;
+}
+
+
+/* 2. EMERALD LUXURY (FOREST TEAL) */
+[data-theme="emerald-luxury"] body {
+    background-color: #F0FDF4 !important;
+    background-image: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%) !important;
+}
+
+[data-theme="emerald-luxury"] .sidebar {
+    background: linear-gradient(180deg, #022C22 0%, #064E3B 50%, #047857 100%) !important;
+}
+
+[data-theme="emerald-luxury"] .cust-hero,
+[data-theme="emerald-luxury"] .report-hero {
+    background: linear-gradient(135deg, #022C22 0%, #065F46 50%, #059669 100%) !important;
+}
+
+[data-theme="emerald-luxury"] .btn-primary {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    border-color: #047857 !important;
+}
+
+
+/* 3. ROYAL NEBULA (VIOLET PURPLE) */
+[data-theme="royal-nebula"] body {
+    background-color: #FAF5FF !important;
+    background-image: radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%) !important;
+}
+
+[data-theme="royal-nebula"] .sidebar {
+    background: linear-gradient(180deg, #1E0A2A 0%, #311042 50%, #4C1D95 100%) !important;
+}
+
+[data-theme="royal-nebula"] .cust-hero,
+[data-theme="royal-nebula"] .report-hero {
+    background: linear-gradient(135deg, #2E1065 0%, #581C87 50%, #7C3AED 100%) !important;
+}
+
+[data-theme="royal-nebula"] .btn-primary {
+    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
+    border-color: #6D28D9 !important;
+}
+
+
+/* 4. SUNSET AMBER (WARM GOLD) */
+[data-theme="sunset-amber"] body {
+    background-color: #FFFBEB !important;
+    background-image: radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.1) 0px, transparent 50%) !important;
+}
+
+[data-theme="sunset-amber"] .sidebar {
+    background: linear-gradient(180deg, #240E02 0%, #451A03 50%, #7C2D12 100%) !important;
+}
+
+[data-theme="sunset-amber"] .cust-hero,
+[data-theme="sunset-amber"] .report-hero {
+    background: linear-gradient(135deg, #451A03 0%, #7C2D12 50%, #EA580C 100%) !important;
+}
+
+[data-theme="sunset-amber"] .btn-primary {
+    background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
+    border-color: #B45309 !important;
+}
