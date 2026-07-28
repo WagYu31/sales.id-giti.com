@@ -578,7 +578,43 @@ table tr td { font-size: 0.85em; }
                 <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="themeDropdown" style="width: 280px; border-radius: 18px; border: 1px solid #E2E8F0; padding: 12px; overflow: hidden; margin-top: 10px;">
                     <li class="px-2 py-1 mb-2 border-bottom pb-2 d-flex align-items-center justify-content-between">
                         <span class="fw-extrabold text-dark" style="font-size:13px; font-family:'Plus Jakarta Sans', sans-serif;"><i class="bi bi-palette2 me-1.5 text-primary"></i>Pilih Tema UI</span>
-                        <span class="badge bg-primary-subtle text-primary fw-bold" style="font-size:10px;">6 Preset</span>
+                        <span class="badge bg-primary-subtle text-primary fw-bold" style="font-size:10px;">8 Preset VIP</span>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('hyperion-gold')">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #000000, #FFD700); display:inline-block; border:1px solid #FFD700;"></span>
+                                <span class="fw-extrabold text-dark" style="font-size:12.5px;">Hyperion Gold</span>
+                            </div>
+                            <span class="badge text-dark font-monospace fw-extrabold" style="font-size:10px; background:#FFD700 !important;">🔥 VIP Gold</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('obsidian-diamond')">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #030712, #06B6D4); display:inline-block; border:1px solid #06B6D4;"></span>
+                                <span class="fw-extrabold text-dark" style="font-size:12.5px;">Obsidian Diamond</span>
+                            </div>
+                            <span class="badge text-white font-monospace fw-bold" style="font-size:10px; background:#0891B2 !important;">💎 Cyan Dark</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('crimson-velvet')">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #0F050D, #E11D48); display:inline-block; border:1px solid #E11D48;"></span>
+                                <span class="fw-extrabold text-dark" style="font-size:12.5px;">Crimson Velvet</span>
+                            </div>
+                            <span class="badge text-white font-monospace fw-bold" style="font-size:10px; background:#E11D48 !important;">🍷 Rose Burgundy</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('solar-yellow')">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #854D0E, #FFFF00); display:inline-block; border:1px solid rgba(0,0,0,0.2);"></span>
+                                <span class="fw-bold" style="font-size:12.5px;">Solar Yellow</span>
+                            </div>
+                            <span class="badge text-dark border font-monospace fw-extrabold" style="font-size:10px; background:#FFFF00 !important; color:#000 !important;">#FFFF00</span>
+                        </button>
                     </li>
                     <li>
                         <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('default')">
@@ -596,15 +632,6 @@ table tr td { font-size: 0.85em; }
                                 <span class="fw-bold" style="font-size:12.5px;">Cyber Executive</span>
                             </div>
                             <span class="badge bg-dark text-white border border-secondary font-monospace" style="font-size:10px;">Dark Mode</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button type="button" class="dropdown-item rounded-3 py-2 px-2.5 d-flex align-items-center justify-content-between mb-1" onclick="setAppTheme('solar-yellow')">
-                            <div class="d-flex align-items-center gap-2">
-                                <span style="width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg, #854D0E, #FFFF00); display:inline-block; border:1px solid rgba(0,0,0,0.2);"></span>
-                                <span class="fw-bold" style="font-size:12.5px;">Solar Yellow (#FFFF00)</span>
-                            </div>
-                            <span class="badge text-dark border font-monospace fw-extrabold" style="font-size:10px; background:#FFFF00 !important; color:#000 !important;">#FFFF00</span>
                         </button>
                     </li>
                     <li>

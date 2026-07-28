@@ -653,6 +653,149 @@ body {
 }
 
 
+/* ============ PRESTIGE EDITION THEMES ============ */
+
+/* 6. HYPERION CYBERPUNK GOLD (VIP PRESTIGE) */
+[data-theme="hyperion-gold"] body {
+    background-color: #0B0F17 !important;
+    background-image: radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.2) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(217, 119, 6, 0.15) 0px, transparent 50%) !important;
+    color: #F8FAFC !important;
+}
+
+[data-theme="hyperion-gold"] .sidebar {
+    background: linear-gradient(180deg, #05080E 0%, #0F172A 60%, #171E2E 100%) !important;
+    border-right: 1px solid rgba(245, 158, 11, 0.3) !important;
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="hyperion-gold"] .sidebar-link.active {
+    background: linear-gradient(135deg, #FFD700 0%, #F59E0B 100%) !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5) !important;
+}
+
+[data-theme="hyperion-gold"] .sidebar-link.active i {
+    color: #000000 !important;
+}
+
+[data-theme="hyperion-gold"] .card,
+[data-theme="hyperion-gold"] .filter-card,
+[data-theme="hyperion-gold"] .table-card {
+    background: #0F172A !important;
+    border: 1px solid rgba(245, 158, 11, 0.25) !important;
+    color: #F8FAFC !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="hyperion-gold"] .cust-hero,
+[data-theme="hyperion-gold"] .assign-hero,
+[data-theme="hyperion-gold"] .report-hero {
+    background: linear-gradient(135deg, #05080E 0%, #1E1B4B 40%, #78350F 100%) !important;
+    border: 1px solid rgba(245, 158, 11, 0.4) !important;
+    box-shadow: 0 15px 35px rgba(245, 158, 11, 0.25) !important;
+}
+
+[data-theme="hyperion-gold"] .btn-primary {
+    background: linear-gradient(135deg, #FFD700 0%, #F59E0B 100%) !important;
+    border: none !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.45) !important;
+}
+
+[data-theme="hyperion-gold"] .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(255, 215, 0, 0.65) !important;
+}
+
+
+/* 7. OBSIDIAN DIAMOND CYAN (DIAMOND LUXURY) */
+[data-theme="obsidian-diamond"] body {
+    background-color: #030712 !important;
+    background-image: radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.2) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%) !important;
+    color: #F9FAFB !important;
+}
+
+[data-theme="obsidian-diamond"] .sidebar {
+    background: linear-gradient(180deg, #030712 0%, #0B132B 60%, #1C2541 100%) !important;
+    border-right: 1px solid rgba(6, 182, 212, 0.3) !important;
+    box-shadow: 4px 0 25px rgba(6, 182, 212, 0.15) !important;
+}
+
+[data-theme="obsidian-diamond"] .sidebar-link.active {
+    background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%) !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.5) !important;
+}
+
+[data-theme="obsidian-diamond"] .card,
+[data-theme="obsidian-diamond"] .filter-card {
+    background: #0B132B !important;
+    border: 1px solid rgba(6, 182, 212, 0.25) !important;
+    color: #F9FAFB !important;
+}
+
+[data-theme="obsidian-diamond"] .cust-hero,
+[data-theme="obsidian-diamond"] .assign-hero {
+    background: linear-gradient(135deg, #030712 0%, #0B132B 40%, #0891B2 100%) !important;
+    border: 1px solid rgba(6, 182, 212, 0.4) !important;
+    box-shadow: 0 15px 35px rgba(6, 182, 212, 0.3) !important;
+}
+
+[data-theme="obsidian-diamond"] .btn-primary {
+    background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%) !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5) !important;
+}
+
+
+/* 8. CRIMSON VELVET ROSE (VIP BURGUNDY) */
+[data-theme="crimson-velvet"] body {
+    background-color: #0F050D !important;
+    background-image: radial-gradient(at 0% 0%, rgba(244, 63, 94, 0.2) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(190, 18, 60, 0.15) 0px, transparent 50%) !important;
+    color: #FFF1F2 !important;
+}
+
+[data-theme="crimson-velvet"] .sidebar {
+    background: linear-gradient(180deg, #0F050D 0%, #26091F 60%, #3D0C30 100%) !important;
+    border-right: 1px solid rgba(244, 63, 94, 0.3) !important;
+    box-shadow: 4px 0 25px rgba(244, 63, 94, 0.15) !important;
+}
+
+[data-theme="crimson-velvet"] .sidebar-link.active {
+    background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%) !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.5) !important;
+}
+
+[data-theme="crimson-velvet"] .card,
+[data-theme="crimson-velvet"] .filter-card {
+    background: #1F0719 !important;
+    border: 1px solid rgba(244, 63, 94, 0.25) !important;
+    color: #FFF1F2 !important;
+}
+
+[data-theme="crimson-velvet"] .cust-hero,
+[data-theme="crimson-velvet"] .assign-hero {
+    background: linear-gradient(135deg, #0F050D 0%, #310D2C 40%, #BE123C 100%) !important;
+    border: 1px solid rgba(244, 63, 94, 0.4) !important;
+    box-shadow: 0 15px 35px rgba(244, 63, 94, 0.35) !important;
+}
+
+[data-theme="crimson-velvet"] .btn-primary {
+    background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%) !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    box-shadow: 0 8px 25px rgba(244, 63, 94, 0.5) !important;
+}
+
+
 /* ============ DYNAMIC SIDEBAR COLOR PRESETS ============ */
 
 /* 1. RICH VIBRANT GOLDEN YELLOW SIDEBAR (#FACC15 / #EAB308) */
