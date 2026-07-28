@@ -187,17 +187,17 @@ if ($res_kat) {
         <div class="row g-2.5 align-items-center mb-3">
             <!-- Search Text -->
             <div class="col-xl-3 col-lg-3 col-md-6 col-12">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" id="searchInput" class="form-control border-start-0 ps-0 fw-semibold" placeholder="Cari nama toko, PIC, atau hp..." style="border-radius:0 12px 12px 0; height:42px;">
+                <div class="input-group custom-filter-group">
+                    <span class="input-group-text border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="searchInput" class="form-control border-start-0 ps-0 fw-semibold" placeholder="Cari nama toko, PIC, hp...">
                 </div>
             </div>
             
             <!-- Filter Daerah / Provinsi -->
             <div class="col-xl-3 col-lg-3 col-md-6 col-12">
-                <div class="input-group">
-                    <span class="input-group-text bg-white" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-geo-alt-fill text-danger"></i></span>
-                    <select id="filterKota" class="form-select fw-semibold" style="border-radius:0 12px 12px 0; height:42px;">
+                <div class="input-group custom-filter-group">
+                    <span class="input-group-text border-end-0"><i class="bi bi-geo-alt-fill text-danger"></i></span>
+                    <select id="filterKota" class="form-select border-start-0 ps-0 fw-semibold">
                         <option value="">Semua Daerah / Provinsi</option>
                         
                         <optgroup label="📍 REGION & PROVINSI UTAMA">
@@ -232,9 +232,9 @@ if ($res_kat) {
 
             <!-- Filter Kategori -->
             <div class="col-xl-3 col-lg-3 col-md-6 col-12">
-                <div class="input-group">
-                    <span class="input-group-text bg-white" style="border-radius:12px 0 0 12px; height:42px;"><i class="bi bi-tags-fill text-primary"></i></span>
-                    <select id="filterKategori" class="form-select fw-semibold" style="border-radius:0 12px 12px 0; height:42px;">
+                <div class="input-group custom-filter-group">
+                    <span class="input-group-text border-end-0"><i class="bi bi-tags-fill text-primary"></i></span>
+                    <select id="filterKategori" class="form-select border-start-0 ps-0 fw-semibold">
                         <option value="">Semua Kategori</option>
                         <?php foreach ($kategori_list as $kat): ?>
                             <option value="<?php echo htmlspecialchars($kat); ?>">🏷️ <?php echo htmlspecialchars($kat); ?></option>
@@ -245,14 +245,17 @@ if ($res_kat) {
 
             <!-- Filter Status Sales -->
             <div class="col-xl-3 col-lg-3 col-md-6 col-12">
-                <select id="filterSalesStatus" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
-                    <option value="">Semua Penugasan</option>
-                    <option value="unassigned">⚠️ Belum Ada Sales</option>
-                    <option value="assigned">✅ Sudah Ada Sales</option>
-                    <?php foreach ($sales_list as $s): ?>
-                        <option value="sales_<?php echo $s['id']; ?>">👤 <?php echo htmlspecialchars($s['nama_lengkap']); ?></option>
-                    <?php endforeach; ?>
-                </select>
+                <div class="input-group custom-filter-group">
+                    <span class="input-group-text border-end-0"><i class="bi bi-person-badge-fill text-info"></i></span>
+                    <select id="filterSalesStatus" class="form-select border-start-0 ps-0 fw-semibold">
+                        <option value="">Semua Penugasan</option>
+                        <option value="unassigned">⚠️ Belum Ada Sales</option>
+                        <option value="assigned">✅ Sudah Ada Sales</option>
+                        <?php foreach ($sales_list as $s): ?>
+                            <option value="sales_<?php echo $s['id']; ?>">👤 <?php echo htmlspecialchars($s['nama_lengkap']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
         </div>
 

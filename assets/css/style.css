@@ -862,6 +862,83 @@ body {
 }
 
 
+/* ============ CUSTOM INTEGRATED FILTER INPUT GROUP ============ */
+.custom-filter-group {
+    border-radius: 12px !important;
+    border: 1px solid #CBD5E1 !important;
+    background: #FFFFFF !important;
+    overflow: hidden;
+    height: 42px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+
+.custom-filter-group:focus-within {
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+.custom-filter-group .input-group-text {
+    background: transparent !important;
+    border: none !important;
+    padding-left: 14px;
+    padding-right: 8px;
+}
+
+.custom-filter-group .form-control,
+.custom-filter-group .form-select {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-size: 13.5px;
+    height: 100%;
+}
+
+/* DARK MODE GLASSMORPHIC INPUTS */
+[data-theme="crimson-velvet"] .custom-filter-group,
+[data-theme="hyperion-gold"] .custom-filter-group,
+[data-theme="obsidian-diamond"] .custom-filter-group,
+[data-theme="cyber-dark"] .custom-filter-group {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: none !important;
+}
+
+[data-theme="crimson-velvet"] .custom-filter-group:focus-within,
+[data-theme="hyperion-gold"] .custom-filter-group:focus-within,
+[data-theme="obsidian-diamond"] .custom-filter-group:focus-within,
+[data-theme="cyber-dark"] .custom-filter-group:focus-within {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.25) !important;
+}
+
+[data-theme="crimson-velvet"] .custom-filter-group .form-control,
+[data-theme="hyperion-gold"] .custom-filter-group .form-control,
+[data-theme="obsidian-diamond"] .custom-filter-group .form-control,
+[data-theme="cyber-dark"] .custom-filter-group .form-control,
+[data-theme="crimson-velvet"] .custom-filter-group .form-select,
+[data-theme="hyperion-gold"] .custom-filter-group .form-select,
+[data-theme="obsidian-diamond"] .custom-filter-group .form-select,
+[data-theme="cyber-dark"] .custom-filter-group .form-select {
+    color: #FFFFFF !important;
+}
+
+[data-theme="crimson-velvet"] .custom-filter-group .form-control::placeholder,
+[data-theme="hyperion-gold"] .custom-filter-group .form-control::placeholder,
+[data-theme="obsidian-diamond"] .custom-filter-group .form-control::placeholder,
+[data-theme="cyber-dark"] .custom-filter-group .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="crimson-velvet"] select option,
+[data-theme="hyperion-gold"] select option,
+[data-theme="obsidian-diamond"] select option,
+[data-theme="cyber-dark"] select option {
+    background-color: #0F172A !important;
+    color: #FFFFFF !important;
+}
+
+
 /* ============ DYNAMIC SIDEBAR COLOR PRESETS ============ */
 
 /* 1. RICH VIBRANT GOLDEN YELLOW SIDEBAR (#FACC15 / #EAB308) */
