@@ -1,7 +1,7 @@
 <?php
 /**
  * Asisten Sales Loewix AI Handler Engine - Master CSO & Negotiation Trainer
- * Provides structured tactical advice, ready-to-send WhatsApp scripts, and product upsell recommendations.
+ * Context-aware AI engine handling both customer quotes and sales rep situational consultations.
  */
 
 ini_set('display_errors', 0);
@@ -40,40 +40,48 @@ if (empty($customerQuestion)) {
 
 $prompt = "Anda adalah Chief Sales Officer (CSO) & Master Sales Trainer untuk merek CCTV ternama 'Loewix CCTV Indonesia'.
 
+Input dari Sales Rep / Situasi: \"{$customerQuestion}\"
+
+PENTING Mengenai Pemahaman Input:
+Input di atas bisa berupa:
+A. Teks obrolan / pertanyaan langsung dari Customer (misal: 'Berapa harganya?', 'Bisa kurang gak?').
+B. Curhat / Konsultasi dari Sales Rep mengenai calon customer / segmen tertentu (misal: 'Saya dapat customer Kepala Sekolah', 'Gimana cara nawarin ke sekolah / toko emas / rumah sakit').
+
+Aturan Utama:
+Jika input adalah KONSULTASI SALES (Case B), JANGAN MENGULANG KALIMAT KONSULTASI SALES! Tapi buatlah 3 SKRIP CHAT WHATSAPP PERSUASIF YANG BISA LANGSUNG DIKIRIMKAN SALES REPOSITORI TERSEBUT KEPADA CUSTOMER NYA (seperti Bapak/Ibu Kepala Sekolah atau Klien Instansi), lengkap dengan sapaan hormat yang sesuai!
+
 Pengetahuan Produk & Selling Point Loewix:
 - Sensor Optik: Sony Starlight & CMOS Smart Sensor (Full Color 24 Jam tetap berwarna di malam hari).
 - Kompresi Video: H.265+ High Efficiency (hemat memori harddisk hingga 50%).
 - Fitur AI: Smart Human & Vehicle Motion Detection (mengurangi false alarm hingga 98%).
 - Layanan Garansi: Garansi 1-to-1 Replacement (Ganti Unit Baru Resmi 1 Tahun) & Service Center Resmi Indonesia.
-- Aplikasi Mobile: Loewix Smart / XMEye (Gratis seumur hidup, cloud P2P instant remote viewing tanpa IP Publik).
-
-Situasi / Pertanyaan Customer: \"{$customerQuestion}\"
+- Legalitas & Faktur: Menyediakan faktur pajak resmi, SPK, & invoice lengkap untuk instansi/sekolah (Dana BOS/Yayasan).
 
 Tugas Anda:
-Berikan 3 Taktik Jawaban Negosiasi Sales yang Sangat Profesional, Persuasif, dan Menjual.
+Berikan 3 Taktik Jawaban / Skrip Chat WhatsApp Sales yang Sangat Profesional, Persuasif, dan Siap Kirim.
 
 Untuk SETIAP OPSI, buat format terstruktur:
-1. Opsi 1 (Penawaran Value & Premium Closing):
-   Fokus menonjolkan kualitas sensor Starlight Full Color, Garansi Replace Baru 1-to-1, dan hemat memori H.265+.
-2. Opsi 2 (Handling Objection & Bonus Value Negosiasi):
-   Atasi penolakan harga / kompetitor dengan memberikan bonus gratis setting HP, bonus kabel premium HDMI, atau voucher promo agar margin sales aman.
-3. Opsi 3 (Upselling & Offer Upgrade Unit High-End):
-   Fokus mengarahkan upgrade ke Loewix IP Camera 4K atau Smart AI Motion Detection dengan penjelasan return on investment jangka panjang.
+1. Opsi 1 (Pendekatan Formal, Kehormatan & Keamanan Area):
+   Gunakan bahasa yang sangat sopan & terhormat (seperti Bapak/Ibu Kepala Sekolah / Direktur). Tekankan keamanan murid/area, transparansi pengawasan, dan kualitas rekaman Starlight Full Color.
+2. Opsi 2 (Pendekatan Solusi Anggaran & Garansi Ganti Baru 1 Tahun):
+   Tekankan kemudahan fleksibilitas anggaran, kelengkapan administrasi/faktur resmi, dan garansi ganti unit baru tanpa merepotkan instansi.
+3. Opsi 3 (Pendekatan IP Camera Smart AI & Monitoring Terpusat):
+   Tawarkan paket IP Camera Loewix dengan integrasi monitoring terpusat di ruang Kepala Sekolah/Pimpinan & smartphone untuk pemantauan realtime.
 
 Setiap Opsi HARUS berbentuk 1 objek dengan properti:
-- \"type\": \"Nama Taktik\"
+- \"type\": \"Nama Taktik / Pendekatan\"
 - \"strategy\": \"Tips taktik sales 1 kalimat kapan pakai opsi ini\"
-- \"text\": \"Teks chat WA persuasif maksimal 3-4 kalimat, sopan, ramah, dan sangat menjual\"
+- \"text\": \"Teks skrip WA persuasif yang siap dikirim Sales ke Customer (Bapak/Ibu Kepala Sekolah / Klien)\"
 - \"product_recommendation\": \"Tipe unit/paket Loewix yang disarankan\"
 
 Kembalikan HANYA format JSON valid seperti ini (tanpa markdown ```json):
 {
   \"answers\": [
     {
-      \"type\": \"Penawaran Value & Premium Closing\",
-      \"strategy\": \"Gunakan jika customer mencari kualitas rekaman terbaik & kejelasan plat nomor malam hari.\",
+      \"type\": \"Pendekatan Formal & Keamanan Sekolah\",
+      \"strategy\": \"Gunakan untuk pesan pembuka ke Kepala Sekolah / Pihak Yayasan.\",
       \"text\": \"...\",
-      \"product_recommendation\": \"Loewix Ultra HD Starlight 5MP Package\"
+      \"product_recommendation\": \"Loewix School Safety Package 8-Cam\"
     },
     ...
   ]
@@ -127,7 +135,28 @@ foreach ($modelsToTry as $modelName) {
 if (empty($answers)) {
     $q = mb_strtolower($customerQuestion);
     
-    if (strpos($q, 'diskon') !== false || strpos($q, 'kurang') !== false || strpos($q, 'mahal') !== false || strpos($q, 'potong') !== false) {
+    if (strpos($q, 'sekolah') !== false || strpos($q, 'pendidikan') !== false || strpos($q, 'kepala') !== false || strpos($q, 'guru') !== false) {
+        $answers = [
+            [
+                'type' => 'Pendekatan Formal & Keamanan Sekolah',
+                'strategy' => 'Sapaan terhormat untuk Kepala Sekolah menonjolkan keamanan lingkungan belajar & gerbang murid.',
+                'text' => 'Selamat pagi/siang Bapak/Ibu Kepala Sekolah. Terkait peningkatan keamanan & pengawasan lingkungan sekolah, mohon izin kami dari Loewix CCTV Indonesia ingin memberikan penawaran Paket CCTV Khusus Instansi Pendidikan. Kamera Loewix sudah dilengkapi Full Color 24 Jam untuk pemantauan gerbang & area kelas secara jernih.',
+                'product_recommendation' => 'Loewix School Safety Package 8-Cam Starlight'
+            ],
+            [
+                'type' => 'Pendekatan Administrasi & Anggaran Sekolah',
+                'strategy' => 'Tekankan kemudahan faktur pajak, SPK resmi, & Garansi Ganti Baru 1 Tahun.',
+                'text' => 'Bapak/Ibu Kepala Sekolah yang kami hormati, produk Loewix CCTV sangat efisien untuk anggaran sekolah karena sudah mencakup Garansi Ganti Unit Baru 1-to-1 dan kelengkapan administrasi/faktur resmi. Kami siap kirimkan proposal teknis & estimasi perbandingan paketnya.',
+                'product_recommendation' => 'Loewix Institutional Package + Invoice Resmi'
+            ],
+            [
+                'type' => 'Pendekatan IP Camera Monitoring Terpusat',
+                'strategy' => 'Tawarkan integrasi pantau langsung dari ruang Kepala Sekolah & smartphone.',
+                'text' => 'Bapak/Ibu Kepala Sekolah, sistem Loewix IP Camera 4K dapat diintegrasikan langsung ke TV monitoring ruang Kepala Sekolah serta smartphone Bapak/Ibu secara realtime. Pemantauan aktivitas sekolah jadi jauh lebih praktis dan transparan.',
+                'product_recommendation' => 'Loewix Smart AI IP Camera Campus Series'
+            ]
+        ];
+    } elseif (strpos($q, 'diskon') !== false || strpos($q, 'kurang') !== false || strpos($q, 'mahal') !== false || strpos($q, 'potong') !== false) {
         $answers = [
             [
                 'type' => 'Penawaran Value & Premium Closing',
@@ -148,39 +177,18 @@ if (empty($answers)) {
                 'product_recommendation' => 'Loewix IP Camera 4K H.265+ Series'
             ]
         ];
-    } elseif (strpos($q, 'merek') !== false || strpos($q, 'sebelah') !== false || strpos($q, 'lain') !== false || strpos($q, 'banding') !== false) {
-        $answers = [
-            [
-                'type' => 'Penawaran Value & Premium Closing',
-                'strategy' => 'Bandingkan kualitas sensor Starlight Full Color & garansi resmi lokal.',
-                'text' => 'Halo Kak! Merek lain mungkin lebih murah beberapa puluh ribu, namun Loewix mengunggulkan Sensor Sony Starlight yang tetap merekam berwarna terang di malam hari. Ditambah garansi ganti unit baru di Service Center Resmi Indonesia.',
-                'product_recommendation' => 'Loewix Sony Starlight Full Color Series'
-            ],
-            [
-                'type' => 'Teknik Negosiasi & Bonus Value',
-                'strategy' => 'Tekankan bebas biaya langganan aplikasi cloud selamanya.',
-                'text' => 'Halo Kak! Hati-hati dengan merek murah yang mengenakan biaya langganan aplikasi bulanan. Aplikasi pemantauan HP Loewix Smart gratis 100% selamanya tanpa biaya tersembunyi!',
-                'product_recommendation' => 'Loewix Smart P2P App Integration'
-            ],
-            [
-                'type' => 'Strategi Upselling & Offer Upgrade',
-                'strategy' => 'Gunakan fitur AI Smart Human Detection untuk mengalahkan kompetitor.',
-                'text' => 'Halo Kak! Dibandingkan CCTV standar merek lain, Loewix sudah dilengkapi fitur Smart Human Detection yang mampu membedakan gerakan manusia dengan hewan/angin, mencegah salah alarm hingga 98%.',
-                'product_recommendation' => 'Loewix Smart AI Detection Series'
-            ]
-        ];
     } else {
         $answers = [
             [
                 'type' => 'Penawaran Value & Premium Closing',
                 'strategy' => 'Fokus pada solusi kebutuhan customer & garansi resmi Loewix.',
-                'text' => 'Halo Kak! Mengenai "' . htmlspecialchars($customerQuestion) . '", kami siap berikan penawaran paket Loewix CCTV paling efisien lengkap dengan garansi resmi ganti baru 1 tahun.',
+                'text' => 'Halo Kak! Mengenai konsultasi kebutuhan Kakak, kami siap berikan skrip penawaran paket Loewix CCTV paling efisien lengkap dengan garansi resmi ganti baru 1 tahun.',
                 'product_recommendation' => 'Loewix Commercial Safety Package'
             ],
             [
                 'type' => 'Teknik Negosiasi & Bonus Value',
                 'strategy' => 'Berikan nilai tambah bonus kabel & bebas konsultasi setting.',
-                'text' => 'Halo Kak! Untuk pertanyaan Kakak, tim teknisi kami siap bantu konfigurasikan sistem pantau HP gratis saat pemasangan agar Kakak tinggal pakai secara instan.',
+                'text' => 'Halo Kak! Untuk calon customer Kakak, tim teknisi kami siap bantu konfigurasikan sistem pantau HP gratis saat pemasangan agar tinggal pakai secara instan.',
                 'product_recommendation' => 'Loewix Turnkey Installation System'
             ],
             [
