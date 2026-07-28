@@ -319,15 +319,15 @@ if ($_SESSION['role'] !== 'sales') {
                 <thead class="table-dark-header">
                     <tr>
                         <th style="width: 18%;">NAMA TOKO</th>
-                        <th style="width: 20%;">PIC & KONTAK</th>
-                        <th class="text-center" style="width: 10%;">KATEGORI</th>
-                        <th class="text-center" style="width: 12%;">KOTA</th>
-                        <th class="text-center" style="width: 14%;">SALES</th>
-                        <th class="text-center" style="width: 7%;">FU</th>
-                        <th class="text-center" style="width: 6%;">KANDIDAT</th>
-                        <th class="text-center" style="width: 6%;">DEAL</th>
+                        <th style="width: 22%;">PIC & KONTAK</th>
+                        <th style="width: 10%;">KATEGORI</th>
+                        <th style="width: 12%;">KOTA</th>
+                        <th style="width: 13%;">SALES</th>
+                        <th class="text-center" style="width: 6%;">FU</th>
+                        <th class="text-center" style="width: 5%;">KANDIDAT</th>
+                        <th class="text-center" style="width: 5%;">DEAL</th>
                         <th class="text-center" style="width: 4%;">MAPS</th>
-                        <th class="text-center" style="width: 8%;">AKSI</th>
+                        <th class="text-center" style="width: 5%;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -350,24 +350,24 @@ if ($_SESSION['role'] !== 'sales') {
                                         $display_pic = trim($pic_name);
                                         $show_name = ($display_pic !== '' && strtolower($display_pic) !== 'unknown' && strtolower($display_pic) !== strtolower(trim($customer['nama_toko'])));
                                         
-                                        echo '<div class="small fw-semibold text-dark mb-1">';
+                                        echo '<div class="d-flex align-items-center flex-wrap gap-1.5 small fw-semibold text-dark my-0.5">';
                                         if ($show_name) {
-                                            echo '<i class="bi bi-person-fill text-muted me-1"></i>' . htmlspecialchars($display_pic) . ' ';
+                                            echo '<span class="d-inline-flex align-items-center"><i class="bi bi-person-fill text-muted me-1"></i>' . htmlspecialchars($display_pic) . '</span>';
                                         }
                                         if (!empty($phone_number)) {
                                             $cleaned_tel = preg_replace('/[^0-9]/', '', $phone_number);
                                             $wa_number = (substr($cleaned_tel, 0, 1) === '0') ? '62' . substr($cleaned_tel, 1) : $cleaned_tel;
-                                            echo '<a href="https://wa.me/' . $wa_number . '" target="_blank" class="badge text-success border text-decoration-none shadow-2sm ms-1" style="background:#F0FDF4; color:#15803D !important; border-color:#86EFAC !important; border-radius:20px; padding:4px 10px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:3px;"><i class="bi bi-whatsapp"></i> ' . htmlspecialchars($phone_number) . '</a>';
+                                            echo '<a href="https://wa.me/' . $wa_number . '" target="_blank" class="badge text-success border text-decoration-none shadow-2sm" style="background:#F0FDF4; color:#15803D !important; border-color:#86EFAC !important; border-radius:20px; padding:4px 10px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:3px;"><i class="bi bi-whatsapp"></i> ' . htmlspecialchars($phone_number) . '</a>';
                                         }
                                         echo '</div>';
                                     }
                                 } else { echo '<span class="text-muted small">-</span>'; }
                                 ?>
                             </td>
-                            <td class="text-center">
+                            <td>
                                 <span class="badge bg-light text-dark border fw-semibold" style="border-radius:20px; padding:5px 12px; font-size:11.5px;"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span>
                             </td>
-                            <td class="text-center">
+                            <td>
                                 <?php 
                                 $city_val = trim($customer['all_cities'] ?? '');
                                 if (!empty($city_val) && $city_val !== '-'): 
@@ -379,9 +379,9 @@ if ($_SESSION['role'] !== 'sales') {
                                     <span class="text-muted small">-</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-center">
+                            <td>
                                 <?php if ($customer['nama_sales']): ?>
-                                    <div class="d-flex align-items-center justify-content-center gap-1.5" style="white-space:nowrap;">
+                                    <div class="d-flex align-items-center gap-1.5" style="white-space:nowrap;">
                                         <div class="sales-avatar-badge-small flex-shrink-0">
                                             <?php echo strtoupper(substr($customer['nama_sales'], 0, 1)); ?>
                                         </div>
