@@ -449,19 +449,33 @@ $(document).ready(function() {
         });
     }
 
-    if ($.fn.select2) {
-        $('#filterKota, #filterKategori, #filterSalesStatus').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            dropdownAutoWidth: true
-        }).on('select2:select select2:clear change', function() {
-            applyAssignmentFilters();
-        });
+    function initFilterSelect2() {
+        if ($.fn.select2) {
+            $('#filterKota, #filterKategori, #filterSalesStatus').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownAutoWidth: true
+            }).on('select2:select select2:clear change', function() {
+                applyAssignmentFilters();
+            });
+        }
     }
 
-    $('#searchInput').on('keyup input', applyAssignmentFilters);
-    $('#filterKota, #filterKategori, #filterSalesStatus').on('change', applyAssignmentFilters);
+    initFilterSelect2();
 
+    // Instant 1st-Click Trigger for Input Group Container & Icons
+    $('.custom-filter-group').on('click', function(e) {
+        const $select = $(this).find('select');
+        if ($select.length && $.fn.select2 && $select.data('select2')) {
+            if (!$select.data('select2').isOpen()) {
+                e.preventDefault();
+                e.stopPropagation();
+                $select.select2('open');
+            }
+        }
+    });
+
+    $('#searchInput').on('keyup input', applyAssignmentFilters);
     $('#selectAll').on('change', function() {
         $('#assignmentTable tbody tr:visible .customer-checkbox').prop('checked', this.checked);
     });
