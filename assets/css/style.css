@@ -972,6 +972,23 @@ body {
     color: #FFFFFF !important;
 }
 
+/* CLICKABLE SORTABLE TABLE HEADER STYLING */
+.table-dark-header th[onclick] {
+    cursor: pointer !important;
+    user-select: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.table-dark-header th[onclick]:hover {
+    background: linear-gradient(135deg, #334155 0%, #1E293B 100%) !important;
+    color: #FACC15 !important;
+}
+
+.table-dark-header th[onclick]:hover i {
+    color: #FACC15 !important;
+    opacity: 1 !important;
+}
+
 
 /* ============ DYNAMIC SIDEBAR COLOR PRESETS ============ */
 

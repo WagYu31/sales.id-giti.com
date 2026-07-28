@@ -265,13 +265,13 @@ if ($res_kat) {
                 <thead class="table-dark-header">
                     <tr>
                         <th style="width: 4%; text-align:center;"><input class="form-check-input" type="checkbox" id="selectAll"></th>
-                        <th style="width: 22%;">Nama Customer</th>
-                        <th style="width: 15%;">Nama PIC</th>
-                        <th style="width: 13%;">Telepon PIC</th>
-                        <th style="width: 10%;">Kategori</th>
-                        <th style="width: 18%;">Alamat</th>
-                        <th style="width: 10%;">Kota</th>
-                        <th style="width: 18%;">Sales Penanggung Jawab</th>
+                        <th style="width: 22%; cursor:pointer;" onclick="sortTable(1)" title="Klik untuk mengurutkan berdasarkan Nama Customer">Nama Customer <i class="bi bi-arrow-down-up ms-1 font-size-10 opacity-75"></i></th>
+                        <th style="width: 15%; cursor:pointer;" onclick="sortTable(2)" title="Klik untuk mengurutkan berdasarkan Nama PIC">Nama PIC <i class="bi bi-arrow-down-up ms-1 font-size-10 opacity-75"></i></th>
+                        <th style="width: 13%; cursor:pointer;" onclick="sortTable(3)" title="Klik untuk mengurutkan berdasarkan No Telepon">Telepon PIC <i class="bi bi-arrow-down-up ms-1 font-size-10 opacity-75"></i></th>
+                        <th style="width: 10%; cursor:pointer;" onclick="sortTable(4)" title="Klik untuk mengurutkan berdasarkan Kategori">Kategori <i class="bi bi-arrow-down-up ms-1 font-size-10 opacity-75"></i></th>
+                        <th style="width: 18%; cursor:pointer;" onclick="sortTable(5)" title="Klik untuk mengurutkan berdasarkan Alamat">Alamat <i class="bi bi-arrow-down-up ms-1 font-size-10 opacity-75"></i></th>
+                        <th style="width: 10%; cursor:pointer;" onclick="sortTable(6)" title="Klik untuk mengurutkan berdasarkan Kota">Kota <i class="bi bi-arrow-down-up ms-1 font-size-10 opacity-75"></i></th>
+                        <th style="width: 18%; cursor:pointer;" onclick="sortTable(7)" title="Klik untuk mengurutkan berdasarkan Sales">Sales Penanggung Jawab <i class="bi bi-arrow-down-up ms-1 font-size-10 opacity-75"></i></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -514,6 +514,47 @@ $(document).ready(function() {
     });
 
 });
+
+let currentSortCol = -1;
+let currentSortAsc = true;
+
+function sortTable(colIndex) {
+    const table = document.getElementById('assignmentTable');
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    if (currentSortCol === colIndex) {
+        currentSortAsc = !currentSortAsc;
+    } else {
+        currentSortCol = colIndex;
+        currentSortAsc = true;
+    }
+
+    const headers = table.querySelectorAll('thead th');
+    headers.forEach((th, idx) => {
+        const icon = th.querySelector('i');
+        if (icon) {
+            if (idx === colIndex) {
+                icon.className = currentSortAsc ? 'bi bi-sort-alpha-down text-warning ms-1 fw-bold' : 'bi bi-sort-alpha-up-alt text-warning ms-1 fw-bold';
+            } else {
+                icon.className = 'bi bi-arrow-down-up ms-1 font-size-10 opacity-75';
+            }
+        }
+    });
+
+    rows.sort((rowA, rowB) => {
+        const cellA = rowA.children[colIndex] ? rowA.children[colIndex].textContent.trim().toLowerCase() : '';
+        const cellB = rowB.children[colIndex] ? rowB.children[colIndex].textContent.trim().toLowerCase() : '';
+
+        if (cellA < cellB) return currentSortAsc ? -1 : 1;
+        if (cellA > cellB) return currentSortAsc ? 1 : -1;
+        return 0;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
