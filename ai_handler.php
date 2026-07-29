@@ -1,7 +1,7 @@
 <?php
 /**
  * Asisten Sales Loewix AI Handler Engine - Master CSO & Negotiation Trainer
- * Context-aware AI engine handling customer quotes, credit terms, and sales rep situational consultations.
+ * Dynamic Gemini AI integration + Master Loewix Sales & Negotiation Matrix Fallback
  */
 
 ini_set('display_errors', 0);
@@ -9,7 +9,12 @@ error_reporting(0);
 
 header('Content-Type: application/json');
 
-$apiKey = 'AIzaSyC9WgTHoRv5qREa5R7LVyOEL58lgn-UaWs';
+if (file_exists('includes/db.php')) {
+    require_once 'includes/db.php';
+}
+
+// Get API Key from environment or constant if provided
+$apiKey = defined('GEMINI_API_KEY') ? GEMINI_API_KEY : (getenv('GEMINI_API_KEY') ?: 'AIzaSyC9WgTHoRv5qREa5R7LVyOEL58lgn-UaWs');
 
 $input = json_decode(file_get_contents('php://input'), true);
 $customerQuestion = trim($input['question'] ?? '');
@@ -44,17 +49,11 @@ Input dari Sales Rep / Situasi: \"{$customerQuestion}\"
 
 PENTING Mengenai Pemahaman Input:
 Input di atas bisa berupa:
-A. Teks obrolan / pertanyaan langsung dari Customer (misal: 'Client mau hutang gimana?', 'Berapa harganya?', 'Bisa kurang gak?', 'Bisa masuk ke NVR Dahua gak?').
-B. Curhat / Konsultasi dari Sales Rep mengenai calon customer / segmen tertentu (misal: 'Saya dapat customer Kepala Sekolah', 'Gimana cara nawarin ke sekolah / toko emas / rumah sakit').
+A. Teks obrolan / pertanyaan langsung dari Customer.
+B. Curhat / Konsultasi dari Sales Rep mengenai situasi prospek (misal: 'kalo client saya sensi di tawarin cara ngadepinnya gmn?', 'Client mau hutang gimana?').
 
 TUGAS UTAMA:
-Buatlah 3 TAKTIK STRATEGI SALES & SKRIP CHAT WHATSAPP PERSUASIF YANG GENIUS DAN SANGAT SPESIFIK SESUAI TOPIK INPUT DI ATAS.
-
-Aturan Penting:
-1. Jika topik mengenai HUTANG / KREDIT / TEMPO / TOP: Berikan strategi penanganan kredit (DP 50%, Cicilan 0% E-Commerce Tokopedia/Shopee PayLater, atau Syarat TOP Instansi PO Resmi).
-2. Jika topik mengenai KEPALA SEKOLAH / PENDIDIKAN: Berikan skrip formal untuk Kepala Sekolah dengan penawaran faktur resmi, SPK, & keamanan murid.
-3. Jika topik mengenai HARGA MAHAL / DISKON: Berikan strategi value garansi 1-to-1 replacement & bonus aksesoris tanpa potong margin.
-4. Jika topik mengenai KOMPETITOR (Dahua/Hikvision): Tekankan kompatibilitas ONVIF universal & sensor Starlight 24 Jam Full Color.
+Berikan 3 Taktik Strategi Sales & Skrip Chat WhatsApp Persuasif yang Genius, Sangat Spesifik, dan Siap Kirim sesuai pertanyaan di atas.
 
 Setiap Opsi HARUS berbentuk 1 objek dengan properti:
 - \"type\": \"Nama Taktik / Pendekatan Strategis\"
@@ -75,56 +74,80 @@ Kembalikan HANYA format JSON valid seperti ini (tanpa markdown ```json):
   ]
 }";
 
-// Models to attempt in sequence
-$modelsToTry = [
-    'gemini-1.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-pro'
+// Endpoint list for Gemini API
+$endpointsToTry = [
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={$apiKey}",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}",
+    "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={$apiKey}"
 ];
 
 $answers = null;
 
-foreach ($modelsToTry as $modelName) {
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key={$apiKey}";
-    $postData = json_encode([
-        'contents' => [['parts' => [['text' => $prompt]]]]
-    ]);
+if (!empty($apiKey) && strlen($apiKey) > 20) {
+    foreach ($endpointsToTry as $url) {
+        $postData = json_encode([
+            'contents' => [['parts' => [['text' => $prompt]]]]
+        ]);
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-    if ($httpCode === 200 && $response) {
-        $responseData = json_decode($response, true);
-        if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
-            $rawText = $responseData['candidates'][0]['content']['parts'][0]['text'];
-            $cleanedJson = preg_replace('/^```json\s*/i', '', $rawText);
-            $cleanedJson = preg_replace('/\s*```$/i', '', $cleanedJson);
-            $cleanedJson = trim($cleanedJson);
+        if ($httpCode === 200 && $response) {
+            $responseData = json_decode($response, true);
+            if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
+                $rawText = $responseData['candidates'][0]['content']['parts'][0]['text'];
+                $cleanedJson = preg_replace('/^```json\s*/i', '', $rawText);
+                $cleanedJson = preg_replace('/\s*```$/i', '', $cleanedJson);
+                $cleanedJson = trim($cleanedJson);
 
-            $parsed = json_decode($cleanedJson, true);
-            if (isset($parsed['answers']) && is_array($parsed['answers']) && count($parsed['answers']) >= 1) {
-                $answers = $parsed['answers'];
-                break;
+                $parsed = json_decode($cleanedJson, true);
+                if (isset($parsed['answers']) && is_array($parsed['answers']) && count($parsed['answers']) >= 1) {
+                    $answers = $parsed['answers'];
+                    break;
+                }
             }
         }
     }
 }
 
-// Master Fallback Engine if API is limited or unavailable
+// Master Loewix Sales Negotiation & Consultation Matrix Fallback
 if (empty($answers)) {
     $q = mb_strtolower($customerQuestion);
     
-    // 1. SCENARIO: HUTANG / KREDIT / TEMPO / TOP / BAYAR NANTI / CICILAN
-    if (strpos($q, 'hutang') !== false || strpos($q, 'utang') !== false || strpos($q, 'kredit') !== false || strpos($q, 'tempo') !== false || strpos($q, 'top') !== false || strpos($q, 'cicil') !== false || strpos($q, 'bayar nanti') !== false || strpos($q, 'termin') !== false) {
+    // 1. SCENARIO: CLIENT SENSI / SENSITIF / JUTEK / GALAK / TRAUMA / TOLAK / DINGIN
+    if (strpos($q, 'sensi') !== false || strpos($q, 'sensitif') !== false || strpos($q, 'jutek') !== false || strpos($q, 'galak') !== false || strpos($q, 'tolak') !== false || strpos($q, 'trauma') !== false || strpos($q, 'marah') !== false || strpos($q, 'cuek') !== false || strpos($q, 'dingin') !== false) {
+        $answers = [
+            [
+                'type' => 'Pendekatan Soft-Approach & Listening First',
+                'strategy' => 'Jangan langsung jualan! Posisikan diri sebagai konsultan keamanan yang ingin membantu kendala mereka.',
+                'text' => 'Halo Kak! Salam kenal dari tim Loewix CCTV Indonesia. Mohon maaf mengganggu waktunya, kami hanya ingin menyapa dan siap membantu jika Kakak ada kendala teknis atau pertanyaan seputar sistem keamanan di tempat Kakak. Tanpa kewajiban membeli, kami siap berbagi solusi gratis kapan saja Kakak butuhkan.',
+                'product_recommendation' => 'Loewix Free Security Consultation Service'
+            ],
+            [
+                'type' => 'Pendekatan Edukasi & Berbagi Panduan Bebas Blind-Spot',
+                'strategy' => 'Kirimkan materi tips bermanfaat agar customer merasa dibantu tanpa ada kesan dipaksa membeli.',
+                'text' => 'Halo Kak! Sekadar berbagi informasi bermanfaat untuk proteksi area usaha/rumah Kakak, kami ada panduan singkat lokasi titik pemasangan CCTV yang bebas dari blind-spot. Jika kelak Kakak butuh perbandingan spesifikasi atau pembaruan sistem, tim kami siap bantu mengirimkan datanya.',
+                'product_recommendation' => 'Loewix Blind-Spot Protection Guide'
+            ],
+            [
+                'type' => 'Pendekatan Solusi Trauma CCTV Rusak & Garansi Ganti Baru',
+                'strategy' => 'Jelaskan garansi ganti unit baru 100% jika trauma karena CCTV lamanya sering rewel & garansinya susah.',
+                'text' => 'Halo Kak! Kami sangat paham terkadang banyak unit CCTV di pasaran yang sering rewel dan garansinya berbelit. Di Loewix, kami berikan jaminan resmi 1-to-1 Replacement (Ganti Unit Baru 100%) jika ada kendala, jadi Kakak tidak perlu pusing menunggu proses servis berminggu-minggu.',
+                'product_recommendation' => 'Loewix 1-to-1 Replacement Guarantee Package'
+            ]
+        ];
+    }
+    // 2. SCENARIO: HUTANG / KREDIT / TEMPO / TOP / BAYAR NANTI / CICILAN
+    elseif (strpos($q, 'hutang') !== false || strpos($q, 'utang') !== false || strpos($q, 'kredit') !== false || strpos($q, 'tempo') !== false || strpos($q, 'top') !== false || strpos($q, 'cicil') !== false || strpos($q, 'bayar nanti') !== false || strpos($q, 'termin') !== false) {
         $answers = [
             [
                 'type' => 'Taktik DP 50% & Pembayaran Bertahap',
@@ -146,7 +169,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 2. SCENARIO: KEPALA SEKOLAH / PENDIDIKAN / GURU / GURU / YAYASAN
+    // 3. SCENARIO: KEPALA SEKOLAH / PENDIDIKAN / GURU / YAYASAN / DANA BOS
     elseif (strpos($q, 'sekolah') !== false || strpos($q, 'pendidikan') !== false || strpos($q, 'kepala') !== false || strpos($q, 'guru') !== false || strpos($q, 'yayasan') !== false || strpos($q, 'bos') !== false) {
         $answers = [
             [
@@ -169,7 +192,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 3. SCENARIO: HARGA MAHAL / DISKON / NEGO / POTONG / MURAH
+    // 4. SCENARIO: HARGA MAHAL / DISKON / NEGO / POTONG / MURAH
     elseif (strpos($q, 'diskon') !== false || strpos($q, 'kurang') !== false || strpos($q, 'mahal') !== false || strpos($q, 'potong') !== false || strpos($q, 'murah') !== false || strpos($q, 'harga') !== false) {
         $answers = [
             [
@@ -192,7 +215,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 4. SCENARIO: KOMPETITOR / MERK SEBELAH / DAHUA / HIKVISION / NVR / DVR / ONVIF
+    // 5. SCENARIO: KOMPETITOR / MERK SEBELAH / DAHUA / HIKVISION / NVR / DVR / ONVIF
     elseif (strpos($q, 'dahua') !== false || strpos($q, 'hikvision') !== false || strpos($q, 'nvr') !== false || strpos($q, 'dvr') !== false || strpos($q, 'onvif') !== false || strpos($q, 'merk') !== false || strpos($q, 'sebelah') !== false) {
         $answers = [
             [
@@ -215,7 +238,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 5. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
+    // 6. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
     elseif (strpos($q, 'toko') !== false || strpos($q, 'reseller') !== false || strpos($q, 'dealer') !== false || strpos($q, 'grosir') !== false || strpos($q, 'jual lagi') !== false) {
         $answers = [
             [
@@ -238,7 +261,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 6. DEFAULT GENERAL CONSULTATION & NEGOTIATION
+    // 7. DEFAULT GENERAL CONSULTATION & NEGOTIATION
     else {
         $answers = [
             [
