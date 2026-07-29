@@ -13,7 +13,7 @@ if (file_exists('includes/db.php')) {
     require_once 'includes/db.php';
 }
 
-// Get API Key from environment, constant, or user provided active key
+// Active Gemini API Key
 $apiKey = defined('GEMINI_API_KEY') ? GEMINI_API_KEY : (getenv('GEMINI_API_KEY') ?: 'AIzaSyBgwtBmX3I6KRHK2V1UpvjhKo4yMoTTAy4');
 
 $input = json_decode(file_get_contents('php://input'), true);
@@ -50,7 +50,7 @@ Input dari Sales Rep / Situasi: \"{$customerQuestion}\"
 PENTING Mengenai Pemahaman Input:
 Input di atas bisa berupa:
 A. Teks obrolan / pertanyaan langsung dari Customer.
-B. Curhat / Konsultasi dari Sales Rep mengenai situasi prospek (misal: 'kalo client saya sensi di tawarin cara ngadepinnya gmn?', 'Client mau hutang gimana?').
+B. Curhat / Konsultasi dari Sales Rep mengenai situasi prospek (misal: 'CLient kepolisian gmn cara nego nya', 'client saya seorang notaris', 'kalo client saya sensi di tawarin cara ngadepinnya gmn?', 'Client mau hutang gimana?').
 
 TUGAS UTAMA:
 Berikan 3 Taktik Strategi Sales & Skrip Chat WhatsApp Persuasif yang Genius, Sangat Spesifik, dan Siap Kirim sesuai pertanyaan di atas.
@@ -76,10 +76,9 @@ Kembalikan HANYA format JSON valid seperti ini (tanpa markdown ```json):
 
 // Endpoint list for Gemini API across supported models
 $endpointsToTry = [
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={$apiKey}",
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={$apiKey}",
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}",
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key={$apiKey}"
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={$apiKey}",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={$apiKey}"
 ];
 
 $answers = null;
@@ -96,7 +95,10 @@ if (!empty($apiKey) && strlen($apiKey) > 20) {
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 12);
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -124,8 +126,54 @@ if (!empty($apiKey) && strlen($apiKey) > 20) {
 if (empty($answers)) {
     $q = mb_strtolower($customerQuestion);
     
-    // 1. SCENARIO: CLIENT SENSI / SENSITIF / JUTEK / GALAK / TRAUMA / TOLAK / DINGIN
-    if (strpos($q, 'sensi') !== false || strpos($q, 'sensitif') !== false || strpos($q, 'jutek') !== false || strpos($q, 'galak') !== false || strpos($q, 'tolak') !== false || strpos($q, 'trauma') !== false || strpos($q, 'marah') !== false || strpos($q, 'cuek') !== false || strpos($q, 'dingin') !== false) {
+    // 1. SCENARIO: KEPOLISIAN / POLISI / POLSEK / POLRES / APARAT / INSTANSI KEAMANAN
+    if (strpos($q, 'polisi') !== false || strpos($q, 'kepolisian') !== false || strpos($q, 'polsek') !== false || strpos($q, 'polres') !== false || strpos($q, 'aparat') !== false) {
+        $answers = [
+            [
+                'type' => 'Pendekatan Kompresi Rekaman H.265+ & Resolusi Ultra HD',
+                'strategy' => 'Tekankan kejelasan rekaman untuk barang bukti (zoom plat nomor/wajah) & ketahanan rekaman jangka panjang.',
+                'text' => 'Selamat pagi/siang Komandan/Bapak. Terkait kebutuhan pengawasan area & bukti rekaman presisi tinggi, kamera Loewix IP Cam 4K dilengkapi sensor Sony Starlight yang dapat melakukan digital zoom detail tanpa pecah gambar, serta kompresi H.265+ untuk penyimpanan rekaman durasi panjang.',
+                'product_recommendation' => 'Loewix High-Definition Institutional Security 4K'
+            ],
+            [
+                'type' => 'Pendekatan Faktur Pajak & Legalitas SPK Resmi',
+                'strategy' => 'Tekankan kelengkapan administrasi pengadaan instansi, faktur pajak resmi, & Garansi Ganti Baru 1-to-1.',
+                'text' => 'Bapak/Komandan yang kami hormati, produk Loewix CCTV didukung legalitas pengadaan resmi, invoice faktur pajak, serta jaminan Garansi Ganti Baru 1-to-1 Replacement selama 1 tahun tanpa proses servis rumit.',
+                'product_recommendation' => 'Loewix Institutional Command Center Package'
+            ],
+            [
+                'type' => 'Pendekatan Integrasi Multi-Channel TV Monitor & Smartphone',
+                'strategy' => 'Tawarkan instalasi ruang pantau terpusat (Command Room) yang terkoneksi langsung ke gadget pimpinan.',
+                'text' => 'Bapak/Komandan, sistem Loewix CCTV dapat langsung dihubungkan ke TV display ruang pimpinan serta pemantauan realtime encrypted via smartphone. Akses pengawasan gedung/ruang tahanan/gerbang dapat terpantau 24 jam.',
+                'product_recommendation' => 'Loewix Command Center TV & Mobile P2P System'
+            ]
+        ];
+    }
+    // 2. SCENARIO: NOTARIS / HUKUM / PENGACARA / KANTOR ADVOKAT
+    elseif (strpos($q, 'notaris') !== false || strpos($q, 'hukum') !== false || strpos($q, 'pengacara') !== false || strpos($q, 'advokat') !== false) {
+        $answers = [
+            [
+                'type' => 'Pendekatan Privasi, Audio Recording & Audit Dokumen',
+                'strategy' => 'Bapak/Ibu Notaris butuh pengawasan area transaksi berkas & perekaman suara ruang akta.',
+                'text' => 'Selamat pagi/siang Bapak/Ibu Notaris. Untuk perlindungan ruang transaksi akta & penyimpanan berkas rahasia, kamera Loewix Smart Audio dilengkapi mikrofon peredam bising untuk merekam interaksi kesepakatan secara jernih serta perlindungan area brankas dokumen 24 jam.',
+                'product_recommendation' => 'Loewix Legal Office Audio-Visual Package'
+            ],
+            [
+                'type' => 'Pendekatan Sensor Motion Detection Area Brankas / Ruang Berkas',
+                'strategy' => 'Tawarkan sensor AI motion alarm yang mengirim notifikasi instant ke HP Notaris jika ada pergerakan di luar jam kantor.',
+                'text' => 'Bapak/Ibu Notaris yang kami hormati, sistem Loewix AI Motion Alarm akan secara otomatis mengirimkan notifikasi darurat & foto terobosan ke smartphone Anda jika terdapat aktivitas mencurigakan di sekitar ruang brankas/arsip pada malam hari.',
+                'product_recommendation' => 'Loewix Confidential Document Shield Series'
+            ],
+            [
+                'type' => 'Pendekatan Estetika Modern & Garansi Ganti Unit Baru',
+                'strategy' => 'Tekankan desain kamera dome yang elegan untuk interior kantor Notaris plus Garansi Ganti Baru 1 Tahun.',
+                'text' => 'Bapak/Ibu Notaris, kamera Loewix Dome Series dirancang elegan menyatu dengan plafon kantor Anda tanpa merusak estetika interior, dilengkapi garansi ganti baru resmi 1-to-1 jika ada kendala.',
+                'product_recommendation' => 'Loewix Sleek Dome Camera Office Edition'
+            ]
+        ];
+    }
+    // 3. SCENARIO: CLIENT SENSI / SENSITIF / JUTEK / GALAK / TRAUMA / TOLAK / DINGIN
+    elseif (strpos($q, 'sensi') !== false || strpos($q, 'sensitif') !== false || strpos($q, 'jutek') !== false || strpos($q, 'galak') !== false || strpos($q, 'tolak') !== false || strpos($q, 'trauma') !== false || strpos($q, 'marah') !== false || strpos($q, 'cuek') !== false || strpos($q, 'dingin') !== false) {
         $answers = [
             [
                 'type' => 'Pendekatan Soft-Approach & Listening First',
@@ -147,7 +195,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 2. SCENARIO: HUTANG / KREDIT / TEMPO / TOP / BAYAR NANTI / CICILAN
+    // 4. SCENARIO: HUTANG / KREDIT / TEMPO / TOP / BAYAR NANTI / CICILAN
     elseif (strpos($q, 'hutang') !== false || strpos($q, 'utang') !== false || strpos($q, 'kredit') !== false || strpos($q, 'tempo') !== false || strpos($q, 'top') !== false || strpos($q, 'cicil') !== false || strpos($q, 'bayar nanti') !== false || strpos($q, 'termin') !== false) {
         $answers = [
             [
@@ -170,7 +218,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 3. SCENARIO: KEPALA SEKOLAH / PENDIDIKAN / GURU / YAYASAN / DANA BOS
+    // 5. SCENARIO: KEPALA SEKOLAH / PENDIDIKAN / GURU / YAYASAN / DANA BOS
     elseif (strpos($q, 'sekolah') !== false || strpos($q, 'pendidikan') !== false || strpos($q, 'kepala') !== false || strpos($q, 'guru') !== false || strpos($q, 'yayasan') !== false || strpos($q, 'bos') !== false) {
         $answers = [
             [
@@ -193,7 +241,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 4. SCENARIO: HARGA MAHAL / DISKON / NEGO / POTONG / MURAH
+    // 6. SCENARIO: HARGA MAHAL / DISKON / NEGO / POTONG / MURAH
     elseif (strpos($q, 'diskon') !== false || strpos($q, 'kurang') !== false || strpos($q, 'mahal') !== false || strpos($q, 'potong') !== false || strpos($q, 'murah') !== false || strpos($q, 'harga') !== false) {
         $answers = [
             [
@@ -216,7 +264,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 5. SCENARIO: KOMPETITOR / MERK SEBELAH / DAHUA / HIKVISION / NVR / DVR / ONVIF
+    // 7. SCENARIO: KOMPETITOR / MERK SEBELAH / DAHUA / HIKVISION / NVR / DVR / ONVIF
     elseif (strpos($q, 'dahua') !== false || strpos($q, 'hikvision') !== false || strpos($q, 'nvr') !== false || strpos($q, 'dvr') !== false || strpos($q, 'onvif') !== false || strpos($q, 'merk') !== false || strpos($q, 'sebelah') !== false) {
         $answers = [
             [
@@ -239,30 +287,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 6. SCENARIO: RANDOM / NON-SALES INPUT (e.g. makan nasi, tes, main, tidur)
-    elseif (strpos($q, 'nasi') !== false || strpos($q, 'makan') !== false || strpos($q, 'minum') !== false || strpos($q, 'main') !== false || strpos($q, 'tidur') !== false || strpos($q, 'lucu') !== false) {
-        $answers = [
-            [
-                'type' => 'Panduan Konsultasi Prospek Sales Loewix',
-                'strategy' => 'Input ini tampaknya santai/tidak berkaitan langsung dengan CCTV. Fokuskan konsultasi pada situasi prospek customer.',
-                'text' => 'Halo Sales Loewix! Sepertinya input Kakak tidak berkaitan langsung dengan penawaran CCTV Loewix. Silakan ketik pertanyaan seputar penanganan prospek customer (misal: "Client mau hutang gimana?", "Client sensi ditawarin gimana?"), nego harga, atau spesifikasi produk yang ingin Kakak konsultasikan!',
-                'product_recommendation' => 'Asisten Sales Loewix Smart Negotiation Coach'
-            ],
-            [
-                'type' => 'Tips Follow-Up Prospek Sambil Ramah Tamah',
-                'strategy' => 'Gunakan topik santai untuk membuka percakapan ramah dengan customer.',
-                'text' => 'Halo Kak! Semoga harinya menyenangkan. Sekadar mengingatkan untuk penawaran paket CCTV Loewix kemarin, apakah ada spesifikasi tambahan yang perlu kami kirimkan untuk bahan pertimbangan Kakak hari ini?',
-                'product_recommendation' => 'Loewix Customer Relationship Manager'
-            ],
-            [
-                'type' => 'Taktik Warm-Closing & Garansi Unit',
-                'strategy' => 'Alihkan percakapan santai customer menjadi kepastian transaksi paket CCTV.',
-                'text' => 'Halo Kak! Berhubung stok paket Loewix Full Color minggu ini sangat terbatas, jika Kakak ingin kami amankan unit dan teknisi pasangnya hari ini, kami bisa kirimkan invoice resminya sekarang juga.',
-                'product_recommendation' => 'Loewix Fast Closing Package'
-            ]
-        ];
-    }
-    // 7. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
+    // 8. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
     elseif (strpos($q, 'toko') !== false || strpos($q, 'reseller') !== false || strpos($q, 'dealer') !== false || strpos($q, 'grosir') !== false || strpos($q, 'jual lagi') !== false) {
         $answers = [
             [
@@ -285,7 +310,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 7. DEFAULT GENERAL CONSULTATION & NEGOTIATION
+    // 9. DEFAULT GENERAL CONSULTATION & NEGOTIATION
     else {
         $answers = [
             [
