@@ -13,8 +13,8 @@ if (file_exists('includes/db.php')) {
     require_once 'includes/db.php';
 }
 
-// Get API Key from environment or constant if provided
-$apiKey = defined('GEMINI_API_KEY') ? GEMINI_API_KEY : (getenv('GEMINI_API_KEY') ?: 'AIzaSyC9WgTHoRv5qREa5R7LVyOEL58lgn-UaWs');
+// Get API Key from environment, constant, or user provided active key
+$apiKey = defined('GEMINI_API_KEY') ? GEMINI_API_KEY : (getenv('GEMINI_API_KEY') ?: 'AIzaSyBgwtBmX3I6KRHK2V1UpvjhKo4yMoTTAy4');
 
 $input = json_decode(file_get_contents('php://input'), true);
 $customerQuestion = trim($input['question'] ?? '');
@@ -74,11 +74,12 @@ Kembalikan HANYA format JSON valid seperti ini (tanpa markdown ```json):
   ]
 }";
 
-// Endpoint list for Gemini API
+// Endpoint list for Gemini API across supported models
 $endpointsToTry = [
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={$apiKey}",
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}",
-    "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={$apiKey}"
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={$apiKey}",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key={$apiKey}"
 ];
 
 $answers = null;
