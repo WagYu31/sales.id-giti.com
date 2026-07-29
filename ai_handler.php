@@ -1,7 +1,7 @@
 <?php
 /**
  * Asisten Sales Loewix AI Handler Engine - Master CSO & Negotiation Trainer
- * Dynamic Gemini AI integration with Retry Loop + Master Industry & Profession Fallback Matrix
+ * Dynamic Gemini AI integration with Official Installer Follow-Up Playbook
  */
 
 ini_set('display_errors', 0);
@@ -22,22 +22,22 @@ $customerQuestion = trim($input['question'] ?? '');
 if (empty($customerQuestion)) {
     echo json_encode(['answers' => [
         [
-            'type' => 'Penawaran Value & Premium Closing',
-            'strategy' => 'Gunakan untuk menyapa customer baru yang menanyakan paket CCTV.',
-            'text' => 'Halo Kak! Terima kasih sudah mengontak Sales Loewix CCTV Indonesia. Kami menyediakan paket CCTV Full Color 24 Jam dengan garansi ganti unit baru resmi. Kakak berencana pasang di rumah atau area toko/kantor?',
-            'product_recommendation' => 'Loewix Package Full Color 2MP 4-Channel'
+            'type' => 'Tahap 1: Perkenalan & Kualifikasi Installer',
+            'strategy' => 'Gunakan untuk menyapa installer/teknisi CCTV baru untuk kualifikasi fokus usaha.',
+            'text' => 'Halo Pak/Bu/Kak, saya Priska/Rina dari Loewix CCTV. Sebelumnya apakah masih main Produk CCTV Pak/Bu/Kak? Kalau boleh tau Bapak Fokus nya di Installer/Toko CCTV?',
+            'product_recommendation' => 'Loewix Official Installer Qualification'
         ],
         [
-            'type' => 'Teknik Negosiasi & Bonus Value',
-            'strategy' => 'Gunakan jika customer menanyakan ketersediaan promo / nego harga.',
-            'text' => 'Halo Kak! Khusus pemesanan minggu ini, kami ada promo paket CCTV Loewix siap pakai sudah termasuk gratis biaya setting pantau HP selamanya dan bonus kabel HDMI. Boleh kami tahu lokasinya Kak?',
-            'product_recommendation' => 'Loewix Smart HD Package + Free Cloud P2P App'
+            'type' => 'Tahap 2: Skrip Promo Paket 2MP AHD Bebas Kombinasi',
+            'strategy' => 'Kirimkan setelah installer merespon, lengkap dengan harga promo & keunggulan bebas kombinasi.',
+            'text' => "*SIKAT BROOO! Installer Mana yang Gak Tergiur Coba?*🤔🔥\nBeli eceran kemahalan? Tenang, Loewix lagi ada Promo Special khusus Installer!\nBikin modal rakit paket CCTV ke konsumen makin jos & margin makin tebal.\n\n✨ Keunggulan Promo:\nBebas Kombinasi: Mau Outdoor 3 + Indoor 1? Boleh! Bebas tentuin sendiri sesuai kebutuhan lapangan.\n\nHarga Banting:\nPaket A: Rp 1.500.000 ❌ ➡ Rp 1.100.000 ✅\nPaket B: Rp 2.500.000 ❌ ➡ Rp 1.900.000 ✅\n\n*\"Rakit gampang, jualan tenang, untung makin kencang.\"*\n\nStok promo terbatas ya! Cepat-cepatan aja.\n👇 Langsung hubungi nomor di bawah:\n📞 [0811-8180-707]",
+            'product_recommendation' => 'Loewix Package 2MP AHD Special Installer'
         ],
         [
-            'type' => 'Strategi Upselling & Offer Upgrade',
-            'strategy' => 'Gunakan untuk customer yang menginginkan hasil rekaman super tajam & deteksi manusia.',
-            'text' => 'Halo Kak! Jika ingin keamanan maksimal yang bisa zoom detail wajah & plat nomor kendaraan malam hari, kami sangat sarankan Seri Loewix IP Camera 4K dengan AI Human Detection.',
-            'product_recommendation' => 'Loewix IP Camera 4K Ultra HD Series'
+            'type' => 'Tahap 3: Skrip Promo Paket 4MP IPCAM Proyek',
+            'strategy' => 'Kirimkan untuk installer yang menangani proyek IP Camera resolusi Ultra HD.',
+            'text' => "*RAKIT PROYEK IPCAM MAKIN UNTUNG & MARGIN TEBAL!* 🔥\nBeli kamera IP satuan mahal? Loewix sediakan Paket Promo IP Camera 4MP Khusus Installer!\nGambar Ultra HD super tajam, support PoE & ONVIF ke NVR merk apa saja.\n\n✨ Keunggulan Paket IPCam 4MP:\n- Resolusi 4MP Real Ultra HD Starlight Full Color 24 Jam\n- Kompresi H.265+ hemat Harddisk hingga 50%\n- Garansi Ganti Baru 1-to-1 Resmi Loewix 1 Tahun\n\nHarga Promo Installer:\nPaket IP A (4 Cam 4MP + NVR): Rp 3.200.000 ❌ ➡ Rp 2.450.000 ✅\nPaket IP B (8 Cam 4MP + NVR): Rp 5.800.000 ❌ ➡ Rp 4.200.000 ✅\n\n*\"Rakit gampang, jualan tenang, margin tebal konsumen senang.\"*\n📞 Hubungi Sales Official: [0811-8180-707]",
+            'product_recommendation' => 'Loewix IP Camera 4MP Ultra HD Installer Package'
         ]
     ]]);
     exit;
@@ -45,15 +45,36 @@ if (empty($customerQuestion)) {
 
 $prompt = "Anda adalah Chief Sales Officer (CSO) & Master Sales Trainer untuk merek CCTV ternama 'Loewix CCTV Indonesia'.
 
+SOP OFFICIAL FOLLOW-UP SALES UNTUK INSTALLER / TEKNISI LOEWIX:
+1. Tahap Perkenalan:
+'Halo Pak/Bu/Kak, saya Priska/Rina dari Loewix CCTV. Sebelumnya apakah masih main Produk CCTV Pak/Bu/Kak? Kalau boleh tau Bapak Fokus nya di Installer/Toko CCTV?'
+
+2. Tahap Kirim Price List & Promo Paket 2MP AHD:
+'*SIKAT BROOO! Installer Mana yang Gak Tergiur Coba?*🤔🔥
+Beli eceran kemahalan? Tenang, Loewix lagi ada Promo Special khusus Installer!
+Bikin modal rakit paket CCTV ke konsumen makin jos & margin makin tebal.
+✨ Keunggulan Promo: Bebas Kombinasi (Outdoor 3 + Indoor 1)
+Harga Banting:
+Paket A: Rp 1.500.000 ❌ ➡ Rp 1.100.000 ✅
+Paket B: Rp 2.500.000 ❌ ➡ Rp 1.900.000 ✅
+*\"Rakit gampang, jualan tenang, untung makin kencang.\"*
+📞 [0811-8180-707]'
+
+3. Tahap Kirim Promo Paket 4MP IPCAM:
+'*RAKIT PROYEK IPCAM MAKIN UNTUNG & MARGIN TEBAL!* 🔥
+Paket Promo IP Camera 4MP Khusus Installer!
+- 4MP Real Ultra HD Starlight Full Color 24 Jam
+- Kompresi H.265+ hemat Harddisk hingga 50%
+- Garansi Ganti Baru 1-to-1 Resmi 1 Tahun
+Harga Promo:
+Paket IP A (4 Cam 4MP + NVR): Rp 3.200.000 ❌ ➡ Rp 2.450.000 ✅
+Paket IP B (8 Cam 4MP + NVR): Rp 5.800.000 ❌ ➡ Rp 4.200.000 ✅
+📞 [0811-8180-707]'
+
 Input dari Sales Rep / Situasi: \"{$customerQuestion}\"
 
-PENTING Mengenai Pemahaman Input:
-Input di atas bisa berupa:
-A. Pertanyaan / situasi prospek spesifik profi/klien (misal: 'client saya seorang dokter', 'Client kepolisian gmn cara nego nya', 'client saya notaris', 'client resto/hotel', 'Client mau hutang').
-B. Pertanyaan penawaran harga / nego / kendala sales.
-
 TUGAS UTAMA:
-Berikan 3 Taktik Strategi Sales & Skrip Chat WhatsApp Persuasif yang Genius, Sangat Spesifik, dan Siap Kirim sesuai profesi/situasi prospek di atas.
+Berikan 3 Taktik Strategi Sales & Skrip Chat WhatsApp Persuasif yang Genius, Sangat Spesifik, dan Siap Kirim sesuai SOP di atas atau situasi prospek di atas.
 
 Setiap Opsi HARUS berbentuk 1 objek dengan properti:
 - \"type\": \"Nama Taktik / Pendekatan Strategis\"
@@ -130,8 +151,31 @@ if (!empty($apiKey) && strlen($apiKey) > 20) {
 if (empty($answers)) {
     $q = mb_strtolower($customerQuestion);
     
-    // 1. SCENARIO: DOKTER / RUMAH SAKIT / KLINIK / PRAKTIK / FARMASI / APOTEK / MEDIS
-    if (strpos($q, 'dokter') !== false || strpos($q, 'rumah sakit') !== false || strpos($q, 'klinik') !== false || strpos($q, 'praktik') !== false || strpos($q, 'farmasi') !== false || strpos($q, 'apotek') !== false || strpos($q, 'medis') !== false) {
+    // 1. SCENARIO: INSTALLER / TEKNISI / FOLLOW UP INSTALLER / PAKET INSTALLER / PROMO INSTALLER / RAKIT
+    if (strpos($q, 'installer') !== false || strpos($q, 'teknisi') !== false || strpos($q, 'follow up') !== false || strpos($q, 'rakit') !== false || strpos($q, '2mp') !== false || strpos($q, '4mp') !== false || strpos($q, 'ahd') !== false || strpos($q, 'ipcam') !== false) {
+        $answers = [
+            [
+                'type' => 'Tahap 1: Perkenalan & Kualifikasi Installer',
+                'strategy' => 'Gunakan untuk menyapa installer/teknisi CCTV baru untuk kualifikasi fokus usaha.',
+                'text' => 'Halo Pak/Bu/Kak, saya Priska/Rina dari Loewix CCTV. Sebelumnya apakah masih main Produk CCTV Pak/Bu/Kak? Kalau boleh tau Bapak Fokus nya di Installer/Toko CCTV?',
+                'product_recommendation' => 'Loewix Official Installer Qualification'
+            ],
+            [
+                'type' => 'Tahap 2: Promo Special Installer 2MP AHD (Bebas Kombinasi)',
+                'strategy' => 'Kirimkan setelah installer merespon, lengkap dengan harga promo & keunggulan bebas kombinasi.',
+                'text' => "*SIKAT BROOO! Installer Mana yang Gak Tergiur Coba?*🤔🔥\nBeli eceran kemahalan? Tenang, Loewix lagi ada Promo Special khusus Installer!\nBikin modal rakit paket CCTV ke konsumen makin jos & margin makin tebal.\n\n✨ Keunggulan Promo:\nBebas Kombinasi: Mau Outdoor 3 + Indoor 1? Boleh! Bebas tentuin sendiri sesuai kebutuhan lapangan.\n\nHarga Banting:\nPaket A: Rp 1.500.000 ❌ ➡ Rp 1.100.000 ✅\nPaket B: Rp 2.500.000 ❌ ➡ Rp 1.900.000 ✅\n\n*\"Rakit gampang, jualan tenang, untung makin kencang.\"*\n\nStok promo terbatas ya! Cepat-cepatan aja.\n👇 Langsung hubungi nomor di bawah:\n📞 [0811-8180-707]",
+                'product_recommendation' => 'Loewix Package 2MP AHD Special Installer'
+            ],
+            [
+                'type' => 'Tahap 3: Promo Special Installer 4MP IPCAM Proyek',
+                'strategy' => 'Kirimkan untuk installer yang menangani proyek IP Camera resolusi Ultra HD.',
+                'text' => "*RAKIT PROYEK IPCAM MAKIN UNTUNG & MARGIN TEBAL!* 🔥\nBeli kamera IP satuan mahal? Loewix sediakan Paket Promo IP Camera 4MP Khusus Installer!\nGambar Ultra HD super tajam, support PoE & ONVIF ke NVR merk apa saja.\n\n✨ Keunggulan Paket IPCam 4MP:\n- Resolusi 4MP Real Ultra HD Starlight Full Color 24 Jam\n- Kompresi H.265+ hemat Harddisk hingga 50%\n- Garansi Ganti Baru 1-to-1 Resmi Loewix 1 Tahun\n\nHarga Promo Installer:\nPaket IP A (4 Cam 4MP + NVR): Rp 3.200.000 ❌ ➡ Rp 2.450.000 ✅\nPaket IP B (8 Cam 4MP + NVR): Rp 5.800.000 ❌ ➡ Rp 4.200.000 ✅\n\n*\"Rakit gampang, jualan tenang, margin tebal konsumen senang.\"*\n📞 Hubungi Sales Official: [0811-8180-707]",
+                'product_recommendation' => 'Loewix IP Camera 4MP Ultra HD Installer Package'
+            ]
+        ];
+    }
+    // 2. SCENARIO: DOKTER / RUMAH SAKIT / KLINIK / PRAKTIK / FARMASI / APOTEK / MEDIS
+    elseif (strpos($q, 'dokter') !== false || strpos($q, 'rumah sakit') !== false || strpos($q, 'klinik') !== false || strpos($q, 'praktik') !== false || strpos($q, 'farmasi') !== false || strpos($q, 'apotek') !== false || strpos($q, 'medis') !== false) {
         $answers = [
             [
                 'type' => 'Pendekatan Higienis, Privasi Ruang Periksa & Area Obat',
@@ -153,7 +197,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 2. SCENARIO: KEPOLISIAN / POLISI / POLSEK / POLRES / APARAT / INSTANSI KEAMANAN
+    // 3. SCENARIO: KEPOLISIAN / POLISI / POLSEK / POLRES / APARAT / INSTANSI KEAMANAN
     elseif (strpos($q, 'polisi') !== false || strpos($q, 'kepolisian') !== false || strpos($q, 'polsek') !== false || strpos($q, 'polres') !== false || strpos($q, 'aparat') !== false) {
         $answers = [
             [
@@ -176,7 +220,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 3. SCENARIO: NOTARIS / HUKUM / PENGACARA / KANTOR ADVOKAT
+    // 4. SCENARIO: NOTARIS / HUKUM / PENGACARA / KANTOR ADVOKAT
     elseif (strpos($q, 'notaris') !== false || strpos($q, 'hukum') !== false || strpos($q, 'pengacara') !== false || strpos($q, 'advokat') !== false) {
         $answers = [
             [
@@ -199,7 +243,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 4. SCENARIO: RESTORAN / KAFE / CAFE / RUMAH MAKAN / KULINER
+    // 5. SCENARIO: RESTORAN / KAFE / CAFE / RUMAH MAKAN / KULINER
     elseif (strpos($q, 'resto') !== false || strpos($q, 'restoran') !== false || strpos($q, 'kafe') !== false || strpos($q, 'cafe') !== false || strpos($q, 'kuliner') !== false || strpos($q, 'rumah makan') !== false) {
         $answers = [
             [
@@ -222,7 +266,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 5. SCENARIO: CLIENT SENSI / SENSITIF / JUTEK / GALAK / TRAUMA / TOLAK / DINGIN
+    // 6. SCENARIO: CLIENT SENSI / SENSITIF / JUTEK / GALAK / TRAUMA / TOLAK / DINGIN
     elseif (strpos($q, 'sensi') !== false || strpos($q, 'sensitif') !== false || strpos($q, 'jutek') !== false || strpos($q, 'galak') !== false || strpos($q, 'tolak') !== false || strpos($q, 'trauma') !== false || strpos($q, 'marah') !== false || strpos($q, 'cuek') !== false || strpos($q, 'dingin') !== false) {
         $answers = [
             [
@@ -245,7 +289,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 6. SCENARIO: HUTANG / KREDIT / TEMPO / TOP / BAYAR NANTI / CICILAN
+    // 7. SCENARIO: HUTANG / KREDIT / TEMPO / TOP / BAYAR NANTI / CICILAN
     elseif (strpos($q, 'hutang') !== false || strpos($q, 'utang') !== false || strpos($q, 'kredit') !== false || strpos($q, 'tempo') !== false || strpos($q, 'top') !== false || strpos($q, 'cicil') !== false || strpos($q, 'bayar nanti') !== false || strpos($q, 'termin') !== false) {
         $answers = [
             [
@@ -268,7 +312,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 7. SCENARIO: KEPALA SEKOLAH / PENDIDIKAN / GURU / YAYASAN / DANA BOS
+    // 8. SCENARIO: KEPALA SEKOLAH / PENDIDIKAN / GURU / YAYASAN / DANA BOS
     elseif (strpos($q, 'sekolah') !== false || strpos($q, 'pendidikan') !== false || strpos($q, 'kepala') !== false || strpos($q, 'guru') !== false || strpos($q, 'yayasan') !== false || strpos($q, 'bos') !== false) {
         $answers = [
             [
@@ -291,7 +335,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 8. SCENARIO: HARGA MAHAL / DISKON / NEGO / POTONG / MURAH
+    // 9. SCENARIO: HARGA MAHAL / DISKON / NEGO / POTONG / MURAH
     elseif (strpos($q, 'diskon') !== false || strpos($q, 'kurang') !== false || strpos($q, 'mahal') !== false || strpos($q, 'potong') !== false || strpos($q, 'murah') !== false || strpos($q, 'harga') !== false) {
         $answers = [
             [
@@ -314,7 +358,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 9. SCENARIO: KOMPETITOR / MERK SEBELAH / DAHUA / HIKVISION / NVR / DVR / ONVIF
+    // 10. SCENARIO: KOMPETITOR / MERK SEBELAH / DAHUA / HIKVISION / NVR / DVR / ONVIF
     elseif (strpos($q, 'dahua') !== false || strpos($q, 'hikvision') !== false || strpos($q, 'nvr') !== false || strpos($q, 'dvr') !== false || strpos($q, 'onvif') !== false || strpos($q, 'merk') !== false || strpos($q, 'sebelah') !== false) {
         $answers = [
             [
@@ -337,7 +381,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 10. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
+    // 11. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
     elseif (strpos($q, 'toko') !== false || strpos($q, 'reseller') !== false || strpos($q, 'dealer') !== false || strpos($q, 'grosir') !== false || strpos($q, 'jual lagi') !== false) {
         $answers = [
             [
@@ -360,7 +404,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 11. SCENARIO: KOLAM RENANG / WATERPARK / RENANG / BERENANG / PENGINAPAN / RESORT
+    // 12. SCENARIO: KOLAM RENANG / WATERPARK / RENANG / BERENANG / PENGINAPAN / RESORT
     elseif (strpos($q, 'renang') !== false || strpos($q, 'kolam') !== false || strpos($q, 'waterpark') !== false || strpos($q, 'pantai') !== false || strpos($q, 'resort') !== false) {
         $answers = [
             [
@@ -383,7 +427,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 12. DYNAMIC CONTEXTUAL GENERATOR FOR ALL OTHER CUSTOM TOPICS
+    // 13. DYNAMIC CONTEXTUAL GENERATOR FOR ALL OTHER CUSTOM TOPICS
     else {
         $cleanTopic = htmlspecialchars(ucwords(mb_substr($customerQuestion, 0, 40)));
         $answers = [
