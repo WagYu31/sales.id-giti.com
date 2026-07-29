@@ -239,7 +239,30 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 6. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
+    // 6. SCENARIO: RANDOM / NON-SALES INPUT (e.g. makan nasi, tes, main, tidur)
+    elseif (strpos($q, 'nasi') !== false || strpos($q, 'makan') !== false || strpos($q, 'minum') !== false || strpos($q, 'main') !== false || strpos($q, 'tidur') !== false || strpos($q, 'lucu') !== false) {
+        $answers = [
+            [
+                'type' => 'Panduan Konsultasi Prospek Sales Loewix',
+                'strategy' => 'Input ini tampaknya santai/tidak berkaitan langsung dengan CCTV. Fokuskan konsultasi pada situasi prospek customer.',
+                'text' => 'Halo Sales Loewix! Sepertinya input Kakak tidak berkaitan langsung dengan penawaran CCTV Loewix. Silakan ketik pertanyaan seputar penanganan prospek customer (misal: "Client mau hutang gimana?", "Client sensi ditawarin gimana?"), nego harga, atau spesifikasi produk yang ingin Kakak konsultasikan!',
+                'product_recommendation' => 'Asisten Sales Loewix Smart Negotiation Coach'
+            ],
+            [
+                'type' => 'Tips Follow-Up Prospek Sambil Ramah Tamah',
+                'strategy' => 'Gunakan topik santai untuk membuka percakapan ramah dengan customer.',
+                'text' => 'Halo Kak! Semoga harinya menyenangkan. Sekadar mengingatkan untuk penawaran paket CCTV Loewix kemarin, apakah ada spesifikasi tambahan yang perlu kami kirimkan untuk bahan pertimbangan Kakak hari ini?',
+                'product_recommendation' => 'Loewix Customer Relationship Manager'
+            ],
+            [
+                'type' => 'Taktik Warm-Closing & Garansi Unit',
+                'strategy' => 'Alihkan percakapan santai customer menjadi kepastian transaksi paket CCTV.',
+                'text' => 'Halo Kak! Berhubung stok paket Loewix Full Color minggu ini sangat terbatas, jika Kakak ingin kami amankan unit dan teknisi pasangnya hari ini, kami bisa kirimkan invoice resminya sekarang juga.',
+                'product_recommendation' => 'Loewix Fast Closing Package'
+            ]
+        ];
+    }
+    // 7. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
     elseif (strpos($q, 'toko') !== false || strpos($q, 'reseller') !== false || strpos($q, 'dealer') !== false || strpos($q, 'grosir') !== false || strpos($q, 'jual lagi') !== false) {
         $answers = [
             [
