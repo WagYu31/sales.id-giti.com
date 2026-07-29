@@ -300,84 +300,103 @@ if ($_SESSION['role'] !== 'sales') {
                 </button>
             </div>
         </div>
-    </div>
+    </d    <!-- EXECUTIVE USER-FRIENDLY FORUM FEED -->
+    <div class="card border-0 shadow-sm" style="border-radius:22px; background:#F8FAFC;">
+        <div class="card-header bg-white py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3 border-bottom" style="border-radius:22px 22px 0 0;">
+            <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle bg-primary bg-gradient d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width:38px; height:38px;">
+                    <i class="bi bi-chat-left-dots-fill fs-5"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-extrabold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:16px;">Daftar Pertanyaan & Diskusi Sales</h5>
+                    <small class="text-muted fw-semibold" style="font-size:12px;">Klik kartu pertanyaan untuk membaca solusi & berdiskusi bersama tim</small>
+                </div>
+            </div>
 
-    <div class="card border-0 shadow-sm" style="border-radius:20px;">
-        <div class="card-header bg-white py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3 border-bottom-0">
-            <h5 class="mb-0 fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif;"><i class="bi bi-chat-left-dots-fill text-primary me-2"></i>Daftar Pertanyaan & Diskusi Sales</h5>
-            <div class="position-relative" style="min-width: 280px;">
+            <!-- Live Search Bar -->
+            <div class="position-relative flex-grow-1 flex-md-grow-0" style="min-width: 290px;">
                 <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0" style="border-top-left-radius:12px; border-bottom-left-radius:12px;"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" id="liveSearchInput" class="form-control border-start-0 ps-0" placeholder="Cari pertanyaan atau sales..." style="border-top-right-radius:12px; border-bottom-right-radius:12px; height:42px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted" style="border-top-left-radius:30px; border-bottom-left-radius:30px; padding-left:16px;">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="liveSearchInput" class="form-control border-start-0 ps-1 fw-semibold" placeholder="Cari topik, pertanyaan, atau sales..." style="border-top-right-radius:30px; border-bottom-right-radius:30px; height:42px; font-size:13.5px;">
                 </div>
             </div>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="questionsTable">
-                    <thead class="table-dark-header">
-                        <tr>
-                            <th style="width: 22%;">PERTANYAAN</th>
-                            <th style="width: 32%;">DETAIL PERTANYAAN</th>
-                            <th style="width: 18%;">DITANYAKAN OLEH</th>
-                            <th class="text-center" style="width: 13%;">JUMLAH JAWABAN</th>
-                            <th style="width: 10%;">DIBUAT</th>
-                            <th class="text-center" style="width: 5%;">AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($questions)): ?>
-                            <tr><td colspan="6" class="text-center p-5 text-muted"><h6 class="fw-bold mb-1">Belum ada pertanyaan.</h6><small>Jadilah yang pertama membuka diskusi sales!</small></td></tr>
-                        <?php else: ?>
-                            <?php foreach ($questions as $q): ?>
-                            <tr class="question-row" id="question-row-<?php echo $q['id']; ?>"
-                                data-question-id="<?php echo $q['id']; ?>"
-                                data-title="<?php echo htmlspecialchars($q['title']); ?>"
-                                data-body="<?php echo htmlspecialchars($q['body']); ?>"
-                                data-author="<?php echo htmlspecialchars($q['author']); ?>"
-                                data-date="<?php echo date('d M Y', strtotime($q['created_at'])); ?>"
-                                data-answers='<?php echo json_encode($q['answers']); ?>'>
-                                
-                                <td class="question-data" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
-                                    <span class="fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif;">
-                                        <i class="bi bi-question-circle-fill text-primary me-1"></i>
-                                        <?php echo htmlspecialchars($q['title']); ?>
-                                    </span>
-                                </td>
-                                
-                                <td class="question-data text-muted small" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
-                                    <?php echo htmlspecialchars(substr($q['body'], 0, 80)) . (strlen($q['body']) > 80 ? '...' : ''); ?>
-                                </td>
-                                
-                                <td class="question-data" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
-                                    <div class="d-flex align-items-center">
-                                        <div class="sales-avatar-badge-small">
+
+        <!-- Forum Cards Grid -->
+        <div class="card-body p-4">
+            <div class="row g-3" id="forumFeedContainer">
+                <?php if (empty($questions)): ?>
+                    <div class="col-12 text-center p-5 bg-white rounded-4 border">
+                        <div class="mb-3"><i class="bi bi-chat-square-dots text-primary" style="font-size: 3.5rem;"></i></div>
+                        <h5 class="fw-extrabold text-dark mb-2">Belum Ada Pertanyaan Diskusi</h5>
+                        <p class="text-muted small mb-3">Jadilah sales pertama yang membuka pertanyaan diskusi untuk tim Loewix!</p>
+                        <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                            <i class="bi bi-plus-circle-fill me-1.5"></i> Buat Pertanyaan Pertama
+                        </button>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($questions as $q): 
+                        $hasAnswers = count($q['answers']) > 0;
+                        $ansBadgeClass = $hasAnswers ? 'bg-primary text-white' : 'bg-warning-subtle text-warning border border-warning-subtle';
+                    ?>
+                    <div class="col-lg-6 col-12 forum-card-item" id="question-row-<?php echo $q['id']; ?>"
+                        data-question-id="<?php echo $q['id']; ?>"
+                        data-title="<?php echo htmlspecialchars($q['title']); ?>"
+                        data-body="<?php echo htmlspecialchars($q['body']); ?>"
+                        data-author="<?php echo htmlspecialchars($q['author']); ?>"
+                        data-date="<?php echo date('d M Y', strtotime($q['created_at'])); ?>"
+                        data-answers='<?php echo json_encode($q['answers']); ?>'>
+                        
+                        <div class="qa-feed-card h-100 p-3.5 bg-white rounded-4 border shadow-2sm d-flex flex-direction-column justify-content-between position-relative" style="transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); border-left: 5px solid #2563EB !important; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#viewQuestionModal" onclick="populateAndShowModal(this.parentElement)">
+                            <div>
+                                <!-- Author Header -->
+                                <div class="d-flex align-items-center justify-content-between mb-2.5">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="sales-avatar-badge-small shadow-2sm" style="width:30px; height:30px; font-size:12px;">
                                             <?php echo strtoupper(substr($q['author'], 0, 1)); ?>
                                         </div>
-                                        <span class="fw-semibold text-dark" style="font-size:13px;"><?php echo htmlspecialchars($q['author']); ?></span>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size:13px; line-height:1.2; font-family:'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($q['author']); ?></div>
+                                            <small class="text-muted" style="font-size:11px;"><i class="bi bi-clock me-1"></i><?php echo date('d M Y', strtotime($q['created_at'])); ?></small>
+                                        </div>
                                     </div>
-                                </td>
-                                <td class="text-center question-data" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
-                                    <span class="answer-pill-btn">
-                                        <i class="bi bi-chat-right-text-fill"></i> <?php echo count($q['answers']); ?> Jawaban
-                                    </span>
-                                </td>
-                                <td class="question-data small text-muted" data-bs-toggle="modal" data-bs-target="#viewQuestionModal">
-                                    <?php echo date('d M Y', strtotime($q['created_at'])); ?>
-                                </td>
-                                <td class="text-center">
-                                    <?php if ($_SESSION['user_id'] == $q['author_id'] || $_SESSION['role'] === 'superadmin'): ?>
-                                        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="<?php echo $q['id']; ?>" data-type="question" title="Hapus Pertanyaan">
-                                            <i class="bi bi-trash-fill"></i>
-                                        </button>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                                    <div class="d-flex align-items-center gap-1.5" onclick="event.stopPropagation();">
+                                        <span class="badge rounded-pill px-2.5 py-1 fw-bold <?php echo $ansBadgeClass; ?>" style="font-size:11px;">
+                                            <i class="bi bi-chat-right-text-fill me-1"></i> <?php echo count($q['answers']); ?> Jawaban
+                                        </span>
+                                        <?php if ($_SESSION['user_id'] == $q['author_id'] || $_SESSION['role'] === 'superadmin'): ?>
+                                            <button class="btn btn-sm btn-light border text-danger rounded-circle ms-1 p-0 d-inline-flex align-items-center justify-content-center delete-btn" data-id="<?php echo $q['id']; ?>" data-type="question" title="Hapus Pertanyaan" style="width:28px; height:28px;">
+                                                <i class="bi bi-trash-fill" style="font-size:12px;"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Question Title -->
+                                <h6 class="fw-bold text-dark mb-1.5" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:14.5px; line-height:1.4;">
+                                    <i class="bi bi-question-circle-fill text-primary me-1.5"></i>
+                                    <?php echo htmlspecialchars($q['title']); ?>
+                                </h6>
+
+                                <!-- Question Body Snippet -->
+                                <p class="text-muted mb-3" style="font-size:13px; line-height:1.5;">
+                                    <?php echo htmlspecialchars(substr($q['body'], 0, 120)) . (strlen($q['body']) > 120 ? '...' : ''); ?>
+                                </p>
+                            </div>
+
+                            <!-- Footer Action Link -->
+                            <div class="pt-2 border-top d-flex align-items-center justify-content-between" style="font-size:12px;">
+                                <span class="text-primary fw-bold d-inline-flex align-items-center gap-1">
+                                    <i class="bi bi-box-arrow-up-right me-0.5"></i> Buka Diskusi & Balas
+                                </span>
+                                <span class="text-muted small">Klik untuk melihat detail →</span>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
         </div>
     </div>
 </div>
@@ -765,36 +784,34 @@ document.addEventListener('DOMContentLoaded', function() {
     if (liveSearchInput) {
         liveSearchInput.addEventListener('keyup', function() {
             const filter = this.value.toLowerCase();
-            document.querySelectorAll('#questionsTable tbody tr').forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
+            document.querySelectorAll('.forum-card-item').forEach(card => {
+                card.style.display = card.textContent.toLowerCase().includes(filter) ? '' : 'none';
             });
         });
     }
 
-    // Q&A Table Click Event Listener
-    if (questionsTable) {
-        questionsTable.addEventListener('click', function(e) {
+    // Forum Container Click Listener
+    const forumFeedContainer = document.getElementById('forumFeedContainer');
+    if (forumFeedContainer) {
+        forumFeedContainer.addEventListener('click', function(e) {
             const deleteButton = e.target.closest('.delete-btn[data-type="question"]');
-            const viewTrigger = e.target.closest('.question-data');
-
             if (deleteButton) {
+                e.stopPropagation();
                 handleDelete(deleteButton.dataset.id, 'question');
-            } else if (viewTrigger) {
-                const row = viewTrigger.parentElement;
-                populateAndShowModal(row);
             }
         });
     }
 
     // Populate dan Tampilkan Modal Lihat Pertanyaan
     const viewQuestionModal = document.getElementById('viewQuestionModal');
-    function populateAndShowModal(row) {
-        const answers = JSON.parse(row.dataset.answers);
-        document.getElementById('q-modal-title').textContent = row.dataset.title;
-        document.getElementById('q-modal-body').textContent = row.dataset.body;
-        document.getElementById('q-modal-author').textContent = row.dataset.author;
-        document.getElementById('q-modal-date').textContent = row.dataset.date;
-        document.getElementById('q-modal-question-id').value = row.dataset.questionId;
+    window.populateAndShowModal = function(cardEl) {
+        if (!cardEl) return;
+        const answers = JSON.parse(cardEl.dataset.answers || '[]');
+        document.getElementById('q-modal-title').textContent = cardEl.dataset.title || '';
+        document.getElementById('q-modal-body').textContent = cardEl.dataset.body || '';
+        document.getElementById('q-modal-author').textContent = cardEl.dataset.author || '';
+        document.getElementById('q-modal-date').textContent = cardEl.dataset.date || '';
+        document.getElementById('q-modal-question-id').value = cardEl.dataset.questionId || '';
         
         const answersList = document.getElementById('q-modal-answers-list');
         answersList.innerHTML = '';
@@ -817,7 +834,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             answersList.innerHTML = '<p class="text-muted fst-italic p-3 text-center">Belum ada jawaban. Jadilah yang pertama memberikan solusi!</p>';
         }
-    }
+    };
 
     // Submit Pertanyaan Baru
     document.getElementById('addQuestionForm')?.addEventListener('submit', function(e) {
