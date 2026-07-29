@@ -1,7 +1,7 @@
 <?php
 /**
  * Asisten Sales Loewix AI Handler Engine - Master CSO & Negotiation Trainer
- * Dynamic Gemini AI integration + Master Loewix Sales & Negotiation Matrix Fallback
+ * Dynamic Gemini AI integration with Retry Loop + Master Industry & Profession Fallback Matrix
  */
 
 ini_set('display_errors', 0);
@@ -49,11 +49,11 @@ Input dari Sales Rep / Situasi: \"{$customerQuestion}\"
 
 PENTING Mengenai Pemahaman Input:
 Input di atas bisa berupa:
-A. Teks obrolan / pertanyaan langsung dari Customer.
-B. Curhat / Konsultasi dari Sales Rep mengenai situasi prospek (misal: 'CLient kepolisian gmn cara nego nya', 'client saya seorang notaris', 'kalo client saya sensi di tawarin cara ngadepinnya gmn?', 'Client mau hutang gimana?').
+A. Pertanyaan / situasi prospek spesifik profi/klien (misal: 'client saya seorang dokter', 'Client kepolisian gmn cara nego nya', 'client saya notaris', 'client resto/hotel', 'Client mau hutang').
+B. Pertanyaan penawaran harga / nego / kendala sales.
 
 TUGAS UTAMA:
-Berikan 3 Taktik Strategi Sales & Skrip Chat WhatsApp Persuasif yang Genius, Sangat Spesifik, dan Siap Kirim sesuai pertanyaan di atas.
+Berikan 3 Taktik Strategi Sales & Skrip Chat WhatsApp Persuasif yang Genius, Sangat Spesifik, dan Siap Kirim sesuai profesi/situasi prospek di atas.
 
 Setiap Opsi HARUS berbentuk 1 objek dengan properti:
 - \"type\": \"Nama Taktik / Pendekatan Strategis\"
@@ -74,7 +74,7 @@ Kembalikan HANYA format JSON valid seperti ini (tanpa markdown ```json):
   ]
 }";
 
-// Endpoint list for Gemini API across supported models
+// Models to attempt in sequence
 $endpointsToTry = [
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}",
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={$apiKey}",
@@ -89,45 +89,72 @@ if (!empty($apiKey) && strlen($apiKey) > 20) {
             'contents' => [['parts' => [['text' => $prompt]]]]
         ]);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 12);
+        // Try up to 2 attempts per endpoint to handle temporary 503 spikes
+        for ($attempt = 1; $attempt <= 2; $attempt++) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
 
-        if ($httpCode === 200 && $response) {
-            $responseData = json_decode($response, true);
-            if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
-                $rawText = $responseData['candidates'][0]['content']['parts'][0]['text'];
-                $cleanedJson = preg_replace('/^```json\s*/i', '', $rawText);
-                $cleanedJson = preg_replace('/\s*```$/i', '', $cleanedJson);
-                $cleanedJson = trim($cleanedJson);
+            if ($httpCode === 200 && $response) {
+                $responseData = json_decode($response, true);
+                if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
+                    $rawText = $responseData['candidates'][0]['content']['parts'][0]['text'];
+                    $cleanedJson = preg_replace('/^```json\s*/i', '', $rawText);
+                    $cleanedJson = preg_replace('/\s*```$/i', '', $cleanedJson);
+                    $cleanedJson = trim($cleanedJson);
 
-                $parsed = json_decode($cleanedJson, true);
-                if (isset($parsed['answers']) && is_array($parsed['answers']) && count($parsed['answers']) >= 1) {
-                    $answers = $parsed['answers'];
-                    break;
+                    $parsed = json_decode($cleanedJson, true);
+                    if (isset($parsed['answers']) && is_array($parsed['answers']) && count($parsed['answers']) >= 1) {
+                        $answers = $parsed['answers'];
+                        break 2;
+                    }
                 }
             }
+            usleep(300000); // 300ms pause before retry
         }
     }
 }
 
-// Master Loewix Sales Negotiation & Consultation Matrix Fallback
+// Master Loewix Sales Negotiation & Profession Matrix Fallback
 if (empty($answers)) {
     $q = mb_strtolower($customerQuestion);
     
-    // 1. SCENARIO: KEPOLISIAN / POLISI / POLSEK / POLRES / APARAT / INSTANSI KEAMANAN
-    if (strpos($q, 'polisi') !== false || strpos($q, 'kepolisian') !== false || strpos($q, 'polsek') !== false || strpos($q, 'polres') !== false || strpos($q, 'aparat') !== false) {
+    // 1. SCENARIO: DOKTER / RUMAH SAKIT / KLINIK / PRAKTIK / FARMASI / APOTEK / MEDIS
+    if (strpos($q, 'dokter') !== false || strpos($q, 'rumah sakit') !== false || strpos($q, 'klinik') !== false || strpos($q, 'praktik') !== false || strpos($q, 'farmasi') !== false || strpos($q, 'apotek') !== false || strpos($q, 'medis') !== false) {
+        $answers = [
+            [
+                'type' => 'Pendekatan Higienis, Privasi Ruang Periksa & Area Obat',
+                'strategy' => 'Dokter sangat peduli keamanan brankas obat, area tunggu pasien, dan rekaman audio transaksi obat.',
+                'text' => 'Selamat pagi/siang Dok. Terkait sistem pengawasan area klinik/praktik Dokter, kamera Loewix 4K dilengkapi sensor Audio Built-in untuk mencatat transaksi pendaftaran/kasir obat, serta fitur Night Vision Starlight untuk memantau area penyimpanan obat & ruang tunggu pasien 24 jam secara jernih.',
+                'product_recommendation' => 'Loewix Medical & Clinic Protection Series'
+            ],
+            [
+                'type' => 'Pendekatan Estetika Interior & Pantau HP dari Ruang Praktik',
+                'strategy' => 'Tawarkan kamera dome modern yang tidak merusak keindahan interior klinik & bisa dipantau langsung dari HP Dokter.',
+                'text' => 'Bapak/Ibu Dokter yang kami hormati, kamera Loewix Dome Series dirancang elegan menyatu dengan plafon klinik tanpa merusak estetika interior, dilengkapi akses P2P encrypted untuk memantau aktivitas area parkir & apotek langsung dari smartphone Dokter.',
+                'product_recommendation' => 'Loewix Sleek Dome Clinic Edition'
+            ],
+            [
+                'type' => 'Pendekatan Garansi Ganti Unit Baru 1-to-1 Respon Cepat',
+                'strategy' => 'Jamin kelancaran operasional klinik dengan garansi ganti baru tanpa perlu menunggu servis berhari-hari.',
+                'text' => 'Dokter, untuk menjamin operasional pengawasan klinik tetap berjalan 24 jam tanpa kendala, Loewix memberikan Garansi Ganti Baru 1-to-1 Replacement jika ada kerusakan teknis, jadi Dokter tidak perlu khawatir soal kendala perbaikan.',
+                'product_recommendation' => 'Loewix Doctor Protection Plan 1-to-1'
+            ]
+        ];
+    }
+    // 2. SCENARIO: KEPOLISIAN / POLISI / POLSEK / POLRES / APARAT / INSTANSI KEAMANAN
+    elseif (strpos($q, 'polisi') !== false || strpos($q, 'kepolisian') !== false || strpos($q, 'polsek') !== false || strpos($q, 'polres') !== false || strpos($q, 'aparat') !== false) {
         $answers = [
             [
                 'type' => 'Pendekatan Kompresi Rekaman H.265+ & Resolusi Ultra HD',
@@ -149,7 +176,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 2. SCENARIO: NOTARIS / HUKUM / PENGACARA / KANTOR ADVOKAT
+    // 3. SCENARIO: NOTARIS / HUKUM / PENGACARA / KANTOR ADVOKAT
     elseif (strpos($q, 'notaris') !== false || strpos($q, 'hukum') !== false || strpos($q, 'pengacara') !== false || strpos($q, 'advokat') !== false) {
         $answers = [
             [
@@ -172,7 +199,30 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 3. SCENARIO: CLIENT SENSI / SENSITIF / JUTEK / GALAK / TRAUMA / TOLAK / DINGIN
+    // 4. SCENARIO: RESTORAN / KAFE / CAFE / RUMAH MAKAN / KULINER
+    elseif (strpos($q, 'resto') !== false || strpos($q, 'restoran') !== false || strpos($q, 'kafe') !== false || strpos($q, 'cafe') !== false || strpos($q, 'kuliner') !== false || strpos($q, 'rumah makan') !== false) {
+        $answers = [
+            [
+                'type' => 'Pendekatan Monitoring Area Kasir & Audio Rekaman',
+                'strategy' => 'Pemilik kuliner/resto sangat mengutamakan pengawasan uang kasir & ketertiban staf.',
+                'text' => 'Halo Kak! Untuk area usaha kuliner/resto, Loewix punya tipe IP Camera khusus dengan Built-in Audio & Mic untuk pantau area kasir dan meja makan langsung dari HP. Nanti setelah makan, saya kirimkan contoh hasil rekaman dan estimasi biayanya ya Pak/Bu.',
+                'product_recommendation' => 'Loewix Audio Dome IP Camera (Support Two-Way Audio & Night Vision)'
+            ],
+            [
+                'type' => 'Pendekatan Outdoor Full Color Parkir & Dapur Dapur Dapur',
+                'strategy' => 'Pantau keamanan area parkir pelanggan malam hari dengan Starlight Full Color.',
+                'text' => 'Halo Kak! Kamera Outdoor Loewix Full Color 24 Jam memastikan area parkir kendaraan pengunjung resto tetap terlihat terang & berwarna meski di malam hari, sehingga pengunjung merasa aman saat makan.',
+                'product_recommendation' => 'Loewix Culinary Outdoor Protection Package'
+            ],
+            [
+                'type' => 'Pendekatan Akses Monitoring Multi-Branch dari HP Owner',
+                'strategy' => 'Tawarkan kemudahan memantau cabang resto dari 1 aplikasi HP selamanya.',
+                'text' => 'Halo Kak! Jika memiliki beberapa cabang resto, seluruh unit Loewix dapat dihubungkan ke 1 aplikasi smartphone secara gratis, membuat owner bisa memantau omset kasir & suasana resto kapan saja.',
+                'product_recommendation' => 'Loewix Multi-Branch Restaurant Hub'
+            ]
+        ];
+    }
+    // 5. SCENARIO: CLIENT SENSI / SENSITIF / JUTEK / GALAK / TRAUMA / TOLAK / DINGIN
     elseif (strpos($q, 'sensi') !== false || strpos($q, 'sensitif') !== false || strpos($q, 'jutek') !== false || strpos($q, 'galak') !== false || strpos($q, 'tolak') !== false || strpos($q, 'trauma') !== false || strpos($q, 'marah') !== false || strpos($q, 'cuek') !== false || strpos($q, 'dingin') !== false) {
         $answers = [
             [
@@ -195,7 +245,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 4. SCENARIO: HUTANG / KREDIT / TEMPO / TOP / BAYAR NANTI / CICILAN
+    // 6. SCENARIO: HUTANG / KREDIT / TEMPO / TOP / BAYAR NANTI / CICILAN
     elseif (strpos($q, 'hutang') !== false || strpos($q, 'utang') !== false || strpos($q, 'kredit') !== false || strpos($q, 'tempo') !== false || strpos($q, 'top') !== false || strpos($q, 'cicil') !== false || strpos($q, 'bayar nanti') !== false || strpos($q, 'termin') !== false) {
         $answers = [
             [
@@ -218,7 +268,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 5. SCENARIO: KEPALA SEKOLAH / PENDIDIKAN / GURU / YAYASAN / DANA BOS
+    // 7. SCENARIO: KEPALA SEKOLAH / PENDIDIKAN / GURU / YAYASAN / DANA BOS
     elseif (strpos($q, 'sekolah') !== false || strpos($q, 'pendidikan') !== false || strpos($q, 'kepala') !== false || strpos($q, 'guru') !== false || strpos($q, 'yayasan') !== false || strpos($q, 'bos') !== false) {
         $answers = [
             [
@@ -241,7 +291,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 6. SCENARIO: HARGA MAHAL / DISKON / NEGO / POTONG / MURAH
+    // 8. SCENARIO: HARGA MAHAL / DISKON / NEGO / POTONG / MURAH
     elseif (strpos($q, 'diskon') !== false || strpos($q, 'kurang') !== false || strpos($q, 'mahal') !== false || strpos($q, 'potong') !== false || strpos($q, 'murah') !== false || strpos($q, 'harga') !== false) {
         $answers = [
             [
@@ -264,7 +314,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 7. SCENARIO: KOMPETITOR / MERK SEBELAH / DAHUA / HIKVISION / NVR / DVR / ONVIF
+    // 9. SCENARIO: KOMPETITOR / MERK SEBELAH / DAHUA / HIKVISION / NVR / DVR / ONVIF
     elseif (strpos($q, 'dahua') !== false || strpos($q, 'hikvision') !== false || strpos($q, 'nvr') !== false || strpos($q, 'dvr') !== false || strpos($q, 'onvif') !== false || strpos($q, 'merk') !== false || strpos($q, 'sebelah') !== false) {
         $answers = [
             [
@@ -287,7 +337,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 8. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
+    // 10. SCENARIO: TOKO / RESELLER / DEALER / GROSIR / MAU JUAL LAGI
     elseif (strpos($q, 'toko') !== false || strpos($q, 'reseller') !== false || strpos($q, 'dealer') !== false || strpos($q, 'grosir') !== false || strpos($q, 'jual lagi') !== false) {
         $answers = [
             [
@@ -310,7 +360,7 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 9. DEFAULT GENERAL CONSULTATION & NEGOTIATION
+    // 11. DEFAULT GENERAL CONSULTATION & NEGOTIATION
     else {
         $answers = [
             [
