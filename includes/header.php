@@ -508,6 +508,9 @@ table tr td { font-size: 0.85em; }
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <div class="sidebar-submenu" id="toolsSubmenu">
+                    <a href="announcements.php" class="sidebar-link <?php echo $currentPage=='announcements.php'?'active':''; ?>">
+                        <i class="bi bi-megaphone-fill"></i> Pengumuman
+                    </a>
                     <a href="broadcast_schedule.php" class="sidebar-link <?php echo $currentPage=='broadcast_schedule.php'?'active':''; ?>">
                         <i class="bi bi-megaphone"></i> Broadcast
                     </a>

@@ -306,6 +306,8 @@ if ($_SESSION['role'] !== 'sales') {
     </div>
 </div>
 
+<?php include 'includes/announcement_widget.php'; ?>
+
 <!-- SECTION 1: COLLAPSIBLE FORUM Q&A ACCORDION -->
 <div id="forum-section" class="mb-4">
     <div class="card border-0 shadow-sm" style="border-radius:18px; overflow:hidden;">

@@ -487,6 +487,8 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
     </div>
 </div>
 
+<?php include 'includes/announcement_widget.php'; ?>
+
 <!-- 3 Stat Cards -->
 <div class="stats-grid">
     <div class="stat-card blue animate-in">
