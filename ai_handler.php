@@ -1,7 +1,7 @@
 <?php
 /**
  * Asisten Sales Loewix AI Handler Engine - Master CSO & Negotiation Trainer
- * Dynamic Gemini AI integration with Official Installer Follow-Up Playbook
+ * Dynamic Gemini AI integration with Direct Customer WA Chat Script Generation
  */
 
 ini_set('display_errors', 0);
@@ -45,41 +45,21 @@ if (empty($customerQuestion)) {
 
 $prompt = "Anda adalah Chief Sales Officer (CSO) & Master Sales Trainer untuk merek CCTV ternama 'Loewix CCTV Indonesia'.
 
-SOP OFFICIAL FOLLOW-UP SALES UNTUK INSTALLER / TEKNISI LOEWIX:
-1. Tahap Perkenalan:
-'Halo Pak/Bu/Kak, saya Priska/Rina dari Loewix CCTV. Sebelumnya apakah masih main Produk CCTV Pak/Bu/Kak? Kalau boleh tau Bapak Fokus nya di Installer/Toko CCTV?'
-
-2. Tahap Kirim Price List & Promo Paket 2MP AHD:
-'*SIKAT BROOO! Installer Mana yang Gak Tergiur Coba?*🤔🔥
-Beli eceran kemahalan? Tenang, Loewix lagi ada Promo Special khusus Installer!
-Bikin modal rakit paket CCTV ke konsumen makin jos & margin makin tebal.
-✨ Keunggulan Promo: Bebas Kombinasi (Outdoor 3 + Indoor 1)
-Harga Banting:
-Paket A: Rp 1.500.000 ❌ ➡ Rp 1.100.000 ✅
-Paket B: Rp 2.500.000 ❌ ➡ Rp 1.900.000 ✅
-*\"Rakit gampang, jualan tenang, untung makin kencang.\"*
-📞 [0811-8180-707]'
-
-3. Tahap Kirim Promo Paket 4MP IPCAM:
-'*RAKIT PROYEK IPCAM MAKIN UNTUNG & MARGIN TEBAL!* 🔥
-Paket Promo IP Camera 4MP Khusus Installer!
-- 4MP Real Ultra HD Starlight Full Color 24 Jam
-- Kompresi H.265+ hemat Harddisk hingga 50%
-- Garansi Ganti Baru 1-to-1 Resmi 1 Tahun
-Harga Promo:
-Paket IP A (4 Cam 4MP + NVR): Rp 3.200.000 ❌ ➡ Rp 2.450.000 ✅
-Paket IP B (8 Cam 4MP + NVR): Rp 5.800.000 ❌ ➡ Rp 4.200.000 ✅
-📞 [0811-8180-707]'
+SOP PERATURAN PENULISAN SKRIP CHAT:
+Properti \"text\" pada setiap opsi HARUS BERISI SKRIP CHAT WHATSAPP YANG SIAP DILAKUKAN COPY-PASTE OLEH SALES DAN LANGSUNG DIKIRIMKAN KEPADA CUSTOMER / PROSPEK KLIEN!
+- Gunakan sapaan profesional yang sesuai dengan profesi customer (misal: 'Komandan', 'Bapak/Ibu Notaris', 'Dokter', 'Bapak/Ibu Kepala Sekolah', 'Pak Bos', 'Kak').
+- DILARANG MENULIS KATA PENJELASAN SEPERTI 'Halo Kak! Terkait situasi prospek Kakak...'.
+- TULISKAN CHAT YANG LANGSUNG MENYAPA CUSTOMER DAN MENWARKAN SOLUSI CCTV LOEWIX SECARA PERSUASIF!
 
 Input dari Sales Rep / Situasi: \"{$customerQuestion}\"
 
 TUGAS UTAMA:
-Berikan 3 Taktik Strategi Sales & Skrip Chat WhatsApp Persuasif yang Genius, Sangat Spesifik, dan Siap Kirim sesuai SOP di atas atau situasi prospek di atas.
+Berikan 3 Taktik Strategi Sales & Skrip Chat WhatsApp Persuasif yang Genius, Sangat Spesifik, dan Siap Kirim sesuai SOP di atas.
 
 Setiap Opsi HARUS berbentuk 1 objek dengan properti:
 - \"type\": \"Nama Taktik / Pendekatan Strategis\"
 - \"strategy\": \"Tips taktik sales 1-2 kalimat cara pakai opsi ini\"
-- \"text\": \"Teks skrip WA persuasif yang siap dikirim Sales ke Customer (Lengkap dengan sapaan & solusi nyata)\"
+- \"text\": \"Skrip Chat WA Persuasif yang SIAP LANGSUNG DIKIRIMKAN KE CUSTOMER (Lengkap dengan sapaan profesi & penawaran)\"
 - \"product_recommendation\": \"Tipe unit/paket Loewix yang disarankan\"
 
 Kembalikan HANYA format JSON valid seperti ini (tanpa markdown ```json):
@@ -174,7 +154,30 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 2. SCENARIO: DOKTER / RUMAH SAKIT / KLINIK / PRAKTIK / FARMASI / APOTEK / MEDIS
+    // 2. SCENARIO: KEPOLISIAN / POLISI / POLSEK / POLRES / APARAT / INSTANSI KEAMANAN / KOMANDAN
+    elseif (strpos($q, 'polisi') !== false || strpos($q, 'kepolisian') !== false || strpos($q, 'polsek') !== false || strpos($q, 'polres') !== false || strpos($q, 'aparat') !== false || strpos($q, 'komandan') !== false) {
+        $answers = [
+            [
+                'type' => 'Pendekatan Kompresi Rekaman H.265+ & Resolusi Ultra HD',
+                'strategy' => 'Tekankan kejelasan rekaman untuk barang bukti (zoom plat nomor/wajah) & ketahanan rekaman jangka panjang.',
+                'text' => 'Selamat pagi/siang Komandan/Bapak. Terkait kebutuhan pengawasan area & bukti rekaman presisi tinggi, kamera Loewix IP Cam 4K dilengkapi sensor Sony Starlight yang dapat melakukan digital zoom detail tanpa pecah gambar, serta kompresi H.265+ untuk penyimpanan rekaman durasi panjang.',
+                'product_recommendation' => 'Loewix High-Definition Institutional Security 4K'
+            ],
+            [
+                'type' => 'Pendekatan Faktur Pajak & Legalitas SPK Resmi',
+                'strategy' => 'Tekankan kelengkapan administrasi pengadaan instansi, faktur pajak resmi, & Garansi Ganti Baru 1-to-1.',
+                'text' => 'Bapak/Komandan yang kami hormati, produk Loewix CCTV didukung legalitas pengadaan resmi, invoice faktur pajak, serta jaminan Garansi Ganti Baru 1-to-1 Replacement selama 1 tahun tanpa proses servis rumit.',
+                'product_recommendation' => 'Loewix Institutional Command Center Package'
+            ],
+            [
+                'type' => 'Pendekatan Integrasi Multi-Channel TV Monitor & Smartphone',
+                'strategy' => 'Tawarkan instalasi ruang pantau terpusat (Command Room) yang terkoneksi langsung ke gadget pimpinan.',
+                'text' => 'Bapak/Komandan, sistem Loewix CCTV dapat langsung dihubungkan ke TV display ruang pimpinan serta pemantauan realtime encrypted via smartphone. Akses pengawasan gedung/ruang tahanan/gerbang dapat terpantau 24 jam.',
+                'product_recommendation' => 'Loewix Command Center TV & Mobile P2P System'
+            ]
+        ];
+    }
+    // 3. SCENARIO: DOKTER / RUMAH SAKIT / KLINIK / PRAKTIK / FARMASI / APOTEK / MEDIS
     elseif (strpos($q, 'dokter') !== false || strpos($q, 'rumah sakit') !== false || strpos($q, 'klinik') !== false || strpos($q, 'praktik') !== false || strpos($q, 'farmasi') !== false || strpos($q, 'apotek') !== false || strpos($q, 'medis') !== false) {
         $answers = [
             [
@@ -194,29 +197,6 @@ if (empty($answers)) {
                 'strategy' => 'Jamin kelancaran operasional klinik dengan garansi ganti baru tanpa perlu menunggu servis berhari-hari.',
                 'text' => 'Dokter, untuk menjamin operasional pengawasan klinik tetap berjalan 24 jam tanpa kendala, Loewix memberikan Garansi Ganti Baru 1-to-1 Replacement jika ada kerusakan teknis, jadi Dokter tidak perlu khawatir soal kendala perbaikan.',
                 'product_recommendation' => 'Loewix Doctor Protection Plan 1-to-1'
-            ]
-        ];
-    }
-    // 3. SCENARIO: KEPOLISIAN / POLISI / POLSEK / POLRES / APARAT / INSTANSI KEAMANAN
-    elseif (strpos($q, 'polisi') !== false || strpos($q, 'kepolisian') !== false || strpos($q, 'polsek') !== false || strpos($q, 'polres') !== false || strpos($q, 'aparat') !== false) {
-        $answers = [
-            [
-                'type' => 'Pendekatan Kompresi Rekaman H.265+ & Resolusi Ultra HD',
-                'strategy' => 'Tekankan kejelasan rekaman untuk barang bukti (zoom plat nomor/wajah) & ketahanan rekaman jangka panjang.',
-                'text' => 'Selamat pagi/siang Komandan/Bapak. Terkait kebutuhan pengawasan area & bukti rekaman presisi tinggi, kamera Loewix IP Cam 4K dilengkapi sensor Sony Starlight yang dapat melakukan digital zoom detail tanpa pecah gambar, serta kompresi H.265+ untuk penyimpanan rekaman durasi panjang.',
-                'product_recommendation' => 'Loewix High-Definition Institutional Security 4K'
-            ],
-            [
-                'type' => 'Pendekatan Faktur Pajak & Legalitas SPK Resmi',
-                'strategy' => 'Tekankan kelengkapan administrasi pengadaan instansi, faktur pajak resmi, & Garansi Ganti Baru 1-to-1.',
-                'text' => 'Bapak/Komandan yang kami hormati, produk Loewix CCTV didukung legalitas pengadaan resmi, invoice faktur pajak, serta jaminan Garansi Ganti Baru 1-to-1 Replacement selama 1 tahun tanpa proses servis rumit.',
-                'product_recommendation' => 'Loewix Institutional Command Center Package'
-            ],
-            [
-                'type' => 'Pendekatan Integrasi Multi-Channel TV Monitor & Smartphone',
-                'strategy' => 'Tawarkan instalasi ruang pantau terpusat (Command Room) yang terkoneksi langsung ke gadget pimpinan.',
-                'text' => 'Bapak/Komandan, sistem Loewix CCTV dapat langsung dihubungkan ke TV display ruang pimpinan serta pemantauan realtime encrypted via smartphone. Akses pengawasan gedung/ruang tahanan/gerbang dapat terpantau 24 jam.',
-                'product_recommendation' => 'Loewix Command Center TV & Mobile P2P System'
             ]
         ];
     }
@@ -253,7 +233,7 @@ if (empty($answers)) {
                 'product_recommendation' => 'Loewix Audio Dome IP Camera (Support Two-Way Audio & Night Vision)'
             ],
             [
-                'type' => 'Pendekatan Outdoor Full Color Parkir & Dapur Dapur Dapur',
+                'type' => 'Pendekatan Outdoor Full Color Parkir & Dapur',
                 'strategy' => 'Pantau keamanan area parkir pelanggan malam hari dengan Starlight Full Color.',
                 'text' => 'Halo Kak! Kamera Outdoor Loewix Full Color 24 Jam memastikan area parkir kendaraan pengunjung resto tetap terlihat terang & berwarna meski di malam hari, sehingga pengunjung merasa aman saat makan.',
                 'product_recommendation' => 'Loewix Culinary Outdoor Protection Package'
@@ -351,7 +331,7 @@ if (empty($answers)) {
                 'product_recommendation' => 'Loewix Smart HD Package + Free Setting HP'
             ],
             [
-                'type' => 'Strategi Upselling & Offer Upgrade',
+                'type' => 'Strategi Upselling & Upgrade IP Camera',
                 'strategy' => 'Tawarkan upgrade ke IP Camera H.265+ hemat harddisk untuk investasi jangka panjang.',
                 'text' => 'Halo Kak! Jika ingin efisiensi maksimal, kami sarankan Upgrade ke Seri Loewix IP Camera H.265+. Teknologi kompresinya menghemat kapasitas Harddisk hingga 50%, jadi Kakak hemat pembelian harddisk tambahan di masa depan.',
                 'product_recommendation' => 'Loewix IP Camera 4K H.265+ Series'
@@ -432,22 +412,22 @@ if (empty($answers)) {
         $cleanTopic = htmlspecialchars(ucwords(mb_substr($customerQuestion, 0, 40)));
         $answers = [
             [
-                'type' => "Pendekatan Solusi Prospek: " . $cleanTopic,
-                'strategy' => "Taktik negosiasi & konsultasi persuasif Loewix untuk menangani situasi prospek '{$cleanTopic}'.",
-                'text' => "Halo Kak! Mengenai situasi prospek Kakak terkait '{$cleanTopic}', kami sarankan kirimkan penawaran Paket Loewix CCTV dengan menekankan fitur keunggulan Garansi Ganti Baru 1-to-1 Resmi dan bonus gratis setting P2P pantau dari smartphone selamanya.",
+                'type' => "Penawaran Khusus Prospek: " . $cleanTopic,
+                'strategy' => "Gunakan skrip chat WA ini untuk menawarkan paket Loewix CCTV secara profesional ke prospek {$cleanTopic}.",
+                'text' => "Selamat pagi/siang Pak/Bu. Terkait kebutuhan pengawasan keamanan untuk {$cleanTopic}, kami dari Loewix CCTV Indonesia menyediakan paket khusus yang dilengkapi fitur Full Color 24 Jam dan Garansi Ganti Unit Baru 1-to-1 Resmi. Boleh kami kirimkan estimasi biayanya Pak/Bu?",
                 'product_recommendation' => "Loewix Custom Smart Security Package"
             ],
             [
-                'type' => "Teknik Soft-Selling & Ramah Tamah",
-                'strategy' => "Tanyakan perkembangan kebutuhan customer dengan sopan tanpa kesan mendesak.",
-                'text' => "Halo Kak! Sekadar menyapa untuk menanyakan perkembangan rencana penawaran '{$cleanTopic}'. Tim teknisi Loewix siap memberikan panduan lokasi titik bebas blind-spot & perbandingan estimasi biayanya kapan saja Kakak butuhkan.",
-                'product_recommendation' => "Loewix Free Security Consultation"
+                'type' => "Taktik Nego Bonus Kabel & Setting HP",
+                'strategy' => "Berikan nilai tambah bonus instalasi & koneksi HP tanpa memotong harga paket.",
+                'text' => "Halo Pak/Bu! Khusus pemesanan minggu ini untuk area {$cleanTopic}, kami berikan promo gratis biaya setting pantau dari HP selamanya + bonus kabel HDMI. Unit siap langsung dipasang oleh teknisi kami.",
+                'product_recommendation' => "Loewix Turnkey Promo Package"
             ],
             [
-                'type' => "Taktik Nego Promo & Bonus Kabel HDMI",
-                'strategy' => "Berikan dorongan bonus aksesoris & garansi kilat untuk menutup transaksi hari ini.",
-                'text' => "Halo Kak! Khusus penutupan transaksi minggu ini untuk '{$cleanTopic}', kami berikan promo gratis kabel HDMI 5m + jaminan garansi ganti unit baru 100% jika ada kendala tanpa potongan margin!",
-                'product_recommendation' => "Loewix Turnkey Closing Package"
+                'type' => "Skrip Follow-Up & Garansi Ganti Baru 1-to-1",
+                'strategy' => "Yakinkan customer bahwa garansi Loewix ganti unit baru 100% tanpa berbelit.",
+                'text' => "Halo Pak/Bu! Sekadar mengingatkan untuk penawaran CCTV Loewix kemarin. Di Loewix kami memberikan jaminan Garansi Ganti Baru 1-to-1 jika ada kendala, jadi Bapak/Ibu tidak perlu pusing perbaikan servis. Apakah ada spesifikasi tambahan yang dibutuhkan?",
+                'product_recommendation' => "Loewix 1-to-1 Replacement Protection"
             ]
         ];
     }
