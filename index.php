@@ -281,150 +281,132 @@ if ($_SESSION['role'] !== 'sales') {
 }
 </style>
 
-<!-- SECTION 1: FORUM Q&A SALES -->
-<div id="forum-section" class="mb-5">
-    <div class="cust-hero mb-3" style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 50%, #1D4ED8 100%);">
-        <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
-            <div>
-                <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
-                    <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
-                    <span>›</span>
-                    <span>Forum Q&A Sales</span>
-                </div>
-                <h1 class="cust-hero-title">Forum Q&A Sales 💬</h1>
-                <p class="cust-hero-subtitle">Dari Sales untuk Sales. Tempat berbagi solusi produk, penanganan customer, dan pengetahuan tim.</p>
+<!-- UNIFIED SINGLE HERO HEADER -->
+<div class="cust-hero mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
+                <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
+                <span>›</span>
+                <span>Daftar Customer & Forum Q&A</span>
             </div>
-            <div class="mt-3 mt-md-0">
-                <button class="btn btn-primary fw-extrabold shadow-lg px-4 py-2.5 rounded-pill d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addQuestionModal" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); border:none;">
-                    <i class="bi bi-plus-circle-fill fs-5"></i> <span>Buat Pertanyaan Baru</span>
-                </button>
-            </div>
+            <h1 class="cust-hero-title">Daftar Customer & Forum Q&A 👥💬</h1>
+            <p class="cust-hero-subtitle">Kelola database customer, PIC kontak, serta berdiskusi bersama tim sales Loewix dalam satu workspace terpadu.</p>
         </div>
-    </d    <!-- EXECUTIVE USER-FRIENDLY FORUM FEED -->
-    <div class="card border-0 shadow-sm" style="border-radius:22px; background:#F8FAFC;">
-        <div class="card-header bg-white py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3 border-bottom" style="border-radius:22px 22px 0 0;">
-            <div class="d-flex align-items-center gap-2">
-                <div class="rounded-circle bg-primary bg-gradient d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width:38px; height:38px;">
-                    <i class="bi bi-chat-left-dots-fill fs-5"></i>
-                </div>
-                <div>
-                    <h5 class="mb-0 fw-extrabold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:16px;">Daftar Pertanyaan & Diskusi Sales</h5>
-                    <small class="text-muted fw-semibold" style="font-size:12px;">Klik kartu pertanyaan untuk membaca solusi & berdiskusi bersama tim</small>
-                </div>
-            </div>
-
-            <!-- Live Search Bar -->
-            <div class="position-relative flex-grow-1 flex-md-grow-0" style="min-width: 290px;">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0 text-muted" style="border-top-left-radius:30px; border-bottom-left-radius:30px; padding-left:16px;">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" id="liveSearchInput" class="form-control border-start-0 ps-1 fw-semibold" placeholder="Cari topik, pertanyaan, atau sales..." style="border-top-right-radius:30px; border-bottom-right-radius:30px; height:42px; font-size:13.5px;">
-                </div>
-            </div>
-        </div>
-
-        <!-- Forum Cards Grid -->
-        <div class="card-body p-4">
-            <div class="row g-3" id="forumFeedContainer">
-                <?php if (empty($questions)): ?>
-                    <div class="col-12 text-center p-5 bg-white rounded-4 border">
-                        <div class="mb-3"><i class="bi bi-chat-square-dots text-primary" style="font-size: 3.5rem;"></i></div>
-                        <h5 class="fw-extrabold text-dark mb-2">Belum Ada Pertanyaan Diskusi</h5>
-                        <p class="text-muted small mb-3">Jadilah sales pertama yang membuka pertanyaan diskusi untuk tim Loewix!</p>
-                        <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
-                            <i class="bi bi-plus-circle-fill me-1.5"></i> Buat Pertanyaan Pertama
-                        </button>
-                    </div>
-                <?php else: ?>
-                    <?php foreach ($questions as $q): 
-                        $hasAnswers = count($q['answers']) > 0;
-                        $ansBadgeClass = $hasAnswers ? 'bg-primary text-white' : 'bg-warning-subtle text-warning border border-warning-subtle';
-                    ?>
-                    <div class="col-lg-6 col-12 forum-card-item" id="question-row-<?php echo $q['id']; ?>"
-                        data-question-id="<?php echo $q['id']; ?>"
-                        data-title="<?php echo htmlspecialchars($q['title']); ?>"
-                        data-body="<?php echo htmlspecialchars($q['body']); ?>"
-                        data-author="<?php echo htmlspecialchars($q['author']); ?>"
-                        data-date="<?php echo date('d M Y', strtotime($q['created_at'])); ?>"
-                        data-answers='<?php echo json_encode($q['answers']); ?>'>
-                        
-                        <div class="qa-feed-card h-100 p-3.5 bg-white rounded-4 border shadow-2sm d-flex flex-direction-column justify-content-between position-relative" style="transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); border-left: 5px solid #2563EB !important; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#viewQuestionModal" onclick="populateAndShowModal(this.parentElement)">
-                            <div>
-                                <!-- Author Header -->
-                                <div class="d-flex align-items-center justify-content-between mb-2.5">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="sales-avatar-badge-small shadow-2sm" style="width:30px; height:30px; font-size:12px;">
-                                            <?php echo strtoupper(substr($q['author'], 0, 1)); ?>
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-dark" style="font-size:13px; line-height:1.2; font-family:'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($q['author']); ?></div>
-                                            <small class="text-muted" style="font-size:11px;"><i class="bi bi-clock me-1"></i><?php echo date('d M Y', strtotime($q['created_at'])); ?></small>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-1.5" onclick="event.stopPropagation();">
-                                        <span class="badge rounded-pill px-2.5 py-1 fw-bold <?php echo $ansBadgeClass; ?>" style="font-size:11px;">
-                                            <i class="bi bi-chat-right-text-fill me-1"></i> <?php echo count($q['answers']); ?> Jawaban
-                                        </span>
-                                        <?php if ($_SESSION['user_id'] == $q['author_id'] || $_SESSION['role'] === 'superadmin'): ?>
-                                            <button class="btn btn-sm btn-light border text-danger rounded-circle ms-1 p-0 d-inline-flex align-items-center justify-content-center delete-btn" data-id="<?php echo $q['id']; ?>" data-type="question" title="Hapus Pertanyaan" style="width:28px; height:28px;">
-                                                <i class="bi bi-trash-fill" style="font-size:12px;"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-
-                                <!-- Question Title -->
-                                <h6 class="fw-bold text-dark mb-1.5" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:14.5px; line-height:1.4;">
-                                    <i class="bi bi-question-circle-fill text-primary me-1.5"></i>
-                                    <?php echo htmlspecialchars($q['title']); ?>
-                                </h6>
-
-                                <!-- Question Body Snippet -->
-                                <p class="text-muted mb-3" style="font-size:13px; line-height:1.5;">
-                                    <?php echo htmlspecialchars(substr($q['body'], 0, 120)) . (strlen($q['body']) > 120 ? '...' : ''); ?>
-                                </p>
-                            </div>
-
-                            <!-- Footer Action Link -->
-                            <div class="pt-2 border-top d-flex align-items-center justify-content-between" style="font-size:12px;">
-                                <span class="text-primary fw-bold d-inline-flex align-items-center gap-1">
-                                    <i class="bi bi-box-arrow-up-right me-0.5"></i> Buka Diskusi & Balas
-                                </span>
-                                <span class="text-muted small">Klik untuk melihat detail →</span>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+        <div class="mt-3 mt-md-0 d-flex flex-wrap gap-2">
+            <a href="customer_add.php" class="btn-add-customer-vip">
+                <span class="btn-icon-badge"><i class="bi bi-plus-lg"></i></span>
+                <span>Tambah Customer Baru</span>
+            </a>
+            <button class="btn btn-outline-light fw-bold rounded-pill px-3 py-2.5 d-inline-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#addQuestionModal" style="border-width:1.5px; backdrop-filter:blur(4px);">
+                <i class="bi bi-chat-square-quote-fill text-warning"></i>
+                <span>Tanya Tim Sales</span>
+            </button>
         </div>
     </div>
 </div>
 
-<hr class="my-5" style="border-top: 2px dashed #CBD5E1; opacity: 0.7;">
-
-<!-- SECTION 2: DAFTAR CUSTOMER -->
-<div id="customer-section">
-    <!-- Hero Header -->
-    <div class="cust-hero">
-        <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
-            <div>
-                <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
-                    <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
-                    <span>›</span>
-                    <span>Daftar Customer</span>
+<!-- SECTION 1: COLLAPSIBLE FORUM Q&A ACCORDION -->
+<div id="forum-section" class="mb-4">
+    <div class="card border-0 shadow-sm" style="border-radius:18px; overflow:hidden;">
+        <div class="card-header bg-white py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3 border-bottom-0" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent" aria-expanded="true">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-primary bg-gradient d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width:40px; height:40px;">
+                    <i class="bi bi-chat-left-dots-fill fs-5"></i>
                 </div>
-                <h1 class="cust-hero-title">Daftar Customer 👥</h1>
-                <p class="cust-hero-subtitle">Kelola database seluruh customer, PIC kontak, status follow up, dan penugasan sales.</p>
+                <div>
+                    <h5 class="mb-0 fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:16px;">
+                        Forum Q&A & Diskusi Sales 
+                        <span class="badge bg-primary rounded-pill ms-2" style="font-size:11.5px; padding:4px 10px;"><?php echo count($questions); ?> Topik</span>
+                    </h5>
+                    <small class="text-muted" style="font-size:12px;">Tempat bertanya & berbagi solusi seputar produk/customer (Klik untuk buka / tutup)</small>
+                </div>
             </div>
-            <div class="mt-3 mt-md-0">
-                <a href="customer_add.php" class="btn-add-customer-vip">
-                    <span class="btn-icon-badge"><i class="bi bi-plus-lg"></i></span>
-                    <span>Tambah Customer Baru</span>
-                </a>
+            <div class="d-flex align-items-center gap-2" onclick="event.stopPropagation();">
+                <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                    <i class="bi bi-plus-circle-fill me-1"></i> Buat Pertanyaan
+                </button>
+                <span class="btn btn-sm btn-light rounded-circle border p-0 d-inline-flex align-items-center justify-content-center" style="width:32px; height:32px;" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent">
+                    <i class="bi bi-chevron-down text-muted"></i>
+                </span>
+            </div>
+        </div>
+
+        <div class="collapse show" id="forumCollapseContent">
+            <div class="card-body p-4 bg-light border-top">
+                <!-- Search Bar -->
+                <div class="mb-3">
+                    <div class="input-group shadow-2sm" style="border-radius:12px; overflow:hidden;">
+                        <span class="input-group-text bg-white border-end-0 text-muted ps-3"><i class="bi bi-search"></i></span>
+                        <input type="text" id="liveSearchInput" class="form-control border-start-0 ps-1 fw-semibold" placeholder="Cari pertanyaan, kata kunci, atau nama sales..." style="height:42px; font-size:13.5px;">
+                    </div>
+                </div>
+
+                <!-- Discussion Items Feed -->
+                <div class="d-flex flex-column gap-2.5" id="forumFeedContainer">
+                    <?php if (empty($questions)): ?>
+                        <div class="text-center p-4 bg-white rounded-3 border">
+                            <i class="bi bi-chat-square-dots text-primary fs-2 mb-2 d-block"></i>
+                            <h6 class="fw-bold text-dark mb-1">Belum ada diskusi sales.</h6>
+                            <small class="text-muted">Klik "Buat Pertanyaan" di atas untuk memulai diskusi!</small>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($questions as $q): 
+                            $hasAnswers = count($q['answers']) > 0;
+                            $ansPillStyle = $hasAnswers ? 'background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE;' : 'background:#FEF3C7; color:#92400E; border:1px solid #FDE68A;';
+                        ?>
+                        <div class="forum-card-item card border-0 shadow-2sm" id="question-row-<?php echo $q['id']; ?>"
+                            data-question-id="<?php echo $q['id']; ?>"
+                            data-title="<?php echo htmlspecialchars($q['title']); ?>"
+                            data-body="<?php echo htmlspecialchars($q['body']); ?>"
+                            data-author="<?php echo htmlspecialchars($q['author']); ?>"
+                            data-date="<?php echo date('d M Y', strtotime($q['created_at'])); ?>"
+                            data-answers='<?php echo json_encode($q['answers']); ?>'
+                            style="border-radius:14px; transition:all 0.2s ease; cursor:pointer;"
+                            data-bs-toggle="modal" data-bs-target="#viewQuestionModal" onclick="populateAndShowModal(this)">
+                            
+                            <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                <div class="d-flex align-items-center gap-3" style="min-width:280px; flex: 1 1 400px;">
+                                    <div class="sales-avatar-badge-small flex-shrink-0" style="width:36px; height:36px; font-size:13px; border-radius:10px;">
+                                        <?php echo strtoupper(substr($q['author'], 0, 1)); ?>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:14.5px; line-height:1.3;">
+                                            <i class="bi bi-question-circle-fill text-primary me-1"></i>
+                                            <?php echo htmlspecialchars($q['title']); ?>
+                                        </div>
+                                        <div class="text-muted small mt-0.5" style="font-size:12.5px;">
+                                            <?php echo htmlspecialchars(substr($q['body'], 0, 100)) . (strlen($q['body']) > 100 ? '...' : ''); ?>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3 ms-auto" onclick="event.stopPropagation();">
+                                    <div class="text-end d-none d-sm-block">
+                                        <div class="fw-semibold text-dark" style="font-size:12px;"><?php echo htmlspecialchars($q['author']); ?></div>
+                                        <small class="text-muted" style="font-size:11px;"><?php echo date('d M Y', strtotime($q['created_at'])); ?></small>
+                                    </div>
+                                    <span class="badge rounded-pill fw-bold" style="<?php echo $ansPillStyle; ?> font-size:11.5px; padding:6px 14px;" data-bs-toggle="modal" data-bs-target="#viewQuestionModal" onclick="populateAndShowModal(this.closest('.forum-card-item'))">
+                                        <i class="bi bi-chat-right-text-fill me-1"></i> <?php echo count($q['answers']); ?> Jawaban
+                                    </span>
+                                    <?php if ($_SESSION['user_id'] == $q['author_id'] || $_SESSION['role'] === 'superadmin'): ?>
+                                        <button class="btn btn-sm btn-light border text-danger rounded-circle p-0 d-inline-flex align-items-center justify-content-center delete-btn" data-id="<?php echo $q['id']; ?>" data-type="question" title="Hapus Pertanyaan" style="width:30px; height:30px;">
+                                            <i class="bi bi-trash-fill" style="font-size:12px;"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- SECTION 2: DAFTAR CUSTOMER -->
+<div id="customer-section">
 
     <!-- Filter Toolbar Card -->
     <div class="filter-card">
