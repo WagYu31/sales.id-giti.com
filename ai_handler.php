@@ -360,26 +360,50 @@ if (empty($answers)) {
             ]
         ];
     }
-    // 11. DEFAULT GENERAL CONSULTATION & NEGOTIATION
-    else {
+    // 11. SCENARIO: KOLAM RENANG / WATERPARK / RENANG / BERENANG / PENGINAPAN / RESORT
+    elseif (strpos($q, 'renang') !== false || strpos($q, 'kolam') !== false || strpos($q, 'waterpark') !== false || strpos($q, 'pantai') !== false || strpos($q, 'resort') !== false) {
         $answers = [
             [
-                'type' => 'Taktik Penawaran Value & Closing Cepat',
-                'strategy' => 'Fokus pada penanganan kebutuhan customer & keunggulan garansi ganti baru Loewix.',
-                'text' => 'Halo Kak! Terkait situasi prospek Kakak, kami sarankan kirimkan penawaran Paket Loewix CCTV dengan menekankan garansi resmi ganti baru 1 tahun & bonus gratis setting P2P pantau dari smartphone selamanya.',
-                'product_recommendation' => 'Loewix Commercial Safety Package'
+                'type' => 'Pendekatan Outdoor Waterproof IP67 & Keamanan Keselamatan Pengunjung',
+                'strategy' => 'Area kolam renang/waterpark sangat membutuhkan kamera tahan cipratan air & kelembaban tinggi IP67.',
+                'text' => 'Halo Kak! Untuk pengawasan area kolam renang/waterpark, Loewix menyediakan tipe IP Camera Outdoor Waterproof IP67 yang tahan embun & cipratan air ekstrem untuk memantau keselamatan pengunjung dan perlindungan area bilas 24 jam.',
+                'product_recommendation' => 'Loewix Waterproof IP67 Swimming Pool Shield'
             ],
             [
-                'type' => 'Teknik Negosiasi & Bonus Accessories',
-                'strategy' => 'Berikan nilai tambah bonus kabel HDMI & bebas konsultasi setting teknisi.',
-                'text' => 'Halo Kak! Untuk meyakinkan calon customer Kakak, infokan bahwa tim teknisi Loewix siap membantu konfigurasikan sistem pantau HP secara gratis saat pemasangan agar tinggal pakai secara instan.',
-                'product_recommendation' => 'Loewix Turnkey System'
+                'type' => 'Pendekatan Audio Warning & Night Vision Starlight 24 Jam',
+                'strategy' => 'Cegah insiden berenang di luar jam operasional dengan sensor suara speaker peringatan.',
+                'text' => 'Halo Kak! Kamera Loewix Active Deterrence dilengkapi Speaker Audio 2-Arah & Lampu LED Starlight yang dapat membunyikan suara peringatan jika ada pengunjung memasuki area kolam di luar jam operasional.',
+                'product_recommendation' => 'Loewix Active Deterrence Pool Speaker Camera'
             ],
             [
-                'type' => 'Strategi Upselling & Upgrade IP Camera',
-                'strategy' => 'Sarankan tipe IP Camera 4K Ultra HD untuk ketajaman gambar maksimal.',
-                'text' => 'Halo Kak! Jika customer mengutamakan hasil rekaman super tajam yang tidak pecah saat di-zoom, sangat disarankan menawarkan Upgrade ke Loewix IP Camera 4K Ultra HD Series.',
-                'product_recommendation' => 'Loewix IP Camera 4K Ultra HD Package'
+                'type' => 'Pendekatan Pantau HP Realtime & Garansi Ganti Baru',
+                'strategy' => 'Bantu pengelola kolam renang memantau situasi dari mana saja via smartphone.',
+                'text' => 'Halo Kak! Pengelola dapat memantau suasana kolam renang & area parkir pengunjung secara realtime dari smartphone gratis selamanya, plus garansi ganti unit baru 1-to-1 jika terkena kendala teknis.',
+                'product_recommendation' => 'Loewix Resort & Pool Protection Package'
+            ]
+        ];
+    }
+    // 12. DYNAMIC CONTEXTUAL GENERATOR FOR ALL OTHER CUSTOM TOPICS
+    else {
+        $cleanTopic = htmlspecialchars(ucwords(mb_substr($customerQuestion, 0, 40)));
+        $answers = [
+            [
+                'type' => "Pendekatan Solusi Prospek: " . $cleanTopic,
+                'strategy' => "Taktik negosiasi & konsultasi persuasif Loewix untuk menangani situasi prospek '{$cleanTopic}'.",
+                'text' => "Halo Kak! Mengenai situasi prospek Kakak terkait '{$cleanTopic}', kami sarankan kirimkan penawaran Paket Loewix CCTV dengan menekankan fitur keunggulan Garansi Ganti Baru 1-to-1 Resmi dan bonus gratis setting P2P pantau dari smartphone selamanya.",
+                'product_recommendation' => "Loewix Custom Smart Security Package"
+            ],
+            [
+                'type' => "Teknik Soft-Selling & Ramah Tamah",
+                'strategy' => "Tanyakan perkembangan kebutuhan customer dengan sopan tanpa kesan mendesak.",
+                'text' => "Halo Kak! Sekadar menyapa untuk menanyakan perkembangan rencana penawaran '{$cleanTopic}'. Tim teknisi Loewix siap memberikan panduan lokasi titik bebas blind-spot & perbandingan estimasi biayanya kapan saja Kakak butuhkan.",
+                'product_recommendation' => "Loewix Free Security Consultation"
+            ],
+            [
+                'type' => "Taktik Nego Promo & Bonus Kabel HDMI",
+                'strategy' => "Berikan dorongan bonus aksesoris & garansi kilat untuk menutup transaksi hari ini.",
+                'text' => "Halo Kak! Khusus penutupan transaksi minggu ini untuk '{$cleanTopic}', kami berikan promo gratis kabel HDMI 5m + jaminan garansi ganti unit baru 100% jika ada kendala tanpa potongan margin!",
+                'product_recommendation' => "Loewix Turnkey Closing Package"
             ]
         ];
     }
