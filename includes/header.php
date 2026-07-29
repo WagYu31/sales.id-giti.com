@@ -499,9 +499,6 @@ table tr td { font-size: 0.85em; }
                 <i class="bi bi-people-fill"></i> Sales Management
             </a>
             <?php endif; ?>
-            <a href="sales_qa.php" class="sidebar-link <?php echo $currentPage=='sales_qa.php'?'active':''; ?>">
-                <i class="bi bi-chat-left-dots-fill"></i> Forum Q&A Sales
-            </a>
 
             <div class="nav-section-label" style="margin-top:8px;">Tools</div>
 
