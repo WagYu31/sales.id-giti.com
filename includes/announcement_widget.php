@@ -91,7 +91,7 @@
 }
 </style>
 
-<div id="announcementWidgetContainer" style="display: none;">
+<div id="announcementWidgetContainer">
     <div class="iso-announcement-card">
         <!-- Header -->
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
@@ -102,7 +102,7 @@
                 <div>
                     <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 17px; letter-spacing: -0.3px;">
                         Papan Pengumuman Sales
-                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1" style="font-size: 11.5px; font-weight: 700;" id="announcementActiveCount">1 Aktif</span>
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1" style="font-size: 11.5px; font-weight: 700;" id="announcementActiveCount">Aktif</span>
                     </h5>
                     <p class="text-muted mb-0" style="font-size: 13px; font-family: 'Inter', sans-serif;">Pemberitahuan resmi promo, price list, & kabar penting dari manajemen Loewix</p>
                 </div>
@@ -111,9 +111,6 @@
                 <a href="announcements.php" class="btn-iso-manage">
                     <i class="bi bi-gear-fill me-1 text-primary"></i> Kelola Pengumuman
                 </a>
-                <button type="button" class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center text-muted" onclick="dismissAnnouncementWidget()" style="width: 32px; height: 32px; font-size: 14px;" title="Tutup Pemberitahuan">
-                    ✕
-                </button>
             </div>
         </div>
 
@@ -126,20 +123,18 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    if (!sessionStorage.getItem("dismissed_announcements")) {
-        loadActiveAnnouncements();
-    }
+    loadActiveAnnouncements();
 });
 
 function loadActiveAnnouncements() {
     fetch('ajax_announcement_handler.php?action=fetch_active')
         .then(res => res.json())
         .then(data => {
+            const container = document.getElementById('announcementWidgetContainer');
+            const list = document.getElementById('announcementCardsList');
+            const countBadge = document.getElementById('announcementActiveCount');
+            
             if (data.status === 'success' && data.data && data.data.length > 0) {
-                const container = document.getElementById('announcementWidgetContainer');
-                const list = document.getElementById('announcementCardsList');
-                const countBadge = document.getElementById('announcementActiveCount');
-                
                 if (countBadge) {
                     countBadge.innerText = `${data.data.length} Aktif`;
                 }
@@ -190,16 +185,25 @@ function loadActiveAnnouncements() {
                 });
 
                 list.innerHTML = html;
-                container.style.display = 'block';
+            } else {
+                if (countBadge) countBadge.innerText = '0 Aktif';
+                list.innerHTML = `
+                <div class="iso-announcement-item" style="border-left: 4px solid #2563EB !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge badge-iso-info px-2.5 py-1 rounded-pill">ℹ️ INFORMASI</span>
+                            <h6 class="fw-bold text-dark mb-0" style="font-size: 15px; font-family: 'Plus Jakarta Sans', sans-serif;">Selamat Datang di Dashboard Sales Loewix 🚀</h6>
+                        </div>
+                    </div>
+                    <div class="text-secondary" style="font-size: 13.5px; line-height: 1.6; font-family: 'Inter', sans-serif;">Belum ada pengumuman aktif saat ini. Anda dapat menerbitkan pengumuman baru melalui menu <strong>Kelola Pengumuman</strong>.</div>
+                </div>`;
             }
+            container.style.display = 'block';
         })
-        .catch(err => console.error("Error loading announcements:", err));
-}
-
-function dismissAnnouncementWidget() {
-    sessionStorage.setItem("dismissed_announcements", "true");
-    const container = document.getElementById('announcementWidgetContainer');
-    if (container) container.style.display = 'none';
+        .catch(err => {
+            console.error("Error loading announcements:", err);
+            document.getElementById('announcementWidgetContainer').style.display = 'block';
+        });
 }
 
 function escapeHtmlAnn(text) {
