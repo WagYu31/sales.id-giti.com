@@ -1,6 +1,6 @@
 <?php
 /**
- * GRAFIK RANKING & LEADERBOARD SALES WIDGET - INTERACTIVE NAILONG DRAGON (奶龙) WITH CLICK MOTIVATION & FLYING PROPS
+ * GRAFIK RANKING & LEADERBOARD SALES WIDGET - ATHLETICS RUNNING TRACK / SIRKUIT LARI EDITION
  * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
  */
 
@@ -54,7 +54,7 @@ $top3 = $ranking_data[2] ?? null;
 $total_sales_count = count($ranking_data);
 ?>
 
-<!-- 3D SPATIAL & INTERACTIVE NAILONG DRAGON (奶龙) WITH CLICK MOTIVATION & FLYING PROPS -->
+<!-- 3D SPATIAL & ATHLETICS RUNNING TRACK / SIRKUIT LARI EDITION -->
 <style>
 @keyframes float3DMedal {
     0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
@@ -85,6 +85,66 @@ $total_sales_count = count($ranking_data);
     0% { transform: scale(1); }
     50% { transform: scale(1.2); color: #2563EB; }
     100% { transform: scale(1); }
+}
+
+/* ATHLETICS RUNNING TRACK / SIRKUIT LARI STYLES */
+.chart-scroll-wrapper {
+    position: relative;
+    max-height: 370px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: 25px;
+    padding-right: 6px;
+    background: linear-gradient(180deg, #A93226 0%, #922B21 50%, #7B241C 100%);
+    border-radius: 22px;
+    border: 2.5px solid #78281F;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.5), 0 12px 28px rgba(169, 50, 38, 0.3);
+}
+
+/* White Running Track Lane Divider Lines */
+.chart-scroll-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 41px,
+        rgba(255, 255, 255, 0.32) 41px,
+        rgba(255, 255, 255, 0.32) 43px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Checkered Finish Line Banner on Right Edge */
+.track-finish-line {
+    position: absolute;
+    right: 70px;
+    top: 0;
+    bottom: 0;
+    width: 14px;
+    background-image: repeating-conic-gradient(#FFFFFF 0 90deg, #000000 0 180deg);
+    background-size: 14px 14px;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    opacity: 0.9;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.track-finish-tag {
+    position: absolute;
+    right: 56px;
+    top: 8px;
+    background: #0F172A;
+    color: #FACC15;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 12px;
+    border: 1px solid #FACC15;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    z-index: 3;
 }
 
 /* INTERACTIVE CLICKABLE NAILONG RUNNER */
@@ -346,23 +406,6 @@ $total_sales_count = count($ranking_data);
 .podium-rank-badge.silver { background: linear-gradient(135deg, #94A3B8 0%, #64748B 100%); }
 .podium-rank-badge.bronze { background: linear-gradient(135deg, #D97706 0%, #B45309 100%); }
 
-.chart-scroll-wrapper {
-    position: relative;
-    max-height: 360px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-top: 25px;
-    padding-right: 6px;
-}
-
-.chart-scroll-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-.chart-scroll-wrapper::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 10px;
-}
-
 .metric-btn {
     border: 1px solid #CBD5E1;
     background: #F8FAFC;
@@ -455,9 +498,9 @@ $total_sales_count = count($ranking_data);
             <div>
                 <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
                     Leaderboard & Grafik Ranking Sales
-                    <span class="badge bg-warning bg-opacity-20 text-dark border border-warning border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">🐲 Interactive Nailong (奶龙) Klik</span>
+                    <span class="badge bg-danger text-white border border-white border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">🏁 Sirkuit Lari Nailong (奶龙)</span>
                 </h5>
-                <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Klik karakter Nailong untuk memberikan sorakan semangat pada Sales!</p>
+                <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Sirkuit Lari Sales Rep: Klik karakter Nailong untuk memberikan sorakan semangat!</p>
             </div>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -560,11 +603,11 @@ $total_sales_count = count($ranking_data);
             <?php endif; ?>
         </div>
 
-        <!-- Right Side: Interactive 3D Chart.js Graphic with NAILONG Dragon Overlay -->
+        <!-- Right Side: Athletics Running Track Circuit Background & Chart -->
         <div class="col-lg-7 col-12">
             <div class="p-3.5 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
                 <div class="d-flex justify-content-between align-items-center mb-2 px-2 flex-wrap gap-2">
-                    <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 14px;" id="chartTitle">📊 Ranking Sales (Sudah FU Invoice)</span>
+                    <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 14px;" id="chartTitle">🏁 Sirkuit Lari Sales (Sudah FU Invoice)</span>
                     <div class="d-flex align-items-center gap-1.5">
                         <span class="text-muted fw-semibold" style="font-size: 11px;">Tampilkan:</span>
                         <button type="button" class="top-limit-btn" onclick="setTopLimit(5, this)">Top 5</button>
@@ -574,8 +617,11 @@ $total_sales_count = count($ranking_data);
                     </div>
                 </div>
 
-                <!-- Scrollable Wrapper for Canvas & NAILONG Dragon Overlays -->
+                <!-- Athletics Track Circuit Wrapper with Checkered Finish Line -->
                 <div class="chart-scroll-wrapper" id="chartScrollWrapper">
+                    <div class="track-finish-line"></div>
+                    <div class="track-finish-tag">FINISH 🏁</div>
+
                     <div id="chartCanvasContainer" style="position: relative; height: 280px; width: 100%;">
                         <canvas id="salesRankingChart"></canvas>
                         <!-- Container for NAILONG Dragon (奶龙) Interactive Runner Characters -->
@@ -696,26 +742,26 @@ function renderScaledChart() {
     const holder = document.getElementById('cctvMascotOverlayHolder');
     if (holder) holder.innerHTML = '';
 
-    // 3D Gradient Fills for Chart Bars
+    // 3D Gold & Vibrant Track Bar Gradients
     const gradientGold = ctx.createLinearGradient(0, 0, 400, 0);
     gradientGold.addColorStop(0, '#F59E0B');
     gradientGold.addColorStop(1, '#FCD34D');
 
     const gradientBlue = ctx.createLinearGradient(0, 0, 400, 0);
-    gradientBlue.addColorStop(0, '#2563EB');
-    gradientBlue.addColorStop(1, '#38BDF8');
+    gradientBlue.addColorStop(0, '#3B82F6');
+    gradientBlue.addColorStop(1, '#60A5FA');
 
     const gradientGreen = ctx.createLinearGradient(0, 0, 400, 0);
-    gradientGreen.addColorStop(0, '#059669');
+    gradientGreen.addColorStop(0, '#10B981');
     gradientGreen.addColorStop(1, '#34D399');
 
     const gradientSilver = ctx.createLinearGradient(0, 0, 400, 0);
-    gradientSilver.addColorStop(0, '#64748B');
-    gradientSilver.addColorStop(1, '#94A3B8');
+    gradientSilver.addColorStop(0, '#94A3B8');
+    gradientSilver.addColorStop(1, '#CBD5E1');
 
     const gradientBronze = ctx.createLinearGradient(0, 0, 400, 0);
-    gradientBronze.addColorStop(0, '#D97706');
-    gradientBronze.addColorStop(1, '#FDBA74');
+    gradientBronze.addColorStop(0, '#F97316');
+    gradientBronze.addColorStop(1, '#FB923C');
 
     salesChartInstance = new Chart(ctx, {
         type: 'bar',
@@ -732,13 +778,13 @@ function renderScaledChart() {
                     gradientGreen
                 ],
                 borderColor: [
-                    '#D97706',
-                    '#475569',
-                    '#B45309',
-                    '#1D4ED8',
-                    '#047857'
+                    '#FCD34D',
+                    '#E2E8F0',
+                    '#FDBA74',
+                    '#93C5FD',
+                    '#6EE7B7'
                 ],
-                borderWidth: 1.5,
+                borderWidth: 2,
                 borderRadius: 10,
                 barThickness: 22,
                 maxBarThickness: 26
@@ -779,12 +825,12 @@ function renderScaledChart() {
             scales: {
                 x: {
                     grace: '18%',
-                    grid: { color: 'rgba(226, 232, 240, 0.7)' },
-                    ticks: { font: { family: 'Inter', size: 11 }, color: '#64748B' }
+                    grid: { color: 'rgba(255, 255, 255, 0.22)' },
+                    ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#FFFFFF' }
                 },
                 y: {
                     grid: { display: false },
-                    ticks: { font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' }, color: '#0F172A' }
+                    ticks: { font: { family: 'Plus Jakarta Sans', size: 12, weight: '700' }, color: '#FFFFFF' }
                 }
             }
         }
@@ -971,7 +1017,7 @@ function switchChartMetric(type) {
 
     if (type === 'inv_sudah') {
         btnInvSudah.classList.add('active');
-        if (chartTitle) chartTitle.innerText = '📊 Ranking Sales (Sudah FU Invoice)';
+        if (chartTitle) chartTitle.innerText = '🏁 Sirkuit Lari Sales (Sudah FU Invoice)';
         if (p1Val && top1Data) p1Val.innerText = top1Data.count_sudah_inv_fu;
         if (p1Lbl) p1Lbl.innerText = 'Sudah FU Invoice';
         if (p2Val && top2Data) p2Val.innerText = top2Data.count_sudah_inv_fu;
@@ -980,7 +1026,7 @@ function switchChartMetric(type) {
         if (p3Lbl) p3Lbl.innerText = 'Sudah FU Invoice';
     } else if (type === 'total') {
         btnTotal.classList.add('active');
-        if (chartTitle) chartTitle.innerText = '📊 Ranking Sales (Total Activity FU)';
+        if (chartTitle) chartTitle.innerText = '🏁 Sirkuit Lari Sales (Total Activity FU)';
         if (p1Val && top1Data) p1Val.innerText = top1Data.total_fu;
         if (p1Lbl) p1Lbl.innerText = 'Total Activity FU';
         if (p2Val && top2Data) p2Val.innerText = top2Data.total_fu;
@@ -989,7 +1035,7 @@ function switchChartMetric(type) {
         if (p3Lbl) p3Lbl.innerText = 'Total Activity FU';
     } else {
         btnCustomer.classList.add('active');
-        if (chartTitle) chartTitle.innerText = '📊 Ranking Sales (Customer di-FU)';
+        if (chartTitle) chartTitle.innerText = '🏁 Sirkuit Lari Sales (Customer di-FU)';
         if (p1Val && top1Data) p1Val.innerText = top1Data.total_customer_fu;
         if (p1Lbl) p1Lbl.innerText = 'Customer di-FU';
         if (p2Val && top2Data) p2Val.innerText = top2Data.total_customer_fu;
