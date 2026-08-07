@@ -1,6 +1,6 @@
 <?php
 /**
- * GRAFIK RANKING & LEADERBOARD SALES WIDGET - CUTE NAILONG DRAGON (奶龙) RUNNER EDITION
+ * GRAFIK RANKING & LEADERBOARD SALES WIDGET - HIGH ENERGETIC NAILONG DRAGON (奶龙) SPRINT RUNNER EDITION
  * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
  */
 
@@ -54,7 +54,7 @@ $top3 = $ranking_data[2] ?? null;
 $total_sales_count = count($ranking_data);
 ?>
 
-<!-- 3D SPATIAL & CUTE NAILONG DRAGON (奶龙) RUNNER EDITION -->
+<!-- 3D SPATIAL & HIGH ENERGETIC NAILONG DRAGON (奶龙) SPRINT RUNNER EDITION -->
 <style>
 @keyframes float3DMedal {
     0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
@@ -87,43 +87,52 @@ $total_sales_count = count($ranking_data);
     100% { transform: scale(1); }
 }
 
-/* CUTE NAILONG DRAGON (奶龙) RUNNER ANIMATIONS */
+/* HIGH ENERGETIC NAILONG SPRINT ANIMATIONS */
 .nailong-runner-character {
     position: absolute;
     width: 48px;
     height: 50px;
     pointer-events: none;
-    transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s ease;
+    transition: left 0.08s linear, top 0.3s ease;
     z-index: 25;
 }
 
 .nailong-svg {
-    filter: drop-shadow(0 6px 14px rgba(245, 158, 11, 0.35));
-    animation: nailongWaddle 0.32s infinite alternate ease-in-out;
+    filter: drop-shadow(0 6px 14px rgba(245, 158, 11, 0.4));
+    animation: nailongEnergeticRun 0.24s infinite alternate cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.nailong-head-group {
+    transform-origin: 23px 16px;
+    animation: nailongHeadBob 0.24s infinite alternate ease-in-out;
 }
 
 .nailong-leg-left {
-    transform-origin: 16px 42px;
-    animation: nailongLegLeft 0.32s infinite alternate ease-in-out;
+    transform-origin: 15px 42px;
+    animation: nailongLegSprintLeft 0.24s infinite alternate ease-in-out;
 }
 
 .nailong-leg-right {
-    transform-origin: 28px 42px;
-    animation: nailongLegRight 0.32s infinite alternate ease-in-out;
+    transform-origin: 29px 42px;
+    animation: nailongLegSprintRight 0.24s infinite alternate ease-in-out;
 }
 
 .nailong-arm-left {
     transform-origin: 12px 25px;
-    animation: nailongArmLeft 0.32s infinite alternate ease-in-out;
+    animation: nailongArmSprintLeft 0.24s infinite alternate ease-in-out;
 }
 
 .nailong-arm-right {
     transform-origin: 32px 25px;
-    animation: nailongArmRight 0.32s infinite alternate ease-in-out;
+    animation: nailongArmSprintRight 0.24s infinite alternate ease-in-out;
 }
 
 .cctv-rec-dot {
-    animation: recBlink 0.6s infinite alternate;
+    animation: recBlink 0.5s infinite alternate;
+}
+
+.nailong-speed-lines line {
+    animation: speedLinePuff 0.18s infinite linear;
 }
 
 .nailong-rank-tag {
@@ -136,29 +145,39 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-@keyframes nailongWaddle {
-    0% { transform: translateY(0px) rotate(-6deg); }
-    100% { transform: translateY(-4px) rotate(6deg); }
+@keyframes nailongEnergeticRun {
+    0% { transform: translateY(0px) rotate(-10deg) scale(0.98); }
+    100% { transform: translateY(-7px) rotate(8deg) scale(1.05); }
 }
 
-@keyframes nailongLegLeft {
-    0% { transform: translateY(-2px) scaleY(0.85); }
-    100% { transform: translateY(2px) scaleY(1.1); }
+@keyframes nailongHeadBob {
+    0% { transform: rotate(-6deg); }
+    100% { transform: rotate(10deg); }
 }
 
-@keyframes nailongLegRight {
-    0% { transform: translateY(2px) scaleY(1.1); }
-    100% { transform: translateY(-2px) scaleY(0.85); }
+@keyframes nailongLegSprintLeft {
+    0% { transform: rotate(-65deg) scaleY(0.8); }
+    100% { transform: rotate(65deg) scaleY(1.25); }
 }
 
-@keyframes nailongArmLeft {
-    0% { transform: rotate(-35deg); }
-    100% { transform: rotate(35deg); }
+@keyframes nailongLegSprintRight {
+    0% { transform: rotate(65deg) scaleY(1.25); }
+    100% { transform: rotate(-65deg) scaleY(0.8); }
 }
 
-@keyframes nailongArmRight {
-    0% { transform: rotate(35deg); }
-    100% { transform: rotate(-35deg); }
+@keyframes nailongArmSprintLeft {
+    0% { transform: rotate(-55deg); }
+    100% { transform: rotate(55deg); }
+}
+
+@keyframes nailongArmSprintRight {
+    0% { transform: rotate(55deg); }
+    100% { transform: rotate(-55deg); }
+}
+
+@keyframes speedLinePuff {
+    0% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(-8px); }
 }
 
 @keyframes recBlink {
@@ -348,7 +367,7 @@ $total_sales_count = count($ranking_data);
             <div>
                 <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
                     Leaderboard & Grafik Ranking Sales
-                    <span class="badge bg-warning bg-opacity-20 text-dark border border-warning border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">🐲 Nailong (奶龙) Runner</span>
+                    <span class="badge bg-warning bg-opacity-20 text-dark border border-warning border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">🐲 High-Speed Nailong (奶龙) Sprint</span>
                 </h5>
                 <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Peringkat sales berdasarkan total invoice yang telah berhasil di-follow up</p>
             </div>
@@ -585,6 +604,10 @@ function renderScaledChart() {
         salesChartInstance.destroy();
     }
 
+    // Clear old Nailong overlay runners
+    const holder = document.getElementById('cctvMascotOverlayHolder');
+    if (holder) holder.innerHTML = '';
+
     // 3D Gradient Fills for Chart Bars
     const gradientGold = ctx.createLinearGradient(0, 0, 400, 0);
     gradientGold.addColorStop(0, '#F59E0B');
@@ -684,14 +707,21 @@ function syncCctvMascotOverlays() {
     const holder = document.getElementById('cctvMascotOverlayHolder');
     if (!holder || !salesChartInstance) return;
 
-    holder.innerHTML = '';
     const meta = salesChartInstance.getDatasetMeta(0);
     if (!meta || !meta.data) return;
 
     meta.data.forEach((bar, idx) => {
         const pos = bar.tooltipPosition();
-        const runnerDiv = document.createElement('div');
-        runnerDiv.className = 'nailong-runner-character';
+        let runnerDiv = document.getElementById(`nailong-runner-${idx}`);
+
+        if (!runnerDiv) {
+            runnerDiv = document.createElement('div');
+            runnerDiv.id = `nailong-runner-${idx}`;
+            runnerDiv.className = 'nailong-runner-character';
+            holder.appendChild(runnerDiv);
+        }
+
+        // Dynamically update position in sync with bar animation growth
         runnerDiv.style.left = `${pos.x + 8}px`;
         runnerDiv.style.top = `${pos.y - 25}px`;
 
@@ -702,15 +732,22 @@ function syncCctvMascotOverlays() {
 
         runnerDiv.innerHTML = `
             <svg width="48" height="50" viewBox="0 0 48 50" fill="none" xmlns="http://www.w3.org/2000/svg" class="nailong-svg">
+                <!-- High-Speed Running Trail Lines -->
+                <g class="nailong-speed-lines">
+                    <line x1="2" y1="20" x2="8" y2="20" stroke="#FFCC00" stroke-width="2.2" stroke-linecap="round"/>
+                    <line x1="0" y1="28" x2="6" y2="28" stroke="#FFCC00" stroke-width="2.2" stroke-linecap="round"/>
+                    <line x1="3" y1="36" x2="9" y2="36" stroke="#FFCC00" stroke-width="2.2" stroke-linecap="round"/>
+                </g>
+
                 <!-- Tail -->
                 <path d="M10 36 C 4 38, 2 34, 6 30 C 8 32, 10 34, 12 34 Z" fill="#FFCC00" stroke="#E6B800" stroke-width="1"/>
                 
-                <!-- Left Waddling Leg -->
-                <ellipse cx="16" cy="42" rx="4.5" ry="5.5" fill="#FFCC00" stroke="#E6B800" stroke-width="1.2" class="nailong-leg-left"/>
-                <!-- Right Waddling Leg -->
-                <ellipse cx="28" cy="42" rx="4.5" ry="5.5" fill="#FFCC00" stroke="#E6B800" stroke-width="1.2" class="nailong-leg-right"/>
+                <!-- Left Running Leg -->
+                <ellipse cx="15" cy="42" rx="4.5" ry="5.5" fill="#FFCC00" stroke="#E6B800" stroke-width="1.2" class="nailong-leg-left"/>
+                <!-- Right Running Leg -->
+                <ellipse cx="29" cy="42" rx="4.5" ry="5.5" fill="#FFCC00" stroke="#E6B800" stroke-width="1.2" class="nailong-leg-right"/>
                 
-                <!-- Chubby Yellow Dragon Body & Big White Belly -->
+                <!-- Chubby Yellow Dragon Body & White Belly -->
                 <path d="M14 20 C 10 24, 10 38, 16 42 C 20 44, 28 44, 32 42 C 38 38, 38 24, 34 20 Z" fill="#FFCC00" stroke="#E6B800" stroke-width="1.5"/>
                 <ellipse cx="23" cy="32" rx="7.5" ry="8.5" fill="#FFEAA7"/>
 
@@ -720,31 +757,30 @@ function syncCctvMascotOverlays() {
                 <path d="M32 25 Q 38 28 35 32" stroke="#FFCC00" stroke-width="4.5" stroke-linecap="round" class="nailong-arm-right"/>
 
                 <!-- Cute NAILONG Head -->
-                <circle cx="23" cy="16" r="13" fill="#FFCC00" stroke="#E6B800" stroke-width="1.5"/>
-                
-                <!-- Cute Tiny Orange Horns -->
-                <path d="M15 5 C 13 1, 17 2, 18 6 Z" fill="#FF9900"/>
-                <path d="M31 5 C 33 1, 29 2, 28 6 Z" fill="#FF9900"/>
+                <g class="nailong-head-group">
+                    <circle cx="23" cy="16" r="13" fill="#FFCC00" stroke="#E6B800" stroke-width="1.5"/>
+                    <path d="M15 5 C 13 1, 17 2, 18 6 Z" fill="#FF9900"/>
+                    <path d="M31 5 C 29 1, 33 2, 28 6 Z" fill="#FF9900"/>
 
-                <!-- CCTV Camera Visor / Headset for Loewix Theme -->
-                <rect x="11" y="10" width="24" height="9" rx="4.5" fill="#0F172A" stroke="#2563EB" stroke-width="1"/>
-                <circle cx="28" cy="14.5" r="3" fill="#00F0FF"/>
-                <circle cx="28" cy="14.5" r="1.2" fill="#FFFFFF"/>
-                <circle cx="15" cy="12" r="1" fill="#FF2E2E" class="cctv-rec-dot"/>
+                    <!-- CCTV Camera Visor / Headset for Loewix Theme -->
+                    <rect x="11" y="10" width="24" height="9" rx="4.5" fill="#0F172A" stroke="#2563EB" stroke-width="1"/>
+                    <circle cx="28" cy="14.5" r="3" fill="#00F0FF"/>
+                    <circle cx="28" cy="14.5" r="1.2" fill="#FFFFFF"/>
+                    <circle cx="15" cy="12" r="1" fill="#FF2E2E" class="cctv-rec-dot"/>
 
-                <!-- Blushy Pink Cheeks -->
-                <circle cx="13" cy="21" r="2.5" fill="#FF7675" opacity="0.65"/>
-                <circle cx="33" cy="21" r="2.5" fill="#FF7675" opacity="0.65"/>
+                    <!-- Blushy Pink Cheeks -->
+                    <circle cx="13" cy="21" r="2.5" fill="#FF7675" opacity="0.65"/>
+                    <circle cx="33" cy="21" r="2.5" fill="#FF7675" opacity="0.65"/>
 
-                <!-- Cute Round Eyes -->
-                <circle cx="17" cy="18" r="2.2" fill="#2D3436"/>
-                <circle cx="17" cy="17.2" r="0.8" fill="#FFFFFF"/>
-                <circle cx="29" cy="18" r="2.2" fill="#2D3436"/>
-                <circle cx="29" cy="17.2" r="0.8" fill="#FFFFFF"/>
+                    <!-- Cute Eyes -->
+                    <circle cx="17" cy="18" r="2.2" fill="#2D3436"/>
+                    <circle cx="17" cy="17.2" r="0.8" fill="#FFFFFF"/>
+                    <circle cx="29" cy="18" r="2.2" fill="#2D3436"/>
+                    <circle cx="29" cy="17.2" r="0.8" fill="#FFFFFF"/>
+                </g>
             </svg>
             ${rankTagHtml}
         `;
-        holder.appendChild(runnerDiv);
     });
 }
 
