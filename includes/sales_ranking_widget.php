@@ -899,11 +899,15 @@ function renderScaledChart() {
     gradientBronze.addColorStop(0, '#F97316');
     gradientBronze.addColorStop(1, '#FB923C');
 
-    // Compute dynamic max for scale so bars and runners span beautifully across the track
+    // Compute scale max - Target Finish Line is Rp 200.000.000 (200 Juta) for Omset Invoice
     const maxVal = Math.max(...slicedValues, 1);
     let scaleMax = Math.ceil(maxVal * 1.25);
+    let stepSizeVal = undefined;
+
     if (currentMetric === 'omset') {
-        scaleMax = Math.max(maxVal * 1.25, 10000000); // Dynamic Rupiah scale
+        // Fixed scale to Target 200 Juta (or higher if a sales exceeds 200M)
+        scaleMax = maxVal > 200000000 ? Math.ceil(maxVal / 50000000) * 50000000 : 200000000;
+        stepSizeVal = 50000000; // 0, 50 Jt, 100 Jt, 150 Jt, 200 Jt
     }
 
     salesChartInstance = new Chart(ctx, {
@@ -969,12 +973,14 @@ function renderScaledChart() {
                 x: {
                     min: 0,
                     max: scaleMax,
-                    grid: { color: 'rgba(255, 255, 255, 0.12)', lineWidth: 1 },
+                    stepSize: stepSizeVal,
+                    grid: { color: 'rgba(255, 255, 255, 0.15)', lineWidth: 1 },
                     ticks: { 
                         color: '#F8FAFC', 
-                        font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
+                        font: { family: 'Plus Jakarta Sans', size: 11.5, weight: '700' },
                         callback: function(val) {
                             if (currentMetric === 'omset') {
+                                if (val === 0) return '0';
                                 if (val >= 1000000) return (val / 1000000) + ' Jt';
                                 return val;
                             }
