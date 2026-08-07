@@ -993,6 +993,11 @@ function renderScaledChart() {
                 }
             },
             animation: {
+                duration: 1500,
+                easing: 'easeOutQuart',
+                onProgress: function(animation) {
+                    positionMascotRunners(this);
+                },
                 onComplete: function() {
                     positionMascotRunners(this);
                 }
