@@ -182,26 +182,27 @@ $total_sales_count = count($ranking_data);
 
 /* === NAILONG 3D SPRITE SHEET ANIMATION === */
 /* Sprite sheet: 1024x1024, 3 columns x 2 rows = 6 frames */
-/* Each frame: 341.33 x 512 px. Display at 52x78px */
+/* Each frame: ~341 x 512 px. Display at 40x60px */
 .nailong-sprite {
-    width: 52px;
-    height: 78px;
+    width: 40px;
+    height: 60px;
     background-image: url('assets/nailong_spritesheet.png?v=<?= time() ?>');
-    background-size: 156px 156px; /* 52*3=156, 78*2=156 */
+    background-size: 120px 120px; /* 40*3=120, 60*2=120 */
     background-repeat: no-repeat;
     background-position: 0 0;
     animation: nailongSpriteRun 0.5s steps(1) infinite;
     display: block;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    mix-blend-mode: multiply; /* Removes white background on colored track */
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
 }
 
 @keyframes nailongSpriteRun {
     0%      { background-position: 0px 0px; }      /* Frame 1 */
-    16.66%  { background-position: -52px 0px; }     /* Frame 2 */
-    33.33%  { background-position: -104px 0px; }    /* Frame 3 */
-    50%     { background-position: 0px -78px; }     /* Frame 4 */
-    66.66%  { background-position: -52px -78px; }   /* Frame 5 */
-    83.33%  { background-position: -104px -78px; }  /* Frame 6 */
+    16.66%  { background-position: -40px 0px; }     /* Frame 2 */
+    33.33%  { background-position: -80px 0px; }     /* Frame 3 */
+    50%     { background-position: 0px -60px; }     /* Frame 4 */
+    66.66%  { background-position: -40px -60px; }   /* Frame 5 */
+    83.33%  { background-position: -80px -60px; }   /* Frame 6 */
     100%    { background-position: 0px 0px; }       /* Loop back */
 }
 
