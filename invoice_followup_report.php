@@ -8,6 +8,15 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Fetch list of sales representatives for filter dropdown
+$sales_list = [];
+$res_sales = $conn->query("SELECT id, nama_lengkap FROM sales WHERE deleted_at IS NULL ORDER BY nama_lengkap ASC");
+if ($res_sales) {
+    while ($s = $res_sales->fetch_assoc()) {
+        $sales_list[] = $s;
+    }
+}
+
 // --- LOGIKA UNTUK SORTING ---
 $allowed_sort_columns = [
     'tgl_invoice' => 'fu_invoice.tgl_follow_up',
@@ -33,6 +42,7 @@ $sql = "
         fu_invoice.id,
         fu_invoice.tgl_follow_up,
         fu_invoice.no_inv,
+        fu_invoice.sales_id,
         c.id AS customer_id,
         c.nama_toko,
         s.nama_lengkap AS nama_sales,
@@ -230,6 +240,23 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
     color: #FFFFFF;
     border-color: #2563EB;
 }
+
+.quick-date-btn {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    border: 1px solid #CBD5E1;
+    background: #FFFFFF;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.quick-date-btn:hover {
+    background: #E2E8F0;
+    color: #0F172A;
+}
 </style>
 
 <div class="main-content-wrapper p-4">
@@ -285,19 +312,80 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
         </div>
     </div>
 
-    <!-- Data Table Card -->
+    <!-- Data Table Card & Complete Filter Suite -->
     <div class="inv-table-card">
-        <div class="p-4 border-bottom bg-white d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <span class="fw-bold text-dark me-2" style="font-size: 14px;">Filter Status:</span>
-                <button class="filter-pill-btn active" onclick="filterStatus('all', this)">Semua (<?php echo $total_count; ?>)</button>
-                <button class="filter-pill-btn" onclick="filterStatus('perlu', this)">🔴 Perlu FU (<?php echo $perlu_fu_count; ?>)</button>
-                <button class="filter-pill-btn" onclick="filterStatus('sudah', this)">🟢 Sudah FU (<?php echo $sudah_fu_count; ?>)</button>
-                <button class="filter-pill-btn" onclick="filterStatus('menunggu', this)">🔵 Menunggu (<?php echo $menunggu_fu_count; ?>)</button>
+        <!-- Enterprise Multi-Filter Bar -->
+        <div class="p-4 border-bottom bg-white">
+            <div class="row g-3 align-items-center mb-3">
+                <!-- Status Filter Pills -->
+                <div class="col-lg-6 col-12">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="fw-bold text-dark me-1" style="font-size: 13.5px;"><i class="bi bi-funnel-fill text-primary"></i> Status:</span>
+                        <button class="filter-pill-btn active" onclick="setStatusFilter('all', this)" id="btnStatusAll">Semua (<?php echo $total_count; ?>)</button>
+                        <button class="filter-pill-btn" onclick="setStatusFilter('perlu', this)">🔴 Perlu FU (<?php echo $perlu_fu_count; ?>)</button>
+                        <button class="filter-pill-btn" onclick="setStatusFilter('sudah', this)">🟢 Sudah FU (<?php echo $sudah_fu_count; ?>)</button>
+                        <button class="filter-pill-btn" onclick="setStatusFilter('menunggu', this)">🔵 Menunggu (<?php echo $menunggu_fu_count; ?>)</button>
+                    </div>
+                </div>
+
+                <!-- Live Search Bar -->
+                <div class="col-lg-6 col-12">
+                    <div class="position-relative">
+                        <i class="bi bi-search position-absolute text-muted" style="left: 14px; top: 11px; font-size: 14px;"></i>
+                        <input type="text" id="liveSearchInput" class="form-control ps-5 rounded-pill" placeholder="Cari no. invoice, nama toko, sales rep..." style="font-size: 13.5px; border-color: #CBD5E1;" onkeyup="applyAllFilters()">
+                    </div>
+                </div>
             </div>
-            <div class="position-relative" style="min-width: 280px;">
-                <i class="bi bi-search position-absolute text-muted" style="left: 14px; top: 10px; font-size: 14px;"></i>
-                <input type="text" id="liveSearchInput" class="form-control ps-5 rounded-pill" placeholder="Cari no. invoice, toko, sales..." style="font-size: 13px; border-color: #CBD5E1;">
+
+            <!-- Advanced Filters Row (Sales Rep Dropdown + Date Range + Presets + Reset) -->
+            <div class="row g-3 align-items-end pt-3 border-top">
+                <!-- Sales Rep Dropdown Filter -->
+                <div class="col-lg-3 col-md-6 col-12">
+                    <label class="form-label mb-1 fw-bold text-secondary" style="font-size: 11.5px; text-transform: uppercase;">
+                        <i class="bi bi-person-badge-fill text-primary"></i> Sales Rep
+                    </label>
+                    <select id="salesFilterSelect" class="form-select rounded-3" style="font-size: 13px; border-color: #CBD5E1;" onchange="applyAllFilters()">
+                        <option value="all">-- Semua Sales Representative --</option>
+                        <?php foreach ($sales_list as $sl): ?>
+                            <option value="<?php echo $sl['id']; ?>"><?php echo htmlspecialchars($sl['nama_lengkap']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Date Range Start Filter -->
+                <div class="col-lg-3 col-md-6 col-6">
+                    <label class="form-label mb-1 fw-bold text-secondary" style="font-size: 11.5px; text-transform: uppercase;">
+                        <i class="bi bi-calendar-event text-primary"></i> Dari Tanggal
+                    </label>
+                    <input type="date" id="dateStartInput" class="form-control rounded-3" style="font-size: 13px; border-color: #CBD5E1;" onchange="applyAllFilters()">
+                </div>
+
+                <!-- Date Range End Filter -->
+                <div class="col-lg-3 col-md-6 col-6">
+                    <label class="form-label mb-1 fw-bold text-secondary" style="font-size: 11.5px; text-transform: uppercase;">
+                        <i class="bi bi-calendar-event-fill text-primary"></i> Sampai Tanggal
+                    </label>
+                    <input type="date" id="dateEndInput" class="form-control rounded-3" style="font-size: 13px; border-color: #CBD5E1;" onchange="applyAllFilters()">
+                </div>
+
+                <!-- Quick Presets & Reset Button -->
+                <div class="col-lg-3 col-md-6 col-12 d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary w-100 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-1.5" style="font-size: 13px; height: 38px;" onclick="resetAllFilters()">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset Filter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preset Quick Date Bar -->
+            <div class="d-flex align-items-center gap-2 mt-2 pt-2 border-top">
+                <span class="text-muted fw-semibold" style="font-size: 11.5px;">Quick Date:</span>
+                <button type="button" class="quick-date-btn" onclick="setQuickDate('today')">Hari Ini</button>
+                <button type="button" class="quick-date-btn" onclick="setQuickDate('this_month')">Bulan Ini</button>
+                <button type="button" class="quick-date-btn" onclick="setQuickDate('last_month')">Bulan Lalu</button>
+                <button type="button" class="quick-date-btn" onclick="setQuickDate('all')">Semua Waktu</button>
+                <span class="ms-auto badge bg-light text-secondary border fw-bold px-3 py-1.5 rounded-pill" style="font-size: 12px;" id="activeFilterResultCount">
+                    <?php echo $total_count; ?> Data Ditampilkan
+                </span>
             </div>
         </div>
 
@@ -340,8 +428,12 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                                 $badge_class = 'badge-soft-danger';
                             }
                             $invoice_timestamp = strtotime($fu['tgl_follow_up']);
+                            $date_iso = date('Y-m-d', $invoice_timestamp);
                             ?>
-                            <tr class="fu-row" data-status="<?php echo $calc_status; ?>">
+                            <tr class="fu-row" 
+                                data-status="<?php echo $calc_status; ?>"
+                                data-sales-id="<?php echo $fu['sales_id']; ?>"
+                                data-date="<?php echo $date_iso; ?>">
                                 <td class="px-4 text-muted" style="font-size: 13px;">
                                     📅 <?php echo date('d M Y, H:i', $invoice_timestamp); ?>
                                 </td>
@@ -387,39 +479,88 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
 <?php require_once 'includes/footer.php'; ?>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('liveSearchInput');
-    const tableBody = document.getElementById('invoiceReportTableBody');
-    const rows = tableBody.getElementsByClassName('fu-row');
+let currentStatusFilter = 'all';
 
-    searchInput.addEventListener('keyup', function() {
-        const filter = searchInput.value.toLowerCase();
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            const text = row.textContent || row.innerText;
-            if (text.toLowerCase().indexOf(filter) > -1) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        }
-    });
-});
-
-function filterStatus(type, btn) {
+function setStatusFilter(type, btn) {
+    currentStatusFilter = type;
     const buttons = document.querySelectorAll('.filter-pill-btn');
     buttons.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    if (btn) btn.classList.add('active');
+    applyAllFilters();
+}
 
-    const rows = document.getElementsByClassName('fu-row');
-    for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        const status = row.getAttribute('data-status');
-        if (type === 'all' || status === type) {
+function applyAllFilters() {
+    const salesVal = document.getElementById('salesFilterSelect').value;
+    const dateStart = document.getElementById('dateStartInput').value;
+    const dateEnd = document.getElementById('dateEndInput').value;
+    const searchText = document.getElementById('liveSearchInput').value.toLowerCase().trim();
+
+    const rows = document.querySelectorAll('#invoiceReportTableBody tr.fu-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const rowStatus = row.getAttribute('data-status');
+        const rowSalesId = row.getAttribute('data-sales-id');
+        const rowDate = row.getAttribute('data-date');
+        const rowText = row.textContent.toLowerCase();
+
+        let matchStatus = (currentStatusFilter === 'all' || rowStatus === currentStatusFilter);
+        let matchSales = (salesVal === 'all' || rowSalesId === salesVal);
+        let matchDateStart = (!dateStart || rowDate >= dateStart);
+        let matchDateEnd = (!dateEnd || rowDate <= dateEnd);
+        let matchSearch = (!searchText || rowText.includes(searchText));
+
+        if (matchStatus && matchSales && matchDateStart && matchDateEnd && matchSearch) {
             row.style.display = "";
+            visibleCount++;
         } else {
             row.style.display = "none";
         }
+    });
+
+    const activeCountBadge = document.getElementById('activeFilterResultCount');
+    if (activeCountBadge) {
+        activeCountBadge.innerText = `${visibleCount} Data Ditampilkan`;
     }
+}
+
+function setQuickDate(type) {
+    const today = new Date();
+    const dateStartInput = document.getElementById('dateStartInput');
+    const dateEndInput = document.getElementById('dateEndInput');
+
+    if (type === 'today') {
+        const dateStr = today.toISOString().split('T')[0];
+        dateStartInput.value = dateStr;
+        dateEndInput.value = dateStr;
+    } else if (type === 'this_month') {
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
+        dateStartInput.value = firstDay;
+        dateEndInput.value = lastDay;
+    } else if (type === 'last_month') {
+        const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1).toISOString().split('T')[0];
+        const lastDay = new Date(today.getFullYear(), today.getMonth(), 0).toISOString().split('T')[0];
+        dateStartInput.value = firstDay;
+        dateEndInput.value = lastDay;
+    } else {
+        dateStartInput.value = "";
+        dateEndInput.value = "";
+    }
+    applyAllFilters();
+}
+
+function resetAllFilters() {
+    currentStatusFilter = 'all';
+    const buttons = document.querySelectorAll('.filter-pill-btn');
+    buttons.forEach(b => b.classList.remove('active'));
+    document.getElementById('btnStatusAll').classList.add('active');
+
+    document.getElementById('salesFilterSelect').value = 'all';
+    document.getElementById('dateStartInput').value = '';
+    document.getElementById('dateEndInput').value = '';
+    document.getElementById('liveSearchInput').value = '';
+
+    applyAllFilters();
 }
 </script>
