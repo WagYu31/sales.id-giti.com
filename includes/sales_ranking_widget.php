@@ -1,23 +1,31 @@
 <?php
 /**
  * GRAFIK RANKING & LEADERBOARD SALES WIDGET
- * Menampilkan peringkat performa sales berdasarkan total Sudah FU
+ * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
  */
 
-// Fetch Ranking Sales Data
+// Fetch Ranking Sales Data matching invoice_followup_report.php
 $sql_ranking_all = "
     SELECT 
         s.id AS sales_id,
         s.nama_lengkap AS nama_sales,
         COUNT(fu.id) AS total_fu,
         COUNT(DISTINCT fu.customer_id) AS total_customer_fu,
-        SUM(CASE WHEN fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN 1 ELSE 0 END) AS total_inv_fu
+        SUM(CASE WHEN fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN 1 ELSE 0 END) AS total_inv_fu,
+        SUM(CASE WHEN fu.no_inv IS NOT NULL AND fu.no_inv != '' AND (
+            SELECT MIN(fu_next.tgl_follow_up)
+            FROM follow_ups fu_next
+            WHERE fu_next.customer_id = fu.customer_id
+              AND fu_next.tgl_follow_up > fu.tgl_follow_up
+              AND fu_next.deleted_at IS NULL
+        ) IS NOT NULL THEN 1 ELSE 0 END) AS count_sudah_inv_fu
     FROM sales s
     LEFT JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL
+    LEFT JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE s.role = 'sales' OR s.role = 'superadmin' OR fu.id IS NOT NULL
     GROUP BY s.id, s.nama_lengkap
     HAVING total_fu > 0
-    ORDER BY total_fu DESC
+    ORDER BY count_sudah_inv_fu DESC, total_inv_fu DESC, total_fu DESC
 ";
 
 $res_ranking = $conn->query($sql_ranking_all);
@@ -29,11 +37,13 @@ if ($res_ranking) {
 }
 
 $chart_labels = [];
+$chart_sudah_inv_fu = [];
 $chart_total_fu = [];
 $chart_customer_fu = [];
 
 foreach ($ranking_data as $rd) {
     $chart_labels[] = $rd['nama_sales'];
+    $chart_sudah_inv_fu[] = (int)$rd['count_sudah_inv_fu'];
     $chart_total_fu[] = (int)$rd['total_fu'];
     $chart_customer_fu[] = (int)$rd['total_customer_fu'];
 }
@@ -119,6 +129,24 @@ $top3 = $ranking_data[2] ?? null;
     height: 280px;
     width: 100%;
 }
+
+.metric-btn {
+    border: 1px solid #CBD5E1;
+    background: #F8FAFC;
+    color: #64748B;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.metric-btn.active, .metric-btn:hover {
+    background: #2563EB;
+    color: #FFFFFF;
+    border-color: #2563EB;
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -133,17 +161,20 @@ $top3 = $ranking_data[2] ?? null;
             <div>
                 <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19px; letter-spacing: -0.4px;">
                     Leaderboard & Grafik Ranking Sales
-                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">Top Performers</span>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">Sudah FU Invoice</span>
                 </h5>
-                <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Peringkat sales berdasarkan total aktivitas Follow Up & customer yang berhasil di-FU</p>
+                <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Peringkat sales berdasarkan total invoice yang telah berhasil di-follow up</p>
             </div>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-sm btn-outline-primary active rounded-pill px-3 py-1.5 fw-bold" style="font-size: 12.5px;" id="btnMetricTotal" onclick="switchChartMetric('total')">
-                Total Activity FU
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="button" class="metric-btn active" id="btnMetricInvSudah" onclick="switchChartMetric('inv_sudah')">
+                📄 Invoice Sudah FU
             </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5 fw-bold" style="font-size: 12.5px;" id="btnMetricCustomer" onclick="switchChartMetric('customer')">
-                Customer di-FU
+            <button type="button" class="metric-btn" id="btnMetricTotal" onclick="switchChartMetric('total')">
+                ⚡ Total Activity FU
+            </button>
+            <button type="button" class="metric-btn" id="btnMetricCustomer" onclick="switchChartMetric('customer')">
+                👥 Customer di-FU
             </button>
         </div>
     </div>
@@ -163,16 +194,16 @@ $top3 = $ranking_data[2] ?? null;
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fs-4 fw-bold text-warning" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;"><?php echo number_format($top1['total_fu'], 0, ',', '.'); ?></div>
-                        <small class="text-muted fw-semibold" style="font-size: 11px;">Sudah FU</small>
+                        <div class="fs-3 fw-bold text-warning metric-val" id="podium1Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;"><?php echo number_format($top1['count_sudah_inv_fu'], 0, ',', '.'); ?></div>
+                        <small class="text-muted fw-semibold metric-lbl" id="podium1Lbl" style="font-size: 11px;">Sudah FU Invoice</small>
                     </div>
                 </div>
                 <div class="progress mt-2" style="height: 6px; border-radius: 10px; background: rgba(245, 158, 11, 0.2);">
                     <div class="progress-bar bg-warning" role="progressbar" style="width: 100%; border-radius: 10px;"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2 text-muted" style="font-size: 12px;">
+                    <span>⚡ <?php echo $top1['total_fu']; ?> Total Activity</span>
                     <span>👥 <?php echo $top1['total_customer_fu']; ?> Customer di-FU</span>
-                    <span>📄 <?php echo $top1['total_inv_fu']; ?> Invoice FU</span>
                 </div>
             </div>
             <?php endif; ?>
@@ -189,17 +220,17 @@ $top3 = $ranking_data[2] ?? null;
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fs-4 fw-bold text-secondary" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;"><?php echo number_format($top2['total_fu'], 0, ',', '.'); ?></div>
-                        <small class="text-muted fw-semibold" style="font-size: 11px;">Sudah FU</small>
+                        <div class="fs-3 fw-bold text-secondary metric-val" id="podium2Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;"><?php echo number_format($top2['count_sudah_inv_fu'], 0, ',', '.'); ?></div>
+                        <small class="text-muted fw-semibold metric-lbl" id="podium2Lbl" style="font-size: 11px;">Sudah FU Invoice</small>
                     </div>
                 </div>
-                <?php $pct2 = $top1['total_fu'] > 0 ? round(($top2['total_fu'] / $top1['total_fu']) * 100) : 0; ?>
+                <?php $pct2 = ($top1 && $top1['count_sudah_inv_fu'] > 0) ? round(($top2['count_sudah_inv_fu'] / $top1['count_sudah_inv_fu']) * 100) : 0; ?>
                 <div class="progress mt-2" style="height: 6px; border-radius: 10px; background: rgba(148, 163, 184, 0.2);">
-                    <div class="progress-bar bg-secondary" role="progressbar" style="width: <?php echo $pct2; ?>%; border-radius: 10px;"></div>
+                    <div class="progress-bar bg-secondary" role="progressbar" style="width: <?php echo max($pct2, 5); ?>%; border-radius: 10px;"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2 text-muted" style="font-size: 12px;">
+                    <span>⚡ <?php echo $top2['total_fu']; ?> Total Activity</span>
                     <span>👥 <?php echo $top2['total_customer_fu']; ?> Customer di-FU</span>
-                    <span>📄 <?php echo $top2['total_inv_fu']; ?> Invoice FU</span>
                 </div>
             </div>
             <?php endif; ?>
@@ -216,17 +247,17 @@ $top3 = $ranking_data[2] ?? null;
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fs-4 fw-bold text-danger" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;"><?php echo number_format($top3['total_fu'], 0, ',', '.'); ?></div>
-                        <small class="text-muted fw-semibold" style="font-size: 11px;">Sudah FU</small>
+                        <div class="fs-3 fw-bold text-danger metric-val" id="podium3Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;"><?php echo number_format($top3['count_sudah_inv_fu'], 0, ',', '.'); ?></div>
+                        <small class="text-muted fw-semibold metric-lbl" id="podium3Lbl" style="font-size: 11px;">Sudah FU Invoice</small>
                     </div>
                 </div>
-                <?php $pct3 = $top1['total_fu'] > 0 ? round(($top3['total_fu'] / $top1['total_fu']) * 100) : 0; ?>
+                <?php $pct3 = ($top1 && $top1['count_sudah_inv_fu'] > 0) ? round(($top3['count_sudah_inv_fu'] / $top1['count_sudah_inv_fu']) * 100) : 0; ?>
                 <div class="progress mt-2" style="height: 6px; border-radius: 10px; background: rgba(217, 119, 6, 0.2);">
-                    <div class="progress-bar bg-warning bg-gradient" role="progressbar" style="width: <?php echo $pct3; ?>%; border-radius: 10px;"></div>
+                    <div class="progress-bar bg-warning bg-gradient" role="progressbar" style="width: <?php echo max($pct3, 5); ?>%; border-radius: 10px;"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2 text-muted" style="font-size: 12px;">
+                    <span>⚡ <?php echo $top3['total_fu']; ?> Total Activity</span>
                     <span>👥 <?php echo $top3['total_customer_fu']; ?> Customer di-FU</span>
-                    <span>📄 <?php echo $top3['total_inv_fu']; ?> Invoice FU</span>
                 </div>
             </div>
             <?php endif; ?>
@@ -234,10 +265,10 @@ $top3 = $ranking_data[2] ?? null;
 
         <!-- Right Side: Interactive Chart.js Graphic -->
         <div class="col-lg-7 col-12">
-            <div class="p-3 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between">
+            <div class="p-3.5 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex justify-content-between align-items-center mb-2 px-2">
-                    <span class="fw-bold text-dark" style="font-size: 14px;">📊 Perbandingan Aktivitas Follow Up Per Sales</span>
-                    <small class="text-muted" style="font-size: 12px;">Live Realtime Ranking</small>
+                    <span class="fw-bold text-dark" style="font-size: 14px;" id="chartTitle">📊 Ranking Sales (Sudah FU Invoice)</span>
+                    <small class="text-muted" style="font-size: 12px;">Sesuai Laporan Invoice FU</small>
                 </div>
                 <div class="chart-container-holder">
                     <canvas id="salesRankingChart"></canvas>
@@ -251,11 +282,16 @@ $top3 = $ranking_data[2] ?? null;
 let salesChartInstance = null;
 
 const salesChartLabels = <?php echo json_encode($chart_labels); ?>;
+const salesChartInvSudah = <?php echo json_encode($chart_sudah_inv_fu); ?>;
 const salesChartTotalFU = <?php echo json_encode($chart_total_fu); ?>;
 const salesChartCustomerFU = <?php echo json_encode($chart_customer_fu); ?>;
 
+const top1Data = <?php echo json_encode($top1); ?>;
+const top2Data = <?php echo json_encode($top2); ?>;
+const top3Data = <?php echo json_encode($top3); ?>;
+
 document.addEventListener("DOMContentLoaded", function() {
-    initSalesRankingChart(salesChartTotalFU, "Total Aktivitas Follow Up");
+    initSalesRankingChart(salesChartInvSudah, "Sudah FU Invoice");
 });
 
 function initSalesRankingChart(dataValues, datasetLabel) {
@@ -264,10 +300,6 @@ function initSalesRankingChart(dataValues, datasetLabel) {
     if (salesChartInstance) {
         salesChartInstance.destroy();
     }
-
-    const gradientBlue = ctx.createLinearGradient(0, 0, 400, 0);
-    gradientBlue.addColorStop(0, '#2563EB');
-    gradientBlue.addColorStop(1, '#38BDF8');
 
     salesChartInstance = new Chart(ctx, {
         type: 'bar',
@@ -300,9 +332,7 @@ function initSalesRankingChart(dataValues, datasetLabel) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    display: false
-                },
+                legend: { display: false },
                 tooltip: {
                     backgroundColor: '#0F172A',
                     padding: 12,
@@ -326,21 +356,52 @@ function initSalesRankingChart(dataValues, datasetLabel) {
 }
 
 function switchChartMetric(type) {
+    const btnInvSudah = document.getElementById('btnMetricInvSudah');
     const btnTotal = document.getElementById('btnMetricTotal');
     const btnCustomer = document.getElementById('btnMetricCustomer');
 
-    if (type === 'total') {
-        btnTotal.classList.add('active', 'btn-outline-primary');
-        btnTotal.classList.remove('btn-outline-secondary');
-        btnCustomer.classList.remove('active', 'btn-outline-primary');
-        btnCustomer.classList.add('btn-outline-secondary');
-        initSalesRankingChart(salesChartTotalFU, "Total Aktivitas Follow Up");
+    const chartTitle = document.getElementById('chartTitle');
+    const p1Val = document.getElementById('podium1Val');
+    const p1Lbl = document.getElementById('podium1Lbl');
+    const p2Val = document.getElementById('podium2Val');
+    const p2Lbl = document.getElementById('podium2Lbl');
+    const p3Val = document.getElementById('podium3Val');
+    const p3Lbl = document.getElementById('podium3Lbl');
+
+    btnInvSudah.classList.remove('active');
+    btnTotal.classList.remove('active');
+    btnCustomer.classList.remove('active');
+
+    if (type === 'inv_sudah') {
+        btnInvSudah.classList.add('active');
+        if (chartTitle) chartTitle.innerText = '📊 Ranking Sales (Sudah FU Invoice)';
+        if (p1Val && top1Data) p1Val.innerText = top1Data.count_sudah_inv_fu;
+        if (p1Lbl) p1Lbl.innerText = 'Sudah FU Invoice';
+        if (p2Val && top2Data) p2Val.innerText = top2Data.count_sudah_inv_fu;
+        if (p2Lbl) p2Lbl.innerText = 'Sudah FU Invoice';
+        if (p3Val && top3Data) p3Val.innerText = top3Data.count_sudah_inv_fu;
+        if (p3Lbl) p3Lbl.innerText = 'Sudah FU Invoice';
+        initSalesRankingChart(salesChartInvSudah, "Sudah FU Invoice");
+    } else if (type === 'total') {
+        btnTotal.classList.add('active');
+        if (chartTitle) chartTitle.innerText = '📊 Ranking Sales (Total Activity FU)';
+        if (p1Val && top1Data) p1Val.innerText = top1Data.total_fu;
+        if (p1Lbl) p1Lbl.innerText = 'Total Activity FU';
+        if (p2Val && top2Data) p2Val.innerText = top2Data.total_fu;
+        if (p2Lbl) p2Lbl.innerText = 'Total Activity FU';
+        if (p3Val && top3Data) p3Val.innerText = top3Data.total_fu;
+        if (p3Lbl) p3Lbl.innerText = 'Total Activity FU';
+        initSalesRankingChart(salesChartTotalFU, "Total Activity FU");
     } else {
-        btnCustomer.classList.add('active', 'btn-outline-primary');
-        btnCustomer.classList.remove('btn-outline-secondary');
-        btnTotal.classList.remove('active', 'btn-outline-primary');
-        btnTotal.classList.add('btn-outline-secondary');
-        initSalesRankingChart(salesChartCustomerFU, "Total Customer di-FU");
+        btnCustomer.classList.add('active');
+        if (chartTitle) chartTitle.innerText = '📊 Ranking Sales (Customer di-FU)';
+        if (p1Val && top1Data) p1Val.innerText = top1Data.total_customer_fu;
+        if (p1Lbl) p1Lbl.innerText = 'Customer di-FU';
+        if (p2Val && top2Data) p2Val.innerText = top2Data.total_customer_fu;
+        if (p2Lbl) p2Lbl.innerText = 'Customer di-FU';
+        if (p3Val && top3Data) p3Val.innerText = top3Data.total_customer_fu;
+        if (p3Lbl) p3Lbl.innerText = 'Customer di-FU';
+        initSalesRankingChart(salesChartCustomerFU, "Customer di-FU");
     }
 }
 </script>
