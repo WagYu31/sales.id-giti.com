@@ -1,6 +1,6 @@
 <?php
 /**
- * GRAFIK RANKING & LEADERBOARD SALES WIDGET - 3D SPATIAL & CCTV MASCOT RUNNER EDITION
+ * GRAFIK RANKING & LEADERBOARD SALES WIDGET - REAL ANIMATED CARTOON CCTV RUNNER EDITION
  * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
  */
 
@@ -54,16 +54,11 @@ $top3 = $ranking_data[2] ?? null;
 $total_sales_count = count($ranking_data);
 ?>
 
-<!-- 3D SPATIAL & CCTV MASCOT RUNNER EDITION -->
+<!-- 3D SPATIAL & REAL ANIMATED CARTOON CCTV RUNNER EDITION -->
 <style>
 @keyframes float3DMedal {
     0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
     50% { transform: translateY(-5px) rotate(4deg) scale(1.08); }
-}
-
-@keyframes cctvRunnerBob {
-    0%, 100% { transform: translateY(0px) rotate(-3deg); }
-    50% { transform: translateY(-4px) rotate(3deg); }
 }
 
 @keyframes pulseGlowGold {
@@ -90,6 +85,157 @@ $total_sales_count = count($ranking_data);
     0% { transform: scale(1); }
     50% { transform: scale(1.2); color: #2563EB; }
     100% { transform: scale(1); }
+}
+
+/* REAL FLUID ANIMATED CARTOON CCTV CHARACTER RUNNER */
+.cctv-runner-character {
+    position: absolute;
+    width: 34px;
+    height: 42px;
+    pointer-events: none;
+    transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s ease;
+    z-index: 25;
+}
+
+.cctv-head-unit {
+    width: 24px;
+    height: 16px;
+    background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+    border-radius: 6px 14px 6px 6px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.5);
+    animation: cctvHeadTilt 1.2s infinite ease-in-out;
+    margin: 0 auto;
+}
+
+.cctv-lens-eye {
+    position: absolute;
+    right: 2px;
+    top: 3px;
+    width: 9px;
+    height: 9px;
+    background: #38BDF8;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #38BDF8, inset 0 0 2px #FFFFFF;
+}
+
+.cctv-rec-light {
+    position: absolute;
+    left: 4px;
+    top: 3px;
+    width: 4px;
+    height: 4px;
+    background: #EF4444;
+    border-radius: 50%;
+    animation: recBlink 0.7s infinite alternate;
+}
+
+.cctv-torso {
+    width: 13px;
+    height: 13px;
+    background: linear-gradient(180deg, #2563EB, #1D4ED8);
+    border-radius: 4px;
+    margin: -2px auto 0;
+    position: relative;
+    animation: runnerBob 0.3s infinite alternate ease-in-out;
+}
+
+.cctv-arm-left, .cctv-arm-right {
+    position: absolute;
+    top: 2px;
+    width: 3.5px;
+    height: 8px;
+    background: #3B82F6;
+    border-radius: 2px;
+    transform-origin: top center;
+}
+
+.cctv-arm-left {
+    left: -3px;
+    animation: runArmLeft 0.3s infinite alternate ease-in-out;
+}
+
+.cctv-arm-right {
+    right: -3px;
+    animation: runArmRight 0.3s infinite alternate ease-in-out;
+}
+
+.cctv-leg-left, .cctv-leg-right {
+    position: absolute;
+    bottom: -9px;
+    width: 4px;
+    height: 10px;
+    background: #0F172A;
+    border-radius: 2px;
+    transform-origin: top center;
+}
+
+.cctv-leg-left {
+    left: 1px;
+    animation: runLegLeft 0.3s infinite alternate cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.cctv-leg-right {
+    right: 1px;
+    animation: runLegRight 0.3s infinite alternate cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.cctv-speed-dust {
+    position: absolute;
+    left: -14px;
+    bottom: -2px;
+    font-size: 11px;
+    animation: dustPuff 0.35s infinite linear;
+}
+
+.cctv-rank-tag {
+    position: absolute;
+    left: 32px;
+    top: 2px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+@keyframes runnerBob {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-3px); }
+}
+
+@keyframes cctvHeadTilt {
+    0%, 100% { transform: rotate(-6deg); }
+    50% { transform: rotate(6deg); }
+}
+
+@keyframes recBlink {
+    0% { opacity: 0.2; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes runLegLeft {
+    0% { transform: rotate(-55deg); }
+    100% { transform: rotate(55deg); }
+}
+
+@keyframes runLegRight {
+    0% { transform: rotate(55deg); }
+    100% { transform: rotate(-55deg); }
+}
+
+@keyframes runArmLeft {
+    0% { transform: rotate(50deg); }
+    100% { transform: rotate(-50deg); }
+}
+
+@keyframes runArmRight {
+    0% { transform: rotate(-50deg); }
+    100% { transform: rotate(50deg); }
+}
+
+@keyframes dustPuff {
+    0% { opacity: 1; transform: translateX(0) scale(1); }
+    100% { opacity: 0; transform: translateX(-12px) scale(0.3); }
 }
 
 .ranking-widget-card {
@@ -260,20 +406,6 @@ $total_sales_count = count($ranking_data);
 .pop-metric {
     animation: popMetricAnim 0.4s ease-out;
 }
-
-.cctv-mascot-runner-badge {
-    animation: cctvRunnerBob 1.8s ease-in-out infinite;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, #0F172A, #1E293B);
-    color: #38BDF8;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 800;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
-}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -288,7 +420,7 @@ $total_sales_count = count($ranking_data);
             <div>
                 <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
                     Leaderboard & Grafik Ranking Sales
-                    <span class="cctv-mascot-runner-badge">📹🏃‍♂️ Loewix CCTV Runner</span>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">Sudah FU Invoice</span>
                 </h5>
                 <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Peringkat sales berdasarkan total invoice yang telah berhasil di-follow up</p>
             </div>
@@ -393,9 +525,9 @@ $total_sales_count = count($ranking_data);
             <?php endif; ?>
         </div>
 
-        <!-- Right Side: Interactive & Scalable 3D Chart.js Graphic with CCTV Mascot Plugin -->
+        <!-- Right Side: Interactive 3D Chart.js Graphic with Real Animated CCTV Runner Overlay -->
         <div class="col-lg-7 col-12">
-            <div class="p-3.5 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between shadow-sm">
+            <div class="p-3.5 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
                 <div class="d-flex justify-content-between align-items-center mb-2 px-2 flex-wrap gap-2">
                     <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 14px;" id="chartTitle">📊 Ranking Sales (Sudah FU Invoice)</span>
                     <div class="d-flex align-items-center gap-1.5">
@@ -407,10 +539,12 @@ $total_sales_count = count($ranking_data);
                     </div>
                 </div>
 
-                <!-- Scrollable Wrapper ensuring optimal bar height even with 100+ sales -->
-                <div class="chart-scroll-wrapper">
+                <!-- Scrollable Wrapper for Canvas & Real Animated CCTV Runner Overlays -->
+                <div class="chart-scroll-wrapper" id="chartScrollWrapper">
                     <div id="chartCanvasContainer" style="position: relative; height: 280px; width: 100%;">
                         <canvas id="salesRankingChart"></canvas>
+                        <!-- Container for Real Animated Vector CCTV Mascot Runner Characters -->
+                        <div id="cctvMascotOverlayHolder" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;"></div>
                     </div>
                 </div>
             </div>
@@ -494,42 +628,6 @@ const top1Data = <?php echo json_encode($top1); ?>;
 const top2Data = <?php echo json_encode($top2); ?>;
 const top3Data = <?php echo json_encode($top3); ?>;
 
-// Custom Chart.js Plugin: CCTV-Head Cartoon Character Mascot Running on Bars
-const cctvMascotRunnerPlugin = {
-    id: 'cctvMascotRunnerPlugin',
-    afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        const meta = chart.getDatasetMeta(0);
-
-        meta.data.forEach((bar, index) => {
-            const { x, y } = bar.tooltipPosition();
-            
-            ctx.save();
-            ctx.translate(x + 10, y);
-            
-            ctx.font = 'bold 15px sans-serif';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            
-            if (index === 0) {
-                // Juara 1: Golden Loewix CCTV Mascot Runner with Flame & Crown
-                ctx.fillText('📹🏃‍♂️💨 🥇👑', 2, 0);
-            } else if (index === 1) {
-                // Juara 2: Silver Loewix CCTV Mascot Runner
-                ctx.fillText('📹🏃‍♂️💨 🥈', 2, 0);
-            } else if (index === 2) {
-                // Juara 3: Bronze Loewix CCTV Mascot Runner
-                ctx.fillText('📹🏃‍♂️ 🥉', 2, 0);
-            } else {
-                // Standard Loewix CCTV Mascot Runner
-                ctx.fillText('📹🏃‍♂️', 2, 0);
-            }
-            
-            ctx.restore();
-        });
-    }
-};
-
 document.addEventListener("DOMContentLoaded", function() {
     renderScaledChart();
 });
@@ -549,7 +647,7 @@ function renderScaledChart() {
 
     // Calculate dynamic height for canvas so bars never get squished
     const container = document.getElementById('chartCanvasContainer');
-    const barHeightPx = 38;
+    const barHeightPx = 42;
     const computedHeight = Math.max(280, slicedLabels.length * barHeightPx);
     container.style.height = `${computedHeight}px`;
 
@@ -612,8 +710,14 @@ function renderScaledChart() {
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-                duration: 1400,
-                easing: 'easeOutQuart'
+                duration: 1200,
+                easing: 'easeOutQuart',
+                onProgress: function() {
+                    syncCctvMascotOverlays();
+                },
+                onComplete: function() {
+                    syncCctvMascotOverlays();
+                }
             },
             plugins: {
                 legend: { display: false },
@@ -636,8 +740,45 @@ function renderScaledChart() {
                     ticks: { font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' }, color: '#0F172A' }
                 }
             }
-        },
-        plugins: [cctvMascotRunnerPlugin]
+        }
+    });
+}
+
+function syncCctvMascotOverlays() {
+    const holder = document.getElementById('cctvMascotOverlayHolder');
+    if (!holder || !salesChartInstance) return;
+
+    holder.innerHTML = '';
+    const meta = salesChartInstance.getDatasetMeta(0);
+    if (!meta || !meta.data) return;
+
+    meta.data.forEach((bar, idx) => {
+        const pos = bar.tooltipPosition();
+        const runnerDiv = document.createElement('div');
+        runnerDiv.className = 'cctv-runner-character';
+        runnerDiv.style.left = `${pos.x + 6}px`;
+        runnerDiv.style.top = `${pos.y - 21}px`;
+
+        let rankTagHtml = '';
+        if (idx === 0) rankTagHtml = '<span class="cctv-rank-tag">🥇 👑</span>';
+        else if (idx === 1) rankTagHtml = '<span class="cctv-rank-tag">🥈</span>';
+        else if (idx === 2) rankTagHtml = '<span class="cctv-rank-tag">🥉</span>';
+
+        runnerDiv.innerHTML = `
+            <div class="cctv-head-unit">
+                <div class="cctv-rec-light"></div>
+                <div class="cctv-lens-eye"></div>
+            </div>
+            <div class="cctv-torso">
+                <div class="cctv-arm-left"></div>
+                <div class="cctv-arm-right"></div>
+                <div class="cctv-leg-left"></div>
+                <div class="cctv-leg-right"></div>
+            </div>
+            <div class="cctv-speed-dust">💨</div>
+            ${rankTagHtml}
+        `;
+        holder.appendChild(runnerDiv);
     });
 }
 
