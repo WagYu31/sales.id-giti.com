@@ -19,7 +19,7 @@ $sql_kat_a = "
     FROM sales s
     JOIN customers c ON c.sales_id = s.id AND c.deleted_at IS NULL
     LEFT JOIN follow_ups fu ON fu.customer_id = c.id AND fu.deleted_at IS NULL
-    WHERE c.created_at >= '{$start_periode}'
+    WHERE c.tgl_input >= '{$start_periode}'
       AND (s.role = 'sales' OR s.role = 'superadmin')
     GROUP BY s.id, s.nama_lengkap
     ORDER BY total_omset_baru DESC, total_customer_baru DESC
@@ -45,7 +45,7 @@ $sql_kat_b = "
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE fu.tgl_follow_up >= '{$start_periode}'
       AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-      AND c.created_at < '{$start_periode}'
+      AND (c.tgl_input < '{$start_periode}' OR c.tgl_input IS NULL)
       AND (s.role = 'sales' OR s.role = 'superadmin')
     GROUP BY s.id, s.nama_lengkap
     ORDER BY total_omset_reaktivasi DESC, total_customer_reaktivasi DESC
