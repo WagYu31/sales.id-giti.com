@@ -583,7 +583,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
         </div>
     </a>
 
-    <a href="sales_invoice_report.php" class="mc-link animate-in">
+    <a href="invoice_followup_report.php" class="mc-link animate-in">
         <div class="mc">
             <div class="mc-icon i-violet"><i class="bi bi-file-earmark-spreadsheet-fill"></i></div>
             <div class="mc-title"><span>Laporan Invoice FU</span></div>
