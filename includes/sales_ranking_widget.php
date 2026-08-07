@@ -1,6 +1,6 @@
 <?php
 /**
- * GRAFIK RANKING & LEADERBOARD SALES WIDGET - HIGH ENERGETIC NAILONG DRAGON (奶龙) SPRINT RUNNER EDITION
+ * GRAFIK RANKING & LEADERBOARD SALES WIDGET - INTERACTIVE NAILONG DRAGON (奶龙) WITH CLICK MOTIVATION & FLYING PROPS
  * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
  */
 
@@ -54,7 +54,7 @@ $top3 = $ranking_data[2] ?? null;
 $total_sales_count = count($ranking_data);
 ?>
 
-<!-- 3D SPATIAL & HIGH ENERGETIC NAILONG DRAGON (奶龙) SPRINT RUNNER EDITION -->
+<!-- 3D SPATIAL & INTERACTIVE NAILONG DRAGON (奶龙) WITH CLICK MOTIVATION & FLYING PROPS -->
 <style>
 @keyframes float3DMedal {
     0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
@@ -87,14 +87,101 @@ $total_sales_count = count($ranking_data);
     100% { transform: scale(1); }
 }
 
-/* HIGH ENERGETIC NAILONG SPRINT ANIMATIONS */
+/* INTERACTIVE CLICKABLE NAILONG RUNNER */
 .nailong-runner-character {
     position: absolute;
     width: 48px;
     height: 50px;
-    pointer-events: none;
-    transition: left 0.08s linear, top 0.3s ease;
+    pointer-events: auto !important;
+    cursor: pointer;
+    transition: left 0.08s linear, top 0.3s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 25;
+}
+
+.nailong-runner-character:hover {
+    transform: scale(1.22) translateY(-4px);
+}
+
+.nailong-runner-character:active {
+    transform: scale(0.95);
+}
+
+/* Joy Spin Animation on Click */
+.nailong-joy-spin {
+    animation: nailongJoySpin 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+@keyframes nailongJoySpin {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    50% { transform: translateY(-22px) rotate(180deg) scale(1.35); }
+    100% { transform: translateY(0) rotate(360deg) scale(1); }
+}
+
+/* Speech Bubble Motivation Popup */
+.nailong-speech-bubble {
+    position: absolute;
+    bottom: 54px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    color: #FFFFFF;
+    border: 1.8px solid #38BDF8;
+    padding: 7px 15px;
+    border-radius: 18px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.45), 0 0 18px rgba(56, 189, 248, 0.4);
+    z-index: 99;
+    pointer-events: none;
+    animation: speechPop 3.4s ease-in-out forwards;
+}
+
+.nailong-speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 7px 7px 0;
+    border-style: solid;
+    border-color: #0F172A transparent;
+    display: block;
+    width: 0;
+}
+
+@keyframes speechPop {
+    0% { transform: translateX(-50%) translateY(12px) scale(0); opacity: 0; }
+    15% { transform: translateX(-50%) translateY(0) scale(1.12); opacity: 1; }
+    25% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+    82% { transform: translateX(-50%) translateY(-3px) scale(1); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-18px) scale(0.5); opacity: 0; }
+}
+
+/* Flying Properties & Confetti Particles */
+.flying-prop-particle {
+    position: absolute;
+    font-size: 22px;
+    pointer-events: none;
+    z-index: 100;
+    animation: flyPropAnim 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+@keyframes flyPropAnim {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(0.4) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(var(--tx), var(--ty)) scale(1.35) rotate(var(--rot));
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(var(--tx) * 1.25), calc(var(--ty) + 45px)) scale(0.3) rotate(calc(var(--rot) * 2));
+    }
 }
 
 .nailong-svg {
@@ -367,9 +454,9 @@ $total_sales_count = count($ranking_data);
             <div>
                 <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
                     Leaderboard & Grafik Ranking Sales
-                    <span class="badge bg-warning bg-opacity-20 text-dark border border-warning border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">🐲 High-Speed Nailong (奶龙) Sprint</span>
+                    <span class="badge bg-warning bg-opacity-20 text-dark border border-warning border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">🐲 Interactive Nailong (奶龙) Klik</span>
                 </h5>
-                <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Peringkat sales berdasarkan total invoice yang telah berhasil di-follow up</p>
+                <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Klik karakter Nailong untuk memberikan sorakan semangat pada Sales!</p>
             </div>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -490,7 +577,7 @@ $total_sales_count = count($ranking_data);
                 <div class="chart-scroll-wrapper" id="chartScrollWrapper">
                     <div id="chartCanvasContainer" style="position: relative; height: 280px; width: 100%;">
                         <canvas id="salesRankingChart"></canvas>
-                        <!-- Container for NAILONG Dragon (奶龙) Runner Characters -->
+                        <!-- Container for NAILONG Dragon (奶龙) Interactive Runner Characters -->
                         <div id="cctvMascotOverlayHolder" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;"></div>
                     </div>
                 </div>
@@ -703,6 +790,62 @@ function renderScaledChart() {
     });
 }
 
+function handleNailongClick(event, salesName) {
+    event.stopPropagation();
+    const runnerEl = event.currentTarget;
+
+    // 1. Trigger Joy 360 Spin
+    runnerEl.classList.remove('nailong-joy-spin');
+    void runnerEl.offsetWidth; // trigger reflow
+    runnerEl.classList.add('nailong-joy-spin');
+
+    // 2. Remove old speech bubble if active
+    const oldBubble = runnerEl.querySelector('.nailong-speech-bubble');
+    if (oldBubble) oldBubble.remove();
+
+    // 3. Create Motivator Speech Bubble
+    const bubble = document.createElement('div');
+    bubble.className = 'nailong-speech-bubble';
+
+    const motivPhrases = [
+        `Semangat ${salesName}! 🔥💪✨`,
+        `Gaskeun ${salesName}! 🚀💎`,
+        `Juara Banget ${salesName}! 🏆⚡`,
+        `Gas Pol ${salesName}! 🏁🔥`
+    ];
+    const phrase = motivPhrases[Math.floor(Math.random() * motivPhrases.length)];
+    bubble.innerText = phrase;
+    runnerEl.appendChild(bubble);
+
+    // 4. Burst Flying Property Particles (📹 💰 🏆 💵 💎 ⭐ 🔥 💖 🎉 ⚡)
+    const props = ['📹', '💰', '🏆', '💵', '💎', '⭐', '🔥', '💖', '🎉', '⚡'];
+    const particleCount = 14;
+
+    for (let i = 0; i < particleCount; i++) {
+        const p = document.createElement('div');
+        p.className = 'flying-prop-particle';
+        p.innerText = props[Math.floor(Math.random() * props.length)];
+
+        const angle = (i / particleCount) * 360 + (Math.random() * 20 - 10);
+        const radius = 60 + Math.random() * 60;
+        const tx = Math.cos(angle * Math.PI / 180) * radius;
+        const ty = Math.sin(angle * Math.PI / 180) * radius - 35;
+        const rot = (Math.random() - 0.5) * 360;
+
+        p.style.left = '20px';
+        p.style.top = '10px';
+        p.style.setProperty('--tx', `${tx}px`);
+        p.style.setProperty('--ty', `${ty}px`);
+        p.style.setProperty('--rot', `${rot}deg`);
+
+        runnerEl.appendChild(p);
+
+        setTimeout(() => {
+            p.remove();
+        }, 1400);
+    }
+}
+
 function syncCctvMascotOverlays() {
     const holder = document.getElementById('cctvMascotOverlayHolder');
     if (!holder || !salesChartInstance) return;
@@ -710,18 +853,24 @@ function syncCctvMascotOverlays() {
     const meta = salesChartInstance.getDatasetMeta(0);
     if (!meta || !meta.data) return;
 
+    const labels = salesChartInstance.data.labels;
+
     meta.data.forEach((bar, idx) => {
         const pos = bar.tooltipPosition();
+        const salesName = labels[idx] || 'Sales';
         let runnerDiv = document.getElementById(`nailong-runner-${idx}`);
 
         if (!runnerDiv) {
             runnerDiv = document.createElement('div');
             runnerDiv.id = `nailong-runner-${idx}`;
             runnerDiv.className = 'nailong-runner-character';
+            runnerDiv.onclick = (e) => handleNailongClick(e, salesName);
             holder.appendChild(runnerDiv);
+        } else {
+            runnerDiv.onclick = (e) => handleNailongClick(e, salesName);
         }
 
-        // Dynamically update position in sync with bar animation growth
+        // Update position in sync with bar expansion
         runnerDiv.style.left = `${pos.x + 8}px`;
         runnerDiv.style.top = `${pos.y - 25}px`;
 
