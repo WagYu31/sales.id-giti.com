@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $keterangan = $_POST['keterangan'];
         $no_inv = $_POST['no_inv'];
+        $nominal_invoice = floatval($_POST['nominal_invoice'] ?? 0);
         $sales_id_fu = $_SESSION['user_id'];
 
         $respon = ($respon_radio === 'Lainnya') ? $respon_lainnya : $respon_radio;
@@ -74,8 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         
         if (empty($error)) {
-            $stmt = $conn->prepare("INSERT INTO follow_ups (customer_id, sales_id, tgl_follow_up, respon, keterangan, no_inv, media1, media2, media3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("iisssssss", $customer_id, $sales_id_fu, $tgl_follow_up, $respon, $keterangan, $no_inv, $media_paths[0], $media_paths[1], $media_paths[2]);
+            $stmt = $conn->prepare("INSERT INTO follow_ups (customer_id, sales_id, tgl_follow_up, respon, keterangan, no_inv, nominal_invoice, media1, media2, media3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("iissssdsss", $customer_id, $sales_id_fu, $tgl_follow_up, $respon, $keterangan, $no_inv, $nominal_invoice, $media_paths[0], $media_paths[1], $media_paths[2]);
             
             if ($stmt->execute()) {
                 $_SESSION['flash_message'] = "Catatan follow up berhasil ditambahkan!";
@@ -166,9 +167,9 @@ $file_accept_types = "image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx";
     <div class="card-body p-4 p-md-5">
         <form action="followup_add.php?customer_id=<?php echo $customer_id; ?>" method="POST" enctype="multipart/form-data">
             
-            <!-- Row 1: Tanggal & Waktu Follow Up + Nomor Invoice (2-Column) -->
+            <!-- Row 1: Tanggal & Waktu Follow Up + Nomor Invoice + Nominal Invoice -->
             <div class="row g-3 mb-4">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <label for="tgl_follow_up" class="form-label fw-bold text-dark d-flex align-items-center justify-content-between">
                         <span>Tanggal & Waktu Follow Up</span>
                         <?php if ($is_sales): ?>
@@ -185,9 +186,17 @@ $file_accept_types = "image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx";
                     <?php endif; ?>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label for="no_inv" class="form-label fw-bold text-dark">Nomor Invoice (Opsional)</label>
-                    <input type="text" class="form-control" id="no_inv" name="no_inv" placeholder="Masukkan nomor invoice jika ada" style="border-radius:14px; padding: 12px 16px;">
+                    <input type="text" class="form-control" id="no_inv" name="no_inv" placeholder="Contoh: INV/2026/08/001" style="border-radius:14px; padding: 12px 16px;">
+                </div>
+
+                <div class="col-md-3">
+                    <label for="nominal_invoice" class="form-label fw-bold text-success">Nominal Invoice (Rp)</label>
+                    <div class="input-group">
+                        <span class="input-group-text fw-bold text-success" style="border-radius:14px 0 0 14px; background:#F0FDF4;">Rp</span>
+                        <input type="number" step="0.01" class="form-control fw-bold text-success" id="nominal_invoice" name="nominal_invoice" placeholder="0" style="border-radius:0 14px 14px 0; padding: 12px 16px;">
+                    </div>
                 </div>
             </div>
 
