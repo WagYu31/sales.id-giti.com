@@ -1,6 +1,6 @@
 <?php
 /**
- * GRAFIK RANKING & LEADERBOARD SALES WIDGET - REAL ANIMATED CARTOON CCTV RUNNER EDITION
+ * GRAFIK RANKING & LEADERBOARD SALES WIDGET - HD 3D VECTOR CCTV ROBOT RUNNER EDITION
  * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
  */
 
@@ -54,7 +54,7 @@ $top3 = $ranking_data[2] ?? null;
 $total_sales_count = count($ranking_data);
 ?>
 
-<!-- 3D SPATIAL & REAL ANIMATED CARTOON CCTV RUNNER EDITION -->
+<!-- 3D SPATIAL & HD 3D VECTOR CCTV ROBOT RUNNER EDITION -->
 <style>
 @keyframes float3DMedal {
     0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
@@ -87,125 +87,66 @@ $total_sales_count = count($ranking_data);
     100% { transform: scale(1); }
 }
 
-/* REAL FLUID ANIMATED CARTOON CCTV CHARACTER RUNNER */
-.cctv-runner-character {
+/* HD ANIMATED VECTOR CCTV ROBOT MASCOT */
+.cctv-runner-character-hd {
     position: absolute;
-    width: 34px;
-    height: 42px;
+    width: 44px;
+    height: 48px;
     pointer-events: none;
     transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s ease;
     z-index: 25;
 }
 
-.cctv-head-unit {
-    width: 24px;
-    height: 16px;
-    background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
-    border-radius: 6px 14px 6px 6px;
-    position: relative;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.5);
-    animation: cctvHeadTilt 1.2s infinite ease-in-out;
-    margin: 0 auto;
+.cctv-robot-svg {
+    filter: drop-shadow(0 6px 12px rgba(15, 23, 42, 0.22));
 }
 
-.cctv-lens-eye {
+.cctv-svg-head {
+    transform-origin: 21px 17px;
+    animation: svgHeadTilt 1.2s infinite ease-in-out;
+}
+
+.cctv-svg-rec {
+    animation: recBlink 0.6s infinite alternate;
+}
+
+.cctv-svg-leg-left {
+    transform-origin: 15px 32px;
+    animation: svgLegRunLeft 0.28s infinite alternate ease-in-out;
+}
+
+.cctv-svg-leg-right {
+    transform-origin: 23px 32px;
+    animation: svgLegRunRight 0.28s infinite alternate ease-in-out;
+}
+
+.cctv-svg-arm-left {
+    transform-origin: 11px 23px;
+    animation: svgArmRunLeft 0.28s infinite alternate ease-in-out;
+}
+
+.cctv-svg-arm-right {
+    transform-origin: 27px 23px;
+    animation: svgArmRunRight 0.28s infinite alternate ease-in-out;
+}
+
+.cctv-jet-flame {
+    animation: flamePuff 0.2s infinite alternate linear;
+}
+
+.cctv-rank-tag-hd {
     position: absolute;
-    right: 2px;
-    top: 3px;
-    width: 9px;
-    height: 9px;
-    background: #38BDF8;
-    border-radius: 50%;
-    box-shadow: 0 0 10px #38BDF8, inset 0 0 2px #FFFFFF;
-}
-
-.cctv-rec-light {
-    position: absolute;
-    left: 4px;
-    top: 3px;
-    width: 4px;
-    height: 4px;
-    background: #EF4444;
-    border-radius: 50%;
-    animation: recBlink 0.7s infinite alternate;
-}
-
-.cctv-torso {
-    width: 13px;
-    height: 13px;
-    background: linear-gradient(180deg, #2563EB, #1D4ED8);
-    border-radius: 4px;
-    margin: -2px auto 0;
-    position: relative;
-    animation: runnerBob 0.3s infinite alternate ease-in-out;
-}
-
-.cctv-arm-left, .cctv-arm-right {
-    position: absolute;
-    top: 2px;
-    width: 3.5px;
-    height: 8px;
-    background: #3B82F6;
-    border-radius: 2px;
-    transform-origin: top center;
-}
-
-.cctv-arm-left {
-    left: -3px;
-    animation: runArmLeft 0.3s infinite alternate ease-in-out;
-}
-
-.cctv-arm-right {
-    right: -3px;
-    animation: runArmRight 0.3s infinite alternate ease-in-out;
-}
-
-.cctv-leg-left, .cctv-leg-right {
-    position: absolute;
-    bottom: -9px;
-    width: 4px;
-    height: 10px;
-    background: #0F172A;
-    border-radius: 2px;
-    transform-origin: top center;
-}
-
-.cctv-leg-left {
-    left: 1px;
-    animation: runLegLeft 0.3s infinite alternate cubic-bezier(0.4, 0, 0.6, 1);
-}
-
-.cctv-leg-right {
-    right: 1px;
-    animation: runLegRight 0.3s infinite alternate cubic-bezier(0.4, 0, 0.6, 1);
-}
-
-.cctv-speed-dust {
-    position: absolute;
-    left: -14px;
-    bottom: -2px;
-    font-size: 11px;
-    animation: dustPuff 0.35s infinite linear;
-}
-
-.cctv-rank-tag {
-    position: absolute;
-    left: 32px;
-    top: 2px;
-    font-size: 12px;
+    left: 44px;
+    top: 6px;
+    font-size: 13px;
     font-weight: 800;
     white-space: nowrap;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-@keyframes runnerBob {
-    0% { transform: translateY(0px); }
-    100% { transform: translateY(-3px); }
-}
-
-@keyframes cctvHeadTilt {
-    0%, 100% { transform: rotate(-6deg); }
-    50% { transform: rotate(6deg); }
+@keyframes svgHeadTilt {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
 }
 
 @keyframes recBlink {
@@ -213,29 +154,29 @@ $total_sales_count = count($ranking_data);
     100% { opacity: 1; transform: scale(1.2); }
 }
 
-@keyframes runLegLeft {
-    0% { transform: rotate(-55deg); }
-    100% { transform: rotate(55deg); }
+@keyframes svgLegRunLeft {
+    0% { transform: rotate(-45deg); }
+    100% { transform: rotate(45deg); }
 }
 
-@keyframes runLegRight {
-    0% { transform: rotate(55deg); }
-    100% { transform: rotate(-55deg); }
+@keyframes svgLegRunRight {
+    0% { transform: rotate(45deg); }
+    100% { transform: rotate(-45deg); }
 }
 
-@keyframes runArmLeft {
-    0% { transform: rotate(50deg); }
-    100% { transform: rotate(-50deg); }
+@keyframes svgArmRunLeft {
+    0% { transform: rotate(40deg); }
+    100% { transform: rotate(-40deg); }
 }
 
-@keyframes runArmRight {
-    0% { transform: rotate(-50deg); }
-    100% { transform: rotate(50deg); }
+@keyframes svgArmRunRight {
+    0% { transform: rotate(-40deg); }
+    100% { transform: rotate(40deg); }
 }
 
-@keyframes dustPuff {
-    0% { opacity: 1; transform: translateX(0) scale(1); }
-    100% { opacity: 0; transform: translateX(-12px) scale(0.3); }
+@keyframes flamePuff {
+    0% { opacity: 0.6; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1.15); }
 }
 
 .ranking-widget-card {
@@ -543,7 +484,7 @@ $total_sales_count = count($ranking_data);
                 <div class="chart-scroll-wrapper" id="chartScrollWrapper">
                     <div id="chartCanvasContainer" style="position: relative; height: 280px; width: 100%;">
                         <canvas id="salesRankingChart"></canvas>
-                        <!-- Container for Real Animated Vector CCTV Mascot Runner Characters -->
+                        <!-- Container for HD Vector CCTV Mascot Runner Characters -->
                         <div id="cctvMascotOverlayHolder" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;"></div>
                     </div>
                 </div>
@@ -763,27 +704,57 @@ function syncCctvMascotOverlays() {
     meta.data.forEach((bar, idx) => {
         const pos = bar.tooltipPosition();
         const runnerDiv = document.createElement('div');
-        runnerDiv.className = 'cctv-runner-character';
-        runnerDiv.style.left = `${pos.x + 6}px`;
-        runnerDiv.style.top = `${pos.y - 21}px`;
+        runnerDiv.className = 'cctv-runner-character-hd';
+        runnerDiv.style.left = `${pos.x + 8}px`;
+        runnerDiv.style.top = `${pos.y - 24}px`;
 
         let rankTagHtml = '';
-        if (idx === 0) rankTagHtml = '<span class="cctv-rank-tag">🥇 👑</span>';
-        else if (idx === 1) rankTagHtml = '<span class="cctv-rank-tag">🥈</span>';
-        else if (idx === 2) rankTagHtml = '<span class="cctv-rank-tag">🥉</span>';
+        if (idx === 0) rankTagHtml = '<span class="cctv-rank-tag-hd">🥇 👑</span>';
+        else if (idx === 1) rankTagHtml = '<span class="cctv-rank-tag-hd">🥈</span>';
+        else if (idx === 2) rankTagHtml = '<span class="cctv-rank-tag-hd">🥉</span>';
 
         runnerDiv.innerHTML = `
-            <div class="cctv-head-unit">
-                <div class="cctv-rec-light"></div>
-                <div class="cctv-lens-eye"></div>
-            </div>
-            <div class="cctv-torso">
-                <div class="cctv-arm-left"></div>
-                <div class="cctv-arm-right"></div>
-                <div class="cctv-leg-left"></div>
-                <div class="cctv-leg-right"></div>
-            </div>
-            <div class="cctv-speed-dust">💨</div>
+            <svg width="44" height="48" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="cctv-robot-svg">
+                <!-- Speed Jet Flame Particles -->
+                <path d="M10 42 C 6 45, 2 46, 0 44 C 3 41, 7 40, 10 42 Z" fill="url(#flameGrad_${idx})" class="cctv-jet-flame"/>
+                
+                <!-- Animated Running Legs -->
+                <path d="M15 32 L 10 40 L 5 41" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" class="cctv-svg-leg-left"/>
+                <path d="M23 32 L 28 40 L 33 41" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" class="cctv-svg-leg-right"/>
+                
+                <!-- Robot Torso & Loewix Tech Vest -->
+                <rect x="11" y="21" width="16" height="13" rx="5" fill="url(#bodyGrad_${idx})" stroke="#2563EB" stroke-width="1.2"/>
+                <circle cx="19" cy="26.5" r="2.5" fill="#38BDF8"/>
+
+                <!-- Animated Running Arms -->
+                <path d="M11 23 L 4 28 L 8 32" stroke="#2563EB" stroke-width="3" stroke-linecap="round" class="cctv-svg-arm-left"/>
+                <path d="M27 23 L 34 28 L 30 32" stroke="#2563EB" stroke-width="3" stroke-linecap="round" class="cctv-svg-arm-right"/>
+
+                <!-- Sleek CCTV Camera Head -->
+                <g class="cctv-svg-head">
+                    <path d="M6 11 C 6 6, 13 4, 21 4 C 29 4, 36 6, 36 11 L 33 13 L 9 13 Z" fill="#1E293B"/>
+                    <rect x="7" y="10" width="24" height="15" rx="7" fill="url(#headGrad_${idx})" stroke="#3B82F6" stroke-width="1.2"/>
+                    <rect x="16" y="12" width="13" height="11" rx="4.5" fill="#070C18"/>
+                    <circle cx="22.5" cy="17.5" r="3.8" fill="#00F0FF"/>
+                    <circle cx="22.5" cy="17.5" r="1.5" fill="#FFFFFF"/>
+                    <circle cx="10" cy="13" r="1.3" fill="#FF2E2E" class="cctv-svg-rec"/>
+                </g>
+
+                <defs>
+                    <linearGradient id="headGrad_${idx}" x1="7" y1="10" x2="31" y2="25" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#3B82F6"/>
+                        <stop offset="1" stop-color="#1D4ED8"/>
+                    </linearGradient>
+                    <linearGradient id="bodyGrad_${idx}" x1="11" y1="21" x2="27" y2="34" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFFFFF"/>
+                        <stop offset="1" stop-color="#E2E8F0"/>
+                    </linearGradient>
+                    <linearGradient id="flameGrad_${idx}" x1="10" y1="42" x2="0" y2="44" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FF9900"/>
+                        <stop offset="1" stop-color="#FF0055"/>
+                    </linearGradient>
+                </defs>
+            </svg>
             ${rankTagHtml}
         `;
         holder.appendChild(runnerDiv);
