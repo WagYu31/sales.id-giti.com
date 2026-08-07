@@ -142,26 +142,70 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <?php endif; ?>
 
-                <!-- Respon Customer -->
+                <!-- Respon Customer (Interactive Segmented Option Chips Grid) -->
                 <div class="mb-4">
-                    <label class="form-label fw-bold text-dark d-block mb-2">Respon Customer</label>
-                    <div class="row g-2">
-                        <?php 
-                        $responses = ["Tidak ada respon", "Tidak tertarik", "Hanya bertanya", "Muncul keinginan membeli", "Deal untuk beli"];
-                        $current_respon = $fu['respon'];
-                        foreach ($responses as $r):
-                            $checked = ($current_respon === $r) ? 'checked' : '';
-                        ?>
-                            <div class="col-md-4 col-6">
-                                <div class="form-check border p-3 rounded-3 bg-light">
-                                    <input class="form-check-input" type="radio" name="respon_radio" id="resp_<?php echo md5($r); ?>" value="<?php echo htmlspecialchars($r); ?>" <?php echo $checked; ?>>
-                                    <label class="form-check-input-label fw-bold text-dark ms-2" for="resp_<?php echo md5($r); ?>">
-                                        <?php echo htmlspecialchars($r); ?>
-                                    </label>
-                                </div>
+                    <label class="form-label fw-bold text-dark d-block mb-2.5">
+                        Respon Customer <span class="text-danger">*</span>
+                    </label>
+                    <?php 
+                    $current_respon = $fu['respon'];
+                    $preset_responses = ["Tidak ada respon", "Tidak tertarik", "Hanya bertanya", "Muncul keinginan membeli", "Deal untuk beli"];
+                    $is_lainnya = !in_array($current_respon, $preset_responses);
+                    ?>
+                    <div class="respon-chip-grid">
+                        <label class="respon-chip-card <?php echo ($current_respon === 'Tidak ada respon') ? 'active' : ''; ?>">
+                            <input type="radio" name="respon_radio" value="Tidak ada respon" <?php echo ($current_respon === 'Tidak ada respon') ? 'checked' : ''; ?>>
+                            <div class="chip-content">
+                                <i class="bi bi-dash-circle text-secondary fs-5"></i>
+                                <span>Tidak Ada Respon</span>
                             </div>
-                        <?php endforeach; ?>
+                        </label>
+                        
+                        <label class="respon-chip-card <?php echo ($current_respon === 'Tidak tertarik') ? 'active' : ''; ?>">
+                            <input type="radio" name="respon_radio" value="Tidak tertarik" <?php echo ($current_respon === 'Tidak tertarik') ? 'checked' : ''; ?>>
+                            <div class="chip-content">
+                                <i class="bi bi-x-circle text-danger fs-5"></i>
+                                <span>Tidak Tertarik</span>
+                            </div>
+                        </label>
+
+                        <label class="respon-chip-card <?php echo ($current_respon === 'Hanya bertanya') ? 'active' : ''; ?>">
+                            <input type="radio" name="respon_radio" value="Hanya bertanya" <?php echo ($current_respon === 'Hanya bertanya') ? 'checked' : ''; ?>>
+                            <div class="chip-content">
+                                <i class="bi bi-question-circle text-info fs-5"></i>
+                                <span>Hanya Bertanya</span>
+                            </div>
+                        </label>
+
+                        <label class="respon-chip-card <?php echo ($current_respon === 'Muncul keinginan membeli') ? 'active' : ''; ?>">
+                            <input type="radio" name="respon_radio" value="Muncul keinginan membeli" <?php echo ($current_respon === 'Muncul keinginan membeli') ? 'checked' : ''; ?>>
+                            <div class="chip-content">
+                                <i class="bi bi-bag-check text-primary fs-5"></i>
+                                <span>Muncul Keinginan Membeli</span>
+                            </div>
+                        </label>
+
+                        <label class="respon-chip-card highlight-deal <?php echo ($current_respon === 'Deal untuk beli') ? 'active' : ''; ?>">
+                            <input type="radio" name="respon_radio" value="Deal untuk beli" <?php echo ($current_respon === 'Deal untuk beli') ? 'checked' : ''; ?>>
+                            <div class="chip-content">
+                                <i class="bi bi-trophy-fill text-success fs-5"></i>
+                                <span>🎉 Deal Untuk Beli</span>
+                            </div>
+                        </label>
+
+                        <label class="respon-chip-card <?php echo ($is_lainnya) ? 'active' : ''; ?>">
+                            <input type="radio" name="respon_radio" value="Lainnya" <?php echo ($is_lainnya) ? 'checked' : ''; ?>>
+                            <div class="chip-content">
+                                <i class="bi bi-pencil-square text-warning fs-5"></i>
+                                <span>Lainnya...</span>
+                            </div>
+                        </label>
                     </div>
+                </div>
+
+                <div class="mb-4" id="respon_lainnya_container" style="display: <?php echo ($is_lainnya) ? 'block' : 'none'; ?>;">
+                    <label for="respon_lainnya" class="form-label fw-bold text-dark">Respon Lainnya <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="respon_lainnya" name="respon_lainnya" value="<?php echo ($is_lainnya) ? htmlspecialchars($current_respon) : ''; ?>" placeholder="Tulis rincian respon customer..." style="border-radius:14px; padding: 12px 16px;">
                 </div>
 
                 <!-- Keterangan / Catatan -->
@@ -184,6 +228,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <?php require_once 'includes/footer.php'; ?>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const responRadios = document.querySelectorAll('input[name="respon_radio"]');
+    const lainnyaContainer = document.getElementById('respon_lainnya_container');
+    const lainnyaInput = document.getElementById('respon_lainnya');
+
+    responRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.respon-chip-card').forEach(c => c.classList.remove('active'));
+            if (this.checked) {
+                this.closest('.respon-chip-card').classList.add('active');
+            }
+
+            if (this.value === 'Lainnya') {
+                if (lainnyaContainer) lainnyaContainer.style.display = 'block';
+                if (lainnyaInput) lainnyaInput.required = true;
+            } else {
+                if (lainnyaContainer) lainnyaContainer.style.display = 'none';
+                if (lainnyaInput) {
+                    lainnyaInput.required = false;
+                    lainnyaInput.value = '';
+                }
+            }
+        });
+    });
+});
+
 function formatRupiahInput(input) {
     let raw = input.value.replace(/[^0-9]/g, '');
     if (raw === '' || raw === '0') {
