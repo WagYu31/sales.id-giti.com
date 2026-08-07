@@ -42,7 +42,12 @@ if ($_SESSION['role'] !== 'superadmin' && $_SESSION['user_id'] != $fu['sales_id'
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $no_inv = trim($_POST['no_inv'] ?? '');
-    $nominal_invoice = floatval($_POST['nominal_invoice'] ?? 0);
+    
+    // Robust Rupiah parsing: removes dots, commas, spaces
+    $raw_nominal = $_POST['nominal_invoice'] ?? '0';
+    $clean_nominal = str_replace(['.', ',', ' '], '', $raw_nominal);
+    $nominal_invoice = floatval($clean_nominal);
+
     $respon_radio = $_POST['respon_radio'] ?? '';
     $respon_lainnya = trim($_POST['respon_lainnya'] ?? '');
     $keterangan = trim($_POST['keterangan'] ?? '');
@@ -62,15 +67,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         SET no_inv = ?, nominal_invoice = ?, respon = ?, keterangan = ?, tgl_follow_up = ?
         WHERE id = ?
     ");
-    $stmt_up->bind_param("sdsssi", $no_inv, $nominal_invoice, $respon, $keterangan, $tgl_follow_up, $fu_id);
-
-    if ($stmt_up->execute()) {
-        $_SESSION['flash_message'] = "Data Follow Up & Nominal Invoice berhasil diperbarui!";
-        $redirect_to = $_GET['redirect'] ?? 'followup_view.php?customer_id=' . $customer_id;
-        header("Location: " . $redirect_to);
-        exit();
+    
+    if (!$stmt_up) {
+        $error = "Database error: " . $conn->error;
     } else {
-        $error = "Gagal memperbarui data: " . $conn->error;
+        $stmt_up->bind_param("sdsssi", $no_inv, $nominal_invoice, $respon, $keterangan, $tgl_follow_up, $fu_id);
+
+        if ($stmt_up->execute()) {
+            $_SESSION['flash_message'] = "Data Follow Up & Nominal Invoice berhasil diperbarui!";
+            $redirect_to = $_POST['redirect'] ?? ($_GET['redirect'] ?? ('followup_view.php?customer_id=' . $customer_id));
+            if (empty($redirect_to)) {
+                $redirect_to = 'followup_view.php?customer_id=' . $customer_id;
+            }
+            header("Location: " . $redirect_to);
+            exit();
+        } else {
+            $error = "Gagal memperbarui data: " . $stmt_up->error;
+        }
     }
 }
 ?>
@@ -114,7 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <div class="card border-0 shadow-sm" style="border-radius: 24px; border: 1.5px solid #E2E8F0;">
         <div class="card-body p-4 p-md-5">
-            <form action="followup_edit.php?id=<?php echo $fu_id; ?>&redirect=<?php echo urlencode($_GET['redirect'] ?? ''); ?>" method="POST">
+            <form action="followup_edit.php?id=<?php echo $fu_id; ?>" method="POST">
+                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($_GET['redirect'] ?? ''); ?>">
                 
                 <!-- Row 1: Nomor Invoice & Nominal Invoice (Rp) -->
                 <div class="row g-3 mb-4">
@@ -124,11 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
 
                     <div class="col-md-6">
-                        <label for="nominal_invoice_display" class="form-label fw-bold text-success">Nominal Invoice (Rp)</label>
+                        <label for="nominal_invoice" class="form-label fw-bold text-success">Nominal Invoice (Rp)</label>
                         <div class="input-group">
                             <span class="input-group-text fw-bold text-success" style="border-radius:14px 0 0 14px; background:#F0FDF4;">Rp</span>
-                            <input type="text" class="form-control fw-bold text-success fs-5" id="nominal_invoice_display" placeholder="0" style="border-radius:0 14px 14px 0; padding: 12px 16px;" oninput="formatRupiahInput(this)" value="<?php echo ((float)$fu['nominal_invoice'] > 0) ? number_format((float)$fu['nominal_invoice'], 0, ',', '.') : ''; ?>">
-                            <input type="hidden" name="nominal_invoice" id="nominal_invoice" value="<?php echo (float)$fu['nominal_invoice']; ?>">
+                            <input type="text" class="form-control fw-bold text-success fs-5" id="nominal_invoice" name="nominal_invoice" placeholder="0" style="border-radius:0 14px 14px 0; padding: 12px 16px;" oninput="formatRupiahInput(this)" value="<?php echo ((float)$fu['nominal_invoice'] > 0) ? number_format((float)$fu['nominal_invoice'], 0, ',', '.') : ''; ?>">
                         </div>
                         <small class="text-muted" style="font-size: 11px;">*Ketik angka, pemisah titik (.) akan terformat otomatis (contoh: 20.000.000)</small>
                     </div>
@@ -258,11 +271,8 @@ function formatRupiahInput(input) {
     let raw = input.value.replace(/[^0-9]/g, '');
     if (raw === '' || raw === '0') {
         input.value = '';
-        document.getElementById('nominal_invoice').value = '0';
         return;
     }
-    const formatted = new Intl.NumberFormat('id-ID').format(raw);
-    input.value = formatted;
-    document.getElementById('nominal_invoice').value = raw;
+    input.value = new Intl.NumberFormat('id-ID').format(raw);
 }
 </script>
