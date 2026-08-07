@@ -1,13 +1,8 @@
-<!-- PAPAN PENGUMUMAN OFFICIAL SALES WIDGET - 3D SPATIAL GLASSMORPHISM DESIGN -->
+<!-- PAPAN PENGUMUMAN OFFICIAL SALES WIDGET - 3D SPATIAL & GRID DESIGN -->
 <style>
 @keyframes float3D {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-4px) rotate(2deg); }
-}
-
-@keyframes pulseGlow3D {
-    0%, 100% { box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35); }
-    50% { box-shadow: 0 10px 28px rgba(37, 99, 235, 0.55); }
 }
 
 @keyframes pulseRed3D {
@@ -18,8 +13,8 @@
 .widget-3d-card {
     background: #FFFFFF;
     border-radius: 24px;
-    padding: 26px 30px;
-    margin-bottom: 30px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
     position: relative;
     box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.02);
     border: 1.5px solid rgba(226, 232, 240, 0.9) !important;
@@ -38,7 +33,7 @@
 }
 
 .avatar-3d-pulse {
-    width: 46px; height: 46px;
+    width: 48px; height: 48px;
     border-radius: 16px;
     background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
     color: #FFFFFF;
@@ -51,20 +46,29 @@
     flex-shrink: 0;
 }
 
-.item-3d-row {
-    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
-    border: 1.5px solid #E2E8F0;
-    border-radius: 18px;
-    padding: 18px 22px;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+.announcement-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 20px;
 }
 
-.item-3d-row:hover {
+.item-3d-card {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+    border: 1.5px solid #E2E8F0;
+    border-radius: 20px;
+    padding: 22px 24px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.item-3d-card:hover {
     background: #FFFFFF;
-    transform: translateY(-3px) scale(1.002);
-    box-shadow: 0 14px 30px -6px rgba(15, 23, 42, 0.1), 0 4px 12px rgba(15, 23, 42, 0.04);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.12), 0 4px 14px rgba(15, 23, 42, 0.04);
     border-color: #CBD5E1;
 }
 
@@ -72,7 +76,7 @@
 .badge-3d-promo {
     background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.38), inset 0 1.5px 2px rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35), inset 0 1.5px 2px rgba(255, 255, 255, 0.4);
     font-weight: 800 !important;
     font-size: 11px !important;
     letter-spacing: 0.5px;
@@ -82,7 +86,7 @@
 .badge-3d-info {
     background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.38), inset 0 1.5px 2px rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35), inset 0 1.5px 2px rgba(255, 255, 255, 0.4);
     font-weight: 800 !important;
     font-size: 11px !important;
     letter-spacing: 0.5px;
@@ -92,7 +96,7 @@
 .badge-3d-warning {
     background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.38), inset 0 1.5px 2px rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35), inset 0 1.5px 2px rgba(255, 255, 255, 0.4);
     font-weight: 800 !important;
     font-size: 11px !important;
     letter-spacing: 0.5px;
@@ -115,7 +119,7 @@
     border: 1.5px solid #CBD5E1;
     font-weight: 700;
     font-size: 13px;
-    padding: 8px 20px;
+    padding: 8px 22px;
     border-radius: 30px;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -136,12 +140,18 @@
 .btn-3d-manage:hover i {
     color: #FFFFFF !important;
 }
+
+@media (max-width: 768px) {
+    .announcement-grid-container {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 
 <div id="announcementWidgetContainer">
     <div class="widget-3d-card">
         <!-- Header Section -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3.5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
             <div class="d-flex align-items-center gap-3">
                 <div class="avatar-3d-pulse">
                     📢
@@ -161,8 +171,8 @@
             </div>
         </div>
 
-        <!-- Announcement Cards List -->
-        <div id="announcementCardsList" class="d-flex flex-column gap-3">
+        <!-- Announcement Cards Grid -->
+        <div id="announcementCardsList" class="announcement-grid-container">
             <!-- Dynamic Content Inserted via JS -->
         </div>
     </div>
@@ -215,19 +225,23 @@ function loadActiveAnnouncements() {
                     });
 
                     html += `
-                    <div class="item-3d-row" style="border-left: 5px solid ${borderLeftColor} !important;">
-                        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                            <div class="d-flex align-items-center gap-2.5">
+                    <div class="item-3d-card" style="border-top: 4px solid ${borderLeftColor} !important;">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2.5">
                                 <span class="badge ${badgeClass} px-3 py-1.5 rounded-pill">
                                     ${badgeIcon} ${badgeLabel}
                                 </span>
-                                <h6 class="fw-bold text-dark mb-0" style="font-size: 15.5px; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.3px;">${escapeHtmlAnn(item.title)}</h6>
+                                <span class="badge bg-light text-secondary border px-2.5 py-1 rounded-pill" style="font-size: 11.5px; font-weight: 500;">
+                                    📅 ${dateStr}
+                                </span>
                             </div>
-                            <div class="text-muted" style="font-size: 12.5px; font-family: 'Inter', sans-serif;">
-                                📅 <strong>${dateStr}</strong> • Oleh: <strong class="text-dark">${escapeHtmlAnn(item.created_by)}</strong>
-                            </div>
+                            <h5 class="fw-bold text-dark mb-2" style="font-size: 16.5px; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.3px; line-height: 1.35;">${escapeHtmlAnn(item.title)}</h5>
+                            <p class="text-secondary mb-3" style="font-size: 14px; line-height: 1.6; font-family: 'Inter', sans-serif;">${escapeHtmlAnn(item.content)}</p>
                         </div>
-                        <div class="text-secondary" style="font-size: 14px; line-height: 1.65; white-space: pre-line; font-family: 'Inter', sans-serif; font-weight: 400;">${escapeHtmlAnn(item.content)}</div>
+                        <div class="pt-2 border-top d-flex justify-content-between align-items-center" style="font-size: 12px; color: #64748B;">
+                            <span>Diterbitkan Oleh:</span>
+                            <span class="fw-bold text-dark">${escapeHtmlAnn(item.created_by)}</span>
+                        </div>
                     </div>`;
                 });
 
@@ -235,14 +249,12 @@ function loadActiveAnnouncements() {
             } else {
                 if (countBadge) countBadge.innerText = '0 Aktif';
                 list.innerHTML = `
-                <div class="item-3d-row" style="border-left: 5px solid #2563EB !important;">
-                    <div class="d-flex justify-content-between align-items-center mb-1.5 flex-wrap gap-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge badge-3d-info px-3 py-1.5 rounded-pill">ℹ️ INFORMASI</span>
-                            <h6 class="fw-bold text-dark mb-0" style="font-size: 15.5px; font-family: 'Plus Jakarta Sans', sans-serif;">Selamat Datang di Dashboard Sales Loewix 🚀</h6>
-                        </div>
+                <div class="item-3d-card" style="border-top: 4px solid #2563EB !important; grid-column: 1 / -1;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge badge-3d-info px-3 py-1.5 rounded-pill">ℹ️ INFORMASI</span>
                     </div>
-                    <div class="text-secondary" style="font-size: 14px; line-height: 1.6; font-family: 'Inter', sans-serif;">Belum ada pengumuman aktif saat ini. Anda dapat menerbitkan pengumuman baru melalui menu <strong>Kelola Pengumuman</strong>.</div>
+                    <h5 class="fw-bold text-dark mb-2" style="font-size: 16.5px; font-family: 'Plus Jakarta Sans', sans-serif;">Selamat Datang di Dashboard Sales Loewix 🚀</h5>
+                    <p class="text-secondary mb-0" style="font-size: 14px; line-height: 1.6; font-family: 'Inter', sans-serif;">Belum ada pengumuman aktif saat ini. Anda dapat menerbitkan pengumuman baru melalui menu <strong>Kelola Pengumuman</strong>.</p>
                 </div>`;
             }
             container.style.display = 'block';
