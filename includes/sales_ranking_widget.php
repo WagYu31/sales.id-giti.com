@@ -1,6 +1,6 @@
 <?php
 /**
- * GRAFIK RANKING & LEADERBOARD SALES WIDGET - HD 3D VECTOR CCTV ROBOT RUNNER EDITION
+ * GRAFIK RANKING & LEADERBOARD SALES WIDGET - CUTE NAILONG DRAGON (奶龙) RUNNER EDITION
  * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
  */
 
@@ -54,7 +54,7 @@ $top3 = $ranking_data[2] ?? null;
 $total_sales_count = count($ranking_data);
 ?>
 
-<!-- 3D SPATIAL & HD 3D VECTOR CCTV ROBOT RUNNER EDITION -->
+<!-- 3D SPATIAL & CUTE NAILONG DRAGON (奶龙) RUNNER EDITION -->
 <style>
 @keyframes float3DMedal {
     0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
@@ -87,96 +87,83 @@ $total_sales_count = count($ranking_data);
     100% { transform: scale(1); }
 }
 
-/* HD ANIMATED VECTOR CCTV ROBOT MASCOT */
-.cctv-runner-character-hd {
+/* CUTE NAILONG DRAGON (奶龙) RUNNER ANIMATIONS */
+.nailong-runner-character {
     position: absolute;
-    width: 44px;
-    height: 48px;
+    width: 48px;
+    height: 50px;
     pointer-events: none;
     transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s ease;
     z-index: 25;
 }
 
-.cctv-robot-svg {
-    filter: drop-shadow(0 6px 12px rgba(15, 23, 42, 0.22));
+.nailong-svg {
+    filter: drop-shadow(0 6px 14px rgba(245, 158, 11, 0.35));
+    animation: nailongWaddle 0.32s infinite alternate ease-in-out;
 }
 
-.cctv-svg-head {
-    transform-origin: 21px 17px;
-    animation: svgHeadTilt 1.2s infinite ease-in-out;
+.nailong-leg-left {
+    transform-origin: 16px 42px;
+    animation: nailongLegLeft 0.32s infinite alternate ease-in-out;
 }
 
-.cctv-svg-rec {
+.nailong-leg-right {
+    transform-origin: 28px 42px;
+    animation: nailongLegRight 0.32s infinite alternate ease-in-out;
+}
+
+.nailong-arm-left {
+    transform-origin: 12px 25px;
+    animation: nailongArmLeft 0.32s infinite alternate ease-in-out;
+}
+
+.nailong-arm-right {
+    transform-origin: 32px 25px;
+    animation: nailongArmRight 0.32s infinite alternate ease-in-out;
+}
+
+.cctv-rec-dot {
     animation: recBlink 0.6s infinite alternate;
 }
 
-.cctv-svg-leg-left {
-    transform-origin: 15px 32px;
-    animation: svgLegRunLeft 0.28s infinite alternate ease-in-out;
-}
-
-.cctv-svg-leg-right {
-    transform-origin: 23px 32px;
-    animation: svgLegRunRight 0.28s infinite alternate ease-in-out;
-}
-
-.cctv-svg-arm-left {
-    transform-origin: 11px 23px;
-    animation: svgArmRunLeft 0.28s infinite alternate ease-in-out;
-}
-
-.cctv-svg-arm-right {
-    transform-origin: 27px 23px;
-    animation: svgArmRunRight 0.28s infinite alternate ease-in-out;
-}
-
-.cctv-jet-flame {
-    animation: flamePuff 0.2s infinite alternate linear;
-}
-
-.cctv-rank-tag-hd {
+.nailong-rank-tag {
     position: absolute;
-    left: 44px;
-    top: 6px;
-    font-size: 13px;
+    left: 46px;
+    top: 8px;
+    font-size: 13.5px;
     font-weight: 800;
     white-space: nowrap;
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-@keyframes svgHeadTilt {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
+@keyframes nailongWaddle {
+    0% { transform: translateY(0px) rotate(-6deg); }
+    100% { transform: translateY(-4px) rotate(6deg); }
+}
+
+@keyframes nailongLegLeft {
+    0% { transform: translateY(-2px) scaleY(0.85); }
+    100% { transform: translateY(2px) scaleY(1.1); }
+}
+
+@keyframes nailongLegRight {
+    0% { transform: translateY(2px) scaleY(1.1); }
+    100% { transform: translateY(-2px) scaleY(0.85); }
+}
+
+@keyframes nailongArmLeft {
+    0% { transform: rotate(-35deg); }
+    100% { transform: rotate(35deg); }
+}
+
+@keyframes nailongArmRight {
+    0% { transform: rotate(35deg); }
+    100% { transform: rotate(-35deg); }
 }
 
 @keyframes recBlink {
-    0% { opacity: 0.2; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1.2); }
-}
-
-@keyframes svgLegRunLeft {
-    0% { transform: rotate(-45deg); }
-    100% { transform: rotate(45deg); }
-}
-
-@keyframes svgLegRunRight {
-    0% { transform: rotate(45deg); }
-    100% { transform: rotate(-45deg); }
-}
-
-@keyframes svgArmRunLeft {
-    0% { transform: rotate(40deg); }
-    100% { transform: rotate(-40deg); }
-}
-
-@keyframes svgArmRunRight {
-    0% { transform: rotate(-40deg); }
-    100% { transform: rotate(40deg); }
-}
-
-@keyframes flamePuff {
-    0% { opacity: 0.6; transform: scale(0.9); }
-    100% { opacity: 1; transform: scale(1.15); }
+    0% { opacity: 0.2; }
+    100% { opacity: 1; }
 }
 
 .ranking-widget-card {
@@ -361,7 +348,7 @@ $total_sales_count = count($ranking_data);
             <div>
                 <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
                     Leaderboard & Grafik Ranking Sales
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">Sudah FU Invoice</span>
+                    <span class="badge bg-warning bg-opacity-20 text-dark border border-warning border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">🐲 Nailong (奶龙) Runner</span>
                 </h5>
                 <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Peringkat sales berdasarkan total invoice yang telah berhasil di-follow up</p>
             </div>
@@ -466,7 +453,7 @@ $total_sales_count = count($ranking_data);
             <?php endif; ?>
         </div>
 
-        <!-- Right Side: Interactive 3D Chart.js Graphic with Real Animated CCTV Runner Overlay -->
+        <!-- Right Side: Interactive 3D Chart.js Graphic with NAILONG Dragon Overlay -->
         <div class="col-lg-7 col-12">
             <div class="p-3.5 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
                 <div class="d-flex justify-content-between align-items-center mb-2 px-2 flex-wrap gap-2">
@@ -480,11 +467,11 @@ $total_sales_count = count($ranking_data);
                     </div>
                 </div>
 
-                <!-- Scrollable Wrapper for Canvas & Real Animated CCTV Runner Overlays -->
+                <!-- Scrollable Wrapper for Canvas & NAILONG Dragon Overlays -->
                 <div class="chart-scroll-wrapper" id="chartScrollWrapper">
                     <div id="chartCanvasContainer" style="position: relative; height: 280px; width: 100%;">
                         <canvas id="salesRankingChart"></canvas>
-                        <!-- Container for HD Vector CCTV Mascot Runner Characters -->
+                        <!-- Container for NAILONG Dragon (奶龙) Runner Characters -->
                         <div id="cctvMascotOverlayHolder" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;"></div>
                     </div>
                 </div>
@@ -704,56 +691,56 @@ function syncCctvMascotOverlays() {
     meta.data.forEach((bar, idx) => {
         const pos = bar.tooltipPosition();
         const runnerDiv = document.createElement('div');
-        runnerDiv.className = 'cctv-runner-character-hd';
+        runnerDiv.className = 'nailong-runner-character';
         runnerDiv.style.left = `${pos.x + 8}px`;
-        runnerDiv.style.top = `${pos.y - 24}px`;
+        runnerDiv.style.top = `${pos.y - 25}px`;
 
         let rankTagHtml = '';
-        if (idx === 0) rankTagHtml = '<span class="cctv-rank-tag-hd">🥇 👑</span>';
-        else if (idx === 1) rankTagHtml = '<span class="cctv-rank-tag-hd">🥈</span>';
-        else if (idx === 2) rankTagHtml = '<span class="cctv-rank-tag-hd">🥉</span>';
+        if (idx === 0) rankTagHtml = '<span class="nailong-rank-tag">🥇 👑</span>';
+        else if (idx === 1) rankTagHtml = '<span class="nailong-rank-tag">🥈</span>';
+        else if (idx === 2) rankTagHtml = '<span class="nailong-rank-tag">🥉</span>';
 
         runnerDiv.innerHTML = `
-            <svg width="44" height="48" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="cctv-robot-svg">
-                <!-- Speed Jet Flame Particles -->
-                <path d="M10 42 C 6 45, 2 46, 0 44 C 3 41, 7 40, 10 42 Z" fill="url(#flameGrad_${idx})" class="cctv-jet-flame"/>
+            <svg width="48" height="50" viewBox="0 0 48 50" fill="none" xmlns="http://www.w3.org/2000/svg" class="nailong-svg">
+                <!-- Tail -->
+                <path d="M10 36 C 4 38, 2 34, 6 30 C 8 32, 10 34, 12 34 Z" fill="#FFCC00" stroke="#E6B800" stroke-width="1"/>
                 
-                <!-- Animated Running Legs -->
-                <path d="M15 32 L 10 40 L 5 41" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" class="cctv-svg-leg-left"/>
-                <path d="M23 32 L 28 40 L 33 41" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" class="cctv-svg-leg-right"/>
+                <!-- Left Waddling Leg -->
+                <ellipse cx="16" cy="42" rx="4.5" ry="5.5" fill="#FFCC00" stroke="#E6B800" stroke-width="1.2" class="nailong-leg-left"/>
+                <!-- Right Waddling Leg -->
+                <ellipse cx="28" cy="42" rx="4.5" ry="5.5" fill="#FFCC00" stroke="#E6B800" stroke-width="1.2" class="nailong-leg-right"/>
                 
-                <!-- Robot Torso & Loewix Tech Vest -->
-                <rect x="11" y="21" width="16" height="13" rx="5" fill="url(#bodyGrad_${idx})" stroke="#2563EB" stroke-width="1.2"/>
-                <circle cx="19" cy="26.5" r="2.5" fill="#38BDF8"/>
+                <!-- Chubby Yellow Dragon Body & Big White Belly -->
+                <path d="M14 20 C 10 24, 10 38, 16 42 C 20 44, 28 44, 32 42 C 38 38, 38 24, 34 20 Z" fill="#FFCC00" stroke="#E6B800" stroke-width="1.5"/>
+                <ellipse cx="23" cy="32" rx="7.5" ry="8.5" fill="#FFEAA7"/>
 
-                <!-- Animated Running Arms -->
-                <path d="M11 23 L 4 28 L 8 32" stroke="#2563EB" stroke-width="3" stroke-linecap="round" class="cctv-svg-arm-left"/>
-                <path d="M27 23 L 34 28 L 30 32" stroke="#2563EB" stroke-width="3" stroke-linecap="round" class="cctv-svg-arm-right"/>
+                <!-- Short Arm Left -->
+                <path d="M12 25 Q 6 28 9 32" stroke="#FFCC00" stroke-width="4.5" stroke-linecap="round" class="nailong-arm-left"/>
+                <!-- Short Arm Right -->
+                <path d="M32 25 Q 38 28 35 32" stroke="#FFCC00" stroke-width="4.5" stroke-linecap="round" class="nailong-arm-right"/>
 
-                <!-- Sleek CCTV Camera Head -->
-                <g class="cctv-svg-head">
-                    <path d="M6 11 C 6 6, 13 4, 21 4 C 29 4, 36 6, 36 11 L 33 13 L 9 13 Z" fill="#1E293B"/>
-                    <rect x="7" y="10" width="24" height="15" rx="7" fill="url(#headGrad_${idx})" stroke="#3B82F6" stroke-width="1.2"/>
-                    <rect x="16" y="12" width="13" height="11" rx="4.5" fill="#070C18"/>
-                    <circle cx="22.5" cy="17.5" r="3.8" fill="#00F0FF"/>
-                    <circle cx="22.5" cy="17.5" r="1.5" fill="#FFFFFF"/>
-                    <circle cx="10" cy="13" r="1.3" fill="#FF2E2E" class="cctv-svg-rec"/>
-                </g>
+                <!-- Cute NAILONG Head -->
+                <circle cx="23" cy="16" r="13" fill="#FFCC00" stroke="#E6B800" stroke-width="1.5"/>
+                
+                <!-- Cute Tiny Orange Horns -->
+                <path d="M15 5 C 13 1, 17 2, 18 6 Z" fill="#FF9900"/>
+                <path d="M31 5 C 33 1, 29 2, 28 6 Z" fill="#FF9900"/>
 
-                <defs>
-                    <linearGradient id="headGrad_${idx}" x1="7" y1="10" x2="31" y2="25" gradientUnits="userSpaceOnUse">
-                        <stop stop-color="#3B82F6"/>
-                        <stop offset="1" stop-color="#1D4ED8"/>
-                    </linearGradient>
-                    <linearGradient id="bodyGrad_${idx}" x1="11" y1="21" x2="27" y2="34" gradientUnits="userSpaceOnUse">
-                        <stop stop-color="#FFFFFF"/>
-                        <stop offset="1" stop-color="#E2E8F0"/>
-                    </linearGradient>
-                    <linearGradient id="flameGrad_${idx}" x1="10" y1="42" x2="0" y2="44" gradientUnits="userSpaceOnUse">
-                        <stop stop-color="#FF9900"/>
-                        <stop offset="1" stop-color="#FF0055"/>
-                    </linearGradient>
-                </defs>
+                <!-- CCTV Camera Visor / Headset for Loewix Theme -->
+                <rect x="11" y="10" width="24" height="9" rx="4.5" fill="#0F172A" stroke="#2563EB" stroke-width="1"/>
+                <circle cx="28" cy="14.5" r="3" fill="#00F0FF"/>
+                <circle cx="28" cy="14.5" r="1.2" fill="#FFFFFF"/>
+                <circle cx="15" cy="12" r="1" fill="#FF2E2E" class="cctv-rec-dot"/>
+
+                <!-- Blushy Pink Cheeks -->
+                <circle cx="13" cy="21" r="2.5" fill="#FF7675" opacity="0.65"/>
+                <circle cx="33" cy="21" r="2.5" fill="#FF7675" opacity="0.65"/>
+
+                <!-- Cute Round Eyes -->
+                <circle cx="17" cy="18" r="2.2" fill="#2D3436"/>
+                <circle cx="17" cy="17.2" r="0.8" fill="#FFFFFF"/>
+                <circle cx="29" cy="18" r="2.2" fill="#2D3436"/>
+                <circle cx="29" cy="17.2" r="0.8" fill="#FFFFFF"/>
             </svg>
             ${rankTagHtml}
         `;
