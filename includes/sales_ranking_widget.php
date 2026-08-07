@@ -161,7 +161,7 @@ $total_sales_count = count($ranking_data);
     position: absolute;
     z-index: 10;
     cursor: pointer;
-    transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s ease;
+    transition: top 0.4s ease;
     filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
 }
 
@@ -993,8 +993,8 @@ function renderScaledChart() {
                 }
             },
             animation: {
-                duration: 1500,
-                easing: 'easeOutQuart',
+                duration: 2800,
+                easing: 'linear',
                 onProgress: function(animation) {
                     positionMascotRunners(this);
                 },
@@ -1009,11 +1009,15 @@ function renderScaledChart() {
 function positionMascotRunners(chart) {
     const holder = document.getElementById('cctvMascotOverlayHolder');
     if (!holder) return;
-    holder.innerHTML = '';
 
     const meta = chart.getDatasetMeta(0);
     const xAxis = chart.scales.x;
-    const yAxis = chart.scales.y;
+
+    // Check if we need to initialize or rebuild the runner DOM elements
+    const needRebuild = holder.children.length !== meta.data.length;
+    if (needRebuild) {
+        holder.innerHTML = '';
+    }
 
     meta.data.forEach((bar, index) => {
         const value = chart.data.datasets[0].data[index];
@@ -1021,89 +1025,85 @@ function positionMascotRunners(chart) {
         const barY = bar.y;
         const barX = bar.x;
 
-        const runnerDiv = document.createElement('div');
-        runnerDiv.className = 'cctv-mascot-runner';
-        
-        // 45px width offset so mascot sits right on the edge of the bar, with offset for 0 value runners
+        // Calculate runner left position (at the leading tip of the growing bar)
         let leftPos = Math.min(barX - 18, xAxis.right - 45);
         if (value === 0) {
             leftPos = xAxis.left + 5 + (index * 4); // Stagger zero runners
         }
         const topPos = barY - 32;
 
-        runnerDiv.style.left = `${leftPos}px`;
-        runnerDiv.style.top = `${topPos}px`;
-        
-        const isFinished = (currentMetric === 'omset' && value >= 200000000) || (barX >= xAxis.right - 48);
-
-        let medalBadge = '';
-        if (index === 0) medalBadge = '🥇';
-        else if (index === 1) medalBadge = '🥈';
-        else if (index === 2) medalBadge = '🥉';
-
-        let displayValStr = (currentMetric === 'omset') ? formatRupiahDisplay(value) : value;
-
-        runnerDiv.onclick = function() {
-            triggerNailongJoySpin(runnerDiv, labelName, isFinished);
-        };
-
-        if (isFinished) {
-            // STATE 2: NAILONG VICTORY 🏆 SELEBRASI NGANGKAT PIALA (Target 200 Juta Finish!)
-            runnerDiv.innerHTML = `
-                <div class="nailong-run-wrapper">
-                    ${medalBadge ? `<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge} 🏆</span>` : '<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">🏆</span>'}
-                    <div class="nailong-victory-float" style="position: relative;">
-                        <!-- SPARKLE PARTICLES -->
-                        <div class="nailong-sparkles">
-                            <div class="sparkle-dot"></div>
-                            <div class="sparkle-dot"></div>
-                            <div class="sparkle-dot"></div>
-                            <div class="sparkle-dot"></div>
-                        </div>
-                        <!-- 3D NAILONG IMAGE -->
-                        <img src="assets/nailong_gambar2_3d.png?v=<?= time() ?>" class="nailong-3d-gambar2" alt="Nailong Victory 🏆" />
-                        <!-- GOLDEN TROPHY 🏆 -->
-                        <div class="nailong-trophy-icon">🏆</div>
-                        <!-- MONEY BAG 💰 -->
-                        <div class="nailong-money-icon">💰</div>
-                        <!-- IKAT KEPALA MERAH PUTIH 🇮🇩 -->
-                        <div class="nailong-headband"></div>
-                    </div>
-                    <div class="nailong-ground-shadow"></div>
-                </div>
-            `;
+        if (!needRebuild && holder.children[index]) {
+            // Update position in-place without destroying DOM node (keeps CSS sprite running!)
+            const runnerDiv = holder.children[index];
+            runnerDiv.style.left = `${leftPos}px`;
+            runnerDiv.style.top = `${topPos}px`;
         } else {
-            // STATE 1: NAILONG LARI DI TEMPAT 🏃 WITH SPRITE SHEET ANIMATION + BENDERA 🇮🇩
-            runnerDiv.innerHTML = `
-                <div class="nailong-run-wrapper">
-                    ${medalBadge ? `<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge}</span>` : ''}
-                    <div class="nailong-run-bounce" style="position: relative;">
-                        <!-- SPEED LINES -->
-                        <div class="nailong-speed-lines-container">
-                            <div class="speed-line"></div>
-                            <div class="speed-line"></div>
-                            <div class="speed-line"></div>
-                        </div>
-                        <!-- NAILONG SPRITE SHEET ANIMATED (tangan & kaki gerak!) -->
-                        <div class="nailong-sprite"></div>
-                        <!-- BENDERA MERAH PUTIH 🇮🇩 WAVING -->
-                        <div class="nailong-flag-pole">
-                            <div style="width: 2px; height: 26px; background: #78350F; border-radius: 1px;"></div>
-                            <div style="width: 14px; height: 9px; background: linear-gradient(180deg, #DC2626 50%, #FFFFFF 50%); border-radius: 1px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 0.3px solid #CBD5E1;"></div>
-                        </div>
-                        <!-- DUST CLOUDS -->
-                        <div class="nailong-dust-cloud">
-                            <div class="dust-puff"></div>
-                            <div class="dust-puff"></div>
-                            <div class="dust-puff"></div>
-                        </div>
-                    </div>
-                    <div class="nailong-ground-shadow"></div>
-                </div>
-            `;
-        }
+            // Create DOM element for runner
+            const runnerDiv = document.createElement('div');
+            runnerDiv.className = 'cctv-mascot-runner';
+            runnerDiv.style.left = `${leftPos}px`;
+            runnerDiv.style.top = `${topPos}px`;
 
-        holder.appendChild(runnerDiv);
+            const isFinished = (currentMetric === 'omset' && value >= 200000000) || (barX >= xAxis.right - 48);
+
+            let medalBadge = '';
+            if (index === 0) medalBadge = '🥇';
+            else if (index === 1) medalBadge = '🥈';
+            else if (index === 2) medalBadge = '🥉';
+
+            runnerDiv.onclick = function() {
+                triggerNailongJoySpin(runnerDiv, labelName, isFinished);
+            };
+
+            if (isFinished) {
+                // STATE 2: NAILONG VICTORY 🏆 SELEBRASI NGANGKAT PIALA (Target 200 Juta Finish!)
+                runnerDiv.innerHTML = `
+                    <div class="nailong-run-wrapper">
+                        ${medalBadge ? `<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge} 🏆</span>` : '<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">🏆</span>'}
+                        <div class="nailong-victory-float" style="position: relative;">
+                            <div class="nailong-sparkles">
+                                <div class="sparkle-dot"></div>
+                                <div class="sparkle-dot"></div>
+                                <div class="sparkle-dot"></div>
+                                <div class="sparkle-dot"></div>
+                            </div>
+                            <img src="assets/nailong_gambar2_3d.png?v=<?= time() ?>" class="nailong-3d-gambar2" alt="Nailong Victory 🏆" />
+                            <div class="nailong-trophy-icon">🏆</div>
+                            <div class="nailong-money-icon">💰</div>
+                            <div class="nailong-headband"></div>
+                        </div>
+                        <div class="nailong-ground-shadow"></div>
+                    </div>
+                `;
+            } else {
+                // STATE 1: NAILONG LARI DI TEMPAT 🏃 WITH SPRITE SHEET ANIMATION + BENDERA 🇮🇩
+                runnerDiv.innerHTML = `
+                    <div class="nailong-run-wrapper">
+                        ${medalBadge ? `<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge}</span>` : ''}
+                        <div class="nailong-run-bounce" style="position: relative;">
+                            <div class="nailong-speed-lines-container">
+                                <div class="speed-line"></div>
+                                <div class="speed-line"></div>
+                                <div class="speed-line"></div>
+                            </div>
+                            <div class="nailong-sprite"></div>
+                            <div class="nailong-flag-pole">
+                                <div style="width: 2px; height: 26px; background: #78350F; border-radius: 1px;"></div>
+                                <div style="width: 14px; height: 9px; background: linear-gradient(180deg, #DC2626 50%, #FFFFFF 50%); border-radius: 1px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 0.3px solid #CBD5E1;"></div>
+                            </div>
+                            <div class="nailong-dust-cloud">
+                                <div class="dust-puff"></div>
+                                <div class="dust-puff"></div>
+                                <div class="dust-puff"></div>
+                            </div>
+                        </div>
+                        <div class="nailong-ground-shadow"></div>
+                    </div>
+                `;
+            }
+
+            holder.appendChild(runnerDiv);
+        }
     });
 }
 
