@@ -1,31 +1,28 @@
 <?php
 /**
  * GRAFIK RANKING & LEADERBOARD SALES WIDGET - ATHLETICS RUNNING TRACK / SIRKUIT LARI EDITION
- * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
+ * PERIODE: MULAI 1 AGUSTUS 2026 (SEMUA DARI 0)
+ * METRIK UTAMA: TOTAL NOMINAL OMSET INVOICE (RP) DENGAN TARGET RP 200 JUTA
  */
 
-// Fetch Ranking Sales Data matching invoice_followup_report.php
+$start_periode_ranking = '2026-08-01 00:00:00';
+$target_omset_finish = 200000000; // Rp 200.000.000,-
+
+// Fetch Ranking Sales Data (Period Agt 2026 Start From 0)
 $sql_ranking_all = "
     SELECT 
         s.id AS sales_id,
         s.nama_lengkap AS nama_sales,
-        COUNT(fu.id) AS total_fu,
-        COUNT(DISTINCT fu.customer_id) AS total_customer_fu,
-        SUM(CASE WHEN fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN 1 ELSE 0 END) AS total_inv_fu,
-        SUM(CASE WHEN fu.no_inv IS NOT NULL AND fu.no_inv != '' AND (
-            SELECT MIN(fu_next.tgl_follow_up)
-            FROM follow_ups fu_next
-            WHERE fu_next.customer_id = fu.customer_id
-              AND fu_next.tgl_follow_up > fu.tgl_follow_up
-              AND fu_next.deleted_at IS NULL
-        ) IS NOT NULL THEN 1 ELSE 0 END) AS count_sudah_inv_fu
+        COALESCE(SUM(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_invoice,
+        COUNT(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' THEN fu.id ELSE NULL END) AS total_fu,
+        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' THEN fu.customer_id ELSE NULL END) AS total_customer_fu,
+        COUNT(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.id ELSE NULL END) AS total_inv_count
     FROM sales s
-    LEFT JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL
+    LEFT JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL AND fu.tgl_follow_up >= '{$start_periode_ranking}'
     LEFT JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE s.role = 'sales' OR s.role = 'superadmin' OR fu.id IS NOT NULL
     GROUP BY s.id, s.nama_lengkap
-    HAVING total_fu > 0
-    ORDER BY count_sudah_inv_fu DESC, total_inv_fu DESC, total_fu DESC
+    ORDER BY total_omset_invoice DESC, total_inv_count DESC, total_fu DESC
 ";
 
 $res_ranking = $conn->query($sql_ranking_all);
@@ -37,13 +34,13 @@ if ($res_ranking) {
 }
 
 $chart_labels = [];
-$chart_sudah_inv_fu = [];
+$chart_omset_invoice = [];
 $chart_total_fu = [];
 $chart_customer_fu = [];
 
 foreach ($ranking_data as $rd) {
     $chart_labels[] = $rd['nama_sales'];
-    $chart_sudah_inv_fu[] = (int)$rd['count_sudah_inv_fu'];
+    $chart_omset_invoice[] = (float)$rd['total_omset_invoice'];
     $chart_total_fu[] = (int)$rd['total_fu'];
     $chart_customer_fu[] = (int)$rd['total_customer_fu'];
 }
@@ -98,154 +95,79 @@ $total_sales_count = count($ranking_data);
     background: linear-gradient(180deg, #A93226 0%, #922B21 50%, #7B241C 100%);
     border-radius: 22px;
     border: 2.5px solid #78281F;
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.5), 0 12px 28px rgba(169, 50, 38, 0.3);
+    box-shadow: inset 0 10px 30px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(123, 36, 28, 0.35);
 }
 
-/* White Running Track Lane Divider Lines */
-.chart-scroll-wrapper::before {
-    content: '';
+.chart-scroll-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+.chart-scroll-wrapper::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+.chart-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: #F59E0B;
+    border-radius: 10px;
+}
+
+.track-bg-overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 41px,
-        rgba(255, 255, 255, 0.32) 41px,
-        rgba(255, 255, 255, 0.32) 43px
-    );
     pointer-events: none;
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 43px, rgba(255, 255, 255, 0.3) 44px),
+        linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 100% 44px, 10% 100%;
     z-index: 1;
 }
 
-/* Checkered Finish Line Banner on Right Edge */
-.track-finish-line {
+.finish-line-banner {
     position: absolute;
-    right: 70px;
-    top: 0;
-    bottom: 0;
-    width: 14px;
-    background-image: repeating-conic-gradient(#FFFFFF 0 90deg, #000000 0 180deg);
-    background-size: 14px 14px;
+    right: 12px;
+    top: 10px;
+    bottom: 10px;
+    width: 22px;
+    background: repeating-linear-gradient(
+        45deg,
+        #000000,
+        #000000 7px,
+        #FFFFFF 7px,
+        #FFFFFF 14px
+    );
+    border-radius: 4px;
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
-    opacity: 0.9;
-    z-index: 2;
+    z-index: 3;
     pointer-events: none;
 }
 
-.track-finish-tag {
+.finish-badge-top {
     position: absolute;
-    right: 56px;
+    right: 4px;
     top: 8px;
     background: #0F172A;
-    color: #FACC15;
+    color: #FCD34D;
     font-size: 10px;
     font-weight: 800;
-    padding: 3px 9px;
+    padding: 3px 8px;
     border-radius: 12px;
-    border: 1px solid #FACC15;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-    z-index: 3;
+    border: 1px solid #F59E0B;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    z-index: 4;
 }
 
-/* INTERACTIVE CLICKABLE NAILONG RUNNER */
-.nailong-runner-character {
+.cctv-mascot-runner {
     position: absolute;
-    width: 48px;
-    height: 50px;
-    pointer-events: auto !important;
+    z-index: 10;
     cursor: pointer;
-    transition: left 0.08s linear, top 0.3s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 25;
+    transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s ease;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
 }
 
-.nailong-runner-character:hover {
-    transform: scale(1.22) translateY(-4px);
+.cctv-mascot-runner:hover {
+    transform: scale(1.15);
 }
 
-.nailong-runner-character:active {
-    transform: scale(0.95);
-}
-
-/* Joy Spin Animation on Click */
-.nailong-joy-spin {
-    animation: nailongJoySpin 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-}
-
-@keyframes nailongJoySpin {
-    0% { transform: translateY(0) rotate(0deg) scale(1); }
-    50% { transform: translateY(-22px) rotate(180deg) scale(1.35); }
-    100% { transform: translateY(0) rotate(360deg) scale(1); }
-}
-
-/* Speech Bubble Motivation Popup */
-.nailong-speech-bubble {
-    position: absolute;
-    bottom: 54px;
-    left: 50%;
-    transform: translateX(-50%) scale(0);
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-    color: #FFFFFF;
-    border: 1.8px solid #38BDF8;
-    padding: 7px 15px;
-    border-radius: 18px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 800;
-    white-space: nowrap;
-    box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.45), 0 0 18px rgba(56, 189, 248, 0.4);
-    z-index: 99;
-    pointer-events: none;
-    animation: speechPop 3.4s ease-in-out forwards;
-}
-
-.nailong-speech-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -7px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 7px 7px 0;
-    border-style: solid;
-    border-color: #0F172A transparent;
-    display: block;
-    width: 0;
-}
-
-@keyframes speechPop {
-    0% { transform: translateX(-50%) translateY(12px) scale(0); opacity: 0; }
-    15% { transform: translateX(-50%) translateY(0) scale(1.12); opacity: 1; }
-    25% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
-    82% { transform: translateX(-50%) translateY(-3px) scale(1); opacity: 1; }
-    100% { transform: translateX(-50%) translateY(-18px) scale(0.5); opacity: 0; }
-}
-
-/* Flying Properties & Confetti Particles */
-.flying-prop-particle {
-    position: absolute;
-    font-size: 22px;
-    pointer-events: none;
-    z-index: 100;
-    animation: flyPropAnim 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-}
-
-@keyframes flyPropAnim {
-    0% {
-        opacity: 1;
-        transform: translate(0, 0) scale(0.4) rotate(0deg);
-    }
-    50% {
-        opacity: 1;
-        transform: translate(var(--tx), var(--ty)) scale(1.35) rotate(var(--rot));
-    }
-    100% {
-        opacity: 0;
-        transform: translate(calc(var(--tx) * 1.25), calc(var(--ty) + 45px)) scale(0.3) rotate(calc(var(--rot) * 2));
-    }
-}
-
-.nailong-svg {
-    filter: drop-shadow(0 6px 14px rgba(245, 158, 11, 0.4));
+.nailong-body-wrap {
     animation: nailongSmoothWaddle 0.55s infinite alternate ease-in-out;
 }
 
@@ -450,11 +372,10 @@ $total_sales_count = count($ranking_data);
     background: #0F172A;
     color: #FFFFFF;
     border-color: #0F172A;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
 }
 
 .btn-full-leaderboard {
-    background: #F1F5F9;
+    background: #FFFFFF;
     color: #0F172A;
     border: 1.5px solid #CBD5E1;
     font-weight: 700;
@@ -496,16 +417,18 @@ $total_sales_count = count($ranking_data);
                 🏆
             </div>
             <div>
-                <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
-                    Leaderboard & Grafik Ranking Sales
-                    <span class="badge bg-danger text-white border border-white border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">🏁 Sirkuit Lari Nailong (奶龙)</span>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 11px; letter-spacing: 0.5px;">PERIODE: MULAI AGUSTUS 2026 (START DARI 0)</span>
+                    <span class="badge bg-danger text-white border border-white border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 800;">🏁 Sirkuit Lari Nailong</span>
+                </div>
+                <h5 class="mb-0 fw-bold text-dark mt-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
+                    Leaderboard & Grafik Ranking Sales Rep
                 </h5>
-                <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Sirkuit Lari Sales Rep: Klik karakter Nailong untuk memberikan sorakan semangat!</p>
             </div>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <button type="button" class="metric-btn active" id="btnMetricInvSudah" onclick="switchChartMetric('inv_sudah')">
-                📄 Invoice Sudah FU
+            <button type="button" class="metric-btn active" id="btnMetricOmset" onclick="switchChartMetric('omset')">
+                💵 Invoice Sales (Rp)
             </button>
             <button type="button" class="metric-btn" id="btnMetricTotal" onclick="switchChartMetric('total')">
                 ⚡ Total Activity FU
@@ -524,6 +447,7 @@ $total_sales_count = count($ranking_data);
         <div class="col-lg-5 col-12 d-flex flex-column gap-3">
             <!-- Top 1 Gold -->
             <?php if ($top1): ?>
+            <?php $top1_omset = (float)$top1['total_omset_invoice']; ?>
             <div class="podium-card gold">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-3">
@@ -534,15 +458,16 @@ $total_sales_count = count($ranking_data);
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fs-3 fw-bold text-warning metric-val" id="podium1Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;"><?php echo number_format($top1['count_sudah_inv_fu'], 0, ',', '.'); ?></div>
-                        <small class="text-muted fw-semibold metric-lbl" id="podium1Lbl" style="font-size: 11px;">Sudah FU Invoice</small>
+                        <div class="fs-4 fw-bold text-warning metric-val font-monospace" id="podium1Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;">Rp <?php echo number_format($top1_omset, 0, ',', '.'); ?></div>
+                        <small class="text-muted fw-semibold metric-lbl" id="podium1Lbl" style="font-size: 11px;">Omset Invoice (Agt 2026)</small>
                     </div>
                 </div>
+                <?php $pct_top1 = min(100, round(($top1_omset / $target_omset_finish) * 100, 1)); ?>
                 <div class="progress mt-2.5" style="height: 7px; border-radius: 10px; background: rgba(245, 158, 11, 0.25);">
-                    <div class="progress-bar bg-warning bg-gradient" role="progressbar" style="width: 100%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                    <div class="progress-bar bg-warning bg-gradient" role="progressbar" style="width: <?php echo max(5, $pct_top1); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2.5 text-muted" style="font-size: 12px;">
-                    <span>⚡ <?php echo $top1['total_fu']; ?> Total Activity</span>
+                    <span>⚡ <?php echo $top1['total_fu']; ?> Activity</span>
                     <span>👥 <?php echo $top1['total_customer_fu']; ?> Customer di-FU</span>
                 </div>
             </div>
@@ -550,6 +475,7 @@ $total_sales_count = count($ranking_data);
 
             <!-- Top 2 Silver -->
             <?php if ($top2): ?>
+            <?php $top2_omset = (float)$top2['total_omset_invoice']; ?>
             <div class="podium-card silver">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-3">
@@ -560,16 +486,16 @@ $total_sales_count = count($ranking_data);
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fs-3 fw-bold text-secondary metric-val" id="podium2Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;"><?php echo number_format($top2['count_sudah_inv_fu'], 0, ',', '.'); ?></div>
-                        <small class="text-muted fw-semibold metric-lbl" id="podium2Lbl" style="font-size: 11px;">Sudah FU Invoice</small>
+                        <div class="fs-4 fw-bold text-secondary metric-val font-monospace" id="podium2Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;">Rp <?php echo number_format($top2_omset, 0, ',', '.'); ?></div>
+                        <small class="text-muted fw-semibold metric-lbl" id="podium2Lbl" style="font-size: 11px;">Omset Invoice (Agt 2026)</small>
                     </div>
                 </div>
-                <?php $pct2 = ($top1 && $top1['count_sudah_inv_fu'] > 0) ? round(($top2['count_sudah_inv_fu'] / $top1['count_sudah_inv_fu']) * 100) : 0; ?>
+                <?php $pct2 = min(100, round(($top2_omset / $target_omset_finish) * 100, 1)); ?>
                 <div class="progress mt-2.5" style="height: 7px; border-radius: 10px; background: rgba(148, 163, 184, 0.25);">
-                    <div class="progress-bar bg-secondary bg-gradient" role="progressbar" style="width: <?php echo max($pct2, 5); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                    <div class="progress-bar bg-secondary bg-gradient" role="progressbar" style="width: <?php echo max(5, $pct2); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2.5 text-muted" style="font-size: 12px;">
-                    <span>⚡ <?php echo $top2['total_fu']; ?> Total Activity</span>
+                    <span>⚡ <?php echo $top2['total_fu']; ?> Activity</span>
                     <span>👥 <?php echo $top2['total_customer_fu']; ?> Customer di-FU</span>
                 </div>
             </div>
@@ -577,6 +503,7 @@ $total_sales_count = count($ranking_data);
 
             <!-- Top 3 Bronze -->
             <?php if ($top3): ?>
+            <?php $top3_omset = (float)$top3['total_omset_invoice']; ?>
             <div class="podium-card bronze">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-3">
@@ -587,16 +514,16 @@ $total_sales_count = count($ranking_data);
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fs-3 fw-bold text-danger metric-val" id="podium3Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;"><?php echo number_format($top3['count_sudah_inv_fu'], 0, ',', '.'); ?></div>
-                        <small class="text-muted fw-semibold metric-lbl" id="podium3Lbl" style="font-size: 11px;">Sudah FU Invoice</small>
+                        <div class="fs-4 fw-bold text-danger metric-val font-monospace" id="podium3Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;">Rp <?php echo number_format($top3_omset, 0, ',', '.'); ?></div>
+                        <small class="text-muted fw-semibold metric-lbl" id="podium3Lbl" style="font-size: 11px;">Omset Invoice (Agt 2026)</small>
                     </div>
                 </div>
-                <?php $pct3 = ($top1 && $top1['count_sudah_inv_fu'] > 0) ? round(($top3['count_sudah_inv_fu'] / $top1['count_sudah_inv_fu']) * 100) : 0; ?>
+                <?php $pct3 = min(100, round(($top3_omset / $target_omset_finish) * 100, 1)); ?>
                 <div class="progress mt-2.5" style="height: 7px; border-radius: 10px; background: rgba(217, 119, 6, 0.25);">
-                    <div class="progress-bar bg-warning bg-gradient" role="progressbar" style="width: <?php echo max($pct3, 5); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                    <div class="progress-bar bg-warning bg-gradient" role="progressbar" style="width: <?php echo max(5, $pct3); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2.5 text-muted" style="font-size: 12px;">
-                    <span>⚡ <?php echo $top3['total_fu']; ?> Total Activity</span>
+                    <span>⚡ <?php echo $top3['total_fu']; ?> Activity</span>
                     <span>👥 <?php echo $top3['total_customer_fu']; ?> Customer di-FU</span>
                 </div>
             </div>
@@ -607,7 +534,7 @@ $total_sales_count = count($ranking_data);
         <div class="col-lg-7 col-12">
             <div class="p-3.5 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
                 <div class="d-flex justify-content-between align-items-center mb-2 px-2 flex-wrap gap-2">
-                    <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 14px;" id="chartTitle">🏁 Sirkuit Lari Sales (Sudah FU Invoice)</span>
+                    <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 14px;" id="chartTitle">🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)</span>
                     <div class="d-flex align-items-center gap-1.5">
                         <span class="text-muted fw-semibold" style="font-size: 11px;">Tampilkan:</span>
                         <button type="button" class="top-limit-btn" onclick="setTopLimit(5, this)">Top 5</button>
@@ -619,13 +546,14 @@ $total_sales_count = count($ranking_data);
 
                 <!-- Athletics Track Circuit Wrapper with Checkered Finish Line -->
                 <div class="chart-scroll-wrapper" id="chartScrollWrapper">
-                    <div class="track-finish-line"></div>
-                    <div class="track-finish-tag">FINISH 🏁</div>
+                    <div class="track-bg-overlay"></div>
+                    <div class="finish-line-banner"></div>
+                    <div class="finish-badge-top">FINISH 🏁</div>
 
-                    <div id="chartCanvasContainer" style="position: relative; height: 280px; width: 100%;">
+                    <div style="position: relative; width: 100%; min-height: 320px;" id="chartCanvasContainer">
                         <canvas id="salesRankingChart"></canvas>
-                        <!-- Container for NAILONG Dragon (奶龙) Interactive Runner Characters -->
-                        <div id="cctvMascotOverlayHolder" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;"></div>
+                        <!-- Interactive Animated CCTV Mascot Runners Overlay (Nailong 奶龙 Edition) -->
+                        <div id="cctvMascotOverlayHolder"></div>
                     </div>
                 </div>
             </div>
@@ -633,49 +561,56 @@ $total_sales_count = count($ranking_data);
     </div>
 </div>
 
-<!-- FULL LEADERBOARD MODAL FOR 100+ SALES -->
-<div class="modal fade" id="fullLeaderboardModal" tabindex="-1" aria-labelledby="fullLeaderboardModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
-            <div class="modal-header bg-dark text-white py-3.5 px-4">
-                <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="fullLeaderboardModalLabel" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                    🏆 Full Leaderboard Performa Tim Sales (<?php echo $total_sales_count; ?> Sales Rep)
-                </h5>
+<!-- Modal Full Leaderboard -->
+<div class="modal fade" id="fullLeaderboardModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
+            <div class="modal-header bg-gradient text-white" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border-radius: 24px 24px 0 0; padding: 20px 28px;">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div style="font-size: 24px;">🏆</div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0 text-white" style="font-family: 'Plus Jakarta Sans', sans-serif;">Full Leaderboard Sales Representative</h5>
+                        <small class="text-white-50">Periode: Mulai 1 Agustus 2026 (Semua Dari 0)</small>
+                    </div>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4 bg-light">
-                <div class="mb-3">
-                    <input type="text" id="modalSearchSales" class="form-control rounded-pill ps-4" placeholder="Cari nama sales rep..." style="font-size: 13.5px;" onkeyup="filterModalSalesTable()">
-                </div>
-                <div class="table-responsive bg-white rounded-3 border shadow-sm">
+            <div class="modal-body p-0">
+                <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th class="py-3 px-3 text-center" style="font-size: 12px;">RANK</th>
-                                <th class="py-3 px-3" style="font-size: 12px;">NAMA SALES REPRESENTATIVE</th>
-                                <th class="py-3 px-3 text-end" style="font-size: 12px;">SUDAH FU INVOICE</th>
-                                <th class="py-3 px-3 text-end" style="font-size: 12px;">TOTAL ACTIVITY FU</th>
-                                <th class="py-3 px-3 text-end" style="font-size: 12px;">CUSTOMER DI-FU</th>
+                                <th class="px-4 py-3 text-secondary" style="font-size: 12px;">PERINGKAT</th>
+                                <th class="px-3 py-3 text-secondary" style="font-size: 12px;">SALES REPRESENTATIVE</th>
+                                <th class="px-3 py-3 text-secondary text-end" style="font-size: 12px;">OMSET INVOICE (RP)</th>
+                                <th class="px-3 py-3 text-secondary text-end" style="font-size: 12px;">TOTAL ACTIVITY</th>
+                                <th class="px-3 py-3 text-secondary text-end" style="font-size: 12px;">CUST DI-FU</th>
                             </tr>
                         </thead>
-                        <tbody id="modalLeaderboardTableBody">
+                        <tbody>
                             <?php foreach ($ranking_data as $idx => $s): ?>
-                                <?php
-                                $rank = $idx + 1;
-                                $rankBadge = "<span class='badge bg-light text-dark border px-2.5 py-1 fw-bold'>#{$rank}</span>";
-                                if ($rank == 1) $rankBadge = "<span class='badge bg-warning text-dark fw-bold px-2.5 py-1'>🥇 #1</span>";
-                                elseif ($rank == 2) $rankBadge = "<span class='badge bg-secondary text-white fw-bold px-2.5 py-1'>🥈 #2</span>";
-                                elseif ($rank == 3) $rankBadge = "<span class='badge bg-danger bg-opacity-75 text-white fw-bold px-2.5 py-1'>🥉 #3</span>";
+                                <?php 
+                                $rNum = $idx + 1;
+                                $badgeCls = 'bg-light text-secondary border';
+                                if ($rNum === 1) $badgeCls = 'bg-warning text-dark fw-bold';
+                                elseif ($rNum === 2) $badgeCls = 'bg-secondary text-white fw-bold';
+                                elseif ($rNum === 3) $badgeCls = 'bg-danger text-white fw-bold';
                                 ?>
-                                <tr class="modal-sales-row">
-                                    <td class="text-center px-3"><?php echo $rankBadge; ?></td>
-                                    <td class="px-3 fw-bold text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                                        <?php echo htmlspecialchars($s['nama_sales']); ?>
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <span class="badge <?php echo $badgeCls; ?> rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 12px;">
+                                            <?php echo $rNum; ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-3">
+                                        <div class="fw-bold text-dark" style="font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                                            <?php echo htmlspecialchars($s['nama_sales']); ?>
+                                        </div>
                                     </td>
                                     <td class="text-end px-3 font-monospace fw-bold text-success" style="font-size: 14px;">
-                                        <?php echo number_format($s['count_sudah_inv_fu'], 0, ',', '.'); ?>
+                                        Rp <?php echo number_format((float)$s['total_omset_invoice'], 0, ',', '.'); ?>
                                     </td>
-                                    <td class="text-end px-3 font-monospace fw-bold text-primary" style="font-size: 14px;">
+                                    <td class="text-end px-3 font-monospace fw-bold text-dark" style="font-size: 14px;">
                                         <?php echo number_format($s['total_fu'], 0, ',', '.'); ?>
                                     </td>
                                     <td class="text-end px-3 font-monospace fw-bold text-secondary" style="font-size: 14px;">
@@ -697,11 +632,11 @@ $total_sales_count = count($ranking_data);
 
 <script>
 let salesChartInstance = null;
-let currentMetric = 'inv_sudah';
+let currentMetric = 'omset';
 let currentTopLimit = 10;
 
 const salesChartLabels = <?php echo json_encode($chart_labels); ?>;
-const salesChartInvSudah = <?php echo json_encode($chart_sudah_inv_fu); ?>;
+const salesChartOmsetInvoice = <?php echo json_encode($chart_omset_invoice); ?>;
 const salesChartTotalFU = <?php echo json_encode($chart_total_fu); ?>;
 const salesChartCustomerFU = <?php echo json_encode($chart_customer_fu); ?>;
 
@@ -714,9 +649,13 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function getActiveDatasetValues() {
-    if (currentMetric === 'inv_sudah') return { values: salesChartInvSudah, label: "Sudah FU Invoice" };
+    if (currentMetric === 'omset') return { values: salesChartOmsetInvoice, label: "Omset Invoice (Rp)" };
     if (currentMetric === 'total') return { values: salesChartTotalFU, label: "Total Activity FU" };
     return { values: salesChartCustomerFU, label: "Customer di-FU" };
+}
+
+function formatRupiahDisplay(num) {
+    return 'Rp ' + new Intl.NumberFormat('id-ID').format(num);
 }
 
 function renderScaledChart() {
@@ -778,16 +717,16 @@ function renderScaledChart() {
                     gradientGreen
                 ],
                 borderColor: [
-                    '#FCD34D',
-                    '#E2E8F0',
-                    '#FDBA74',
-                    '#93C5FD',
-                    '#6EE7B7'
+                    '#D97706',
+                    '#64748B',
+                    '#C2410C',
+                    '#1D4ED8',
+                    '#047857'
                 ],
-                borderWidth: 2,
-                borderRadius: 10,
-                barThickness: 22,
-                maxBarThickness: 26
+                borderWidth: 1.5,
+                borderRadius: 14,
+                borderSkipped: false,
+                barThickness: 16
             }]
         },
         options: {
@@ -796,267 +735,338 @@ function renderScaledChart() {
             maintainAspectRatio: false,
             layout: {
                 padding: {
-                    right: 75,
                     top: 55,
-                    bottom: 15
-                }
-            },
-            animation: {
-                duration: 1200,
-                easing: 'easeOutQuart',
-                onProgress: function() {
-                    syncCctvMascotOverlays();
-                },
-                onComplete: function() {
-                    syncCctvMascotOverlays();
+                    right: 65,
+                    left: 10,
+                    bottom: 10
                 }
             },
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#0F172A',
-                    padding: 12,
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
                     titleFont: { family: 'Plus Jakarta Sans', size: 13, weight: 'bold' },
-                    bodyFont: { family: 'Inter', size: 12 },
+                    bodyFont: { family: 'Plus Jakarta Sans', size: 12.5 },
+                    padding: 12,
                     cornerRadius: 12,
-                    displayColors: false
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            let val = context.raw;
+                            if (currentMetric === 'omset') {
+                                return ` 💰 Omset Invoice: ${formatRupiahDisplay(val)}`;
+                            }
+                            return ` ${context.dataset.label}: ${val}`;
+                        }
+                    }
                 }
             },
             scales: {
                 x: {
-                    grace: '18%',
-                    grid: { color: 'rgba(255, 255, 255, 0.22)' },
-                    ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#FFFFFF' }
+                    grid: { color: 'rgba(255, 255, 255, 0.12)', lineWidth: 1 },
+                    ticks: { 
+                        color: '#F8FAFC', 
+                        font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
+                        callback: function(val) {
+                            if (currentMetric === 'omset') {
+                                if (val >= 1000000) return (val / 1000000) + ' Jt';
+                                return val;
+                            }
+                            return val;
+                        }
+                    },
+                    border: { display: false }
                 },
                 y: {
                     grid: { display: false },
-                    ticks: { font: { family: 'Plus Jakarta Sans', size: 12, weight: '700' }, color: '#FFFFFF' }
+                    ticks: {
+                        color: '#FFFFFF',
+                        font: { family: 'Plus Jakarta Sans', size: 12.5, weight: '700' }
+                    },
+                    border: { display: false }
+                }
+            },
+            animation: {
+                onComplete: function() {
+                    positionMascotRunners(this);
                 }
             }
         }
     });
 }
 
-function handleNailongClick(event, salesName) {
-    event.stopPropagation();
-    const runnerEl = event.currentTarget;
+function positionMascotRunners(chart) {
+    const holder = document.getElementById('cctvMascotOverlayHolder');
+    if (!holder) return;
+    holder.innerHTML = '';
 
-    // 1. Trigger Joy 360 Spin
-    runnerEl.classList.remove('nailong-joy-spin');
-    void runnerEl.offsetWidth; // trigger reflow
-    runnerEl.classList.add('nailong-joy-spin');
+    const meta = chart.getDatasetMeta(0);
+    const xAxis = chart.scales.x;
+    const yAxis = chart.scales.y;
 
-    // 2. Remove old speech bubble if active
-    const oldBubble = runnerEl.querySelector('.nailong-speech-bubble');
-    if (oldBubble) oldBubble.remove();
+    meta.data.forEach((bar, index) => {
+        const value = chart.data.datasets[0].data[index];
+        const labelName = chart.data.labels[index];
+        const barY = bar.y;
+        const barX = bar.x;
 
-    // 3. Create Motivator Speech Bubble
-    const bubble = document.createElement('div');
-    bubble.className = 'nailong-speech-bubble';
+        const runnerDiv = document.createElement('div');
+        runnerDiv.className = 'cctv-mascot-runner';
+        
+        // 45px width offset so mascot sits right on the edge of the bar
+        const leftPos = Math.min(barX - 18, xAxis.right - 45);
+        const topPos = barY - 32;
 
-    const motivPhrases = [
-        `Semangat ${salesName}! 🔥💪✨`,
-        `Gaskeun ${salesName}! 🚀💎`,
-        `Juara Banget ${salesName}! 🏆⚡`,
-        `Gas Pol ${salesName}! 🏁🔥`
-    ];
-    const phrase = motivPhrases[Math.floor(Math.random() * motivPhrases.length)];
-    bubble.innerText = phrase;
-    runnerEl.appendChild(bubble);
+        runnerDiv.style.left = `${leftPos}px`;
+        runnerDiv.style.top = `${topPos}px`;
+        
+        let medalBadge = '';
+        if (index === 0) medalBadge = '🥇';
+        else if (index === 1) medalBadge = '🥈';
+        else if (index === 2) medalBadge = '🥉';
 
-    // 4. Burst Flying Property Particles (📹 💰 🏆 💵 💎 ⭐ 🔥 💖 🎉 ⚡)
-    const props = ['📹', '💰', '🏆', '💵', '💎', '⭐', '🔥', '💖', '🎉', '⚡'];
-    const particleCount = 14;
+        let displayValStr = (currentMetric === 'omset') ? formatRupiahDisplay(value) : value;
 
-    for (let i = 0; i < particleCount; i++) {
-        const p = document.createElement('div');
-        p.className = 'flying-prop-particle';
-        p.innerText = props[Math.floor(Math.random() * props.length)];
+        runnerDiv.onclick = function() {
+            triggerNailongJoySpin(runnerDiv, labelName);
+        };
 
-        const angle = (i / particleCount) * 360 + (Math.random() * 20 - 10);
-        const radius = 60 + Math.random() * 60;
-        const tx = Math.cos(angle * Math.PI / 180) * radius;
-        const ty = Math.sin(angle * Math.PI / 180) * radius - 35;
-        const rot = (Math.random() - 0.5) * 360;
+        // Interactive CCTV Camera + Dragon Mascot SVG Character (Nailong 奶龙 Edition)
+        runnerDiv.innerHTML = `
+            <div style="position: relative;">
+                ${medalBadge ? `<span class="nailong-rank-tag">${medalBadge}</span>` : ''}
+                <div class="nailong-body-wrap">
+                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Speed Lines / Wind Effects -->
+                        <g class="nailong-speed-lines" stroke="#FDE047" stroke-width="1.5" stroke-linecap="round">
+                            <line x1="2" y1="18" x2="8" y2="18" />
+                            <line x1="0" y1="26" x2="6" y2="26" />
+                            <line x1="3" y1="34" x2="9" y2="34" />
+                        </g>
 
-        p.style.left = '20px';
-        p.style.top = '10px';
-        p.style.setProperty('--tx', `${tx}px`);
-        p.style.setProperty('--ty', `${ty}px`);
-        p.style.setProperty('--rot', `${rot}deg`);
+                        <!-- Tail with Cute Spike -->
+                        <path d="M 12 36 Q 4 40 8 44 Q 16 42 16 36 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
 
-        runnerEl.appendChild(p);
+                        <!-- Left Back Arm -->
+                        <path class="nailong-arm-left" d="M 14 26 C 10 28, 8 32, 12 33" stroke="#CA8A04" stroke-width="3" stroke-linecap="round"/>
+
+                        <!-- Left Back Leg -->
+                        <ellipse class="nailong-leg-left" cx="16" cy="41" rx="4" ry="3.5" fill="#EAB308" stroke="#CA8A04" stroke-width="1.2"/>
+
+                        <!-- Dragon Chubby Body (Yellow Golden) -->
+                        <path d="M 14 22 C 14 16, 32 16, 32 22 C 34 32, 30 42, 22 42 C 14 42, 12 32, 14 22 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+
+                        <!-- Cute White Belly Patch -->
+                        <ellipse cx="23" cy="32" rx="6.5" ry="7.5" fill="#FEF9C3"/>
+
+                        <!-- Right Front Leg -->
+                        <ellipse class="nailong-leg-right" cx="28" cy="41" rx="4.5" ry="4" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
+
+                        <!-- Right Front Arm -->
+                        <path class="nailong-arm-right" d="M 28 26 C 34 27, 36 30, 32 32" stroke="#CA8A04" stroke-width="3.2" stroke-linecap="round"/>
+
+                        <!-- Head & Horns Group -->
+                        <g class="nailong-head-group">
+                            <!-- Cute Little Dragon Horns (Orange Amber) -->
+                            <path d="M 18 10 Q 17 4 20 6 Q 21 10 20 12 Z" fill="#F97316"/>
+                            <path d="M 26 10 Q 25 4 28 6 Q 29 10 28 12 Z" fill="#F97316"/>
+
+                            <!-- Big Chubby Dragon Head -->
+                            <circle cx="23" cy="16" r="11" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+
+                            <!-- Big Derpy Kawaii Eyes -->
+                            <circle cx="19" cy="15" r="3.2" fill="#000000"/>
+                            <circle cx="27" cy="15" r="3.2" fill="#000000"/>
+                            <circle cx="20" cy="14" r="1.1" fill="#FFFFFF"/>
+                            <circle cx="28" cy="14" r="1.1" fill="#FFFFFF"/>
+
+                            <!-- Rosy Blush Cheeks -->
+                            <ellipse cx="15.5" cy="18" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+                            <ellipse cx="30.5" cy="18" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+
+                            <!-- Big Happy DERP Smile Mouth -->
+                            <path d="M 19 19 Q 23 24 27 19 Z" fill="#991B1B" stroke="#7F1D1D" stroke-width="0.8"/>
+                            <path d="M 21 20 Q 23 22 25 20 Z" fill="#F87171"/>
+                        </g>
+
+                        <!-- CCTV Security Headset Strap & Camera Lens Mount -->
+                        <rect x="13" y="11" width="20" height="3" rx="1.5" fill="#1E293B"/>
+                        <circle cx="33" cy="14" r="4.5" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+                        <circle cx="33" cy="14" r="2" fill="#38BDF8"/>
+                        <!-- CCTV Blinking Red REC Light -->
+                        <circle class="cctv-rec-dot" cx="35" cy="11" r="1.2" fill="#EF4444"/>
+                    </svg>
+                </div>
+            </div>
+        `;
+
+        holder.appendChild(runnerDiv);
+    });
+}
+
+function triggerNailongJoySpin(element, salesName) {
+    element.style.animation = 'none';
+    element.offsetHeight; // trigger reflow
+    element.style.animation = 'nailongJoySpin 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    
+    spawnFlyingPartyProps(element);
+    showMotivationSpeechBubble(element, salesName);
+}
+
+function spawnFlyingPartyProps(parentElement) {
+    const props = ['📹', '💰', '🏆', '💵', '💎', '⭐', '🔥', '💖', '🎉', '⚡', '🏆', '💵', '💎', '⭐'];
+    const container = document.body;
+    const rect = parentElement.getBoundingClientRect();
+
+    for (let i = 0; i < 14; i++) {
+        const propEl = document.createElement('div');
+        propEl.innerText = props[Math.floor(Math.random() * props.length)];
+        
+        const startX = rect.left + 20;
+        const startY = rect.top + 10;
+        
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 80 + Math.random() * 120;
+        const targetX = startX + Math.cos(angle) * distance;
+        const targetY = startY + Math.sin(angle) * distance - 40;
+        
+        propEl.style.cssText = `
+            position: fixed;
+            left: ${startX}px;
+            top: ${startY}px;
+            font-size: ${18 + Math.random() * 14}px;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 1;
+            transform: scale(0.5) rotate(0deg);
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        `;
+
+        container.appendChild(propEl);
 
         setTimeout(() => {
-            p.remove();
-        }, 1400);
+            propEl.style.left = `${targetX}px`;
+            propEl.style.top = `${targetY}px`;
+            propEl.style.opacity = '0';
+            propEl.style.transform = `scale(1.4) rotate(${Math.random() * 360 - 180}deg)`;
+        }, 20);
+
+        setTimeout(() => propEl.remove(), 950);
     }
 }
 
-function syncCctvMascotOverlays() {
-    const holder = document.getElementById('cctvMascotOverlayHolder');
-    if (!holder || !salesChartInstance) return;
+function showMotivationSpeechBubble(parentElement, salesName) {
+    const existing = parentElement.querySelector('.nailong-speech-bubble');
+    if (existing) existing.remove();
 
-    const meta = salesChartInstance.getDatasetMeta(0);
-    if (!meta || !meta.data) return;
+    const bubble = document.createElement('div');
+    bubble.className = 'nailong-speech-bubble';
+    
+    const quotes = [
+        `Semangat ${salesName}! 🔥💪✨`,
+        `Gas Terus ${salesName}! 🚀🏆`,
+        `Gacor Kang ${salesName}! 💰💵`,
+        `Juara Loewix ${salesName}! 👑🌟`,
+        `Sultan ${salesName} Mantaap! 💎🎉`
+    ];
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-    const labels = salesChartInstance.data.labels;
+    bubble.style.cssText = `
+        position: absolute;
+        bottom: 52px;
+        left: 50%;
+        transform: translateX(-50%) scale(0.7);
+        background: linear-gradient(135deg, #0F172A, #1E293B);
+        color: #FDE047;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 11.5px;
+        font-weight: 800;
+        padding: 6px 12px;
+        border-radius: 14px;
+        border: 1.5px solid #F59E0B;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 100;
+    `;
+    
+    bubble.innerText = randomQuote;
+    parentElement.appendChild(bubble);
 
-    meta.data.forEach((bar, idx) => {
-        const pos = bar.tooltipPosition();
-        const salesName = labels[idx] || 'Sales';
-        let runnerDiv = document.getElementById(`nailong-runner-${idx}`);
+    setTimeout(() => {
+        bubble.style.opacity = '1';
+        bubble.style.transform = 'translateX(-50%) scale(1)';
+    }, 20);
 
-        if (!runnerDiv) {
-            runnerDiv = document.createElement('div');
-            runnerDiv.id = `nailong-runner-${idx}`;
-            runnerDiv.className = 'nailong-runner-character';
-            runnerDiv.onclick = (e) => handleNailongClick(e, salesName);
-            holder.appendChild(runnerDiv);
-        } else {
-            runnerDiv.onclick = (e) => handleNailongClick(e, salesName);
+    setTimeout(() => {
+        bubble.style.opacity = '0';
+        bubble.style.transform = 'translateX(-50%) scale(0.7)';
+        setTimeout(() => bubble.remove(), 300);
+    }, 2200);
+}
+
+function switchChartMetric(metricType) {
+    currentMetric = metricType;
+    
+    document.getElementById('btnMetricOmset').classList.remove('active');
+    document.getElementById('btnMetricTotal').classList.remove('active');
+    document.getElementById('btnMetricCustomer').classList.remove('active');
+
+    let titleText = '🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)';
+    let metricLblText = 'Omset Invoice (Agt 2026)';
+
+    if (metricType === 'omset') {
+        document.getElementById('btnMetricOmset').classList.add('active');
+        titleText = '🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)';
+        metricLblText = 'Omset Invoice (Agt 2026)';
+    } else if (metricType === 'total') {
+        document.getElementById('btnMetricTotal').classList.add('active');
+        titleText = '⚡ Sirkuit Lari Sales (Total Activity Follow Up)';
+        metricLblText = 'Total Activity FU';
+    } else if (metricType === 'customer') {
+        document.getElementById('btnMetricCustomer').classList.add('active');
+        titleText = '👥 Sirkuit Lari Sales (Jumlah Customer di-FU)';
+        metricLblText = 'Customer di-FU';
+    }
+
+    document.getElementById('chartTitle').innerHTML = titleText;
+    document.querySelectorAll('.metric-lbl').forEach(el => el.innerText = metricLblText);
+
+    updatePodiumCards(metricType);
+    renderScaledChart();
+}
+
+function updatePodiumCards(metricType) {
+    const val1 = document.getElementById('podium1Val');
+    const val2 = document.getElementById('podium2Val');
+    const val3 = document.getElementById('podium3Val');
+
+    if (val1 && top1Data) val1.innerText = getFormattedMetricValue(top1Data, metricType);
+    if (val2 && top2Data) val2.innerText = getFormattedMetricValue(top2Data, metricType);
+    if (val3 && top3Data) val3.innerText = getFormattedMetricValue(top3Data, metricType);
+
+    [val1, val2, val3].forEach(el => {
+        if (el) {
+            el.classList.remove('pop-metric');
+            void el.offsetWidth;
+            el.classList.add('pop-metric');
         }
-
-        // Update position in sync with bar expansion
-        runnerDiv.style.left = `${pos.x + 8}px`;
-        runnerDiv.style.top = `${pos.y - 25}px`;
-
-        let rankTagHtml = '';
-        if (idx === 0) rankTagHtml = '<span class="nailong-rank-tag">🥇 👑</span>';
-        else if (idx === 1) rankTagHtml = '<span class="nailong-rank-tag">🥈</span>';
-        else if (idx === 2) rankTagHtml = '<span class="nailong-rank-tag">🥉</span>';
-
-        runnerDiv.innerHTML = `
-            <svg width="48" height="50" viewBox="0 0 48 50" fill="none" xmlns="http://www.w3.org/2000/svg" class="nailong-svg">
-                <!-- High-Speed Running Trail Lines -->
-                <g class="nailong-speed-lines">
-                    <line x1="2" y1="20" x2="8" y2="20" stroke="#FFCC00" stroke-width="2.2" stroke-linecap="round"/>
-                    <line x1="0" y1="28" x2="6" y2="28" stroke="#FFCC00" stroke-width="2.2" stroke-linecap="round"/>
-                    <line x1="3" y1="36" x2="9" y2="36" stroke="#FFCC00" stroke-width="2.2" stroke-linecap="round"/>
-                </g>
-
-                <!-- Tail -->
-                <path d="M10 36 C 4 38, 2 34, 6 30 C 8 32, 10 34, 12 34 Z" fill="#FFCC00" stroke="#E6B800" stroke-width="1"/>
-                
-                <!-- Left Running Leg -->
-                <ellipse cx="15" cy="42" rx="4.5" ry="5.5" fill="#FFCC00" stroke="#E6B800" stroke-width="1.2" class="nailong-leg-left"/>
-                <!-- Right Running Leg -->
-                <ellipse cx="29" cy="42" rx="4.5" ry="5.5" fill="#FFCC00" stroke="#E6B800" stroke-width="1.2" class="nailong-leg-right"/>
-                
-                <!-- Chubby Yellow Dragon Body & White Belly -->
-                <path d="M14 20 C 10 24, 10 38, 16 42 C 20 44, 28 44, 32 42 C 38 38, 38 24, 34 20 Z" fill="#FFCC00" stroke="#E6B800" stroke-width="1.5"/>
-                <ellipse cx="23" cy="32" rx="7.5" ry="8.5" fill="#FFEAA7"/>
-
-                <!-- Short Arm Left -->
-                <path d="M12 25 Q 6 28 9 32" stroke="#FFCC00" stroke-width="4.5" stroke-linecap="round" class="nailong-arm-left"/>
-                <!-- Short Arm Right -->
-                <path d="M32 25 Q 38 28 35 32" stroke="#FFCC00" stroke-width="4.5" stroke-linecap="round" class="nailong-arm-right"/>
-
-                <!-- Cute NAILONG Head -->
-                <g class="nailong-head-group">
-                    <circle cx="23" cy="16" r="13" fill="#FFCC00" stroke="#E6B800" stroke-width="1.5"/>
-                    <path d="M15 5 C 13 1, 17 2, 18 6 Z" fill="#FF9900"/>
-                    <path d="M31 5 C 29 1, 33 2, 28 6 Z" fill="#FF9900"/>
-
-                    <!-- CCTV Camera Visor / Headset for Loewix Theme -->
-                    <rect x="11" y="10" width="24" height="9" rx="4.5" fill="#0F172A" stroke="#2563EB" stroke-width="1"/>
-                    <circle cx="28" cy="14.5" r="3" fill="#00F0FF"/>
-                    <circle cx="28" cy="14.5" r="1.2" fill="#FFFFFF"/>
-                    <circle cx="15" cy="12" r="1" fill="#FF2E2E" class="cctv-rec-dot"/>
-
-                    <!-- Blushy Pink Cheeks -->
-                    <circle cx="13" cy="21" r="2.5" fill="#FF7675" opacity="0.65"/>
-                    <circle cx="33" cy="21" r="2.5" fill="#FF7675" opacity="0.65"/>
-
-                    <!-- Cute Eyes -->
-                    <circle cx="17" cy="18" r="2.2" fill="#2D3436"/>
-                    <circle cx="17" cy="17.2" r="0.8" fill="#FFFFFF"/>
-                    <circle cx="29" cy="18" r="2.2" fill="#2D3436"/>
-                    <circle cx="29" cy="17.2" r="0.8" fill="#FFFFFF"/>
-                </g>
-            </svg>
-            ${rankTagHtml}
-        `;
     });
 }
 
-function triggerNumberPop() {
-    const vals = document.querySelectorAll('.metric-val');
-    vals.forEach(v => {
-        v.classList.remove('pop-metric');
-        void v.offsetWidth; // trigger reflow
-        v.classList.add('pop-metric');
-    });
+function getFormattedMetricValue(data, metricType) {
+    if (metricType === 'omset') return formatRupiahDisplay(data.total_omset_invoice);
+    if (metricType === 'total') return new Intl.NumberFormat('id-ID').format(data.total_fu);
+    return new Intl.NumberFormat('id-ID').format(data.total_customer_fu);
 }
 
 function setTopLimit(limit, btn) {
     currentTopLimit = limit;
-    const buttons = document.querySelectorAll('.top-limit-btn');
-    buttons.forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.top-limit-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     renderScaledChart();
-}
-
-function switchChartMetric(type) {
-    currentMetric = type;
-    const btnInvSudah = document.getElementById('btnMetricInvSudah');
-    const btnTotal = document.getElementById('btnMetricTotal');
-    const btnCustomer = document.getElementById('btnMetricCustomer');
-
-    const chartTitle = document.getElementById('chartTitle');
-    const p1Val = document.getElementById('podium1Val');
-    const p1Lbl = document.getElementById('podium1Lbl');
-    const p2Val = document.getElementById('podium2Val');
-    const p2Lbl = document.getElementById('podium2Lbl');
-    const p3Val = document.getElementById('podium3Val');
-    const p3Lbl = document.getElementById('podium3Lbl');
-
-    btnInvSudah.classList.remove('active');
-    btnTotal.classList.remove('active');
-    btnCustomer.classList.remove('active');
-
-    if (type === 'inv_sudah') {
-        btnInvSudah.classList.add('active');
-        if (chartTitle) chartTitle.innerText = '🏁 Sirkuit Lari Sales (Sudah FU Invoice)';
-        if (p1Val && top1Data) p1Val.innerText = top1Data.count_sudah_inv_fu;
-        if (p1Lbl) p1Lbl.innerText = 'Sudah FU Invoice';
-        if (p2Val && top2Data) p2Val.innerText = top2Data.count_sudah_inv_fu;
-        if (p2Lbl) p2Lbl.innerText = 'Sudah FU Invoice';
-        if (p3Val && top3Data) p3Val.innerText = top3Data.count_sudah_inv_fu;
-        if (p3Lbl) p3Lbl.innerText = 'Sudah FU Invoice';
-    } else if (type === 'total') {
-        btnTotal.classList.add('active');
-        if (chartTitle) chartTitle.innerText = '🏁 Sirkuit Lari Sales (Total Activity FU)';
-        if (p1Val && top1Data) p1Val.innerText = top1Data.total_fu;
-        if (p1Lbl) p1Lbl.innerText = 'Total Activity FU';
-        if (p2Val && top2Data) p2Val.innerText = top2Data.total_fu;
-        if (p2Lbl) p2Lbl.innerText = 'Total Activity FU';
-        if (p3Val && top3Data) p3Val.innerText = top3Data.total_fu;
-        if (p3Lbl) p3Lbl.innerText = 'Total Activity FU';
-    } else {
-        btnCustomer.classList.add('active');
-        if (chartTitle) chartTitle.innerText = '🏁 Sirkuit Lari Sales (Customer di-FU)';
-        if (p1Val && top1Data) p1Val.innerText = top1Data.total_customer_fu;
-        if (p1Lbl) p1Lbl.innerText = 'Customer di-FU';
-        if (p2Val && top2Data) p2Val.innerText = top2Data.total_customer_fu;
-        if (p2Lbl) p2Lbl.innerText = 'Customer di-FU';
-        if (p3Val && top3Data) p3Val.innerText = top3Data.total_customer_fu;
-        if (p3Lbl) p3Lbl.innerText = 'Customer di-FU';
-    }
-    triggerNumberPop();
-    renderScaledChart();
-}
-
-function filterModalSalesTable() {
-    const input = document.getElementById('modalSearchSales').value.toLowerCase();
-    const rows = document.querySelectorAll('#modalLeaderboardTableBody tr.modal-sales-row');
-    rows.forEach(r => {
-        const text = r.textContent.toLowerCase();
-        if (text.includes(input)) {
-            r.style.display = "";
-        } else {
-            r.style.display = "none";
-        }
-    });
 }
 </script>
