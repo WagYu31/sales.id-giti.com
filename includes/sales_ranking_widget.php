@@ -851,9 +851,9 @@ function positionMascotRunners(chart) {
             // STATE 2: VICTORY SELEBRASI NGANGKAT PIALA 🏆 (Target 200 Juta Finish!)
             runnerDiv.innerHTML = `
                 <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-                    <span class="nailong-rank-tag" style="top: -18px; left: 50%; transform: translateX(-50%);">🏆 #1</span>
+                    <span class="nailong-rank-tag" style="top: -20px; left: 50%; transform: translateX(-50%); font-size: 14px;">🏆 #1</span>
                     <div class="nailong-body-wrap" style="animation: nailongJoySpin 2s infinite ease-in-out;">
-                        <img src="assets/nailong_victory.gif" alt="Nailong Victory 🏆" style="height: 52px; width: auto; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5)); border-radius: 8px;" />
+                        <img src="assets/nailong_victory.gif" alt="Nailong Victory 🏆" style="height: 56px; width: auto; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5));" />
                     </div>
                 </div>
             `;
@@ -861,9 +861,9 @@ function positionMascotRunners(chart) {
             // STATE 1: RUNNING IN PLACE WITH BENDERA MERAH PUTIH 🇮🇩 & SUNGLASSES 🕶️
             runnerDiv.innerHTML = `
                 <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-                    ${medalBadge ? `<span class="nailong-rank-tag" style="top: -18px; left: 50%; transform: translateX(-50%);">${medalBadge}</span>` : ''}
+                    ${medalBadge ? `<span class="nailong-rank-tag" style="top: -20px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge}</span>` : ''}
                     <div class="nailong-body-wrap">
-                        <img src="assets/nailong_running.gif" alt="Nailong Running 🇮🇩" style="height: 46px; width: auto; object-fit: contain; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4)); border-radius: 8px;" />
+                        <img src="assets/nailong_running.gif" alt="Nailong Running 🇮🇩" style="height: 50px; width: auto; object-fit: contain; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4));" />
                     </div>
                 </div>
             `;
