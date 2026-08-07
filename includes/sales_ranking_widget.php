@@ -709,6 +709,13 @@ function renderScaledChart() {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    right: 65,
+                    top: 10,
+                    bottom: 10
+                }
+            },
             animation: {
                 duration: 1200,
                 easing: 'easeOutQuart',
@@ -732,6 +739,7 @@ function renderScaledChart() {
             },
             scales: {
                 x: {
+                    grace: '18%',
                     grid: { color: 'rgba(226, 232, 240, 0.7)' },
                     ticks: { font: { family: 'Inter', size: 11 }, color: '#64748B' }
                 },
