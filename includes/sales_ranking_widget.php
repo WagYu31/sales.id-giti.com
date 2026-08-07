@@ -84,29 +84,30 @@ $total_sales_count = count($ranking_data);
     100% { transform: scale(1); }
 }
 
-/* ATHLETICS RUNNING TRACK / SIRKUIT LARI STYLES */
+/* ATHLETICS RUNNING TRACK / SIRKUIT LARI 17 AGUSTUS KEMERDEKAAN RI 🇮🇩 STYLES */
 .chart-scroll-wrapper {
     position: relative;
     max-height: 370px;
     overflow-y: auto;
     overflow-x: hidden;
-    padding-top: 25px;
+    padding-top: 28px;
     padding-right: 6px;
-    background: linear-gradient(180deg, #A93226 0%, #922B21 50%, #7B241C 100%);
+    background: linear-gradient(180deg, #881337 0%, #991B1B 35%, #B91C1C 70%, #7F1D1D 100%);
     border-radius: 22px;
-    border: 2.5px solid #78281F;
-    box-shadow: inset 0 10px 30px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(123, 36, 28, 0.35);
+    border: 3px solid #DC2626;
+    outline: 2px solid #F59E0B;
+    box-shadow: inset 0 10px 30px rgba(0, 0, 0, 0.6), 0 12px 30px rgba(220, 38, 38, 0.4);
 }
 
 .chart-scroll-wrapper::-webkit-scrollbar {
     width: 6px;
 }
 .chart-scroll-wrapper::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.25);
     border-radius: 10px;
 }
 .chart-scroll-wrapper::-webkit-scrollbar-thumb {
-    background: #F59E0B;
+    background: linear-gradient(180deg, #DC2626, #F59E0B);
     border-radius: 10px;
 }
 
@@ -115,27 +116,28 @@ $total_sales_count = count($ranking_data);
     top: 0; left: 0; right: 0; bottom: 0;
     pointer-events: none;
     background-image: 
-        repeating-linear-gradient(0deg, transparent, transparent 43px, rgba(255, 255, 255, 0.3) 44px),
-        linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+        repeating-linear-gradient(0deg, transparent, transparent 43px, rgba(255, 255, 255, 0.35) 44px),
+        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
     background-size: 100% 44px, 10% 100%;
     z-index: 1;
 }
 
+/* GARIS FINISH MERAH PUTIH 17 AGUSTUS 🇮🇩 */
 .finish-line-banner {
     position: absolute;
     right: 12px;
     top: 10px;
     bottom: 10px;
-    width: 22px;
+    width: 24px;
     background: repeating-linear-gradient(
         45deg,
-        #000000,
-        #000000 7px,
-        #FFFFFF 7px,
-        #FFFFFF 14px
+        #DC2626,
+        #DC2626 8px,
+        #FFFFFF 8px,
+        #FFFFFF 16px
     );
     border-radius: 4px;
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 16px rgba(220, 38, 38, 0.9), 0 0 8px rgba(255, 255, 255, 0.9);
     z-index: 3;
     pointer-events: none;
 }
@@ -143,15 +145,15 @@ $total_sales_count = count($ranking_data);
 .finish-badge-top {
     position: absolute;
     right: 4px;
-    top: 8px;
-    background: #0F172A;
-    color: #FCD34D;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 12px;
-    border: 1px solid #F59E0B;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    top: 6px;
+    background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+    color: #FFFFFF;
+    font-size: 10.5px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 14px;
+    border: 1.5px solid #FCD34D;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.6);
     z-index: 4;
 }
 
@@ -418,8 +420,8 @@ $total_sales_count = count($ranking_data);
             </div>
             <div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 11px; letter-spacing: 0.5px;">PERIODE: MULAI AGUSTUS 2026 (START DARI 0)</span>
-                    <span class="badge bg-danger text-white border border-white border-opacity-50 rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 800;">🏁 Sirkuit Lari Nailong</span>
+                    <span class="badge bg-danger text-white fw-bold rounded-pill px-3 py-1" style="font-size: 11px; letter-spacing: 0.5px; border: 1px solid #FCD34D;">🇮🇩 EDISI SPESIAL KEMERDEKAAN 17 AGUSTUS</span>
+                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 800;">🏁 Sirkuit Balap Nailong Merah Putih 🇮🇩</span>
                 </div>
                 <h5 class="mb-0 fw-bold text-dark mt-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
                     Leaderboard & Grafik Ranking Sales Rep
@@ -548,7 +550,7 @@ $total_sales_count = count($ranking_data);
                 <div class="chart-scroll-wrapper" id="chartScrollWrapper">
                     <div class="track-bg-overlay"></div>
                     <div class="finish-line-banner"></div>
-                    <div class="finish-badge-top">FINISH 🏁</div>
+                    <div class="finish-badge-top">FINISH 🏁 17 AGUSTUS 🇮🇩</div>
 
                     <div style="position: relative; width: 100%; min-height: 320px;" id="chartCanvasContainer">
                         <canvas id="salesRankingChart"></canvas>
@@ -899,12 +901,23 @@ function positionMascotRunners(chart) {
                             <!-- Big Happy DERP Smile Mouth -->
                             <path d="M 19 19 Q 23 24 27 19 Z" fill="#991B1B" stroke="#7F1D1D" stroke-width="0.8"/>
                             <path d="M 21 20 Q 23 22 25 20 Z" fill="#F87171"/>
+
+                            <!-- Ikat Kepala Merah Putih 17 Agustus 🇮🇩 -->
+                            <rect x="13" y="7" width="20" height="2.2" fill="#DC2626" rx="1" />
+                            <rect x="13" y="9.2" width="20" height="2.2" fill="#FFFFFF" rx="1" stroke="#CBD5E1" stroke-width="0.3" />
+                            <rect x="21.5" y="6" width="3" height="6" fill="#DC2626" rx="0.5" />
+                            <rect x="21.5" y="9" width="3" height="3" fill="#FFFFFF" rx="0.5" />
                         </g>
 
+                        <!-- Waving Indonesian Flag 🇮🇩 in Hand -->
+                        <line x1="33" y1="18" x2="33" y2="40" stroke="#78350F" stroke-width="1.6" stroke-linecap="round"/>
+                        <rect x="33" y="18" width="11" height="4.5" fill="#DC2626" rx="0.5"/>
+                        <rect x="33" y="22.5" width="11" height="4.5" fill="#FFFFFF" rx="0.5" stroke="#E2E8F0" stroke-width="0.3"/>
+
                         <!-- CCTV Security Headset Strap & Camera Lens Mount -->
-                        <rect x="13" y="11" width="20" height="3" rx="1.5" fill="#1E293B"/>
-                        <circle cx="33" cy="14" r="4.5" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
-                        <circle cx="33" cy="14" r="2" fill="#38BDF8"/>
+                        <rect x="13" y="12" width="20" height="2.5" rx="1.2" fill="#1E293B"/>
+                        <circle cx="33" cy="14" r="4" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+                        <circle cx="33" cy="14" r="1.8" fill="#38BDF8"/>
                         <!-- CCTV Blinking Red REC Light -->
                         <circle class="cctv-rec-dot" cx="35" cy="11" r="1.2" fill="#EF4444"/>
                     </svg>
@@ -926,11 +939,11 @@ function triggerNailongJoySpin(element, salesName) {
 }
 
 function spawnFlyingPartyProps(parentElement) {
-    const props = ['📹', '💰', '🏆', '💵', '💎', '⭐', '🔥', '💖', '🎉', '⚡', '🏆', '💵', '💎', '⭐'];
+    const props = ['🇮🇩', '📹', '💰', '🏆', '💵', '💎', '⭐', '🔥', '💖', '🎉', '⚡', '🇮🇩', '🏆', '💵', '💎', '⭐'];
     const container = document.body;
     const rect = parentElement.getBoundingClientRect();
 
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 16; i++) {
         const propEl = document.createElement('div');
         propEl.innerText = props[Math.floor(Math.random() * props.length)];
         
@@ -976,11 +989,11 @@ function showMotivationSpeechBubble(parentElement, salesName) {
     bubble.className = 'nailong-speech-bubble';
     
     const quotes = [
-        `Semangat ${salesName}! 🔥💪✨`,
-        `Gas Terus ${salesName}! 🚀🏆`,
-        `Gacor Kang ${salesName}! 💰💵`,
-        `Juara Loewix ${salesName}! 👑🌟`,
-        `Sultan ${salesName} Mantaap! 💎🎉`
+        `DIRGAHAYU INDONESIA! 🇮🇩 Semangat ${salesName}! 🔥💪`,
+        `MERDEKA! 🇮🇩 Gas Terus ${salesName}! 🚀🏆`,
+        `17 AGUSTUS GACOR! 🇮🇩 ${salesName} Mantaap! 💰💵`,
+        `SULTAN KEMERDEKAAN! 🇮🇩 ${salesName} 👑🌟`,
+        `JUARA LOEWIX 17 AGUSTUS! 🇮🇩 ${salesName} 💎🎉`
     ];
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
@@ -989,15 +1002,15 @@ function showMotivationSpeechBubble(parentElement, salesName) {
         bottom: 52px;
         left: 50%;
         transform: translateX(-50%) scale(0.7);
-        background: linear-gradient(135deg, #0F172A, #1E293B);
-        color: #FDE047;
+        background: linear-gradient(135deg, #DC2626, #991B1B);
+        color: #FFFFFF;
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 11.5px;
         font-weight: 800;
-        padding: 6px 12px;
+        padding: 7px 14px;
         border-radius: 14px;
-        border: 1.5px solid #F59E0B;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        border: 1.5px solid #FCD34D;
+        box-shadow: 0 8px 20px rgba(220, 38, 38, 0.5);
         white-space: nowrap;
         pointer-events: none;
         opacity: 0;
