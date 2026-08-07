@@ -479,6 +479,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 </div>
 
 <?php include 'includes/announcement_widget.php'; ?>
+<?php include 'includes/bonus_competition_widget.php'; ?>
 <?php include 'includes/sales_ranking_widget.php'; ?>
 
 <!-- 3 Stat Cards -->
