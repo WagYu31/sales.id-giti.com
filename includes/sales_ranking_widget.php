@@ -859,22 +859,161 @@ function positionMascotRunners(chart) {
         };
 
         if (isFinished) {
-            // STATE 2: VICTORY SELEBRASI NGANGKAT PIALA 🏆 (Target 200 Juta Finish!)
+            // STATE 2: GAMBAR 2 NAILONG VICTORY SELEBRASI NGANGKAT PIALA 🏆 (Target 200 Juta Finish!)
             runnerDiv.innerHTML = `
                 <div style="position: relative; display: flex; align-items: center; justify-content: center;">
                     <span class="nailong-rank-tag" style="top: -18px; left: 50%; transform: translateX(-50%); font-size: 13px;">🏆 #1</span>
-                    <div class="nailong-body-wrap" style="animation: nailongJoySpin 2s infinite ease-in-out;">
-                        <img src="assets/nailong_victory.gif?v=<?= time() ?>" class="nailong-avatar" alt="Nailong Victory 🏆" style="width: 48px;" />
+                    <div class="nailong-body-wrap" style="animation: nailongJoySpin 1.8s infinite ease-in-out;">
+                        <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 6px 14px rgba(0,0,0,0.35));">
+                            <!-- Flying Victory Confetti Stars -->
+                            <circle cx="6" cy="10" r="1.8" fill="#EF4444" />
+                            <circle cx="46" cy="8" r="1.8" fill="#3B82F6" />
+                            <circle cx="50" cy="22" r="1.8" fill="#F59E0B" />
+                            <circle cx="4" cy="30" r="1.8" fill="#10B981" />
+
+                            <!-- Money Bag Rp next to feet -->
+                            <path d="M 6 38 Q 4 34 8 32 Q 12 30 14 34 Q 16 38 12 42 Q 8 42 6 38 Z" fill="#D97706" stroke="#92400E" stroke-width="1"/>
+                            <text x="7.5" y="38" font-size="5.5" font-weight="bold" fill="#FEF3C7">Rp</text>
+                            <!-- Gold Coins -->
+                            <circle cx="15" cy="42" r="2.5" fill="#FACC15" stroke="#CA8A04" stroke-width="0.8"/>
+                            <circle cx="18" cy="43" r="2" fill="#F59E0B" stroke="#B45309" stroke-width="0.8"/>
+
+                            <!-- Tail with Spike -->
+                            <path d="M 16 38 Q 8 42 12 46 Q 20 44 20 38 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
+
+                            <!-- GAMBAR 2: Chubby Yellow Dragon Body -->
+                            <path d="M 18 24 C 18 18, 36 18, 36 24 C 38 34, 34 44, 26 44 C 18 44, 16 34, 18 24 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+
+                            <!-- Cute White Belly Patch -->
+                            <ellipse cx="27" cy="34" rx="7.5" ry="8.5" fill="#FEF9C3"/>
+
+                            <!-- Claws on Feet -->
+                            <ellipse cx="20" cy="43" rx="4.5" ry="4" fill="#EAB308" stroke="#CA8A04" stroke-width="1.2"/>
+                            <circle cx="18" cy="45" r="0.9" fill="#78350F"/>
+                            <circle cx="20" cy="45.5" r="0.9" fill="#78350F"/>
+                            
+                            <ellipse cx="32" cy="43" rx="5" ry="4.5" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
+                            <circle cx="30" cy="45.5" r="0.9" fill="#78350F"/>
+                            <circle cx="32" cy="46" r="0.9" fill="#78350F"/>
+
+                            <!-- GAMBAR 2 HEAD & DERPY TONGUE OUT 👅 -->
+                            <g class="nailong-head-group">
+                                <path d="M 22 12 Q 21 6 24 8 Q 25 12 24 14 Z" fill="#F97316"/>
+                                <path d="M 30 12 Q 29 6 32 8 Q 33 12 32 14 Z" fill="#F97316"/>
+
+                                <!-- Big Round Head -->
+                                <circle cx="27" cy="18" r="11.5" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+
+                                <!-- GAMBAR 2: Big Derpy Green Kawaii Eyes -->
+                                <circle cx="23" cy="16" r="3.6" fill="#15803D" />
+                                <circle cx="31" cy="16" r="3.6" fill="#15803D" />
+                                <circle cx="23" cy="16" r="2.2" fill="#000000" />
+                                <circle cx="31" cy="16" r="2.2" fill="#000000" />
+                                <circle cx="22" cy="14.8" r="1.1" fill="#FFFFFF" />
+                                <circle cx="30" cy="14.8" r="1.1" fill="#FFFFFF" />
+
+                                <!-- Rosy Blush Cheeks -->
+                                <ellipse cx="18.5" cy="21" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+                                <ellipse cx="35.5" cy="21" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+
+                                <!-- GAMBAR 2: Big DERP Tongue Out Mouth 👅 -->
+                                <path d="M 22 21 Q 27 28 32 21 Z" fill="#991B1B" stroke="#7F1D1D" stroke-width="0.8"/>
+                                <path d="M 24 23 Q 27 29 30 23 Z" fill="#F87171"/>
+                                <!-- Sticking Tongue 👅 -->
+                                <path d="M 24.5 24 Q 27 30 29.5 24 Z" fill="#FB7185" stroke="#E11D48" stroke-width="0.7"/>
+
+                                <!-- Ikat Kepala Merah Putih 17 Agustus 🇮🇩 -->
+                                <rect x="17" y="8.5" width="20" height="2.2" fill="#DC2626" rx="1" />
+                                <rect x="17" y="10.7" width="20" height="2.2" fill="#FFFFFF" rx="1" stroke="#CBD5E1" stroke-width="0.3" />
+                            </g>
+
+                            <!-- Right Arm Lifting Golden Trophy 🏆 #1 Up High -->
+                            <path d="M 32 28 C 38 24, 42 16, 40 10" stroke="#CA8A04" stroke-width="3.5" stroke-linecap="round"/>
+                            <!-- GOLDEN TROPHY 🏆 -->
+                            <path d="M 36 4 L 46 4 L 44 12 Q 41 16 38 12 Z" fill="#F59E0B" stroke="#B45309" stroke-width="1"/>
+                            <rect x="39" y="14" width="4" height="4" fill="#D97706"/>
+                            <rect x="37" y="18" width="8" height="3" fill="#78350F" rx="0.5"/>
+                            <text x="39.5" y="10" font-size="5" font-weight="bold" fill="#000000">#1</text>
+                        </svg>
                     </div>
                 </div>
             `;
         } else {
-            // STATE 1: RUNNING IN PLACE WITH BENDERA MERAH PUTIH 🇮🇩 & SUNGLASSES 🕶️
+            // STATE 1: GAMBAR 2 NAILONG LARI DI TEMPAT WITH BENDERA MERAH PUTIH 🇮🇩 & SUNGLASSES 🕶️
             runnerDiv.innerHTML = `
                 <div style="position: relative; display: flex; align-items: center; justify-content: center;">
                     ${medalBadge ? `<span class="nailong-rank-tag" style="top: -18px; left: 50%; transform: translateX(-50%); font-size: 13px;">${medalBadge}</span>` : ''}
-                    <div class="nailong-body-wrap">
-                        <img src="assets/nailong_running.gif?v=<?= time() ?>" class="nailong-avatar" alt="Nailong Running 🇮🇩" />
+                    <div class="nailong-body-wrap" style="animation: nailongSmoothWaddle 0.4s infinite alternate ease-in-out;">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 5px 12px rgba(0,0,0,0.3));">
+                            <!-- Wind Speed Lines Puff -->
+                            <g class="nailong-speed-lines" stroke="#FDE047" stroke-width="1.8" stroke-linecap="round">
+                                <line x1="1" y1="18" x2="7" y2="18" />
+                                <line x1="0" y1="26" x2="6" y2="26" />
+                                <line x1="2" y1="34" x2="8" y2="34" />
+                            </g>
+
+                            <!-- Tail -->
+                            <path d="M 12 36 Q 4 40 8 44 Q 16 42 16 36 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
+
+                            <!-- Left Back Arm -->
+                            <path class="nailong-arm-left" d="M 14 26 C 10 28, 8 32, 12 33" stroke="#CA8A04" stroke-width="3" stroke-linecap="round"/>
+
+                            <!-- GAMBAR 2: Legs Running -->
+                            <ellipse class="nailong-leg-left" cx="16" cy="41" rx="4.2" ry="3.8" fill="#EAB308" stroke="#CA8A04" stroke-width="1.2"/>
+                            <circle cx="14" cy="43" r="0.8" fill="#78350F"/>
+                            <circle cx="16" cy="43.5" r="0.8" fill="#78350F"/>
+
+                            <!-- GAMBAR 2 Chubby Body -->
+                            <path d="M 14 22 C 14 16, 32 16, 32 22 C 34 32, 30 42, 22 42 C 14 42, 12 32, 14 22 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+
+                            <!-- Cute White Belly Patch -->
+                            <ellipse cx="23" cy="32" rx="6.5" ry="7.5" fill="#FEF9C3"/>
+
+                            <!-- Right Front Leg -->
+                            <ellipse class="nailong-leg-right" cx="28" cy="41" rx="4.5" ry="4" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
+                            <circle cx="27" cy="43.5" r="0.8" fill="#78350F"/>
+                            <circle cx="29" cy="44" r="0.8" fill="#78350F"/>
+
+                            <!-- Right Front Arm -->
+                            <path class="nailong-arm-right" d="M 28 26 C 34 27, 36 30, 32 32" stroke="#CA8A04" stroke-width="3.2" stroke-linecap="round"/>
+
+                            <!-- GAMBAR 2 HEAD & DERPY TONGUE OUT 👅 -->
+                            <g class="nailong-head-group">
+                                <path d="M 18 10 Q 17 4 20 6 Q 21 10 20 12 Z" fill="#F97316"/>
+                                <path d="M 26 10 Q 25 4 28 6 Q 29 10 28 12 Z" fill="#F97316"/>
+
+                                <!-- Big Round Head -->
+                                <circle cx="23" cy="16" r="11" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+
+                                <!-- GAMBAR 2: Derpy Big Green Kawaii Eyes -->
+                                <circle cx="19" cy="14.5" r="3.4" fill="#15803D" />
+                                <circle cx="27" cy="14.5" r="3.4" fill="#15803D" />
+                                <circle cx="19" cy="14.5" r="2.1" fill="#000000" />
+                                <circle cx="27" cy="14.5" r="2.1" fill="#000000" />
+                                <circle cx="18.2" cy="13.3" r="1.1" fill="#FFFFFF" />
+                                <circle cx="26.2" cy="13.3" r="1.1" fill="#FFFFFF" />
+
+                                <!-- Rosy Blush Cheeks -->
+                                <ellipse cx="14.5" cy="19" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+                                <ellipse cx="29.5" cy="19" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+
+                                <!-- GAMBAR 2: DERPY TONGUE OUT MOUTH 👅 -->
+                                <path d="M 19 19.5 Q 23 26 27 19.5 Z" fill="#991B1B" stroke="#7F1D1D" stroke-width="0.8"/>
+                                <!-- Sticking Tongue 👅 -->
+                                <path d="M 20.5 21.5 Q 23 27 25.5 21.5 Z" fill="#FB7185" stroke="#E11D48" stroke-width="0.7"/>
+
+                                <!-- Ikat Kepala Merah Putih 17 Agustus 🇮🇩 -->
+                                <rect x="13" y="6" width="20" height="2.2" fill="#DC2626" rx="1" />
+                                <rect x="13" y="8.2" width="20" height="2.2" fill="#FFFFFF" rx="1" stroke="#CBD5E1" stroke-width="0.3" />
+                                <rect x="21.5" y="5" width="3" height="6" fill="#DC2626" rx="0.5" />
+                                <rect x="21.5" y="8" width="3" height="3" fill="#FFFFFF" rx="0.5" />
+                            </g>
+
+                            <!-- Waving Indonesian Flag 🇮🇩 in Hand -->
+                            <line x1="33" y1="18" x2="33" y2="40" stroke="#78350F" stroke-width="1.6" stroke-linecap="round"/>
+                            <rect x="33" y="18" width="11" height="4.5" fill="#DC2626" rx="0.5"/>
+                            <rect x="33" y="22.5" width="11" height="4.5" fill="#FFFFFF" rx="0.5" stroke="#E2E8F0" stroke-width="0.3"/>
+                        </svg>
                     </div>
                 </div>
             `;
