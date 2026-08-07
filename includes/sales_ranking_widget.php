@@ -162,48 +162,12 @@ $total_sales_count = count($ranking_data);
     z-index: 10;
     cursor: pointer;
     transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s ease;
-    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
 }
 
 .cctv-mascot-runner:hover {
-    transform: scale(1.15);
-}
-
-.nailong-body-wrap {
-    animation: nailongSmoothWaddle 0.55s infinite alternate ease-in-out;
-}
-
-.nailong-head-group {
-    transform-origin: 23px 16px;
-    animation: nailongHeadBob 0.55s infinite alternate ease-in-out;
-}
-
-.nailong-leg-left {
-    transform-origin: 15px 42px;
-    animation: nailongLegRunLeft 0.55s infinite alternate ease-in-out;
-}
-
-.nailong-leg-right {
-    transform-origin: 29px 42px;
-    animation: nailongLegRunRight 0.55s infinite alternate ease-in-out;
-}
-
-.nailong-arm-left {
-    transform-origin: 12px 25px;
-    animation: nailongArmRunLeft 0.55s infinite alternate ease-in-out;
-}
-
-.nailong-arm-right {
-    transform-origin: 32px 25px;
-    animation: nailongArmRunRight 0.55s infinite alternate ease-in-out;
-}
-
-.cctv-rec-dot {
-    animation: recBlink 0.8s infinite alternate;
-}
-
-.nailong-speed-lines line {
-    animation: speedLinePuff 0.4s infinite linear;
+    transform: scale(1.18);
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.55)) brightness(1.08);
 }
 
 .nailong-rank-tag {
@@ -216,71 +180,252 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-@keyframes nailongSmoothWaddle {
-    0% { transform: translateY(0px) rotate(-4deg); }
-    100% { transform: translateY(-4px) rotate(4deg); }
-}
-
-@keyframes nailongHeadBob {
-    0% { transform: rotate(-3deg); }
-    100% { transform: rotate(4deg); }
-}
-
-@keyframes nailongLegRunLeft {
-    0% { transform: rotate(-35deg) scaleY(0.9); }
-    100% { transform: rotate(35deg) scaleY(1.1); }
-}
-
-@keyframes nailongLegRunRight {
-    0% { transform: rotate(35deg) scaleY(1.1); }
-    100% { transform: rotate(-35deg) scaleY(0.9); }
-}
-
-@keyframes nailongArmRunLeft {
-    0% { transform: rotate(-30deg); }
-    100% { transform: rotate(30deg); }
-}
-
-@keyframes nailongArmRunRight {
-    0% { transform: rotate(30deg); }
-    100% { transform: rotate(-30deg); }
-}
-
-@keyframes speedLinePuff {
-    0% { opacity: 1; transform: translateX(0); }
-    100% { opacity: 0; transform: translateX(-8px); }
-}
-
-@keyframes recBlink {
-    0% { opacity: 0.2; }
-    100% { opacity: 1; }
-}
-
+/* === NAILONG 3D IMAGE === */
 .nailong-3d-gambar2 {
-    width: 46px;
+    width: 52px;
     height: auto;
-    max-height: 52px;
+    max-height: 58px;
     object-fit: contain;
-    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.35));
     display: block;
 }
 
-@keyframes nailong3DWaddleRun {
-    0% { transform: translateY(0px) rotate(-6deg) scale(1); }
-    25% { transform: translateY(-5px) rotate(-2deg) scale(1.04); }
-    50% { transform: translateY(0px) rotate(6deg) scale(1); }
-    75% { transform: translateY(-5px) rotate(2deg) scale(1.04); }
-    100% { transform: translateY(0px) rotate(-6deg) scale(1); }
+/* === RUNNING ANIMATION: Dynamic Bounce + Lean + Squash-Stretch === */
+.nailong-run-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.nailong-run-bounce {
+    animation: nailongRunBounce 0.35s infinite ease-in-out;
+}
+
+@keyframes nailongRunBounce {
+    0%   { transform: translateY(0px) rotate(-3deg) scaleX(1) scaleY(1); }
+    15%  { transform: translateY(-8px) rotate(-1deg) scaleX(0.96) scaleY(1.06); }
+    30%  { transform: translateY(-10px) rotate(1deg) scaleX(0.94) scaleY(1.08); }
+    50%  { transform: translateY(-4px) rotate(3deg) scaleX(1.02) scaleY(0.97); }
+    65%  { transform: translateY(1px) rotate(2deg) scaleX(1.04) scaleY(0.95); }
+    80%  { transform: translateY(-6px) rotate(-2deg) scaleX(0.97) scaleY(1.04); }
+    100% { transform: translateY(0px) rotate(-3deg) scaleX(1) scaleY(1); }
+}
+
+/* === GROUND SHADOW that pulses with bounce === */
+.nailong-ground-shadow {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 8px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: nailongShadowPulse 0.35s infinite ease-in-out;
+}
+
+@keyframes nailongShadowPulse {
+    0%   { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.5; }
+    30%  { transform: translateX(-50%) scaleX(0.7) scaleY(0.6); opacity: 0.3; }
+    65%  { transform: translateX(-50%) scaleX(1.15) scaleY(1.1); opacity: 0.6; }
+    100% { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.5; }
+}
+
+/* === DUST CLOUD particles behind runner === */
+.nailong-dust-cloud {
+    position: absolute;
+    bottom: 0px;
+    left: -6px;
+    width: 20px;
+    height: 14px;
+    pointer-events: none;
+}
+
+.dust-puff {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    animation: dustPuffAnim 0.5s infinite ease-out;
+}
+
+.dust-puff:nth-child(1) {
+    width: 6px; height: 6px;
+    bottom: 2px; left: 4px;
+    animation-delay: 0s;
+}
+.dust-puff:nth-child(2) {
+    width: 8px; height: 7px;
+    bottom: 5px; left: 0px;
+    animation-delay: 0.12s;
+}
+.dust-puff:nth-child(3) {
+    width: 5px; height: 5px;
+    bottom: 0px; left: 8px;
+    animation-delay: 0.25s;
+}
+
+@keyframes dustPuffAnim {
+    0%   { opacity: 0.7; transform: translate(0, 0) scale(0.5); }
+    50%  { opacity: 0.4; transform: translate(-8px, -3px) scale(1); }
+    100% { opacity: 0; transform: translate(-16px, -6px) scale(1.3); }
+}
+
+/* === SPEED LINES behind runner === */
+.nailong-speed-lines-container {
+    position: absolute;
+    left: -14px;
+    top: 30%;
+    width: 14px;
+    height: 16px;
+    pointer-events: none;
+}
+
+.speed-line {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 100%);
+    border-radius: 1px;
+    animation: speedLineMove 0.4s infinite linear;
+}
+
+.speed-line:nth-child(1) {
+    width: 10px; top: 0px;
+    animation-delay: 0s;
+}
+.speed-line:nth-child(2) {
+    width: 12px; top: 6px;
+    animation-delay: 0.13s;
+}
+.speed-line:nth-child(3) {
+    width: 8px; top: 12px;
+    animation-delay: 0.26s;
+}
+
+@keyframes speedLineMove {
+    0%   { opacity: 0.8; transform: translateX(0); width: 10px; }
+    50%  { opacity: 0.5; transform: translateX(-6px); width: 14px; }
+    100% { opacity: 0; transform: translateX(-14px); width: 4px; }
+}
+
+/* === BENDERA MERAH PUTIH 🇮🇩 WAVING === */
+.nailong-flag-pole {
+    position: absolute;
+    top: 8px;
+    right: -8px;
+    display: flex;
+    align-items: flex-start;
+    animation: nailongFlagWave 0.5s infinite alternate ease-in-out;
+    transform-origin: bottom center;
 }
 
 @keyframes nailongFlagWave {
-    0% { transform: rotate(8deg); }
-    100% { transform: rotate(18deg); }
+    0%   { transform: rotate(5deg); }
+    100% { transform: rotate(20deg); }
+}
+
+/* === IKAT KEPALA MERAH PUTIH === */
+.nailong-headband {
+    position: absolute;
+    top: 4px;
+    left: 10px;
+    right: 10px;
+    height: 4.5px;
+    background: linear-gradient(180deg, #DC2626 50%, #FFFFFF 50%);
+    border-radius: 2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transform: rotate(-4deg);
+}
+
+/* === VICTORY CELEBRATION ANIMATION === */
+.nailong-victory-float {
+    animation: nailongVictoryFloat 1.6s infinite ease-in-out;
+}
+
+@keyframes nailongVictoryFloat {
+    0%   { transform: translateY(0px) scale(1) rotate(0deg); }
+    20%  { transform: translateY(-8px) scale(1.06) rotate(2deg); }
+    40%  { transform: translateY(-5px) scale(1.03) rotate(-1deg); }
+    60%  { transform: translateY(-10px) scale(1.08) rotate(3deg); }
+    80%  { transform: translateY(-3px) scale(1.02) rotate(-2deg); }
+    100% { transform: translateY(0px) scale(1) rotate(0deg); }
+}
+
+.nailong-trophy-icon {
+    position: absolute;
+    top: -14px;
+    right: -12px;
+    font-size: 22px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    animation: trophyBounce 0.7s infinite alternate ease-in-out;
 }
 
 @keyframes trophyBounce {
-    0% { transform: translateY(0px) scale(1); }
-    100% { transform: translateY(-4px) scale(1.1); }
+    0%   { transform: translateY(0px) scale(1) rotate(-5deg); }
+    100% { transform: translateY(-6px) scale(1.15) rotate(8deg); }
+}
+
+.nailong-money-icon {
+    position: absolute;
+    bottom: -2px;
+    left: -10px;
+    font-size: 16px;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.4));
+    animation: moneyBagWiggle 1.2s infinite ease-in-out;
+}
+
+@keyframes moneyBagWiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25%  { transform: rotate(-8deg) scale(1.05); }
+    75%  { transform: rotate(8deg) scale(1.05); }
+}
+
+/* === VICTORY SPARKLE PARTICLES === */
+.nailong-sparkles {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    pointer-events: none;
+}
+
+.sparkle-dot {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    animation: sparkleFloat 1.4s infinite ease-in-out;
+}
+
+.sparkle-dot:nth-child(1) {
+    background: #FCD34D; top: 0; left: 20%;
+    animation-delay: 0s;
+}
+.sparkle-dot:nth-child(2) {
+    background: #DC2626; top: 30%; right: 0;
+    animation-delay: 0.3s;
+}
+.sparkle-dot:nth-child(3) {
+    background: #FFFFFF; bottom: 10%; left: 10%;
+    animation-delay: 0.6s;
+}
+.sparkle-dot:nth-child(4) {
+    background: #F59E0B; top: 15%; left: 60%;
+    animation-delay: 0.9s;
+}
+
+@keyframes sparkleFloat {
+    0%   { opacity: 0; transform: scale(0) translateY(0); }
+    30%  { opacity: 1; transform: scale(1.2) translateY(-4px); }
+    70%  { opacity: 0.6; transform: scale(0.8) translateY(-8px); }
+    100% { opacity: 0; transform: scale(0) translateY(-12px); }
+}
+
+/* === NAILONG JOY SPIN (click reaction) === */
+@keyframes nailongJoySpin {
+    0%   { transform: rotate(0deg) scale(1); }
+    25%  { transform: rotate(15deg) scale(1.15); }
+    50%  { transform: rotate(-10deg) scale(1.1); }
+    75%  { transform: rotate(360deg) scale(1.2); }
+    100% { transform: rotate(360deg) scale(1); }
 }
 
 .ranking-widget-card {
@@ -875,42 +1020,59 @@ function positionMascotRunners(chart) {
         };
 
         if (isFinished) {
-            // STATE 2: GAMBAR 2 3D PNG NAILONG VICTORY SELEBRASI NGANGKAT PIALA 🏆 (Target 200 Juta Finish!)
+            // STATE 2: NAILONG VICTORY 🏆 SELEBRASI NGANGKAT PIALA (Target 200 Juta Finish!)
             runnerDiv.innerHTML = `
-                <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-                    <span class="nailong-rank-tag" style="top: -22px; left: 50%; transform: translateX(-50%); font-size: 13px;">🏆 #1</span>
-                    <div class="nailong-body-wrap" style="animation: nailongJoySpin 1.8s infinite ease-in-out; position: relative;">
-                        <!-- GAMBAR 2 3D DRAGON PNG -->
-                        <img src="assets/nailong_gambar2_3d.png?v=<?= time() ?>" class="nailong-3d-gambar2" alt="Nailong 3D Victory 🏆" />
-                        
-                        <!-- GOLDEN TROPHY 🏆 #1 HELD UP HIGH -->
-                        <div style="position: absolute; top: -12px; right: -10px; font-size: 22px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); animation: trophyBounce 0.8s infinite alternate ease-in-out;">🏆</div>
-                        <!-- MONEY BAG 💰 NEXT TO FEET -->
-                        <div style="position: absolute; bottom: -2px; left: -8px; font-size: 16px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.4));">💰</div>
-                        
-                        <!-- IKAT KEPALA MERAH PUTIH 🇮🇩 OVERLAY -->
-                        <div style="position: absolute; top: 5px; left: 8px; right: 8px; height: 4.5px; background: linear-gradient(180deg, #DC2626 50%, #FFFFFF 50%); border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transform: rotate(-4deg);"></div>
+                <div class="nailong-run-wrapper">
+                    ${medalBadge ? `<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge} 🏆</span>` : '<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">🏆</span>'}
+                    <div class="nailong-victory-float" style="position: relative;">
+                        <!-- SPARKLE PARTICLES -->
+                        <div class="nailong-sparkles">
+                            <div class="sparkle-dot"></div>
+                            <div class="sparkle-dot"></div>
+                            <div class="sparkle-dot"></div>
+                            <div class="sparkle-dot"></div>
+                        </div>
+                        <!-- 3D NAILONG IMAGE -->
+                        <img src="assets/nailong_gambar2_3d.png?v=<?= time() ?>" class="nailong-3d-gambar2" alt="Nailong Victory 🏆" />
+                        <!-- GOLDEN TROPHY 🏆 -->
+                        <div class="nailong-trophy-icon">🏆</div>
+                        <!-- MONEY BAG 💰 -->
+                        <div class="nailong-money-icon">💰</div>
+                        <!-- IKAT KEPALA MERAH PUTIH 🇮🇩 -->
+                        <div class="nailong-headband"></div>
                     </div>
+                    <div class="nailong-ground-shadow"></div>
                 </div>
             `;
         } else {
-            // STATE 1: GAMBAR 2 3D PNG NAILONG LARI DI TEMPAT WITH BENDERA MERAH PUTIH 🇮🇩
+            // STATE 1: NAILONG LARI DI TEMPAT 🏃 WITH BENDERA MERAH PUTIH 🇮🇩
             runnerDiv.innerHTML = `
-                <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-                    ${medalBadge ? `<span class="nailong-rank-tag" style="top: -22px; left: 50%; transform: translateX(-50%); font-size: 13px;">${medalBadge}</span>` : ''}
-                    <div class="nailong-body-wrap" style="animation: nailong3DWaddleRun 0.45s infinite ease-in-out; position: relative;">
-                        <!-- GAMBAR 2 3D DRAGON PNG -->
-                        <img src="assets/nailong_gambar2_3d.png?v=<?= time() ?>" class="nailong-3d-gambar2" alt="Nailong 3D Gambar 2 🐉" />
-                        
-                        <!-- IKAT KEPALA MERAH PUTIH 🇮🇩 OVERLAY ON GAMBAR 2 HEAD -->
-                        <div style="position: absolute; top: 5px; left: 8px; right: 8px; height: 4.5px; background: linear-gradient(180deg, #DC2626 50%, #FFFFFF 50%); border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transform: rotate(-4deg);"></div>
-                        
-                        <!-- BENDERA MERAH PUTIH 🇮🇩 WAVING IN HAND -->
-                        <div style="position: absolute; top: 10px; right: -6px; display: flex; align-items: flex-start; animation: nailongFlagWave 0.6s infinite alternate ease-in-out;">
+                <div class="nailong-run-wrapper">
+                    ${medalBadge ? `<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge}</span>` : ''}
+                    <div class="nailong-run-bounce" style="position: relative;">
+                        <!-- SPEED LINES -->
+                        <div class="nailong-speed-lines-container">
+                            <div class="speed-line"></div>
+                            <div class="speed-line"></div>
+                            <div class="speed-line"></div>
+                        </div>
+                        <!-- 3D NAILONG IMAGE -->
+                        <img src="assets/nailong_gambar2_3d.png?v=<?= time() ?>" class="nailong-3d-gambar2" alt="Nailong Lari 🐉" />
+                        <!-- IKAT KEPALA MERAH PUTIH 🇮🇩 -->
+                        <div class="nailong-headband"></div>
+                        <!-- BENDERA MERAH PUTIH 🇮🇩 WAVING -->
+                        <div class="nailong-flag-pole">
                             <div style="width: 2px; height: 26px; background: #78350F; border-radius: 1px;"></div>
-                            <div style="width: 13px; height: 8.5px; background: linear-gradient(180deg, #DC2626 50%, #FFFFFF 50%); border-radius: 1px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 0.3px solid #CBD5E1;"></div>
+                            <div style="width: 14px; height: 9px; background: linear-gradient(180deg, #DC2626 50%, #FFFFFF 50%); border-radius: 1px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 0.3px solid #CBD5E1;"></div>
+                        </div>
+                        <!-- DUST CLOUDS -->
+                        <div class="nailong-dust-cloud">
+                            <div class="dust-puff"></div>
+                            <div class="dust-puff"></div>
+                            <div class="dust-puff"></div>
                         </div>
                     </div>
+                    <div class="nailong-ground-shadow"></div>
                 </div>
             `;
         }
