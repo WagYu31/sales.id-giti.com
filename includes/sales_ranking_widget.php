@@ -348,9 +348,10 @@ $total_sales_count = count($ranking_data);
 
 .chart-scroll-wrapper {
     position: relative;
-    max-height: 330px;
+    max-height: 360px;
     overflow-y: auto;
     overflow-x: hidden;
+    padding-top: 25px;
     padding-right: 6px;
 }
 
@@ -679,10 +680,10 @@ function renderScaledChart() {
     let slicedLabels = salesChartLabels.slice(0, limit);
     let slicedValues = values.slice(0, limit);
 
-    // Calculate dynamic height for canvas so bars never get squished
+    // Calculate dynamic height for canvas so bars and top Nailong head/speech bubble never get squished or clipped
     const container = document.getElementById('chartCanvasContainer');
-    const barHeightPx = 42;
-    const computedHeight = Math.max(280, slicedLabels.length * barHeightPx);
+    const barHeightPx = 44;
+    const computedHeight = Math.max(320, slicedLabels.length * barHeightPx + 60);
     container.style.height = `${computedHeight}px`;
 
     const ctx = document.getElementById('salesRankingChart').getContext('2d');
@@ -749,9 +750,9 @@ function renderScaledChart() {
             maintainAspectRatio: false,
             layout: {
                 padding: {
-                    right: 65,
-                    top: 10,
-                    bottom: 10
+                    right: 75,
+                    top: 55,
+                    bottom: 15
                 }
             },
             animation: {
