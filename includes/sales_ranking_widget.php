@@ -262,9 +262,9 @@ $total_sales_count = count($ranking_data);
     max-height: 46px;
     background: transparent !important;
     object-fit: contain;
-    mix-blend-mode: normal;
+    mix-blend-mode: multiply;
+    filter: contrast(115%) brightness(105%);
     display: block;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
 }
 
 .ranking-widget-card {
@@ -864,7 +864,7 @@ function positionMascotRunners(chart) {
                 <div style="position: relative; display: flex; align-items: center; justify-content: center;">
                     <span class="nailong-rank-tag" style="top: -18px; left: 50%; transform: translateX(-50%); font-size: 13px;">🏆 #1</span>
                     <div class="nailong-body-wrap" style="animation: nailongJoySpin 2s infinite ease-in-out;">
-                        <img src="assets/nailong_victory.gif" class="nailong-avatar" alt="Nailong Victory 🏆" style="width: 48px;" />
+                        <img src="assets/nailong_victory.gif?v=<?= time() ?>" class="nailong-avatar" alt="Nailong Victory 🏆" style="width: 48px;" />
                     </div>
                 </div>
             `;
@@ -874,7 +874,7 @@ function positionMascotRunners(chart) {
                 <div style="position: relative; display: flex; align-items: center; justify-content: center;">
                     ${medalBadge ? `<span class="nailong-rank-tag" style="top: -18px; left: 50%; transform: translateX(-50%); font-size: 13px;">${medalBadge}</span>` : ''}
                     <div class="nailong-body-wrap">
-                        <img src="assets/nailong_running.gif" class="nailong-avatar" alt="Nailong Running 🇮🇩" />
+                        <img src="assets/nailong_running.gif?v=<?= time() ?>" class="nailong-avatar" alt="Nailong Running 🇮🇩" />
                     </div>
                 </div>
             `;
