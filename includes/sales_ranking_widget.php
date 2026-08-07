@@ -1,6 +1,6 @@
 <?php
 /**
- * GRAFIK RANKING & LEADERBOARD SALES WIDGET
+ * GRAFIK RANKING & LEADERBOARD SALES WIDGET - SCALABLE FOR 100+ SALES
  * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
  */
 
@@ -51,9 +51,10 @@ foreach ($ranking_data as $rd) {
 $top1 = $ranking_data[0] ?? null;
 $top2 = $ranking_data[1] ?? null;
 $top3 = $ranking_data[2] ?? null;
+$total_sales_count = count($ranking_data);
 ?>
 
-<!-- 3D SPATIAL SALES RANKING LEADERBOARD WIDGET -->
+<!-- 3D SPATIAL SALES RANKING LEADERBOARD WIDGET (SCALABLE 100+ SALES) -->
 <style>
 .ranking-widget-card {
     background: #FFFFFF;
@@ -124,10 +125,21 @@ $top3 = $ranking_data[2] ?? null;
 .podium-rank-badge.silver { background: linear-gradient(135deg, #94A3B8, #64748B); }
 .podium-rank-badge.bronze { background: linear-gradient(135deg, #D97706, #B45309); }
 
-.chart-container-holder {
+/* Scrollable Canvas Holder for Scalability */
+.chart-scroll-wrapper {
     position: relative;
-    height: 280px;
-    width: 100%;
+    max-height: 320px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;
+}
+
+.chart-scroll-wrapper::-webkit-scrollbar {
+    width: 5px;
+}
+.chart-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 10px;
 }
 
 .metric-btn {
@@ -146,6 +158,46 @@ $top3 = $ranking_data[2] ?? null;
     background: #2563EB;
     color: #FFFFFF;
     border-color: #2563EB;
+}
+
+.top-limit-btn {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    border: 1px solid #CBD5E1;
+    background: #FFFFFF;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.top-limit-btn.active, .top-limit-btn:hover {
+    background: #0F172A;
+    color: #FFFFFF;
+    border-color: #0F172A;
+}
+
+.btn-full-leaderboard {
+    background: #F1F5F9;
+    color: #0F172A;
+    border: 1.5px solid #CBD5E1;
+    font-weight: 700;
+    font-size: 12.5px;
+    padding: 7px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.btn-full-leaderboard:hover {
+    background: #0F172A;
+    color: #FFFFFF;
+    border-color: #0F172A;
 }
 </style>
 
@@ -175,6 +227,9 @@ $top3 = $ranking_data[2] ?? null;
             </button>
             <button type="button" class="metric-btn" id="btnMetricCustomer" onclick="switchChartMetric('customer')">
                 👥 Customer di-FU
+            </button>
+            <button type="button" class="btn-full-leaderboard ms-1" data-bs-toggle="modal" data-bs-target="#fullLeaderboardModal">
+                📋 Full Leaderboard (<?php echo $total_sales_count; ?> Sales)
             </button>
         </div>
     </div>
@@ -263,16 +318,88 @@ $top3 = $ranking_data[2] ?? null;
             <?php endif; ?>
         </div>
 
-        <!-- Right Side: Interactive Chart.js Graphic -->
+        <!-- Right Side: Interactive & Scalable Chart.js Graphic -->
         <div class="col-lg-7 col-12">
             <div class="p-3.5 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between">
-                <div class="d-flex justify-content-between align-items-center mb-2 px-2">
+                <div class="d-flex justify-content-between align-items-center mb-2 px-2 flex-wrap gap-2">
                     <span class="fw-bold text-dark" style="font-size: 14px;" id="chartTitle">📊 Ranking Sales (Sudah FU Invoice)</span>
-                    <small class="text-muted" style="font-size: 12px;">Sesuai Laporan Invoice FU</small>
+                    <div class="d-flex align-items-center gap-1.5">
+                        <span class="text-muted fw-semibold" style="font-size: 11px;">Tampilkan:</span>
+                        <button type="button" class="top-limit-btn" onclick="setTopLimit(5, this)">Top 5</button>
+                        <button type="button" class="top-limit-btn active" onclick="setTopLimit(10, this)">Top 10</button>
+                        <button type="button" class="top-limit-btn" onclick="setTopLimit(20, this)">Top 20</button>
+                        <button type="button" class="top-limit-btn" onclick="setTopLimit('all', this)">Semua (<?php echo $total_sales_count; ?>)</button>
+                    </div>
                 </div>
-                <div class="chart-container-holder">
-                    <canvas id="salesRankingChart"></canvas>
+
+                <!-- Scrollable Wrapper ensuring optimal bar height even with 100+ sales -->
+                <div class="chart-scroll-wrapper">
+                    <div id="chartCanvasContainer" style="position: relative; height: 280px; width: 100%;">
+                        <canvas id="salesRankingChart"></canvas>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FULL LEADERBOARD MODAL FOR 100+ SALES -->
+<div class="modal fade" id="fullLeaderboardModal" tabindex="-1" aria-labelledby="fullLeaderboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+            <div class="modal-header bg-dark text-white py-3.5 px-4">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="fullLeaderboardModalLabel" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                    🏆 Full Leaderboard Performa Tim Sales (<?php echo $total_sales_count; ?> Sales Rep)
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <div class="mb-3">
+                    <input type="text" id="modalSearchSales" class="form-control rounded-pill ps-4" placeholder="Cari nama sales rep..." style="font-size: 13.5px;" onkeyup="filterModalSalesTable()">
+                </div>
+                <div class="table-responsive bg-white rounded-3 border shadow-sm">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="py-3 px-3 text-center" style="font-size: 12px;">RANK</th>
+                                <th class="py-3 px-3" style="font-size: 12px;">NAMA SALES REPRESENTATIVE</th>
+                                <th class="py-3 px-3 text-end" style="font-size: 12px;">SUDAH FU INVOICE</th>
+                                <th class="py-3 px-3 text-end" style="font-size: 12px;">TOTAL ACTIVITY FU</th>
+                                <th class="py-3 px-3 text-end" style="font-size: 12px;">CUSTOMER DI-FU</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalLeaderboardTableBody">
+                            <?php foreach ($ranking_data as $idx => $s): ?>
+                                <?php
+                                $rank = $idx + 1;
+                                $rankBadge = "<span class='badge bg-light text-dark border px-2.5 py-1 fw-bold'>#{$rank}</span>";
+                                if ($rank == 1) $rankBadge = "<span class='badge bg-warning text-dark fw-bold px-2.5 py-1'>🥇 #1</span>";
+                                elseif ($rank == 2) $rankBadge = "<span class='badge bg-secondary text-white fw-bold px-2.5 py-1'>🥈 #2</span>";
+                                elseif ($rank == 3) $rankBadge = "<span class='badge bg-danger bg-opacity-75 text-white fw-bold px-2.5 py-1'>🥉 #3</span>";
+                                ?>
+                                <tr class="modal-sales-row">
+                                    <td class="text-center px-3"><?php echo $rankBadge; ?></td>
+                                    <td class="px-3 fw-bold text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                        <?php echo htmlspecialchars($s['nama_sales']); ?>
+                                    </td>
+                                    <td class="text-end px-3 font-monospace fw-bold text-success" style="font-size: 14px;">
+                                        <?php echo number_format($s['count_sudah_inv_fu'], 0, ',', '.'); ?>
+                                    </td>
+                                    <td class="text-end px-3 font-monospace fw-bold text-primary" style="font-size: 14px;">
+                                        <?php echo number_format($s['total_fu'], 0, ',', '.'); ?>
+                                    </td>
+                                    <td class="text-end px-3 font-monospace fw-bold text-secondary" style="font-size: 14px;">
+                                        <?php echo number_format($s['total_customer_fu'], 0, ',', '.'); ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer bg-white border-top py-2.5 px-4 justify-content-between">
+                <span class="text-muted" style="font-size: 12.5px;">Data diperbarui secara realtime dari database</span>
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -280,6 +407,8 @@ $top3 = $ranking_data[2] ?? null;
 
 <script>
 let salesChartInstance = null;
+let currentMetric = 'inv_sudah';
+let currentTopLimit = 10;
 
 const salesChartLabels = <?php echo json_encode($chart_labels); ?>;
 const salesChartInvSudah = <?php echo json_encode($chart_sudah_inv_fu); ?>;
@@ -291,10 +420,28 @@ const top2Data = <?php echo json_encode($top2); ?>;
 const top3Data = <?php echo json_encode($top3); ?>;
 
 document.addEventListener("DOMContentLoaded", function() {
-    initSalesRankingChart(salesChartInvSudah, "Sudah FU Invoice");
+    renderScaledChart();
 });
 
-function initSalesRankingChart(dataValues, datasetLabel) {
+function getActiveDatasetValues() {
+    if (currentMetric === 'inv_sudah') return { values: salesChartInvSudah, label: "Sudah FU Invoice" };
+    if (currentMetric === 'total') return { values: salesChartTotalFU, label: "Total Activity FU" };
+    return { values: salesChartCustomerFU, label: "Customer di-FU" };
+}
+
+function renderScaledChart() {
+    const { values, label } = getActiveDatasetValues();
+    
+    let limit = currentTopLimit === 'all' ? values.length : parseInt(currentTopLimit);
+    let slicedLabels = salesChartLabels.slice(0, limit);
+    let slicedValues = values.slice(0, limit);
+
+    // Calculate dynamic height for canvas so bars never get squished
+    const container = document.getElementById('chartCanvasContainer');
+    const barHeightPx = 36;
+    const computedHeight = Math.max(280, slicedLabels.length * barHeightPx);
+    container.style.height = `${computedHeight}px`;
+
     const ctx = document.getElementById('salesRankingChart').getContext('2d');
     
     if (salesChartInstance) {
@@ -304,10 +451,10 @@ function initSalesRankingChart(dataValues, datasetLabel) {
     salesChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: salesChartLabels,
+            labels: slicedLabels,
             datasets: [{
-                label: datasetLabel,
-                data: dataValues,
+                label: label,
+                data: slicedValues,
                 backgroundColor: [
                     'rgba(245, 158, 11, 0.85)',
                     'rgba(148, 163, 184, 0.85)',
@@ -324,7 +471,8 @@ function initSalesRankingChart(dataValues, datasetLabel) {
                 ],
                 borderWidth: 1.5,
                 borderRadius: 8,
-                barPercentage: 0.6
+                barThickness: 22,
+                maxBarThickness: 26
             }]
         },
         options: {
@@ -355,7 +503,16 @@ function initSalesRankingChart(dataValues, datasetLabel) {
     });
 }
 
+function setTopLimit(limit, btn) {
+    currentTopLimit = limit;
+    const buttons = document.querySelectorAll('.top-limit-btn');
+    buttons.forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderScaledChart();
+}
+
 function switchChartMetric(type) {
+    currentMetric = type;
     const btnInvSudah = document.getElementById('btnMetricInvSudah');
     const btnTotal = document.getElementById('btnMetricTotal');
     const btnCustomer = document.getElementById('btnMetricCustomer');
@@ -381,7 +538,6 @@ function switchChartMetric(type) {
         if (p2Lbl) p2Lbl.innerText = 'Sudah FU Invoice';
         if (p3Val && top3Data) p3Val.innerText = top3Data.count_sudah_inv_fu;
         if (p3Lbl) p3Lbl.innerText = 'Sudah FU Invoice';
-        initSalesRankingChart(salesChartInvSudah, "Sudah FU Invoice");
     } else if (type === 'total') {
         btnTotal.classList.add('active');
         if (chartTitle) chartTitle.innerText = '📊 Ranking Sales (Total Activity FU)';
@@ -391,7 +547,6 @@ function switchChartMetric(type) {
         if (p2Lbl) p2Lbl.innerText = 'Total Activity FU';
         if (p3Val && top3Data) p3Val.innerText = top3Data.total_fu;
         if (p3Lbl) p3Lbl.innerText = 'Total Activity FU';
-        initSalesRankingChart(salesChartTotalFU, "Total Activity FU");
     } else {
         btnCustomer.classList.add('active');
         if (chartTitle) chartTitle.innerText = '📊 Ranking Sales (Customer di-FU)';
@@ -401,7 +556,20 @@ function switchChartMetric(type) {
         if (p2Lbl) p2Lbl.innerText = 'Customer di-FU';
         if (p3Val && top3Data) p3Val.innerText = top3Data.total_customer_fu;
         if (p3Lbl) p3Lbl.innerText = 'Customer di-FU';
-        initSalesRankingChart(salesChartCustomerFU, "Customer di-FU");
     }
+    renderScaledChart();
+}
+
+function filterModalSalesTable() {
+    const input = document.getElementById('modalSearchSales').value.toLowerCase();
+    const rows = document.querySelectorAll('#modalLeaderboardTableBody tr.modal-sales-row');
+    rows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        if (text.includes(input)) {
+            r.style.display = "";
+        } else {
+            r.style.display = "none";
+        }
+    });
 }
 </script>
