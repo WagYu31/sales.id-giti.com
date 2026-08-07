@@ -42,6 +42,7 @@ $sql = "
         fu_invoice.id,
         fu_invoice.tgl_follow_up,
         fu_invoice.no_inv,
+        fu_invoice.nominal_invoice,
         fu_invoice.sales_id,
         c.id AS customer_id,
         c.nama_toko,
@@ -400,6 +401,9 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                             <?php echo create_sort_link_fu('no_inv', 'No. Invoice', $sort_by, $sort_dir); ?>
                         </th>
                         <th class="py-3 px-3 text-secondary" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                            NOMINAL INVOICE (RP)
+                        </th>
+                        <th class="py-3 px-3 text-secondary" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">
                             <?php echo create_sort_link_fu('nama_toko', 'Nama Toko / Klien', $sort_by, $sort_dir); ?>
                         </th>
                         <th class="py-3 px-3 text-secondary" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">
@@ -440,6 +444,11 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                                 <td class="px-3">
                                     <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-2 font-monospace" style="font-size: 13px; font-weight: 700;">
                                         <?php echo htmlspecialchars($fu['no_inv']); ?>
+                                    </span>
+                                </td>
+                                <td class="px-3">
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success font-monospace px-3 py-1.5 rounded-pill" style="font-size: 13px; font-weight: 800;">
+                                        Rp <?php echo number_format((float)($fu['nominal_invoice'] ?? 0), 0, ',', '.'); ?>
                                     </span>
                                 </td>
                                 <td class="px-3">

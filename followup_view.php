@@ -149,7 +149,16 @@ $followups_result = $stmt_fu->get_result();
                                     endfor; ?>
                                 </td>
                                 <td>
-                                    <?php echo nl2br(htmlspecialchars($fu['no_inv'])); ?>
+                                    <?php if (!empty($fu['no_inv'])): ?>
+                                        <div class="fw-bold text-dark"><?php echo htmlspecialchars($fu['no_inv']); ?></div>
+                                    <?php endif; ?>
+                                    <?php if (isset($fu['nominal_invoice']) && (float)$fu['nominal_invoice'] > 0): ?>
+                                        <div class="badge bg-success bg-opacity-10 text-success border border-success font-monospace px-2.5 py-1 mt-1" style="font-size: 12px; font-weight: 800;">
+                                            Rp <?php echo number_format($fu['nominal_invoice'], 0, ',', '.'); ?>
+                                        </div>
+                                    <?php elseif (empty($fu['no_inv'])): ?>
+                                        <span class="text-muted" style="font-size: 11.5px;">-</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php if ($_SESSION['role'] == 'superadmin' || (isset($fu['sales_id']) && $_SESSION['user_id'] == $fu['sales_id'])): ?>
