@@ -307,6 +307,7 @@ if ($_SESSION['role'] !== 'sales') {
 </div>
 
 <?php include 'includes/announcement_widget.php'; ?>
+<?php include 'includes/bonus_competition_widget.php'; ?>
 <?php include 'includes/sales_ranking_widget.php'; ?>
 
 <!-- SECTION 1: COLLAPSIBLE FORUM Q&A ACCORDION -->
