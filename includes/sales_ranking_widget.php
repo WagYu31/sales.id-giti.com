@@ -256,6 +256,17 @@ $total_sales_count = count($ranking_data);
     100% { opacity: 1; }
 }
 
+.nailong-avatar {
+    width: 44px;
+    height: auto;
+    max-height: 46px;
+    background: transparent !important;
+    object-fit: contain;
+    mix-blend-mode: normal;
+    display: block;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+}
+
 .ranking-widget-card {
     background: #FFFFFF;
     border-radius: 26px;
@@ -851,9 +862,9 @@ function positionMascotRunners(chart) {
             // STATE 2: VICTORY SELEBRASI NGANGKAT PIALA 🏆 (Target 200 Juta Finish!)
             runnerDiv.innerHTML = `
                 <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-                    <span class="nailong-rank-tag" style="top: -20px; left: 50%; transform: translateX(-50%); font-size: 14px;">🏆 #1</span>
+                    <span class="nailong-rank-tag" style="top: -18px; left: 50%; transform: translateX(-50%); font-size: 13px;">🏆 #1</span>
                     <div class="nailong-body-wrap" style="animation: nailongJoySpin 2s infinite ease-in-out;">
-                        <img src="assets/nailong_victory.gif" alt="Nailong Victory 🏆" style="height: 56px; width: auto; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5));" />
+                        <img src="assets/nailong_victory.gif" class="nailong-avatar" alt="Nailong Victory 🏆" style="width: 48px;" />
                     </div>
                 </div>
             `;
@@ -861,9 +872,9 @@ function positionMascotRunners(chart) {
             // STATE 1: RUNNING IN PLACE WITH BENDERA MERAH PUTIH 🇮🇩 & SUNGLASSES 🕶️
             runnerDiv.innerHTML = `
                 <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-                    ${medalBadge ? `<span class="nailong-rank-tag" style="top: -20px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge}</span>` : ''}
+                    ${medalBadge ? `<span class="nailong-rank-tag" style="top: -18px; left: 50%; transform: translateX(-50%); font-size: 13px;">${medalBadge}</span>` : ''}
                     <div class="nailong-body-wrap">
-                        <img src="assets/nailong_running.gif" alt="Nailong Running 🇮🇩" style="height: 50px; width: auto; object-fit: contain; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4));" />
+                        <img src="assets/nailong_running.gif" class="nailong-avatar" alt="Nailong Running 🇮🇩" />
                     </div>
                 </div>
             `;
