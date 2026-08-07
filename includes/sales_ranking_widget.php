@@ -186,40 +186,40 @@ $total_sales_count = count($ranking_data);
 
 .nailong-svg {
     filter: drop-shadow(0 6px 14px rgba(245, 158, 11, 0.4));
-    animation: nailongEnergeticRun 0.24s infinite alternate cubic-bezier(0.4, 0, 0.6, 1);
+    animation: nailongSmoothWaddle 0.55s infinite alternate ease-in-out;
 }
 
 .nailong-head-group {
     transform-origin: 23px 16px;
-    animation: nailongHeadBob 0.24s infinite alternate ease-in-out;
+    animation: nailongHeadBob 0.55s infinite alternate ease-in-out;
 }
 
 .nailong-leg-left {
     transform-origin: 15px 42px;
-    animation: nailongLegSprintLeft 0.24s infinite alternate ease-in-out;
+    animation: nailongLegRunLeft 0.55s infinite alternate ease-in-out;
 }
 
 .nailong-leg-right {
     transform-origin: 29px 42px;
-    animation: nailongLegSprintRight 0.24s infinite alternate ease-in-out;
+    animation: nailongLegRunRight 0.55s infinite alternate ease-in-out;
 }
 
 .nailong-arm-left {
     transform-origin: 12px 25px;
-    animation: nailongArmSprintLeft 0.24s infinite alternate ease-in-out;
+    animation: nailongArmRunLeft 0.55s infinite alternate ease-in-out;
 }
 
 .nailong-arm-right {
     transform-origin: 32px 25px;
-    animation: nailongArmSprintRight 0.24s infinite alternate ease-in-out;
+    animation: nailongArmRunRight 0.55s infinite alternate ease-in-out;
 }
 
 .cctv-rec-dot {
-    animation: recBlink 0.5s infinite alternate;
+    animation: recBlink 0.8s infinite alternate;
 }
 
 .nailong-speed-lines line {
-    animation: speedLinePuff 0.18s infinite linear;
+    animation: speedLinePuff 0.4s infinite linear;
 }
 
 .nailong-rank-tag {
@@ -232,34 +232,34 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-@keyframes nailongEnergeticRun {
-    0% { transform: translateY(0px) rotate(-10deg) scale(0.98); }
-    100% { transform: translateY(-7px) rotate(8deg) scale(1.05); }
+@keyframes nailongSmoothWaddle {
+    0% { transform: translateY(0px) rotate(-4deg); }
+    100% { transform: translateY(-4px) rotate(4deg); }
 }
 
 @keyframes nailongHeadBob {
-    0% { transform: rotate(-6deg); }
-    100% { transform: rotate(10deg); }
+    0% { transform: rotate(-3deg); }
+    100% { transform: rotate(4deg); }
 }
 
-@keyframes nailongLegSprintLeft {
-    0% { transform: rotate(-65deg) scaleY(0.8); }
-    100% { transform: rotate(65deg) scaleY(1.25); }
+@keyframes nailongLegRunLeft {
+    0% { transform: rotate(-35deg) scaleY(0.9); }
+    100% { transform: rotate(35deg) scaleY(1.1); }
 }
 
-@keyframes nailongLegSprintRight {
-    0% { transform: rotate(65deg) scaleY(1.25); }
-    100% { transform: rotate(-65deg) scaleY(0.8); }
+@keyframes nailongLegRunRight {
+    0% { transform: rotate(35deg) scaleY(1.1); }
+    100% { transform: rotate(-35deg) scaleY(0.9); }
 }
 
-@keyframes nailongArmSprintLeft {
-    0% { transform: rotate(-55deg); }
-    100% { transform: rotate(55deg); }
+@keyframes nailongArmRunLeft {
+    0% { transform: rotate(-30deg); }
+    100% { transform: rotate(30deg); }
 }
 
-@keyframes nailongArmSprintRight {
-    0% { transform: rotate(55deg); }
-    100% { transform: rotate(-55deg); }
+@keyframes nailongArmRunRight {
+    0% { transform: rotate(30deg); }
+    100% { transform: rotate(-30deg); }
 }
 
 @keyframes speedLinePuff {
