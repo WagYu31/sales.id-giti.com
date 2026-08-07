@@ -180,7 +180,32 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-/* === NAILONG 3D IMAGE === */
+/* === NAILONG 3D SPRITE SHEET ANIMATION === */
+/* Sprite sheet: 1024x1024, 3 columns x 2 rows = 6 frames */
+/* Each frame: 341.33 x 512 px. Display at 52x78px */
+.nailong-sprite {
+    width: 52px;
+    height: 78px;
+    background-image: url('assets/nailong_spritesheet.png?v=<?= time() ?>');
+    background-size: 156px 156px; /* 52*3=156, 78*2=156 */
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    animation: nailongSpriteRun 0.5s steps(1) infinite;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+@keyframes nailongSpriteRun {
+    0%      { background-position: 0px 0px; }      /* Frame 1 */
+    16.66%  { background-position: -52px 0px; }     /* Frame 2 */
+    33.33%  { background-position: -104px 0px; }    /* Frame 3 */
+    50%     { background-position: 0px -78px; }     /* Frame 4 */
+    66.66%  { background-position: -52px -78px; }   /* Frame 5 */
+    83.33%  { background-position: -104px -78px; }  /* Frame 6 */
+    100%    { background-position: 0px 0px; }       /* Loop back */
+}
+
+/* Static single image fallback for victory */
 .nailong-3d-gambar2 {
     width: 52px;
     height: auto;
@@ -189,24 +214,22 @@ $total_sales_count = count($ranking_data);
     display: block;
 }
 
-/* === RUNNING ANIMATION: Dynamic Bounce + Lean + Squash-Stretch === */
+/* === RUNNING WRAPPER === */
 .nailong-run-wrapper {
     position: relative;
     display: inline-block;
 }
 
 .nailong-run-bounce {
-    animation: nailongRunBounce 0.35s infinite ease-in-out;
+    animation: nailongRunBounce 0.5s infinite ease-in-out;
 }
 
 @keyframes nailongRunBounce {
-    0%   { transform: translateY(0px) rotate(-3deg) scaleX(1) scaleY(1); }
-    15%  { transform: translateY(-8px) rotate(-1deg) scaleX(0.96) scaleY(1.06); }
-    30%  { transform: translateY(-10px) rotate(1deg) scaleX(0.94) scaleY(1.08); }
-    50%  { transform: translateY(-4px) rotate(3deg) scaleX(1.02) scaleY(0.97); }
-    65%  { transform: translateY(1px) rotate(2deg) scaleX(1.04) scaleY(0.95); }
-    80%  { transform: translateY(-6px) rotate(-2deg) scaleX(0.97) scaleY(1.04); }
-    100% { transform: translateY(0px) rotate(-3deg) scaleX(1) scaleY(1); }
+    0%   { transform: translateY(0px) rotate(-2deg); }
+    25%  { transform: translateY(-5px) rotate(0deg); }
+    50%  { transform: translateY(-2px) rotate(2deg); }
+    75%  { transform: translateY(-5px) rotate(0deg); }
+    100% { transform: translateY(0px) rotate(-2deg); }
 }
 
 /* === GROUND SHADOW that pulses with bounce === */
@@ -1045,7 +1068,7 @@ function positionMascotRunners(chart) {
                 </div>
             `;
         } else {
-            // STATE 1: NAILONG LARI DI TEMPAT 🏃 WITH BENDERA MERAH PUTIH 🇮🇩
+            // STATE 1: NAILONG LARI DI TEMPAT 🏃 WITH SPRITE SHEET ANIMATION + BENDERA 🇮🇩
             runnerDiv.innerHTML = `
                 <div class="nailong-run-wrapper">
                     ${medalBadge ? `<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge}</span>` : ''}
@@ -1056,10 +1079,8 @@ function positionMascotRunners(chart) {
                             <div class="speed-line"></div>
                             <div class="speed-line"></div>
                         </div>
-                        <!-- 3D NAILONG IMAGE -->
-                        <img src="assets/nailong_gambar2_3d.png?v=<?= time() ?>" class="nailong-3d-gambar2" alt="Nailong Lari 🐉" />
-                        <!-- IKAT KEPALA MERAH PUTIH 🇮🇩 -->
-                        <div class="nailong-headband"></div>
+                        <!-- NAILONG SPRITE SHEET ANIMATED (tangan & kaki gerak!) -->
+                        <div class="nailong-sprite"></div>
                         <!-- BENDERA MERAH PUTIH 🇮🇩 WAVING -->
                         <div class="nailong-flag-pole">
                             <div style="width: 2px; height: 26px; background: #78350F; border-radius: 1px;"></div>
