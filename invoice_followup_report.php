@@ -465,8 +465,11 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                                     </span>
                                 </td>
                                 <td class="px-4 text-end">
+                                    <a href="followup_edit.php?id=<?php echo $fu['id']; ?>&redirect=<?php echo urlencode('invoice_followup_report.php'); ?>" class="btn btn-sm btn-outline-primary rounded-pill me-1" title="Edit Follow Up & Nominal Invoice" style="font-size: 12px; font-weight: 700; padding: 5px 12px;">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
                                     <a href="followup_view.php?customer_id=<?php echo $fu['customer_id']; ?>" target="_blank" class="btn-detail-fu" title="Lihat Riwayat Follow Up Customer">
-                                        <i class="bi bi-eye-fill"></i> Detail Follow Up
+                                        <i class="bi bi-eye-fill"></i> Detail
                                     </a>
                                 </td>
                             </tr>

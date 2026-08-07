@@ -162,6 +162,9 @@ $followups_result = $stmt_fu->get_result();
                                 </td>
                                 <td>
                                     <?php if ($_SESSION['role'] == 'superadmin' || (isset($fu['sales_id']) && $_SESSION['user_id'] == $fu['sales_id'])): ?>
+                                        <a href="followup_edit.php?id=<?php echo $fu['id']; ?>&redirect=<?php echo urlencode('followup_view.php?customer_id=' . $customer_id); ?>" class="btn btn-sm btn-outline-primary me-1" title="Edit Follow Up & Nominal Invoice">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
                                         <button class="btn btn-sm btn-outline-danger delete-followup-btn" data-followup-id="<?php echo $fu['id']; ?>" title="Hapus Follow Up">
                                             <i class="bi bi-trash"></i>
                                         </button>
