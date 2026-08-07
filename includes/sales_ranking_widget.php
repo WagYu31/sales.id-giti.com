@@ -702,6 +702,13 @@ function renderScaledChart() {
     gradientBronze.addColorStop(0, '#F97316');
     gradientBronze.addColorStop(1, '#FB923C');
 
+    // Compute dynamic max for scale so bars and runners span beautifully across the track
+    const maxVal = Math.max(...slicedValues, 1);
+    let scaleMax = Math.ceil(maxVal * 1.25);
+    if (currentMetric === 'omset') {
+        scaleMax = Math.max(maxVal * 1.25, 10000000); // Dynamic Rupiah scale
+    }
+
     salesChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -726,7 +733,7 @@ function renderScaledChart() {
                 borderWidth: 1.5,
                 borderRadius: 14,
                 borderSkipped: false,
-                barThickness: 16
+                barThickness: 18
             }]
         },
         options: {
@@ -763,6 +770,8 @@ function renderScaledChart() {
             },
             scales: {
                 x: {
+                    min: 0,
+                    max: scaleMax,
                     grid: { color: 'rgba(255, 255, 255, 0.12)', lineWidth: 1 },
                     ticks: { 
                         color: '#F8FAFC', 
@@ -813,8 +822,11 @@ function positionMascotRunners(chart) {
         const runnerDiv = document.createElement('div');
         runnerDiv.className = 'cctv-mascot-runner';
         
-        // 45px width offset so mascot sits right on the edge of the bar
-        const leftPos = Math.min(barX - 18, xAxis.right - 45);
+        // 45px width offset so mascot sits right on the edge of the bar, with offset for 0 value runners
+        let leftPos = Math.min(barX - 18, xAxis.right - 45);
+        if (value === 0) {
+            leftPos = xAxis.left + 5 + (index * 4); // Stagger zero runners
+        }
         const topPos = barY - 32;
 
         runnerDiv.style.left = `${leftPos}px`;
