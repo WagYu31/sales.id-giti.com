@@ -203,11 +203,13 @@ $file_accept_types = "image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx";
                 </div>
 
                 <div class="col-md-3">
-                    <label for="nominal_invoice" class="form-label fw-bold text-success">Nominal Invoice (Rp)</label>
+                    <label for="nominal_invoice_display" class="form-label fw-bold text-success">Nominal Invoice (Rp)</label>
                     <div class="input-group">
                         <span class="input-group-text fw-bold text-success" style="border-radius:14px 0 0 14px; background:#F0FDF4;">Rp</span>
-                        <input type="number" step="0.01" class="form-control fw-bold text-success" id="nominal_invoice" name="nominal_invoice" placeholder="0" style="border-radius:0 14px 14px 0; padding: 12px 16px;">
+                        <input type="text" class="form-control fw-bold text-success" id="nominal_invoice_display" placeholder="0" style="border-radius:0 14px 14px 0; padding: 12px 16px;" oninput="formatRupiahInput(this)">
+                        <input type="hidden" name="nominal_invoice" id="nominal_invoice" value="0">
                     </div>
+                    <small class="text-muted" style="font-size: 10.5px;">*Tersusun otomatis dengan titik (.)</small>
                 </div>
             </div>
 
@@ -493,6 +495,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function formatRupiahInput(input) {
+    let raw = input.value.replace(/[^0-9]/g, '');
+    if (raw === '' || raw === '0') {
+        input.value = '';
+        document.getElementById('nominal_invoice').value = '0';
+        return;
+    }
+    const formatted = new Intl.NumberFormat('id-ID').format(raw);
+    input.value = formatted;
+    document.getElementById('nominal_invoice').value = raw;
+}
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
