@@ -834,6 +834,8 @@ function positionMascotRunners(chart) {
         runnerDiv.style.left = `${leftPos}px`;
         runnerDiv.style.top = `${topPos}px`;
         
+        const isFinished = (currentMetric === 'omset' && value >= 200000000) || (barX >= xAxis.right - 48);
+
         let medalBadge = '';
         if (index === 0) medalBadge = '🥇';
         else if (index === 1) medalBadge = '🥈';
@@ -842,100 +844,171 @@ function positionMascotRunners(chart) {
         let displayValStr = (currentMetric === 'omset') ? formatRupiahDisplay(value) : value;
 
         runnerDiv.onclick = function() {
-            triggerNailongJoySpin(runnerDiv, labelName);
+            triggerNailongJoySpin(runnerDiv, labelName, isFinished);
         };
 
-        // Interactive CCTV Camera + Dragon Mascot SVG Character (Nailong 奶龙 Edition)
-        runnerDiv.innerHTML = `
-            <div style="position: relative;">
-                ${medalBadge ? `<span class="nailong-rank-tag">${medalBadge}</span>` : ''}
-                <div class="nailong-body-wrap">
-                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Speed Lines / Wind Effects -->
-                        <g class="nailong-speed-lines" stroke="#FDE047" stroke-width="1.5" stroke-linecap="round">
-                            <line x1="2" y1="18" x2="8" y2="18" />
-                            <line x1="0" y1="26" x2="6" y2="26" />
-                            <line x1="3" y1="34" x2="9" y2="34" />
-                        </g>
+        if (isFinished) {
+            // STATE 2: VICTORY SELEBRASI NGANGKAT PIALA 🏆 (Target 200 Juta Finish!)
+            runnerDiv.innerHTML = `
+                <div style="position: relative;">
+                    <span class="nailong-rank-tag">🏆 #1</span>
+                    <div class="nailong-body-wrap" style="animation: nailongJoySpin 2s infinite ease-in-out;">
+                        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Flying Victory Confetti Stars -->
+                            <circle cx="6" cy="10" r="1.5" fill="#EF4444" />
+                            <circle cx="44" cy="8" r="1.5" fill="#3B82F6" />
+                            <circle cx="48" cy="22" r="1.5" fill="#F59E0B" />
+                            <circle cx="4" cy="30" r="1.5" fill="#10B981" />
 
-                        <!-- Tail with Cute Spike -->
-                        <path d="M 12 36 Q 4 40 8 44 Q 16 42 16 36 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
+                            <!-- Money Bag Rp next to feet -->
+                            <path d="M 6 38 Q 4 34 8 32 Q 12 30 14 34 Q 16 38 12 42 Q 8 42 6 38 Z" fill="#D97706" stroke="#92400E" stroke-width="1"/>
+                            <text x="8" y="38" font-size="6" font-weight="bold" fill="#FEF3C7">Rp</text>
+                            <!-- Gold Coins -->
+                            <circle cx="15" cy="42" r="2.5" fill="#FACC15" stroke="#CA8A04" stroke-width="0.8"/>
+                            <circle cx="18" cy="43" r="2" fill="#F59E0B" stroke="#B45309" stroke-width="0.8"/>
 
-                        <!-- Left Back Arm -->
-                        <path class="nailong-arm-left" d="M 14 26 C 10 28, 8 32, 12 33" stroke="#CA8A04" stroke-width="3" stroke-linecap="round"/>
+                            <!-- Tail -->
+                            <path d="M 16 38 Q 8 42 12 46 Q 20 44 20 38 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
 
-                        <!-- Left Back Leg -->
-                        <ellipse class="nailong-leg-left" cx="16" cy="41" rx="4" ry="3.5" fill="#EAB308" stroke="#CA8A04" stroke-width="1.2"/>
+                            <!-- Chubby Body -->
+                            <path d="M 18 24 C 18 18, 36 18, 36 24 C 38 34, 34 44, 26 44 C 18 44, 16 34, 18 24 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
 
-                        <!-- Dragon Chubby Body (Yellow Golden) -->
-                        <path d="M 14 22 C 14 16, 32 16, 32 22 C 34 32, 30 42, 22 42 C 14 42, 12 32, 14 22 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+                            <!-- Cute White Belly Patch -->
+                            <ellipse cx="27" cy="34" rx="7" ry="8" fill="#FEF9C3"/>
 
-                        <!-- Cute White Belly Patch -->
-                        <ellipse cx="23" cy="32" rx="6.5" ry="7.5" fill="#FEF9C3"/>
+                            <!-- Legs -->
+                            <ellipse cx="20" cy="43" rx="4.5" ry="4" fill="#EAB308" stroke="#CA8A04" stroke-width="1.2"/>
+                            <ellipse cx="32" cy="43" rx="5" ry="4.5" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
 
-                        <!-- Right Front Leg -->
-                        <ellipse class="nailong-leg-right" cx="28" cy="41" rx="4.5" ry="4" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
+                            <!-- Left Arm Waving Flag -->
+                            <path d="M 18 28 C 14 26, 12 22, 14 18" stroke="#CA8A04" stroke-width="3" stroke-linecap="round"/>
 
-                        <!-- Right Front Arm -->
-                        <path class="nailong-arm-right" d="M 28 26 C 34 27, 36 30, 32 32" stroke="#CA8A04" stroke-width="3.2" stroke-linecap="round"/>
+                            <!-- Head & Horns Group -->
+                            <g class="nailong-head-group">
+                                <path d="M 22 12 Q 21 6 24 8 Q 25 12 24 14 Z" fill="#F97316"/>
+                                <path d="M 30 12 Q 29 6 32 8 Q 33 12 32 14 Z" fill="#F97316"/>
 
-                        <!-- Head & Horns Group -->
-                        <g class="nailong-head-group">
-                            <!-- Cute Little Dragon Horns (Orange Amber) -->
-                            <path d="M 18 10 Q 17 4 20 6 Q 21 10 20 12 Z" fill="#F97316"/>
-                            <path d="M 26 10 Q 25 4 28 6 Q 29 10 28 12 Z" fill="#F97316"/>
+                                <circle cx="27" cy="18" r="11" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
 
-                            <!-- Big Chubby Dragon Head -->
-                            <circle cx="23" cy="16" r="11" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+                                <!-- Sunglasses Cool 🕶️ -->
+                                <path d="M 19 16 L 25 16 L 24 20 L 19 20 Z" fill="#0F172A" />
+                                <path d="M 27 16 L 33 16 L 33 20 L 28 20 Z" fill="#0F172A" />
+                                <line x1="24" y1="17" x2="28" y2="17" stroke="#0F172A" stroke-width="1.5" />
 
-                            <!-- Big Derpy Kawaii Eyes -->
-                            <circle cx="19" cy="15" r="3.2" fill="#000000"/>
-                            <circle cx="27" cy="15" r="3.2" fill="#000000"/>
-                            <circle cx="20" cy="14" r="1.1" fill="#FFFFFF"/>
-                            <circle cx="28" cy="14" r="1.1" fill="#FFFFFF"/>
+                                <!-- Rosy Blush Cheeks -->
+                                <ellipse cx="19.5" cy="21" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+                                <ellipse cx="34.5" cy="21" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
 
-                            <!-- Rosy Blush Cheeks -->
-                            <ellipse cx="15.5" cy="18" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
-                            <ellipse cx="30.5" cy="18" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+                                <!-- Big Happy DERP Victory Smile -->
+                                <path d="M 23 22 Q 27 27 31 22 Z" fill="#991B1B" stroke="#7F1D1D" stroke-width="0.8"/>
 
-                            <!-- Big Happy DERP Smile Mouth -->
-                            <path d="M 19 19 Q 23 24 27 19 Z" fill="#991B1B" stroke="#7F1D1D" stroke-width="0.8"/>
-                            <path d="M 21 20 Q 23 22 25 20 Z" fill="#F87171"/>
+                                <!-- Ikat Kepala Merah Putih 17 Agustus 🇮🇩 -->
+                                <rect x="17" y="9" width="20" height="2.2" fill="#DC2626" rx="1" />
+                                <rect x="17" y="11.2" width="20" height="2.2" fill="#FFFFFF" rx="1" stroke="#CBD5E1" stroke-width="0.3" />
+                            </g>
 
-                            <!-- Ikat Kepala Merah Putih 17 Agustus 🇮🇩 -->
-                            <rect x="13" y="7" width="20" height="2.2" fill="#DC2626" rx="1" />
-                            <rect x="13" y="9.2" width="20" height="2.2" fill="#FFFFFF" rx="1" stroke="#CBD5E1" stroke-width="0.3" />
-                            <rect x="21.5" y="6" width="3" height="6" fill="#DC2626" rx="0.5" />
-                            <rect x="21.5" y="9" width="3" height="3" fill="#FFFFFF" rx="0.5" />
-                        </g>
-
-                        <!-- Waving Indonesian Flag 🇮🇩 in Hand -->
-                        <line x1="33" y1="18" x2="33" y2="40" stroke="#78350F" stroke-width="1.6" stroke-linecap="round"/>
-                        <rect x="33" y="18" width="11" height="4.5" fill="#DC2626" rx="0.5"/>
-                        <rect x="33" y="22.5" width="11" height="4.5" fill="#FFFFFF" rx="0.5" stroke="#E2E8F0" stroke-width="0.3"/>
-
-                        <!-- CCTV Security Headset Strap & Camera Lens Mount -->
-                        <rect x="13" y="12" width="20" height="2.5" rx="1.2" fill="#1E293B"/>
-                        <circle cx="33" cy="14" r="4" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
-                        <circle cx="33" cy="14" r="1.8" fill="#38BDF8"/>
-                        <!-- CCTV Blinking Red REC Light -->
-                        <circle class="cctv-rec-dot" cx="35" cy="11" r="1.2" fill="#EF4444"/>
-                    </svg>
+                            <!-- Right Arm Lifting Golden Trophy 🏆 #1 Up High -->
+                            <path d="M 32 28 C 38 24, 42 16, 40 10" stroke="#CA8A04" stroke-width="3.5" stroke-linecap="round"/>
+                            <!-- GOLDEN TROPHY 🏆 -->
+                            <path d="M 36 4 L 46 4 L 44 12 Q 41 16 38 12 Z" fill="#F59E0B" stroke="#B45309" stroke-width="1"/>
+                            <rect x="39" y="14" width="4" height="4" fill="#D97706"/>
+                            <rect x="37" y="18" width="8" height="3" fill="#78350F" rx="0.5"/>
+                            <text x="40" y="10" font-size="5" font-weight="bold" fill="#000000">#1</text>
+                        </svg>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        } else {
+            // STATE 1: RUNNING IN PLACE WITH BENDERA MERAH PUTIH 🇮🇩 & SUNGLASSES 🕶️
+            runnerDiv.innerHTML = `
+                <div style="position: relative;">
+                    ${medalBadge ? `<span class="nailong-rank-tag">${medalBadge}</span>` : ''}
+                    <div class="nailong-body-wrap">
+                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Speed Lines / Wind Effects -->
+                            <g class="nailong-speed-lines" stroke="#FDE047" stroke-width="1.5" stroke-linecap="round">
+                                <line x1="2" y1="18" x2="8" y2="18" />
+                                <line x1="0" y1="26" x2="6" y2="26" />
+                                <line x1="3" y1="34" x2="9" y2="34" />
+                            </g>
+
+                            <!-- Tail with Cute Spike -->
+                            <path d="M 12 36 Q 4 40 8 44 Q 16 42 16 36 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
+
+                            <!-- Left Back Arm -->
+                            <path class="nailong-arm-left" d="M 14 26 C 10 28, 8 32, 12 33" stroke="#CA8A04" stroke-width="3" stroke-linecap="round"/>
+
+                            <!-- Left Back Leg -->
+                            <ellipse class="nailong-leg-left" cx="16" cy="41" rx="4" ry="3.5" fill="#EAB308" stroke="#CA8A04" stroke-width="1.2"/>
+
+                            <!-- Dragon Chubby Body (Yellow Golden) -->
+                            <path d="M 14 22 C 14 16, 32 16, 32 22 C 34 32, 30 42, 22 42 C 14 42, 12 32, 14 22 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+
+                            <!-- Cute White Belly Patch -->
+                            <ellipse cx="23" cy="32" rx="6.5" ry="7.5" fill="#FEF9C3"/>
+
+                            <!-- Right Front Leg -->
+                            <ellipse class="nailong-leg-right" cx="28" cy="41" rx="4.5" ry="4" fill="#FACC15" stroke="#CA8A04" stroke-width="1.2"/>
+
+                            <!-- Right Front Arm -->
+                            <path class="nailong-arm-right" d="M 28 26 C 34 27, 36 30, 32 32" stroke="#CA8A04" stroke-width="3.2" stroke-linecap="round"/>
+
+                            <!-- Head & Horns Group -->
+                            <g class="nailong-head-group">
+                                <!-- Cute Little Dragon Horns (Orange Amber) -->
+                                <path d="M 18 10 Q 17 4 20 6 Q 21 10 20 12 Z" fill="#F97316"/>
+                                <path d="M 26 10 Q 25 4 28 6 Q 29 10 28 12 Z" fill="#F97316"/>
+
+                                <!-- Big Chubby Dragon Head -->
+                                <circle cx="23" cy="16" r="11" fill="#FACC15" stroke="#CA8A04" stroke-width="1.5"/>
+
+                                <!-- Sunglasses Cool 🕶️ -->
+                                <path d="M 15 14 L 21 14 L 20 18 L 15 18 Z" fill="#0F172A" />
+                                <path d="M 23 14 L 29 14 L 29 18 L 24 18 Z" fill="#0F172A" />
+                                <line x1="20" y1="15" x2="24" y2="15" stroke="#0F172A" stroke-width="1.5" />
+
+                                <!-- Rosy Blush Cheeks -->
+                                <ellipse cx="15.5" cy="19" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+                                <ellipse cx="30.5" cy="19" rx="2" ry="1.2" fill="#F87171" opacity="0.85"/>
+
+                                <!-- Big Happy DERP Smile Mouth -->
+                                <path d="M 19 20 Q 23 24 27 20 Z" fill="#991B1B" stroke="#7F1D1D" stroke-width="0.8"/>
+
+                                <!-- Ikat Kepala Merah Putih 17 Agustus 🇮🇩 -->
+                                <rect x="13" y="6.5" width="20" height="2.2" fill="#DC2626" rx="1" />
+                                <rect x="13" y="8.7" width="20" height="2.2" fill="#FFFFFF" rx="1" stroke="#CBD5E1" stroke-width="0.3" />
+                                <rect x="21.5" y="5.5" width="3" height="6" fill="#DC2626" rx="0.5" />
+                                <rect x="21.5" y="8.5" width="3" height="3" fill="#FFFFFF" rx="0.5" />
+                            </g>
+
+                            <!-- Waving Indonesian Flag 🇮🇩 in Hand -->
+                            <line x1="33" y1="18" x2="33" y2="40" stroke="#78350F" stroke-width="1.6" stroke-linecap="round"/>
+                            <rect x="33" y="18" width="11" height="4.5" fill="#DC2626" rx="0.5"/>
+                            <rect x="33" y="22.5" width="11" height="4.5" fill="#FFFFFF" rx="0.5" stroke="#E2E8F0" stroke-width="0.3"/>
+
+                            <!-- CCTV Security Headset Strap & Camera Lens Mount -->
+                            <rect x="13" y="12" width="20" height="2.5" rx="1.2" fill="#1E293B"/>
+                            <circle cx="33" cy="14" r="4" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+                            <circle cx="33" cy="14" r="1.8" fill="#38BDF8"/>
+                            <!-- CCTV Blinking Red REC Light -->
+                            <circle class="cctv-rec-dot" cx="35" cy="11" r="1.2" fill="#EF4444"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+        }
 
         holder.appendChild(runnerDiv);
     });
 }
 
-function triggerNailongJoySpin(element, salesName) {
+function triggerNailongJoySpin(element, salesName, isFinished) {
     element.style.animation = 'none';
     element.offsetHeight; // trigger reflow
     element.style.animation = 'nailongJoySpin 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)';
     
     spawnFlyingPartyProps(element);
-    showMotivationSpeechBubble(element, salesName);
+    showMotivationSpeechBubble(element, salesName, isFinished);
 }
 
 function spawnFlyingPartyProps(parentElement) {
@@ -981,20 +1054,28 @@ function spawnFlyingPartyProps(parentElement) {
     }
 }
 
-function showMotivationSpeechBubble(parentElement, salesName) {
+function showMotivationSpeechBubble(parentElement, salesName, isFinished) {
     const existing = parentElement.querySelector('.nailong-speech-bubble');
     if (existing) existing.remove();
 
     const bubble = document.createElement('div');
     bubble.className = 'nailong-speech-bubble';
     
-    const quotes = [
+    let quotes = [
         `DIRGAHAYU INDONESIA! 🇮🇩 Semangat ${salesName}! 🔥💪`,
         `MERDEKA! 🇮🇩 Gas Terus ${salesName}! 🚀🏆`,
-        `17 AGUSTUS GACOR! 🇮🇩 ${salesName} Mantaap! 💰💵`,
+        `GACOR KEMERDEKAAN! 🇮🇩 ${salesName} Mantaap! 💰💵`,
         `SULTAN KEMERDEKAAN! 🇮🇩 ${salesName} 👑🌟`,
-        `JUARA LOEWIX 17 AGUSTUS! 🇮🇩 ${salesName} 💎🎉`
+        `JUARA LOEWIX! 🇮🇩 ${salesName} 💎🎉`
     ];
+
+    if (isFinished) {
+        quotes = [
+            `JUARA 1 FINISH! 🏆 🇮🇩 Omset 200 Juta ${salesName}! 🎉`,
+            `PUNCAK VICTORY! 👑 🇮🇩 ${salesName} Angkat Piala 🏆!`,
+            `SULTAN JUARA 1! 🏆 💰 Omset 200M Tuntas ${salesName}! 🇮🇩`
+        ];
+    }
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
     bubble.style.cssText = `
