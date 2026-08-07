@@ -1,6 +1,6 @@
 <?php
 /**
- * GRAFIK RANKING & LEADERBOARD SALES WIDGET - 3D SPATIAL & FULL ANIMATED EDITION
+ * GRAFIK RANKING & LEADERBOARD SALES WIDGET - 3D SPATIAL & CCTV MASCOT RUNNER EDITION
  * Menampilkan peringkat performa sales berdasarkan data Laporan Follow Up Invoice
  */
 
@@ -54,11 +54,16 @@ $top3 = $ranking_data[2] ?? null;
 $total_sales_count = count($ranking_data);
 ?>
 
-<!-- 3D SPATIAL & FULL ANIMATED SALES RANKING LEADERBOARD WIDGET -->
+<!-- 3D SPATIAL & CCTV MASCOT RUNNER EDITION -->
 <style>
 @keyframes float3DMedal {
     0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
     50% { transform: translateY(-5px) rotate(4deg) scale(1.08); }
+}
+
+@keyframes cctvRunnerBob {
+    0%, 100% { transform: translateY(0px) rotate(-3deg); }
+    50% { transform: translateY(-4px) rotate(3deg); }
 }
 
 @keyframes pulseGlowGold {
@@ -255,6 +260,20 @@ $total_sales_count = count($ranking_data);
 .pop-metric {
     animation: popMetricAnim 0.4s ease-out;
 }
+
+.cctv-mascot-runner-badge {
+    animation: cctvRunnerBob 1.8s ease-in-out infinite;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #0F172A, #1E293B);
+    color: #38BDF8;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -269,7 +288,7 @@ $total_sales_count = count($ranking_data);
             <div>
                 <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
                     Leaderboard & Grafik Ranking Sales
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800;">Sudah FU Invoice</span>
+                    <span class="cctv-mascot-runner-badge">📹🏃‍♂️ Loewix CCTV Runner</span>
                 </h5>
                 <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Peringkat sales berdasarkan total invoice yang telah berhasil di-follow up</p>
             </div>
@@ -374,7 +393,7 @@ $total_sales_count = count($ranking_data);
             <?php endif; ?>
         </div>
 
-        <!-- Right Side: Interactive & Scalable 3D Chart.js Graphic -->
+        <!-- Right Side: Interactive & Scalable 3D Chart.js Graphic with CCTV Mascot Plugin -->
         <div class="col-lg-7 col-12">
             <div class="p-3.5 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between shadow-sm">
                 <div class="d-flex justify-content-between align-items-center mb-2 px-2 flex-wrap gap-2">
@@ -474,6 +493,42 @@ const salesChartCustomerFU = <?php echo json_encode($chart_customer_fu); ?>;
 const top1Data = <?php echo json_encode($top1); ?>;
 const top2Data = <?php echo json_encode($top2); ?>;
 const top3Data = <?php echo json_encode($top3); ?>;
+
+// Custom Chart.js Plugin: CCTV-Head Cartoon Character Mascot Running on Bars
+const cctvMascotRunnerPlugin = {
+    id: 'cctvMascotRunnerPlugin',
+    afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        const meta = chart.getDatasetMeta(0);
+
+        meta.data.forEach((bar, index) => {
+            const { x, y } = bar.tooltipPosition();
+            
+            ctx.save();
+            ctx.translate(x + 10, y);
+            
+            ctx.font = 'bold 15px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            
+            if (index === 0) {
+                // Juara 1: Golden Loewix CCTV Mascot Runner with Flame & Crown
+                ctx.fillText('📹🏃‍♂️💨 🥇👑', 2, 0);
+            } else if (index === 1) {
+                // Juara 2: Silver Loewix CCTV Mascot Runner
+                ctx.fillText('📹🏃‍♂️💨 🥈', 2, 0);
+            } else if (index === 2) {
+                // Juara 3: Bronze Loewix CCTV Mascot Runner
+                ctx.fillText('📹🏃‍♂️ 🥉', 2, 0);
+            } else {
+                // Standard Loewix CCTV Mascot Runner
+                ctx.fillText('📹🏃‍♂️', 2, 0);
+            }
+            
+            ctx.restore();
+        });
+    }
+};
 
 document.addEventListener("DOMContentLoaded", function() {
     renderScaledChart();
@@ -581,7 +636,8 @@ function renderScaledChart() {
                     ticks: { font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' }, color: '#0F172A' }
                 }
             }
-        }
+        },
+        plugins: [cctvMascotRunnerPlugin]
     });
 }
 
