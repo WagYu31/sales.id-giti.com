@@ -33,4 +33,10 @@ date_default_timezone_set('Asia/Jakarta');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Auto-ensure nominal_invoice column exists in follow_ups table
+$chk_col = $conn->query("SHOW COLUMNS FROM `follow_ups` LIKE 'nominal_invoice'");
+if ($chk_col && $chk_col->num_rows === 0) {
+    $conn->query("ALTER TABLE `follow_ups` ADD COLUMN `nominal_invoice` DECIMAL(15,2) DEFAULT 0 AFTER `no_inv`");
+}
 ?>

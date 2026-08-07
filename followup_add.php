@@ -76,16 +76,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         if (empty($error)) {
             $stmt = $conn->prepare("INSERT INTO follow_ups (customer_id, sales_id, tgl_follow_up, respon, keterangan, no_inv, nominal_invoice, media1, media2, media3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("iissssdsss", $customer_id, $sales_id_fu, $tgl_follow_up, $respon, $keterangan, $no_inv, $nominal_invoice, $media_paths[0], $media_paths[1], $media_paths[2]);
             
-            if ($stmt->execute()) {
-                $_SESSION['flash_message'] = "Catatan follow up berhasil ditambahkan!";
-                header("Location: followup_view.php?customer_id=" . $customer_id);
-                exit();
-            } else {
-                $error = "Gagal menyimpan data follow up: " . $stmt->error;
+            if (!$stmt) {
+                // Auto-heal column if missing on live server
+                $conn->query("ALTER TABLE `follow_ups` ADD COLUMN `nominal_invoice` DECIMAL(15,2) DEFAULT 0 AFTER `no_inv`");
+                $stmt = $conn->prepare("INSERT INTO follow_ups (customer_id, sales_id, tgl_follow_up, respon, keterangan, no_inv, nominal_invoice, media1, media2, media3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             }
-            $stmt->close();
+
+            if ($stmt) {
+                $stmt->bind_param("iissssdsss", $customer_id, $sales_id_fu, $tgl_follow_up, $respon, $keterangan, $no_inv, $nominal_invoice, $media_paths[0], $media_paths[1], $media_paths[2]);
+                
+                if ($stmt->execute()) {
+                    $_SESSION['flash_message'] = "Catatan follow up berhasil ditambahkan!";
+                    header("Location: followup_view.php?customer_id=" . $customer_id);
+                    exit();
+                } else {
+                    $error = "Gagal menyimpan data follow up: " . $stmt->error;
+                }
+                $stmt->close();
+            } else {
+                $error = "Gagal memproses query database: " . $conn->error;
+            }
         }
     }
 }
