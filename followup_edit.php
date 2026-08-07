@@ -1,10 +1,10 @@
 <?php
+ob_start();
 /**
  * EDIT FOLLOW UP & NOMINAL INVOICE
  */
 $page_title = 'Edit Follow Up & Nominal Invoice';
 require_once 'includes/db.php';
-require_once 'includes/header.php';
 require_once 'includes/media_compressor.php';
 
 if (!isset($_GET['id'])) {
@@ -79,13 +79,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (empty($redirect_to)) {
                 $redirect_to = 'followup_view.php?customer_id=' . $customer_id;
             }
-            header("Location: " . $redirect_to);
+            if (!headers_sent()) {
+                header("Location: " . $redirect_to);
+            } else {
+                echo "<script>window.location.href = '" . addslashes($redirect_to) . "';</script>";
+            }
             exit();
         } else {
             $error = "Gagal memperbarui data: " . $stmt_up->error;
         }
     }
 }
+
+require_once 'includes/header.php';
 ?>
 
 <style>
