@@ -192,7 +192,6 @@ $total_sales_count = count($ranking_data);
     background-position: 0 0;
     animation: nailongSpriteRun 0.5s steps(1) infinite;
     display: block;
-    mix-blend-mode: multiply; /* Removes white background on colored track */
     filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
 }
 
