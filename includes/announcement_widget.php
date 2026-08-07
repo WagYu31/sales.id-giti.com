@@ -224,6 +224,8 @@ function loadActiveAnnouncements() {
                         day: 'numeric', month: 'short', year: 'numeric'
                     });
 
+                    const formattedContent = escapeHtmlAnn(item.content).replace(/\n/g, '<br>');
+
                     html += `
                     <div class="item-3d-card" style="border-top: 4px solid ${borderLeftColor} !important;">
                         <div>
@@ -236,7 +238,7 @@ function loadActiveAnnouncements() {
                                 </span>
                             </div>
                             <h5 class="fw-bold text-dark mb-2" style="font-size: 16.5px; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.3px; line-height: 1.35;">${escapeHtmlAnn(item.title)}</h5>
-                            <p class="text-secondary mb-3" style="font-size: 14px; line-height: 1.6; font-family: 'Inter', sans-serif;">${escapeHtmlAnn(item.content)}</p>
+                            <p class="text-secondary mb-3" style="font-size: 14px; line-height: 1.6; font-family: 'Inter', sans-serif;">${formattedContent}</p>
                         </div>
                         <div class="pt-2 border-top d-flex justify-content-between align-items-center" style="font-size: 12px; color: #64748B;">
                             <span>Diterbitkan Oleh:</span>
