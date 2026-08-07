@@ -420,7 +420,7 @@ $total_sales_count = count($ranking_data);
             </div>
             <div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-danger text-white fw-bold rounded-pill px-3 py-1" style="font-size: 11px; letter-spacing: 0.5px; border: 1px solid #FCD34D;">🇮🇩 EDISI SPESIAL KEMERDEKAAN 17 AGUSTUS</span>
+                    <span class="badge bg-danger text-white fw-bold rounded-pill px-3 py-1" style="font-size: 11px; letter-spacing: 0.5px; border: 1px solid #FCD34D;">🇮🇩 EDISI SPESIAL KEMERDEKAAN</span>
                     <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 800;">🏁 Sirkuit Balap Nailong Merah Putih 🇮🇩</span>
                 </div>
                 <h5 class="mb-0 fw-bold text-dark mt-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
@@ -550,7 +550,7 @@ $total_sales_count = count($ranking_data);
                 <div class="chart-scroll-wrapper" id="chartScrollWrapper">
                     <div class="track-bg-overlay"></div>
                     <div class="finish-line-banner"></div>
-                    <div class="finish-badge-top">FINISH 🏁 17 AGUSTUS 🇮🇩</div>
+                    <div class="finish-badge-top">FINISH 🏁 🇮🇩</div>
 
                     <div style="position: relative; width: 100%; min-height: 320px;" id="chartCanvasContainer">
                         <canvas id="salesRankingChart"></canvas>

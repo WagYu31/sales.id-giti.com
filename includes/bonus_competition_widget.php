@@ -60,11 +60,11 @@ if ($res_kat_b) {
 }
 ?>
 
-<!-- 3D SULTAN BONUS COMPETITION TRACKER WIDGET -->
+/* 3D SULTAN BONUS COMPETITION TRACKER WIDGET - EVENT KEMERDEKAAN RI 🇮🇩 */
 <style>
 @keyframes pulseGoldGlow {
-    0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.35), inset 0 0 15px rgba(254, 240, 138, 0.4); }
-    50% { box-shadow: 0 0 35px rgba(245, 158, 11, 0.65), inset 0 0 25px rgba(254, 240, 138, 0.7); }
+    0%, 100% { box-shadow: 0 0 25px rgba(220, 38, 38, 0.4), inset 0 0 18px rgba(245, 158, 11, 0.35); }
+    50% { box-shadow: 0 0 40px rgba(220, 38, 38, 0.7), inset 0 0 30px rgba(245, 158, 11, 0.6); }
 }
 
 @keyframes floatCashBadge {
@@ -73,12 +73,13 @@ if ($res_kat_b) {
 }
 
 .bonus-competition-card {
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    background: linear-gradient(135deg, #1E1B4B 0%, #2A0818 45%, #450A0A 100%);
     border-radius: 26px;
     padding: 32px 36px;
     margin-bottom: 34px;
     position: relative;
-    border: 2px solid #F59E0B !important;
+    border: 2.5px solid #DC2626 !important;
+    outline: 2px solid #F59E0B;
     animation: pulseGoldGlow 4s infinite ease-in-out;
     color: #FFFFFF;
     overflow: hidden;
@@ -89,12 +90,12 @@ if ($res_kat_b) {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 5px;
-    background: linear-gradient(90deg, #F59E0B 0%, #10B981 50%, #3B82F6 100%);
+    background: linear-gradient(90deg, #DC2626 0%, #FCD34D 50%, #DC2626 100%);
 }
 
 .bonus-kat-box {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.75);
+    border: 1.5px solid rgba(220, 38, 38, 0.35);
     backdrop-filter: blur(12px);
     border-radius: 20px;
     padding: 24px;
@@ -106,20 +107,20 @@ if ($res_kat_b) {
 }
 
 .bonus-kat-box:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.9);
     transform: translateY(-4px);
-    border-color: rgba(245, 158, 11, 0.5);
+    border-color: rgba(245, 158, 11, 0.6);
 }
 
 .cash-prize-badge {
-    background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+    background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
     color: #FFFFFF;
     font-size: 13px;
     font-weight: 800;
-    padding: 6px 16px;
+    padding: 7px 18px;
     border-radius: 20px;
-    border: 1px solid #34D399;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+    border: 1.5px solid #FCD34D;
+    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.5);
     animation: floatCashBadge 3s infinite ease-in-out;
     display: inline-flex;
     align-items: center;
@@ -127,8 +128,8 @@ if ($res_kat_b) {
 }
 
 .rank-row-item {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 14px;
     padding: 12px 16px;
     margin-bottom: 10px;
@@ -136,8 +137,8 @@ if ($res_kat_b) {
 }
 
 .rank-row-item:hover {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(56, 189, 248, 0.4);
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(245, 158, 11, 0.5);
 }
 
 .rank-pill {
@@ -160,13 +161,13 @@ if ($res_kat_b) {
     <!-- Header Banner -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div class="d-flex align-items-center gap-3">
-            <div style="font-size: 38px; filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.5));">
+            <div style="font-size: 38px; filter: drop-shadow(0 4px 10px rgba(220, 38, 38, 0.6));">
                 🎁
             </div>
             <div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 11px; letter-spacing: 0.5px;">PERIODE: MULAI AGUSTUS 2026 (START DARI 0)</span>
-                    <span class="badge bg-emerald bg-opacity-20 text-success border border-success rounded-pill px-2.5 py-0.5" style="font-size: 11px;">TARGET: RP 200.000.000,- / BULAN</span>
+                    <span class="badge bg-danger text-white fw-bold rounded-pill px-3 py-1" style="font-size: 11px; letter-spacing: 0.5px; border: 1px solid #FCD34D;">🇮🇩 EVENT KEMERDEKAAN LOEWIX</span>
+                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 11px;">TARGET: RP 200.000.000,- / BULAN</span>
                 </div>
                 <h4 class="mb-0 fw-bold text-white mt-1" style="font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.4px;">
                     Kompetisi Bonus Sales Sultan Loewix 🔥
@@ -175,7 +176,7 @@ if ($res_kat_b) {
         </div>
         <div class="text-end">
             <div class="cash-prize-badge">
-                💵 HADIAH RP 2.000.000,- / KATEGORI
+                🇮🇩 HADIAH RP 2.000.000,- / KATEGORI
             </div>
         </div>
     </div>
