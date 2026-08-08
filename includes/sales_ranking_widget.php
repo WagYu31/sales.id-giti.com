@@ -63,12 +63,14 @@ $chart_labels = [];
 $chart_omset_invoice = [];
 $chart_total_fu = [];
 $chart_customer_fu = [];
+$chart_inv_count = [];
 
 foreach ($ranking_data as $rd) {
     $chart_labels[] = $rd['nama_sales'];
     $chart_omset_invoice[] = (float)$rd['total_omset_invoice'];
     $chart_total_fu[] = (int)$rd['total_fu'];
     $chart_customer_fu[] = (int)$rd['total_customer_fu'];
+    $chart_inv_count[] = (int)$rd['total_inv_count'];
 }
 
 $top1 = $ranking_data[0] ?? null;
@@ -863,6 +865,9 @@ $total_sales_count = count($ranking_data);
             <button type="button" class="metric-btn active" id="btnMetricOmset" onclick="switchChartMetric('omset')">
                 💵 Invoice Sales (Rp)
             </button>
+            <button type="button" class="metric-btn" id="btnMetricInvCount" onclick="switchChartMetric('inv_count')">
+                🧾 Invoice Terbanyak
+            </button>
             <button type="button" class="metric-btn" id="btnMetricTotal" onclick="switchChartMetric('total')">
                 ⚡ Total Activity FU
             </button>
@@ -1093,6 +1098,7 @@ $total_sales_count = count($ranking_data);
                                 <th class="px-4 py-3 text-secondary" style="font-size: 12px;">PERINGKAT</th>
                                 <th class="px-3 py-3 text-secondary" style="font-size: 12px;">SALES REPRESENTATIVE</th>
                                 <th class="px-3 py-3 text-secondary text-end" style="font-size: 12px;">OMSET INVOICE (RP)</th>
+                                <th class="px-3 py-3 text-secondary text-end" style="font-size: 12px;">JUMLAH INVOICE</th>
                                 <th class="px-3 py-3 text-secondary text-end" style="font-size: 12px;">TOTAL ACTIVITY</th>
                                 <th class="px-3 py-3 text-secondary text-end" style="font-size: 12px;">CUST DI-FU</th>
                             </tr>
@@ -1119,6 +1125,9 @@ $total_sales_count = count($ranking_data);
                                     </td>
                                     <td class="text-end px-3 font-monospace fw-bold text-success" style="font-size: 14px;">
                                         Rp <?php echo number_format((float)$s['total_omset_invoice'], 0, ',', '.'); ?>
+                                    </td>
+                                    <td class="text-end px-3 font-monospace fw-bold text-primary" style="font-size: 14px;">
+                                        <?php echo number_format($s['total_inv_count'], 0, ',', '.'); ?> Inv
                                     </td>
                                     <td class="text-end px-3 font-monospace fw-bold text-dark" style="font-size: 14px;">
                                         <?php echo number_format($s['total_fu'], 0, ',', '.'); ?>
@@ -1149,6 +1158,7 @@ const salesChartLabels = <?php echo json_encode($chart_labels); ?>;
 const salesChartOmsetInvoice = <?php echo json_encode($chart_omset_invoice); ?>;
 const salesChartTotalFU = <?php echo json_encode($chart_total_fu); ?>;
 const salesChartCustomerFU = <?php echo json_encode($chart_customer_fu); ?>;
+const salesChartInvCount = <?php echo json_encode($chart_inv_count); ?>;
 
 const top1Data = <?php echo json_encode($top1); ?>;
 const top2Data = <?php echo json_encode($top2); ?>;
@@ -1160,6 +1170,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function getActiveDatasetValues() {
     if (currentMetric === 'omset') return { values: salesChartOmsetInvoice, label: "Omset Invoice (Rp)" };
+    if (currentMetric === 'inv_count') return { values: salesChartInvCount, label: "Jumlah Invoice" };
     if (currentMetric === 'total') return { values: salesChartTotalFU, label: "Total Activity FU" };
     return { values: salesChartCustomerFU, label: "Customer di-FU" };
 }
@@ -1635,16 +1646,21 @@ function switchChartMetric(metricType) {
     currentMetric = metricType;
     
     document.getElementById('btnMetricOmset').classList.remove('active');
+    if (document.getElementById('btnMetricInvCount')) document.getElementById('btnMetricInvCount').classList.remove('active');
     document.getElementById('btnMetricTotal').classList.remove('active');
     document.getElementById('btnMetricCustomer').classList.remove('active');
 
     let titleText = '🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)';
-    let metricLblText = 'Omset Invoice (Agt 2026)';
+    let metricLblText = 'Omset Invoice (<?= $label_periode_ranking ?>)';
 
     if (metricType === 'omset') {
         document.getElementById('btnMetricOmset').classList.add('active');
         titleText = '🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)';
-        metricLblText = 'Omset Invoice (Agt 2026)';
+        metricLblText = 'Omset Invoice (<?= $label_periode_ranking ?>)';
+    } else if (metricType === 'inv_count') {
+        if (document.getElementById('btnMetricInvCount')) document.getElementById('btnMetricInvCount').classList.add('active');
+        titleText = '🧾 Sirkuit Lari Sales (Jumlah Invoice Terbanyak)';
+        metricLblText = 'Total Invoice (<?= $label_periode_ranking ?>)';
     } else if (metricType === 'total') {
         document.getElementById('btnMetricTotal').classList.add('active');
         titleText = '⚡ Sirkuit Lari Sales (Total Activity Follow Up)';
@@ -1681,7 +1697,9 @@ function updatePodiumCards(metricType) {
 }
 
 function getFormattedMetricValue(data, metricType) {
+    if (!data) return '-';
     if (metricType === 'omset') return formatRupiahDisplay(data.total_omset_invoice);
+    if (metricType === 'inv_count') return new Intl.NumberFormat('id-ID').format(data.total_inv_count) + ' Inv';
     if (metricType === 'total') return new Intl.NumberFormat('id-ID').format(data.total_fu);
     return new Intl.NumberFormat('id-ID').format(data.total_customer_fu);
 }
