@@ -30,7 +30,7 @@
     box-shadow: 0 1px 6px rgba(220, 38, 38, 0.3);
 }
 
-.ticker-left-badge {
+.ticker-badge-right {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -64,13 +64,13 @@
 .ticker-track-viewport {
     flex: 1;
     overflow: hidden;
-    margin: 0 18px;
+    margin: 0 16px 0 0;
     position: relative;
     height: 100%;
     display: flex;
     align-items: center;
-    -webkit-mask-image: linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 24px), transparent 100%);
 }
 
 .ticker-track-content {
@@ -179,21 +179,19 @@
 <!-- TOP RUNNING TEXT TICKER BAR CONTAINER -->
 <div id="topAnnouncementTickerContainer" style="display: none;">
     <div class="top-announcement-ticker-bar">
-        <!-- Left Badge -->
-        <div class="ticker-left-badge">
-            <div class="ticker-live-dot"></div>
-            <span>📢 PENGUMUMAN</span>
-        </div>
-
-        <!-- Center Running Text Viewport -->
+        <!-- Running Text Viewport (Left Side) -->
         <div class="ticker-track-viewport" onclick="openAnnouncementModal()">
             <div class="ticker-track-content" id="tickerTrackContentHolder">
                 <!-- Dynamically Inserted Ticker Items -->
             </div>
         </div>
 
-        <!-- Right Action Buttons -->
+        <!-- Right Group: Speaker Logo & Badge + Action Buttons -->
         <div class="ticker-right-actions">
+            <div class="ticker-badge-right">
+                <div class="ticker-live-dot"></div>
+                <span>📢 PENGUMUMAN</span>
+            </div>
             <button type="button" class="btn-ticker-view" onclick="openAnnouncementModal()">
                 <span>📋 Lihat Detail</span>
                 <span class="badge bg-primary text-white rounded-pill px-2 py-0.5" style="font-size: 10.5px;" id="tickerActiveCount">0</span>
