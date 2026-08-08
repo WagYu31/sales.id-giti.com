@@ -59,7 +59,7 @@ $total_notif_count = $notif_pending_fu + $notif_kandidat + $notif_maintenance;
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -67,16 +67,30 @@ $total_notif_count = $notif_pending_fu + $notif_kandidat + $notif_maintenance;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
 <style>
-/* ============ RESET & GLOBALS ============ */
+/* ============ RESET & TYPOGRAPHY SYSTEM ============ */
 *,*::before,*::after { box-sizing: border-box; }
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: #F1F5F9;
     color: #1E293B;
     margin: 0;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     display: flex;
     min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6, .welcome-title, .section-title, .mc-title, .card-title, .modal-title {
+    font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif;
+    letter-spacing: -0.025em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+.font-monospace {
+    font-family: 'JetBrains Mono', 'Plus Jakarta Sans', monospace !important;
+    font-feature-settings: 'tnum' on, 'lnum' on;
 }
 table tr td { font-size: 0.85em; }
 .input-group-text { cursor: pointer; }

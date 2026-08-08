@@ -118,23 +118,25 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 }
 
 .welcome-title {
-    font-size: 34px;
+    font-size: 36px;
     font-weight: 800;
     color: #FFFFFF;
-    letter-spacing: -0.8px;
-    margin: 0 0 12px 0;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    line-height: 1.2;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    letter-spacing: -0.035em;
+    margin: 0 0 10px 0;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    line-height: 1.18;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    -webkit-font-smoothing: antialiased;
 }
 
 .welcome-subtitle {
     font-size: 15px;
-    color: rgba(226, 232, 240, 0.9);
-    font-weight: 400;
-    line-height: 1.6;
+    color: rgba(241, 245, 249, 0.92);
+    font-weight: 500;
+    line-height: 1.65;
     margin: 0 0 24px 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    letter-spacing: -0.01em;
     max-width: 640px;
 }
 
@@ -146,13 +148,14 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
     backdrop-filter: blur(12px);
     border: 1.5px solid rgba(255, 255, 255, 0.3);
     color: #FFFFFF;
-    padding: 10px 24px;
+    padding: 11px 26px;
     border-radius: 30px;
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 700;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.01em;
     box-shadow: 0 8px 20px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 
