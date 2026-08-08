@@ -1155,6 +1155,9 @@ function getSalesCallName(salesName) {
     if (lower.includes('edi suprianto') || lower.includes('suprianto') || lower === 'edi') {
         return 'Anto';
     }
+    if (lower.includes('efrina panjaitan') || lower.includes('panjaitan') || lower.includes('efrina')) {
+        return 'Rina';
+    }
     return salesName.trim().split(' ')[0];
 }
 
