@@ -76,8 +76,8 @@ if ($kat === 'a') {
             AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
         WHERE (c.sales_id = {$sales_id} OR fu.sales_id = {$sales_id})
           AND c.deleted_at IS NULL
-          AND DATE(c.tgl_input) >= DATE('{$start_periode}')
-          AND DATE(c.tgl_input) <= DATE('{$end_periode}')
+          AND c.tgl_input >= '{$start_periode}' 
+          AND c.tgl_input <= '{$end_periode}'
         ORDER BY fu.tgl_follow_up DESC, c.tgl_input DESC
     ";
     $res = $conn->query($sql);
@@ -116,7 +116,7 @@ if ($kat === 'a') {
           AND fu.tgl_follow_up >= '{$start_periode}' 
           AND fu.tgl_follow_up <= '{$end_periode}'
           AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-          AND (DATE(c.tgl_input) < DATE('{$start_periode}') OR c.tgl_input IS NULL OR c.tgl_input = '')
+          AND (c.tgl_input < '{$start_periode}' OR c.tgl_input IS NULL OR c.tgl_input = '' OR c.tgl_input LIKE '0000%')
         ORDER BY fu.tgl_follow_up DESC
     ";
     $res = $conn->query($sql);
