@@ -262,13 +262,14 @@ if ($res_kat_b) {
                                 $omset_a = (float)$item['total_omset_baru'];
                                 $pct_target_a = min(100, round(($omset_a / $target_omset_per_bulan) * 100, 1));
                                 ?>
-                                <div class="rank-row-item">
+                                <div class="rank-row-item" style="cursor: pointer;" onclick="openBonusSalesDetail(<?php echo $item['sales_id']; ?>, 'a')" title="Klik untuk lihat rincian detail <?= htmlspecialchars($item['nama_sales']); ?>">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="rank-pill <?php echo $rClass; ?>"><?php echo $rIcon; ?></div>
                                             <div>
-                                                <div class="fw-bold text-white" style="font-size: 13.5px; font-family: 'Plus Jakarta Sans', sans-serif;">
-                                                    <?php echo htmlspecialchars($item['nama_sales']); ?>
+                                                <div class="fw-bold text-white d-flex align-items-center gap-1.5" style="font-size: 13.5px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                                                    <span><?php echo htmlspecialchars($item['nama_sales']); ?></span>
+                                                    <span class="badge bg-white bg-opacity-10 text-info fw-normal" style="font-size: 9.5px; padding: 2px 6px;">🔍 Detail</span>
                                                 </div>
                                                 <small class="text-white-50" style="font-size: 11px;"><?php echo $item['total_customer_baru']; ?> Cust Baru</small>
                                             </div>
@@ -287,7 +288,7 @@ if ($res_kat_b) {
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="text-center py-4 text-white-50" style="font-size: 13px;">
-                                🚀 Belum ada data customer baru per 1 Agustus 2026.<br>
+                                🚀 Belum ada data customer baru per <?= $label_periode ?>.<br>
                                 <small>Ayo follow up customer baru untuk mendapatkan omset & bonus Rp 2 Juta!</small>
                             </div>
                         <?php endif; ?>
@@ -295,7 +296,7 @@ if ($res_kat_b) {
                 </div>
 
                 <div class="mt-3 pt-3 border-top border-secondary border-opacity-30 d-flex justify-content-between align-items-center" style="font-size: 11.5px; color: #94A3B8;">
-                    <span>📌 Syarat: Cust Baru per 1 Agt 2026</span>
+                    <span>📌 Syarat: <?= $syarat_kat_a ?></span>
                     <span class="text-warning fw-bold">Pemenang: Top 1 Sales</span>
                 </div>
             </div>
@@ -328,13 +329,14 @@ if ($res_kat_b) {
                                 $omset_b = (float)$item['total_omset_reaktivasi'];
                                 $pct_target_b = min(100, round(($omset_b / $target_omset_per_bulan) * 100, 1));
                                 ?>
-                                <div class="rank-row-item">
+                                <div class="rank-row-item" style="cursor: pointer;" onclick="openBonusSalesDetail(<?php echo $item['sales_id']; ?>, 'b')" title="Klik untuk lihat rincian detail <?= htmlspecialchars($item['nama_sales']); ?>">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="rank-pill <?php echo $rClass; ?>"><?php echo $rIcon; ?></div>
                                             <div>
-                                                <div class="fw-bold text-white" style="font-size: 13.5px; font-family: 'Plus Jakarta Sans', sans-serif;">
-                                                    <?php echo htmlspecialchars($item['nama_sales']); ?>
+                                                <div class="fw-bold text-white d-flex align-items-center gap-1.5" style="font-size: 13.5px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                                                    <span><?php echo htmlspecialchars($item['nama_sales']); ?></span>
+                                                    <span class="badge bg-white bg-opacity-10 text-info fw-normal" style="font-size: 9.5px; padding: 2px 6px;">🔍 Detail</span>
                                                 </div>
                                                 <small class="text-white-50" style="font-size: 11px;"><?php echo $item['total_customer_reaktivasi']; ?> Cust Belanja</small>
                                             </div>
@@ -353,7 +355,7 @@ if ($res_kat_b) {
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="text-center py-4 text-white-50" style="font-size: 13px;">
-                                🔥 Belum ada data reaktivasi customer lama per 1 Agustus 2026.<br>
+                                🔥 Belum ada data reaktivasi customer lama per <?= $label_periode ?>.<br>
                                 <small>Ayo follow up customer lama agar reaktivasi & dapatkan omset serta bonus Rp 2 Juta!</small>
                             </div>
                         <?php endif; ?>
@@ -361,10 +363,59 @@ if ($res_kat_b) {
                 </div>
 
                 <div class="mt-3 pt-3 border-top border-secondary border-opacity-30 d-flex justify-content-between align-items-center" style="font-size: 11.5px; color: #94A3B8;">
-                    <span>📌 Syarat: Reaktivasi Cust Lama per 1 Agt 2026</span>
+                    <span>📌 Syarat: <?= $syarat_kat_b ?></span>
                     <span class="text-warning fw-bold">Pemenang: Top 1 Sales</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal Detail Sales Bonus Sultan -->
+<div class="modal fade" id="bonusSalesDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 22px; overflow: hidden;" id="bonusSalesDetailModalBody">
+            <div class="p-5 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="mt-2 text-muted fw-bold">Memuat rincian detail sales...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openBonusSalesDetail(salesId, kat) {
+    const modalEl = document.getElementById('bonusSalesDetailModal');
+    const modalBody = document.getElementById('bonusSalesDetailModalBody');
+    const selectedBulan = '<?= $selected_bulan ?>';
+
+    modalBody.innerHTML = `
+        <div class="p-5 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="mt-2 text-muted fw-bold">Memuat rincian detail sales...</div>
+        </div>
+    `;
+
+    const bsModal = new bootstrap.Modal(modalEl);
+    bsModal.show();
+
+    fetch(`ajax_bonus_sales_detail.php?sales_id=${salesId}&kat=${kat}&periode_bulan=${selectedBulan}`)
+        .then(res => res.text())
+        .then(html => {
+            modalBody.innerHTML = html;
+        })
+        .catch(err => {
+            modalBody.innerHTML = `
+                <div class="p-4 text-center text-danger">
+                    <div class="fs-2 mb-2">⚠️</div>
+                    <div class="fw-bold">Gagal memuat detail sales.</div>
+                    <small class="text-muted">Silakan coba beberapa saat lagi.</small>
+                </div>
+            `;
+        });
+}
+</script>
