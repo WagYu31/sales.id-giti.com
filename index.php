@@ -281,6 +281,9 @@ if ($_SESSION['role'] !== 'sales') {
 }
 </style>
 
+<!-- TOP RUNNING TEXT ANNOUNCEMENT TICKER BANNER -->
+<?php include 'includes/announcement_widget.php'; ?>
+
 <!-- UNIFIED SINGLE HERO HEADER -->
 <div class="cust-hero mb-4">
     <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
@@ -306,7 +309,6 @@ if ($_SESSION['role'] !== 'sales') {
     </div>
 </div>
 
-<?php include 'includes/announcement_widget.php'; ?>
 <?php include 'includes/bonus_competition_widget.php'; ?>
 <?php include 'includes/sales_ranking_widget.php'; ?>
 

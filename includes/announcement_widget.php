@@ -1,270 +1,342 @@
-<!-- PAPAN PENGUMUMAN OFFICIAL SALES WIDGET - 3D SPATIAL & GRID DESIGN -->
+<?php
+/**
+ * PAPAN PENGUMUMAN OFFICIAL SALES WIDGET - TOP RUNNING TEXT TICKER EDITION
+ * DILETAK KAN DI PALING ATAS DASHBOARD (DI BAWAH NAVBAR / SEBELUM HERO WELCOME)
+ */
+?>
 <style>
-@keyframes float3D {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-4px) rotate(2deg); }
-}
-
-@keyframes pulseRed3D {
-    0%, 100% { box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4); }
-    50% { box-shadow: 0 8px 22px rgba(239, 68, 68, 0.7); }
-}
-
-.widget-3d-card {
-    background: #FFFFFF;
-    border-radius: 24px;
-    padding: 28px 32px;
-    margin-bottom: 32px;
+/* === TOP RUNNING TEXT TICKER BAR STYLES === */
+.top-announcement-ticker-bar {
+    background: linear-gradient(90deg, #0F172A 0%, #1E293B 60%, #0F172A 100%);
+    border-radius: 16px;
+    padding: 0 16px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
     position: relative;
-    box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.02);
-    border: 1.5px solid rgba(226, 232, 240, 0.9) !important;
+    border: 1.5px solid rgba(51, 65, 85, 0.8);
+    box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.3);
     overflow: hidden;
-    transform-style: preserve-3d;
-    perspective: 1200px;
 }
 
-.widget-3d-card::before {
+.top-announcement-ticker-bar::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #2563EB 0%, #8B5CF6 50%, #EC4899 100%);
-    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
+    height: 3px;
+    background: linear-gradient(90deg, #DC2626 0%, #F59E0B 50%, #2563EB 100%);
 }
 
-.avatar-3d-pulse {
-    width: 48px; height: 48px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-    color: #FFFFFF;
+.ticker-left-badge {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 10px 22px -4px rgba(37, 99, 235, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.35);
-    animation: float3D 4s ease-in-out infinite;
+    gap: 8px;
+    background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+    color: #FFFFFF;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 12px;
+    border: 1px solid #FCD34D;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+    white-space: nowrap;
     flex-shrink: 0;
+    z-index: 2;
 }
 
-.announcement-grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 20px;
+.ticker-live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4ADE80;
+    box-shadow: 0 0 8px #4ADE80;
+    animation: liveDotPulse 1.5s infinite alternate;
 }
 
-.item-3d-card {
-    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
-    border: 1.5px solid #E2E8F0;
-    border-radius: 20px;
-    padding: 22px 24px;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+@keyframes liveDotPulse {
+    0% { opacity: 0.4; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1.2); }
+}
+
+.ticker-track-viewport {
+    flex: 1;
+    overflow: hidden;
+    margin: 0 16px;
     position: relative;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    height: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
 }
 
-.item-3d-card:hover {
-    background: #FFFFFF;
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.12), 0 4px 14px rgba(15, 23, 42, 0.04);
-    border-color: #CBD5E1;
+.ticker-track-content {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: tickerMarqueeScroll 28s linear infinite;
+    cursor: pointer;
 }
 
-/* 3D Glossy Badges */
-.badge-3d-promo {
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35), inset 0 1.5px 2px rgba(255, 255, 255, 0.4);
-    font-weight: 800 !important;
-    font-size: 11px !important;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+.ticker-track-viewport:hover .ticker-track-content {
+    animation-play-state: paused;
 }
 
-.badge-3d-info {
-    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35), inset 0 1.5px 2px rgba(255, 255, 255, 0.4);
-    font-weight: 800 !important;
-    font-size: 11px !important;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+@keyframes tickerMarqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
 }
 
-.badge-3d-warning {
-    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35), inset 0 1.5px 2px rgba(255, 255, 255, 0.4);
-    font-weight: 800 !important;
-    font-size: 11px !important;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-.badge-3d-urgent {
-    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
-    color: #FFFFFF !important;
-    animation: pulseRed3D 2s infinite;
-    font-weight: 800 !important;
-    font-size: 11px !important;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-.btn-3d-manage {
-    background: #FFFFFF;
-    color: #2563EB;
-    border: 1.5px solid #CBD5E1;
-    font-weight: 700;
-    font-size: 13px;
-    padding: 8px 22px;
-    border-radius: 30px;
-    text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+.ticker-item-inline {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    color: #F8FAFC;
+    padding-right: 28px;
 }
 
-.btn-3d-manage:hover {
-    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+.ticker-item-tag {
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.ticker-tag-urgent { background: rgba(239, 68, 68, 0.25); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.4); }
+.ticker-tag-promo  { background: rgba(16, 185, 129, 0.25); color: #6EE7B7; border: 1px solid rgba(16, 185, 129, 0.4); }
+.ticker-tag-warning{ background: rgba(245, 158, 11, 0.25); color: #FDE047; border: 1px solid rgba(245, 158, 11, 0.4); }
+.ticker-tag-info   { background: rgba(59, 130, 246, 0.25); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.4); }
+
+.ticker-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+.btn-ticker-view {
+    background: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-ticker-view:hover {
+    background: #2563EB;
     color: #FFFFFF;
     border-color: #2563EB;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
-.btn-3d-manage:hover i {
-    color: #FFFFFF !important;
+.btn-ticker-manage {
+    background: #FFFFFF;
+    color: #0F172A;
+    border: 1px solid #CBD5E1;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
-@media (max-width: 768px) {
-    .announcement-grid-container {
-        grid-template-columns: 1fr;
-    }
+.btn-ticker-manage:hover {
+    background: #0F172A;
+    color: #FFFFFF;
+    border-color: #0F172A;
+}
+
+/* Modal Grid Styles */
+.announcement-modal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
 }
 </style>
 
-<div id="announcementWidgetContainer">
-    <div class="widget-3d-card">
-        <!-- Header Section -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-            <div class="d-flex align-items-center gap-3">
-                <div class="avatar-3d-pulse">
-                    📢
-                </div>
-                <div>
-                    <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; letter-spacing: -0.4px;">
-                        Papan Pengumuman Sales
-                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1" style="font-size: 11.5px; font-weight: 800; border: 1px solid rgba(37, 99, 235, 0.2);" id="announcementActiveCount">Aktif</span>
-                    </h5>
-                    <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Pemberitahuan resmi promo, price list, & kabar penting dari manajemen Loewix</p>
-                </div>
-            </div>
-            <div class="mt-2 mt-sm-0">
-                <a href="announcements.php" class="btn-3d-manage">
-                    <i class="bi bi-gear-fill text-primary"></i> Kelola Pengumuman
-                </a>
+<!-- TOP RUNNING TEXT TICKER BAR CONTAINER -->
+<div id="topAnnouncementTickerContainer" style="display: none;">
+    <div class="top-announcement-ticker-bar">
+        <!-- Left Badge -->
+        <div class="ticker-left-badge">
+            <div class="ticker-live-dot"></div>
+            <span>📢 PENGUMUMAN</span>
+        </div>
+
+        <!-- Center Running Text Viewport -->
+        <div class="ticker-track-viewport" onclick="openAnnouncementModal()">
+            <div class="ticker-track-content" id="tickerTrackContentHolder">
+                <!-- Dynamically Inserted Ticker Items -->
             </div>
         </div>
 
-        <!-- Announcement Cards Grid -->
-        <div id="announcementCardsList" class="announcement-grid-container">
-            <!-- Dynamic Content Inserted via JS -->
+        <!-- Right Action Buttons -->
+        <div class="ticker-right-actions">
+            <button type="button" class="btn-ticker-view" onclick="openAnnouncementModal()">
+                📋 Lihat Semua (<span id="tickerActiveCount">0</span>)
+            </button>
+            <a href="announcements.php" class="btn-ticker-manage">
+                ⚙️ Kelola
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL FULL DETAIL PENGUMUMAN SALES -->
+<div class="modal fade" id="announcementFullModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border-radius: 24px 24px 0 0; padding: 20px 28px;">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div style="font-size: 24px;">📢</div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0 text-white" style="font-family: 'Plus Jakarta Sans', sans-serif;">Papan Pengumuman Resmi Sales</h5>
+                        <small class="text-white-50">Pemberitahuan promo, price list, & kabar penting dari manajemen Loewix</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <div id="announcementModalGridList" class="announcement-modal-grid">
+                    <!-- Dynamic Cards Rendered Here -->
+                </div>
+            </div>
+            <div class="modal-footer bg-white border-top py-2.5 px-4 justify-content-between">
+                <span class="text-muted" style="font-size: 12.5px;">Diperbarui secara realtime oleh tim manajemen</span>
+                <a href="announcements.php" class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold">Kelola Pengumuman</a>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+let cachedAnnouncementsData = [];
+
 document.addEventListener("DOMContentLoaded", function() {
-    loadActiveAnnouncements();
+    loadActiveAnnouncementsTicker();
 });
 
-function loadActiveAnnouncements() {
+function loadActiveAnnouncementsTicker() {
     fetch('ajax_announcement_handler.php?action=fetch_active')
         .then(res => res.json())
         .then(data => {
-            const container = document.getElementById('announcementWidgetContainer');
-            const list = document.getElementById('announcementCardsList');
-            const countBadge = document.getElementById('announcementActiveCount');
-            
+            const container = document.getElementById('topAnnouncementTickerContainer');
+            const trackHolder = document.getElementById('tickerTrackContentHolder');
+            const countSpan = document.getElementById('tickerActiveCount');
+
             if (data.status === 'success' && data.data && data.data.length > 0) {
-                if (countBadge) {
-                    countBadge.innerText = `${data.data.length} Aktif`;
-                }
+                cachedAnnouncementsData = data.data;
+                if (countSpan) countSpan.innerText = data.data.length;
 
-                let html = '';
+                let tickerItemsHtml = '';
                 data.data.forEach(item => {
-                    let badgeClass = 'badge-3d-info';
-                    let badgeIcon = 'ℹ️';
-                    let badgeLabel = 'INFORMASI RESMI';
-                    let borderLeftColor = '#2563EB';
-                    
-                    if (item.badge_type === 'promo') {
-                        badgeClass = 'badge-3d-promo';
-                        badgeIcon = '🚀';
-                        badgeLabel = 'PROMO SPESIAL';
-                        borderLeftColor = '#10B981';
-                    } else if (item.badge_type === 'warning') {
-                        badgeClass = 'badge-3d-warning';
-                        badgeIcon = '⚠️';
-                        badgeLabel = 'PERHATIAN PENTING';
-                        borderLeftColor = '#F59E0B';
-                    } else if (item.badge_type === 'urgent') {
-                        badgeClass = 'badge-3d-urgent';
-                        badgeIcon = '🚨';
-                        badgeLabel = 'DARURAT / URGENT';
-                        borderLeftColor = '#EF4444';
-                    }
+                    let tagClass = 'ticker-tag-info';
+                    let tagLabel = 'INFO';
+                    if (item.badge_type === 'promo') { tagClass = 'ticker-tag-promo'; tagLabel = 'PROMO'; }
+                    else if (item.badge_type === 'warning') { tagClass = 'ticker-tag-warning'; tagLabel = 'PERHATIAN'; }
+                    else if (item.badge_type === 'urgent') { tagClass = 'ticker-tag-urgent'; tagLabel = 'DARURAT'; }
 
-                    const dateStr = new Date(item.created_at).toLocaleDateString('id-ID', {
-                        day: 'numeric', month: 'short', year: 'numeric'
-                    });
+                    const titleStr = escapeHtmlAnn(item.title);
+                    const snippetStr = escapeHtmlAnn(item.content).replace(/(\r\n|\n|\r)/gm, " ");
 
-                    const formattedContent = escapeHtmlAnn(item.content).replace(/\n/g, '<br>');
-
-                    html += `
-                    <div class="item-3d-card" style="border-top: 4px solid ${borderLeftColor} !important;">
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-2.5">
-                                <span class="badge ${badgeClass} px-3 py-1.5 rounded-pill">
-                                    ${badgeIcon} ${badgeLabel}
-                                </span>
-                                <span class="badge bg-light text-secondary border px-2.5 py-1 rounded-pill" style="font-size: 11.5px; font-weight: 500;">
-                                    📅 ${dateStr}
-                                </span>
-                            </div>
-                            <h5 class="fw-bold text-dark mb-2" style="font-size: 16.5px; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.3px; line-height: 1.35;">${escapeHtmlAnn(item.title)}</h5>
-                            <p class="text-secondary mb-3" style="font-size: 14px; line-height: 1.6; font-family: 'Inter', sans-serif;">${formattedContent}</p>
+                    tickerItemsHtml += `
+                        <div class="ticker-item-inline">
+                            <span class="ticker-item-tag ${tagClass}">${tagLabel}</span>
+                            <span class="fw-bold">${titleStr}</span>
+                            <span class="text-white-50">— ${snippetStr}</span>
+                            <span class="ms-2 me-2 text-warning">⭐</span>
                         </div>
-                        <div class="pt-2 border-top d-flex justify-content-between align-items-center" style="font-size: 12px; color: #64748B;">
-                            <span>Diterbitkan Oleh:</span>
-                            <span class="fw-bold text-dark">${escapeHtmlAnn(item.created_by)}</span>
-                        </div>
-                    </div>`;
+                    `;
                 });
 
-                list.innerHTML = html;
+                // Duplicate sequence twice to create a seamless infinite loop marquee
+                trackHolder.innerHTML = tickerItemsHtml + tickerItemsHtml;
+                container.style.display = 'block';
+
+                // Render full cards for modal
+                renderAnnouncementModalCards(data.data);
             } else {
-                if (countBadge) countBadge.innerText = '0 Aktif';
-                list.innerHTML = `
-                <div class="item-3d-card" style="border-top: 4px solid #2563EB !important; grid-column: 1 / -1;">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="badge badge-3d-info px-3 py-1.5 rounded-pill">ℹ️ INFORMASI</span>
-                    </div>
-                    <h5 class="fw-bold text-dark mb-2" style="font-size: 16.5px; font-family: 'Plus Jakarta Sans', sans-serif;">Selamat Datang di Dashboard Sales Loewix 🚀</h5>
-                    <p class="text-secondary mb-0" style="font-size: 14px; line-height: 1.6; font-family: 'Inter', sans-serif;">Belum ada pengumuman aktif saat ini. Anda dapat menerbitkan pengumuman baru melalui menu <strong>Kelola Pengumuman</strong>.</p>
-                </div>`;
+                container.style.display = 'none';
             }
-            container.style.display = 'block';
         })
         .catch(err => {
-            console.error("Error loading announcements:", err);
-            document.getElementById('announcementWidgetContainer').style.display = 'block';
+            console.error("Error loading announcement ticker:", err);
         });
+}
+
+function renderAnnouncementModalCards(dataList) {
+    const modalGrid = document.getElementById('announcementModalGridList');
+    if (!modalGrid) return;
+
+    let html = '';
+    dataList.forEach(item => {
+        let badgeClass = 'bg-primary';
+        let badgeIcon = 'ℹ️';
+        let badgeLabel = 'INFORMASI RESMI';
+        let borderTopColor = '#2563EB';
+
+        if (item.badge_type === 'promo') {
+            badgeClass = 'bg-success';
+            badgeIcon = '🚀';
+            badgeLabel = 'PROMO SPESIAL';
+            borderTopColor = '#10B981';
+        } else if (item.badge_type === 'warning') {
+            badgeClass = 'bg-warning text-dark';
+            badgeIcon = '⚠️';
+            badgeLabel = 'PERHATIAN PENTING';
+            borderTopColor = '#F59E0B';
+        } else if (item.badge_type === 'urgent') {
+            badgeClass = 'bg-danger';
+            badgeIcon = '🚨';
+            badgeLabel = 'DARURAT / URGENT';
+            borderTopColor = '#EF4444';
+        }
+
+        const dateStr = new Date(item.created_at).toLocaleDateString('id-ID', {
+            day: 'numeric', month: 'short', year: 'numeric'
+        });
+
+        const formattedContent = escapeHtmlAnn(item.content).replace(/\n/g, '<br>');
+
+        html += `
+        <div class="card border-0 shadow-sm p-3.5 bg-white" style="border-radius: 18px; border-top: 4px solid ${borderTopColor} !important;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge ${badgeClass} px-3 py-1.5 rounded-pill fw-bold" style="font-size: 11px;">
+                    ${badgeIcon} ${badgeLabel}
+                </span>
+                <small class="text-muted fw-semibold">📅 ${dateStr}</small>
+            </div>
+            <h6 class="fw-bold text-dark mb-2" style="font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif;">${escapeHtmlAnn(item.title)}</h6>
+            <p class="text-secondary mb-3" style="font-size: 13.5px; line-height: 1.6; font-family: 'Inter', sans-serif;">${formattedContent}</p>
+            <div class="pt-2 border-top d-flex justify-content-between align-items-center" style="font-size: 11.5px; color: #64748B;">
+                <span>Diterbitkan Oleh:</span>
+                <span class="fw-bold text-dark">${escapeHtmlAnn(item.created_by)}</span>
+            </div>
+        </div>`;
+    });
+
+    modalGrid.innerHTML = html;
+}
+
+function openAnnouncementModal() {
+    const modalEl = document.getElementById('announcementFullModal');
+    if (modalEl) {
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+    }
 }
 
 function escapeHtmlAnn(text) {
