@@ -1,11 +1,11 @@
 <?php
 /**
- * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (COMBINED KAT A & KAT B)
+ * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (MATCHING INVOICE_FOLLOWUP_REPORT.PHP)
  */
 require_once 'includes/db.php';
 
 $sales_id = intval($_GET['sales_id'] ?? 0);
-$kat = trim($_GET['kat'] ?? 'a'); // 'a' or 'b' or 'all'
+$kat = trim($_GET['kat'] ?? 'a');
 $selected_bulan = trim($_GET['periode_bulan'] ?? '8');
 
 if ($sales_id <= 0) {
@@ -13,35 +13,27 @@ if ($sales_id <= 0) {
     exit;
 }
 
-// Set date range based on selected month
+// Set month SQL conditions using MySQL MONTH() and YEAR()
 if ($selected_bulan === '9') {
-    $start_date = '2026-09-01';
-    $end_date = '2026-09-30';
-    $start_periode = '2026-09-01 00:00:00';
-    $end_periode = '2026-09-30 23:59:59';
     $label_periode = 'Bulan 9 (September 2026)';
+    $month_sql = "MONTH(fu.tgl_follow_up) = 9 AND YEAR(fu.tgl_follow_up) = 2026";
+    $month_cust_sql = "MONTH(c.tgl_input) = 9 AND YEAR(c.tgl_input) = 2026";
 } else if ($selected_bulan === '10') {
-    $start_date = '2026-10-01';
-    $end_date = '2026-10-31';
-    $start_periode = '2026-10-01 00:00:00';
-    $end_periode = '2026-10-31 23:59:59';
     $label_periode = 'Bulan 10 (Oktober 2026)';
+    $month_sql = "MONTH(fu.tgl_follow_up) = 10 AND YEAR(fu.tgl_follow_up) = 2026";
+    $month_cust_sql = "MONTH(c.tgl_input) = 10 AND YEAR(c.tgl_input) = 2026";
 } else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
-    $start_date = '2026-08-01';
-    $end_date = '2026-10-31';
-    $start_periode = '2026-08-01 00:00:00';
-    $end_periode = '2026-10-31 23:59:59';
     $label_periode = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
+    $month_sql = "MONTH(fu.tgl_follow_up) BETWEEN 8 AND 10 AND YEAR(fu.tgl_follow_up) = 2026";
+    $month_cust_sql = "MONTH(c.tgl_input) BETWEEN 8 AND 10 AND YEAR(c.tgl_input) = 2026";
 } else {
     $selected_bulan = '8';
-    $start_date = '2026-08-01';
-    $end_date = '2026-08-31';
-    $start_periode = '2026-08-01 00:00:00';
-    $end_periode = '2026-08-31 23:59:59';
     $label_periode = 'Bulan 8 (Agustus 2026)';
+    $month_sql = "MONTH(fu.tgl_follow_up) = 8 AND YEAR(fu.tgl_follow_up) = 2026";
+    $month_cust_sql = "MONTH(c.tgl_input) = 8 AND YEAR(c.tgl_input) = 2026";
 }
 
-// Fetch Sales info
+// Fetch Sales Rep Info
 $stmt = $conn->prepare("SELECT id, nama_lengkap, email FROM sales WHERE id = ?");
 if (!$stmt) {
     $res = $conn->query("SELECT id, nama_lengkap, email FROM sales WHERE id = {$sales_id}");
@@ -59,34 +51,30 @@ if (!$sales) {
 
 $target_omset = 200000000;
 
-// Fetch ALL invoice transactions for this sales in the selected period
-// Kat A = Customer Baru (DATE(c.tgl_input) in period)
-// Kat B = Reaktivasi Customer Lama (DATE(c.tgl_input) before period)
+// Fetch Invoice Follow-Up records matching invoice_followup_report.php
 $sql_all = "
     SELECT 
+        fu.id AS followup_id,
+        fu.tgl_follow_up,
+        fu.no_inv,
+        fu.nominal_invoice,
+        fu.sales_id,
+        fu.catatan,
         c.id AS customer_id,
         c.nama_toko AS nama_customer,
-        (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
         c.tgl_input AS tgl_input_cust,
-        fu.id AS followup_id,
-        fu.no_inv,
-        fu.tgl_follow_up,
-        fu.nominal_invoice,
-        fu.catatan,
+        (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
         CASE 
-            WHEN (c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}')
-              OR (DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}') THEN 'A'
+            WHEN ({$month_cust_sql}) THEN 'A'
             ELSE 'B'
         END AS kat_type
     FROM follow_ups fu
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
+      AND fu.no_inv IS NOT NULL 
+      AND fu.no_inv != ''
       AND fu.deleted_at IS NULL
-      AND (
-          (fu.tgl_follow_up >= '{$start_periode}' AND fu.tgl_follow_up <= '{$end_periode}')
-          OR (DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}')
-      )
-      AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
+      AND ({$month_sql})
     ORDER BY fu.tgl_follow_up DESC
 ";
 
@@ -113,70 +101,31 @@ if ($res_all) {
     }
 }
 
-// Fetch any Kat A new customers created in period who don't have invoices yet
-$sql_new_cust = "
-    SELECT 
-        c.id AS customer_id,
-        c.nama_toko AS nama_customer,
-        (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
-        c.tgl_input AS tgl_input_cust,
-        NULL AS followup_id,
-        NULL AS no_inv,
-        NULL AS tgl_follow_up,
-        0 AS nominal_invoice,
-        NULL AS catatan,
-        'A' AS kat_type
-    FROM customers c
-    WHERE (c.sales_id = {$sales_id})
-      AND c.deleted_at IS NULL
-      AND (
-          (c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}')
-          OR (DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}')
-      )
-      AND c.id NOT IN (
-          SELECT fu2.customer_id FROM follow_ups fu2 
-          WHERE (fu2.sales_id = {$sales_id} OR fu2.customer_id = c.id) 
-            AND fu2.deleted_at IS NULL 
-            AND (
-                (fu2.tgl_follow_up >= '{$start_periode}' AND fu2.tgl_follow_up <= '{$end_periode}')
-                OR (DATE(fu2.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}')
-            )
-            AND fu2.no_inv IS NOT NULL AND fu2.no_inv != ''
-      )
-    ORDER BY c.tgl_input DESC
-";
-$res_new_cust = $conn->query($sql_new_cust);
-if ($res_new_cust) {
-    while ($r = $res_new_cust->fetch_assoc()) {
-        $items[] = $r;
-        if (!in_array($r['customer_id'], $cust_seen_a)) $cust_seen_a[] = $r['customer_id'];
-        if (!in_array($r['customer_id'], $cust_seen)) $cust_seen[] = $r['customer_id'];
-    }
-}
-
-// ULTIMATE FALLBACK: If items still empty, load all follow ups for this sales rep
+// Fallback: If empty, fetch all non-empty invoice follow ups for this sales rep regardless of date
 if (empty($items)) {
     $sql_fb = "
         SELECT 
+            fu.id AS followup_id,
+            fu.tgl_follow_up,
+            fu.no_inv,
+            fu.nominal_invoice,
+            fu.sales_id,
+            fu.catatan,
             c.id AS customer_id,
             c.nama_toko AS nama_customer,
-            (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
             c.tgl_input AS tgl_input_cust,
-            fu.id AS followup_id,
-            fu.no_inv,
-            fu.tgl_follow_up,
-            fu.nominal_invoice,
-            fu.catatan,
+            (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
             CASE 
-                WHEN (c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}') THEN 'A'
+                WHEN ({$month_cust_sql}) THEN 'A'
                 ELSE 'B'
             END AS kat_type
         FROM follow_ups fu
         JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
         WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
+          AND fu.no_inv IS NOT NULL 
+          AND fu.no_inv != ''
           AND fu.deleted_at IS NULL
-        ORDER BY fu.id DESC
-        LIMIT 50
+        ORDER BY fu.tgl_follow_up DESC
     ";
     $res_fb = $conn->query($sql_fb);
     if ($res_fb) {
@@ -266,7 +215,7 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
     </div>
 
     <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 14px;">
-        📄 Rincian <?= $total_cust_combined ?> Customer & Transaksi Invoice:
+        📄 Rincian <?= count($items) ?> Transaksi Invoice Customer:
     </h6>
 
     <?php if (empty($items)): ?>
@@ -320,7 +269,7 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
                             </td>
                             <td>
                                 <?php if (!empty($row['tgl_follow_up'])): ?>
-                                    <span class="text-dark fw-medium"><?= date('d M Y', strtotime($row['tgl_follow_up'])) ?></span>
+                                    <span class="text-dark fw-medium"><?= date('d M Y, H:i', strtotime($row['tgl_follow_up'])) ?></span>
                                 <?php else: ?>
                                     <span class="text-muted" style="font-size: 11px;">Input: <?= date('d M Y', strtotime($row['tgl_input_cust'])) ?></span>
                                 <?php endif; ?>
