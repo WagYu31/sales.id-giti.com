@@ -1223,15 +1223,27 @@ function renderScaledChart() {
     gradientBronze.addColorStop(0, '#F97316');
     gradientBronze.addColorStop(1, '#FB923C');
 
-    // Compute scale max - Target Finish Line is Rp 200.000.000 (200 Juta) for Omset Invoice
+    // Compute scale max - Fixed Targets for each metric so finish line represents real goals
     const maxVal = Math.max(...slicedValues, 1);
-    let scaleMax = Math.ceil(maxVal * 1.25);
-    let stepSizeVal = undefined;
+    let scaleMax = 50;
+    let stepSizeVal = 10;
 
     if (currentMetric === 'omset') {
         // Fixed scale to Target 200 Juta (or higher if a sales exceeds 200M)
         scaleMax = maxVal > 200000000 ? Math.ceil(maxVal / 50000000) * 50000000 : 200000000;
         stepSizeVal = 50000000; // 0, 50 Jt, 100 Jt, 150 Jt, 200 Jt
+    } else if (currentMetric === 'inv_count') {
+        // Target finish line for Invoice Terbanyak is 50 Invoice
+        scaleMax = maxVal > 50 ? Math.ceil(maxVal / 10) * 10 : 50;
+        stepSizeVal = 10;
+    } else if (currentMetric === 'total') {
+        // Target finish line for Activity FU is 100 Activity
+        scaleMax = maxVal > 100 ? Math.ceil(maxVal / 20) * 20 : 100;
+        stepSizeVal = 20;
+    } else if (currentMetric === 'customer') {
+        // Target finish line for Customer FU is 50 Customer
+        scaleMax = maxVal > 50 ? Math.ceil(maxVal / 10) * 10 : 50;
+        stepSizeVal = 10;
     }
 
     salesChartInstance = new Chart(ctx, {
@@ -1374,7 +1386,11 @@ function positionMascotRunners(chart) {
             runnerDiv.style.left = `${leftPos}px`;
             runnerDiv.style.top = `${topPos}px`;
 
-            const isFinished = (currentMetric === 'omset' && value >= 200000000) || (barX >= xAxis.right - 48);
+            let isFinished = false;
+            if (currentMetric === 'omset' && value >= 200000000) isFinished = true;
+            else if (currentMetric === 'inv_count' && value >= 50) isFinished = true;
+            else if (currentMetric === 'total' && value >= 100) isFinished = true;
+            else if (currentMetric === 'customer' && value >= 50) isFinished = true;
 
             let medalBadge = '';
             if (index === 0) medalBadge = '🥇';
@@ -1659,7 +1675,7 @@ function switchChartMetric(metricType) {
         metricLblText = 'Omset Invoice (<?= $label_periode_ranking ?>)';
     } else if (metricType === 'inv_count') {
         if (document.getElementById('btnMetricInvCount')) document.getElementById('btnMetricInvCount').classList.add('active');
-        titleText = '🧾 Sirkuit Lari Sales (Jumlah Invoice Terbanyak)';
+        titleText = '🧾 Sirkuit Lari Sales (Jumlah Invoice Terbanyak - Target 50 Inv)';
         metricLblText = 'Total Invoice (<?= $label_periode_ranking ?>)';
     } else if (metricType === 'total') {
         document.getElementById('btnMetricTotal').classList.add('active');
