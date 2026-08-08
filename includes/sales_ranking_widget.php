@@ -861,23 +861,30 @@ $total_sales_count = count($ranking_data);
                 </h5>
             </div>
         </div>
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            <button type="button" class="metric-btn active" id="btnMetricOmset" onclick="switchChartMetric('omset')">
-                💵 Invoice Sales (Rp)
-            </button>
-            <button type="button" class="metric-btn" id="btnMetricInvCount" onclick="switchChartMetric('inv_count')">
-                🧾 Invoice Terbanyak
-            </button>
-            <button type="button" class="metric-btn" id="btnMetricTotal" onclick="switchChartMetric('total')">
-                ⚡ Total Activity FU
-            </button>
-            <button type="button" class="metric-btn" id="btnMetricCustomer" onclick="switchChartMetric('customer')">
-                👥 Customer di-FU
-            </button>
-            <button type="button" class="btn-full-leaderboard ms-1" data-bs-toggle="modal" data-bs-target="#fullLeaderboardModal">
-                📋 Full Leaderboard (<?php echo $total_sales_count; ?> Sales)
-            </button>
+        <div class="text-end">
+            <div class="cash-prize-badge-3d" style="background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #1D4ED8 100%); border-color: #93C5FD; box-shadow: 0 10px 25px -4px rgba(37, 99, 235, 0.5);">
+                <span>💰</span> HADIAH UTAMA 2 JT INV TERBANYAK
+            </div>
         </div>
+    </div>
+
+    <!-- Filter Buttons Bar -->
+    <div class="d-flex align-items-center gap-2 flex-wrap mb-4">
+        <button type="button" class="metric-btn active" id="btnMetricOmset" onclick="switchChartMetric('omset')">
+            💵 Invoice Sales (Rp)
+        </button>
+        <button type="button" class="metric-btn" id="btnMetricInvCount" onclick="switchChartMetric('inv_count')" style="border: 1.5px solid #3B82F6;">
+            🧾 Invoice Terbanyak <span class="badge bg-danger text-white rounded-pill px-2 py-0.5 ms-1" style="font-size: 10px;">Hadiah 2 Juta 💰</span>
+        </button>
+        <button type="button" class="metric-btn" id="btnMetricTotal" onclick="switchChartMetric('total')">
+            ⚡ Total Activity FU
+        </button>
+        <button type="button" class="metric-btn" id="btnMetricCustomer" onclick="switchChartMetric('customer')">
+            👥 Customer di-FU
+        </button>
+        <button type="button" class="btn-full-leaderboard ms-1" data-bs-toggle="modal" data-bs-target="#fullLeaderboardModal">
+            📋 Full Leaderboard (<?php echo $total_sales_count; ?> Sales)
+        </button>
     </div>
 
     <div class="row g-4 align-items-stretch">
@@ -1675,7 +1682,7 @@ function switchChartMetric(metricType) {
         metricLblText = 'Omset Invoice (<?= $label_periode_ranking ?>)';
     } else if (metricType === 'inv_count') {
         if (document.getElementById('btnMetricInvCount')) document.getElementById('btnMetricInvCount').classList.add('active');
-        titleText = '🧾 Sirkuit Lari Sales (Jumlah Invoice Terbanyak - Target 50 Inv)';
+        titleText = '🧾 Sirkuit Lari Sales (HADIAH UTAMA 2 JT INVOICE TERBANYAK - Target 50 Inv)';
         metricLblText = 'Total Invoice (<?= $label_periode_ranking ?>)';
     } else if (metricType === 'total') {
         document.getElementById('btnMetricTotal').classList.add('active');
