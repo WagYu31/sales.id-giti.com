@@ -74,14 +74,18 @@ $sql_all = "
         fu.nominal_invoice,
         fu.catatan,
         CASE 
-            WHEN (DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}') THEN 'A'
+            WHEN (c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}')
+              OR (DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}') THEN 'A'
             ELSE 'B'
         END AS kat_type
     FROM follow_ups fu
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
       AND fu.deleted_at IS NULL
-      AND DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
+      AND (
+          (fu.tgl_follow_up >= '{$start_periode}' AND fu.tgl_follow_up <= '{$end_periode}')
+          OR (DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}')
+      )
       AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
     ORDER BY fu.tgl_follow_up DESC
 ";
@@ -123,14 +127,20 @@ $sql_new_cust = "
         NULL AS catatan,
         'A' AS kat_type
     FROM customers c
-    WHERE c.sales_id = {$sales_id}
+    WHERE (c.sales_id = {$sales_id})
       AND c.deleted_at IS NULL
-      AND DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}'
+      AND (
+          (c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}')
+          OR (DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}')
+      )
       AND c.id NOT IN (
           SELECT fu2.customer_id FROM follow_ups fu2 
           WHERE (fu2.sales_id = {$sales_id} OR fu2.customer_id = c.id) 
             AND fu2.deleted_at IS NULL 
-            AND DATE(fu2.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
+            AND (
+                (fu2.tgl_follow_up >= '{$start_periode}' AND fu2.tgl_follow_up <= '{$end_periode}')
+                OR (DATE(fu2.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}')
+            )
             AND fu2.no_inv IS NOT NULL AND fu2.no_inv != ''
       )
     ORDER BY c.tgl_input DESC
@@ -141,6 +151,47 @@ if ($res_new_cust) {
         $items[] = $r;
         if (!in_array($r['customer_id'], $cust_seen_a)) $cust_seen_a[] = $r['customer_id'];
         if (!in_array($r['customer_id'], $cust_seen)) $cust_seen[] = $r['customer_id'];
+    }
+}
+
+// ULTIMATE FALLBACK: If items still empty, load all follow ups for this sales rep
+if (empty($items)) {
+    $sql_fb = "
+        SELECT 
+            c.id AS customer_id,
+            c.nama_toko AS nama_customer,
+            (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
+            c.tgl_input AS tgl_input_cust,
+            fu.id AS followup_id,
+            fu.no_inv,
+            fu.tgl_follow_up,
+            fu.nominal_invoice,
+            fu.catatan,
+            CASE 
+                WHEN (c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}') THEN 'A'
+                ELSE 'B'
+            END AS kat_type
+        FROM follow_ups fu
+        JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
+        WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
+          AND fu.deleted_at IS NULL
+        ORDER BY fu.id DESC
+        LIMIT 50
+    ";
+    $res_fb = $conn->query($sql_fb);
+    if ($res_fb) {
+        while ($r = $res_fb->fetch_assoc()) {
+            $items[] = $r;
+            $nom = (float)($r['nominal_invoice'] ?? 0);
+            if ($r['kat_type'] === 'A') {
+                $omset_a += $nom;
+                if (!in_array($r['customer_id'], $cust_seen_a)) $cust_seen_a[] = $r['customer_id'];
+            } else {
+                $omset_b += $nom;
+                if (!in_array($r['customer_id'], $cust_seen_b)) $cust_seen_b[] = $r['customer_id'];
+            }
+            if (!in_array($r['customer_id'], $cust_seen)) $cust_seen[] = $r['customer_id'];
+        }
     }
 }
 
