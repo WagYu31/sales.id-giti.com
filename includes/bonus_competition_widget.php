@@ -259,9 +259,9 @@ if ($res_combined) {
                     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2 border-bottom border-secondary border-opacity-30 pb-3">
                         <div>
                             <h5 class="fw-bold text-white mb-1 d-flex align-items-center gap-2" style="font-size: 18px; font-family: 'Plus Jakarta Sans', sans-serif;">
-                                🏆 Leaderboard Sultan Sales (Gabungan Cust Baru & Reaktivasi)
+                                🏆 Leaderboard Perolehan Sales (Akuisisi & Reaktivasi Mitra)
                             </h5>
-                            <small class="text-white-50" style="font-size: 12px;">Total pencapaian omset invoice & jumlah customer belanja per <?= $label_periode ?> (Target Rp 200 Juta Omset Invoice).</small>
+                            <small class="text-white-50" style="font-size: 12px;">Akumulasi omset invoice & jumlah mitra aktif per <?= $label_periode ?> (Target Rp 200 Juta Omset Invoice).</small>
                         </div>
                         <span class="badge bg-warning bg-opacity-20 text-warning border border-warning rounded-pill px-3 py-1.5" style="font-size: 12px; font-weight: 800; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);">
                             💰 TOTAL HADIAH RP 4.000.000,-
@@ -291,8 +291,8 @@ if ($res_combined) {
                                                     <span class="detail-btn-3d">🔍 Detail Rincian</span>
                                                 </div>
                                                 <small class="text-white-50" style="font-size: 11.5px;">
-                                                    <strong class="text-warning"><?php echo $item['total_cust_belanja']; ?> Cust Belanja</strong> 
-                                                    (🚀 <?php echo $item['total_cust_baru']; ?> Cust Baru + 🔥 <?php echo $item['total_cust_reaktivasi']; ?> Reaktivasi)
+                                                    <strong class="text-warning"><?php echo $item['total_cust_belanja']; ?> Mitra Transaksi</strong> 
+                                                    (🚀 <?php echo $item['total_cust_baru']; ?> Baru + 🔥 <?php echo $item['total_cust_reaktivasi']; ?> Reaktivasi)
                                                 </small>
                                             </div>
                                         </div>

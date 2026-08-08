@@ -196,7 +196,7 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
                 <h3 class="fw-bold mb-1 text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.4px;">
                     👤 <?= htmlspecialchars($sales['nama_lengkap']) ?>
                 </h3>
-                <small class="text-secondary fw-medium" style="font-size: 13px;">Gabungan Kat A (Cust Baru) & Kat B (Reaktivasi Customer Lama)</small>
+                <small class="text-secondary fw-semibold" style="font-size: 13px;">Akumulasi Pencapaian Akuisisi Customer Baru & Reaktivasi Portofolio Lama</small>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -205,23 +205,23 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
         <div class="row g-3 mt-3 pt-2">
             <div class="col-12 col-md-4">
                 <div class="kpi-card-clean" style="background: #EFF6FF; border: 1.5px solid #BFDBFE;">
-                    <small class="d-block fw-bold mb-1 text-uppercase" style="font-size: 11px; color: #1E40AF;">🚀 Kat A: Cust Baru</small>
+                    <small class="d-block fw-bold mb-1 text-uppercase" style="font-size: 11px; color: #1E40AF;">🚀 Akuisisi Customer Baru</small>
                     <span class="fw-bold font-monospace" style="font-size: 17px; color: #1E3A8A;">Rp <?= number_format($omset_a, 0, ',', '.') ?></span>
-                    <div class="fw-semibold mt-1" style="font-size: 11.5px; color: #2563EB;"><?= $total_cust_a ?> Customer</div>
+                    <div class="fw-semibold mt-1" style="font-size: 11.5px; color: #2563EB;"><?= $total_cust_a ?> Mitra Baru</div>
                 </div>
             </div>
             <div class="col-12 col-md-4">
                 <div class="kpi-card-clean" style="background: #FEF3C7; border: 1.5px solid #FDE68A;">
-                    <small class="d-block fw-bold mb-1 text-uppercase" style="font-size: 11px; color: #92400E;">🔥 Kat B: Reaktivasi</small>
+                    <small class="d-block fw-bold mb-1 text-uppercase" style="font-size: 11px; color: #92400E;">🔥 Reaktivasi Portofolio</small>
                     <span class="fw-bold font-monospace" style="font-size: 17px; color: #78350F;">Rp <?= number_format($omset_b, 0, ',', '.') ?></span>
-                    <div class="fw-semibold mt-1" style="font-size: 11.5px; color: #D97706;"><?= $total_cust_b ?> Customer Belanja</div>
+                    <div class="fw-semibold mt-1" style="font-size: 11.5px; color: #D97706;"><?= $total_cust_b ?> Mitra Transaksi</div>
                 </div>
             </div>
             <div class="col-12 col-md-4">
                 <div class="kpi-card-clean" style="background: #ECFDF5; border: 1.5px solid #A7F3D0;">
-                    <small class="d-block fw-bold mb-1 text-uppercase" style="font-size: 11px; color: #065F46;">🏆 Total Combined Omset</small>
+                    <small class="d-block fw-bold mb-1 text-uppercase" style="font-size: 11px; color: #065F46;">🏆 Total Akumulasi Omset</small>
                     <span class="fw-bold font-monospace" style="font-size: 18px; color: #047857;">Rp <?= number_format($total_omset_combined, 0, ',', '.') ?></span>
-                    <div class="fw-bold mt-1" style="font-size: 11.5px; color: #059669;"><?= $total_cust_combined ?> Customer Total (<?= $pct_target_comb ?>% Target)</div>
+                    <div class="fw-bold mt-1" style="font-size: 11.5px; color: #059669;"><?= $total_cust_combined ?> Total Mitra (<?= $pct_target_comb ?>% Target)</div>
                 </div>
             </div>
         </div>
@@ -241,7 +241,7 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
     </div>
 
     <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 14.5px;">
-        📄 Rincian <?= count($items) ?> Transaksi Invoice Customer:
+        📄 Rincian <?= count($items) ?> Transaksi Penjualan & Invoice Customer:
     </h6>
 
     <?php if (empty($items)): ?>
@@ -271,11 +271,11 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
                             <td style="white-space: nowrap;">
                                 <?php if ($row['kat_type'] === 'A'): ?>
                                     <span class="badge bg-primary bg-opacity-10 text-primary fw-bold border border-primary border-opacity-20 px-3 py-1.5 rounded-pill" style="font-size: 11px;">
-                                        🚀 Kat A: Baru
+                                        🚀 Akuisisi Baru
                                     </span>
                                 <?php else: ?>
                                     <span class="badge bg-warning bg-opacity-20 text-dark fw-bold border border-warning border-opacity-30 px-3 py-1.5 rounded-pill" style="font-size: 11px; background-color: #FEF3C7; color: #92400E;">
-                                        🔥 Kat B: Reaktivasi
+                                        🔥 Reaktivasi Lama
                                     </span>
                                 <?php endif; ?>
                             </td>
@@ -316,7 +316,7 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
                 </tbody>
                 <tfoot class="bg-light fw-bold border-top" style="position: sticky; bottom: 0; z-index: 10; background: #F8FAFC;">
                     <tr>
-                        <td colspan="5" class="ps-3 py-3 text-dark">GRAND TOTAL COMBINED OMSET:</td>
+                        <td colspan="5" class="ps-3 py-3 text-dark">TOTAL AKUMULASI OMSET PENJUALAN:</td>
                         <td class="text-end pe-3 py-3 text-success font-monospace fs-6 fw-bold">
                             Rp <?= number_format($total_omset_combined, 0, ',', '.') ?>
                         </td>
