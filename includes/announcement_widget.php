@@ -77,7 +77,7 @@
     display: flex;
     align-items: center;
     white-space: nowrap;
-    animation: tickerMarqueeScroll 30s linear infinite;
+    animation: tickerMarqueeScroll 12s linear infinite;
     cursor: pointer;
 }
 
