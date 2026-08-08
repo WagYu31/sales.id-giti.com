@@ -60,8 +60,8 @@ if (!$sales) {
 $target_omset = 200000000;
 
 // Fetch ALL invoice transactions for this sales in the selected period
-// Kat A = Customer Baru (c.tgl_input in period)
-// Kat B = Reaktivasi Customer Lama (c.tgl_input before period)
+// Kat A = Customer Baru (DATE(c.tgl_input) in period)
+// Kat B = Reaktivasi Customer Lama (DATE(c.tgl_input) before period)
 $sql_all = "
     SELECT 
         c.id AS customer_id,
@@ -74,15 +74,14 @@ $sql_all = "
         fu.nominal_invoice,
         fu.catatan,
         CASE 
-            WHEN (c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}') THEN 'A'
+            WHEN (DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}') THEN 'A'
             ELSE 'B'
         END AS kat_type
     FROM follow_ups fu
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
       AND fu.deleted_at IS NULL
-      AND fu.tgl_follow_up >= '{$start_periode}' 
-      AND fu.tgl_follow_up <= '{$end_periode}'
+      AND DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
       AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
     ORDER BY fu.tgl_follow_up DESC
 ";
@@ -126,14 +125,12 @@ $sql_new_cust = "
     FROM customers c
     WHERE c.sales_id = {$sales_id}
       AND c.deleted_at IS NULL
-      AND c.tgl_input >= '{$start_periode}' 
-      AND c.tgl_input <= '{$end_periode}'
+      AND DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}'
       AND c.id NOT IN (
           SELECT fu2.customer_id FROM follow_ups fu2 
           WHERE (fu2.sales_id = {$sales_id} OR fu2.customer_id = c.id) 
             AND fu2.deleted_at IS NULL 
-            AND fu2.tgl_follow_up >= '{$start_periode}' 
-            AND fu2.tgl_follow_up <= '{$end_periode}'
+            AND DATE(fu2.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
             AND fu2.no_inv IS NOT NULL AND fu2.no_inv != ''
       )
     ORDER BY c.tgl_input DESC
