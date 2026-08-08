@@ -1,6 +1,6 @@
 <?php
 /**
- * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (ELEGANT & RESPONSIVE DESIGN)
+ * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL WITH INTERACTIVE MONTH FILTER
  */
 require_once 'includes/db.php';
 
@@ -13,24 +13,41 @@ if ($sales_id <= 0) {
     exit;
 }
 
-// Month Label
+// Date Range Filtering
+$where_date_fu = "";
+$where_date_cust = "";
+
 if ($selected_bulan === '9') {
     $start_date = '2026-09-01';
     $end_date = '2026-09-30';
     $label_periode = 'Bulan 9 (September 2026)';
+    $where_date_fu = "AND DATE(fu.tgl_follow_up) BETWEEN '2026-09-01' AND '2026-09-30'";
+    $where_date_cust = "DATE(c.tgl_input) BETWEEN '2026-09-01' AND '2026-09-30'";
 } else if ($selected_bulan === '10') {
     $start_date = '2026-10-01';
     $end_date = '2026-10-31';
     $label_periode = 'Bulan 10 (Oktober 2026)';
-} else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
+    $where_date_fu = "AND DATE(fu.tgl_follow_up) BETWEEN '2026-10-01' AND '2026-10-31'";
+    $where_date_cust = "DATE(c.tgl_input) BETWEEN '2026-10-01' AND '2026-10-31'";
+} else if ($selected_bulan === '8-10') {
     $start_date = '2026-08-01';
     $end_date = '2026-10-31';
-    $label_periode = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
+    $label_periode = 'Periode Total (Agt - Okt 2026)';
+    $where_date_fu = "AND DATE(fu.tgl_follow_up) BETWEEN '2026-08-01' AND '2026-10-31'";
+    $where_date_cust = "DATE(c.tgl_input) BETWEEN '2026-08-01' AND '2026-10-31'";
+} else if ($selected_bulan === 'all_time') {
+    $start_date = '2026-01-01';
+    $end_date = '2026-12-31';
+    $label_periode = 'Semua Waktu History';
+    $where_date_fu = "";
+    $where_date_cust = "1=1";
 } else {
     $selected_bulan = '8';
     $start_date = '2026-08-01';
     $end_date = '2026-08-31';
     $label_periode = 'Bulan 8 (Agustus 2026)';
+    $where_date_fu = "AND DATE(fu.tgl_follow_up) BETWEEN '2026-08-01' AND '2026-08-31'";
+    $where_date_cust = "DATE(c.tgl_input) BETWEEN '2026-08-01' AND '2026-08-31'";
 }
 
 // Fetch Sales Rep Info
@@ -51,7 +68,7 @@ if (!$sales) {
 
 $target_omset = 200000000;
 
-// Fetch Invoice Follow-Up records matching invoice_followup_report.php
+// Fetch Invoice Follow-Up records matching invoice_followup_report.php with date filter
 $sql_all = "
     SELECT 
         fu.id AS followup_id,
@@ -65,7 +82,7 @@ $sql_all = "
         c.tgl_input AS tgl_input_cust,
         (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
         CASE 
-            WHEN (DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}') THEN 'A'
+            WHEN ({$where_date_cust}) THEN 'A'
             ELSE 'B'
         END AS kat_type
     FROM follow_ups fu
@@ -74,6 +91,7 @@ $sql_all = "
       AND (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
       AND fu.no_inv IS NOT NULL 
       AND fu.no_inv != ''
+      {$where_date_fu}
     ORDER BY fu.tgl_follow_up DESC
 ";
 
@@ -127,6 +145,7 @@ if (empty($items)) {
           AND fu.no_inv IS NOT NULL 
           AND fu.no_inv != ''
           AND fu.deleted_at IS NULL
+          {$where_date_fu}
         ORDER BY fu.tgl_follow_up DESC
     ";
     $res_fb = $conn->query($sql_fb);
@@ -176,6 +195,14 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
 .kpi-card-clean:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.filter-btn-modal {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 50px;
+    transition: all 0.2s ease;
 }
 </style>
 
@@ -229,6 +256,33 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
 </div>
 
 <div class="modal-body p-4 bg-light">
+    <!-- Interactive Month Filter Bar -->
+    <div class="card border-0 shadow-sm p-2 mb-3 bg-white" style="border-radius: 50px; border: 1px solid #E2E8F0;">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-2">
+            <div class="d-flex align-items-center gap-2">
+                <span class="fw-bold text-dark" style="font-size: 12.5px;"><i class="bi bi-funnel-fill text-danger me-1"></i>Filter Periode:</span>
+                <span class="badge bg-danger text-white rounded-pill px-3 py-1 fw-bold" style="font-size: 11px;"><?= $label_periode ?></span>
+            </div>
+            <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                <button type="button" onclick="switchModalBulanFilter(<?= $sales_id ?>, '8')" class="btn filter-btn-modal <?= ($selected_bulan==='8')?'btn-danger text-white shadow-sm':'btn-outline-secondary' ?>">
+                    📅 Agt (Bulan 8)
+                </button>
+                <button type="button" onclick="switchModalBulanFilter(<?= $sales_id ?>, '9')" class="btn filter-btn-modal <?= ($selected_bulan==='9')?'btn-warning text-dark shadow-sm':'btn-outline-secondary' ?>">
+                    📅 Sep (Bulan 9)
+                </button>
+                <button type="button" onclick="switchModalBulanFilter(<?= $sales_id ?>, '10')" class="btn filter-btn-modal <?= ($selected_bulan==='10')?'btn-success text-white shadow-sm':'btn-outline-secondary' ?>">
+                    📅 Okt (Bulan 10)
+                </button>
+                <button type="button" onclick="switchModalBulanFilter(<?= $sales_id ?>, '8-10')" class="btn filter-btn-modal <?= ($selected_bulan==='8-10')?'btn-primary text-white shadow-sm':'btn-outline-secondary' ?>">
+                    🏆 Total (Agt - Okt)
+                </button>
+                <button type="button" onclick="switchModalBulanFilter(<?= $sales_id ?>, 'all_time')" class="btn filter-btn-modal <?= ($selected_bulan==='all_time')?'btn-dark text-white shadow-sm':'btn-outline-secondary' ?>">
+                    🗓️ Semua Waktu
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Progress Bar Card -->
     <div class="card border-0 shadow-sm p-3 mb-3" style="border-radius: 16px; border: 1px solid #E2E8F0;">
         <div class="d-flex justify-content-between align-items-center mb-1.5 text-dark fw-bold" style="font-size: 12.5px;">
@@ -241,14 +295,14 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
     </div>
 
     <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 14.5px;">
-        📄 Rincian <?= count($items) ?> Transaksi Penjualan & Invoice Customer:
+        📄 Rincian <?= count($items) ?> Transaksi Penjualan & Invoice Customer (<?= $label_periode ?>):
     </h6>
 
     <?php if (empty($items)): ?>
         <div class="text-center py-5 bg-white rounded-4 border">
             <div class="fs-1 mb-2">📦</div>
             <h6 class="fw-bold text-dark mb-1">Belum ada rincian transaksi.</h6>
-            <small class="text-muted">Tidak ditemukan customer / invoice pada periode ini.</small>
+            <small class="text-muted">Tidak ditemukan customer / invoice pada periode <?= htmlspecialchars($label_periode) ?>.</small>
         </div>
     <?php else: ?>
         <!-- WIDE SCROLLABLE TABLE CONTAINER WITH GUARANTEED FIT -->

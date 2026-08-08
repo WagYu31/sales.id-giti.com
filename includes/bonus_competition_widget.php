@@ -359,6 +359,22 @@ function openBonusSalesDetail(salesId, kat) {
             `;
         });
 }
+
+function switchModalBulanFilter(salesId, newBulan) {
+    const modalBody = document.getElementById('bonusSalesDetailModalBody');
+    modalBody.style.opacity = '0.5';
+
+    fetch(`ajax_bonus_sales_detail.php?sales_id=${salesId}&kat=all&periode_bulan=${newBulan}`)
+        .then(res => res.text())
+        .then(html => {
+            modalBody.innerHTML = html;
+            modalBody.style.opacity = '1';
+        })
+        .catch(err => {
+            modalBody.style.opacity = '1';
+            alert('Gagal memfilter data: ' + err.message);
+        });
+}
 </script>
 
 <!-- MODAL CONTAINER FOR SALES DETAIL -->
