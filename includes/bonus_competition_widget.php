@@ -71,29 +71,30 @@ if ($res_kat_a) {
     }
 }
 
-// 2. Fetch Top Sales Kategori B: Reaktivasi Customer Lama Belanja Kembali & Omset Invoice (Mulai 1 Agt 2026)
-$sql_kat_b = "
+// Fetch Combined Sales Leaderboard (Kat A + Kat B Combined)
+$sql_combined = "
     SELECT 
         s.id AS sales_id,
         s.nama_lengkap AS nama_sales,
-        COUNT(DISTINCT fu.customer_id) AS total_customer_reaktivasi,
-        COALESCE(SUM(fu.nominal_invoice), 0) AS total_omset_reaktivasi
+        COUNT(DISTINCT CASE WHEN DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}' THEN c.id END) AS total_cust_baru,
+        COUNT(DISTINCT CASE WHEN (DATE(c.tgl_input) < '{$start_date}' OR c.tgl_input IS NULL OR c.tgl_input = '' OR c.tgl_input LIKE '0000%') THEN fu.customer_id END) AS total_cust_reaktivasi,
+        COUNT(DISTINCT fu.customer_id) AS total_cust_belanja,
+        COALESCE(SUM(fu.nominal_invoice), 0) AS total_omset_combined
     FROM sales s
     JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
       AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-      AND (DATE(c.tgl_input) < '{$start_date}' OR c.tgl_input IS NULL OR c.tgl_input = '' OR c.tgl_input LIKE '0000%')
       AND (s.role = 'sales' OR s.role = 'superadmin')
     GROUP BY s.id, s.nama_lengkap
-    ORDER BY total_omset_reaktivasi DESC, total_customer_reaktivasi DESC
-    LIMIT 5
+    ORDER BY total_omset_combined DESC, total_cust_belanja DESC
+    LIMIT 10
 ";
-$res_kat_b = $conn->query($sql_kat_b);
-$list_kat_b = [];
-if ($res_kat_b) {
-    while ($r = $res_kat_b->fetch_assoc()) {
-        $list_kat_b[] = $r;
+$res_combined = $conn->query($sql_combined);
+$list_combined = [];
+if ($res_combined) {
+    while ($r = $res_combined->fetch_assoc()) {
+        $list_combined[] = $r;
     }
 }
 ?>
@@ -126,76 +127,66 @@ if ($res_kat_b) {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 4.5px;
-    background: linear-gradient(90deg, #DC2626 0%, #F59E0B 50%, #DC2626 100%);
-    box-shadow: 0 2px 10px rgba(220, 38, 38, 0.4);
-}
-
-.bonus-kat-box {
-    background: #0F172A;
-    border: 2px solid #DC2626;
-    border-radius: 22px;
-    padding: 24px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
-    color: #FFFFFF;
-}
-
-.bonus-kat-box:hover {
-    transform: translateY(-5px);
-    border-color: #F59E0B;
-    box-shadow: 0 20px 40px rgba(220, 38, 38, 0.25);
+    background: linear-gradient(90deg, #DC2626 0%, #F59E0B 50%, #10B981 100%);
 }
 
 .cash-prize-badge {
     background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
     color: #FFFFFF;
-    font-size: 13px;
     font-weight: 800;
-    padding: 7px 18px;
-    border-radius: 20px;
-    border: 1.5px solid #FCD34D;
-    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
-    animation: floatCashBadge 3s infinite ease-in-out;
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 20px -4px rgba(220, 38, 38, 0.4);
+    animation: floatCashBadge 3s ease-in-out infinite;
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
 
-.rank-row-item {
-    background: rgba(30, 41, 59, 0.7);
+.bonus-kat-box {
+    background: linear-gradient(145deg, #0F172A 0%, #1E293B 100%);
+    border-radius: 20px;
+    padding: 24px 28px;
+    height: 100%;
+    position: relative;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 12px 24px -6px rgba(15, 23, 42, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.rank-row-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
     border-radius: 14px;
     padding: 12px 16px;
     margin-bottom: 10px;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .rank-row-item:hover {
-    background: rgba(30, 41, 59, 0.95);
-    border-color: rgba(245, 158, 11, 0.5);
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(251, 191, 36, 0.4);
+    transform: translateY(-2px);
 }
 
 .rank-pill {
     width: 28px; height: 28px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 13px;
-    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 11px;
 }
-.rank-pill.gold { background: linear-gradient(135deg, #F59E0B, #D97706); color: #FFF; }
-.rank-pill.silver { background: linear-gradient(135deg, #94A3B8, #64748B); color: #FFF; }
-.rank-pill.bronze { background: linear-gradient(135deg, #D97706, #B45309); color: #FFF; }
+
+.rank-pill.gold { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #FFF; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); }
+.rank-pill.silver { background: linear-gradient(135deg, #94A3B8 0%, #64748B 100%); color: #FFF; }
+.rank-pill.bronze { background: linear-gradient(135deg, #D97706 0%, #B45309 100%); color: #FFF; }
 .rank-pill.normal { background: rgba(255, 255, 255, 0.1); color: #94A3B8; }
 </style>
 
-<div class="bonus-competition-card">
+<div class="bonus-competition-card" id="sultan-bonus-widget">
     <!-- Header Banner -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div class="d-flex align-items-center gap-3">
@@ -214,7 +205,7 @@ if ($res_kat_b) {
         </div>
         <div class="text-end">
             <div class="cash-prize-badge">
-                🇮🇩 HADIAH RP 2.000.000,- / KATEGORI
+                💰 HADIAH BONUS RP 4.000.000,-
             </div>
         </div>
     </div>
@@ -241,138 +232,75 @@ if ($res_kat_b) {
         </div>
     </div>
 
-    <!-- 2 Main Categories Grid -->
-    <div class="row g-4 align-items-stretch">
-        <!-- KATEGORI A: Customer Baru Terbanyak & Nominal Invoice -->
-        <div class="col-lg-6 col-12">
-            <div class="bonus-kat-box">
+    <!-- Combined Leaderboard Box -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="bonus-kat-box" style="padding: 28px 32px;">
                 <div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-bold text-white mb-0 d-flex align-items-center gap-2" style="font-size: 15.5px;">
-                            🚀 KATEGORI A: Customer Baru Terbanyak
-                        </h6>
-                        <span class="badge bg-success bg-opacity-20 text-success border border-success rounded-pill px-2.5 py-1" style="font-size: 11px; font-weight: 800;">
-                            💰 BONUS RP 2.000.000,-
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                        <div>
+                            <h5 class="fw-bold text-white mb-1 d-flex align-items-center gap-2" style="font-size: 17px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                                🏆 Leaderboard Perolehan Sultan Sales (Gabungan Cust Baru & Reaktivasi)
+                            </h5>
+                            <small class="text-white-50" style="font-size: 12px;">Total pencapaian omset invoice & jumlah customer belanja per <?= $label_periode ?> (Target Rp 200 Juta Omset Invoice).</small>
+                        </div>
+                        <span class="badge bg-warning bg-opacity-20 text-warning border border-warning rounded-pill px-3 py-1.5" style="font-size: 12px; font-weight: 800;">
+                            💰 TOTAL BONUS RP 4.000.000,-
                         </span>
                     </div>
-                    <p class="text-white-50 mb-3" style="font-size: 12px;">Mencari Customer Baru terbanyak & pencapaian omset invoice (Target Rp 200 Juta).</p>
 
-                    <!-- Realtime Leaderboard List Category A -->
-                    <div class="rank-list-holder">
-                        <?php if (!empty($list_kat_a)): ?>
-                            <?php foreach ($list_kat_a as $i => $item): ?>
+                    <!-- Realtime Combined Leaderboard List -->
+                    <div class="rank-list-holder mt-3">
+                        <?php if (!empty($list_combined)): ?>
+                            <?php foreach ($list_combined as $i => $item): ?>
                                 <?php
                                 $rClass = 'normal';
                                 $rIcon = '#' . ($i + 1);
                                 if ($i === 0) { $rClass = 'gold'; $rIcon = '🥇'; }
                                 elseif ($i === 1) { $rClass = 'silver'; $rIcon = '🥈'; }
                                 elseif ($i === 2) { $rClass = 'bronze'; $rIcon = '🥉'; }
-                                $omset_a = (float)$item['total_omset_baru'];
-                                $pct_target_a = min(100, round(($omset_a / $target_omset_per_bulan) * 100, 1));
+                                $omset_comb = (float)$item['total_omset_combined'];
+                                $pct_target_comb = min(100, round(($omset_comb / $target_omset_per_bulan) * 100, 1));
                                 ?>
-                                <div class="rank-row-item" style="cursor: pointer;" onclick="openBonusSalesDetail(<?php echo $item['sales_id']; ?>, 'a')" title="Klik untuk lihat rincian detail <?= htmlspecialchars($item['nama_sales']); ?>">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <div class="d-flex align-items-center gap-2">
+                                <div class="rank-row-item" style="cursor: pointer;" onclick="openBonusSalesDetail(<?php echo $item['sales_id']; ?>, 'all')" title="Klik untuk lihat rincian detail <?= htmlspecialchars($item['nama_sales']); ?>">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-1.5 gap-2">
+                                        <div class="d-flex align-items-center gap-3">
                                             <div class="rank-pill <?php echo $rClass; ?>"><?php echo $rIcon; ?></div>
                                             <div>
-                                                <div class="fw-bold text-white d-flex align-items-center gap-1.5" style="font-size: 13.5px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                                                <div class="fw-bold text-white d-flex align-items-center gap-2" style="font-size: 14.5px; font-family: 'Plus Jakarta Sans', sans-serif;">
                                                     <span><?php echo htmlspecialchars($item['nama_sales']); ?></span>
-                                                    <span class="badge bg-white bg-opacity-10 text-info fw-normal" style="font-size: 9.5px; padding: 2px 6px;">🔍 Detail</span>
+                                                    <span class="badge bg-white bg-opacity-10 text-info fw-normal" style="font-size: 10px; padding: 3px 8px;">🔍 Detail Rincian</span>
                                                 </div>
-                                                <small class="text-white-50" style="font-size: 11px;"><?php echo $item['total_customer_baru']; ?> Cust Baru</small>
+                                                <small class="text-white-50" style="font-size: 11.5px;">
+                                                    <strong class="text-warning"><?php echo $item['total_cust_belanja']; ?> Cust Belanja</strong> 
+                                                    (🚀 <?php echo $item['total_cust_baru']; ?> Cust Baru + 🔥 <?php echo $item['total_cust_reaktivasi']; ?> Reaktivasi)
+                                                </small>
                                             </div>
                                         </div>
                                         <div class="text-end">
-                                            <div class="fw-bold text-emerald-400 font-monospace" style="font-size: 13.5px; color: #34D399;">
-                                                Rp <?php echo number_format($omset_a, 0, ',', '.'); ?>
+                                            <div class="fw-bold text-emerald-400 font-monospace" style="font-size: 15px; color: #34D399;">
+                                                Rp <?php echo number_format($omset_comb, 0, ',', '.'); ?>
                                             </div>
-                                            <small class="text-warning fw-semibold" style="font-size: 10.5px;"><?php echo $pct_target_a; ?>% dari Rp 200 Juta</small>
+                                            <small class="text-warning fw-semibold" style="font-size: 11px;"><?php echo $pct_target_comb; ?>% dari Target Rp 200 Juta</small>
                                         </div>
                                     </div>
-                                    <div class="progress" style="height: 5px; background: rgba(255, 255, 255, 0.1); border-radius: 10px;">
-                                        <div class="progress-bar bg-success bg-gradient" role="progressbar" style="width: <?php echo max($pct_target_a, 2); ?>%; border-radius: 10px;"></div>
+                                    <div class="progress" style="height: 7px; background: rgba(255, 255, 255, 0.1); border-radius: 10px;">
+                                        <div class="progress-bar bg-success bg-gradient" role="progressbar" style="width: <?php echo max($pct_target_comb, 2); ?>%; border-radius: 10px;"></div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="text-center py-4 text-white-50" style="font-size: 13px;">
-                                🚀 Belum ada data customer baru per <?= $label_periode ?>.<br>
-                                <small>Ayo follow up customer baru untuk mendapatkan omset & bonus Rp 2 Juta!</small>
+                                🚀 Belum ada data pencapaian omset invoice sales per <?= $label_periode ?>.<br>
+                                <small>Ayo tingkatkan omset invoice customer baru & reaktivasi untuk memenangkan Bonus Sultan Rp 4 Juta!</small>
                             </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <div class="mt-3 pt-3 border-top border-secondary border-opacity-30 d-flex justify-content-between align-items-center" style="font-size: 11.5px; color: #94A3B8;">
-                    <span>📌 Syarat: <?= $syarat_kat_a ?></span>
-                    <span class="text-warning fw-bold">Pemenang: Top 1 Sales</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- KATEGORI B: Reaktivasi Customer Lama Belanja Kembali -->
-        <div class="col-lg-6 col-12">
-            <div class="bonus-kat-box">
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-bold text-white mb-0 d-flex align-items-center gap-2" style="font-size: 15.5px;">
-                            🔥 KATEGORI B: Reaktivasi Customer Lama
-                        </h6>
-                        <span class="badge bg-warning bg-opacity-20 text-warning border border-warning rounded-pill px-2.5 py-1" style="font-size: 11px; font-weight: 800;">
-                            💰 BONUS RP 2.000.000,-
-                        </span>
-                    </div>
-                    <p class="text-white-50 mb-3" style="font-size: 12px;">Membangunkan Customer Lama untuk Belanja Kembali (Target Rp 200 Juta Omset Invoice).</p>
-
-                    <!-- Realtime Leaderboard List Category B -->
-                    <div class="rank-list-holder">
-                        <?php if (!empty($list_kat_b)): ?>
-                            <?php foreach ($list_kat_b as $i => $item): ?>
-                                <?php
-                                $rClass = 'normal';
-                                $rIcon = '#' . ($i + 1);
-                                if ($i === 0) { $rClass = 'gold'; $rIcon = '🥇'; }
-                                elseif ($i === 1) { $rClass = 'silver'; $rIcon = '🥈'; }
-                                elseif ($i === 2) { $rClass = 'bronze'; $rIcon = '🥉'; }
-                                $omset_b = (float)$item['total_omset_reaktivasi'];
-                                $pct_target_b = min(100, round(($omset_b / $target_omset_per_bulan) * 100, 1));
-                                ?>
-                                <div class="rank-row-item" style="cursor: pointer;" onclick="openBonusSalesDetail(<?php echo $item['sales_id']; ?>, 'b')" title="Klik untuk lihat rincian detail <?= htmlspecialchars($item['nama_sales']); ?>">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="rank-pill <?php echo $rClass; ?>"><?php echo $rIcon; ?></div>
-                                            <div>
-                                                <div class="fw-bold text-white d-flex align-items-center gap-1.5" style="font-size: 13.5px; font-family: 'Plus Jakarta Sans', sans-serif;">
-                                                    <span><?php echo htmlspecialchars($item['nama_sales']); ?></span>
-                                                    <span class="badge bg-white bg-opacity-10 text-info fw-normal" style="font-size: 9.5px; padding: 2px 6px;">🔍 Detail</span>
-                                                </div>
-                                                <small class="text-white-50" style="font-size: 11px;"><?php echo $item['total_customer_reaktivasi']; ?> Cust Belanja</small>
-                                            </div>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="fw-bold font-monospace" style="font-size: 13.5px; color: #FCD34D;">
-                                                Rp <?php echo number_format($omset_b, 0, ',', '.'); ?>
-                                            </div>
-                                            <small class="text-warning fw-semibold" style="font-size: 10.5px;"><?php echo $pct_target_b; ?>% dari Rp 200 Juta</small>
-                                        </div>
-                                    </div>
-                                    <div class="progress" style="height: 5px; background: rgba(255, 255, 255, 0.1); border-radius: 10px;">
-                                        <div class="progress-bar bg-warning bg-gradient" role="progressbar" style="width: <?php echo max($pct_target_b, 2); ?>%; border-radius: 10px;"></div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="text-center py-4 text-white-50" style="font-size: 13px;">
-                                🔥 Belum ada data reaktivasi customer lama per <?= $label_periode ?>.<br>
-                                <small>Ayo follow up customer lama agar reaktivasi & dapatkan omset serta bonus Rp 2 Juta!</small>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <div class="mt-3 pt-3 border-top border-secondary border-opacity-30 d-flex justify-content-between align-items-center" style="font-size: 11.5px; color: #94A3B8;">
-                    <span>📌 Syarat: <?= $syarat_kat_b ?></span>
-                    <span class="text-warning fw-bold">Pemenang: Top 1 Sales</span>
+                <div class="mt-3 pt-3 border-top border-secondary border-opacity-30 d-flex flex-wrap justify-content-between align-items-center" style="font-size: 12px; color: #94A3B8;">
+                    <span>📌 Syarat: Pencapaian Omset Invoice (Cust Baru + Reaktivasi) per <?= $label_periode ?></span>
+                    <span class="text-warning fw-bold">Pemenang Utama: Top 1 Sales Sultan Loewix 🏆</span>
                 </div>
             </div>
         </div>
