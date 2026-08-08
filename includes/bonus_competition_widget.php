@@ -12,7 +12,6 @@ $target_omset_per_bulan = 200000000; // Rp 200.000.000,-
 $selected_bulan = trim($_GET['periode_bulan'] ?? '8');
 
 if ($selected_bulan === '9') {
-if ($selected_bulan === '9') {
     $start_date = '2026-09-01';
     $end_date = '2026-09-30';
     $start_periode = '2026-09-01 00:00:00';
