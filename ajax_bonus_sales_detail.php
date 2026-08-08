@@ -77,11 +77,7 @@ if ($kat === 'a') {
             fu.nominal_invoice,
             fu.catatan
         FROM customers c
-        LEFT JOIN follow_ups fu ON fu.customer_id = c.id 
-            AND fu.deleted_at IS NULL 
-            AND fu.tgl_follow_up >= '{$start_periode}' 
-            AND fu.tgl_follow_up <= '{$end_periode}'
-            AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
+        LEFT JOIN follow_ups fu ON fu.customer_id = c.id AND fu.deleted_at IS NULL
         WHERE (c.sales_id = {$sales_id} OR fu.sales_id = {$sales_id})
           AND c.deleted_at IS NULL
           AND c.tgl_input >= '{$start_periode}' 
