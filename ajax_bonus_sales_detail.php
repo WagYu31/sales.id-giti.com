@@ -79,11 +79,13 @@ if ($kat === 'a') {
         FROM customers c
         LEFT JOIN follow_ups fu ON fu.customer_id = c.id 
             AND fu.deleted_at IS NULL 
-            AND DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
+            AND fu.tgl_follow_up >= '{$start_periode}' 
+            AND fu.tgl_follow_up <= '{$end_periode}'
             AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
         WHERE (c.sales_id = {$sales_id} OR fu.sales_id = {$sales_id})
           AND c.deleted_at IS NULL
-          AND DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}'
+          AND c.tgl_input >= '{$start_periode}' 
+          AND c.tgl_input <= '{$end_periode}'
         ORDER BY fu.tgl_follow_up DESC, c.tgl_input DESC
     ";
     $res = $conn->query($sql);
@@ -96,6 +98,37 @@ if ($kat === 'a') {
             }
             if (!in_array($r['customer_id'], $cust_seen)) {
                 $cust_seen[] = $r['customer_id'];
+            }
+        }
+    }
+
+    // Fallback: If empty, load all customers created by this sales rep in the period
+    if (empty($items)) {
+        $sql_fb = "
+            SELECT 
+                c.id AS customer_id,
+                c.nama_customer,
+                c.no_hp,
+                c.tgl_input AS tgl_input_cust,
+                NULL AS followup_id,
+                NULL AS no_inv,
+                NULL AS tgl_follow_up,
+                0 AS nominal_invoice,
+                NULL AS catatan
+            FROM customers c
+            WHERE c.sales_id = {$sales_id}
+              AND c.deleted_at IS NULL
+              AND c.tgl_input >= '{$start_periode}' 
+              AND c.tgl_input <= '{$end_periode}'
+            ORDER BY c.tgl_input DESC
+        ";
+        $res_fb = $conn->query($sql_fb);
+        if ($res_fb) {
+            while ($r = $res_fb->fetch_assoc()) {
+                $items[] = $r;
+                if (!in_array($r['customer_id'], $cust_seen)) {
+                    $cust_seen[] = $r['customer_id'];
+                }
             }
         }
     }
@@ -119,9 +152,10 @@ if ($kat === 'a') {
         JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
         WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
           AND fu.deleted_at IS NULL
-          AND DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
+          AND fu.tgl_follow_up >= '{$start_periode}' 
+          AND fu.tgl_follow_up <= '{$end_periode}'
           AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-          AND (DATE(c.tgl_input) < '{$start_date}' OR c.tgl_input IS NULL OR c.tgl_input = '' OR c.tgl_input LIKE '0000%')
+          AND (c.tgl_input < '{$start_periode}' OR c.tgl_input IS NULL OR c.tgl_input = '' OR c.tgl_input LIKE '0000%' OR c.tgl_input NOT BETWEEN '{$start_periode}' AND '{$end_periode}')
         ORDER BY fu.tgl_follow_up DESC
     ";
     $res = $conn->query($sql);
@@ -132,6 +166,40 @@ if ($kat === 'a') {
             $total_omset += (float)$r['nominal_invoice'];
             if (!in_array($r['customer_id'], $cust_seen)) {
                 $cust_seen[] = $r['customer_id'];
+            }
+        }
+    }
+
+    // Fallback: If empty, fetch all invoice follow ups for this sales rep in the period
+    if (empty($items)) {
+        $sql_fb = "
+            SELECT 
+                c.id AS customer_id,
+                c.nama_customer,
+                c.no_hp,
+                c.tgl_input AS tgl_input_cust,
+                fu.id AS followup_id,
+                fu.no_inv,
+                fu.tgl_follow_up,
+                fu.nominal_invoice,
+                fu.catatan
+            FROM follow_ups fu
+            JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
+            WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
+              AND fu.deleted_at IS NULL
+              AND fu.tgl_follow_up >= '{$start_periode}' 
+              AND fu.tgl_follow_up <= '{$end_periode}'
+              AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
+            ORDER BY fu.tgl_follow_up DESC
+        ";
+        $res_fb = $conn->query($sql_fb);
+        if ($res_fb) {
+            while ($r = $res_fb->fetch_assoc()) {
+                $items[] = $r;
+                $total_omset += (float)$r['nominal_invoice'];
+                if (!in_array($r['customer_id'], $cust_seen)) {
+                    $cust_seen[] = $r['customer_id'];
+                }
             }
         }
     }
