@@ -1146,6 +1146,64 @@ function triggerNailongJoySpin(element, salesName, isFinished) {
     
     spawnFlyingPartyProps(element);
     showMotivationSpeechBubble(element, salesName, isFinished);
+    playNailongCheerAudio(salesName);
+}
+
+function playNailongCheerAudio(salesName) {
+    // Extract first name (e.g. "Edi Suprianto" -> "Edi")
+    const firstName = salesName ? salesName.trim().split(' ')[0] : 'Sales';
+
+    // 1. Synthesize Upbeat Victory Cheer Chiptune Fanfare via Web Audio API
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+            const ctx = new AudioCtx();
+            const notes = [
+                { f: 523.25, d: 0.1, t: 0 },      // C5
+                { f: 659.25, d: 0.1, t: 0.1 },    // E5
+                { f: 783.99, d: 0.1, t: 0.2 },    // G5
+                { f: 1046.50, d: 0.25, t: 0.3 },  // C6
+                { f: 880.00, d: 0.1, t: 0.55 },   // A5
+                { f: 1046.50, d: 0.35, t: 0.65 }  // C6
+            ];
+
+            notes.forEach(n => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(n.f, ctx.currentTime + n.t);
+
+                gain.gain.setValueAtTime(0.3, ctx.currentTime + n.t);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + n.t + n.d);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(ctx.currentTime + n.t);
+                osc.stop(ctx.currentTime + n.t + n.d);
+            });
+        }
+    } catch (e) {
+        console.log("Web Audio API info:", e);
+    }
+
+    // 2. Web Speech Synthesis Indonesian Cheer Leader Voice ("Semangat Edi! Semangat Edi!")
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Cancel any ongoing speech
+
+        const cheerText = `Semangat ${firstName}! Semangat ${firstName}! Semangat ${firstName}! Ayo ${firstName}, pasti Juara Loewix!`;
+        const utterance = new SpeechSynthesisUtterance(cheerText);
+        utterance.lang = 'id-ID';
+        utterance.rate = 1.2;
+        utterance.pitch = 1.35;
+        utterance.volume = 1.0;
+
+        const voices = window.speechSynthesis.getVoices();
+        const idVoice = voices.find(v => v.lang.includes('id') || v.lang.includes('ID'));
+        if (idVoice) utterance.voice = idVoice;
+
+        window.speechSynthesis.speak(utterance);
+    }
 }
 
 function spawnFlyingPartyProps(parentElement) {
