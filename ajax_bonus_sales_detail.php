@@ -1,15 +1,15 @@
 <?php
 /**
- * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL
+ * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (COMBINED KAT A & KAT B)
  */
 require_once 'includes/db.php';
 
 $sales_id = intval($_GET['sales_id'] ?? 0);
-$kat = trim($_GET['kat'] ?? 'a'); // 'a' or 'b'
+$kat = trim($_GET['kat'] ?? 'a'); // 'a' or 'b' or 'all'
 $selected_bulan = trim($_GET['periode_bulan'] ?? '8');
 
 if ($sales_id <= 0) {
-    echo '<div class="alert alert-danger">Invalid Sales ID.</div>';
+    echo '<div class="alert alert-danger p-4 text-center">Invalid Sales ID.</div>';
     exit;
 }
 
@@ -33,6 +33,7 @@ if ($selected_bulan === '9') {
     $end_periode = '2026-10-31 23:59:59';
     $label_periode = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
 } else {
+    $selected_bulan = '8';
     $start_date = '2026-08-01';
     $end_date = '2026-08-31';
     $start_periode = '2026-08-01 00:00:00';
@@ -57,188 +58,147 @@ if (!$sales) {
 }
 
 $target_omset = 200000000;
+
+// Fetch ALL invoice transactions for this sales in the selected period
+// Kat A = Customer Baru (c.tgl_input in period)
+// Kat B = Reaktivasi Customer Lama (c.tgl_input before period)
+$sql_all = "
+    SELECT 
+        c.id AS customer_id,
+        c.nama_toko AS nama_customer,
+        (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
+        c.tgl_input AS tgl_input_cust,
+        fu.id AS followup_id,
+        fu.no_inv,
+        fu.tgl_follow_up,
+        fu.nominal_invoice,
+        fu.catatan,
+        CASE 
+            WHEN (c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}') THEN 'A'
+            ELSE 'B'
+        END AS kat_type
+    FROM follow_ups fu
+    JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
+    WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
+      AND fu.deleted_at IS NULL
+      AND fu.tgl_follow_up >= '{$start_periode}' 
+      AND fu.tgl_follow_up <= '{$end_periode}'
+      AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
+    ORDER BY fu.tgl_follow_up DESC
+";
+
+$res_all = $conn->query($sql_all);
 $items = [];
-$total_omset = 0;
-$total_cust_count = 0;
+$cust_seen = [];
+$cust_seen_a = [];
+$cust_seen_b = [];
+$omset_a = 0;
+$omset_b = 0;
 
-if ($kat === 'a') {
-    $kat_title = "🚀 Kategori A: Customer Baru Terbanyak";
-    $kat_desc = "Daftar Customer Baru & transaksi omset invoice per " . $label_periode;
-
-    $sql = "
-        SELECT 
-            c.id AS customer_id,
-            c.nama_toko AS nama_customer,
-            (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
-            c.tgl_input AS tgl_input_cust,
-            fu.id AS followup_id,
-            fu.no_inv,
-            fu.tgl_follow_up,
-            fu.nominal_invoice,
-            fu.catatan
-        FROM customers c
-        LEFT JOIN follow_ups fu ON fu.customer_id = c.id AND fu.deleted_at IS NULL
-        WHERE (c.sales_id = {$sales_id} OR fu.sales_id = {$sales_id})
-          AND c.deleted_at IS NULL
-          AND c.tgl_input >= '{$start_periode}' 
-          AND c.tgl_input <= '{$end_periode}'
-        ORDER BY fu.tgl_follow_up DESC, c.tgl_input DESC
-    ";
-    $res = $conn->query($sql);
-    $cust_seen = [];
-    if ($res) {
-        while ($r = $res->fetch_assoc()) {
-            $items[] = $r;
-            if (!empty($r['nominal_invoice'])) {
-                $total_omset += (float)$r['nominal_invoice'];
-            }
-            if (!in_array($r['customer_id'], $cust_seen)) {
-                $cust_seen[] = $r['customer_id'];
-            }
+if ($res_all) {
+    while ($r = $res_all->fetch_assoc()) {
+        $items[] = $r;
+        $nom = (float)($r['nominal_invoice'] ?? 0);
+        if ($r['kat_type'] === 'A') {
+            $omset_a += $nom;
+            if (!in_array($r['customer_id'], $cust_seen_a)) $cust_seen_a[] = $r['customer_id'];
+        } else {
+            $omset_b += $nom;
+            if (!in_array($r['customer_id'], $cust_seen_b)) $cust_seen_b[] = $r['customer_id'];
         }
+        if (!in_array($r['customer_id'], $cust_seen)) $cust_seen[] = $r['customer_id'];
     }
-
-    // Fallback: If empty, load all customers created by this sales rep in the period
-    if (empty($items)) {
-        $sql_fb = "
-            SELECT 
-                c.id AS customer_id,
-                c.nama_toko AS nama_customer,
-                (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
-                c.tgl_input AS tgl_input_cust,
-                NULL AS followup_id,
-                NULL AS no_inv,
-                NULL AS tgl_follow_up,
-                0 AS nominal_invoice,
-                NULL AS catatan
-            FROM customers c
-            WHERE c.sales_id = {$sales_id}
-              AND c.deleted_at IS NULL
-              AND c.tgl_input >= '{$start_periode}' 
-              AND c.tgl_input <= '{$end_periode}'
-            ORDER BY c.tgl_input DESC
-        ";
-        $res_fb = $conn->query($sql_fb);
-        if ($res_fb) {
-            while ($r = $res_fb->fetch_assoc()) {
-                $items[] = $r;
-                if (!in_array($r['customer_id'], $cust_seen)) {
-                    $cust_seen[] = $r['customer_id'];
-                }
-            }
-        }
-    }
-    $total_cust_count = count($cust_seen);
-} else {
-    $kat_title = "🔥 Kategori B: Reaktivasi Customer Lama";
-    $kat_desc = "Daftar Customer Lama yang berhasil belanja kembali per " . $label_periode;
-
-    $sql = "
-        SELECT 
-            c.id AS customer_id,
-            c.nama_toko AS nama_customer,
-            (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
-            c.tgl_input AS tgl_input_cust,
-            fu.id AS followup_id,
-            fu.no_inv,
-            fu.tgl_follow_up,
-            fu.nominal_invoice,
-            fu.catatan
-        FROM follow_ups fu
-        JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
-        WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
-          AND fu.deleted_at IS NULL
-          AND fu.tgl_follow_up >= '{$start_periode}' 
-          AND fu.tgl_follow_up <= '{$end_periode}'
-          AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-          AND (c.tgl_input < '{$start_periode}' OR c.tgl_input IS NULL OR c.tgl_input = '' OR c.tgl_input LIKE '0000%' OR c.tgl_input NOT BETWEEN '{$start_periode}' AND '{$end_periode}')
-        ORDER BY fu.tgl_follow_up DESC
-    ";
-    $res = $conn->query($sql);
-    $cust_seen = [];
-    if ($res) {
-        while ($r = $res->fetch_assoc()) {
-            $items[] = $r;
-            $total_omset += (float)$r['nominal_invoice'];
-            if (!in_array($r['customer_id'], $cust_seen)) {
-                $cust_seen[] = $r['customer_id'];
-            }
-        }
-    }
-
-    // Fallback: If empty, fetch all invoice follow ups for this sales rep in the period
-    if (empty($items)) {
-        $sql_fb = "
-            SELECT 
-                c.id AS customer_id,
-                c.nama_toko AS nama_customer,
-                (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
-                c.tgl_input AS tgl_input_cust,
-                fu.id AS followup_id,
-                fu.no_inv,
-                fu.tgl_follow_up,
-                fu.nominal_invoice,
-                fu.catatan
-            FROM follow_ups fu
-            JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
-            WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
-              AND fu.deleted_at IS NULL
-              AND fu.tgl_follow_up >= '{$start_periode}' 
-              AND fu.tgl_follow_up <= '{$end_periode}'
-              AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-            ORDER BY fu.tgl_follow_up DESC
-        ";
-        $res_fb = $conn->query($sql_fb);
-        if ($res_fb) {
-            while ($r = $res_fb->fetch_assoc()) {
-                $items[] = $r;
-                $total_omset += (float)$r['nominal_invoice'];
-                if (!in_array($r['customer_id'], $cust_seen)) {
-                    $cust_seen[] = $r['customer_id'];
-                }
-            }
-        }
-    }
-    $total_cust_count = count($cust_seen);
 }
 
-$pct_target = min(100, round(($total_omset / $target_omset) * 100, 1));
+// Fetch any Kat A new customers created in period who don't have invoices yet
+$sql_new_cust = "
+    SELECT 
+        c.id AS customer_id,
+        c.nama_toko AS nama_customer,
+        (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
+        c.tgl_input AS tgl_input_cust,
+        NULL AS followup_id,
+        NULL AS no_inv,
+        NULL AS tgl_follow_up,
+        0 AS nominal_invoice,
+        NULL AS catatan,
+        'A' AS kat_type
+    FROM customers c
+    WHERE c.sales_id = {$sales_id}
+      AND c.deleted_at IS NULL
+      AND c.tgl_input >= '{$start_periode}' 
+      AND c.tgl_input <= '{$end_periode}'
+      AND c.id NOT IN (
+          SELECT fu2.customer_id FROM follow_ups fu2 
+          WHERE (fu2.sales_id = {$sales_id} OR fu2.customer_id = c.id) 
+            AND fu2.deleted_at IS NULL 
+            AND fu2.tgl_follow_up >= '{$start_periode}' 
+            AND fu2.tgl_follow_up <= '{$end_periode}'
+            AND fu2.no_inv IS NOT NULL AND fu2.no_inv != ''
+      )
+    ORDER BY c.tgl_input DESC
+";
+$res_new_cust = $conn->query($sql_new_cust);
+if ($res_new_cust) {
+    while ($r = $res_new_cust->fetch_assoc()) {
+        $items[] = $r;
+        if (!in_array($r['customer_id'], $cust_seen_a)) $cust_seen_a[] = $r['customer_id'];
+        if (!in_array($r['customer_id'], $cust_seen)) $cust_seen[] = $r['customer_id'];
+    }
+}
+
+$total_omset_combined = $omset_a + $omset_b;
+$total_cust_a = count($cust_seen_a);
+$total_cust_b = count($cust_seen_b);
+$total_cust_combined = count($cust_seen);
+
+$pct_target_comb = min(100, round(($total_omset_combined / $target_omset) * 100, 1));
+$pct_target_a = min(100, round(($omset_a / $target_omset) * 100, 1));
+$pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
 ?>
 
-<!-- MODAL CONTENT -->
+<!-- MODAL HEADER -->
 <div class="modal-header border-0 pb-0" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); color: #FFF; border-radius: 20px 20px 0 0; padding: 24px 28px 18px;">
     <div class="w-100">
         <div class="d-flex justify-content-between align-items-start">
             <div>
-                <span class="badge bg-danger text-white rounded-pill px-3 py-1 fw-bold mb-2" style="font-size: 11px; border: 1px solid #FCD34D;">
-                    <?= $kat_title ?>
-                </span>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary text-white rounded-pill px-3 py-1 fw-bold" style="font-size: 11px; border: 1px solid #38BDF8;">
+                        🏆 Total Rincian Gabungan Sales
+                    </span>
+                    <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1 fw-bold" style="font-size: 11px;">
+                        <?= $label_periode ?>
+                    </span>
+                </div>
                 <h4 class="fw-bold mb-1 text-white" style="font-family: 'Plus Jakarta Sans', sans-serif;">
                     👤 <?= htmlspecialchars($sales['nama_lengkap']) ?>
                 </h4>
-                <small class="text-white-50" style="font-size: 12px;"><?= $kat_desc ?></small>
+                <small class="text-white-50" style="font-size: 12px;">Gabungan Kat A (Cust Baru) & Kat B (Reaktivasi Customer Lama)</small>
             </div>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
-        <!-- Metric KPI Cards Grid -->
+        <!-- Metric KPI Cards Grid (3 Columns) -->
         <div class="row g-2 mt-3 pt-2 border-top border-secondary border-opacity-30">
-            <div class="col-6 col-md-4">
+            <div class="col-12 col-md-4">
                 <div class="p-2.5 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10">
-                    <small class="text-white-50 d-block" style="font-size: 10.5px;">TOTAL OMSET INVOICE</small>
-                    <span class="fw-bold text-warning font-monospace" style="font-size: 15px;">Rp <?= number_format($total_omset, 0, ',', '.') ?></span>
-                </div>
-            </div>
-            <div class="col-6 col-md-4">
-                <div class="p-2.5 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10">
-                    <small class="text-white-50 d-block" style="font-size: 10.5px;">PENCAPAIAN TARGET</small>
-                    <span class="fw-bold text-emerald-400 font-monospace" style="font-size: 15px; color: #34D399;"><?= $pct_target ?>% <small class="text-white-50" style="font-size: 10px;">/ Rp 200M</small></span>
+                    <small class="text-info d-block fw-bold" style="font-size: 10.5px;">🚀 KAT A: CUST BARU</small>
+                    <span class="fw-bold text-white font-monospace" style="font-size: 14px;">Rp <?= number_format($omset_a, 0, ',', '.') ?></span>
+                    <div class="text-white-50" style="font-size: 10.5px;"><?= $total_cust_a ?> Customer</div>
                 </div>
             </div>
             <div class="col-12 col-md-4">
                 <div class="p-2.5 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10">
-                    <small class="text-white-50 d-block" style="font-size: 10.5px;"><?= ($kat==='a')?'TOTAL CUST BARU':'TOTAL CUST REAKTIVASI' ?></small>
-                    <span class="fw-bold text-info" style="font-size: 15px;"><?= $total_cust_count ?> Customer</span>
+                    <small class="text-warning d-block fw-bold" style="font-size: 10.5px;">🔥 KAT B: REAKTIVASI</small>
+                    <span class="fw-bold text-white font-monospace" style="font-size: 14px;">Rp <?= number_format($omset_b, 0, ',', '.') ?></span>
+                    <div class="text-white-50" style="font-size: 10.5px;"><?= $total_cust_b ?> Customer Belanja</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="p-2.5 rounded-3 bg-warning bg-opacity-20 border border-warning border-opacity-30">
+                    <small class="text-warning d-block fw-bold" style="font-size: 10.5px;">🏆 TOTAL COMBINED OMSET</small>
+                    <span class="fw-bold text-warning font-monospace" style="font-size: 15px;">Rp <?= number_format($total_omset_combined, 0, ',', '.') ?></span>
+                    <div class="text-emerald-400 fw-bold" style="font-size: 10.5px; color: #34D399;"><?= $total_cust_combined ?> Customer Total (<?= $pct_target_comb ?>% Target)</div>
                 </div>
             </div>
         </div>
@@ -250,22 +210,22 @@ $pct_target = min(100, round(($total_omset / $target_omset) * 100, 1));
     <div class="card border-0 shadow-sm p-3 mb-3" style="border-radius: 14px;">
         <div class="d-flex justify-content-between align-items-center mb-1 text-dark fw-bold" style="font-size: 12px;">
             <span>Target Sultan Rp 200.000.000,- / Bulan</span>
-            <span class="text-primary"><?= $pct_target ?>% Tuntas</span>
+            <span class="text-primary"><?= $pct_target_comb ?>% Tuntas (Rp <?= number_format($total_omset_combined, 0, ',', '.') ?>)</span>
         </div>
         <div class="progress" style="height: 10px; border-radius: 10px; background: #E2E8F0;">
-            <div class="progress-bar <?= ($kat==='a')?'bg-success':'bg-warning' ?> bg-gradient" role="progressbar" style="width: <?= max($pct_target, 3) ?>%; border-radius: 10px;"></div>
+            <div class="progress-bar bg-success bg-gradient" role="progressbar" style="width: <?= max($pct_target_comb, 3) ?>%; border-radius: 10px;"></div>
         </div>
     </div>
 
     <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 14px;">
-        📄 Detail Rincian Customer & Invoice Transaction:
+        📄 Rincian <?= $total_cust_combined ?> Customer & Transaksi Invoice:
     </h6>
 
     <?php if (empty($items)): ?>
         <div class="text-center py-4 bg-white rounded-3 border">
             <div class="fs-2 mb-2">📦</div>
             <h6 class="fw-bold text-dark mb-1">Belum ada rincian transaksi.</h6>
-            <small class="text-muted">Tidak ditemukan invoice pada periode ini.</small>
+            <small class="text-muted">Tidak ditemukan customer / invoice pada periode ini.</small>
         </div>
     <?php else: ?>
         <div class="table-responsive bg-white rounded-3 shadow-sm border">
@@ -273,9 +233,10 @@ $pct_target = min(100, round(($total_omset / $target_omset) * 100, 1));
                 <thead class="bg-light text-secondary" style="font-size: 11.5px;">
                     <tr>
                         <th class="py-2.5 ps-3">No</th>
+                        <th class="py-2.5">Kategori</th>
                         <th class="py-2.5">Customer</th>
                         <th class="py-2.5">No. Invoice</th>
-                        <th class="py-2.5">Tgl Follow Up</th>
+                        <th class="py-2.5">Tgl Transaksi</th>
                         <th class="py-2.5 text-end pe-3">Nominal Omset (Rp)</th>
                     </tr>
                 </thead>
@@ -284,6 +245,17 @@ $pct_target = min(100, round(($total_omset / $target_omset) * 100, 1));
                         <tr>
                             <td class="ps-3 fw-bold text-muted"><?= $idx + 1 ?></td>
                             <td>
+                                <?php if ($row['kat_type'] === 'A'): ?>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold border border-primary border-opacity-20 px-2 py-1" style="font-size: 10.5px;">
+                                        🚀 Kat A: Baru
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge bg-warning bg-opacity-15 text-dark fw-bold border border-warning border-opacity-30 px-2 py-1" style="font-size: 10.5px; background-color: #FEF3C7; color: #92400E;">
+                                        🔥 Kat B: Reaktivasi
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
                                 <div class="fw-bold text-dark"><?= htmlspecialchars($row['nama_customer']) ?></div>
                                 <?php if (!empty($row['no_hp'])): ?>
                                     <small class="text-muted"><?= htmlspecialchars($row['no_hp']) ?></small>
@@ -291,7 +263,7 @@ $pct_target = min(100, round(($total_omset / $target_omset) * 100, 1));
                             </td>
                             <td>
                                 <?php if (!empty($row['no_inv'])): ?>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold border border-primary border-opacity-20 px-2 py-1" style="font-size: 11px;">
+                                    <span class="badge bg-secondary bg-opacity-10 text-dark fw-bold border px-2 py-1" style="font-size: 11px;">
                                         <?= htmlspecialchars($row['no_inv']) ?>
                                     </span>
                                 <?php else: ?>
@@ -302,11 +274,11 @@ $pct_target = min(100, round(($total_omset / $target_omset) * 100, 1));
                                 <?php if (!empty($row['tgl_follow_up'])): ?>
                                     <span class="text-dark fw-medium"><?= date('d M Y', strtotime($row['tgl_follow_up'])) ?></span>
                                 <?php else: ?>
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted" style="font-size: 11px;">Input: <?= date('d M Y', strtotime($row['tgl_input_cust'])) ?></span>
                                 <?php endif; ?>
                             </td>
                             <td class="text-end pe-3">
-                                <?php if (!empty($row['nominal_invoice'])): ?>
+                                <?php if (!empty($row['nominal_invoice']) && (float)$row['nominal_invoice'] > 0): ?>
                                     <span class="fw-bold text-success font-monospace" style="font-size: 13px;">
                                         Rp <?= number_format($row['nominal_invoice'], 0, ',', '.') ?>
                                     </span>
@@ -319,9 +291,9 @@ $pct_target = min(100, round(($total_omset / $target_omset) * 100, 1));
                 </tbody>
                 <tfoot class="bg-light fw-bold border-top">
                     <tr>
-                        <td colspan="4" class="ps-3 text-dark">TOTAL OMSET INVOICE:</td>
+                        <td colspan="5" class="ps-3 text-dark">GRAND TOTAL COMBINED OMSET:</td>
                         <td class="text-end pe-3 text-success font-monospace fs-6">
-                            Rp <?= number_format($total_omset, 0, ',', '.') ?>
+                            Rp <?= number_format($total_omset_combined, 0, ',', '.') ?>
                         </td>
                     </tr>
                 </tfoot>
