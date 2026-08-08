@@ -122,7 +122,105 @@ $total_sales_count = count($ranking_data);
     border-radius: 22px;
     border: 3px solid #DC2626;
     outline: 2px solid #F59E0B;
-    box-shadow: inset 0 10px 30px rgba(0, 0, 0, 0.6), 0 12px 30px rgba(220, 38, 38, 0.4);
+    box-shadow: inset 0 16px 36px rgba(0, 0, 0, 0.65), 0 16px 36px rgba(220, 38, 38, 0.45);
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+/* === 3D FLYING BIRDS & SKY LAYER === */
+.track-3d-birds-layer {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 90px;
+    pointer-events: none;
+    z-index: 4;
+    overflow: hidden;
+}
+
+.flying-bird {
+    position: absolute;
+    font-size: 20px;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.bird-1 {
+    top: 8px;
+    font-size: 26px;
+    animation: birdFlight1 14s linear infinite, birdFlap 0.4s ease-in-out infinite alternate;
+}
+
+.bird-2 {
+    top: 26px;
+    font-size: 19px;
+    opacity: 0.9;
+    animation: birdFlight2 19s linear infinite, birdFlap 0.35s ease-in-out infinite alternate;
+    animation-delay: 3.5s;
+}
+
+.bird-3 {
+    top: 48px;
+    font-size: 24px;
+    animation: birdFlight3 12s linear infinite, birdFlap 0.45s ease-in-out infinite alternate;
+    animation-delay: 7s;
+}
+
+.bird-4 {
+    top: 16px;
+    font-size: 17px;
+    opacity: 0.85;
+    animation: birdFlight2 23s linear infinite, birdFlap 0.3s ease-in-out infinite alternate;
+    animation-delay: 11s;
+}
+
+@keyframes birdFlap {
+    0%   { transform: translateY(0px) rotate(-8deg) scaleY(1); }
+    100% { transform: translateY(-7px) rotate(8deg) scaleY(0.7); }
+}
+
+@keyframes birdFlight1 {
+    0%   { left: -10%; transform: translateY(0) scaleX(1); }
+    50%  { transform: translateY(-12px) scaleX(1); }
+    100% { left: 110%; transform: translateY(0) scaleX(1); }
+}
+
+@keyframes birdFlight2 {
+    0%   { left: -10%; transform: translateY(5px) scaleX(1); }
+    50%  { transform: translateY(-14px) scaleX(1); }
+    100% { left: 110%; transform: translateY(5px) scaleX(1); }
+}
+
+@keyframes birdFlight3 {
+    0%   { left: -10%; transform: translateY(-5px) scaleX(1); }
+    50%  { transform: translateY(10px) scaleX(1); }
+    100% { left: 110%; transform: translateY(-5px) scaleX(1); }
+}
+
+/* 3D Floating Clouds */
+.track-3d-clouds-layer {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 70px;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+    opacity: 0.3;
+}
+
+.cloud-item {
+    position: absolute;
+    font-size: 32px;
+    filter: blur(1px);
+    animation: cloudDrift 35s linear infinite;
+}
+
+.cloud-item:nth-child(1) { top: 2px; left: -15%; animation-duration: 38s; }
+.cloud-item:nth-child(2) { top: 20px; left: -30%; animation-duration: 48s; animation-delay: 12s; }
+
+@keyframes cloudDrift {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(120vw); }
 }
 
 .chart-scroll-wrapper::-webkit-scrollbar {
@@ -769,6 +867,18 @@ $total_sales_count = count($ranking_data);
 
                 <!-- Athletics Track Circuit Wrapper with Checkered Finish Line -->
                 <div class="chart-scroll-wrapper" id="chartScrollWrapper">
+                    <!-- 3D Spatial Parallax Sky & Flying Birds Layer -->
+                    <div class="track-3d-clouds-layer">
+                        <div class="cloud-item">☁️</div>
+                        <div class="cloud-item">☁️</div>
+                    </div>
+                    <div class="track-3d-birds-layer">
+                        <div class="flying-bird bird-1">🦅</div>
+                        <div class="flying-bird bird-2">🕊️</div>
+                        <div class="flying-bird bird-3">🦅</div>
+                        <div class="flying-bird bird-4">🕊️</div>
+                    </div>
+
                     <div class="track-bg-overlay"></div>
                     <div class="finish-line-banner"></div>
                     <div class="finish-badge-top">FINISH 🏁 🇮🇩</div>
