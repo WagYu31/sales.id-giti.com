@@ -137,11 +137,11 @@ $total_sales_count = count($ranking_data);
     overflow: hidden;
 }
 
-/* === REALISTIC SVG VECTOR BIRDS IN FLIGHT === */
+/* === REALISTIC SVG VECTOR BIRDS IN FLIGHT (7-BIRD FLOCK SQUADRON) === */
 .track-3d-birds-layer {
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 100px;
+    height: 110px;
     pointer-events: none;
     z-index: 4;
     overflow: hidden;
@@ -154,16 +154,20 @@ $total_sales_count = count($ranking_data);
     animation-iteration-count: infinite;
 }
 
-/* SVG Wing Morphing Animation */
+/* Varied SVG Wing Morphing Animations */
 .svg-real-bird .left-wing {
     transform-origin: 50px 30px;
     animation: wingFlapLeft 0.32s ease-in-out infinite alternate;
 }
-
 .svg-real-bird .right-wing {
     transform-origin: 50px 30px;
     animation: wingFlapRight 0.32s ease-in-out infinite alternate;
 }
+
+.bird-fast .left-wing { animation-duration: 0.25s; }
+.bird-fast .right-wing { animation-duration: 0.25s; }
+.bird-slow .left-wing { animation-duration: 0.42s; }
+.bird-slow .right-wing { animation-duration: 0.42s; }
 
 @keyframes wingFlapLeft {
     0%   { transform: rotate(0deg) scaleY(1); }
@@ -175,34 +179,70 @@ $total_sales_count = count($ranking_data);
     100% { transform: rotate(-44deg) scaleY(0.4); }
 }
 
-/* Individual Realistic Flight Swoop Trajectories */
-/* Eagle Leader 1 - Big Foreground Swoop */
+/* 7-Bird Flock Trajectories & Positions */
+/* Bird 1: Lead Eagle */
 .bird-lead {
     width: 44px; height: 28px;
     top: 15px;
-    animation: eagleSwoopFlight1 11s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation: flightSwoop1 10.5s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: 0s;
 }
 
-/* Flock Bird 2 - Mid Altitude */
-.bird-flock-1 {
-    width: 32px; height: 20px;
-    top: 35px;
-    opacity: 0.9;
-    animation: flockSwoopFlight2 15s cubic-bezier(0.37, 0, 0.63, 1) infinite;
-    animation-delay: 2.5s;
+/* Bird 2: Wingman Top Right */
+.bird-v1 {
+    width: 36px; height: 22px;
+    top: 5px;
+    opacity: 0.95;
+    animation: flightSwoop2 12s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: 0.8s;
 }
 
-/* Flock Bird 3 - High Altitude */
-.bird-flock-2 {
-    width: 24px; height: 16px;
+/* Bird 3: Wingman Mid Left */
+.bird-v2 {
+    width: 38px; height: 24px;
+    top: 32px;
+    opacity: 0.95;
+    animation: flightSwoop3 11s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: 1.6s;
+}
+
+/* Bird 4: Flock Center High */
+.bird-v3 {
+    width: 28px; height: 18px;
+    top: 10px;
+    opacity: 0.85;
+    animation: flightSwoop1 13.5s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: 3.2s;
+}
+
+/* Bird 5: Flock Mid Swooper */
+.bird-v4 {
+    width: 40px; height: 25px;
+    top: 40px;
+    animation: flightSwoop2 10s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: 4.8s;
+}
+
+/* Bird 6: Flock Distance 1 */
+.bird-v5 {
+    width: 22px; height: 14px;
     top: 8px;
-    opacity: 0.8;
-    animation: flockSwoopFlight3 18s cubic-bezier(0.37, 0, 0.63, 1) infinite;
-    animation-delay: 6s;
+    opacity: 0.75;
+    animation: flightSwoop3 15s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: 6.4s;
+}
+
+/* Bird 7: Flock Distance 2 */
+.bird-v6 {
+    width: 20px; height: 13px;
+    top: 28px;
+    opacity: 0.7;
+    animation: flightSwoop1 16s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: 8.0s;
 }
 
 /* Real Aerodynamic Swooping & Pitching Keyframes */
-@keyframes eagleSwoopFlight1 {
+@keyframes flightSwoop1 {
     0% {
         left: -12%;
         top: 20px;
@@ -227,18 +267,18 @@ $total_sales_count = count($ranking_data);
     }
 }
 
-@keyframes flockSwoopFlight2 {
+@keyframes flightSwoop2 {
     0% {
         left: -10%;
         top: 35px;
         transform: rotate(-8deg);
     }
     35% {
-        top: 12px;
-        transform: rotate(-14deg);
+        top: 8px;
+        transform: rotate(-15deg);
     }
     65% {
-        top: 42px;
+        top: 44px;
         transform: rotate(12deg);
     }
     100% {
@@ -248,23 +288,23 @@ $total_sales_count = count($ranking_data);
     }
 }
 
-@keyframes flockSwoopFlight3 {
+@keyframes flightSwoop3 {
     0% {
         left: -10%;
         top: 8px;
         transform: rotate(-6deg);
     }
     40% {
-        top: 28px;
-        transform: rotate(8deg);
+        top: 32px;
+        transform: rotate(10deg);
     }
     75% {
-        top: 4px;
-        transform: rotate(-10deg);
+        top: 5px;
+        transform: rotate(-12deg);
     }
     100% {
         left: 110%;
-        top: 12px;
+        top: 14px;
         transform: rotate(2deg);
     }
 }
@@ -945,8 +985,8 @@ $total_sales_count = count($ranking_data);
                         <div class="cloud-item">☁️</div>
                     </div>
                     <div class="track-3d-birds-layer">
-                        <!-- Lead Eagle (Foreground Vector SVG Bird) -->
-                        <div class="real-bird-unit bird-lead">
+                        <!-- Bird 1: Lead Eagle -->
+                        <div class="real-bird-unit bird-lead bird-fast">
                             <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
                                 <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#0F172A" />
                                 <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#1E293B" />
@@ -955,8 +995,8 @@ $total_sales_count = count($ranking_data);
                             </svg>
                         </div>
 
-                        <!-- Flock Bird 2 (Mid-ground Vector SVG Bird) -->
-                        <div class="real-bird-unit bird-flock-1">
+                        <!-- Bird 2: Wingman Top Right -->
+                        <div class="real-bird-unit bird-v1">
                             <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
                                 <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#1E293B" />
                                 <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#334155" />
@@ -965,13 +1005,53 @@ $total_sales_count = count($ranking_data);
                             </svg>
                         </div>
 
-                        <!-- Flock Bird 3 (Background Distance Vector SVG Bird) -->
-                        <div class="real-bird-unit bird-flock-2">
+                        <!-- Bird 3: Wingman Mid Left -->
+                        <div class="real-bird-unit bird-v2 bird-fast">
+                            <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
+                                <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#0F172A" />
+                                <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#1E293B" />
+                                <path d="M 50,30 Q 42,33 34,31 Q 45,25 50,24 Q 55,25 66,31 Q 58,33 50,30" fill="#0F172A" />
+                                <polygon points="34,31 20,37 26,31 22,25" fill="#0F172A" />
+                            </svg>
+                        </div>
+
+                        <!-- Bird 4: Flock Center High -->
+                        <div class="real-bird-unit bird-v3 bird-slow">
                             <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
                                 <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#334155" />
                                 <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#475569" />
                                 <path d="M 50,30 Q 42,33 34,31 Q 45,25 50,24 Q 55,25 66,31 Q 58,33 50,30" fill="#334155" />
                                 <polygon points="34,31 20,37 26,31 22,25" fill="#334155" />
+                            </svg>
+                        </div>
+
+                        <!-- Bird 5: Flock Mid Swooper -->
+                        <div class="real-bird-unit bird-v4">
+                            <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
+                                <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#1E293B" />
+                                <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#334155" />
+                                <path d="M 50,30 Q 42,33 34,31 Q 45,25 50,24 Q 55,25 66,31 Q 58,33 50,30" fill="#1E293B" />
+                                <polygon points="34,31 20,37 26,31 22,25" fill="#1E293B" />
+                            </svg>
+                        </div>
+
+                        <!-- Bird 6: Flock Distance 1 -->
+                        <div class="real-bird-unit bird-v5 bird-slow">
+                            <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
+                                <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#475569" />
+                                <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#64748B" />
+                                <path d="M 50,30 Q 42,33 34,31 Q 45,25 50,24 Q 55,25 66,31 Q 58,33 50,30" fill="#475569" />
+                                <polygon points="34,31 20,37 26,31 22,25" fill="#475569" />
+                            </svg>
+                        </div>
+
+                        <!-- Bird 7: Flock Distance 2 -->
+                        <div class="real-bird-unit bird-v6">
+                            <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
+                                <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#475569" />
+                                <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#64748B" />
+                                <path d="M 50,30 Q 42,33 34,31 Q 45,25 50,24 Q 55,25 66,31 Q 58,33 50,30" fill="#475569" />
+                                <polygon points="34,31 20,37 26,31 22,25" fill="#475569" />
                             </svg>
                         </div>
                     </div>
