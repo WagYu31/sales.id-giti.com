@@ -180,21 +180,21 @@ $total_sales_count = count($ranking_data);
 }
 
 @keyframes birdFlight1 {
-    0%   { left: -10%; transform: translateY(0) scaleX(1); }
-    50%  { transform: translateY(-12px) scaleX(1); }
-    100% { left: 110%; transform: translateY(0) scaleX(1); }
+    0%   { left: -10%; transform: translateY(0) scaleX(-1); }
+    50%  { transform: translateY(-12px) scaleX(-1); }
+    100% { left: 110%; transform: translateY(0) scaleX(-1); }
 }
 
 @keyframes birdFlight2 {
-    0%   { left: -10%; transform: translateY(5px) scaleX(1); }
-    50%  { transform: translateY(-14px) scaleX(1); }
-    100% { left: 110%; transform: translateY(5px) scaleX(1); }
+    0%   { left: -10%; transform: translateY(5px) scaleX(-1); }
+    50%  { transform: translateY(-14px) scaleX(-1); }
+    100% { left: 110%; transform: translateY(5px) scaleX(-1); }
 }
 
 @keyframes birdFlight3 {
-    0%   { left: -10%; transform: translateY(-5px) scaleX(1); }
-    50%  { transform: translateY(10px) scaleX(1); }
-    100% { left: 110%; transform: translateY(-5px) scaleX(1); }
+    0%   { left: -10%; transform: translateY(-5px) scaleX(-1); }
+    50%  { transform: translateY(10px) scaleX(-1); }
+    100% { left: 110%; transform: translateY(-5px) scaleX(-1); }
 }
 
 /* 3D Floating Clouds */
