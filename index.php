@@ -315,7 +315,7 @@ if ($_SESSION['role'] !== 'sales') {
 <!-- SECTION 1: COLLAPSIBLE FORUM Q&A ACCORDION -->
 <div id="forum-section" class="mb-4">
     <div class="card border-0 shadow-sm" style="border-radius:18px; overflow:hidden;">
-        <div class="card-header bg-white py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3 border-bottom-0" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent" aria-expanded="true">
+        <div class="card-header bg-white py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3 border-bottom-0 collapsed" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent" aria-expanded="false">
             <div class="d-flex align-items-center gap-3">
                 <div class="rounded-circle bg-primary bg-gradient d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width:40px; height:40px;">
                     <i class="bi bi-chat-left-dots-fill fs-5"></i>
@@ -338,7 +338,7 @@ if ($_SESSION['role'] !== 'sales') {
             </div>
         </div>
 
-        <div class="collapse show" id="forumCollapseContent">
+        <div class="collapse" id="forumCollapseContent">
             <div class="card-body p-4 bg-light border-top">
                 <!-- Search Bar -->
                 <div class="mb-3">
