@@ -7,7 +7,37 @@
  */
 
 $target_omset_per_bulan = 200000000; // Rp 200.000.000,-
-$start_periode = '2026-08-01 00:00:00';
+
+// Parse month filter (Bulan 8, 9, 10 or 8-10)
+$selected_bulan = trim($_GET['periode_bulan'] ?? '8');
+
+if ($selected_bulan === '9') {
+    $start_periode = '2026-09-01 00:00:00';
+    $end_periode = '2026-09-30 23:59:59';
+    $label_periode = 'Bulan 9 (September 2026)';
+    $syarat_kat_a = 'Cust Baru per Sep 2026';
+    $syarat_kat_b = 'Reaktivasi Cust Lama Sep 2026';
+} else if ($selected_bulan === '10') {
+    $start_periode = '2026-10-01 00:00:00';
+    $end_periode = '2026-10-31 23:59:59';
+    $label_periode = 'Bulan 10 (Oktober 2026)';
+    $syarat_kat_a = 'Cust Baru per Okt 2026';
+    $syarat_kat_b = 'Reaktivasi Cust Lama Okt 2026';
+} else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
+    $selected_bulan = '8-10';
+    $start_periode = '2026-08-01 00:00:00';
+    $end_periode = '2026-10-31 23:59:59';
+    $label_periode = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
+    $syarat_kat_a = 'Cust Baru Periode Agt - Okt 2026';
+    $syarat_kat_b = 'Reaktivasi Cust Lama Agt - Okt 2026';
+} else {
+    $selected_bulan = '8';
+    $start_periode = '2026-08-01 00:00:00';
+    $end_periode = '2026-08-31 23:59:59';
+    $label_periode = 'Bulan 8 (Agustus 2026)';
+    $syarat_kat_a = 'Cust Baru per 1 Agt 2026';
+    $syarat_kat_b = 'Reaktivasi Cust Lama per 1 Agt 2026';
+}
 
 // 1. Fetch Top Sales Kategori A: Customer Baru Terbanyak & Omset Invoice (Mulai 1 Agt 2026)
 $sql_kat_a = "
@@ -15,11 +45,11 @@ $sql_kat_a = "
         s.id AS sales_id,
         s.nama_lengkap AS nama_sales,
         COUNT(DISTINCT c.id) AS total_customer_baru,
-        COALESCE(SUM(CASE WHEN fu.tgl_follow_up >= '{$start_periode}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_baru
+        COALESCE(SUM(CASE WHEN fu.tgl_follow_up >= '{$start_periode}' AND fu.tgl_follow_up <= '{$end_periode}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_baru
     FROM sales s
     JOIN customers c ON c.sales_id = s.id AND c.deleted_at IS NULL
     LEFT JOIN follow_ups fu ON fu.customer_id = c.id AND fu.deleted_at IS NULL
-    WHERE c.tgl_input >= '{$start_periode}'
+    WHERE c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}'
       AND (s.role = 'sales' OR s.role = 'superadmin')
     GROUP BY s.id, s.nama_lengkap
     ORDER BY total_omset_baru DESC, total_customer_baru DESC
@@ -43,7 +73,7 @@ $sql_kat_b = "
     FROM sales s
     JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
-    WHERE fu.tgl_follow_up >= '{$start_periode}'
+    WHERE fu.tgl_follow_up >= '{$start_periode}' AND fu.tgl_follow_up <= '{$end_periode}'
       AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
       AND (c.tgl_input < '{$start_periode}' OR c.tgl_input IS NULL)
       AND (s.role = 'sales' OR s.role = 'superadmin')
@@ -178,6 +208,28 @@ if ($res_kat_b) {
             <div class="cash-prize-badge">
                 🇮🇩 HADIAH RP 2.000.000,- / KATEGORI
             </div>
+        </div>
+    </div>
+
+    <!-- Month Filter Bar (Bulan 8 - 10) -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 p-2 bg-light rounded-pill border gap-2">
+        <div class="d-flex align-items-center gap-2 px-2">
+            <span class="fw-bold text-dark" style="font-size: 12.5px;">📅 Filter Periode:</span>
+            <span class="badge bg-danger text-white rounded-pill px-3 py-1 fw-bold" style="font-size: 11px; border: 1px solid #FCD34D;"><?= $label_periode ?></span>
+        </div>
+        <div class="d-flex align-items-center gap-1.5 flex-wrap">
+            <a href="?periode_bulan=8" class="btn btn-sm <?= ($selected_bulan==='8')?'btn-danger fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+                📅 Agt (Bulan 8)
+            </a>
+            <a href="?periode_bulan=9" class="btn btn-sm <?= ($selected_bulan==='9')?'btn-warning fw-bold text-dark shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+                📅 Sep (Bulan 9)
+            </a>
+            <a href="?periode_bulan=10" class="btn btn-sm <?= ($selected_bulan==='10')?'btn-success fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+                📅 Okt (Bulan 10)
+            </a>
+            <a href="?periode_bulan=8-10" class="btn btn-sm <?= ($selected_bulan==='8-10')?'btn-primary fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+                🏆 Total (Bulan 8-10)
+            </a>
         </div>
     </div>
 

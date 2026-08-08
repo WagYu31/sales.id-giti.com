@@ -5,20 +5,46 @@
  * METRIK UTAMA: TOTAL NOMINAL OMSET INVOICE (RP) DENGAN TARGET RP 200 JUTA
  */
 
-$start_periode_ranking = '2026-08-01 00:00:00';
+// Parse month filter (Bulan 8, 9, 10 or 8-10)
+$selected_bulan = trim($_GET['periode_bulan'] ?? '8');
+
+if ($selected_bulan === '9') {
+    $start_periode_ranking = '2026-09-01 00:00:00';
+    $end_periode_ranking = '2026-09-30 23:59:59';
+    $label_periode_ranking = 'Sep 2026';
+    $full_label_ranking = 'Bulan 9 (September 2026)';
+} else if ($selected_bulan === '10') {
+    $start_periode_ranking = '2026-10-01 00:00:00';
+    $end_periode_ranking = '2026-10-31 23:59:59';
+    $label_periode_ranking = 'Okt 2026';
+    $full_label_ranking = 'Bulan 10 (Oktober 2026)';
+} else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
+    $selected_bulan = '8-10';
+    $start_periode_ranking = '2026-08-01 00:00:00';
+    $end_periode_ranking = '2026-10-31 23:59:59';
+    $label_periode_ranking = 'Agt-Okt 2026';
+    $full_label_ranking = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
+} else {
+    $selected_bulan = '8';
+    $start_periode_ranking = '2026-08-01 00:00:00';
+    $end_periode_ranking = '2026-08-31 23:59:59';
+    $label_periode_ranking = 'Agt 2026';
+    $full_label_ranking = 'Bulan 8 (Agustus 2026)';
+}
+
 $target_omset_finish = 200000000; // Rp 200.000.000,-
 
-// Fetch Ranking Sales Data (Period Agt 2026 Start From 0)
+// Fetch Ranking Sales Data
 $sql_ranking_all = "
     SELECT 
         s.id AS sales_id,
         s.nama_lengkap AS nama_sales,
-        COALESCE(SUM(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_invoice,
-        COUNT(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' THEN fu.id ELSE NULL END) AS total_fu,
-        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' THEN fu.customer_id ELSE NULL END) AS total_customer_fu,
-        COUNT(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.id ELSE NULL END) AS total_inv_count
+        COALESCE(SUM(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_invoice,
+        COUNT(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' THEN fu.id ELSE NULL END) AS total_fu,
+        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' THEN fu.customer_id ELSE NULL END) AS total_customer_fu,
+        COUNT(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.id ELSE NULL END) AS total_inv_count
     FROM sales s
-    LEFT JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL AND fu.tgl_follow_up >= '{$start_periode_ranking}'
+    LEFT JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL AND fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}'
     LEFT JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE s.role = 'sales' OR s.role = 'superadmin' OR fu.id IS NOT NULL
     GROUP BY s.id, s.nama_lengkap
@@ -656,7 +682,7 @@ $total_sales_count = count($ranking_data);
                     </div>
                     <div class="text-end">
                         <div class="fs-4 fw-bold text-warning metric-val font-monospace" id="podium1Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;">Rp <?php echo number_format($top1_omset, 0, ',', '.'); ?></div>
-                        <small class="text-muted fw-semibold metric-lbl" id="podium1Lbl" style="font-size: 11px;">Omset Invoice (Agt 2026)</small>
+                        <small class="text-muted fw-semibold metric-lbl" id="podium1Lbl" style="font-size: 11px;">Omset Invoice (<?= $label_periode_ranking ?>)</small>
                     </div>
                 </div>
                 <?php $pct_top1 = min(100, round(($top1_omset / $target_omset_finish) * 100, 1)); ?>
@@ -684,7 +710,7 @@ $total_sales_count = count($ranking_data);
                     </div>
                     <div class="text-end">
                         <div class="fs-4 fw-bold text-secondary metric-val font-monospace" id="podium2Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;">Rp <?php echo number_format($top2_omset, 0, ',', '.'); ?></div>
-                        <small class="text-muted fw-semibold metric-lbl" id="podium2Lbl" style="font-size: 11px;">Omset Invoice (Agt 2026)</small>
+                        <small class="text-muted fw-semibold metric-lbl" id="podium2Lbl" style="font-size: 11px;">Omset Invoice (<?= $label_periode_ranking ?>)</small>
                     </div>
                 </div>
                 <?php $pct2 = min(100, round(($top2_omset / $target_omset_finish) * 100, 1)); ?>
@@ -712,7 +738,7 @@ $total_sales_count = count($ranking_data);
                     </div>
                     <div class="text-end">
                         <div class="fs-4 fw-bold text-danger metric-val font-monospace" id="podium3Val" style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1;">Rp <?php echo number_format($top3_omset, 0, ',', '.'); ?></div>
-                        <small class="text-muted fw-semibold metric-lbl" id="podium3Lbl" style="font-size: 11px;">Omset Invoice (Agt 2026)</small>
+                        <small class="text-muted fw-semibold metric-lbl" id="podium3Lbl" style="font-size: 11px;">Omset Invoice (<?= $label_periode_ranking ?>)</small>
                     </div>
                 </div>
                 <?php $pct3 = min(100, round(($top3_omset / $target_omset_finish) * 100, 1)); ?>
