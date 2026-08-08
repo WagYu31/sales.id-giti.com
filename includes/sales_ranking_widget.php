@@ -137,69 +137,136 @@ $total_sales_count = count($ranking_data);
     overflow: hidden;
 }
 
-.flying-bird {
+/* === REALISTIC SVG VECTOR BIRDS IN FLIGHT === */
+.track-3d-birds-layer {
     position: absolute;
-    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
-    animation-timing-function: linear;
+    top: 0; left: 0; right: 0;
+    height: 100px;
+    pointer-events: none;
+    z-index: 4;
+    overflow: hidden;
+}
+
+.real-bird-unit {
+    position: absolute;
+    filter: drop-shadow(0 8px 14px rgba(0,0,0,0.55));
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
     animation-iteration-count: infinite;
 }
 
-.bird-inner {
-    display: inline-block;
-    transform: scaleX(-1);
-    animation: birdFlap 0.4s ease-in-out infinite alternate;
+/* SVG Wing Morphing Animation */
+.svg-real-bird .left-wing {
+    transform-origin: 50px 30px;
+    animation: wingFlapLeft 0.32s ease-in-out infinite alternate;
 }
 
-.bird-1 {
-    top: 8px;
-    font-size: 26px;
-    animation: birdFlight1 14s linear infinite;
+.svg-real-bird .right-wing {
+    transform-origin: 50px 30px;
+    animation: wingFlapRight 0.32s ease-in-out infinite alternate;
 }
 
-.bird-2 {
-    top: 26px;
-    font-size: 19px;
+@keyframes wingFlapLeft {
+    0%   { transform: rotate(0deg) scaleY(1); }
+    100% { transform: rotate(44deg) scaleY(0.4); }
+}
+
+@keyframes wingFlapRight {
+    0%   { transform: rotate(0deg) scaleY(1); }
+    100% { transform: rotate(-44deg) scaleY(0.4); }
+}
+
+/* Individual Realistic Flight Swoop Trajectories */
+/* Eagle Leader 1 - Big Foreground Swoop */
+.bird-lead {
+    width: 44px; height: 28px;
+    top: 15px;
+    animation: eagleSwoopFlight1 11s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
+/* Flock Bird 2 - Mid Altitude */
+.bird-flock-1 {
+    width: 32px; height: 20px;
+    top: 35px;
     opacity: 0.9;
-    animation: birdFlight2 19s linear infinite;
-    animation-delay: 3.5s;
+    animation: flockSwoopFlight2 15s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: 2.5s;
 }
 
-.bird-3 {
-    top: 48px;
-    font-size: 24px;
-    animation: birdFlight3 12s linear infinite;
-    animation-delay: 7s;
+/* Flock Bird 3 - High Altitude */
+.bird-flock-2 {
+    width: 24px; height: 16px;
+    top: 8px;
+    opacity: 0.8;
+    animation: flockSwoopFlight3 18s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: 6s;
 }
 
-.bird-4 {
-    top: 16px;
-    font-size: 17px;
-    opacity: 0.85;
-    animation: birdFlight2 23s linear infinite;
-    animation-delay: 11s;
+/* Real Aerodynamic Swooping & Pitching Keyframes */
+@keyframes eagleSwoopFlight1 {
+    0% {
+        left: -12%;
+        top: 20px;
+        transform: rotate(-12deg) scale(0.9);
+    }
+    25% {
+        top: 4px;
+        transform: rotate(-18deg) scale(1.1);
+    }
+    50% {
+        top: 38px;
+        transform: rotate(10deg) scale(1.2);
+    }
+    75% {
+        top: 10px;
+        transform: rotate(-8deg) scale(1.05);
+    }
+    100% {
+        left: 112%;
+        top: 22px;
+        transform: rotate(6deg) scale(0.9);
+    }
 }
 
-@keyframes birdFlap {
-    0%   { transform: scaleX(-1) translateY(0px) rotate(-8deg); }
-    100% { transform: scaleX(-1) translateY(-7px) rotate(8deg); }
+@keyframes flockSwoopFlight2 {
+    0% {
+        left: -10%;
+        top: 35px;
+        transform: rotate(-8deg);
+    }
+    35% {
+        top: 12px;
+        transform: rotate(-14deg);
+    }
+    65% {
+        top: 42px;
+        transform: rotate(12deg);
+    }
+    100% {
+        left: 110%;
+        top: 25px;
+        transform: rotate(4deg);
+    }
 }
 
-@keyframes birdFlight1 {
-    0%   { left: -10%; }
-    50%  { top: 2px; }
-    100% { left: 110%; }
-}
-
-@keyframes birdFlight2 {
-    0%   { left: -10%; }
-    50%  { top: 34px; }
-    100% { left: 110%; }
-}
-
-@keyframes birdFlight3 {
-    0%   { left: -10%; }
-    50%  { top: 40px; }
-    100% { left: 110%; }
+@keyframes flockSwoopFlight3 {
+    0% {
+        left: -10%;
+        top: 8px;
+        transform: rotate(-6deg);
+    }
+    40% {
+        top: 28px;
+        transform: rotate(8deg);
+    }
+    75% {
+        top: 4px;
+        transform: rotate(-10deg);
+    }
+    100% {
+        left: 110%;
+        top: 12px;
+        transform: rotate(2deg);
+    }
 }
 
 /* 3D Floating Clouds */
@@ -878,10 +945,35 @@ $total_sales_count = count($ranking_data);
                         <div class="cloud-item">☁️</div>
                     </div>
                     <div class="track-3d-birds-layer">
-                        <div class="flying-bird bird-1"><span class="bird-inner">🦅</span></div>
-                        <div class="flying-bird bird-2"><span class="bird-inner">🕊️</span></div>
-                        <div class="flying-bird bird-3"><span class="bird-inner">🦅</span></div>
-                        <div class="flying-bird bird-4"><span class="bird-inner">🕊️</span></div>
+                        <!-- Lead Eagle (Foreground Vector SVG Bird) -->
+                        <div class="real-bird-unit bird-lead">
+                            <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
+                                <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#0F172A" />
+                                <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#1E293B" />
+                                <path d="M 50,30 Q 42,33 34,31 Q 45,25 50,24 Q 55,25 66,31 Q 58,33 50,30" fill="#0F172A" />
+                                <polygon points="34,31 20,37 26,31 22,25" fill="#0F172A" />
+                            </svg>
+                        </div>
+
+                        <!-- Flock Bird 2 (Mid-ground Vector SVG Bird) -->
+                        <div class="real-bird-unit bird-flock-1">
+                            <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
+                                <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#1E293B" />
+                                <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#334155" />
+                                <path d="M 50,30 Q 42,33 34,31 Q 45,25 50,24 Q 55,25 66,31 Q 58,33 50,30" fill="#1E293B" />
+                                <polygon points="34,31 20,37 26,31 22,25" fill="#1E293B" />
+                            </svg>
+                        </div>
+
+                        <!-- Flock Bird 3 (Background Distance Vector SVG Bird) -->
+                        <div class="real-bird-unit bird-flock-2">
+                            <svg class="svg-real-bird" viewBox="0 0 100 60" width="100%" height="100%">
+                                <path class="svg-wing left-wing" d="M 50,30 Q 28,2 2,28 Q 26,22 50,30" fill="#334155" />
+                                <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#475569" />
+                                <path d="M 50,30 Q 42,33 34,31 Q 45,25 50,24 Q 55,25 66,31 Q 58,33 50,30" fill="#334155" />
+                                <polygon points="34,31 20,37 26,31 22,25" fill="#334155" />
+                            </svg>
+                        </div>
                     </div>
 
                     <div class="track-bg-overlay"></div>
