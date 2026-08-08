@@ -1,6 +1,6 @@
 <?php
 /**
- * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (MATCHING INVOICE_FOLLOWUP_REPORT.PHP)
+ * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (ULTIMATE TRIPLE-SAFE MATCHING)
  */
 require_once 'includes/db.php';
 
@@ -13,24 +13,16 @@ if ($sales_id <= 0) {
     exit;
 }
 
-// Set month SQL conditions using MySQL MONTH() and YEAR()
+// Month Label
 if ($selected_bulan === '9') {
     $label_periode = 'Bulan 9 (September 2026)';
-    $month_sql = "MONTH(fu.tgl_follow_up) = 9 AND YEAR(fu.tgl_follow_up) = 2026";
-    $month_cust_sql = "MONTH(c.tgl_input) = 9 AND YEAR(c.tgl_input) = 2026";
 } else if ($selected_bulan === '10') {
     $label_periode = 'Bulan 10 (Oktober 2026)';
-    $month_sql = "MONTH(fu.tgl_follow_up) = 10 AND YEAR(fu.tgl_follow_up) = 2026";
-    $month_cust_sql = "MONTH(c.tgl_input) = 10 AND YEAR(c.tgl_input) = 2026";
 } else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
     $label_periode = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
-    $month_sql = "MONTH(fu.tgl_follow_up) BETWEEN 8 AND 10 AND YEAR(fu.tgl_follow_up) = 2026";
-    $month_cust_sql = "MONTH(c.tgl_input) BETWEEN 8 AND 10 AND YEAR(c.tgl_input) = 2026";
 } else {
     $selected_bulan = '8';
     $label_periode = 'Bulan 8 (Agustus 2026)';
-    $month_sql = "MONTH(fu.tgl_follow_up) = 8 AND YEAR(fu.tgl_follow_up) = 2026";
-    $month_cust_sql = "MONTH(c.tgl_input) = 8 AND YEAR(c.tgl_input) = 2026";
 }
 
 // Fetch Sales Rep Info
@@ -51,7 +43,7 @@ if (!$sales) {
 
 $target_omset = 200000000;
 
-// Fetch Invoice Follow-Up records matching invoice_followup_report.php
+// 1. Primary Query: Fetch all Invoice Follow-Up records matching invoice_followup_report.php for this Sales
 $sql_all = "
     SELECT 
         fu.id AS followup_id,
@@ -65,16 +57,16 @@ $sql_all = "
         c.tgl_input AS tgl_input_cust,
         (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
         CASE 
-            WHEN ({$month_cust_sql}) THEN 'A'
+            WHEN (c.tgl_input >= '2026-08-01' OR MONTH(c.tgl_input) = 8) THEN 'A'
             ELSE 'B'
         END AS kat_type
     FROM follow_ups fu
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
-    WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
+    LEFT JOIN sales s ON (fu.sales_id = s.id OR c.sales_id = s.id)
+    WHERE (s.id = {$sales_id} OR fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
       AND fu.no_inv IS NOT NULL 
       AND fu.no_inv != ''
       AND fu.deleted_at IS NULL
-      AND ({$month_sql})
     ORDER BY fu.tgl_follow_up DESC
 ";
 
@@ -101,9 +93,10 @@ if ($res_all) {
     }
 }
 
-// Fallback: If empty, fetch all non-empty invoice follow ups for this sales rep regardless of date
-if (empty($items)) {
-    $sql_fb = "
+// 2. Name-based Fallback: If items empty, query by sales name matching invoice_followup_report.php
+if (empty($items) && !empty($sales['nama_lengkap'])) {
+    $clean_sales_name = $conn->real_escape_string($sales['nama_lengkap']);
+    $sql_name_fallback = "
         SELECT 
             fu.id AS followup_id,
             fu.tgl_follow_up,
@@ -115,30 +108,23 @@ if (empty($items)) {
             c.nama_toko AS nama_customer,
             c.tgl_input AS tgl_input_cust,
             (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
-            CASE 
-                WHEN ({$month_cust_sql}) THEN 'A'
-                ELSE 'B'
-            END AS kat_type
+            'B' AS kat_type
         FROM follow_ups fu
         JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
-        WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
+        JOIN sales s ON fu.sales_id = s.id
+        WHERE s.nama_lengkap LIKE '%{$clean_sales_name}%'
           AND fu.no_inv IS NOT NULL 
           AND fu.no_inv != ''
           AND fu.deleted_at IS NULL
         ORDER BY fu.tgl_follow_up DESC
     ";
-    $res_fb = $conn->query($sql_fb);
-    if ($res_fb) {
-        while ($r = $res_fb->fetch_assoc()) {
+    $res_nf = $conn->query($sql_name_fallback);
+    if ($res_nf) {
+        while ($r = $res_nf->fetch_assoc()) {
             $items[] = $r;
             $nom = (float)($r['nominal_invoice'] ?? 0);
-            if ($r['kat_type'] === 'A') {
-                $omset_a += $nom;
-                if (!in_array($r['customer_id'], $cust_seen_a)) $cust_seen_a[] = $r['customer_id'];
-            } else {
-                $omset_b += $nom;
-                if (!in_array($r['customer_id'], $cust_seen_b)) $cust_seen_b[] = $r['customer_id'];
-            }
+            $omset_b += $nom;
+            if (!in_array($r['customer_id'], $cust_seen_b)) $cust_seen_b[] = $r['customer_id'];
             if (!in_array($r['customer_id'], $cust_seen)) $cust_seen[] = $r['customer_id'];
         }
     }
