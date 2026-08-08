@@ -1,6 +1,6 @@
 <?php
 /**
- * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (ULTIMATE TRIPLE-SAFE MATCHING)
+ * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (CLEAN & RELIABLE QUERY)
  */
 require_once 'includes/db.php';
 
@@ -15,13 +15,21 @@ if ($sales_id <= 0) {
 
 // Month Label
 if ($selected_bulan === '9') {
+    $start_date = '2026-09-01';
+    $end_date = '2026-09-30';
     $label_periode = 'Bulan 9 (September 2026)';
 } else if ($selected_bulan === '10') {
+    $start_date = '2026-10-01';
+    $end_date = '2026-10-31';
     $label_periode = 'Bulan 10 (Oktober 2026)';
 } else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
+    $start_date = '2026-08-01';
+    $end_date = '2026-10-31';
     $label_periode = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
 } else {
     $selected_bulan = '8';
+    $start_date = '2026-08-01';
+    $end_date = '2026-08-31';
     $label_periode = 'Bulan 8 (Agustus 2026)';
 }
 
@@ -43,7 +51,7 @@ if (!$sales) {
 
 $target_omset = 200000000;
 
-// 1. Primary Query: Fetch all Invoice Follow-Up records matching invoice_followup_report.php for this Sales
+// Clean & Direct Query: Fetch all Invoice Follow-Up records matching invoice_followup_report.php
 $sql_all = "
     SELECT 
         fu.id AS followup_id,
@@ -57,20 +65,25 @@ $sql_all = "
         c.tgl_input AS tgl_input_cust,
         (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
         CASE 
-            WHEN (c.tgl_input >= '2026-08-01' OR MONTH(c.tgl_input) = 8) THEN 'A'
+            WHEN (DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}') THEN 'A'
             ELSE 'B'
         END AS kat_type
     FROM follow_ups fu
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
-    LEFT JOIN sales s ON (fu.sales_id = s.id OR c.sales_id = s.id)
-    WHERE (s.id = {$sales_id} OR fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
+    WHERE fu.deleted_at IS NULL
+      AND (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
       AND fu.no_inv IS NOT NULL 
       AND fu.no_inv != ''
-      AND fu.deleted_at IS NULL
     ORDER BY fu.tgl_follow_up DESC
 ";
 
 $res_all = $conn->query($sql_all);
+
+if (!$res_all) {
+    echo '<div class="alert alert-danger p-4 text-center"><strong>SQL Query Error:</strong> ' . htmlspecialchars($conn->error) . '</div>';
+    exit;
+}
+
 $items = [];
 $cust_seen = [];
 $cust_seen_a = [];
@@ -78,25 +91,23 @@ $cust_seen_b = [];
 $omset_a = 0;
 $omset_b = 0;
 
-if ($res_all) {
-    while ($r = $res_all->fetch_assoc()) {
-        $items[] = $r;
-        $nom = (float)($r['nominal_invoice'] ?? 0);
-        if ($r['kat_type'] === 'A') {
-            $omset_a += $nom;
-            if (!in_array($r['customer_id'], $cust_seen_a)) $cust_seen_a[] = $r['customer_id'];
-        } else {
-            $omset_b += $nom;
-            if (!in_array($r['customer_id'], $cust_seen_b)) $cust_seen_b[] = $r['customer_id'];
-        }
-        if (!in_array($r['customer_id'], $cust_seen)) $cust_seen[] = $r['customer_id'];
+while ($r = $res_all->fetch_assoc()) {
+    $items[] = $r;
+    $nom = (float)($r['nominal_invoice'] ?? 0);
+    if ($r['kat_type'] === 'A') {
+        $omset_a += $nom;
+        if (!in_array($r['customer_id'], $cust_seen_a)) $cust_seen_a[] = $r['customer_id'];
+    } else {
+        $omset_b += $nom;
+        if (!in_array($r['customer_id'], $cust_seen_b)) $cust_seen_b[] = $r['customer_id'];
     }
+    if (!in_array($r['customer_id'], $cust_seen)) $cust_seen[] = $r['customer_id'];
 }
 
-// 2. Name-based Fallback: If items empty, query by sales name matching invoice_followup_report.php
-if (empty($items) && !empty($sales['nama_lengkap'])) {
+// Fallback: If empty, fetch all follow ups without fu.sales_id filter
+if (empty($items)) {
     $clean_sales_name = $conn->real_escape_string($sales['nama_lengkap']);
-    $sql_name_fallback = "
+    $sql_fb = "
         SELECT 
             fu.id AS followup_id,
             fu.tgl_follow_up,
@@ -118,9 +129,9 @@ if (empty($items) && !empty($sales['nama_lengkap'])) {
           AND fu.deleted_at IS NULL
         ORDER BY fu.tgl_follow_up DESC
     ";
-    $res_nf = $conn->query($sql_name_fallback);
-    if ($res_nf) {
-        while ($r = $res_nf->fetch_assoc()) {
+    $res_fb = $conn->query($sql_fb);
+    if ($res_fb) {
+        while ($r = $res_fb->fetch_assoc()) {
             $items[] = $r;
             $nom = (float)($r['nominal_invoice'] ?? 0);
             $omset_b += $nom;
