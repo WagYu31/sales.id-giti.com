@@ -139,30 +139,35 @@ $total_sales_count = count($ranking_data);
 
 .flying-bird {
     position: absolute;
-    font-size: 20px;
     filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
     animation-timing-function: linear;
     animation-iteration-count: infinite;
 }
 
+.bird-inner {
+    display: inline-block;
+    transform: scaleX(-1);
+    animation: birdFlap 0.4s ease-in-out infinite alternate;
+}
+
 .bird-1 {
     top: 8px;
     font-size: 26px;
-    animation: birdFlight1 14s linear infinite, birdFlap 0.4s ease-in-out infinite alternate;
+    animation: birdFlight1 14s linear infinite;
 }
 
 .bird-2 {
     top: 26px;
     font-size: 19px;
     opacity: 0.9;
-    animation: birdFlight2 19s linear infinite, birdFlap 0.35s ease-in-out infinite alternate;
+    animation: birdFlight2 19s linear infinite;
     animation-delay: 3.5s;
 }
 
 .bird-3 {
     top: 48px;
     font-size: 24px;
-    animation: birdFlight3 12s linear infinite, birdFlap 0.45s ease-in-out infinite alternate;
+    animation: birdFlight3 12s linear infinite;
     animation-delay: 7s;
 }
 
@@ -170,31 +175,31 @@ $total_sales_count = count($ranking_data);
     top: 16px;
     font-size: 17px;
     opacity: 0.85;
-    animation: birdFlight2 23s linear infinite, birdFlap 0.3s ease-in-out infinite alternate;
+    animation: birdFlight2 23s linear infinite;
     animation-delay: 11s;
 }
 
 @keyframes birdFlap {
-    0%   { transform: translateY(0px) rotate(-8deg) scaleY(1); }
-    100% { transform: translateY(-7px) rotate(8deg) scaleY(0.7); }
+    0%   { transform: scaleX(-1) translateY(0px) rotate(-8deg); }
+    100% { transform: scaleX(-1) translateY(-7px) rotate(8deg); }
 }
 
 @keyframes birdFlight1 {
-    0%   { left: -10%; transform: translateY(0) scaleX(-1); }
-    50%  { transform: translateY(-12px) scaleX(-1); }
-    100% { left: 110%; transform: translateY(0) scaleX(-1); }
+    0%   { left: -10%; }
+    50%  { top: 2px; }
+    100% { left: 110%; }
 }
 
 @keyframes birdFlight2 {
-    0%   { left: -10%; transform: translateY(5px) scaleX(-1); }
-    50%  { transform: translateY(-14px) scaleX(-1); }
-    100% { left: 110%; transform: translateY(5px) scaleX(-1); }
+    0%   { left: -10%; }
+    50%  { top: 34px; }
+    100% { left: 110%; }
 }
 
 @keyframes birdFlight3 {
-    0%   { left: -10%; transform: translateY(-5px) scaleX(-1); }
-    50%  { transform: translateY(10px) scaleX(-1); }
-    100% { left: 110%; transform: translateY(-5px) scaleX(-1); }
+    0%   { left: -10%; }
+    50%  { top: 40px; }
+    100% { left: 110%; }
 }
 
 /* 3D Floating Clouds */
@@ -873,10 +878,10 @@ $total_sales_count = count($ranking_data);
                         <div class="cloud-item">☁️</div>
                     </div>
                     <div class="track-3d-birds-layer">
-                        <div class="flying-bird bird-1">🦅</div>
-                        <div class="flying-bird bird-2">🕊️</div>
-                        <div class="flying-bird bird-3">🦅</div>
-                        <div class="flying-bird bird-4">🕊️</div>
+                        <div class="flying-bird bird-1"><span class="bird-inner">🦅</span></div>
+                        <div class="flying-bird bird-2"><span class="bird-inner">🕊️</span></div>
+                        <div class="flying-bird bird-3"><span class="bird-inner">🦅</span></div>
+                        <div class="flying-bird bird-4"><span class="bird-inner">🕊️</span></div>
                     </div>
 
                     <div class="track-bg-overlay"></div>
