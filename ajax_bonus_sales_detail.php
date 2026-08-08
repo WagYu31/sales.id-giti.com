@@ -33,13 +33,18 @@ if ($selected_bulan === '9') {
 }
 
 // Fetch Sales info
-$stmt = $conn->prepare("SELECT id, nama_lengkap, email, no_hp FROM sales WHERE id = ?");
-$stmt->bind_param("i", $sales_id);
-$stmt->execute();
-$sales = $stmt->get_result()->fetch_assoc();
+$stmt = $conn->prepare("SELECT id, nama_lengkap, email FROM sales WHERE id = ?");
+if (!$stmt) {
+    $res = $conn->query("SELECT id, nama_lengkap, email FROM sales WHERE id = {$sales_id}");
+    $sales = $res ? $res->fetch_assoc() : null;
+} else {
+    $stmt->bind_param("i", $sales_id);
+    $stmt->execute();
+    $sales = $stmt->get_result()->fetch_assoc();
+}
 
 if (!$sales) {
-    echo '<div class="alert alert-danger">Sales tidak ditemukan.</div>';
+    echo '<div class="alert alert-danger p-4 text-center">Sales tidak ditemukan.</div>';
     exit;
 }
 
