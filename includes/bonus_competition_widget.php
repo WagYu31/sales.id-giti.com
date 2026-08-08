@@ -12,12 +12,17 @@ $target_omset_per_bulan = 200000000; // Rp 200.000.000,-
 $selected_bulan = trim($_GET['periode_bulan'] ?? '8');
 
 if ($selected_bulan === '9') {
+if ($selected_bulan === '9') {
+    $start_date = '2026-09-01';
+    $end_date = '2026-09-30';
     $start_periode = '2026-09-01 00:00:00';
     $end_periode = '2026-09-30 23:59:59';
     $label_periode = 'Bulan 9 (September 2026)';
     $syarat_kat_a = 'Cust Baru per Sep 2026';
     $syarat_kat_b = 'Reaktivasi Cust Lama Sep 2026';
 } else if ($selected_bulan === '10') {
+    $start_date = '2026-10-01';
+    $end_date = '2026-10-31';
     $start_periode = '2026-10-01 00:00:00';
     $end_periode = '2026-10-31 23:59:59';
     $label_periode = 'Bulan 10 (Oktober 2026)';
@@ -25,6 +30,8 @@ if ($selected_bulan === '9') {
     $syarat_kat_b = 'Reaktivasi Cust Lama Okt 2026';
 } else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
     $selected_bulan = '8-10';
+    $start_date = '2026-08-01';
+    $end_date = '2026-10-31';
     $start_periode = '2026-08-01 00:00:00';
     $end_periode = '2026-10-31 23:59:59';
     $label_periode = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
@@ -32,6 +39,8 @@ if ($selected_bulan === '9') {
     $syarat_kat_b = 'Reaktivasi Cust Lama Agt - Okt 2026';
 } else {
     $selected_bulan = '8';
+    $start_date = '2026-08-01';
+    $end_date = '2026-08-31';
     $start_periode = '2026-08-01 00:00:00';
     $end_periode = '2026-08-31 23:59:59';
     $label_periode = 'Bulan 8 (Agustus 2026)';
@@ -45,11 +54,11 @@ $sql_kat_a = "
         s.id AS sales_id,
         s.nama_lengkap AS nama_sales,
         COUNT(DISTINCT c.id) AS total_customer_baru,
-        COALESCE(SUM(CASE WHEN fu.tgl_follow_up >= '{$start_periode}' AND fu.tgl_follow_up <= '{$end_periode}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_baru
+        COALESCE(SUM(CASE WHEN DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_baru
     FROM sales s
     JOIN customers c ON c.sales_id = s.id AND c.deleted_at IS NULL
     LEFT JOIN follow_ups fu ON fu.customer_id = c.id AND fu.deleted_at IS NULL
-    WHERE c.tgl_input >= '{$start_periode}' AND c.tgl_input <= '{$end_periode}'
+    WHERE DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}'
       AND (s.role = 'sales' OR s.role = 'superadmin')
     GROUP BY s.id, s.nama_lengkap
     ORDER BY total_omset_baru DESC, total_customer_baru DESC
@@ -73,9 +82,9 @@ $sql_kat_b = "
     FROM sales s
     JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
-    WHERE fu.tgl_follow_up >= '{$start_periode}' AND fu.tgl_follow_up <= '{$end_periode}'
+    WHERE DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
       AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-      AND (c.tgl_input < '{$start_periode}' OR c.tgl_input IS NULL)
+      AND (DATE(c.tgl_input) < '{$start_date}' OR c.tgl_input IS NULL OR c.tgl_input = '' OR c.tgl_input LIKE '0000%')
       AND (s.role = 'sales' OR s.role = 'superadmin')
     GROUP BY s.id, s.nama_lengkap
     ORDER BY total_omset_reaktivasi DESC, total_customer_reaktivasi DESC

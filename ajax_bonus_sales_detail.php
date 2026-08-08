@@ -15,18 +15,26 @@ if ($sales_id <= 0) {
 
 // Set date range based on selected month
 if ($selected_bulan === '9') {
+    $start_date = '2026-09-01';
+    $end_date = '2026-09-30';
     $start_periode = '2026-09-01 00:00:00';
     $end_periode = '2026-09-30 23:59:59';
     $label_periode = 'Bulan 9 (September 2026)';
 } else if ($selected_bulan === '10') {
+    $start_date = '2026-10-01';
+    $end_date = '2026-10-31';
     $start_periode = '2026-10-01 00:00:00';
     $end_periode = '2026-10-31 23:59:59';
     $label_periode = 'Bulan 10 (Oktober 2026)';
 } else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
+    $start_date = '2026-08-01';
+    $end_date = '2026-10-31';
     $start_periode = '2026-08-01 00:00:00';
     $end_periode = '2026-10-31 23:59:59';
     $label_periode = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
 } else {
+    $start_date = '2026-08-01';
+    $end_date = '2026-08-31';
     $start_periode = '2026-08-01 00:00:00';
     $end_periode = '2026-08-31 23:59:59';
     $label_periode = 'Bulan 8 (Agustus 2026)';
@@ -71,13 +79,11 @@ if ($kat === 'a') {
         FROM customers c
         LEFT JOIN follow_ups fu ON fu.customer_id = c.id 
             AND fu.deleted_at IS NULL 
-            AND fu.tgl_follow_up >= '{$start_periode}' 
-            AND fu.tgl_follow_up <= '{$end_periode}'
+            AND DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
             AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
         WHERE (c.sales_id = {$sales_id} OR fu.sales_id = {$sales_id})
           AND c.deleted_at IS NULL
-          AND c.tgl_input >= '{$start_periode}' 
-          AND c.tgl_input <= '{$end_periode}'
+          AND DATE(c.tgl_input) BETWEEN '{$start_date}' AND '{$end_date}'
         ORDER BY fu.tgl_follow_up DESC, c.tgl_input DESC
     ";
     $res = $conn->query($sql);
@@ -113,10 +119,9 @@ if ($kat === 'a') {
         JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
         WHERE (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
           AND fu.deleted_at IS NULL
-          AND fu.tgl_follow_up >= '{$start_periode}' 
-          AND fu.tgl_follow_up <= '{$end_periode}'
+          AND DATE(fu.tgl_follow_up) BETWEEN '{$start_date}' AND '{$end_date}'
           AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-          AND (c.tgl_input < '{$start_periode}' OR c.tgl_input IS NULL OR c.tgl_input = '' OR c.tgl_input LIKE '0000%')
+          AND (DATE(c.tgl_input) < '{$start_date}' OR c.tgl_input IS NULL OR c.tgl_input = '' OR c.tgl_input LIKE '0000%')
         ORDER BY fu.tgl_follow_up DESC
     ";
     $res = $conn->query($sql);
