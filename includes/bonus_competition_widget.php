@@ -363,7 +363,7 @@ function openBonusSalesDetail(salesId, kat) {
 
 <!-- MODAL CONTAINER FOR SALES DETAIL -->
 <div class="modal fade" id="bonusSalesDetailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 1150px; width: 95vw;">
         <div class="modal-content border-0 shadow-lg" id="bonusSalesDetailModalBody" style="border-radius: 24px; overflow: hidden;">
             <!-- Content loaded via AJAX -->
         </div>

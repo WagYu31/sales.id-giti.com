@@ -1,6 +1,6 @@
 <?php
 /**
- * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (TEMA KEMERDEKAAN 🇮🇩 3D EDITION)
+ * AJAX HANDLER FOR BONUS COMPETITION SALES DETAIL MODAL (ELEGANT & RESPONSIVE DESIGN)
  */
 require_once 'includes/db.php';
 
@@ -51,7 +51,7 @@ if (!$sales) {
 
 $target_omset = 200000000;
 
-// Clean & Direct Query: Fetch all Invoice Follow-Up records matching invoice_followup_report.php
+// Fetch Invoice Follow-Up records matching invoice_followup_report.php
 $sql_all = "
     SELECT 
         fu.id AS followup_id,
@@ -151,49 +151,77 @@ $pct_target_a = min(100, round(($omset_a / $target_omset) * 100, 1));
 $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
 ?>
 
-<!-- MODAL HEADER TEMA KEMERDEKAAN LOEWIX 🇮🇩 3D -->
-<div class="modal-header border-0 pb-0" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 55%, #450A0A 100%); color: #FFF; border-radius: 24px 24px 0 0; padding: 28px 32px 22px; position: relative;">
-    <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #DC2626 0%, #FFFFFF 50%, #DC2626 100%);"></div>
+<style>
+.modal-table-scrollable::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+.modal-table-scrollable::-webkit-scrollbar-track {
+    background: #F1F5F9;
+    border-radius: 10px;
+}
+.modal-table-scrollable::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 10px;
+}
+.modal-table-scrollable::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
+.kpi-card-clean {
+    border-radius: 16px;
+    padding: 16px 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kpi-card-clean:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+</style>
+
+<!-- MODAL HEADER -->
+<div class="modal-header border-0 pb-0" style="background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 28px 32px 20px; position: relative;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #DC2626 0%, #F59E0B 50%, #10B981 100%);"></div>
     <div class="w-100">
         <div class="d-flex justify-content-between align-items-start">
             <div>
                 <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge bg-danger text-white rounded-pill px-3 py-1 fw-bold" style="font-size: 11px; border: 1.5px solid #FCD34D; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);">
-                        🇮🇩 DETAIL RINCIAN GABUNGAN SALES
+                    <span class="badge bg-danger text-white rounded-pill px-3 py-1 fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">
+                        🇮🇩 EVENT KEMERDEKAAN LOEWIX
                     </span>
-                    <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-bold" style="font-size: 11px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
+                    <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-bold" style="font-size: 11px;">
                         <?= $label_periode ?>
                     </span>
                 </div>
-                <h3 class="fw-extrabold mb-1 text-white" style="font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.4px;">
+                <h3 class="fw-bold mb-1 text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.4px;">
                     👤 <?= htmlspecialchars($sales['nama_lengkap']) ?>
                 </h3>
-                <small class="text-white-50" style="font-size: 12.5px;">Gabungan Kat A (Cust Baru) & Kat B (Reaktivasi Customer Lama)</small>
+                <small class="text-secondary fw-medium" style="font-size: 13px;">Gabungan Kat A (Cust Baru) & Kat B (Reaktivasi Customer Lama)</small>
             </div>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
-        <!-- 3D Metric KPI Cards Grid -->
-        <div class="row g-2.5 mt-3 pt-3 border-top border-secondary border-opacity-30">
+        <!-- 3 KPI Cards Grid -->
+        <div class="row g-3 mt-3 pt-2">
             <div class="col-12 col-md-4">
-                <div class="p-3 rounded-4" style="background: rgba(14, 165, 233, 0.12); border: 1.5px solid rgba(56, 189, 248, 0.3); backdrop-filter: blur(6px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);">
-                    <small class="text-info d-block fw-extrabold" style="font-size: 11px; letter-spacing: 0.5px;">🚀 KAT A: CUST BARU</small>
-                    <span class="fw-extrabold text-white font-monospace" style="font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.4);">Rp <?= number_format($omset_a, 0, ',', '.') ?></span>
-                    <div class="text-white-50 mt-0.5" style="font-size: 11px;"><?= $total_cust_a ?> Customer</div>
+                <div class="kpi-card-clean" style="background: #EFF6FF; border: 1.5px solid #BFDBFE;">
+                    <small class="d-block fw-bold mb-1 text-uppercase" style="font-size: 11px; color: #1E40AF;">🚀 Kat A: Cust Baru</small>
+                    <span class="fw-bold font-monospace" style="font-size: 17px; color: #1E3A8A;">Rp <?= number_format($omset_a, 0, ',', '.') ?></span>
+                    <div class="fw-semibold mt-1" style="font-size: 11.5px; color: #2563EB;"><?= $total_cust_a ?> Customer</div>
                 </div>
             </div>
             <div class="col-12 col-md-4">
-                <div class="p-3 rounded-4" style="background: rgba(245, 158, 11, 0.12); border: 1.5px solid rgba(251, 191, 36, 0.3); backdrop-filter: blur(6px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);">
-                    <small class="text-warning d-block fw-extrabold" style="font-size: 11px; letter-spacing: 0.5px;">🔥 KAT B: REAKTIVASI</small>
-                    <span class="fw-extrabold text-white font-monospace" style="font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.4);">Rp <?= number_format($omset_b, 0, ',', '.') ?></span>
-                    <div class="text-white-50 mt-0.5" style="font-size: 11px;"><?= $total_cust_b ?> Customer Belanja</div>
+                <div class="kpi-card-clean" style="background: #FEF3C7; border: 1.5px solid #FDE68A;">
+                    <small class="d-block fw-bold mb-1 text-uppercase" style="font-size: 11px; color: #92400E;">🔥 Kat B: Reaktivasi</small>
+                    <span class="fw-bold font-monospace" style="font-size: 17px; color: #78350F;">Rp <?= number_format($omset_b, 0, ',', '.') ?></span>
+                    <div class="fw-semibold mt-1" style="font-size: 11.5px; color: #D97706;"><?= $total_cust_b ?> Customer Belanja</div>
                 </div>
             </div>
             <div class="col-12 col-md-4">
-                <div class="p-3 rounded-4" style="background: linear-gradient(135deg, rgba(220, 38, 38, 0.25) 0%, rgba(245, 158, 11, 0.25) 100%); border: 1.5px solid #FCD34D; box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);">
-                    <small class="text-warning d-block fw-extrabold" style="font-size: 11px; letter-spacing: 0.5px;">🏆 TOTAL COMBINED OMSET</small>
-                    <span class="fw-extrabold text-warning font-monospace" style="font-size: 17px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Rp <?= number_format($total_omset_combined, 0, ',', '.') ?></span>
-                    <div class="fw-bold mt-0.5" style="font-size: 11px; color: #34D399;"><?= $total_cust_combined ?> Customer Total (<?= $pct_target_comb ?>% Target)</div>
+                <div class="kpi-card-clean" style="background: #ECFDF5; border: 1.5px solid #A7F3D0;">
+                    <small class="d-block fw-bold mb-1 text-uppercase" style="font-size: 11px; color: #065F46;">🏆 Total Combined Omset</small>
+                    <span class="fw-bold font-monospace" style="font-size: 18px; color: #047857;">Rp <?= number_format($total_omset_combined, 0, ',', '.') ?></span>
+                    <div class="fw-bold mt-1" style="font-size: 11.5px; color: #059669;"><?= $total_cust_combined ?> Customer Total (<?= $pct_target_comb ?>% Target)</div>
                 </div>
             </div>
         </div>
@@ -202,13 +230,13 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
 
 <div class="modal-body p-4 bg-light">
     <!-- Progress Bar Card -->
-    <div class="card border-0 shadow-sm p-3.5 mb-4" style="border-radius: 18px; border: 1px solid #E2E8F0;">
+    <div class="card border-0 shadow-sm p-3 mb-3" style="border-radius: 16px; border: 1px solid #E2E8F0;">
         <div class="d-flex justify-content-between align-items-center mb-1.5 text-dark fw-bold" style="font-size: 12.5px;">
-            <span class="d-flex align-items-center gap-1.5">🎯 Target Sultan Rp 200.000.000,- / Bulan</span>
+            <span>🎯 Target Sultan Rp 200.000.000,- / Bulan</span>
             <span class="badge bg-primary text-white rounded-pill px-3 py-1 fw-bold"><?= $pct_target_comb ?>% Tuntas (Rp <?= number_format($total_omset_combined, 0, ',', '.') ?>)</span>
         </div>
-        <div class="progress" style="height: 12px; border-radius: 10px; background: #E2E8F0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
-            <div class="progress-bar bg-success bg-gradient" role="progressbar" style="width: <?= max($pct_target_comb, 3) ?>%; border-radius: 10px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);"></div>
+        <div class="progress" style="height: 10px; border-radius: 10px; background: #E2E8F0;">
+            <div class="progress-bar bg-success bg-gradient" role="progressbar" style="width: <?= max($pct_target_comb, 3) ?>%; border-radius: 10px;"></div>
         </div>
     </div>
 
@@ -223,59 +251,60 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
             <small class="text-muted">Tidak ditemukan customer / invoice pada periode ini.</small>
         </div>
     <?php else: ?>
-        <div class="table-responsive bg-white rounded-4 shadow-sm border" style="overflow: hidden;">
-            <table class="table table-hover align-middle mb-0" style="font-size: 12.5px;">
-                <thead style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: #94A3B8; font-size: 11.5px; border-bottom: 2px solid #DC2626;">
+        <!-- WIDE SCROLLABLE TABLE CONTAINER WITH GUARANTEED FIT -->
+        <div class="modal-table-scrollable bg-white rounded-4 shadow-sm border" style="overflow-x: auto; max-height: 520px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0" style="min-width: 980px; width: 100%; font-size: 13px;">
+                <thead style="background: #F8FAFC; color: #475569; font-size: 11.5px; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid #E2E8F0;">
                     <tr>
-                        <th class="py-3 ps-3 text-white">No</th>
-                        <th class="py-3 text-white">Kategori</th>
-                        <th class="py-3 text-white">Customer</th>
-                        <th class="py-3 text-white">No. Invoice</th>
-                        <th class="py-3 text-white">Tgl Transaksi</th>
-                        <th class="py-3 text-end pe-3 text-white">Nominal Omset (Rp)</th>
+                        <th class="py-3 ps-3 text-uppercase font-monospace" style="width: 50px;">NO</th>
+                        <th class="py-3 text-uppercase font-monospace" style="width: 160px;">KATEGORI</th>
+                        <th class="py-3 text-uppercase font-monospace" style="width: 280px;">CUSTOMER & TELEPON</th>
+                        <th class="py-3 text-uppercase font-monospace" style="width: 180px;">NO. INVOICE</th>
+                        <th class="py-3 text-uppercase font-monospace" style="width: 160px;">TGL TRANSAKSI</th>
+                        <th class="py-3 text-uppercase font-monospace text-end pe-3" style="width: 170px;">NOMINAL OMSET</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($items as $idx => $row): ?>
                         <tr>
-                            <td class="ps-3 fw-bold text-secondary"><?= $idx + 1 ?></td>
-                            <td>
+                            <td class="ps-3 fw-bold text-muted" style="white-space: nowrap;"><?= $idx + 1 ?></td>
+                            <td style="white-space: nowrap;">
                                 <?php if ($row['kat_type'] === 'A'): ?>
-                                    <span class="badge bg-info bg-opacity-15 text-info fw-bold border border-info border-opacity-30 px-2.5 py-1.5 rounded-pill" style="font-size: 10.5px; background: #E0F2FE; color: #0369A1;">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold border border-primary border-opacity-20 px-3 py-1.5 rounded-pill" style="font-size: 11px;">
                                         🚀 Kat A: Baru
                                     </span>
                                 <?php else: ?>
-                                    <span class="badge bg-warning bg-opacity-15 text-dark fw-bold border border-warning border-opacity-30 px-2.5 py-1.5 rounded-pill" style="font-size: 10.5px; background-color: #FEF3C7; color: #92400E;">
+                                    <span class="badge bg-warning bg-opacity-20 text-dark fw-bold border border-warning border-opacity-30 px-3 py-1.5 rounded-pill" style="font-size: 11px; background-color: #FEF3C7; color: #92400E;">
                                         🔥 Kat B: Reaktivasi
                                     </span>
                                 <?php endif; ?>
                             </td>
-                            <td>
-                                <div class="fw-extrabold text-dark" style="font-size: 13px;"><?= htmlspecialchars($row['nama_customer']) ?></div>
+                            <td style="white-space: nowrap;">
+                                <div class="fw-bold text-dark" style="font-size: 13.5px;"><?= htmlspecialchars($row['nama_customer']) ?></div>
                                 <?php if (!empty($row['no_hp'])): ?>
-                                    <small class="text-muted font-monospace"><i class="bi bi-telephone-fill text-secondary me-1" style="font-size: 10px;"></i><?= htmlspecialchars($row['no_hp']) ?></small>
+                                    <small class="text-secondary font-monospace"><i class="bi bi-telephone-fill me-1" style="font-size: 10px;"></i><?= htmlspecialchars($row['no_hp']) ?></small>
                                 <?php endif; ?>
                             </td>
-                            <td>
+                            <td style="white-space: nowrap;">
                                 <?php if (!empty($row['no_inv'])): ?>
-                                    <span class="badge bg-dark bg-opacity-10 text-dark fw-bold border px-2.5 py-1 rounded-3 font-monospace" style="font-size: 11px; background: #F1F5F9;">
+                                    <span class="badge bg-light text-dark fw-bold border px-3 py-1.5 rounded-3 font-monospace" style="font-size: 11.5px; background: #F1F5F9;">
                                         <?= htmlspecialchars($row['no_inv']) ?>
                                     </span>
                                 <?php else: ?>
                                     <span class="text-muted fw-semibold" style="font-size: 11px;">Belum Invoice</span>
                                 <?php endif; ?>
                             </td>
-                            <td>
+                            <td style="white-space: nowrap;">
                                 <?php if (!empty($row['tgl_follow_up'])): ?>
                                     <span class="text-dark fw-bold" style="font-size: 12px;"><?= date('d M Y', strtotime($row['tgl_follow_up'])) ?></span>
-                                    <div class="text-muted" style="font-size: 10.5px;"><?= date('H:i', strtotime($row['tgl_follow_up'])) ?> WIB</div>
+                                    <small class="text-muted d-block" style="font-size: 11px;"><?= date('H:i', strtotime($row['tgl_follow_up'])) ?> WIB</small>
                                 <?php else: ?>
                                     <span class="text-muted" style="font-size: 11px;">Input: <?= date('d M Y', strtotime($row['tgl_input_cust'])) ?></span>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-end pe-3">
+                            <td class="text-end pe-3" style="white-space: nowrap;">
                                 <?php if (!empty($row['nominal_invoice']) && (float)$row['nominal_invoice'] > 0): ?>
-                                    <span class="fw-extrabold text-success font-monospace" style="font-size: 13.5px;">
+                                    <span class="fw-bold text-success font-monospace" style="font-size: 14px;">
                                         Rp <?= number_format($row['nominal_invoice'], 0, ',', '.') ?>
                                     </span>
                                 <?php else: ?>
@@ -285,10 +314,10 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-                <tfoot class="bg-dark text-white fw-bold border-top" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);">
+                <tfoot class="bg-light fw-bold border-top" style="position: sticky; bottom: 0; z-index: 10; background: #F8FAFC;">
                     <tr>
-                        <td colspan="5" class="ps-3 py-3 text-white">GRAND TOTAL COMBINED OMSET:</td>
-                        <td class="text-end pe-3 py-3 text-warning font-monospace fs-6 fw-extrabold">
+                        <td colspan="5" class="ps-3 py-3 text-dark">GRAND TOTAL COMBINED OMSET:</td>
+                        <td class="text-end pe-3 py-3 text-success font-monospace fs-6 fw-bold">
                             Rp <?= number_format($total_omset_combined, 0, ',', '.') ?>
                         </td>
                     </tr>
@@ -299,5 +328,5 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
 </div>
 
 <div class="modal-footer bg-light border-top-0 pt-0 pe-4 pb-4">
-    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold btn-sm shadow-sm" data-bs-dismiss="modal">Tutup</button>
+    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Tutup</button>
 </div>
