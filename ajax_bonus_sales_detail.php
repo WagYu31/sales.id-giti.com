@@ -68,8 +68,8 @@ if ($kat === 'a') {
     $sql = "
         SELECT 
             c.id AS customer_id,
-            c.nama_customer,
-            c.no_hp,
+            c.nama_toko AS nama_customer,
+            (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
             c.tgl_input AS tgl_input_cust,
             fu.id AS followup_id,
             fu.no_inv,
@@ -107,8 +107,8 @@ if ($kat === 'a') {
         $sql_fb = "
             SELECT 
                 c.id AS customer_id,
-                c.nama_customer,
-                c.no_hp,
+                c.nama_toko AS nama_customer,
+                (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
                 c.tgl_input AS tgl_input_cust,
                 NULL AS followup_id,
                 NULL AS no_inv,
@@ -140,8 +140,8 @@ if ($kat === 'a') {
     $sql = "
         SELECT 
             c.id AS customer_id,
-            c.nama_customer,
-            c.no_hp,
+            c.nama_toko AS nama_customer,
+            (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
             c.tgl_input AS tgl_input_cust,
             fu.id AS followup_id,
             fu.no_inv,
@@ -175,8 +175,8 @@ if ($kat === 'a') {
         $sql_fb = "
             SELECT 
                 c.id AS customer_id,
-                c.nama_customer,
-                c.no_hp,
+                c.nama_toko AS nama_customer,
+                (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
                 c.tgl_input AS tgl_input_cust,
                 fu.id AS followup_id,
                 fu.no_inv,
