@@ -1149,52 +1149,82 @@ function triggerNailongJoySpin(element, salesName, isFinished) {
     playNailongCheerAudio(salesName);
 }
 
-function playNailongCheerAudio(salesName) {
-    // Extract first name (e.g. "Edi Suprianto" -> "Edi")
-    const firstName = salesName ? salesName.trim().split(' ')[0] : 'Sales';
+function getSalesCallName(salesName) {
+    if (!salesName) return 'Sales';
+    const lower = salesName.toLowerCase().trim();
+    if (lower.includes('edi suprianto') || lower.includes('suprianto') || lower === 'edi') {
+        return 'Anto';
+    }
+    return salesName.trim().split(' ')[0];
+}
 
-    // 1. Synthesize Upbeat Victory Cheer Chiptune Fanfare via Web Audio API
+function playNailongCheerAudio(salesName) {
+    const callName = getSalesCallName(salesName);
+
+    // 1. Synthesize 17 Agustus Independence Day Marching Band Fanfare (Web Audio API)
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (AudioCtx) {
             const ctx = new AudioCtx();
-            const notes = [
-                { f: 523.25, d: 0.1, t: 0 },      // C5
-                { f: 659.25, d: 0.1, t: 0.1 },    // E5
-                { f: 783.99, d: 0.1, t: 0.2 },    // G5
-                { f: 1046.50, d: 0.25, t: 0.3 },  // C6
-                { f: 880.00, d: 0.1, t: 0.55 },   // A5
-                { f: 1046.50, d: 0.35, t: 0.65 }  // C6
+
+            // Notes for 17 Agustus 1945 March:
+            // "Tujuh belas agustus tahun empat lima... itulah hari kemerdekaan kita!"
+            // G4 (392Hz), E4 (329.63Hz), C4 (261.63Hz), A4 (440Hz), F4 (349.23Hz), C5 (523.25Hz), E5 (659.25Hz)
+            const marchMelody = [
+                { f: 392.00, d: 0.12, t: 0.00 }, // Tu-
+                { f: 392.00, d: 0.12, t: 0.14 }, // -juh
+                { f: 329.63, d: 0.15, t: 0.28 }, // be-
+                { f: 261.63, d: 0.22, t: 0.45 }, // -las
+                { f: 392.00, d: 0.12, t: 0.70 }, // A-
+                { f: 392.00, d: 0.12, t: 0.84 }, // -gus-
+                { f: 329.63, d: 0.15, t: 0.98 }, // -tus
+                { f: 261.63, d: 0.22, t: 1.15 }, // ta-
+                { f: 392.00, d: 0.10, t: 1.40 }, // -hun
+                { f: 440.00, d: 0.10, t: 1.52 }, // em-
+                { f: 392.00, d: 0.10, t: 1.64 }, // -pat
+                { f: 329.63, d: 0.10, t: 1.76 }, // li-
+                { f: 349.23, d: 0.10, t: 1.88 }, // -ma
+                { f: 392.00, d: 0.25, t: 2.00 }, // !!!
+                { f: 523.25, d: 0.15, t: 2.30 }, // C5
+                { f: 659.25, d: 0.35, t: 2.48 }  // E5 MERDEKA!
             ];
 
-            notes.forEach(n => {
-                const osc = ctx.createOscillator();
+            marchMelody.forEach(n => {
+                // Main Brass Trumpet (Sawtooth + Triangle mix)
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
                 const gain = ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(n.f, ctx.currentTime + n.t);
 
-                gain.gain.setValueAtTime(0.3, ctx.currentTime + n.t);
+                osc1.type = 'sawtooth';
+                osc2.type = 'triangle';
+                osc1.frequency.setValueAtTime(n.f, ctx.currentTime + n.t);
+                osc2.frequency.setValueAtTime(n.f * 1.005, ctx.currentTime + n.t); // Subtle chorus
+
+                gain.gain.setValueAtTime(0.28, ctx.currentTime + n.t);
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + n.t + n.d);
 
-                osc.connect(gain);
+                osc1.connect(gain);
+                osc2.connect(gain);
                 gain.connect(ctx.destination);
 
-                osc.start(ctx.currentTime + n.t);
-                osc.stop(ctx.currentTime + n.t + n.d);
+                osc1.start(ctx.currentTime + n.t);
+                osc2.start(ctx.currentTime + n.t);
+                osc1.stop(ctx.currentTime + n.t + n.d);
+                osc2.stop(ctx.currentTime + n.t + n.d);
             });
         }
     } catch (e) {
         console.log("Web Audio API info:", e);
     }
 
-    // 2. Web Speech Synthesis Indonesian Cheer Leader Voice ("Semangat Edi! Semangat Edi!")
+    // 2. Web Speech Synthesis Indonesian Cheer Leader Voice ("Semangat Anto!")
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel(); // Cancel any ongoing speech
 
-        const cheerText = `Semangat ${firstName}! Semangat ${firstName}! Semangat ${firstName}! Ayo ${firstName}, pasti Juara Loewix!`;
+        const cheerText = `Semangat ${callName}! Semangat ${callName}! Semangat ${callName}! Merdeka! Ayo ${callName}, pasti Juara Loewix!`;
         const utterance = new SpeechSynthesisUtterance(cheerText);
         utterance.lang = 'id-ID';
-        utterance.rate = 1.2;
+        utterance.rate = 1.25;
         utterance.pitch = 1.35;
         utterance.volume = 1.0;
 
@@ -1253,22 +1283,24 @@ function showMotivationSpeechBubble(parentElement, salesName, isFinished) {
     const existing = parentElement.querySelector('.nailong-speech-bubble');
     if (existing) existing.remove();
 
+    const callName = getSalesCallName(salesName);
+
     const bubble = document.createElement('div');
     bubble.className = 'nailong-speech-bubble';
     
     let quotes = [
-        `DIRGAHAYU INDONESIA! 🇮🇩 Semangat ${salesName}! 🔥💪`,
-        `MERDEKA! 🇮🇩 Gas Terus ${salesName}! 🚀🏆`,
-        `GACOR KEMERDEKAAN! 🇮🇩 ${salesName} Mantaap! 💰💵`,
-        `SULTAN KEMERDEKAAN! 🇮🇩 ${salesName} 👑🌟`,
-        `JUARA LOEWIX! 🇮🇩 ${salesName} 💎🎉`
+        `DIRGAHAYU INDONESIA! 🇮🇩 Semangat ${callName}! 🔥💪`,
+        `MERDEKA! 🇮🇩 Gas Terus ${callName}! 🚀🏆`,
+        `GACOR KEMERDEKAAN! 🇮🇩 ${callName} Mantaap! 💰💵`,
+        `SULTAN KEMERDEKAAN! 🇮🇩 ${callName} 👑🌟`,
+        `JUARA LOEWIX! 🇮🇩 ${callName} 💎🎉`
     ];
 
     if (isFinished) {
         quotes = [
-            `JUARA 1 FINISH! 🏆 🇮🇩 Omset 200 Juta ${salesName}! 🎉`,
-            `PUNCAK VICTORY! 👑 🇮🇩 ${salesName} Angkat Piala 🏆!`,
-            `SULTAN JUARA 1! 🏆 💰 Omset 200M Tuntas ${salesName}! 🇮🇩`
+            `JUARA 1 FINISH! 🏆 🇮🇩 Omset 200 Juta ${callName}! 🎉`,
+            `PUNCAK VICTORY! 👑 🇮🇩 ${callName} Angkat Piala 🏆!`,
+            `SULTAN JUARA 1! 🏆 💰 Omset 200M Tuntas ${callName}! 🇮🇩`
         ];
     }
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
