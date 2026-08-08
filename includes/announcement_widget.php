@@ -1,23 +1,23 @@
 <?php
 /**
- * PAPAN PENGUMUMAN OFFICIAL SALES WIDGET - TOP RUNNING TEXT TICKER EDITION
+ * PAPAN PENGUMUMAN OFFICIAL SALES WIDGET - ULTRA CLEAN LIGHT TICKER BANNER
  * DILETAK KAN DI PALING ATAS DASHBOARD (DI BAWAH NAVBAR / SEBELUM HERO WELCOME)
  */
 ?>
 <style>
-/* === TOP RUNNING TEXT TICKER BAR STYLES === */
+/* === ULTRA CLEAN LIGHT TICKER BANNER === */
 .top-announcement-ticker-bar {
-    background: linear-gradient(90deg, #0F172A 0%, #1E293B 60%, #0F172A 100%);
-    border-radius: 16px;
-    padding: 0 16px;
-    height: 48px;
+    background: #FFFFFF;
+    border-radius: 18px;
+    padding: 0 18px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 22px;
+    margin-bottom: 24px;
     position: relative;
-    border: 1.5px solid rgba(51, 65, 85, 0.8);
-    box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.3);
+    border: 1.5px solid #E2E8F0;
+    box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.02);
     overflow: hidden;
 }
 
@@ -25,56 +25,59 @@
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 3px;
+    height: 3.5px;
     background: linear-gradient(90deg, #DC2626 0%, #F59E0B 50%, #2563EB 100%);
+    box-shadow: 0 1px 6px rgba(220, 38, 38, 0.3);
 }
 
 .ticker-left-badge {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
     color: #FFFFFF;
     font-size: 11.5px;
     font-weight: 800;
-    padding: 5px 12px;
-    border-radius: 12px;
+    padding: 6px 14px;
+    border-radius: 14px;
     border: 1px solid #FCD34D;
-    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.35);
     white-space: nowrap;
     flex-shrink: 0;
-    z-index: 2;
+    z-index: 5;
 }
 
 .ticker-live-dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: #4ADE80;
-    box-shadow: 0 0 8px #4ADE80;
+    background: #22C55E;
+    box-shadow: 0 0 10px #22C55E;
     animation: liveDotPulse 1.5s infinite alternate;
 }
 
 @keyframes liveDotPulse {
     0% { opacity: 0.4; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1.25); }
 }
 
 .ticker-track-viewport {
     flex: 1;
     overflow: hidden;
-    margin: 0 16px;
+    margin: 0 18px;
     position: relative;
     height: 100%;
     display: flex;
     align-items: center;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%);
 }
 
 .ticker-track-content {
     display: flex;
     align-items: center;
     white-space: nowrap;
-    animation: tickerMarqueeScroll 28s linear infinite;
+    animation: tickerMarqueeScroll 30s linear infinite;
     cursor: pointer;
 }
 
@@ -90,64 +93,69 @@
 .ticker-item-inline {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 13px;
-    color: #F8FAFC;
-    padding-right: 28px;
+    font-size: 13.5px;
+    color: #1E293B;
+    padding-right: 32px;
 }
 
 .ticker-item-tag {
     font-size: 10.5px;
     font-weight: 800;
-    padding: 2px 8px;
-    border-radius: 8px;
+    padding: 3px 10px;
+    border-radius: 10px;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.ticker-tag-urgent { background: rgba(239, 68, 68, 0.25); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.4); }
-.ticker-tag-promo  { background: rgba(16, 185, 129, 0.25); color: #6EE7B7; border: 1px solid rgba(16, 185, 129, 0.4); }
-.ticker-tag-warning{ background: rgba(245, 158, 11, 0.25); color: #FDE047; border: 1px solid rgba(245, 158, 11, 0.4); }
-.ticker-tag-info   { background: rgba(59, 130, 246, 0.25); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.4); }
+.ticker-tag-urgent { background: linear-gradient(135deg, #EF4444, #DC2626); color: #FFFFFF; }
+.ticker-tag-promo  { background: linear-gradient(135deg, #10B981, #059669); color: #FFFFFF; }
+.ticker-tag-warning{ background: linear-gradient(135deg, #F59E0B, #D97706); color: #FFFFFF; }
+.ticker-tag-info   { background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: #FFFFFF; }
 
 .ticker-right-actions {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
-    z-index: 2;
+    z-index: 5;
 }
 
 .btn-ticker-view {
-    background: rgba(255, 255, 255, 0.1);
-    color: #FFFFFF;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 11.5px;
+    background: #EFF6FF;
+    color: #2563EB;
+    border: 1.5px solid #BFDBFE;
+    font-size: 12px;
     font-weight: 700;
-    padding: 4px 14px;
-    border-radius: 12px;
+    padding: 5px 16px;
+    border-radius: 14px;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .btn-ticker-view:hover {
     background: #2563EB;
     color: #FFFFFF;
     border-color: #2563EB;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    transform: translateY(-1px);
 }
 
 .btn-ticker-manage {
-    background: #FFFFFF;
-    color: #0F172A;
-    border: 1px solid #CBD5E1;
-    font-size: 11.5px;
+    background: #F8FAFC;
+    color: #475569;
+    border: 1.5px solid #CBD5E1;
+    font-size: 12px;
     font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 12px;
+    padding: 5px 14px;
+    border-radius: 14px;
     text-decoration: none;
     transition: all 0.2s ease;
     white-space: nowrap;
@@ -157,6 +165,7 @@
     background: #0F172A;
     color: #FFFFFF;
     border-color: #0F172A;
+    transform: translateY(-1px);
 }
 
 /* Modal Grid Styles */
@@ -186,7 +195,8 @@
         <!-- Right Action Buttons -->
         <div class="ticker-right-actions">
             <button type="button" class="btn-ticker-view" onclick="openAnnouncementModal()">
-                📋 Lihat Semua (<span id="tickerActiveCount">0</span>)
+                <span>📋 Lihat Detail</span>
+                <span class="badge bg-primary text-white rounded-pill px-2 py-0.5" style="font-size: 10.5px;" id="tickerActiveCount">0</span>
             </button>
             <a href="announcements.php" class="btn-ticker-manage">
                 ⚙️ Kelola
@@ -255,9 +265,9 @@ function loadActiveAnnouncementsTicker() {
                     tickerItemsHtml += `
                         <div class="ticker-item-inline">
                             <span class="ticker-item-tag ${tagClass}">${tagLabel}</span>
-                            <span class="fw-bold">${titleStr}</span>
-                            <span class="text-white-50">— ${snippetStr}</span>
-                            <span class="ms-2 me-2 text-warning">⭐</span>
+                            <span class="fw-bold text-dark">${titleStr}</span>
+                            <span class="text-secondary">— ${snippetStr}</span>
+                            <span class="ms-2 me-2 text-warning fw-bold">⭐</span>
                         </div>
                     `;
                 });
