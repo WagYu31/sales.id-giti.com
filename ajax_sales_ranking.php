@@ -46,7 +46,7 @@ $sql_ranking_all = "
     FROM sales s
     LEFT JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL AND fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}'
     LEFT JOIN customers c ON c.sales_id = s.id AND c.deleted_at IS NULL AND c.tgl_input >= '{$start_periode_ranking}' AND c.tgl_input <= '{$end_periode_ranking}'
-    WHERE s.role = 'sales' OR s.role = 'superadmin' OR fu.id IS NOT NULL OR c.id IS NOT NULL
+    WHERE s.deleted_at IS NULL OR fu.id IS NOT NULL OR c.id IS NOT NULL
     GROUP BY s.id, s.nama_lengkap
     ORDER BY (total_fu + total_cust_baru) DESC, total_fu DESC, total_cust_baru DESC
 ";
