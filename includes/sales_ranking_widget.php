@@ -5,10 +5,15 @@
  * METRIK UTAMA: TOTAL NOMINAL OMSET INVOICE (RP) DENGAN TARGET RP 200 JUTA
  */
 
-// Parse month filter (Bulan 8, 9, 10 or 8-10)
-$selected_bulan = trim($_GET['periode_bulan'] ?? '8');
+// Parse month filter (Default: 3 Bulan - Agt-Okt 2026)
+$selected_bulan = trim($_GET['periode_bulan'] ?? '8-10');
 
-if ($selected_bulan === '9') {
+if ($selected_bulan === '8') {
+    $start_periode_ranking = '2026-08-01 00:00:00';
+    $end_periode_ranking = '2026-08-31 23:59:59';
+    $label_periode_ranking = 'Agt 2026';
+    $full_label_ranking = 'Bulan 8 (Agustus 2026)';
+} else if ($selected_bulan === '9') {
     $start_periode_ranking = '2026-09-01 00:00:00';
     $end_periode_ranking = '2026-09-30 23:59:59';
     $label_periode_ranking = 'Sep 2026';
@@ -18,18 +23,12 @@ if ($selected_bulan === '9') {
     $end_periode_ranking = '2026-10-31 23:59:59';
     $label_periode_ranking = 'Okt 2026';
     $full_label_ranking = 'Bulan 10 (Oktober 2026)';
-} else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
+} else {
     $selected_bulan = '8-10';
     $start_periode_ranking = '2026-08-01 00:00:00';
     $end_periode_ranking = '2026-10-31 23:59:59';
-    $label_periode_ranking = 'Agt-Okt 2026';
-    $full_label_ranking = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
-} else {
-    $selected_bulan = '8';
-    $start_periode_ranking = '2026-08-01 00:00:00';
-    $end_periode_ranking = '2026-08-31 23:59:59';
-    $label_periode_ranking = 'Agt 2026';
-    $full_label_ranking = 'Bulan 8 (Agustus 2026)';
+    $label_periode_ranking = '3 Bulan (Agt-Okt)';
+    $full_label_ranking = 'Periode 3 Bulan (Agt - Okt 2026)';
 }
 
 $target_omset_finish = 200000000; // Rp 200.000.000,-
@@ -865,6 +864,28 @@ $total_sales_count = count($ranking_data);
             <div class="cash-prize-badge-3d" style="background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #1D4ED8 100%); border-color: #93C5FD; box-shadow: 0 10px 25px -4px rgba(37, 99, 235, 0.5);">
                 <span>💰</span> HADIAH UTAMA 2 JT INV TERBANYAK
             </div>
+        </div>
+    </div>
+
+    <!-- Month Filter Bar (3 Bulan: Agt - Okt 2026) -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 p-2 bg-light rounded-pill border gap-2 shadow-sm">
+        <div class="d-flex align-items-center gap-2 px-3">
+            <span class="fw-bold text-dark" style="font-size: 12.5px;">📅 Filter Periode Ranking:</span>
+            <span class="badge bg-primary text-white rounded-pill px-3 py-1 fw-bold" style="font-size: 11px; border: 1px solid #93C5FD;"><?= $full_label_ranking ?></span>
+        </div>
+        <div class="d-flex align-items-center gap-1.5 flex-wrap">
+            <a href="?periode_bulan=8-10" class="btn btn-sm <?= ($selected_bulan==='8-10')?'btn-primary fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+                🏆 Total 3 Bulan (Agt-Okt)
+            </a>
+            <a href="?periode_bulan=8" class="btn btn-sm <?= ($selected_bulan==='8')?'btn-danger fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+                📅 Agt (Bulan 8)
+            </a>
+            <a href="?periode_bulan=9" class="btn btn-sm <?= ($selected_bulan==='9')?'btn-warning fw-bold text-dark shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+                📅 Sep (Bulan 9)
+            </a>
+            <a href="?periode_bulan=10" class="btn btn-sm <?= ($selected_bulan==='10')?'btn-success fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+                📅 Okt (Bulan 10)
+            </a>
         </div>
     </div>
 
