@@ -564,36 +564,28 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-/* === LOEWIX CCTV 3D ROBOT REALISTIC SPRINT ANIMATION === */
+/* === LOEWIX CCTV 3D ROBOT REALISTIC LEG STRIDE ANIMATION === */
 .loewix-runner-3d, .nailong-sprite {
     width: 52px;
     height: 64px;
-    background-image: url('assets/loewix_runner_3d.png?v=<?= time() ?>');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center bottom;
     display: block;
     filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));
     transform-origin: center bottom;
-    animation: loewixRealSprint 0.18s infinite linear;
+    animation: loewixLegStride 0.32s steps(1) infinite;
 }
 
-/* Real Olympic Forward Sprint (Forward Lean -14deg, Low Ground Stride 2.5px, High-Velocity Foot Patter) */
-@keyframes loewixRealSprint {
-    0% {
-        transform: translateY(0px) translateX(0px) rotate(-14deg) scale(1.04, 0.96) skewX(6deg);
+/* 2-Frame Alternating Leg Stride (Pose A Left Foot Striking -> Pose B Right Foot Striking) */
+@keyframes loewixLegStride {
+    0%, 49% {
+        background-image: url('assets/loewix_runner_3d.png?v=<?= time() ?>');
+        transform: translateY(0px) rotate(-13deg) scale(1.02, 0.98);
     }
-    25% {
-        transform: translateY(-2.5px) translateX(3px) rotate(-11deg) scale(0.98, 1.02) skewX(4deg);
-    }
-    50% {
-        transform: translateY(-0.5px) translateX(1px) rotate(-15deg) scale(1.05, 0.95) skewX(7deg);
-    }
-    75% {
-        transform: translateY(-3px) translateX(4px) rotate(-12deg) scale(0.97, 1.03) skewX(5deg);
-    }
-    100% {
-        transform: translateY(0px) translateX(0px) rotate(-14deg) scale(1.04, 0.96) skewX(6deg);
+    50%, 99% {
+        background-image: url('assets/loewix_runner_pose_b.png?v=<?= time() ?>');
+        transform: translateY(-2px) rotate(-15deg) scale(0.98, 1.02);
     }
 }
 
