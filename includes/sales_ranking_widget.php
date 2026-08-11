@@ -856,7 +856,7 @@ $total_sales_count = count($ranking_data);
                     <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 800;">🏁 Sirkuit Balap Nailong Merah Putih 🇮🇩</span>
                 </div>
                 <h5 class="mb-0 fw-bold text-dark mt-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
-                    Leaderboard & Grafik Ranking Sales Rep
+                    PROGRAM PER SEMESTER DALAM 3 BULAN
                 </h5>
             </div>
         </div>
