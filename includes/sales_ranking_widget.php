@@ -1281,6 +1281,13 @@ function switchMonthPeriode(monthVal, btnEl) {
             rankingDataRaw = data.ranking_data || [];
             currentLabelPeriodeRanking = data.label_periode_ranking || '3 Bulan (Agt-Okt)';
 
+            salesChartLabels = data.chart_labels || [];
+            salesChartOmsetInvoice = data.chart_omset_invoice || [];
+            salesChartTotalFU = data.chart_total_fu || [];
+            salesChartCustBaru = data.chart_cust_baru || [];
+            salesChartCustomerFU = data.chart_customer_fu || [];
+            salesChartInvCount = data.chart_inv_count || [];
+
             const badgeFullLabel = document.getElementById('badgeFullLabelRanking');
             if (badgeFullLabel) badgeFullLabel.innerText = data.full_label_ranking;
 
@@ -1420,11 +1427,11 @@ function escapeHtml(str) {
 }
 
 function getActiveDatasetValues() {
-    if (currentMetric === 'total') return { values: salesChartTotalFU, label: "Total Activity FU" };
-    if (currentMetric === 'cust_baru') return { values: salesChartCustBaru, label: "Customer Baru Input" };
-    if (currentMetric === 'customer') return { values: salesChartCustomerFU, label: "Customer di-FU" };
-    if (currentMetric === 'inv_count') return { values: salesChartInvCount, label: "Jumlah Invoice" };
-    return { values: salesChartOmsetInvoice, label: "Omset Invoice (Rp)" };
+    if (currentMetric === 'total') return { values: salesChartTotalFU || [], label: "Total Activity FU" };
+    if (currentMetric === 'cust_baru') return { values: salesChartCustBaru || [], label: "Customer Baru Input" };
+    if (currentMetric === 'customer') return { values: salesChartCustomerFU || [], label: "Customer di-FU" };
+    if (currentMetric === 'inv_count') return { values: salesChartInvCount || [], label: "Jumlah Invoice" };
+    return { values: salesChartOmsetInvoice || [], label: "Omset Invoice (Rp)" };
 }
 
 function formatRupiahDisplay(num) {
@@ -1433,10 +1440,11 @@ function formatRupiahDisplay(num) {
 
 function renderScaledChart() {
     const { values, label } = getActiveDatasetValues();
+    const activeValues = Array.isArray(values) ? values : [];
     
-    let limit = currentTopLimit === 'all' ? values.length : parseInt(currentTopLimit);
-    let slicedLabels = salesChartLabels.slice(0, limit);
-    let slicedValues = values.slice(0, limit);
+    let limit = currentTopLimit === 'all' ? activeValues.length : parseInt(currentTopLimit);
+    let slicedLabels = (salesChartLabels || []).slice(0, limit);
+    let slicedValues = activeValues.slice(0, limit);
 
     // Calculate dynamic height for canvas so bars and top Nailong head/speech bubble never get squished or clipped
     const container = document.getElementById('chartCanvasContainer');
