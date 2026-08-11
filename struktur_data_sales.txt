@@ -9,7 +9,7 @@
 ├── ajax_promosi_handler.php
 ├── ajax_qa_handler.php
 ├── assets
-│   ├── broadcasts
+│   ├── broadcasjeh ts
 │   │   ├── images
 │   │   │   ├── 68c90c15613e6-WhatsApp Image 2025-09-16 at 10.24.51_e1b722f6.jpg
 │   │   │   ├── 68c90f337f5dd-WhatsApp Image 2025-09-16 at 10.24.51_e1b722f6.jpg
