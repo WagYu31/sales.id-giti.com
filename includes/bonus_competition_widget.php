@@ -224,7 +224,7 @@ if ($res_combined) {
         </div>
         <div class="text-end">
             <div class="cash-prize-badge-3d">
-                <span>💰</span> HADIAH UTAMA RP 2.000.000,-
+                <span>💰</span> HADIAH UTAMA RP 3.000.000,-
             </div>
         </div>
     </div>
@@ -264,7 +264,7 @@ if ($res_combined) {
                             <small class="text-white-50" style="font-size: 12px;">Akumulasi omset invoice & jumlah mitra aktif per <?= $label_periode ?> (Target Rp 200 Juta Omset Invoice).</small>
                         </div>
                         <span class="badge bg-warning bg-opacity-20 text-warning border border-warning rounded-pill px-3 py-1.5" style="font-size: 12px; font-weight: 800; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);">
-                            💰 TOTAL HADIAH RP 2.000.000,-
+                            💰 TOTAL HADIAH RP 3.000.000,-
                         </span>
                     </div>
 
@@ -311,7 +311,7 @@ if ($res_combined) {
                         <?php else: ?>
                             <div class="text-center py-4 text-white-50" style="font-size: 13px;">
                                 🚀 Belum ada data pencapaian omset invoice sales per <?= $label_periode ?>.<br>
-                                <small>Ayo tingkatkan omset invoice customer baru & reaktivasi untuk memenangkan Bonus Sultan Rp 2 Juta!</small>
+                                <small>Ayo tingkatkan omset invoice customer baru & reaktivasi untuk memenangkan Bonus Sultan Rp 3 Juta!</small>
                             </div>
                         <?php endif; ?>
                     </div>
