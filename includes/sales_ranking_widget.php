@@ -1486,8 +1486,8 @@ function renderScaledChart() {
     gradientBronze.addColorStop(0, '#F97316');
     gradientBronze.addColorStop(1, '#FB923C');
 
-    // Compute scale max - Fixed Targets for each metric so finish line represents real goals
-    const maxVal = Math.max(...slicedValues, 1);
+    // Compute scale max - Dynamic scale with headroom so bars and finish line look great
+    const maxVal = Math.max(...slicedValues, 0);
     let scaleMax = 50;
     let stepSizeVal = 10;
 
@@ -1495,18 +1495,14 @@ function renderScaledChart() {
         // Fixed scale to Target 200 Juta (or higher if a sales exceeds 200M)
         scaleMax = maxVal > 200000000 ? Math.ceil(maxVal / 50000000) * 50000000 : 200000000;
         stepSizeVal = 50000000; // 0, 50 Jt, 100 Jt, 150 Jt, 200 Jt
-    } else if (currentMetric === 'inv_count') {
-        // Target finish line for Invoice Terbanyak is 50 Invoice
-        scaleMax = maxVal > 50 ? Math.ceil(maxVal / 10) * 10 : 50;
-        stepSizeVal = 10;
-    } else if (currentMetric === 'total') {
-        // Target finish line for Activity FU is 100 Activity
-        scaleMax = maxVal > 100 ? Math.ceil(maxVal / 20) * 20 : 100;
-        stepSizeVal = 20;
-    } else if (currentMetric === 'customer') {
-        // Target finish line for Customer FU is 50 Customer
-        scaleMax = maxVal > 50 ? Math.ceil(maxVal / 10) * 10 : 50;
-        stepSizeVal = 10;
+    } else {
+        if (maxVal === 0) {
+            scaleMax = 50;
+            stepSizeVal = 10;
+        } else {
+            scaleMax = Math.ceil(maxVal * 1.15);
+            stepSizeVal = Math.max(1, Math.ceil(scaleMax / 5));
+        }
     }
 
     salesChartInstance = new Chart(ctx, {
@@ -2021,5 +2017,16 @@ function setTopLimit(limit, btn) {
     document.querySelectorAll('.top-limit-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     renderScaledChart();
+}
+
+// Auto-initialize chart and Nailong runners on page load
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(function() {
+        switchChartMetric(currentMetric);
+    }, 50);
+} else {
+    document.addEventListener('DOMContentLoaded', function() {
+        switchChartMetric(currentMetric);
+    });
 }
 </script>
