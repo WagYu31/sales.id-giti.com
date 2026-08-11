@@ -431,33 +431,32 @@ $total_sales_count = count($ranking_data);
 }
 
 /* === LOEWIX CCTV 3D ROBOT RUNNER ANIMATION === */
-.loewix-runner-3d {
-    width: 48px;
-    height: 60px;
+.loewix-runner-3d, .nailong-sprite {
+    width: 50px;
+    height: 62px;
     background-image: url('assets/loewix_runner_3d.png?v=<?= time() ?>');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center bottom;
     display: block;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
-    animation: loewixRobotRun 0.45s ease-in-out infinite alternate;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5));
+    transform-origin: center bottom;
+    animation: loewixSprint3D 0.28s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
 }
 
-@keyframes loewixRobotRun {
-    0% { transform: translateY(0) rotate(-3deg); }
-    100% { transform: translateY(-5px) rotate(4deg); }
-}
-
-.nailong-sprite {
-    width: 48px;
-    height: 60px;
-    background-image: url('assets/loewix_runner_3d.png?v=<?= time() ?>');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    display: block;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
-    animation: loewixRobotRun 0.45s ease-in-out infinite alternate;
+@keyframes loewixSprint3D {
+    0% {
+        transform: translateY(0px) rotate(-6deg) scale(1.08, 0.92) skewX(4deg);
+    }
+    35% {
+        transform: translateY(-4px) rotate(-1deg) scale(0.98, 1.02) skewX(2deg);
+    }
+    70% {
+        transform: translateY(-9px) rotate(5deg) scale(0.94, 1.06) skewX(-2deg);
+    }
+    100% {
+        transform: translateY(-12px) rotate(8deg) scale(0.90, 1.10) skewX(-5deg);
+    }
 }
 
 /* Static single image fallback for victory */
@@ -466,7 +465,6 @@ $total_sales_count = count($ranking_data);
     height: 52px;
     object-fit: contain;
     display: block;
-    mix-blend-mode: multiply;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
 }
 
@@ -477,15 +475,12 @@ $total_sales_count = count($ranking_data);
 }
 
 .nailong-run-bounce {
-    animation: nailongRunBounce 0.5s infinite ease-in-out;
+    animation: loewixRunBounce 0.28s infinite alternate ease-in-out;
 }
 
-@keyframes nailongRunBounce {
-    0%   { transform: translateY(0px) rotate(-2deg); }
-    25%  { transform: translateY(-5px) rotate(0deg); }
-    50%  { transform: translateY(-2px) rotate(2deg); }
-    75%  { transform: translateY(-5px) rotate(0deg); }
-    100% { transform: translateY(0px) rotate(-2deg); }
+@keyframes loewixRunBounce {
+    0%   { transform: scale(1, 1); }
+    100% { transform: scale(1.02, 0.98); }
 }
 
 /* === GROUND SHADOW that pulses with bounce === */
@@ -496,16 +491,14 @@ $total_sales_count = count($ranking_data);
     transform: translateX(-50%);
     width: 36px;
     height: 8px;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 70%);
     border-radius: 50%;
-    animation: nailongShadowPulse 0.35s infinite ease-in-out;
+    animation: nailongShadowPulse 0.28s infinite alternate ease-in-out;
 }
 
 @keyframes nailongShadowPulse {
-    0%   { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.5; }
-    30%  { transform: translateX(-50%) scaleX(0.7) scaleY(0.6); opacity: 0.3; }
-    65%  { transform: translateX(-50%) scaleX(1.15) scaleY(1.1); opacity: 0.6; }
-    100% { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.5; }
+    0%   { transform: translateX(-50%) scaleX(1.2) scaleY(1.1); opacity: 0.65; }
+    100% { transform: translateX(-50%) scaleX(0.6) scaleY(0.5); opacity: 0.25; }
 }
 
 /* === DUST CLOUD particles behind runner === */
