@@ -377,7 +377,7 @@ $total_sales_count = count($ranking_data);
 .stadium-center-billboard {
     position: absolute;
     top: 6px;
-    left: 45%;
+    left: 50%;
     transform: translateX(-50%);
     z-index: 3;
     pointer-events: none;
@@ -1262,10 +1262,8 @@ $total_sales_count = count($ranking_data);
                                 </div>
                                 <div class="billboard-text-content">
                                     <span class="billboard-icon">🔥</span>
-                                    <span class="billboard-title">SIRKUIT JUARA LOEWIX</span>
-                                    <span class="billboard-divider">|</span>
-                                    <span class="billboard-subtitle">GASPOL CAPAI TARGET 200 JUTA!</span>
-                                    <span class="billboard-flag">🇮🇩</span>
+                                    <span class="billboard-title" style="font-size: 12px; font-weight: 900; letter-spacing: 0.6px;">SIRKUIT JUARA LOEWIX</span>
+                                    <span class="billboard-flag">🏆 🇮🇩</span>
                                 </div>
                             </div>
                         </div>
