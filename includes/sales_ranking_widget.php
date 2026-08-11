@@ -413,34 +413,61 @@ $total_sales_count = count($ranking_data);
 .led-dot.yellow { background: #F59E0B; box-shadow: 0 0 5px #F59E0B; }
 .led-dot.green { background: #10B981; box-shadow: 0 0 5px #10B981; }
 
-.billboard-text-content {
+/* Billboard Animated Rotating Text Slider (Teks Berubah-Rubah Otomatis) */
+.billboard-text-slider {
+    position: relative;
+    height: 18px;
+    overflow: hidden;
+    min-width: 210px;
+}
+
+.billboard-msg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: billboardMsgCycle 12s infinite ease-in-out;
+}
+
+.billboard-msg:nth-child(1) { animation-delay: 0s; }
+.billboard-msg:nth-child(2) { animation-delay: 4s; }
+.billboard-msg:nth-child(3) { animation-delay: 8s; }
+
+@keyframes billboardMsgCycle {
+    0% { opacity: 0; transform: translateY(14px); }
+    5% { opacity: 1; transform: translateY(0px); }
+    29% { opacity: 1; transform: translateY(0px); }
+    33% { opacity: 0; transform: translateY(-14px); }
+    100% { opacity: 0; transform: translateY(-14px); }
 }
 
 .billboard-icon { font-size: 12px; animation: iconPulse 1s infinite alternate; }
-@keyframes iconPulse { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
+@keyframes iconPulse { 0% { transform: scale(1); } 100% { transform: scale(1.25); } }
 
 .billboard-title {
-    font-size: 10.5px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 900;
     color: #FDE047;
-    letter-spacing: 0.4px;
-    text-shadow: 0 0 6px rgba(253, 224, 71, 0.5);
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 8px rgba(253, 224, 71, 0.6);
 }
 
-.billboard-divider {
-    color: #64748B;
-    font-size: 9.5px;
+.billboard-title.alt2 {
+    color: #38BDF8;
+    text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
 }
 
-.billboard-subtitle {
-    font-size: 10px;
-    font-weight: 700;
-    color: #FFFFFF;
-    letter-spacing: 0.2px;
+.billboard-title.alt3 {
+    color: #4ADE80;
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
 }
 
 .billboard-flag { font-size: 11px; }
@@ -1250,10 +1277,22 @@ $total_sales_count = count($ranking_data);
                                     <span class="led-dot yellow"></span>
                                     <span class="led-dot green"></span>
                                 </div>
-                                <div class="billboard-text-content">
-                                    <span class="billboard-icon">🔥</span>
-                                    <span class="billboard-title" style="font-size: 12px; font-weight: 900; letter-spacing: 0.6px;">SIRKUIT JUARA LOEWIX</span>
-                                    <span class="billboard-flag">🏆 🇮🇩</span>
+                                <div class="billboard-text-slider">
+                                    <div class="billboard-msg">
+                                        <span class="billboard-icon">🔥</span>
+                                        <span class="billboard-title">SIRKUIT JUARA LOEWIX</span>
+                                        <span class="billboard-flag">🏆 🇮🇩</span>
+                                    </div>
+                                    <div class="billboard-msg">
+                                        <span class="billboard-icon">⚡</span>
+                                        <span class="billboard-title alt2">TOP SALES LOEWIX BULAN INI</span>
+                                        <span class="billboard-flag">🌟 🥇</span>
+                                    </div>
+                                    <div class="billboard-msg">
+                                        <span class="billboard-icon">🚀</span>
+                                        <span class="billboard-title alt3">GASPOL TARGET 200 JUTA!</span>
+                                        <span class="billboard-flag">💪 🇮🇩</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
