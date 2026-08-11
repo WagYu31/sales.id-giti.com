@@ -843,7 +843,7 @@ $total_sales_count = count($ranking_data);
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-<div class="ranking-widget-card">
+<div class="ranking-widget-card" id="ranking-widget-card">
     <!-- Header -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div class="d-flex align-items-center gap-3">
@@ -867,25 +867,25 @@ $total_sales_count = count($ranking_data);
         </div>
     </div>
 
-    <!-- Month Filter Bar (3 Bulan: Agt - Okt 2026) -->
+    <!-- Month Filter Bar (3 Bulan: Agt - Okt 2026) - In-Place Dynamic AJAX Filter -->
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 p-2 bg-light rounded-pill border gap-2 shadow-sm">
         <div class="d-flex align-items-center gap-2 px-3">
             <span class="fw-bold text-dark" style="font-size: 12.5px;">📅 Filter Periode Ranking:</span>
-            <span class="badge bg-primary text-white rounded-pill px-3 py-1 fw-bold" style="font-size: 11px; border: 1px solid #93C5FD;"><?= $full_label_ranking ?></span>
+            <span class="badge bg-primary text-white rounded-pill px-3 py-1 fw-bold" id="badgeFullLabelRanking" style="font-size: 11px; border: 1px solid #93C5FD;"><?= $full_label_ranking ?></span>
         </div>
         <div class="d-flex align-items-center gap-1.5 flex-wrap">
-            <a href="?periode_bulan=8-10" class="btn btn-sm <?= ($selected_bulan==='8-10')?'btn-primary fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+            <button type="button" onclick="switchMonthPeriode('8-10', this)" class="btn btn-sm month-filter-btn <?= ($selected_bulan==='8-10')?'active-month btn-primary fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
                 🏆 Total 3 Bulan (Agt-Okt)
-            </a>
-            <a href="?periode_bulan=8" class="btn btn-sm <?= ($selected_bulan==='8')?'btn-danger fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+            </button>
+            <button type="button" onclick="switchMonthPeriode('8', this)" class="btn btn-sm month-filter-btn <?= ($selected_bulan==='8')?'active-month btn-danger fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
                 📅 Agt (Bulan 8)
-            </a>
-            <a href="?periode_bulan=9" class="btn btn-sm <?= ($selected_bulan==='9')?'btn-warning fw-bold text-dark shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+            </button>
+            <button type="button" onclick="switchMonthPeriode('9', this)" class="btn btn-sm month-filter-btn <?= ($selected_bulan==='9')?'active-month btn-warning fw-bold text-dark shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
                 📅 Sep (Bulan 9)
-            </a>
-            <a href="?periode_bulan=10" class="btn btn-sm <?= ($selected_bulan==='10')?'btn-success fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
+            </button>
+            <button type="button" onclick="switchMonthPeriode('10', this)" class="btn btn-sm month-filter-btn <?= ($selected_bulan==='10')?'active-month btn-success fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
                 📅 Okt (Bulan 10)
-            </a>
+            </button>
         </div>
     </div>
 
@@ -914,13 +914,13 @@ $total_sales_count = count($ranking_data);
             <!-- Top 1 Gold -->
             <?php if ($top1): ?>
             <?php $top1_omset = (float)$top1['total_omset_invoice']; ?>
-            <div class="podium-card gold">
+            <div class="podium-card gold" id="podiumCard1">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="podium-rank-badge gold">🥇</div>
                         <div>
                             <span class="badge bg-warning text-dark fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10.5px; letter-spacing: 0.5px;">JUARA 1</span>
-                            <h6 class="mb-0 fw-bold text-dark mt-0.5" style="font-size: 16.5px; font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($top1['nama_sales']); ?></h6>
+                            <h6 class="mb-0 fw-bold text-dark mt-0.5" id="podium1Name" style="font-size: 16.5px; font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($top1['nama_sales']); ?></h6>
                         </div>
                     </div>
                     <div class="text-end">
@@ -930,11 +930,11 @@ $total_sales_count = count($ranking_data);
                 </div>
                 <?php $pct_top1 = min(100, round(($top1_omset / $target_omset_finish) * 100, 1)); ?>
                 <div class="progress mt-2.5" style="height: 7px; border-radius: 10px; background: rgba(245, 158, 11, 0.25);">
-                    <div class="progress-bar bg-warning bg-gradient" role="progressbar" style="width: <?php echo max(5, $pct_top1); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                    <div class="progress-bar bg-warning bg-gradient" id="podium1Progress" role="progressbar" style="width: <?php echo max(5, $pct_top1); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2.5 text-muted" style="font-size: 12px;">
-                    <span>⚡ <?php echo $top1['total_fu']; ?> Activity</span>
-                    <span>👥 <?php echo $top1['total_customer_fu']; ?> Customer di-FU</span>
+                    <span id="podium1Activity">⚡ <?php echo $top1['total_fu']; ?> Activity</span>
+                    <span id="podium1Cust">👥 <?php echo $top1['total_customer_fu']; ?> Customer di-FU</span>
                 </div>
             </div>
             <?php endif; ?>
@@ -942,13 +942,13 @@ $total_sales_count = count($ranking_data);
             <!-- Top 2 Silver -->
             <?php if ($top2): ?>
             <?php $top2_omset = (float)$top2['total_omset_invoice']; ?>
-            <div class="podium-card silver">
+            <div class="podium-card silver" id="podiumCard2">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="podium-rank-badge silver">🥈</div>
                         <div>
                             <span class="badge bg-secondary text-white fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10.5px; letter-spacing: 0.5px;">JUARA 2</span>
-                            <h6 class="mb-0 fw-bold text-dark mt-0.5" style="font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($top2['nama_sales']); ?></h6>
+                            <h6 class="mb-0 fw-bold text-dark mt-0.5" id="podium2Name" style="font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($top2['nama_sales']); ?></h6>
                         </div>
                     </div>
                     <div class="text-end">
@@ -958,11 +958,11 @@ $total_sales_count = count($ranking_data);
                 </div>
                 <?php $pct2 = min(100, round(($top2_omset / $target_omset_finish) * 100, 1)); ?>
                 <div class="progress mt-2.5" style="height: 7px; border-radius: 10px; background: rgba(148, 163, 184, 0.25);">
-                    <div class="progress-bar bg-secondary bg-gradient" role="progressbar" style="width: <?php echo max(5, $pct2); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                    <div class="progress-bar bg-secondary bg-gradient" id="podium2Progress" role="progressbar" style="width: <?php echo max(5, $pct2); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2.5 text-muted" style="font-size: 12px;">
-                    <span>⚡ <?php echo $top2['total_fu']; ?> Activity</span>
-                    <span>👥 <?php echo $top2['total_customer_fu']; ?> Customer di-FU</span>
+                    <span id="podium2Activity">⚡ <?php echo $top2['total_fu']; ?> Activity</span>
+                    <span id="podium2Cust">👥 <?php echo $top2['total_customer_fu']; ?> Customer di-FU</span>
                 </div>
             </div>
             <?php endif; ?>
@@ -970,13 +970,13 @@ $total_sales_count = count($ranking_data);
             <!-- Top 3 Bronze -->
             <?php if ($top3): ?>
             <?php $top3_omset = (float)$top3['total_omset_invoice']; ?>
-            <div class="podium-card bronze">
+            <div class="podium-card bronze" id="podiumCard3">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="podium-rank-badge bronze">🥉</div>
                         <div>
                             <span class="badge bg-danger bg-opacity-75 text-white fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10.5px; letter-spacing: 0.5px;">JUARA 3</span>
-                            <h6 class="mb-0 fw-bold text-dark mt-0.5" style="font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($top3['nama_sales']); ?></h6>
+                            <h6 class="mb-0 fw-bold text-dark mt-0.5" id="podium3Name" style="font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($top3['nama_sales']); ?></h6>
                         </div>
                     </div>
                     <div class="text-end">
@@ -986,11 +986,11 @@ $total_sales_count = count($ranking_data);
                 </div>
                 <?php $pct3 = min(100, round(($top3_omset / $target_omset_finish) * 100, 1)); ?>
                 <div class="progress mt-2.5" style="height: 7px; border-radius: 10px; background: rgba(217, 119, 6, 0.25);">
-                    <div class="progress-bar bg-warning bg-gradient" role="progressbar" style="width: <?php echo max(5, $pct3); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                    <div class="progress-bar bg-warning bg-gradient" id="podium3Progress" role="progressbar" style="width: <?php echo max(5, $pct3); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2.5 text-muted" style="font-size: 12px;">
-                    <span>⚡ <?php echo $top3['total_fu']; ?> Activity</span>
-                    <span>👥 <?php echo $top3['total_customer_fu']; ?> Customer di-FU</span>
+                    <span id="podium3Activity">⚡ <?php echo $top3['total_fu']; ?> Activity</span>
+                    <span id="podium3Cust">👥 <?php echo $top3['total_customer_fu']; ?> Customer di-FU</span>
                 </div>
             </div>
             <?php endif; ?>
@@ -1131,7 +1131,7 @@ $total_sales_count = count($ranking_data);
                                 <th class="px-3 py-3 text-secondary text-end" style="font-size: 12px;">CUST DI-FU</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="modalLeaderboardTbody">
                             <?php foreach ($ranking_data as $idx => $s): ?>
                                 <?php 
                                 $rNum = $idx + 1;
@@ -1181,20 +1181,156 @@ $total_sales_count = count($ranking_data);
 let salesChartInstance = null;
 let currentMetric = 'omset';
 let currentTopLimit = 10;
+let currentMonthPeriode = '<?= $selected_bulan ?>';
 
-const salesChartLabels = <?php echo json_encode($chart_labels); ?>;
-const salesChartOmsetInvoice = <?php echo json_encode($chart_omset_invoice); ?>;
-const salesChartTotalFU = <?php echo json_encode($chart_total_fu); ?>;
-const salesChartCustomerFU = <?php echo json_encode($chart_customer_fu); ?>;
-const salesChartInvCount = <?php echo json_encode($chart_inv_count); ?>;
+let salesChartLabels = <?php echo json_encode($chart_labels); ?>;
+let salesChartOmsetInvoice = <?php echo json_encode($chart_omset_invoice); ?>;
+let salesChartTotalFU = <?php echo json_encode($chart_total_fu); ?>;
+let salesChartCustomerFU = <?php echo json_encode($chart_customer_fu); ?>;
+let salesChartInvCount = <?php echo json_encode($chart_inv_count); ?>;
 
-const top1Data = <?php echo json_encode($top1); ?>;
-const top2Data = <?php echo json_encode($top2); ?>;
-const top3Data = <?php echo json_encode($top3); ?>;
+let top1Data = <?php echo json_encode($top1); ?>;
+let top2Data = <?php echo json_encode($top2); ?>;
+let top3Data = <?php echo json_encode($top3); ?>;
 
 document.addEventListener("DOMContentLoaded", function() {
     renderScaledChart();
 });
+
+function switchMonthPeriode(monthVal, btnEl) {
+    if (currentMonthPeriode === monthVal && btnEl && btnEl.classList.contains('active-month')) return;
+    currentMonthPeriode = monthVal;
+
+    // Reset month filter button styles
+    document.querySelectorAll('.month-filter-btn').forEach(btn => {
+        btn.className = 'btn btn-sm month-filter-btn btn-outline-secondary rounded-pill px-3 py-1';
+        btn.style.fontSize = '11.5px';
+    });
+
+    if (btnEl) {
+        btnEl.classList.add('active-month');
+        if (monthVal === '8-10') btnEl.className = 'btn btn-sm month-filter-btn active-month btn-primary fw-bold text-white shadow-sm rounded-pill px-3 py-1';
+        else if (monthVal === '8') btnEl.className = 'btn btn-sm month-filter-btn active-month btn-danger fw-bold text-white shadow-sm rounded-pill px-3 py-1';
+        else if (monthVal === '9') btnEl.className = 'btn btn-sm month-filter-btn active-month btn-warning fw-bold text-dark shadow-sm rounded-pill px-3 py-1';
+        else if (monthVal === '10') btnEl.className = 'btn btn-sm month-filter-btn active-month btn-success fw-bold text-white shadow-sm rounded-pill px-3 py-1';
+    }
+
+    const cardEl = document.getElementById('ranking-widget-card');
+    if (cardEl) {
+        cardEl.style.transition = 'opacity 0.25s ease';
+        cardEl.style.opacity = '0.55';
+    }
+
+    fetch('ajax_sales_ranking.php?periode_bulan=' + encodeURIComponent(monthVal))
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) return;
+
+            const badgeFullLabel = document.getElementById('badgeFullLabelRanking');
+            if (badgeFullLabel) badgeFullLabel.innerText = data.full_label_ranking;
+
+            salesChartLabels = data.chart_labels || [];
+            salesChartOmsetInvoice = data.chart_omset_invoice || [];
+            salesChartTotalFU = data.chart_total_fu || [];
+            salesChartCustomerFU = data.chart_customer_fu || [];
+            salesChartInvCount = data.chart_inv_count || [];
+
+            updatePodiumCardsDOM(data.top1, data.top2, data.top3, data.label_periode_ranking);
+            switchChartMetric(currentMetric);
+            updateModalLeaderboardDOM(data.ranking_data);
+
+            if (cardEl) cardEl.style.opacity = '1';
+        })
+        .catch(err => {
+            console.error('AJAX Month Filter Error:', err);
+            if (cardEl) cardEl.style.opacity = '1';
+        });
+}
+
+function updatePodiumCardsDOM(top1, top2, top3, labelPeriode) {
+    top1Data = top1;
+    top2Data = top2;
+    top3Data = top3;
+
+    function renderSinglePodium(prefix, data) {
+        const nameEl = document.getElementById(prefix + 'Name');
+        const progressEl = document.getElementById(prefix + 'Progress');
+        const actEl = document.getElementById(prefix + 'Activity');
+        const custEl = document.getElementById(prefix + 'Cust');
+        const lblEl = document.getElementById(prefix + 'Lbl');
+
+        if (lblEl) lblEl.innerText = `Omset Invoice (${labelPeriode})`;
+
+        if (data) {
+            if (nameEl) nameEl.innerText = data.nama_sales;
+            const omset = parseFloat(data.total_omset_invoice) || 0;
+            const pct = Math.min(100, Math.round((omset / 200000000) * 100 * 10) / 10);
+            if (progressEl) progressEl.style.width = Math.max(5, pct) + '%';
+            if (actEl) actEl.innerText = `⚡ ${data.total_fu} Activity`;
+            if (custEl) custEl.innerText = `👥 ${data.total_customer_fu} Customer di-FU`;
+        } else {
+            if (nameEl) nameEl.innerText = '-';
+            if (progressEl) progressEl.style.width = '5%';
+            if (actEl) actEl.innerText = '⚡ 0 Activity';
+            if (custEl) custEl.innerText = '👥 0 Customer di-FU';
+        }
+    }
+
+    renderSinglePodium('podium1', top1);
+    renderSinglePodium('podium2', top2);
+    renderSinglePodium('podium3', top3);
+}
+
+function updateModalLeaderboardDOM(rankingData) {
+    const tbody = document.getElementById('modalLeaderboardTbody');
+    if (!tbody || !rankingData) return;
+
+    let html = '';
+    rankingData.forEach((s, idx) => {
+        const rNum = idx + 1;
+        let badgeCls = 'bg-light text-secondary border';
+        if (rNum === 1) badgeCls = 'bg-warning text-dark fw-bold';
+        else if (rNum === 2) badgeCls = 'bg-secondary text-white fw-bold';
+        else if (rNum === 3) badgeCls = 'bg-danger text-white fw-bold';
+
+        const omsetFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(s.total_omset_invoice);
+        const invCount = new Intl.NumberFormat('id-ID').format(s.total_inv_count);
+        const totalFu = new Intl.NumberFormat('id-ID').format(s.total_fu);
+        const custFu = new Intl.NumberFormat('id-ID').format(s.total_customer_fu);
+
+        html += `
+        <tr>
+            <td class="px-4 py-3">
+                <span class="badge ${badgeCls} rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 12px;">
+                    ${rNum}
+                </span>
+            </td>
+            <td class="px-3">
+                <div class="fw-bold text-dark" style="font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    ${escapeHtml(s.nama_sales)}
+                </div>
+            </td>
+            <td class="text-end px-3 font-monospace fw-bold text-success" style="font-size: 14px;">
+                ${omsetFormatted}
+            </td>
+            <td class="text-end px-3 font-monospace fw-bold text-primary" style="font-size: 14px;">
+                ${invCount} Inv
+            </td>
+            <td class="text-end px-3 font-monospace fw-bold text-dark" style="font-size: 14px;">
+                ${totalFu}
+            </td>
+            <td class="text-end px-3 font-monospace fw-bold text-secondary" style="font-size: 14px;">
+                ${custFu}
+            </td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 function getActiveDatasetValues() {
     if (currentMetric === 'omset') return { values: salesChartOmsetInvoice, label: "Omset Invoice (Rp)" };
