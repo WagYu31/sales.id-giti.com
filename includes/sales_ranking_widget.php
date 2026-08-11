@@ -591,7 +591,7 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-/* === LOEWIX CCTV 3D ROBOT RUNNER BIRD-WING SMOOTH SWING ANIMATION === */
+/* === LOEWIX CCTV 3D ROBOT RUNNER ULTRA-REALISTIC SPRINT ANIMATION === */
 .loewix-runner-3d, .nailong-sprite {
     width: 52px;
     height: 64px;
@@ -600,48 +600,28 @@ $total_sales_count = count($ranking_data);
     background-repeat: no-repeat;
     background-position: center bottom;
     display: block;
-    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));
-    transform-origin: 50% 85%;
-    animation: robotRunnerBodySway 0.32s ease-in-out infinite alternate;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.45));
+    transform-origin: center bottom;
+    animation: loewixSprintRealistic3D 0.38s ease-in-out infinite;
 }
 
-/* Smooth Biomechanical Body Lean & Forward Stride (Matching Bird Wing Easing) */
-@keyframes robotRunnerBodySway {
+/* 3D Olympic Forward Sprint Physics (Micro Ground Glide 3px, Stride Body Compression & Push-off) */
+@keyframes loewixSprintRealistic3D {
     0% {
-        transform: rotate(-16deg) skewX(6deg) translateY(0px) scale(1.03, 0.97);
+        transform: translateY(0px) rotate(-12deg) scale(1.03, 0.97) skewX(4deg);
+    }
+    25% {
+        transform: translateY(-3px) rotate(-14deg) scale(0.97, 1.03) skewX(-2deg);
+    }
+    50% {
+        transform: translateY(-1px) rotate(-11deg) scale(1.02, 0.98) skewX(3deg);
+    }
+    75% {
+        transform: translateY(-4px) rotate(-15deg) scale(0.96, 1.04) skewX(-3deg);
     }
     100% {
-        transform: rotate(-9deg) skewX(-4deg) translateY(-3px) scale(0.97, 1.03);
+        transform: translateY(0px) rotate(-12deg) scale(1.03, 0.97) skewX(4deg);
     }
-}
-
-/* SVG Vector Biomechanical Legs Overlay (Swinging Smoothly Like Bird Wings!) */
-.svg-runner-legs {
-    position: absolute;
-    top: 0; left: 0;
-    width: 52px; height: 64px;
-    pointer-events: none;
-    z-index: 2;
-}
-
-.svg-runner-legs .left-leg-svg {
-    transform-origin: 24px 40px;
-    animation: robotLegFlapLeft 0.32s ease-in-out infinite alternate;
-}
-
-.svg-runner-legs .right-leg-svg {
-    transform-origin: 28px 40px;
-    animation: robotLegFlapRight 0.32s ease-in-out infinite alternate;
-}
-
-@keyframes robotLegFlapLeft {
-    0%   { transform: rotate(-38deg) scaleY(1.0); }
-    100% { transform: rotate(38deg) scaleY(0.65); }
-}
-
-@keyframes robotLegFlapRight {
-    0%   { transform: rotate(38deg) scaleY(0.65); }
-    100% { transform: rotate(-38deg) scaleY(1.0); }
 }
 
 /* Static single image fallback for victory */
@@ -1914,10 +1894,6 @@ function positionMascotRunners(chart) {
                                 <div class="sparkle-dot"></div>
                                 <div class="sparkle-dot"></div>
                             </div>
-                            <svg class="svg-runner-legs" viewBox="0 0 52 64" width="52" height="64">
-                                <path class="svg-leg right-leg-svg" d="M 28,40 Q 36,48 46,58" stroke="#334155" stroke-width="4.5" stroke-linecap="round" fill="none" />
-                                <path class="svg-leg left-leg-svg" d="M 24,40 Q 14,50 4,58" stroke="#64748B" stroke-width="5" stroke-linecap="round" fill="none" />
-                            </svg>
                             <div class="nailong-sprite"></div>
                             <div class="nailong-flag-pole">
                                 <div style="width: 2px; height: 26px; background: #78350F; border-radius: 1px;"></div>
@@ -1943,10 +1919,6 @@ function positionMascotRunners(chart) {
                                 <div class="speed-line"></div>
                                 <div class="speed-line"></div>
                             </div>
-                            <svg class="svg-runner-legs" viewBox="0 0 52 64" width="52" height="64">
-                                <path class="svg-leg right-leg-svg" d="M 28,40 Q 36,48 46,58" stroke="#334155" stroke-width="4.5" stroke-linecap="round" fill="none" />
-                                <path class="svg-leg left-leg-svg" d="M 24,40 Q 14,50 4,58" stroke="#64748B" stroke-width="5" stroke-linecap="round" fill="none" />
-                            </svg>
                             <div class="nailong-sprite"></div>
                             <div class="nailong-flag-pole">
                                 <div style="width: 2px; height: 26px; background: #78350F; border-radius: 1px;"></div>
