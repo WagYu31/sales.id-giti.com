@@ -9,24 +9,24 @@ require_once 'includes/db.php';
 $selected_bulan = trim($_GET['periode_bulan'] ?? '8-10');
 
 if ($selected_bulan === '8') {
-    $where_fu = "MONTH(fu.tgl_follow_up) = 8";
-    $where_c = "MONTH(c.tgl_input) = 8";
+    $where_fu = "(YEAR(fu.tgl_follow_up) = 2026 AND MONTH(fu.tgl_follow_up) = 8)";
+    $where_c = "(YEAR(c.tgl_input) = 2026 AND MONTH(c.tgl_input) = 8)";
     $label_periode_ranking = 'Agt 2026';
     $full_label_ranking = 'Bulan 8 (Agustus 2026)';
 } else if ($selected_bulan === '9') {
-    $where_fu = "MONTH(fu.tgl_follow_up) = 9";
-    $where_c = "MONTH(c.tgl_input) = 9";
+    $where_fu = "(YEAR(fu.tgl_follow_up) = 2026 AND MONTH(fu.tgl_follow_up) = 9)";
+    $where_c = "(YEAR(c.tgl_input) = 2026 AND MONTH(c.tgl_input) = 9)";
     $label_periode_ranking = 'Sep 2026';
     $full_label_ranking = 'Bulan 9 (September 2026)';
 } else if ($selected_bulan === '10') {
-    $where_fu = "MONTH(fu.tgl_follow_up) = 10";
-    $where_c = "MONTH(c.tgl_input) = 10";
+    $where_fu = "(YEAR(fu.tgl_follow_up) = 2026 AND MONTH(fu.tgl_follow_up) = 10)";
+    $where_c = "(YEAR(c.tgl_input) = 2026 AND MONTH(c.tgl_input) = 10)";
     $label_periode_ranking = 'Okt 2026';
     $full_label_ranking = 'Bulan 10 (Oktober 2026)';
 } else {
     $selected_bulan = '8-10';
-    $where_fu = "MONTH(fu.tgl_follow_up) IN (8, 9, 10)";
-    $where_c = "MONTH(c.tgl_input) IN (8, 9, 10)";
+    $where_fu = "(YEAR(fu.tgl_follow_up) = 2026 AND MONTH(fu.tgl_follow_up) IN (8, 9, 10))";
+    $where_c = "(YEAR(c.tgl_input) = 2026 AND MONTH(c.tgl_input) IN (8, 9, 10))";
     $label_periode_ranking = '3 Bulan (Agt-Okt)';
     $full_label_ranking = 'Periode 3 Bulan (Agt - Okt 2026)';
 }
