@@ -915,7 +915,7 @@ $total_sales_count = count($ranking_data);
         <button type="button" class="metric-btn" id="btnMetricOmset" onclick="switchChartMetric('omset')">
             💵 Invoice Sales (Rp)
         </button>
-        <button type="button" class="btn-full-leaderboard ms-1" data-bs-toggle="modal" data-bs-target="#fullLeaderboardModal">
+        <button type="button" class="btn-full-leaderboard ms-1" data-bs-toggle="modal" data-bs-target="#fullLeaderboardModal" id="btnFullLeaderboardText">
             📋 Full Leaderboard (<?php echo $total_sales_count; ?> Sales)
         </button>
     </div>
@@ -1284,6 +1284,11 @@ function switchMonthPeriode(monthVal, btnEl) {
             const badgeFullLabel = document.getElementById('badgeFullLabelRanking');
             if (badgeFullLabel) badgeFullLabel.innerText = data.full_label_ranking;
 
+            const btnFullLeaderboard = document.getElementById('btnFullLeaderboardText');
+            if (btnFullLeaderboard && data.ranking_data) {
+                btnFullLeaderboard.innerText = `📋 Full Leaderboard (${data.ranking_data.length} Sales)`;
+            }
+
             switchChartMetric(currentMetric);
             updateModalLeaderboardDOM(data.ranking_data);
 
@@ -1601,6 +1606,12 @@ function positionMascotRunners(chart) {
 
     const meta = chart.getDatasetMeta(0);
     const xAxis = chart.scales.x;
+
+    if (!meta || !meta.data || meta.data.length === 0) return;
+
+    // Safety guard: Ensure y-coordinates are valid numbers before positioning runners
+    const firstBarY = meta.data[0] ? meta.data[0].y : null;
+    if (firstBarY === null || isNaN(firstBarY) || firstBarY === undefined) return;
 
     // Force rebuild whenever dataset changes or metric/periode changes
     const currentDatasetKey = `${currentMetric}_${currentMonthPeriode}_${currentTopLimit}_${meta.data.length}`;
