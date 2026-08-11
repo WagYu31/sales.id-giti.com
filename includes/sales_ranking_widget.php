@@ -323,6 +323,39 @@ $total_sales_count = count($ranking_data);
     }
 }
 
+/* === STADIUM TREES & FOLIAGE LAYER (Lapangan Kasih Pohon Pohon) === */
+.stadium-trees-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.stadium-tree {
+    position: absolute;
+    bottom: 4px;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45));
+    transform-origin: bottom center;
+    animation: stadiumTreeSway 4s ease-in-out infinite alternate;
+}
+
+.tree-left-1 { left: 8px; width: 44px; height: 62px; animation-delay: 0s; }
+.tree-left-2 { left: 48px; width: 36px; height: 50px; animation-delay: 0.8s; opacity: 0.9; }
+.tree-left-3 { left: 88px; width: 48px; height: 68px; animation-delay: 1.5s; }
+
+.tree-right-1 { right: 55px; width: 46px; height: 64px; animation-delay: 0.4s; }
+.tree-right-2 { right: 98px; width: 38px; height: 52px; animation-delay: 1.2s; opacity: 0.92; }
+.tree-right-3 { right: 140px; width: 50px; height: 70px; animation-delay: 1.9s; }
+
+@keyframes stadiumTreeSway {
+    0% { transform: rotate(-2.5deg) scaleX(1); }
+    100% { transform: rotate(3deg) scaleX(1.04); }
+}
+
 /* 3D Floating Clouds */
 .track-3d-clouds-layer {
     position: absolute;
@@ -1102,6 +1135,69 @@ $total_sales_count = count($ranking_data);
                                 <path class="svg-wing right-wing" d="M 50,30 Q 72,2 98,28 Q 74,22 50,30" fill="#64748B" />
                                 <path d="M 50,30 Q 42,33 34,31 Q 45,25 50,24 Q 55,25 66,31 Q 58,33 50,30" fill="#475569" />
                                 <polygon points="34,31 20,37 26,31 22,25" fill="#475569" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- STADIUM SIDE TREES & PARK FOLIAGE (Lapangan Kasih Pohon Pohon) -->
+                    <div class="stadium-trees-overlay">
+                        <!-- Tree Left 1: Tall Emerald Pine -->
+                        <div class="stadium-tree tree-left-1">
+                            <svg viewBox="0 0 100 140" width="100%" height="100%">
+                                <rect x="43" y="90" width="14" height="45" rx="3" fill="#451A03" />
+                                <path d="M 50 8 L 92 60 L 74 60 L 96 96 L 4 96 L 26 60 L 8 60 Z" fill="#047857" />
+                                <path d="M 50 8 L 82 50 L 67 50 L 86 86 L 14 86 L 33 50 L 18 50 Z" fill="#10B981" opacity="0.88" />
+                                <path d="M 50 8 L 72 40 L 59 40 L 76 74 L 24 74 L 41 40 L 28 40 Z" fill="#34D399" opacity="0.75" />
+                            </svg>
+                        </div>
+                        <!-- Tree Left 2: Round Oak Tree -->
+                        <div class="stadium-tree tree-left-2">
+                            <svg viewBox="0 0 100 130" width="100%" height="100%">
+                                <rect x="43" y="75" width="14" height="50" rx="4" fill="#3B1705" />
+                                <circle cx="50" cy="50" r="42" fill="#065F46" />
+                                <circle cx="30" cy="45" r="28" fill="#047857" />
+                                <circle cx="70" cy="45" r="28" fill="#059669" />
+                                <circle cx="50" cy="30" r="26" fill="#10B981" />
+                                <circle cx="42" cy="24" r="16" fill="#34D399" opacity="0.65" />
+                            </svg>
+                        </div>
+                        <!-- Tree Left 3: Mid Pine Tree -->
+                        <div class="stadium-tree tree-left-3">
+                            <svg viewBox="0 0 100 140" width="100%" height="100%">
+                                <rect x="44" y="90" width="12" height="45" rx="3" fill="#451A03" />
+                                <path d="M 50 12 L 88 62 L 72 62 L 92 98 L 8 98 L 28 62 L 12 62 Z" fill="#064E3B" />
+                                <path d="M 50 12 L 78 52 L 64 52 L 82 88 L 18 88 L 36 52 L 22 52 Z" fill="#059669" opacity="0.9" />
+                                <path d="M 50 12 L 68 42 L 56 42 L 72 76 L 28 76 L 44 42 L 32 42 Z" fill="#10B981" opacity="0.75" />
+                            </svg>
+                        </div>
+
+                        <!-- Tree Right 1: Tall Pine near Finish Line -->
+                        <div class="stadium-tree tree-right-1">
+                            <svg viewBox="0 0 100 140" width="100%" height="100%">
+                                <rect x="43" y="90" width="14" height="45" rx="3" fill="#451A03" />
+                                <path d="M 50 8 L 92 60 L 74 60 L 96 96 L 4 96 L 26 60 L 8 60 Z" fill="#047857" />
+                                <path d="M 50 8 L 82 50 L 67 50 L 86 86 L 14 86 L 33 50 L 18 50 Z" fill="#10B981" opacity="0.88" />
+                                <path d="M 50 8 L 72 40 L 59 40 L 76 74 L 24 74 L 41 40 L 28 40 Z" fill="#34D399" opacity="0.75" />
+                            </svg>
+                        </div>
+                        <!-- Tree Right 2: Round Oak Tree -->
+                        <div class="stadium-tree tree-right-2">
+                            <svg viewBox="0 0 100 130" width="100%" height="100%">
+                                <rect x="43" y="75" width="14" height="50" rx="4" fill="#3B1705" />
+                                <circle cx="50" cy="50" r="42" fill="#065F46" />
+                                <circle cx="30" cy="45" r="28" fill="#047857" />
+                                <circle cx="70" cy="45" r="28" fill="#059669" />
+                                <circle cx="50" cy="30" r="26" fill="#10B981" />
+                                <circle cx="42" cy="24" r="16" fill="#34D399" opacity="0.65" />
+                            </svg>
+                        </div>
+                        <!-- Tree Right 3: Compact Pine -->
+                        <div class="stadium-tree tree-right-3">
+                            <svg viewBox="0 0 100 140" width="100%" height="100%">
+                                <rect x="44" y="90" width="12" height="45" rx="3" fill="#451A03" />
+                                <path d="M 50 12 L 88 62 L 72 62 L 92 98 L 8 98 L 28 62 L 12 62 Z" fill="#064E3B" />
+                                <path d="M 50 12 L 78 52 L 64 52 L 82 88 L 18 88 L 36 52 L 22 52 Z" fill="#059669" opacity="0.9" />
+                                <path d="M 50 12 L 68 42 L 56 42 L 72 76 L 28 76 L 44 42 L 32 42 Z" fill="#10B981" opacity="0.75" />
                             </svg>
                         </div>
                     </div>
