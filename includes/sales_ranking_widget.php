@@ -33,27 +33,33 @@ if ($selected_bulan === '8') {
 
 $target_omset_finish = 200000000; // Rp 200.000.000,-
 
-// Fetch Ranking Sales Data
+// Fetch Ranking Sales Data (Primary Focus: Follow Up & Penambahan Customer Baru)
 $sql_ranking_all = "
     SELECT 
         s.id AS sales_id,
         s.nama_lengkap AS nama_sales,
-        COALESCE(SUM(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_invoice,
-        COUNT(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' THEN fu.id ELSE NULL END) AS total_fu,
-        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' THEN fu.customer_id ELSE NULL END) AS total_customer_fu,
-        COUNT(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.id ELSE NULL END) AS total_inv_count
+        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' THEN fu.id END) AS total_fu,
+        COUNT(DISTINCT CASE WHEN c.tgl_input >= '{$start_periode_ranking}' AND c.tgl_input <= '{$end_periode_ranking}' THEN c.id END) AS total_cust_baru,
+        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' THEN fu.customer_id END) AS total_customer_fu,
+        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.id END) AS total_inv_count,
+        COALESCE(SUM(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_invoice
     FROM sales s
     LEFT JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL AND fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}'
-    LEFT JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
-    WHERE s.role = 'sales' OR s.role = 'superadmin' OR fu.id IS NOT NULL
+    LEFT JOIN customers c ON c.sales_id = s.id AND c.deleted_at IS NULL AND c.tgl_input >= '{$start_periode_ranking}' AND c.tgl_input <= '{$end_periode_ranking}'
+    WHERE s.role = 'sales' OR s.role = 'superadmin' OR fu.id IS NOT NULL OR c.id IS NOT NULL
     GROUP BY s.id, s.nama_lengkap
-    ORDER BY total_omset_invoice DESC, total_inv_count DESC, total_fu DESC
+    ORDER BY (total_fu + total_cust_baru) DESC, total_fu DESC, total_cust_baru DESC
 ";
 
 $res_ranking = $conn->query($sql_ranking_all);
 $ranking_data = [];
 if ($res_ranking) {
     while ($row = $res_ranking->fetch_assoc()) {
+        $row['total_omset_invoice'] = (float)$row['total_omset_invoice'];
+        $row['total_fu'] = (int)$row['total_fu'];
+        $row['total_cust_baru'] = (int)$row['total_cust_baru'];
+        $row['total_customer_fu'] = (int)$row['total_customer_fu'];
+        $row['total_inv_count'] = (int)$row['total_inv_count'];
         $ranking_data[] = $row;
     }
 }
@@ -61,15 +67,17 @@ if ($res_ranking) {
 $chart_labels = [];
 $chart_omset_invoice = [];
 $chart_total_fu = [];
+$chart_cust_baru = [];
 $chart_customer_fu = [];
 $chart_inv_count = [];
 
 foreach ($ranking_data as $rd) {
     $chart_labels[] = $rd['nama_sales'];
-    $chart_omset_invoice[] = (float)$rd['total_omset_invoice'];
-    $chart_total_fu[] = (int)$rd['total_fu'];
-    $chart_customer_fu[] = (int)$rd['total_customer_fu'];
-    $chart_inv_count[] = (int)$rd['total_inv_count'];
+    $chart_omset_invoice[] = $rd['total_omset_invoice'];
+    $chart_total_fu[] = $rd['total_fu'];
+    $chart_cust_baru[] = $rd['total_cust_baru'];
+    $chart_customer_fu[] = $rd['total_customer_fu'];
+    $chart_inv_count[] = $rd['total_inv_count'];
 }
 
 $top1 = $ranking_data[0] ?? null;
@@ -890,19 +898,22 @@ $total_sales_count = count($ranking_data);
         </div>
     </div>
 
-    <!-- Filter Buttons Bar -->
+    <!-- Filter Buttons Bar (Primary Focus: Follow Up & Penambahan Customer Baru) -->
     <div class="d-flex align-items-center gap-2 flex-wrap mb-4">
-        <button type="button" class="metric-btn active" id="btnMetricOmset" onclick="switchChartMetric('omset')">
-            💵 Invoice Sales (Rp)
+        <button type="button" class="metric-btn active" id="btnMetricTotal" onclick="switchChartMetric('total')">
+            ⚡ Total Activity FU
+        </button>
+        <button type="button" class="metric-btn" id="btnMetricCustBaru" onclick="switchChartMetric('cust_baru')">
+            🚀 Customer Baru Input
+        </button>
+        <button type="button" class="metric-btn" id="btnMetricCustomer" onclick="switchChartMetric('customer')">
+            👥 Customer di-FU
         </button>
         <button type="button" class="metric-btn" id="btnMetricInvCount" onclick="switchChartMetric('inv_count')" style="border: 1.5px solid #3B82F6;">
             🧾 Invoice Terbanyak <span class="badge bg-danger text-white rounded-pill px-2 py-0.5 ms-1" style="font-size: 10px;">Hadiah 2 Juta 💰</span>
         </button>
-        <button type="button" class="metric-btn" id="btnMetricTotal" onclick="switchChartMetric('total')">
-            ⚡ Total Activity FU
-        </button>
-        <button type="button" class="metric-btn" id="btnMetricCustomer" onclick="switchChartMetric('customer')">
-            👥 Customer di-FU
+        <button type="button" class="metric-btn" id="btnMetricOmset" onclick="switchChartMetric('omset')">
+            💵 Invoice Sales (Rp)
         </button>
         <button type="button" class="btn-full-leaderboard ms-1" data-bs-toggle="modal" data-bs-target="#fullLeaderboardModal">
             📋 Full Leaderboard (<?php echo $total_sales_count; ?> Sales)
@@ -1180,7 +1191,7 @@ $total_sales_count = count($ranking_data);
 
 <script>
 let salesChartInstance = null;
-let currentMetric = 'omset';
+let currentMetric = 'total';
 let currentTopLimit = 10;
 let currentMonthPeriode = '<?= $selected_bulan ?>';
 let currentLabelPeriodeRanking = '<?= $label_periode_ranking ?>';
@@ -1189,6 +1200,7 @@ let rankingDataRaw = <?php echo json_encode($ranking_data); ?>;
 let salesChartLabels = <?php echo json_encode($chart_labels); ?>;
 let salesChartOmsetInvoice = <?php echo json_encode($chart_omset_invoice); ?>;
 let salesChartTotalFU = <?php echo json_encode($chart_total_fu); ?>;
+let salesChartCustBaru = <?php echo json_encode($chart_cust_baru); ?>;
 let salesChartCustomerFU = <?php echo json_encode($chart_customer_fu); ?>;
 let salesChartInvCount = <?php echo json_encode($chart_inv_count); ?>;
 
@@ -1203,14 +1215,16 @@ document.addEventListener("DOMContentLoaded", function() {
 function getSortedDatasetByMetric(metricType) {
     let rawList = [...rankingDataRaw];
 
-    if (metricType === 'omset') {
-        rawList.sort((a, b) => (parseFloat(b.total_omset_invoice) || 0) - (parseFloat(a.total_omset_invoice) || 0));
-    } else if (metricType === 'inv_count') {
-        rawList.sort((a, b) => (parseInt(b.total_inv_count) || 0) - (parseInt(a.total_inv_count) || 0));
-    } else if (metricType === 'total') {
+    if (metricType === 'total') {
         rawList.sort((a, b) => (parseInt(b.total_fu) || 0) - (parseInt(a.total_fu) || 0));
+    } else if (metricType === 'cust_baru') {
+        rawList.sort((a, b) => (parseInt(b.total_cust_baru) || 0) - (parseInt(a.total_cust_baru) || 0));
     } else if (metricType === 'customer') {
         rawList.sort((a, b) => (parseInt(b.total_customer_fu) || 0) - (parseInt(a.total_customer_fu) || 0));
+    } else if (metricType === 'inv_count') {
+        rawList.sort((a, b) => (parseInt(b.total_inv_count) || 0) - (parseInt(a.total_inv_count) || 0));
+    } else if (metricType === 'omset') {
+        rawList.sort((a, b) => (parseFloat(b.total_omset_invoice) || 0) - (parseFloat(a.total_omset_invoice) || 0));
     }
 
     let labels = [];
@@ -1218,10 +1232,11 @@ function getSortedDatasetByMetric(metricType) {
 
     rawList.forEach(item => {
         labels.push(item.nama_sales);
-        if (metricType === 'omset') values.push(parseFloat(item.total_omset_invoice) || 0);
-        else if (metricType === 'inv_count') values.push(parseInt(item.total_inv_count) || 0);
-        else if (metricType === 'total') values.push(parseInt(item.total_fu) || 0);
+        if (metricType === 'total') values.push(parseInt(item.total_fu) || 0);
+        else if (metricType === 'cust_baru') values.push(parseInt(item.total_cust_baru) || 0);
         else if (metricType === 'customer') values.push(parseInt(item.total_customer_fu) || 0);
+        else if (metricType === 'inv_count') values.push(parseInt(item.total_inv_count) || 0);
+        else if (metricType === 'omset') values.push(parseFloat(item.total_omset_invoice) || 0);
     });
 
     return {
@@ -1287,25 +1302,59 @@ function updatePodiumCardsDOM(top1, top2, top3, labelPeriode) {
 
     function renderSinglePodium(prefix, data) {
         const nameEl = document.getElementById(prefix + 'Name');
+        const valEl = document.getElementById(prefix + 'Val');
         const progressEl = document.getElementById(prefix + 'Progress');
         const actEl = document.getElementById(prefix + 'Activity');
         const custEl = document.getElementById(prefix + 'Cust');
         const lblEl = document.getElementById(prefix + 'Lbl');
 
-        if (lblEl) lblEl.innerText = `Omset Invoice (${labelPeriode})`;
+        let metricLabelText = `Total Activity FU (${labelPeriode})`;
+        if (currentMetric === 'total') metricLabelText = `Total Activity FU (${labelPeriode})`;
+        else if (currentMetric === 'cust_baru') metricLabelText = `Cust Baru Input (${labelPeriode})`;
+        else if (currentMetric === 'customer') metricLabelText = `Customer di-FU (${labelPeriode})`;
+        else if (currentMetric === 'inv_count') metricLabelText = `Total Invoice (${labelPeriode})`;
+        else if (currentMetric === 'omset') metricLabelText = `Omset Invoice (${labelPeriode})`;
+
+        if (lblEl) lblEl.innerText = metricLabelText;
 
         if (data) {
             if (nameEl) nameEl.innerText = data.nama_sales;
-            const omset = parseFloat(data.total_omset_invoice) || 0;
-            const pct = Math.min(100, Math.round((omset / 200000000) * 100 * 10) / 10);
+
+            let valStr = '';
+            let pct = 5;
+
+            if (currentMetric === 'total') {
+                const totalFu = parseInt(data.total_fu) || 0;
+                valStr = `${new Intl.NumberFormat('id-ID').format(totalFu)} Activity`;
+                pct = Math.min(100, Math.round((totalFu / 100) * 100));
+            } else if (currentMetric === 'cust_baru') {
+                const custBaru = parseInt(data.total_cust_baru) || 0;
+                valStr = `${new Intl.NumberFormat('id-ID').format(custBaru)} Cust Baru`;
+                pct = Math.min(100, Math.round((custBaru / 20) * 100));
+            } else if (currentMetric === 'customer') {
+                const custFu = parseInt(data.total_customer_fu) || 0;
+                valStr = `${new Intl.NumberFormat('id-ID').format(custFu)} Cust di-FU`;
+                pct = Math.min(100, Math.round((custFu / 50) * 100));
+            } else if (currentMetric === 'inv_count') {
+                const invCount = parseInt(data.total_inv_count) || 0;
+                valStr = `${new Intl.NumberFormat('id-ID').format(invCount)} Invoice`;
+                pct = Math.min(100, Math.round((invCount / 50) * 100));
+            } else {
+                const omset = parseFloat(data.total_omset_invoice) || 0;
+                valStr = formatRupiahDisplay(omset);
+                pct = Math.min(100, Math.round((omset / 200000000) * 100 * 10) / 10);
+            }
+
+            if (valEl) valEl.innerText = valStr;
             if (progressEl) progressEl.style.width = Math.max(5, pct) + '%';
-            if (actEl) actEl.innerText = `⚡ ${data.total_fu} Activity`;
-            if (custEl) custEl.innerText = `👥 ${data.total_customer_fu} Customer di-FU`;
+            if (actEl) actEl.innerText = `⚡ ${data.total_fu || 0} Activity FU`;
+            if (custEl) custEl.innerText = `🚀 ${data.total_cust_baru || 0} Cust Baru`;
         } else {
             if (nameEl) nameEl.innerText = '-';
+            if (valEl) valEl.innerText = '0';
             if (progressEl) progressEl.style.width = '5%';
-            if (actEl) actEl.innerText = '⚡ 0 Activity';
-            if (custEl) custEl.innerText = '👥 0 Customer di-FU';
+            if (actEl) actEl.innerText = '⚡ 0 Activity FU';
+            if (custEl) custEl.innerText = '🚀 0 Cust Baru';
         }
     }
 
@@ -1329,7 +1378,7 @@ function updateModalLeaderboardDOM(rankingData) {
         const omsetFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(s.total_omset_invoice);
         const invCount = new Intl.NumberFormat('id-ID').format(s.total_inv_count);
         const totalFu = new Intl.NumberFormat('id-ID').format(s.total_fu);
-        const custFu = new Intl.NumberFormat('id-ID').format(s.total_customer_fu);
+        const custBaru = new Intl.NumberFormat('id-ID').format(s.total_cust_baru || 0);
 
         html += `
         <tr>
@@ -1343,17 +1392,17 @@ function updateModalLeaderboardDOM(rankingData) {
                     ${escapeHtml(s.nama_sales)}
                 </div>
             </td>
+            <td class="text-end px-3 font-monospace fw-bold text-dark" style="font-size: 14px;">
+                ${totalFu} FU
+            </td>
             <td class="text-end px-3 font-monospace fw-bold text-success" style="font-size: 14px;">
-                ${omsetFormatted}
+                ${custBaru} Baru
             </td>
             <td class="text-end px-3 font-monospace fw-bold text-primary" style="font-size: 14px;">
                 ${invCount} Inv
             </td>
-            <td class="text-end px-3 font-monospace fw-bold text-dark" style="font-size: 14px;">
-                ${totalFu}
-            </td>
-            <td class="text-end px-3 font-monospace fw-bold text-secondary" style="font-size: 14px;">
-                ${custFu}
+            <td class="text-end px-3 font-monospace fw-bold text-muted" style="font-size: 14px;">
+                ${omsetFormatted}
             </td>
         </tr>`;
     });
@@ -1366,10 +1415,11 @@ function escapeHtml(str) {
 }
 
 function getActiveDatasetValues() {
-    if (currentMetric === 'omset') return { values: salesChartOmsetInvoice, label: "Omset Invoice (Rp)" };
-    if (currentMetric === 'inv_count') return { values: salesChartInvCount, label: "Jumlah Invoice" };
     if (currentMetric === 'total') return { values: salesChartTotalFU, label: "Total Activity FU" };
-    return { values: salesChartCustomerFU, label: "Customer di-FU" };
+    if (currentMetric === 'cust_baru') return { values: salesChartCustBaru, label: "Customer Baru Input" };
+    if (currentMetric === 'customer') return { values: salesChartCustomerFU, label: "Customer di-FU" };
+    if (currentMetric === 'inv_count') return { values: salesChartInvCount, label: "Jumlah Invoice" };
+    return { values: salesChartOmsetInvoice, label: "Omset Invoice (Rp)" };
 }
 
 function formatRupiahDisplay(num) {
@@ -1870,30 +1920,35 @@ function showMotivationSpeechBubble(parentElement, salesName, isFinished) {
 function switchChartMetric(metricType) {
     currentMetric = metricType;
     
-    document.getElementById('btnMetricOmset').classList.remove('active');
+    if (document.getElementById('btnMetricOmset')) document.getElementById('btnMetricOmset').classList.remove('active');
     if (document.getElementById('btnMetricInvCount')) document.getElementById('btnMetricInvCount').classList.remove('active');
-    document.getElementById('btnMetricTotal').classList.remove('active');
-    document.getElementById('btnMetricCustomer').classList.remove('active');
+    if (document.getElementById('btnMetricTotal')) document.getElementById('btnMetricTotal').classList.remove('active');
+    if (document.getElementById('btnMetricCustBaru')) document.getElementById('btnMetricCustBaru').classList.remove('active');
+    if (document.getElementById('btnMetricCustomer')) document.getElementById('btnMetricCustomer').classList.remove('active');
 
-    let titleText = '🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)';
-    let metricLblText = `Omset Invoice (${currentLabelPeriodeRanking})`;
+    let titleText = '⚡ Sirkuit Lari Sales (Total Activity Follow Up)';
+    let metricLblText = 'Total Activity FU';
 
-    if (metricType === 'omset') {
-        document.getElementById('btnMetricOmset').classList.add('active');
-        titleText = '🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)';
-        metricLblText = `Omset Invoice (${currentLabelPeriodeRanking})`;
+    if (metricType === 'total') {
+        if (document.getElementById('btnMetricTotal')) document.getElementById('btnMetricTotal').classList.add('active');
+        titleText = '⚡ Sirkuit Lari Sales (Total Activity Follow Up)';
+        metricLblText = 'Total Activity FU';
+    } else if (metricType === 'cust_baru') {
+        if (document.getElementById('btnMetricCustBaru')) document.getElementById('btnMetricCustBaru').classList.add('active');
+        titleText = '🚀 Sirkuit Lari Sales (Penambahan Customer Baru Input)';
+        metricLblText = 'Customer Baru Input';
+    } else if (metricType === 'customer') {
+        if (document.getElementById('btnMetricCustomer')) document.getElementById('btnMetricCustomer').classList.add('active');
+        titleText = '👥 Sirkuit Lari Sales (Jumlah Customer di-FU)';
+        metricLblText = 'Customer di-FU';
     } else if (metricType === 'inv_count') {
         if (document.getElementById('btnMetricInvCount')) document.getElementById('btnMetricInvCount').classList.add('active');
         titleText = `🧾 Sirkuit Lari Sales (HADIAH UTAMA 2 JT INVOICE TERBANYAK - ${currentLabelPeriodeRanking})`;
         metricLblText = `Total Invoice (${currentLabelPeriodeRanking})`;
-    } else if (metricType === 'total') {
-        document.getElementById('btnMetricTotal').classList.add('active');
-        titleText = '⚡ Sirkuit Lari Sales (Total Activity Follow Up)';
-        metricLblText = 'Total Activity FU';
-    } else if (metricType === 'customer') {
-        document.getElementById('btnMetricCustomer').classList.add('active');
-        titleText = '👥 Sirkuit Lari Sales (Jumlah Customer di-FU)';
-        metricLblText = 'Customer di-FU';
+    } else if (metricType === 'omset') {
+        if (document.getElementById('btnMetricOmset')) document.getElementById('btnMetricOmset').classList.add('active');
+        titleText = '🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)';
+        metricLblText = `Omset Invoice (${currentLabelPeriodeRanking})`;
     }
 
     document.getElementById('chartTitle').innerHTML = titleText;
@@ -1903,10 +1958,11 @@ function switchChartMetric(metricType) {
     const metricData = getSortedDatasetByMetric(metricType);
 
     salesChartLabels = metricData.labels;
-    if (metricType === 'omset') salesChartOmsetInvoice = metricData.values;
-    else if (metricType === 'inv_count') salesChartInvCount = metricData.values;
-    else if (metricType === 'total') salesChartTotalFU = metricData.values;
+    if (metricType === 'total') salesChartTotalFU = metricData.values;
+    else if (metricType === 'cust_baru') salesChartCustBaru = metricData.values;
     else if (metricType === 'customer') salesChartCustomerFU = metricData.values;
+    else if (metricType === 'inv_count') salesChartInvCount = metricData.values;
+    else if (metricType === 'omset') salesChartOmsetInvoice = metricData.values;
 
     updatePodiumCardsDOM(metricData.top1, metricData.top2, metricData.top3, currentLabelPeriodeRanking);
     renderScaledChart();
