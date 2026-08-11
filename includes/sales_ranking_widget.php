@@ -1571,27 +1571,35 @@ function positionMascotRunners(chart) {
             };
 
             if (isFinished) {
-                // STATE 2: NAILONG VICTORY 🏆 SELEBRASI NGANGKAT PIALA (Target 200 Juta Finish!)
+                // VICTORY NAILONG 🏆 (FINISHED TARGET WITH CROWN & SPARKLES + SPRITE ANIMATION)
                 runnerDiv.innerHTML = `
                     <div class="nailong-run-wrapper">
-                        ${medalBadge ? `<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge} 🏆</span>` : '<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">🏆</span>'}
-                        <div class="nailong-victory-float" style="position: relative;">
+                        <span class="nailong-rank-tag" style="top: -26px; left: 50%; transform: translateX(-50%); font-size: 14px; background: linear-gradient(135deg, #F59E0B, #B45309); color: #FFF; border: 1.5px solid #FEF08A; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.5);">
+                            ${medalBadge ? medalBadge + ' 👑' : '👑 🏆'}
+                        </span>
+                        <div class="nailong-run-bounce" style="position: relative;">
                             <div class="nailong-sparkles">
                                 <div class="sparkle-dot"></div>
                                 <div class="sparkle-dot"></div>
                                 <div class="sparkle-dot"></div>
                                 <div class="sparkle-dot"></div>
                             </div>
-                            <img src="assets/nailong_gambar2_3d.png?v=<?= time() ?>" class="nailong-3d-gambar2" alt="Nailong Victory 🏆" />
-                            <div class="nailong-trophy-icon">🏆</div>
-                            <div class="nailong-money-icon">💰</div>
-                            <div class="nailong-headband"></div>
+                            <div class="nailong-sprite"></div>
+                            <div class="nailong-flag-pole">
+                                <div style="width: 2px; height: 26px; background: #78350F; border-radius: 1px;"></div>
+                                <div style="width: 14px; height: 9px; background: linear-gradient(180deg, #DC2626 50%, #FFFFFF 50%); border-radius: 1px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 0.3px solid #CBD5E1;"></div>
+                            </div>
+                            <div class="nailong-dust-cloud">
+                                <div class="dust-puff"></div>
+                                <div class="dust-puff"></div>
+                                <div class="dust-puff"></div>
+                            </div>
                         </div>
                         <div class="nailong-ground-shadow"></div>
                     </div>
                 `;
             } else {
-                // STATE 1: NAILONG LARI DI TEMPAT 🏃 WITH SPRITE SHEET ANIMATION + BENDERA 🇮🇩
+                // RUNNING NAILONG 🏃 WITH SPRITE SHEET ANIMATION + BENDERA 🇮🇩
                 runnerDiv.innerHTML = `
                     <div class="nailong-run-wrapper">
                         ${medalBadge ? `<span class="nailong-rank-tag" style="top: -24px; left: 50%; transform: translateX(-50%); font-size: 14px;">${medalBadge}</span>` : ''}
