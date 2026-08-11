@@ -206,25 +206,43 @@
 <!-- MODAL FULL DETAIL PENGUMUMAN SALES -->
 <div class="modal fade" id="announcementFullModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
-            <div class="modal-header text-white" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border-radius: 24px 24px 0 0; padding: 20px 28px;">
-                <div class="d-flex align-items-center gap-2.5">
-                    <div style="font-size: 24px;">📢</div>
+        <div class="modal-content border-0 shadow-2xl" style="border-radius: 28px; overflow: hidden; background: #F8FAFC;">
+            <!-- Modern Premium Hero Header -->
+            <div class="modal-header text-white border-0 position-relative" style="background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%); padding: 24px 32px; overflow: hidden;">
+                <!-- Decorative Ambient Light Orbs -->
+                <div style="position: absolute; top: -60px; right: -60px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%); pointer-events: none;"></div>
+                <div style="position: absolute; bottom: -40px; left: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%); pointer-events: none;"></div>
+                
+                <div class="d-flex align-items-center gap-3.5 position-relative" style="z-index: 2;">
+                    <div style="width: 52px; height: 52px; background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);">
+                        📢
+                    </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0 text-white" style="font-family: 'Plus Jakarta Sans', sans-serif;">Papan Pengumuman Resmi Sales</h5>
-                        <small class="text-white-50">Pemberitahuan promo, price list, & kabar penting dari manajemen Loewix</small>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge bg-warning text-dark fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10px; letter-spacing: 0.5px;">RESMI & TERVERIFIKASI</span>
+                            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-0.5" style="font-size: 10px;">LOEWIX MANAJEMEN</span>
+                        </div>
+                        <h5 class="modal-title fw-extrabold mb-0 text-white" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; letter-spacing: -0.4px;">Papan Pengumuman Resmi Sales</h5>
+                        <p class="mb-0 text-white-50 mt-0.5" style="font-size: 12.5px;">Pemberitahuan promo, price list, & kabar penting dari manajemen Loewix</p>
                     </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white position-relative" style="z-index: 2;" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4 bg-light">
+            
+            <div class="modal-body p-4" style="background-color: #F1F5F9;">
                 <div id="announcementModalGridList" class="announcement-modal-grid">
                     <!-- Dynamic Cards Rendered Here -->
                 </div>
             </div>
-            <div class="modal-footer bg-white border-top py-2.5 px-4 justify-content-between">
-                <span class="text-muted" style="font-size: 12.5px;">Diperbarui secara realtime oleh tim manajemen</span>
-                <a href="announcements.php" class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold">Kelola Pengumuman</a>
+            
+            <div class="modal-footer bg-white border-top border-slate-200 py-3 px-4 justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 12.5px;">
+                    <span class="d-inline-block rounded-circle bg-success" style="width: 8px; height: 8px; box-shadow: 0 0 8px #10B981;"></span>
+                    <span class="fw-semibold text-slate-600">Diperbarui secara realtime oleh tim manajemen</span>
+                </div>
+                <a href="announcements.php" class="btn btn-primary rounded-pill px-4 py-2 text-sm fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); border: none;">
+                    ⚙️ Kelola Pengumuman
+                </a>
             </div>
         </div>
     </div>
@@ -291,26 +309,30 @@ function renderAnnouncementModalCards(dataList) {
 
     let html = '';
     dataList.forEach(item => {
-        let badgeClass = 'bg-primary';
+        let badgeStyle = 'background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #FFF;';
         let badgeIcon = 'ℹ️';
         let badgeLabel = 'INFORMASI RESMI';
-        let borderTopColor = '#2563EB';
+        let accentGradient = 'linear-gradient(90deg, #3B82F6, #60A5FA)';
+        let shadowStyle = 'box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);';
 
         if (item.badge_type === 'promo') {
-            badgeClass = 'bg-success';
+            badgeStyle = 'background: linear-gradient(135deg, #059669, #10B981); color: #FFF;';
             badgeIcon = '🚀';
             badgeLabel = 'PROMO SPESIAL';
-            borderTopColor = '#10B981';
+            accentGradient = 'linear-gradient(90deg, #10B981, #34D399)';
+            shadowStyle = 'box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.05);';
         } else if (item.badge_type === 'warning') {
-            badgeClass = 'bg-warning text-dark';
+            badgeStyle = 'background: linear-gradient(135deg, #D97706, #F59E0B); color: #FFF;';
             badgeIcon = '⚠️';
             badgeLabel = 'PERHATIAN PENTING';
-            borderTopColor = '#F59E0B';
+            accentGradient = 'linear-gradient(90deg, #F59E0B, #FCD34D)';
+            shadowStyle = 'box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);';
         } else if (item.badge_type === 'urgent') {
-            badgeClass = 'bg-danger';
+            badgeStyle = 'background: linear-gradient(135deg, #DC2626, #EF4444); color: #FFF;';
             badgeIcon = '🚨';
             badgeLabel = 'DARURAT / URGENT';
-            borderTopColor = '#EF4444';
+            accentGradient = 'linear-gradient(90deg, #EF4444, #F87171)';
+            shadowStyle = 'box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.18), 0 4px 6px -2px rgba(0, 0, 0, 0.05);';
         }
 
         const dateStr = new Date(item.created_at).toLocaleDateString('id-ID', {
@@ -320,18 +342,35 @@ function renderAnnouncementModalCards(dataList) {
         const formattedContent = escapeHtmlAnn(item.content).replace(/\n/g, '<br>');
 
         html += `
-        <div class="card border-0 shadow-sm p-3.5 bg-white" style="border-radius: 18px; border-top: 4px solid ${borderTopColor} !important;">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="badge ${badgeClass} px-3 py-1.5 rounded-pill fw-bold" style="font-size: 11px;">
-                    ${badgeIcon} ${badgeLabel}
+        <div class="card border-0 p-4 bg-white position-relative" style="border-radius: 22px; ${shadowStyle}">
+            <!-- Top Gradient Accent Line -->
+            <div style="position: absolute; top: 0; left: 24px; right: 24px; height: 4px; background: ${accentGradient}; border-radius: 0 0 8px 8px;"></div>
+            
+            <div class="d-flex justify-content-between align-items-center mb-3 mt-1">
+                <span class="badge px-3 py-1.5 rounded-pill fw-bold d-inline-flex align-items-center gap-1.5" style="${badgeStyle} font-size: 11px; letter-spacing: 0.3px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    <span>${badgeIcon}</span> ${badgeLabel}
                 </span>
-                <small class="text-muted fw-semibold">📅 ${dateStr}</small>
+                <div class="d-flex align-items-center gap-1 text-slate-500 fw-semibold" style="font-size: 11.5px; background: #F1F5F9; color: #475569; padding: 4px 12px; border-radius: 20px;">
+                    <span>📅</span> ${dateStr}
+                </div>
             </div>
-            <h6 class="fw-bold text-dark mb-2" style="font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif;">${escapeHtmlAnn(item.title)}</h6>
-            <p class="text-secondary mb-3" style="font-size: 13.5px; line-height: 1.6; font-family: 'Inter', sans-serif;">${formattedContent}</p>
-            <div class="pt-2 border-top d-flex justify-content-between align-items-center" style="font-size: 11.5px; color: #64748B;">
-                <span>Diterbitkan Oleh:</span>
-                <span class="fw-bold text-dark">${escapeHtmlAnn(item.created_by)}</span>
+            
+            <h6 class="fw-extrabold text-slate-900 mb-2.5" style="font-size: 17.5px; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.3px; line-height: 1.35; color: #0F172A;">
+                ${escapeHtmlAnn(item.title)}
+            </h6>
+            
+            <div class="text-slate-600 mb-3.5" style="font-size: 14px; line-height: 1.65; font-family: 'Plus Jakarta Sans', sans-serif; color: #334155; background: #F8FAFC; padding: 14px 16px; border-radius: 14px; border: 1px solid #E2E8F0;">
+                ${formattedContent}
+            </div>
+            
+            <div class="pt-2.5 border-top border-slate-100 d-flex justify-content-between align-items-center" style="font-size: 12px; color: #64748B;">
+                <div class="d-flex align-items-center gap-1.5">
+                    <span style="font-size: 14px;">✍️</span>
+                    <span>Diterbitkan Oleh:</span>
+                </div>
+                <span class="badge bg-slate-100 text-slate-800 fw-bold px-2.5 py-1 rounded-pill" style="font-size: 11.5px; background: #E2E8F0; color: #0F172A;">
+                    ${escapeHtmlAnn(item.created_by)}
+                </span>
             </div>
         </div>`;
     });
