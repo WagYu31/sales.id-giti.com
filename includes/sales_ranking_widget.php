@@ -1183,6 +1183,8 @@ let salesChartInstance = null;
 let currentMetric = 'omset';
 let currentTopLimit = 10;
 let currentMonthPeriode = '<?= $selected_bulan ?>';
+let currentLabelPeriodeRanking = '<?= $label_periode_ranking ?>';
+let rankingDataRaw = <?php echo json_encode($ranking_data); ?>;
 
 let salesChartLabels = <?php echo json_encode($chart_labels); ?>;
 let salesChartOmsetInvoice = <?php echo json_encode($chart_omset_invoice); ?>;
@@ -1197,6 +1199,40 @@ let top3Data = <?php echo json_encode($top3); ?>;
 document.addEventListener("DOMContentLoaded", function() {
     renderScaledChart();
 });
+
+function getSortedDatasetByMetric(metricType) {
+    let rawList = [...rankingDataRaw];
+
+    if (metricType === 'omset') {
+        rawList.sort((a, b) => (parseFloat(b.total_omset_invoice) || 0) - (parseFloat(a.total_omset_invoice) || 0));
+    } else if (metricType === 'inv_count') {
+        rawList.sort((a, b) => (parseInt(b.total_inv_count) || 0) - (parseInt(a.total_inv_count) || 0));
+    } else if (metricType === 'total') {
+        rawList.sort((a, b) => (parseInt(b.total_fu) || 0) - (parseInt(a.total_fu) || 0));
+    } else if (metricType === 'customer') {
+        rawList.sort((a, b) => (parseInt(b.total_customer_fu) || 0) - (parseInt(a.total_customer_fu) || 0));
+    }
+
+    let labels = [];
+    let values = [];
+
+    rawList.forEach(item => {
+        labels.push(item.nama_sales);
+        if (metricType === 'omset') values.push(parseFloat(item.total_omset_invoice) || 0);
+        else if (metricType === 'inv_count') values.push(parseInt(item.total_inv_count) || 0);
+        else if (metricType === 'total') values.push(parseInt(item.total_fu) || 0);
+        else if (metricType === 'customer') values.push(parseInt(item.total_customer_fu) || 0);
+    });
+
+    return {
+        sortedList: rawList,
+        labels: labels,
+        values: values,
+        top1: rawList[0] || null,
+        top2: rawList[1] || null,
+        top3: rawList[2] || null
+    };
+}
 
 function switchMonthPeriode(monthVal, btnEl) {
     if (currentMonthPeriode === monthVal && btnEl && btnEl.classList.contains('active-month')) return;
@@ -1227,16 +1263,12 @@ function switchMonthPeriode(monthVal, btnEl) {
         .then(data => {
             if (!data.success) return;
 
+            rankingDataRaw = data.ranking_data || [];
+            currentLabelPeriodeRanking = data.label_periode_ranking || '3 Bulan (Agt-Okt)';
+
             const badgeFullLabel = document.getElementById('badgeFullLabelRanking');
             if (badgeFullLabel) badgeFullLabel.innerText = data.full_label_ranking;
 
-            salesChartLabels = data.chart_labels || [];
-            salesChartOmsetInvoice = data.chart_omset_invoice || [];
-            salesChartTotalFU = data.chart_total_fu || [];
-            salesChartCustomerFU = data.chart_customer_fu || [];
-            salesChartInvCount = data.chart_inv_count || [];
-
-            updatePodiumCardsDOM(data.top1, data.top2, data.top3, data.label_periode_ranking);
             switchChartMetric(currentMetric);
             updateModalLeaderboardDOM(data.ranking_data);
 
@@ -1844,16 +1876,16 @@ function switchChartMetric(metricType) {
     document.getElementById('btnMetricCustomer').classList.remove('active');
 
     let titleText = '🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)';
-    let metricLblText = 'Omset Invoice (<?= $label_periode_ranking ?>)';
+    let metricLblText = `Omset Invoice (${currentLabelPeriodeRanking})`;
 
     if (metricType === 'omset') {
         document.getElementById('btnMetricOmset').classList.add('active');
         titleText = '🏁 Sirkuit Lari Sales (Omset Invoice Rp - Target 200 Juta)';
-        metricLblText = 'Omset Invoice (<?= $label_periode_ranking ?>)';
+        metricLblText = `Omset Invoice (${currentLabelPeriodeRanking})`;
     } else if (metricType === 'inv_count') {
         if (document.getElementById('btnMetricInvCount')) document.getElementById('btnMetricInvCount').classList.add('active');
-        titleText = '🧾 Sirkuit Lari Sales (HADIAH UTAMA 2 JT INVOICE TERBANYAK - Target 50 Inv)';
-        metricLblText = 'Total Invoice (<?= $label_periode_ranking ?>)';
+        titleText = `🧾 Sirkuit Lari Sales (HADIAH UTAMA 2 JT INVOICE TERBANYAK - ${currentLabelPeriodeRanking})`;
+        metricLblText = `Total Invoice (${currentLabelPeriodeRanking})`;
     } else if (metricType === 'total') {
         document.getElementById('btnMetricTotal').classList.add('active');
         titleText = '⚡ Sirkuit Lari Sales (Total Activity Follow Up)';
@@ -1867,7 +1899,16 @@ function switchChartMetric(metricType) {
     document.getElementById('chartTitle').innerHTML = titleText;
     document.querySelectorAll('.metric-lbl').forEach(el => el.innerText = metricLblText);
 
-    updatePodiumCards(metricType);
+    // Dynamic sort by active metric
+    const metricData = getSortedDatasetByMetric(metricType);
+
+    salesChartLabels = metricData.labels;
+    if (metricType === 'omset') salesChartOmsetInvoice = metricData.values;
+    else if (metricType === 'inv_count') salesChartInvCount = metricData.values;
+    else if (metricType === 'total') salesChartTotalFU = metricData.values;
+    else if (metricType === 'customer') salesChartCustomerFU = metricData.values;
+
+    updatePodiumCardsDOM(metricData.top1, metricData.top2, metricData.top3, currentLabelPeriodeRanking);
     renderScaledChart();
 }
 
