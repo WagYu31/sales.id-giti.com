@@ -5,6 +5,10 @@
  * METRIK UTAMA: TOTAL NOMINAL OMSET INVOICE (RP) DENGAN TARGET RP 200 JUTA
  */
 
+if (!isset($conn)) {
+    require_once __DIR__ . '/db.php';
+}
+
 // Parse month filter (Default: 3 Bulan - Agt-Okt 2026)
 $selected_bulan = trim($_GET['periode_bulan'] ?? '8-10');
 
