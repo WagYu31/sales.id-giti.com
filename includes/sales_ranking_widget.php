@@ -430,32 +430,36 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-/* === LOEWIX CCTV 3D ROBOT RUNNER ANIMATION === */
+/* === LOEWIX CCTV 3D ROBOT RUNNER BIOMECHANICAL ANIMATION === */
 .loewix-runner-3d, .nailong-sprite {
-    width: 50px;
-    height: 62px;
+    width: 52px;
+    height: 64px;
     background-image: url('assets/loewix_runner_3d.png?v=<?= time() ?>');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center bottom;
     display: block;
-    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5));
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));
     transform-origin: center bottom;
-    animation: loewixSprint3D 0.28s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+    animation: loewixSprintRealistic 0.42s infinite linear;
 }
 
-@keyframes loewixSprint3D {
+/* 4-Stage Biomechanical Running Stride (Left Foot Landing -> Air Thrust -> Right Foot Landing -> Air Thrust) */
+@keyframes loewixSprintRealistic {
     0% {
-        transform: translateY(0px) rotate(-6deg) scale(1.08, 0.92) skewX(4deg);
+        transform: translateY(0px) rotate(-7deg) scale(1.12, 0.88) skewX(5deg);
     }
-    35% {
-        transform: translateY(-4px) rotate(-1deg) scale(0.98, 1.02) skewX(2deg);
+    25% {
+        transform: translateY(-16px) rotate(6deg) scale(0.88, 1.12) skewX(-4deg);
     }
-    70% {
-        transform: translateY(-9px) rotate(5deg) scale(0.94, 1.06) skewX(-2deg);
+    50% {
+        transform: translateY(-1px) rotate(-5deg) scale(1.12, 0.88) skewX(4deg);
+    }
+    75% {
+        transform: translateY(-18px) rotate(9deg) scale(0.86, 1.14) skewX(-6deg);
     }
     100% {
-        transform: translateY(-12px) rotate(8deg) scale(0.90, 1.10) skewX(-5deg);
+        transform: translateY(0px) rotate(-7deg) scale(1.12, 0.88) skewX(5deg);
     }
 }
 
@@ -475,30 +479,28 @@ $total_sales_count = count($ranking_data);
 }
 
 .nailong-run-bounce {
-    animation: loewixRunBounce 0.28s infinite alternate ease-in-out;
+    display: inline-block;
 }
 
-@keyframes loewixRunBounce {
-    0%   { transform: scale(1, 1); }
-    100% { transform: scale(1.02, 0.98); }
-}
-
-/* === GROUND SHADOW that pulses with bounce === */
+/* === GROUND SHADOW that synchronizes with 2-foot stride landing === */
 .nailong-ground-shadow {
     position: absolute;
     bottom: -4px;
     left: 50%;
     transform: translateX(-50%);
-    width: 36px;
+    width: 38px;
     height: 8px;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, transparent 70%);
     border-radius: 50%;
-    animation: nailongShadowPulse 0.28s infinite alternate ease-in-out;
+    animation: loewixShadowPulse 0.42s infinite linear;
 }
 
-@keyframes nailongShadowPulse {
-    0%   { transform: translateX(-50%) scaleX(1.2) scaleY(1.1); opacity: 0.65; }
-    100% { transform: translateX(-50%) scaleX(0.6) scaleY(0.5); opacity: 0.25; }
+@keyframes loewixShadowPulse {
+    0%   { transform: translateX(-50%) scaleX(1.3) scaleY(1.2); opacity: 0.75; }
+    25%  { transform: translateX(-50%) scaleX(0.5) scaleY(0.4); opacity: 0.2; }
+    50%  { transform: translateX(-50%) scaleX(1.3) scaleY(1.2); opacity: 0.75; }
+    75%  { transform: translateX(-50%) scaleX(0.4) scaleY(0.3); opacity: 0.15; }
+    100% { transform: translateX(-50%) scaleX(1.3) scaleY(1.2); opacity: 0.75; }
 }
 
 /* === DUST CLOUD particles behind runner === */
