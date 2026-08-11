@@ -7,28 +7,13 @@
 
 $target_omset_per_bulan = 200000000; // Rp 200.000.000,-
 
-// Parse month filter (Bulan 8, 9, 10 or 8-10)
-$selected_bulan = trim($_GET['periode_bulan'] ?? '8');
+$target_omset_per_bulan = 200000000; // Rp 200.000.000,-
 
-if ($selected_bulan === '9') {
-    $start_date = '2026-09-01';
-    $end_date = '2026-09-30';
-    $label_periode = 'Bulan 9 (September 2026)';
-} else if ($selected_bulan === '10') {
-    $start_date = '2026-10-01';
-    $end_date = '2026-10-31';
-    $label_periode = 'Bulan 10 (Oktober 2026)';
-} else if ($selected_bulan === '8-10' || $selected_bulan === 'all') {
-    $selected_bulan = '8-10';
-    $start_date = '2026-08-01';
-    $end_date = '2026-10-31';
-    $label_periode = 'Periode Bulan 8 - 10 (Agt - Okt 2026)';
-} else {
-    $selected_bulan = '8';
-    $start_date = '2026-08-01';
-    $end_date = '2026-08-31';
-    $label_periode = 'Bulan 8 (Agustus 2026)';
-}
+// Single Month Event: Bulan 8 (Agustus 2026)
+$selected_bulan = '8';
+$start_date = '2026-08-01';
+$end_date = '2026-08-31';
+$label_periode = 'Bulan 8 (Agustus 2026)';
 
 // Fetch Combined Sales Leaderboard (Kat A + Kat B Combined)
 $sql_combined = "
@@ -229,25 +214,14 @@ if ($res_combined) {
         </div>
     </div>
 
-    <!-- Month Filter Bar (Bulan 8 - 10) -->
-    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 p-2 bg-light rounded-pill border gap-2 shadow-sm">
-        <div class="d-flex align-items-center gap-2 px-3">
-            <span class="fw-bold text-dark" style="font-size: 12.5px;">📅 Filter Periode:</span>
-            <span class="badge bg-danger text-white rounded-pill px-3 py-1 fw-bold" style="font-size: 11px; border: 1px solid #FCD34D;"><?= $label_periode ?></span>
+    <!-- Single Month Info Bar -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 p-3 bg-light rounded-pill border gap-2 shadow-sm">
+        <div class="d-flex align-items-center gap-2 px-2">
+            <span class="fw-bold text-dark" style="font-size: 13px;">📅 Periode Event Sultan:</span>
+            <span class="badge bg-danger text-white rounded-pill px-3 py-1.5 fw-bold" style="font-size: 11.5px; border: 1px solid #FCD34D;"><?= $label_periode ?></span>
         </div>
-        <div class="d-flex align-items-center gap-1.5 flex-wrap">
-            <a href="?periode_bulan=8" class="btn btn-sm <?= ($selected_bulan==='8')?'btn-danger fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
-                📅 Agt (Bulan 8)
-            </a>
-            <a href="?periode_bulan=9" class="btn btn-sm <?= ($selected_bulan==='9')?'btn-warning fw-bold text-dark shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
-                📅 Sep (Bulan 9)
-            </a>
-            <a href="?periode_bulan=10" class="btn btn-sm <?= ($selected_bulan==='10')?'btn-success fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
-                📅 Okt (Bulan 10)
-            </a>
-            <a href="?periode_bulan=8-10" class="btn btn-sm <?= ($selected_bulan==='8-10')?'btn-primary fw-bold text-white shadow-sm':'btn-outline-secondary' ?> rounded-pill px-3 py-1" style="font-size: 11.5px;">
-                🏆 Total (Bulan 8-10)
-            </a>
+        <div class="px-2">
+            <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1.5" style="font-size: 11.5px;">🎯 Durasi: 1 Bulan Penuh (Agustus 2026)</span>
         </div>
     </div>
 
