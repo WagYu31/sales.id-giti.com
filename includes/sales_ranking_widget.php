@@ -430,29 +430,34 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-/* === NAILONG 3D SPRITE SHEET ANIMATION === */
-/* Sprite sheet: 1024x1024, 3 columns x 2 rows = 6 frames */
-/* Each frame: ~341 x 512 px. Display at 40x60px */
-.nailong-sprite {
-    width: 40px;
+/* === LOEWIX CCTV 3D ROBOT RUNNER ANIMATION === */
+.loewix-runner-3d {
+    width: 48px;
     height: 60px;
-    background-image: url('assets/nailong_spritesheet.png?v=<?= time() ?>');
-    background-size: 120px 120px; /* 40*3=120, 60*2=120 */
+    background-image: url('assets/loewix_runner_3d.png?v=<?= time() ?>');
+    background-size: contain;
     background-repeat: no-repeat;
-    background-position: 0 0;
-    animation: nailongSpriteRun 0.5s steps(1) infinite;
+    background-position: center bottom;
     display: block;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+    animation: loewixRobotRun 0.45s ease-in-out infinite alternate;
 }
 
-@keyframes nailongSpriteRun {
-    0%      { background-position: 0px 0px; }      /* Frame 1 */
-    16.66%  { background-position: -40px 0px; }     /* Frame 2 */
-    33.33%  { background-position: -80px 0px; }     /* Frame 3 */
-    50%     { background-position: 0px -60px; }     /* Frame 4 */
-    66.66%  { background-position: -40px -60px; }   /* Frame 5 */
-    83.33%  { background-position: -80px -60px; }   /* Frame 6 */
-    100%    { background-position: 0px 0px; }       /* Loop back */
+@keyframes loewixRobotRun {
+    0% { transform: translateY(0) rotate(-3deg); }
+    100% { transform: translateY(-5px) rotate(4deg); }
+}
+
+.nailong-sprite {
+    width: 48px;
+    height: 60px;
+    background-image: url('assets/loewix_runner_3d.png?v=<?= time() ?>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    display: block;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+    animation: loewixRobotRun 0.45s ease-in-out infinite alternate;
 }
 
 /* Static single image fallback for victory */
@@ -867,7 +872,7 @@ $total_sales_count = count($ranking_data);
             <div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <span class="badge bg-danger text-white fw-bold rounded-pill px-3 py-1" style="font-size: 11px; letter-spacing: 0.5px; border: 1px solid #FCD34D;">🇮🇩 EDISI SPESIAL KEMERDEKAAN</span>
-                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 800;">🏁 Sirkuit Balap Nailong Merah Putih 🇮🇩</span>
+                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 800;">🏁 Sirkuit Balap Loewix CCTV Robot 🤖 🇮🇩</span>
                 </div>
                 <h5 class="mb-0 fw-bold text-dark mt-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19.5px; letter-spacing: -0.4px;">
                     PROGRAM PER SEMESTER DALAM 3 BULAN
