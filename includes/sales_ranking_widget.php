@@ -591,18 +591,9 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-/* === LOEWIX CCTV 3D ROBOT RUNNER ULTRA-REALISTIC SPRINT ANIMATION === */
+/* === HIDE 2D IMAGE SPRITE SO THREE.JS 3D WEBGL ROBOT IS THE MAIN CHARACTER === */
 .loewix-runner-3d, .nailong-sprite {
-    width: 52px;
-    height: 64px;
-    background-image: url('assets/loewix_runner_3d.png?v=<?= time() ?>');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    display: block;
-    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.45));
-    transform-origin: center bottom;
-    animation: loewixSprintRealistic3D 0.38s ease-in-out infinite;
+    display: none !important;
 }
 
 /* 3D Olympic Forward Sprint Physics (Micro Ground Glide 3px, Stride Body Compression & Push-off) */
@@ -1856,15 +1847,15 @@ function initThreeJsRunnersEngine() {
         threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         // Lighting
-        const ambLight = new THREE.AmbientLight(0xffffff, 0.9);
+        const ambLight = new THREE.AmbientLight(0xffffff, 1.35);
         threeScene.add(ambLight);
 
-        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
-        dirLight1.position.set(150, -100, 300);
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight1.position.set(150, -50, 350);
         threeScene.add(dirLight1);
 
-        const dirLight2 = new THREE.DirectionalLight(0xF59E0B, 0.7);
-        dirLight2.position.set(-150, 100, 200);
+        const dirLight2 = new THREE.DirectionalLight(0xF59E0B, 0.8);
+        dirLight2.position.set(-150, 50, 250);
         threeScene.add(dirLight2);
 
         isThreeJsEngineActive = true;
@@ -2095,8 +2086,8 @@ function positionMascotRunners(chart) {
                 threeRobotsList[index] = build3DLoewixMechaRobot();
             }
             if (threeRobotsList[index]) {
-                threeRobotsList[index].targetX = leftPos + 26;
-                threeRobotsList[index].targetY = topPos + 32;
+                threeRobotsList[index].targetX = leftPos + 18;
+                threeRobotsList[index].targetY = -topPos - 12;
             }
         }
 
