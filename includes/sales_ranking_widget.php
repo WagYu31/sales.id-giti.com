@@ -1320,7 +1320,8 @@ $total_sales_count = count($ranking_data);
 
                     <div style="position: relative; width: 100%; min-height: 320px;" id="chartCanvasContainer">
                         <canvas id="salesRankingChart"></canvas>
-                        <!-- Interactive Animated CCTV Mascot Runners Overlay (Nailong 奶龙 Edition) -->
+                        <!-- Real-time Three.js 3D WebGL Rigged Mecha Character Canvas -->
+                        <canvas id="threeJsRunnersCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;"></canvas>
                         <div id="cctvMascotOverlayHolder"></div>
                     </div>
                 </div>
@@ -1328,6 +1329,9 @@ $total_sales_count = count($ranking_data);
         </div>
     </div>
 </div>
+
+<!-- Three.js 3D WebGL Rendering Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <!-- Modal Full Leaderboard -->
 <div class="modal fade" id="fullLeaderboardModal" tabindex="-1" aria-hidden="true">
@@ -1817,20 +1821,245 @@ function renderScaledChart() {
     });
 }
 
+/* ==========================================================================
+   LOEWIX 3D WEBGL REAL-TIME RIGGED CHARACTER ENGINE (THREE.JS)
+   - Real 3D Procedural Character Mesh with 3D Joints & Bipedal Kinematics
+   - 60 FPS Real-time Knee Flexion, Hip Stride, Arm Swing, and Head Bobbing
+   ========================================================================== */
+
+let threeScene, threeCamera, threeRenderer;
+let threeRobotsList = [];
+let isThreeJsEngineActive = false;
+let threeAnimFrameId = null;
+
+function initThreeJsRunnersEngine() {
+    if (isThreeJsEngineActive) return true;
+    if (typeof THREE === 'undefined') return false;
+
+    const container = document.getElementById('chartCanvasContainer');
+    const canvas = document.getElementById('threeJsRunnersCanvas');
+    if (!container || !canvas) return false;
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    if (width === 0 || height === 0) return false;
+
+    try {
+        threeScene = new THREE.Scene();
+
+        // 2D to 3D coordinate mapping camera
+        threeCamera = new THREE.OrthographicCamera(0, width, 0, height, 1, 1000);
+        threeCamera.position.z = 400;
+
+        threeRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        threeRenderer.setSize(width, height);
+        threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Lighting
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.9);
+        threeScene.add(ambLight);
+
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight1.position.set(150, -100, 300);
+        threeScene.add(dirLight1);
+
+        const dirLight2 = new THREE.DirectionalLight(0xF59E0B, 0.7);
+        dirLight2.position.set(-150, 100, 200);
+        threeScene.add(dirLight2);
+
+        isThreeJsEngineActive = true;
+        animateThreeJsRunnersLoop();
+        return true;
+    } catch (e) {
+        console.error("Three.js init error:", e);
+        return false;
+    }
+}
+
+function build3DLoewixMechaRobot() {
+    const group = new THREE.Group();
+
+    // Metallic Materials
+    const chromeMat = new THREE.MeshStandardMaterial({ color: 0xE2E8F0, metalness: 0.85, roughness: 0.2 });
+    const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.3 });
+    const lensGlassMat = new THREE.MeshPhysicalMaterial({ color: 0x0F172A, metalness: 0.1, roughness: 0.1, transmission: 0.7, transparent: true });
+    const ledRedMat = new THREE.MeshBasicMaterial({ color: 0xEF4444 });
+    const flagRedMat = new THREE.MeshBasicMaterial({ color: 0xDC2626 });
+    const flagWhiteMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+
+    // 1. DOME CAMERA HEAD
+    const headGroup = new THREE.Group();
+    const domeHead = new THREE.Mesh(new THREE.SphereGeometry(11, 24, 24), chromeMat);
+    headGroup.add(domeHead);
+
+    const lensBezel = new THREE.Mesh(new THREE.CylinderGeometry(6.5, 7, 3, 24), darkMetalMat);
+    lensBezel.rotation.x = Math.PI / 2;
+    lensBezel.position.z = 8;
+    headGroup.add(lensBezel);
+
+    const lensGlass = new THREE.Mesh(new THREE.SphereGeometry(5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), lensGlassMat);
+    lensGlass.rotation.x = Math.PI / 2;
+    lensGlass.position.z = 9;
+    headGroup.add(lensGlass);
+
+    const redLed = new THREE.Mesh(new THREE.SphereGeometry(1.2, 12, 12), ledRedMat);
+    redLed.position.set(3, 4, 10);
+    headGroup.add(redLed);
+
+    headGroup.position.y = 22;
+    group.add(headGroup);
+
+    // 2. PELVIS & TORSO
+    const pelvis = new THREE.Mesh(new THREE.CylinderGeometry(4.5, 4, 5, 16), darkMetalMat);
+    pelvis.position.y = 12;
+    group.add(pelvis);
+
+    // 3. LEFT LEG RIG (Hip -> Thigh -> Knee -> Shin -> Foot)
+    const leftHip = new THREE.Group();
+    leftHip.position.set(-4.5, 12, 0);
+
+    const leftThigh = new THREE.Mesh(new THREE.CylinderGeometry(2, 1.6, 9, 12), chromeMat);
+    leftThigh.position.y = -4.5;
+    leftHip.add(leftThigh);
+
+    const leftKnee = new THREE.Group();
+    leftKnee.position.y = -9;
+    const leftKneeCap = new THREE.Mesh(new THREE.SphereGeometry(1.8, 12, 12), darkMetalMat);
+    leftKnee.add(leftKneeCap);
+
+    const leftShin = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.2, 9, 12), chromeMat);
+    leftShin.position.y = -4.5;
+    leftKnee.add(leftShin);
+
+    const leftFoot = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 6), darkMetalMat);
+    leftFoot.position.set(0, -9, 1.5);
+    leftKnee.add(leftFoot);
+
+    leftHip.add(leftKnee);
+    group.add(leftHip);
+
+    // 4. RIGHT LEG RIG (Hip -> Thigh -> Knee -> Shin -> Foot)
+    const rightHip = new THREE.Group();
+    rightHip.position.set(4.5, 12, 0);
+
+    const rightThigh = new THREE.Mesh(new THREE.CylinderGeometry(2, 1.6, 9, 12), chromeMat);
+    rightThigh.position.y = -4.5;
+    rightHip.add(rightThigh);
+
+    const rightKnee = new THREE.Group();
+    rightKnee.position.y = -9;
+    const rightKneeCap = new THREE.Mesh(new THREE.SphereGeometry(1.8, 12, 12), darkMetalMat);
+    rightKnee.add(rightKneeCap);
+
+    const rightShin = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.2, 9, 12), chromeMat);
+    rightShin.position.y = -4.5;
+    rightKnee.add(rightShin);
+
+    const rightFoot = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 6), darkMetalMat);
+    rightFoot.position.set(0, -9, 1.5);
+    rightKnee.add(rightFoot);
+
+    rightHip.add(rightKnee);
+    group.add(rightHip);
+
+    // 5. ARMS & BENDERA INDONESIA 🇮🇩
+    const leftShoulder = new THREE.Group();
+    leftShoulder.position.set(-10, 22, 0);
+    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.2, 10, 12), chromeMat);
+    leftArm.position.y = -5;
+    leftShoulder.add(leftArm);
+    group.add(leftShoulder);
+
+    const rightShoulder = new THREE.Group();
+    rightShoulder.position.set(10, 22, 0);
+    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.2, 10, 12), chromeMat);
+    rightArm.position.y = -5;
+    rightShoulder.add(rightArm);
+
+    // Flag Pole & Flag
+    const flagPole = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 22, 8), darkMetalMat);
+    flagPole.position.set(0, -3, 6);
+    flagPole.rotation.x = Math.PI / 4;
+    rightShoulder.add(flagPole);
+
+    const flagRed = new THREE.Mesh(new THREE.BoxGeometry(8, 3, 0.3), flagRedMat);
+    flagRed.position.set(4, 5, 9);
+    rightShoulder.add(flagRed);
+    const flagWhite = new THREE.Mesh(new THREE.BoxGeometry(8, 3, 0.3), flagWhiteMat);
+    flagWhite.position.set(4, 2, 9);
+    rightShoulder.add(flagWhite);
+
+    group.add(rightShoulder);
+
+    // Scale & Orientation
+    group.scale.set(1.3, 1.3, 1.3);
+    group.rotation.y = Math.PI / 2; // Facing finish line
+
+    threeScene.add(group);
+
+    return {
+        group: group,
+        leftHip: leftHip,
+        leftKnee: leftKnee,
+        rightHip: rightHip,
+        rightKnee: rightKnee,
+        leftShoulder: leftShoulder,
+        rightShoulder: rightShoulder,
+        headGroup: headGroup,
+        targetX: 0,
+        targetY: 0
+    };
+}
+
+function animateThreeJsRunnersLoop() {
+    threeAnimFrameId = requestAnimationFrame(animateThreeJsRunnersLoop);
+
+    if (!threeRenderer || !threeScene || !threeCamera) return;
+
+    const time = Date.now() * 0.016;
+
+    threeRobotsList.forEach((robot, idx) => {
+        if (!robot || !robot.group) return;
+
+        // Bipedal Stride Kinematic Motion
+        const strideAngle = Math.sin(time * 0.85 + idx * 0.4) * 0.8;
+
+        // Hip Joint Stride
+        robot.leftHip.rotation.x = strideAngle;
+        robot.rightHip.rotation.x = -strideAngle;
+
+        // Knee Joint Flexion (Knees bend naturally during step)
+        robot.leftKnee.rotation.x = Math.max(0, Math.sin(time * 0.85 + idx * 0.4 + 0.4) * 1.2);
+        robot.rightKnee.rotation.x = Math.max(0, -Math.sin(time * 0.85 + idx * 0.4 + 0.4) * 1.2);
+
+        // Shoulder & Arm Swing
+        robot.leftShoulder.rotation.x = -strideAngle * 0.75;
+        robot.rightShoulder.rotation.x = strideAngle * 0.75;
+
+        // Forward Bobbing & Stride Bounce
+        robot.group.rotation.z = -0.25; // Lean forward
+        robot.group.position.x = robot.targetX;
+        robot.group.position.y = robot.targetY + Math.abs(Math.sin(time * 0.85)) * 3;
+    });
+
+    threeRenderer.render(threeScene, threeCamera);
+}
+
 function positionMascotRunners(chart) {
     const holder = document.getElementById('cctvMascotOverlayHolder');
     if (!holder) return;
+
+    // Initialize 3D Three.js WebGL Engine
+    const has3D = initThreeJsRunnersEngine();
 
     const meta = chart.getDatasetMeta(0);
     const xAxis = chart.scales.x;
 
     if (!meta || !meta.data || meta.data.length === 0) return;
 
-    // Safety guard: Ensure y-coordinates are valid numbers before positioning runners
     const firstBarY = meta.data[0] ? meta.data[0].y : null;
     if (firstBarY === null || isNaN(firstBarY) || firstBarY === undefined) return;
 
-    // Force rebuild whenever dataset changes or metric/periode changes
     const currentDatasetKey = `${currentMetric}_${currentMonthPeriode}_${currentTopLimit}_${meta.data.length}`;
     const prevDatasetKey = holder.getAttribute('data-key');
     const needRebuild = (prevDatasetKey !== currentDatasetKey) || (holder.children.length !== meta.data.length);
@@ -1838,6 +2067,14 @@ function positionMascotRunners(chart) {
     if (needRebuild) {
         holder.innerHTML = '';
         holder.setAttribute('data-key', currentDatasetKey);
+
+        // Clean up previous 3D Three.js Robots
+        if (has3D && threeScene) {
+            threeRobotsList.forEach(r => {
+                if (r && r.group) threeScene.remove(r.group);
+            });
+            threeRobotsList = [];
+        }
     }
 
     meta.data.forEach((bar, index) => {
@@ -1846,12 +2083,22 @@ function positionMascotRunners(chart) {
         const barY = bar.y;
         const barX = bar.x;
 
-        // Calculate runner left position (at the leading tip of the growing bar)
         let leftPos = Math.min(barX - 18, xAxis.right - 45);
         if (value === 0) {
-            leftPos = xAxis.left + 5 + (index * 4); // Stagger zero runners
+            leftPos = xAxis.left + 5 + (index * 4);
         }
         const topPos = barY - 32;
+
+        // Update 3D Three.js WebGL Robot Position
+        if (has3D) {
+            if (!threeRobotsList[index]) {
+                threeRobotsList[index] = build3DLoewixMechaRobot();
+            }
+            if (threeRobotsList[index]) {
+                threeRobotsList[index].targetX = leftPos + 26;
+                threeRobotsList[index].targetY = topPos + 32;
+            }
+        }
 
         if (!needRebuild && holder.children[index]) {
             // Update position in-place without destroying DOM node (keeps CSS sprite running!)
