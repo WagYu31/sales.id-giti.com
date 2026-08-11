@@ -233,7 +233,7 @@ if ($res_combined) {
                     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2 border-bottom border-secondary border-opacity-30 pb-3">
                         <div>
                             <h5 class="fw-bold text-white mb-1 d-flex align-items-center gap-2" style="font-size: 18px; font-family: 'Plus Jakarta Sans', sans-serif;">
-                                🏆 Leaderboard Perolehan Sales (Akuisisi & Reaktivasi Mitra)
+                                🏆 1 BULAN DENGAN PENJUALAN TERBAIK
                             </h5>
                             <small class="text-white-50" style="font-size: 12px;">Akumulasi omset invoice & jumlah mitra aktif per <?= $label_periode ?> (Target Rp 200 Juta Omset Invoice).</small>
                         </div>
