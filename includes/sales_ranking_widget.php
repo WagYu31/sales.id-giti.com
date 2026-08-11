@@ -358,21 +358,15 @@ $total_sales_count = count($ranking_data);
 }
 
 /* Staggered 3D Skyline Positions Across Top Horizon */
-.tree-p1 { left: 1.2%; top: 6px; width: 34px; height: 42px; opacity: 0.85; animation-delay: 0s; }
-.tree-o2 { left: 4.8%; top: 14px; width: 30px; height: 36px; opacity: 0.72; animation-delay: 0.6s; }
-.tree-p3 { left: 8.5%; top: 4px; width: 38px; height: 46px; opacity: 0.90; animation-delay: 1.2s; }
-.tree-o4 { left: 12.5%; top: 16px; width: 28px; height: 34px; opacity: 0.68; animation-delay: 1.8s; }
+.tree-p1 { left: 1.5%; top: 6px; width: 34px; height: 42px; opacity: 0.85; animation-delay: 0s; }
+.tree-o2 { left: 5.0%; top: 12px; width: 28px; height: 34px; opacity: 0.72; animation-delay: 0.6s; }
+.tree-p3 { left: 8.5%; top: 4px; width: 36px; height: 44px; opacity: 0.90; animation-delay: 1.2s; }
+.tree-o4 { left: 12.0%; top: 14px; width: 26px; height: 32px; opacity: 0.68; animation-delay: 1.8s; }
 
-.tree-p5 { left: 17.5%; top: 8px; width: 32px; height: 40px; opacity: 0.80; animation-delay: 0.4s; }
-.tree-o6 { left: 21.5%; top: 14px; width: 28px; height: 34px; opacity: 0.70; animation-delay: 1.0s; }
-
-.tree-o7 { right: 21.5%; top: 14px; width: 28px; height: 34px; opacity: 0.70; animation-delay: 0.9s; }
-.tree-p8 { right: 17.5%; top: 8px; width: 32px; height: 40px; opacity: 0.80; animation-delay: 1.5s; }
-
-.tree-o9 { right: 12.5%; top: 16px; width: 28px; height: 34px; opacity: 0.68; animation-delay: 0.3s; }
-.tree-p10 { right: 8.5%; top: 4px; width: 38px; height: 46px; opacity: 0.90; animation-delay: 0.9s; }
-.tree-o11 { right: 4.8%; top: 14px; width: 30px; height: 36px; opacity: 0.72; animation-delay: 1.6s; }
-.tree-p12 { right: 1.2%; top: 6px; width: 34px; height: 42px; opacity: 0.85; animation-delay: 2.1s; }
+.tree-o7 { right: 26.5%; top: 14px; width: 26px; height: 32px; opacity: 0.68; animation-delay: 0.9s; }
+.tree-p8 { right: 22.5%; top: 8px; width: 32px; height: 40px; opacity: 0.80; animation-delay: 1.5s; }
+.tree-o9 { right: 18.5%; top: 14px; width: 28px; height: 34px; opacity: 0.70; animation-delay: 0.3s; }
+.tree-p10 { right: 14.5%; top: 4px; width: 36px; height: 44px; opacity: 0.90; animation-delay: 0.9s; }
 
 @keyframes tree3dSway {
     0% { transform: rotate(-2deg) scaleX(1); }
@@ -383,7 +377,7 @@ $total_sales_count = count($ranking_data);
 .stadium-center-billboard {
     position: absolute;
     top: 6px;
-    left: 50%;
+    left: 45%;
     transform: translateX(-50%);
     z-index: 3;
     pointer-events: none;
@@ -394,74 +388,74 @@ $total_sales_count = count($ranking_data);
 
 .billboard-screen-body {
     background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
-    border: 2px solid #F59E0B;
-    border-radius: 12px;
-    padding: 4px 14px;
-    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35), 0 0 24px rgba(15, 23, 42, 0.8), inset 0 0 10px rgba(245, 158, 11, 0.2);
+    border: 1.5px solid #F59E0B;
+    border-radius: 10px;
+    padding: 3px 10px;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35), 0 0 20px rgba(15, 23, 42, 0.8), inset 0 0 8px rgba(245, 158, 11, 0.2);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     white-space: nowrap;
     position: relative;
 }
 
 .billboard-led-lights {
     display: flex;
-    gap: 3px;
+    gap: 2.5px;
 }
 
 .led-dot {
-    width: 5px;
-    height: 5px;
+    width: 4.5px;
+    height: 4.5px;
     border-radius: 50%;
 }
-.led-dot.red { background: #EF4444; box-shadow: 0 0 6px #EF4444; }
-.led-dot.yellow { background: #F59E0B; box-shadow: 0 0 6px #F59E0B; }
-.led-dot.green { background: #10B981; box-shadow: 0 0 6px #10B981; }
+.led-dot.red { background: #EF4444; box-shadow: 0 0 5px #EF4444; }
+.led-dot.yellow { background: #F59E0B; box-shadow: 0 0 5px #F59E0B; }
+.led-dot.green { background: #10B981; box-shadow: 0 0 5px #10B981; }
 
 .billboard-text-content {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-.billboard-icon { font-size: 13px; animation: iconPulse 1s infinite alternate; }
-@keyframes iconPulse { 0% { transform: scale(1); } 100% { transform: scale(1.25); } }
+.billboard-icon { font-size: 12px; animation: iconPulse 1s infinite alternate; }
+@keyframes iconPulse { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
 
 .billboard-title {
-    font-size: 11.5px;
+    font-size: 10.5px;
     font-weight: 800;
     color: #FDE047;
-    letter-spacing: 0.5px;
-    text-shadow: 0 0 8px rgba(253, 224, 71, 0.6);
+    letter-spacing: 0.4px;
+    text-shadow: 0 0 6px rgba(253, 224, 71, 0.5);
 }
 
 .billboard-divider {
     color: #64748B;
-    font-size: 10px;
+    font-size: 9.5px;
 }
 
 .billboard-subtitle {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     color: #FFFFFF;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
 }
 
-.billboard-flag { font-size: 12px; }
+.billboard-flag { font-size: 11px; }
 
 /* Support Legs */
 .billboard-leg {
     position: absolute;
-    bottom: -9px;
-    width: 3px;
-    height: 10px;
+    bottom: -8px;
+    width: 2.5px;
+    height: 9px;
     background: linear-gradient(180deg, #64748B 0%, #334155 100%);
     border-radius: 1px;
 }
-.billboard-leg.leg-left { left: 18px; }
-.billboard-leg.leg-right { right: 18px; }
+.billboard-leg.leg-left { left: 16px; }
+.billboard-leg.leg-right { right: 16px; }
 
 /* 3D Floating Clouds */
 .track-3d-clouds-layer {
@@ -1719,7 +1713,7 @@ function renderScaledChart() {
             maintainAspectRatio: false,
             layout: {
                 padding: {
-                    top: 55,
+                    top: 68,
                     right: 65,
                     left: 10,
                     bottom: 10
