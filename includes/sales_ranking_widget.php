@@ -379,6 +379,90 @@ $total_sales_count = count($ranking_data);
     100% { transform: rotate(2.5deg) scaleX(1.03); }
 }
 
+/* === STADIUM 3D CENTER BILLBOARD BOARD === */
+.stadium-center-billboard {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.billboard-screen-body {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+    border: 2px solid #F59E0B;
+    border-radius: 12px;
+    padding: 4px 14px;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35), 0 0 24px rgba(15, 23, 42, 0.8), inset 0 0 10px rgba(245, 158, 11, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    position: relative;
+}
+
+.billboard-led-lights {
+    display: flex;
+    gap: 3px;
+}
+
+.led-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+}
+.led-dot.red { background: #EF4444; box-shadow: 0 0 6px #EF4444; }
+.led-dot.yellow { background: #F59E0B; box-shadow: 0 0 6px #F59E0B; }
+.led-dot.green { background: #10B981; box-shadow: 0 0 6px #10B981; }
+
+.billboard-text-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.billboard-icon { font-size: 13px; animation: iconPulse 1s infinite alternate; }
+@keyframes iconPulse { 0% { transform: scale(1); } 100% { transform: scale(1.25); } }
+
+.billboard-title {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #FDE047;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 8px rgba(253, 224, 71, 0.6);
+}
+
+.billboard-divider {
+    color: #64748B;
+    font-size: 10px;
+}
+
+.billboard-subtitle {
+    font-size: 11px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 0.3px;
+}
+
+.billboard-flag { font-size: 12px; }
+
+/* Support Legs */
+.billboard-leg {
+    position: absolute;
+    bottom: -9px;
+    width: 3px;
+    height: 10px;
+    background: linear-gradient(180deg, #64748B 0%, #334155 100%);
+    border-radius: 1px;
+}
+.billboard-leg.leg-left { left: 18px; }
+.billboard-leg.leg-right { right: 18px; }
+
 /* 3D Floating Clouds */
 .track-3d-clouds-layer {
     position: absolute;
@@ -1162,7 +1246,7 @@ $total_sales_count = count($ranking_data);
                         </div>
                     </div>
 
-                    <!-- STADIUM 3D TREES LAYER (Neat Skyline Horizon Forest) -->
+                    <!-- STADIUM 3D TREES & CENTER BILLBOARD LAYER -->
                     <div class="stadium-trees-overlay">
                         <!-- Skyline Left Cluster -->
                         <div class="tree-3d-pine tree-p1"></div>
@@ -1171,6 +1255,26 @@ $total_sales_count = count($ranking_data);
                         <div class="tree-3d-oak tree-o4"></div>
                         <div class="tree-3d-pine tree-p5"></div>
                         <div class="tree-3d-oak tree-o6"></div>
+
+                        <!-- Center Stadium 3D Billboard Board -->
+                        <div class="stadium-center-billboard">
+                            <div class="billboard-leg leg-left"></div>
+                            <div class="billboard-leg leg-right"></div>
+                            <div class="billboard-screen-body">
+                                <div class="billboard-led-lights">
+                                    <span class="led-dot red"></span>
+                                    <span class="led-dot yellow"></span>
+                                    <span class="led-dot green"></span>
+                                </div>
+                                <div class="billboard-text-content">
+                                    <span class="billboard-icon">🔥</span>
+                                    <span class="billboard-title">SIRKUIT JUARA LOEWIX</span>
+                                    <span class="billboard-divider">|</span>
+                                    <span class="billboard-subtitle">GASPOL CAPAI TARGET 200 JUTA!</span>
+                                    <span class="billboard-flag">🇮🇩</span>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Skyline Right Cluster -->
                         <div class="tree-3d-oak tree-o7"></div>
