@@ -323,33 +323,34 @@ $total_sales_count = count($ranking_data);
     }
 }
 
-/* === STADIUM TREES & FOLIAGE LAYER (Lapangan Kasih Pohon Pohon) === */
+/* === STADIUM TREES & FOLIAGE LAYER (TOP HORIZON BACKDROP) === */
 .stadium-trees-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    height: 48px;
     pointer-events: none;
-    z-index: 2;
+    z-index: 1;
     overflow: hidden;
+    opacity: 0.65;
 }
 
 .stadium-tree {
     position: absolute;
-    bottom: 4px;
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45));
+    top: -8px;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
     transform-origin: bottom center;
     animation: stadiumTreeSway 4s ease-in-out infinite alternate;
 }
 
-.tree-left-1 { left: 8px; width: 44px; height: 62px; animation-delay: 0s; }
-.tree-left-2 { left: 48px; width: 36px; height: 50px; animation-delay: 0.8s; opacity: 0.9; }
-.tree-left-3 { left: 88px; width: 48px; height: 68px; animation-delay: 1.5s; }
+.tree-left-1 { left: 4%; width: 28px; height: 38px; animation-delay: 0s; }
+.tree-left-2 { left: 12%; width: 24px; height: 32px; animation-delay: 0.8s; opacity: 0.85; }
+.tree-left-3 { left: 22%; width: 30px; height: 42px; animation-delay: 1.5s; }
 
-.tree-right-1 { right: 55px; width: 46px; height: 64px; animation-delay: 0.4s; }
-.tree-right-2 { right: 98px; width: 38px; height: 52px; animation-delay: 1.2s; opacity: 0.92; }
-.tree-right-3 { right: 140px; width: 50px; height: 70px; animation-delay: 1.9s; }
+.tree-right-1 { right: 14%; width: 28px; height: 38px; animation-delay: 0.4s; }
+.tree-right-2 { right: 24%; width: 24px; height: 32px; animation-delay: 1.2s; opacity: 0.85; }
+.tree-right-3 { right: 34%; width: 30px; height: 42px; animation-delay: 1.9s; }
 
 @keyframes stadiumTreeSway {
     0% { transform: rotate(-2.5deg) scaleX(1); }
