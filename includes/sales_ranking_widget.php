@@ -323,7 +323,7 @@ $total_sales_count = count($ranking_data);
     }
 }
 
-/* === STADIUM 3D TREES LAYER (TOP SKY HORIZON CORNERS) === */
+/* === STADIUM 3D TREES LAYER (NEAT SKYLINE HORIZON FOREST) === */
 .stadium-trees-overlay {
     position: absolute;
     top: 0;
@@ -335,22 +335,44 @@ $total_sales_count = count($ranking_data);
     overflow: hidden;
 }
 
-.tree-3d-item {
+.tree-3d-pine {
     position: absolute;
     background-image: url('assets/tree_3d_pine.png?v=<?= time() ?>');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center bottom;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
     transform-origin: bottom center;
-    animation: tree3dSway 4s ease-in-out infinite alternate;
+    animation: tree3dSway 4.2s ease-in-out infinite alternate;
 }
 
-.tree-3d-tl1 { top: 12px; left: 16px; width: 38px; height: 46px; opacity: 0.85; animation-delay: 0s; }
-.tree-3d-tl2 { top: 20px; left: 48px; width: 28px; height: 34px; opacity: 0.65; animation-delay: 0.7s; }
+.tree-3d-oak {
+    position: absolute;
+    background-image: url('assets/tree_3d_oak.png?v=<?= time() ?>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+    transform-origin: bottom center;
+    animation: tree3dSway 4.8s ease-in-out infinite alternate;
+}
 
-.tree-3d-tr1 { top: 12px; right: 75px; width: 38px; height: 46px; opacity: 0.85; animation-delay: 0.3s; }
-.tree-3d-tr2 { top: 20px; right: 106px; width: 28px; height: 34px; opacity: 0.65; animation-delay: 1.1s; }
+/* Staggered 3D Skyline Positions Across Top Horizon */
+.tree-p1 { left: 1.2%; top: 6px; width: 34px; height: 42px; opacity: 0.85; animation-delay: 0s; }
+.tree-o2 { left: 4.8%; top: 14px; width: 30px; height: 36px; opacity: 0.72; animation-delay: 0.6s; }
+.tree-p3 { left: 8.5%; top: 4px; width: 38px; height: 46px; opacity: 0.90; animation-delay: 1.2s; }
+.tree-o4 { left: 12.5%; top: 16px; width: 28px; height: 34px; opacity: 0.68; animation-delay: 1.8s; }
+
+.tree-p5 { left: 17.5%; top: 8px; width: 32px; height: 40px; opacity: 0.80; animation-delay: 0.4s; }
+.tree-o6 { left: 21.5%; top: 14px; width: 28px; height: 34px; opacity: 0.70; animation-delay: 1.0s; }
+
+.tree-o7 { right: 21.5%; top: 14px; width: 28px; height: 34px; opacity: 0.70; animation-delay: 0.9s; }
+.tree-p8 { right: 17.5%; top: 8px; width: 32px; height: 40px; opacity: 0.80; animation-delay: 1.5s; }
+
+.tree-o9 { right: 12.5%; top: 16px; width: 28px; height: 34px; opacity: 0.68; animation-delay: 0.3s; }
+.tree-p10 { right: 8.5%; top: 4px; width: 38px; height: 46px; opacity: 0.90; animation-delay: 0.9s; }
+.tree-o11 { right: 4.8%; top: 14px; width: 30px; height: 36px; opacity: 0.72; animation-delay: 1.6s; }
+.tree-p12 { right: 1.2%; top: 6px; width: 34px; height: 42px; opacity: 0.85; animation-delay: 2.1s; }
 
 @keyframes tree3dSway {
     0% { transform: rotate(-2deg) scaleX(1); }
@@ -1140,13 +1162,23 @@ $total_sales_count = count($ranking_data);
                         </div>
                     </div>
 
-                    <!-- STADIUM SIDE TREES & PARK FOLIAGE (Lapangan Kasih Pohon Pohon) -->
-                    <!-- STADIUM 3D TREES LAYER (Top Sky Horizon Corners) -->
+                    <!-- STADIUM 3D TREES LAYER (Neat Skyline Horizon Forest) -->
                     <div class="stadium-trees-overlay">
-                        <div class="tree-3d-item tree-3d-tl1"></div>
-                        <div class="tree-3d-item tree-3d-tl2"></div>
-                        <div class="tree-3d-item tree-3d-tr1"></div>
-                        <div class="tree-3d-item tree-3d-tr2"></div>
+                        <!-- Skyline Left Cluster -->
+                        <div class="tree-3d-pine tree-p1"></div>
+                        <div class="tree-3d-oak tree-o2"></div>
+                        <div class="tree-3d-pine tree-p3"></div>
+                        <div class="tree-3d-oak tree-o4"></div>
+                        <div class="tree-3d-pine tree-p5"></div>
+                        <div class="tree-3d-oak tree-o6"></div>
+
+                        <!-- Skyline Right Cluster -->
+                        <div class="tree-3d-oak tree-o7"></div>
+                        <div class="tree-3d-pine tree-p8"></div>
+                        <div class="tree-3d-oak tree-o9"></div>
+                        <div class="tree-3d-pine tree-p10"></div>
+                        <div class="tree-3d-oak tree-o11"></div>
+                        <div class="tree-3d-pine tree-p12"></div>
                     </div>
 
                     <div class="track-bg-overlay"></div>
