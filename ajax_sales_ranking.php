@@ -9,24 +9,24 @@ require_once 'includes/db.php';
 $selected_bulan = trim($_GET['periode_bulan'] ?? '8-10');
 
 if ($selected_bulan === '8') {
-    $start_periode_ranking = '2026-08-01 00:00:00';
-    $end_periode_ranking = '2026-08-31 23:59:59';
+    $where_fu = "MONTH(fu.tgl_follow_up) = 8";
+    $where_c = "MONTH(c.tgl_input) = 8";
     $label_periode_ranking = 'Agt 2026';
     $full_label_ranking = 'Bulan 8 (Agustus 2026)';
 } else if ($selected_bulan === '9') {
-    $start_periode_ranking = '2026-09-01 00:00:00';
-    $end_periode_ranking = '2026-09-30 23:59:59';
+    $where_fu = "MONTH(fu.tgl_follow_up) = 9";
+    $where_c = "MONTH(c.tgl_input) = 9";
     $label_periode_ranking = 'Sep 2026';
     $full_label_ranking = 'Bulan 9 (September 2026)';
 } else if ($selected_bulan === '10') {
-    $start_periode_ranking = '2026-10-01 00:00:00';
-    $end_periode_ranking = '2026-10-31 23:59:59';
+    $where_fu = "MONTH(fu.tgl_follow_up) = 10";
+    $where_c = "MONTH(c.tgl_input) = 10";
     $label_periode_ranking = 'Okt 2026';
     $full_label_ranking = 'Bulan 10 (Oktober 2026)';
 } else {
     $selected_bulan = '8-10';
-    $start_periode_ranking = '2026-08-01 00:00:00';
-    $end_periode_ranking = '2026-10-31 23:59:59';
+    $where_fu = "MONTH(fu.tgl_follow_up) IN (8, 9, 10)";
+    $where_c = "MONTH(c.tgl_input) IN (8, 9, 10)";
     $label_periode_ranking = '3 Bulan (Agt-Okt)';
     $full_label_ranking = 'Periode 3 Bulan (Agt - Okt 2026)';
 }
@@ -38,14 +38,14 @@ $sql_ranking_all = "
     SELECT 
         s.id AS sales_id,
         s.nama_lengkap AS nama_sales,
-        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' THEN fu.id END) AS total_fu,
-        COUNT(DISTINCT CASE WHEN c.tgl_input >= '{$start_periode_ranking}' AND c.tgl_input <= '{$end_periode_ranking}' THEN c.id END) AS total_cust_baru,
-        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' THEN fu.customer_id END) AS total_customer_fu,
-        COUNT(DISTINCT CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.id END) AS total_inv_count,
-        COALESCE(SUM(CASE WHEN fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}' AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_invoice
+        COUNT(DISTINCT CASE WHEN {$where_fu} THEN fu.id END) AS total_fu,
+        COUNT(DISTINCT CASE WHEN {$where_c} THEN c.id END) AS total_cust_baru,
+        COUNT(DISTINCT CASE WHEN {$where_fu} THEN fu.customer_id END) AS total_customer_fu,
+        COUNT(DISTINCT CASE WHEN {$where_fu} AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.id END) AS total_inv_count,
+        COALESCE(SUM(CASE WHEN {$where_fu} AND fu.no_inv IS NOT NULL AND fu.no_inv != '' THEN fu.nominal_invoice ELSE 0 END), 0) AS total_omset_invoice
     FROM sales s
-    LEFT JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL AND fu.tgl_follow_up >= '{$start_periode_ranking}' AND fu.tgl_follow_up <= '{$end_periode_ranking}'
-    LEFT JOIN customers c ON c.sales_id = s.id AND c.deleted_at IS NULL AND c.tgl_input >= '{$start_periode_ranking}' AND c.tgl_input <= '{$end_periode_ranking}'
+    LEFT JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL AND {$where_fu}
+    LEFT JOIN customers c ON c.sales_id = s.id AND c.deleted_at IS NULL AND {$where_c}
     WHERE s.deleted_at IS NULL OR fu.id IS NOT NULL OR c.id IS NOT NULL
     GROUP BY s.id, s.nama_lengkap
     ORDER BY (total_fu + total_cust_baru) DESC, total_fu DESC, total_cust_baru DESC
