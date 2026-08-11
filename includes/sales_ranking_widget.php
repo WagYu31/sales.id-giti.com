@@ -564,7 +564,7 @@ $total_sales_count = count($ranking_data);
     filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));
 }
 
-/* === LOEWIX CCTV 3D ROBOT RUNNER BIOMECHANICAL ANIMATION === */
+/* === LOEWIX CCTV 3D ROBOT REALISTIC SPRINT ANIMATION === */
 .loewix-runner-3d, .nailong-sprite {
     width: 52px;
     height: 64px;
@@ -575,25 +575,25 @@ $total_sales_count = count($ranking_data);
     display: block;
     filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));
     transform-origin: center bottom;
-    animation: loewixSprintRealistic 0.42s infinite linear;
+    animation: loewixRealSprint 0.18s infinite linear;
 }
 
-/* 4-Stage Biomechanical Running Stride (Left Foot Landing -> Air Thrust -> Right Foot Landing -> Air Thrust) */
-@keyframes loewixSprintRealistic {
+/* Real Olympic Forward Sprint (Forward Lean -14deg, Low Ground Stride 2.5px, High-Velocity Foot Patter) */
+@keyframes loewixRealSprint {
     0% {
-        transform: translateY(0px) rotate(-7deg) scale(1.12, 0.88) skewX(5deg);
+        transform: translateY(0px) translateX(0px) rotate(-14deg) scale(1.04, 0.96) skewX(6deg);
     }
     25% {
-        transform: translateY(-16px) rotate(6deg) scale(0.88, 1.12) skewX(-4deg);
+        transform: translateY(-2.5px) translateX(3px) rotate(-11deg) scale(0.98, 1.02) skewX(4deg);
     }
     50% {
-        transform: translateY(-1px) rotate(-5deg) scale(1.12, 0.88) skewX(4deg);
+        transform: translateY(-0.5px) translateX(1px) rotate(-15deg) scale(1.05, 0.95) skewX(7deg);
     }
     75% {
-        transform: translateY(-18px) rotate(9deg) scale(0.86, 1.14) skewX(-6deg);
+        transform: translateY(-3px) translateX(4px) rotate(-12deg) scale(0.97, 1.03) skewX(5deg);
     }
     100% {
-        transform: translateY(0px) rotate(-7deg) scale(1.12, 0.88) skewX(5deg);
+        transform: translateY(0px) translateX(0px) rotate(-14deg) scale(1.04, 0.96) skewX(6deg);
     }
 }
 
@@ -616,25 +616,23 @@ $total_sales_count = count($ranking_data);
     display: inline-block;
 }
 
-/* === GROUND SHADOW that synchronizes with 2-foot stride landing === */
+/* === GROUND SHADOW that stays steady under ground sprinter === */
 .nailong-ground-shadow {
     position: absolute;
     bottom: -4px;
     left: 50%;
     transform: translateX(-50%);
-    width: 38px;
-    height: 8px;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, transparent 70%);
+    width: 40px;
+    height: 7px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, transparent 70%);
     border-radius: 50%;
-    animation: loewixShadowPulse 0.42s infinite linear;
+    animation: loewixShadowSprint 0.18s infinite linear;
 }
 
-@keyframes loewixShadowPulse {
-    0%   { transform: translateX(-50%) scaleX(1.3) scaleY(1.2); opacity: 0.75; }
-    25%  { transform: translateX(-50%) scaleX(0.5) scaleY(0.4); opacity: 0.2; }
-    50%  { transform: translateX(-50%) scaleX(1.3) scaleY(1.2); opacity: 0.75; }
-    75%  { transform: translateX(-50%) scaleX(0.4) scaleY(0.3); opacity: 0.15; }
-    100% { transform: translateX(-50%) scaleX(1.3) scaleY(1.2); opacity: 0.75; }
+@keyframes loewixShadowSprint {
+    0%   { transform: translateX(-50%) scaleX(1.15) scaleY(1.0); opacity: 0.7; }
+    50%  { transform: translateX(-50%) scaleX(0.9) scaleY(0.95); opacity: 0.55; }
+    100% { transform: translateX(-50%) scaleX(1.15) scaleY(1.0); opacity: 0.7; }
 }
 
 /* === DUST CLOUD particles behind runner === */
