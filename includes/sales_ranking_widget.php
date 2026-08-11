@@ -323,38 +323,38 @@ $total_sales_count = count($ranking_data);
     }
 }
 
-/* === STADIUM TREES & FOLIAGE LAYER (TOP HORIZON BACKDROP) === */
+/* === STADIUM 3D TREES LAYER (TOP SKY HORIZON CORNERS) === */
 .stadium-trees-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 48px;
+    bottom: 0;
     pointer-events: none;
     z-index: 1;
     overflow: hidden;
-    opacity: 0.65;
 }
 
-.stadium-tree {
+.tree-3d-item {
     position: absolute;
-    top: -8px;
-    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+    background-image: url('assets/tree_3d_pine.png?v=<?= time() ?>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
     transform-origin: bottom center;
-    animation: stadiumTreeSway 4s ease-in-out infinite alternate;
+    animation: tree3dSway 4s ease-in-out infinite alternate;
 }
 
-.tree-left-1 { left: 4%; width: 28px; height: 38px; animation-delay: 0s; }
-.tree-left-2 { left: 12%; width: 24px; height: 32px; animation-delay: 0.8s; opacity: 0.85; }
-.tree-left-3 { left: 22%; width: 30px; height: 42px; animation-delay: 1.5s; }
+.tree-3d-tl1 { top: 12px; left: 16px; width: 38px; height: 46px; opacity: 0.85; animation-delay: 0s; }
+.tree-3d-tl2 { top: 20px; left: 48px; width: 28px; height: 34px; opacity: 0.65; animation-delay: 0.7s; }
 
-.tree-right-1 { right: 14%; width: 28px; height: 38px; animation-delay: 0.4s; }
-.tree-right-2 { right: 24%; width: 24px; height: 32px; animation-delay: 1.2s; opacity: 0.85; }
-.tree-right-3 { right: 34%; width: 30px; height: 42px; animation-delay: 1.9s; }
+.tree-3d-tr1 { top: 12px; right: 75px; width: 38px; height: 46px; opacity: 0.85; animation-delay: 0.3s; }
+.tree-3d-tr2 { top: 20px; right: 106px; width: 28px; height: 34px; opacity: 0.65; animation-delay: 1.1s; }
 
-@keyframes stadiumTreeSway {
-    0% { transform: rotate(-2.5deg) scaleX(1); }
-    100% { transform: rotate(3deg) scaleX(1.04); }
+@keyframes tree3dSway {
+    0% { transform: rotate(-2deg) scaleX(1); }
+    100% { transform: rotate(2.5deg) scaleX(1.03); }
 }
 
 /* 3D Floating Clouds */
@@ -1141,66 +1141,12 @@ $total_sales_count = count($ranking_data);
                     </div>
 
                     <!-- STADIUM SIDE TREES & PARK FOLIAGE (Lapangan Kasih Pohon Pohon) -->
+                    <!-- STADIUM 3D TREES LAYER (Top Sky Horizon Corners) -->
                     <div class="stadium-trees-overlay">
-                        <!-- Tree Left 1: Tall Emerald Pine -->
-                        <div class="stadium-tree tree-left-1">
-                            <svg viewBox="0 0 100 140" width="100%" height="100%">
-                                <rect x="43" y="90" width="14" height="45" rx="3" fill="#451A03" />
-                                <path d="M 50 8 L 92 60 L 74 60 L 96 96 L 4 96 L 26 60 L 8 60 Z" fill="#047857" />
-                                <path d="M 50 8 L 82 50 L 67 50 L 86 86 L 14 86 L 33 50 L 18 50 Z" fill="#10B981" opacity="0.88" />
-                                <path d="M 50 8 L 72 40 L 59 40 L 76 74 L 24 74 L 41 40 L 28 40 Z" fill="#34D399" opacity="0.75" />
-                            </svg>
-                        </div>
-                        <!-- Tree Left 2: Round Oak Tree -->
-                        <div class="stadium-tree tree-left-2">
-                            <svg viewBox="0 0 100 130" width="100%" height="100%">
-                                <rect x="43" y="75" width="14" height="50" rx="4" fill="#3B1705" />
-                                <circle cx="50" cy="50" r="42" fill="#065F46" />
-                                <circle cx="30" cy="45" r="28" fill="#047857" />
-                                <circle cx="70" cy="45" r="28" fill="#059669" />
-                                <circle cx="50" cy="30" r="26" fill="#10B981" />
-                                <circle cx="42" cy="24" r="16" fill="#34D399" opacity="0.65" />
-                            </svg>
-                        </div>
-                        <!-- Tree Left 3: Mid Pine Tree -->
-                        <div class="stadium-tree tree-left-3">
-                            <svg viewBox="0 0 100 140" width="100%" height="100%">
-                                <rect x="44" y="90" width="12" height="45" rx="3" fill="#451A03" />
-                                <path d="M 50 12 L 88 62 L 72 62 L 92 98 L 8 98 L 28 62 L 12 62 Z" fill="#064E3B" />
-                                <path d="M 50 12 L 78 52 L 64 52 L 82 88 L 18 88 L 36 52 L 22 52 Z" fill="#059669" opacity="0.9" />
-                                <path d="M 50 12 L 68 42 L 56 42 L 72 76 L 28 76 L 44 42 L 32 42 Z" fill="#10B981" opacity="0.75" />
-                            </svg>
-                        </div>
-
-                        <!-- Tree Right 1: Tall Pine near Finish Line -->
-                        <div class="stadium-tree tree-right-1">
-                            <svg viewBox="0 0 100 140" width="100%" height="100%">
-                                <rect x="43" y="90" width="14" height="45" rx="3" fill="#451A03" />
-                                <path d="M 50 8 L 92 60 L 74 60 L 96 96 L 4 96 L 26 60 L 8 60 Z" fill="#047857" />
-                                <path d="M 50 8 L 82 50 L 67 50 L 86 86 L 14 86 L 33 50 L 18 50 Z" fill="#10B981" opacity="0.88" />
-                                <path d="M 50 8 L 72 40 L 59 40 L 76 74 L 24 74 L 41 40 L 28 40 Z" fill="#34D399" opacity="0.75" />
-                            </svg>
-                        </div>
-                        <!-- Tree Right 2: Round Oak Tree -->
-                        <div class="stadium-tree tree-right-2">
-                            <svg viewBox="0 0 100 130" width="100%" height="100%">
-                                <rect x="43" y="75" width="14" height="50" rx="4" fill="#3B1705" />
-                                <circle cx="50" cy="50" r="42" fill="#065F46" />
-                                <circle cx="30" cy="45" r="28" fill="#047857" />
-                                <circle cx="70" cy="45" r="28" fill="#059669" />
-                                <circle cx="50" cy="30" r="26" fill="#10B981" />
-                                <circle cx="42" cy="24" r="16" fill="#34D399" opacity="0.65" />
-                            </svg>
-                        </div>
-                        <!-- Tree Right 3: Compact Pine -->
-                        <div class="stadium-tree tree-right-3">
-                            <svg viewBox="0 0 100 140" width="100%" height="100%">
-                                <rect x="44" y="90" width="12" height="45" rx="3" fill="#451A03" />
-                                <path d="M 50 12 L 88 62 L 72 62 L 92 98 L 8 98 L 28 62 L 12 62 Z" fill="#064E3B" />
-                                <path d="M 50 12 L 78 52 L 64 52 L 82 88 L 18 88 L 36 52 L 22 52 Z" fill="#059669" opacity="0.9" />
-                                <path d="M 50 12 L 68 42 L 56 42 L 72 76 L 28 76 L 44 42 L 32 42 Z" fill="#10B981" opacity="0.75" />
-                            </svg>
-                        </div>
+                        <div class="tree-3d-item tree-3d-tl1"></div>
+                        <div class="tree-3d-item tree-3d-tl2"></div>
+                        <div class="tree-3d-item tree-3d-tr1"></div>
+                        <div class="tree-3d-item tree-3d-tr2"></div>
                     </div>
 
                     <div class="track-bg-overlay"></div>
