@@ -445,10 +445,11 @@ $total_sales_count = count($ranking_data);
 /* Static single image fallback for victory */
 .nailong-3d-gambar2 {
     width: 52px;
-    height: auto;
-    max-height: 58px;
+    height: 52px;
     object-fit: contain;
     display: block;
+    mix-blend-mode: multiply;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
 }
 
 /* === RUNNING WRAPPER === */
@@ -1519,10 +1520,14 @@ function positionMascotRunners(chart) {
     const meta = chart.getDatasetMeta(0);
     const xAxis = chart.scales.x;
 
-    // Check if we need to initialize or rebuild the runner DOM elements
-    const needRebuild = holder.children.length !== meta.data.length;
+    // Force rebuild whenever dataset changes or metric/periode changes
+    const currentDatasetKey = `${currentMetric}_${currentMonthPeriode}_${currentTopLimit}_${meta.data.length}`;
+    const prevDatasetKey = holder.getAttribute('data-key');
+    const needRebuild = (prevDatasetKey !== currentDatasetKey) || (holder.children.length !== meta.data.length);
+
     if (needRebuild) {
         holder.innerHTML = '';
+        holder.setAttribute('data-key', currentDatasetKey);
     }
 
     meta.data.forEach((bar, index) => {
