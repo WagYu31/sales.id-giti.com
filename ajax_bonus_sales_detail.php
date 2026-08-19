@@ -328,9 +328,9 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
                 <thead style="background: #F8FAFC; color: #475569; font-size: 11.5px; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid #E2E8F0;">
                     <tr>
                         <th class="py-3 ps-3 text-uppercase font-monospace" style="width: 50px;">NO</th>
-                        <th class="py-3 text-uppercase font-monospace" style="width: 160px;">KATEGORI</th>
-                        <th class="py-3 text-uppercase font-monospace" style="width: 280px;">CUSTOMER & TELEPON</th>
-                        <th class="py-3 text-uppercase font-monospace" style="width: 180px;">NO. INVOICE</th>
+                        <th class="py-3 text-uppercase font-monospace" style="width: 190px;">KATEGORI & TGL INPUT</th>
+                        <th class="py-3 text-uppercase font-monospace" style="width: 270px;">CUSTOMER & TELEPON</th>
+                        <th class="py-3 text-uppercase font-monospace" style="width: 170px;">NO. INVOICE</th>
                         <th class="py-3 text-uppercase font-monospace" style="width: 160px;">TGL TRANSAKSI</th>
                         <th class="py-3 text-uppercase font-monospace text-end pe-3" style="width: 170px;">NOMINAL OMSET</th>
                     </tr>
@@ -341,14 +341,22 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
                             <td class="ps-3 fw-bold text-muted" style="white-space: nowrap;"><?= $idx + 1 ?></td>
                             <td style="white-space: nowrap;">
                                 <?php if ($row['kat_type'] === 'A'): ?>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold border border-primary border-opacity-20 px-3 py-1.5 rounded-pill" style="font-size: 11px;">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold border border-primary border-opacity-20 px-2.5 py-1 rounded-pill" style="font-size: 11px;">
                                         🚀 Akuisisi Baru
                                     </span>
                                 <?php else: ?>
-                                    <span class="badge bg-warning bg-opacity-20 text-dark fw-bold border border-warning border-opacity-30 px-3 py-1.5 rounded-pill" style="font-size: 11px; background-color: #FEF3C7; color: #92400E;">
+                                    <span class="badge bg-warning bg-opacity-20 text-dark fw-bold border border-warning border-opacity-30 px-2.5 py-1 rounded-pill" style="font-size: 11px; background-color: #FEF3C7; color: #92400E;">
                                         🔥 Reaktivasi Lama
                                     </span>
                                 <?php endif; ?>
+
+                                <div class="mt-1 text-muted" style="font-size: 11px;">
+                                    <?php if (!empty($row['tgl_input_cust'])): ?>
+                                        <i class="bi bi-calendar-plus text-primary me-1" style="font-size: 10.5px;"></i>Ditambahkan: <strong class="text-dark"><?= date('d M Y', strtotime($row['tgl_input_cust'])) ?></strong>
+                                    <?php else: ?>
+                                        <i class="bi bi-calendar-check text-secondary me-1" style="font-size: 10.5px;"></i>Ditambahkan: <strong class="text-secondary">&le; Mei 2026</strong>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                             <td style="white-space: nowrap;">
                                 <div class="fw-bold text-dark" style="font-size: 13.5px;"><?= htmlspecialchars($row['nama_customer']) ?></div>
