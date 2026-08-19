@@ -68,7 +68,9 @@ if (!$sales) {
 
 $target_omset = 200000000;
 
-// Fetch Invoice Follow-Up records matching invoice_followup_report.php with date filter
+// Fetch Invoice Follow-Up records matching qualified customers:
+// 1. Cust Baru: Input in program period (tgl_input >= 2026-08-01)
+// 2. Cust Lama Reaktivasi: Input <= 2026-05-31 & NO invoice in June/July 2026
 $sql_all = "
     SELECT 
         fu.id AS followup_id,
@@ -82,7 +84,7 @@ $sql_all = "
         c.tgl_input AS tgl_input_cust,
         (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
         CASE 
-            WHEN ({$where_date_cust}) THEN 'A'
+            WHEN (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01') THEN 'A'
             ELSE 'B'
         END AS kat_type
     FROM follow_ups fu
@@ -91,6 +93,21 @@ $sql_all = "
       AND (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
       AND fu.no_inv IS NOT NULL 
       AND fu.no_inv != ''
+      AND (
+          -- Kategori A: Customer Baru
+          (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01')
+          OR 
+          -- Kategori B: Customer Lama Reaktivasi (Terakhir belanja <= bln 5, tidak belanja bln 6-7)
+          ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
+           AND NOT EXISTS (
+               SELECT 1 FROM follow_ups fu_mid 
+               WHERE fu_mid.customer_id = c.id 
+                 AND fu_mid.deleted_at IS NULL 
+                 AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
+                 AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
+                 AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
+           ))
+      )
       {$where_date_fu}
     ORDER BY fu.tgl_follow_up DESC
 ";
