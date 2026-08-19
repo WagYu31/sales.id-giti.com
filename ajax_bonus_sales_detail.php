@@ -82,6 +82,13 @@ $sql_all = "
         c.id AS customer_id,
         c.nama_toko AS nama_customer,
         c.tgl_input AS tgl_input_cust,
+        (SELECT MAX(fu_prev.tgl_follow_up)
+         FROM follow_ups fu_prev
+         WHERE fu_prev.customer_id = c.id
+           AND fu_prev.deleted_at IS NULL
+           AND fu_prev.no_inv IS NOT NULL AND fu_prev.no_inv != ''
+           AND fu_prev.tgl_follow_up < '2026-08-01 00:00:00'
+        ) AS tgl_terakhir_beli_lama,
         (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
         CASE 
             WHEN (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01') THEN 'A'
@@ -153,6 +160,13 @@ if (empty($items)) {
             c.id AS customer_id,
             c.nama_toko AS nama_customer,
             c.tgl_input AS tgl_input_cust,
+            (SELECT MAX(fu_prev.tgl_follow_up)
+             FROM follow_ups fu_prev
+             WHERE fu_prev.customer_id = c.id
+               AND fu_prev.deleted_at IS NULL
+               AND fu_prev.no_inv IS NOT NULL AND fu_prev.no_inv != ''
+               AND fu_prev.tgl_follow_up < '2026-08-01 00:00:00'
+            ) AS tgl_terakhir_beli_lama,
             (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
             'B' AS kat_type
         FROM follow_ups fu
@@ -328,8 +342,8 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
                 <thead style="background: #F8FAFC; color: #475569; font-size: 11.5px; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid #E2E8F0;">
                     <tr>
                         <th class="py-3 ps-3 text-uppercase font-monospace" style="width: 50px;">NO</th>
-                        <th class="py-3 text-uppercase font-monospace" style="width: 190px;">KATEGORI & TGL INPUT</th>
-                        <th class="py-3 text-uppercase font-monospace" style="width: 270px;">CUSTOMER & TELEPON</th>
+                        <th class="py-3 text-uppercase font-monospace" style="width: 220px;">KATEGORI & RIWAYAT BELANJA</th>
+                        <th class="py-3 text-uppercase font-monospace" style="width: 260px;">CUSTOMER & TELEPON</th>
                         <th class="py-3 text-uppercase font-monospace" style="width: 170px;">NO. INVOICE</th>
                         <th class="py-3 text-uppercase font-monospace" style="width: 160px;">TGL TRANSAKSI</th>
                         <th class="py-3 text-uppercase font-monospace text-end pe-3" style="width: 170px;">NOMINAL OMSET</th>
@@ -344,19 +358,27 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
                                     <span class="badge bg-primary bg-opacity-10 text-primary fw-bold border border-primary border-opacity-20 px-2.5 py-1 rounded-pill" style="font-size: 11px;">
                                         🚀 Akuisisi Baru
                                     </span>
+                                    <div class="mt-1 text-muted" style="font-size: 11px; line-height: 1.45;">
+                                        <div><i class="bi bi-calendar-plus text-primary me-1" style="font-size: 10px;"></i>Di-input: <strong class="text-dark"><?= !empty($row['tgl_input_cust']) ? date('d M Y', strtotime($row['tgl_input_cust'])) : '-' ?></strong></div>
+                                        <div class="text-success fw-semibold"><i class="bi bi-stars text-warning me-1" style="font-size: 10px;"></i>Transaksi Perdana</div>
+                                    </div>
                                 <?php else: ?>
                                     <span class="badge bg-warning bg-opacity-20 text-dark fw-bold border border-warning border-opacity-30 px-2.5 py-1 rounded-pill" style="font-size: 11px; background-color: #FEF3C7; color: #92400E;">
                                         🔥 Reaktivasi Lama
                                     </span>
+                                    <div class="mt-1 text-muted" style="font-size: 11px; line-height: 1.45;">
+                                        <div><i class="bi bi-calendar-check text-secondary me-1" style="font-size: 10px;"></i>Di-input: <strong class="text-secondary"><?= !empty($row['tgl_input_cust']) ? date('d M Y', strtotime($row['tgl_input_cust'])) : '&le; Mei 2026' ?></strong></div>
+                                        <div>
+                                            <i class="bi bi-cart-x text-danger me-1" style="font-size: 10px;"></i>Terakhir Beli: 
+                                            <strong class="text-dark">
+                                                <?= !empty($row['tgl_terakhir_beli_lama']) ? date('d M Y', strtotime($row['tgl_terakhir_beli_lama'])) : 'Belum Ada Belanja s/d Mei' ?>
+                                            </strong>
+                                        </div>
+                                        <div style="font-size: 10px; color: #059669;" class="fw-semibold">
+                                            <i class="bi bi-check-circle-fill text-success me-1" style="font-size: 9.5px;"></i>Dorman di Bln 6 & 7 (0 Inv)
+                                        </div>
+                                    </div>
                                 <?php endif; ?>
-
-                                <div class="mt-1 text-muted" style="font-size: 11px;">
-                                    <?php if (!empty($row['tgl_input_cust'])): ?>
-                                        <i class="bi bi-calendar-plus text-primary me-1" style="font-size: 10.5px;"></i>Ditambahkan: <strong class="text-dark"><?= date('d M Y', strtotime($row['tgl_input_cust'])) ?></strong>
-                                    <?php else: ?>
-                                        <i class="bi bi-calendar-check text-secondary me-1" style="font-size: 10.5px;"></i>Ditambahkan: <strong class="text-secondary">&le; Mei 2026</strong>
-                                    <?php endif; ?>
-                                </div>
                             </td>
                             <td style="white-space: nowrap;">
                                 <div class="fw-bold text-dark" style="font-size: 13.5px;"><?= htmlspecialchars($row['nama_customer']) ?></div>
