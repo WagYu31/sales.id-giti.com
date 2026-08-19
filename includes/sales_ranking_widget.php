@@ -961,11 +961,17 @@ $total_sales_count = count($ranking_data);
     background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
     transform-style: preserve-3d;
     perspective: 800px;
+    cursor: pointer;
+    user-select: none;
 }
 
 .podium-card:hover {
-    transform: translateY(-6px) rotateX(3deg) rotateY(-2deg) scale(1.015);
-    box-shadow: 0 22px 42px -8px rgba(15, 23, 42, 0.14), 0 8px 18px rgba(15, 23, 42, 0.06);
+    transform: translateY(-6px) rotateX(3deg) rotateY(-2deg) scale(1.02);
+    box-shadow: 0 22px 42px -8px rgba(15, 23, 42, 0.18), 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.podium-card:active {
+    transform: scale(0.97);
 }
 
 .podium-card.gold {
@@ -1163,12 +1169,15 @@ $total_sales_count = count($ranking_data);
             <!-- Top 1 Gold -->
             <?php if ($top1): ?>
             <?php $top1_omset = (float)$top1['total_omset_invoice']; ?>
-            <div class="podium-card gold" id="podiumCard1">
+            <div class="podium-card gold" id="podiumCard1" onclick="openSalesDetailModal(<?= $top1['sales_id'] ?>)" title="Klik untuk melihat Detail Rincian <?= htmlspecialchars($top1['nama_sales']); ?>">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="podium-rank-badge gold">🥇</div>
                         <div>
-                            <span class="badge bg-warning text-dark fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10.5px; letter-spacing: 0.5px;">JUARA 1</span>
+                            <div class="d-flex align-items-center gap-1.5">
+                                <span class="badge bg-warning text-dark fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10.5px; letter-spacing: 0.5px;">JUARA 1</span>
+                                <span class="badge bg-white bg-opacity-90 text-dark border px-2 py-0.5 rounded-pill shadow-xs" style="font-size: 9.5px; font-weight: 700;"><i class="bi bi-box-arrow-up-right text-primary me-1"></i>Rincian</span>
+                            </div>
                             <h6 class="mb-0 fw-bold text-dark mt-0.5" id="podium1Name" style="font-size: 16.5px; font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($top1['nama_sales']); ?></h6>
                         </div>
                     </div>
@@ -1182,8 +1191,8 @@ $total_sales_count = count($ranking_data);
                     <div class="progress-bar bg-warning bg-gradient" id="podium1Progress" role="progressbar" style="width: <?php echo max(5, $pct_top1); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2.5 text-muted" style="font-size: 12px;">
-                    <span id="podium1Activity">⚡ <?php echo $top1['total_fu']; ?> Activity</span>
-                    <span id="podium1Cust">👥 <?php echo $top1['total_customer_fu']; ?> Customer di-FU</span>
+                    <span id="podium1Activity">⚡ <?php echo $top1['total_fu']; ?> Activity FU</span>
+                    <span id="podium1Cust">🚀 <?php echo $top1['total_cust_baru']; ?> Cust Baru</span>
                 </div>
             </div>
             <?php endif; ?>
@@ -1191,12 +1200,15 @@ $total_sales_count = count($ranking_data);
             <!-- Top 2 Silver -->
             <?php if ($top2): ?>
             <?php $top2_omset = (float)$top2['total_omset_invoice']; ?>
-            <div class="podium-card silver" id="podiumCard2">
+            <div class="podium-card silver" id="podiumCard2" onclick="openSalesDetailModal(<?= $top2['sales_id'] ?>)" title="Klik untuk melihat Detail Rincian <?= htmlspecialchars($top2['nama_sales']); ?>">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="podium-rank-badge silver">🥈</div>
                         <div>
-                            <span class="badge bg-secondary text-white fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10.5px; letter-spacing: 0.5px;">JUARA 2</span>
+                            <div class="d-flex align-items-center gap-1.5">
+                                <span class="badge bg-secondary text-white fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10.5px; letter-spacing: 0.5px;">JUARA 2</span>
+                                <span class="badge bg-white bg-opacity-90 text-dark border px-2 py-0.5 rounded-pill shadow-xs" style="font-size: 9.5px; font-weight: 700;"><i class="bi bi-box-arrow-up-right text-primary me-1"></i>Rincian</span>
+                            </div>
                             <h6 class="mb-0 fw-bold text-dark mt-0.5" id="podium2Name" style="font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($top2['nama_sales']); ?></h6>
                         </div>
                     </div>
@@ -1210,8 +1222,8 @@ $total_sales_count = count($ranking_data);
                     <div class="progress-bar bg-secondary bg-gradient" id="podium2Progress" role="progressbar" style="width: <?php echo max(5, $pct2); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2.5 text-muted" style="font-size: 12px;">
-                    <span id="podium2Activity">⚡ <?php echo $top2['total_fu']; ?> Activity</span>
-                    <span id="podium2Cust">👥 <?php echo $top2['total_customer_fu']; ?> Customer di-FU</span>
+                    <span id="podium2Activity">⚡ <?php echo $top2['total_fu']; ?> Activity FU</span>
+                    <span id="podium2Cust">🚀 <?php echo $top2['total_cust_baru']; ?> Cust Baru</span>
                 </div>
             </div>
             <?php endif; ?>
@@ -1219,12 +1231,15 @@ $total_sales_count = count($ranking_data);
             <!-- Top 3 Bronze -->
             <?php if ($top3): ?>
             <?php $top3_omset = (float)$top3['total_omset_invoice']; ?>
-            <div class="podium-card bronze" id="podiumCard3">
+            <div class="podium-card bronze" id="podiumCard3" onclick="openSalesDetailModal(<?= $top3['sales_id'] ?>)" title="Klik untuk melihat Detail Rincian <?= htmlspecialchars($top3['nama_sales']); ?>">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="podium-rank-badge bronze">🥉</div>
                         <div>
-                            <span class="badge bg-danger bg-opacity-75 text-white fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10.5px; letter-spacing: 0.5px;">JUARA 3</span>
+                            <div class="d-flex align-items-center gap-1.5">
+                                <span class="badge bg-danger bg-opacity-75 text-white fw-bold rounded-pill px-2.5 py-0.5" style="font-size: 10.5px; letter-spacing: 0.5px;">JUARA 3</span>
+                                <span class="badge bg-white bg-opacity-90 text-dark border px-2 py-0.5 rounded-pill shadow-xs" style="font-size: 9.5px; font-weight: 700;"><i class="bi bi-box-arrow-up-right text-primary me-1"></i>Rincian</span>
+                            </div>
                             <h6 class="mb-0 fw-bold text-dark mt-0.5" id="podium3Name" style="font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo htmlspecialchars($top3['nama_sales']); ?></h6>
                         </div>
                     </div>
@@ -1238,8 +1253,8 @@ $total_sales_count = count($ranking_data);
                     <div class="progress-bar bg-warning bg-gradient" id="podium3Progress" role="progressbar" style="width: <?php echo max(5, $pct3); ?>%; border-radius: 10px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2.5 text-muted" style="font-size: 12px;">
-                    <span id="podium3Activity">⚡ <?php echo $top3['total_fu']; ?> Activity</span>
-                    <span id="podium3Cust">👥 <?php echo $top3['total_customer_fu']; ?> Customer di-FU</span>
+                    <span id="podium3Activity">⚡ <?php echo $top3['total_fu']; ?> Activity FU</span>
+                    <span id="podium3Cust">🚀 <?php echo $top3['total_cust_baru']; ?> Cust Baru</span>
                 </div>
             </div>
             <?php endif; ?>
@@ -1602,13 +1617,25 @@ function updatePodiumCardsDOM(top1, top2, top3, labelPeriode) {
     top2Data = top2;
     top3Data = top3;
 
-    function renderSinglePodium(prefix, data) {
+    function renderSinglePodium(cardId, prefix, data) {
+        const cardEl = document.getElementById(cardId);
         const nameEl = document.getElementById(prefix + 'Name');
         const valEl = document.getElementById(prefix + 'Val');
         const progressEl = document.getElementById(prefix + 'Progress');
         const actEl = document.getElementById(prefix + 'Activity');
         const custEl = document.getElementById(prefix + 'Cust');
         const lblEl = document.getElementById(prefix + 'Lbl');
+
+        if (cardEl) {
+            if (data && data.sales_id) {
+                cardEl.style.cursor = 'pointer';
+                cardEl.setAttribute('onclick', `openSalesDetailModal(${data.sales_id})`);
+                cardEl.setAttribute('title', `Klik untuk melihat Detail Rincian ${data.nama_sales}`);
+            } else {
+                cardEl.removeAttribute('onclick');
+                cardEl.style.cursor = 'default';
+            }
+        }
 
         let metricLabelText = `Total Activity FU (${labelPeriode})`;
         if (currentMetric === 'total') metricLabelText = `Total Activity FU (${labelPeriode})`;
@@ -1660,9 +1687,9 @@ function updatePodiumCardsDOM(top1, top2, top3, labelPeriode) {
         }
     }
 
-    renderSinglePodium('podium1', top1);
-    renderSinglePodium('podium2', top2);
-    renderSinglePodium('podium3', top3);
+    renderSinglePodium('podiumCard1', 'podium1', top1);
+    renderSinglePodium('podiumCard2', 'podium2', top2);
+    renderSinglePodium('podiumCard3', 'podium3', top3);
 }
 
 function updateModalLeaderboardDOM(rankingData) {
@@ -1681,30 +1708,32 @@ function updateModalLeaderboardDOM(rankingData) {
         const invCount = new Intl.NumberFormat('id-ID').format(s.total_inv_count);
         const totalFu = new Intl.NumberFormat('id-ID').format(s.total_fu);
         const custBaru = new Intl.NumberFormat('id-ID').format(s.total_cust_baru || 0);
+        const custFu = new Intl.NumberFormat('id-ID').format(s.total_customer_fu || 0);
 
         html += `
-        <tr>
+        <tr style="cursor: pointer;" onclick="openSalesDetailModal(${s.sales_id})" title="Klik untuk melihat Detail Rincian ${escapeHtml(s.nama_sales)}">
             <td class="px-4 py-3">
                 <span class="badge ${badgeCls} rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 12px;">
                     ${rNum}
                 </span>
             </td>
             <td class="px-3">
-                <div class="fw-bold text-dark" style="font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif;">
-                    ${escapeHtml(s.nama_sales)}
+                <div class="fw-bold text-dark d-flex align-items-center justify-content-between" style="font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    <span>${escapeHtml(s.nama_sales)}</span>
+                    <span class="badge bg-light text-primary border rounded-pill px-2 py-0.5" style="font-size: 10px; font-weight: 700;"><i class="bi bi-box-arrow-up-right me-1"></i>Rincian</span>
                 </div>
             </td>
-            <td class="text-end px-3 font-monospace fw-bold text-dark" style="font-size: 14px;">
-                ${totalFu} FU
-            </td>
             <td class="text-end px-3 font-monospace fw-bold text-success" style="font-size: 14px;">
-                ${custBaru} Baru
+                ${omsetFormatted}
             </td>
             <td class="text-end px-3 font-monospace fw-bold text-primary" style="font-size: 14px;">
                 ${invCount} Inv
             </td>
-            <td class="text-end px-3 font-monospace fw-bold text-muted" style="font-size: 14px;">
-                ${omsetFormatted}
+            <td class="text-end px-3 font-monospace fw-bold text-dark" style="font-size: 14px;">
+                ${totalFu}
+            </td>
+            <td class="text-end px-3 font-monospace fw-bold text-secondary" style="font-size: 14px;">
+                ${custFu}
             </td>
         </tr>`;
     });
@@ -1733,8 +1762,10 @@ function renderScaledChart() {
     const activeValues = Array.isArray(values) ? values : [];
     
     let limit = currentTopLimit === 'all' ? activeValues.length : parseInt(currentTopLimit);
-    let slicedLabels = (salesChartLabels || []).slice(0, limit);
-    let slicedValues = activeValues.slice(0, limit);
+    const sortedMeta = getSortedDatasetByMetric(currentMetric);
+    let slicedList = (sortedMeta.sortedList || []).slice(0, limit);
+    let slicedLabels = (sortedMeta.labels || []).slice(0, limit);
+    let slicedValues = (sortedMeta.values || []).slice(0, limit);
 
     // Calculate dynamic height for canvas so bars and top Nailong head/speech bubble never get squished or clipped
     const container = document.getElementById('chartCanvasContainer');
@@ -1889,6 +1920,17 @@ function renderScaledChart() {
                 onComplete: function() {
                     positionMascotRunners(this);
                 }
+            },
+            onClick: function(event, elements) {
+                if (elements && elements.length > 0) {
+                    const elIndex = elements[0].index;
+                    if (slicedList && slicedList[elIndex] && slicedList[elIndex].sales_id) {
+                        openSalesDetailModal(slicedList[elIndex].sales_id);
+                    }
+                }
+            },
+            onHover: function(event, chartElement) {
+                event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
             }
         }
     });
@@ -2556,6 +2598,77 @@ function setTopLimit(limit, btn) {
     document.querySelectorAll('.top-limit-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     renderScaledChart();
+}
+
+/* ==========================================================================
+   SALES PERFORMANCE DETAIL MODAL HANDLER (DETAIL RINCIAN SALES)
+   ========================================================================== */
+function openSalesDetailModal(salesId) {
+    if (!salesId) return;
+
+    let modalEl = document.getElementById('salesDetailProgramModal');
+    if (!modalEl) {
+        const modalHtml = `
+        <div class="modal fade" id="salesDetailProgramModal" tabindex="-1" aria-hidden="true" style="z-index: 1065;">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-2xl" id="salesDetailProgramModalBody" style="border-radius: 26px; overflow: hidden; background: #FFFFFF;">
+                </div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modalEl = document.getElementById('salesDetailProgramModal');
+    }
+
+    const modalBody = document.getElementById('salesDetailProgramModalBody');
+    const selectedBulan = currentMonthPeriode || '8-10';
+
+    modalBody.innerHTML = `
+        <div class="p-5 text-center bg-white" style="border-radius: 26px;">
+            <div class="spinner-border text-danger" role="status" style="width: 3.2rem; height: 3.2rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="mt-3 text-dark fw-bold fs-5" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                Memuat Rincian Detail Transaksi Sales...
+            </div>
+            <small class="text-muted">PROGRAM PER SEMESTER DALAM 3 BULAN 🏁 🤖 🇮🇩</small>
+        </div>
+    `;
+
+    const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    bsModal.show();
+
+    fetch(`ajax_bonus_sales_detail.php?sales_id=${encodeURIComponent(salesId)}&kat=all&periode_bulan=${encodeURIComponent(selectedBulan)}`)
+        .then(res => res.text())
+        .then(html => {
+            modalBody.innerHTML = html;
+        })
+        .catch(err => {
+            modalBody.innerHTML = `
+                <div class="p-5 text-center bg-white" style="border-radius: 26px;">
+                    <div class="fs-1 mb-2">⚠️</div>
+                    <h5 class="fw-bold text-danger mb-1">Gagal Memuat Detail Rincian</h5>
+                    <p class="text-muted">${err.message}</p>
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            `;
+        });
+}
+
+function switchModalBulanFilter(salesId, newBulan) {
+    const modalBody = document.getElementById('salesDetailProgramModalBody') || document.getElementById('bonusSalesDetailModalBody');
+    if (!modalBody) return;
+    modalBody.style.opacity = '0.5';
+
+    fetch(`ajax_bonus_sales_detail.php?sales_id=${encodeURIComponent(salesId)}&kat=all&periode_bulan=${encodeURIComponent(newBulan)}`)
+        .then(res => res.text())
+        .then(html => {
+            modalBody.style.opacity = '1';
+            modalBody.innerHTML = html;
+        })
+        .catch(err => {
+            modalBody.style.opacity = '1';
+            console.error('Modal Month Filter Error:', err);
+        });
 }
 
 // Auto-initialize chart and Nailong runners on page load
