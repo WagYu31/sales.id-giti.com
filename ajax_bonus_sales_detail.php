@@ -90,7 +90,7 @@ $sql_all = "
     FROM follow_ups fu
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE fu.deleted_at IS NULL
-      AND (fu.sales_id = {$sales_id} OR c.sales_id = {$sales_id})
+      AND fu.sales_id = {$sales_id}
       AND fu.no_inv IS NOT NULL 
       AND fu.no_inv != ''
       AND (
