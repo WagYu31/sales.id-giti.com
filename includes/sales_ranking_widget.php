@@ -65,7 +65,7 @@ $sql_ranking_all = "
 
         -- Total Activity FU on Qualified Customers (Cust Baru + Cust Lama Reaktivasi)
         COUNT(DISTINCT CASE 
-            WHEN (
+            WHEN c.id IS NOT NULL AND (
                 -- Kategori 1: Customer Baru Program
                 (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '{$end_date}')
                 OR 
@@ -86,7 +86,7 @@ $sql_ranking_all = "
 
         -- Total Distinct Qualified Customers di-FU
         COUNT(DISTINCT CASE 
-            WHEN (
+            WHEN c.id IS NOT NULL AND (
                 -- Kategori 1: Customer Baru
                 (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '{$end_date}')
                 OR 
@@ -107,7 +107,7 @@ $sql_ranking_all = "
 
         -- Total Jumlah Invoice yang Valid (Cust Baru + Cust Lama Reaktivasi yang Belanja)
         COUNT(DISTINCT CASE 
-            WHEN (
+            WHEN c.id IS NOT NULL AND (
                 -- Kategori 1: Customer Baru
                 (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '{$end_date}')
                 OR 
@@ -129,7 +129,7 @@ $sql_ranking_all = "
 
         -- Total Omset Invoice yang Valid (Rp)
         COALESCE(SUM(CASE 
-            WHEN (
+            WHEN c.id IS NOT NULL AND (
                 -- Kategori 1: Customer Baru
                 (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '{$end_date}')
                 OR 
