@@ -68,6 +68,43 @@ if (!$sales) {
 
 $target_omset = 200000000;
 
+// Cek Otorisasi Super Admin untuk Fitur Export Excel
+$is_superadmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'superadmin');
+$current_user_id = $_SESSION['user_id'] ?? 0;
+
+$has_export_permission = false;
+$export_req_status = null;
+
+if ($is_superadmin) {
+    $has_export_permission = true;
+} else {
+    $chk_p = $conn->prepare("
+        SELECT id, status, created_at 
+        FROM download_requests 
+        WHERE sales_id = ? 
+          AND status IN ('Approved', 'Pending')
+          AND (
+              (request_type = 'bonus_sales_detail' AND (target_sales_id = ? OR target_sales_id IS NULL))
+              OR request_type = 'customer_list'
+          )
+        ORDER BY id DESC 
+        LIMIT 1
+    ");
+    if ($chk_p) {
+        $chk_p->bind_param('ii', $current_user_id, $sales_id);
+        $chk_p->execute();
+        $res_p = $chk_p->get_result();
+        if ($res_p && $res_p->num_rows > 0) {
+            $p_row = $res_p->fetch_assoc();
+            $export_req_status = $p_row['status'];
+            if ($p_row['status'] === 'Approved') {
+                $has_export_permission = true;
+            }
+        }
+        $chk_p->close();
+    }
+}
+
 // Fetch Invoice Follow-Up records matching qualified customers:
 // 1. Cust Baru: Input in program period (tgl_input >= 2026-08-01)
 // 2. Cust Lama Reaktivasi: Input <= 2026-05-31 & NO invoice in June/July 2026
@@ -325,9 +362,26 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
         </div>
     </div>
 
-    <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 14.5px;">
-        📄 Rincian <?= count($items) ?> Transaksi Penjualan & Invoice Customer (<?= $label_periode ?>):
-    </h6>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 14.5px;">
+            📄 Rincian <?= count($items) ?> Transaksi Penjualan & Invoice Customer (<?= $label_periode ?>):
+        </h6>
+        <div>
+            <?php if ($is_superadmin || $has_export_permission): ?>
+                <a href="export_bonus_sales_excel.php?sales_id=<?= $sales_id ?>&periode_bulan=<?= urlencode($selected_bulan) ?>" target="_blank" class="btn btn-success btn-sm rounded-pill px-3 py-1.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 12px; background: #059669; border-color: #059669;">
+                    <i class="bi bi-file-earmark-excel-fill fs-6"></i> Export Excel (.xlsx)
+                </a>
+            <?php elseif ($export_req_status === 'Pending'): ?>
+                <button type="button" onclick="showExportPendingNotice()" class="btn btn-warning btn-sm text-dark rounded-pill px-3 py-1.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 12px;">
+                    <i class="bi bi-hourglass-split fs-6"></i> Menunggu Izin Superadmin
+                </button>
+            <?php else: ?>
+                <button type="button" onclick="openRequestExportModal(<?= $sales_id ?>, '<?= htmlspecialchars(addslashes($sales['nama_lengkap'])) ?>', '<?= htmlspecialchars($selected_bulan) ?>', <?= count($items) ?>)" class="btn btn-warning btn-sm text-dark rounded-pill px-3 py-1.5 fw-extrabold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 12px; border: 1.5px solid #F59E0B;">
+                    <i class="bi bi-shield-lock-fill text-dark fs-6"></i> 🔒 Minta Izin Export Superadmin
+                </button>
+            <?php endif; ?>
+        </div>
+    </div>
 
     <?php if (empty($items)): ?>
         <div class="text-center py-5 bg-white rounded-4 border">
@@ -428,6 +482,177 @@ $pct_target_b = min(100, round(($omset_b / $target_omset) * 100, 1));
     <?php endif; ?>
 </div>
 
-<div class="modal-footer bg-light border-top-0 pt-0 pe-4 pb-4">
-    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Tutup</button>
+<div class="modal-footer bg-light border-top-0 pt-0 pe-4 pb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <?php if ($is_superadmin || $has_export_permission): ?>
+            <a href="export_bonus_sales_excel.php?sales_id=<?= $sales_id ?>&periode_bulan=<?= urlencode($selected_bulan) ?>" target="_blank" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2" style="background: #059669; border-color: #059669;">
+                <i class="bi bi-file-earmark-excel-fill fs-5"></i> 📥 Download File Excel (.xlsx)
+            </a>
+        <?php elseif ($export_req_status === 'Pending'): ?>
+            <button type="button" onclick="showExportPendingNotice()" class="btn btn-warning text-dark rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-hourglass-split fs-5"></i> ⏳ Menunggu Izin Superadmin
+            </button>
+        <?php else: ?>
+            <button type="button" onclick="openRequestExportModal(<?= $sales_id ?>, '<?= htmlspecialchars(addslashes($sales['nama_lengkap'])) ?>', '<?= htmlspecialchars($selected_bulan) ?>', <?= count($items) ?>)" class="btn btn-warning text-dark rounded-pill px-4 py-2 fw-extrabold shadow-sm d-inline-flex align-items-center gap-2" style="border: 1.5px solid #F59E0B;">
+                <i class="bi bi-shield-lock-fill text-dark fs-5"></i> 🔒 Minta Izin Export Superadmin
+            </button>
+        <?php endif; ?>
+    </div>
+    <button type="button" class="btn btn-secondary rounded-pill px-4 py-2 fw-bold shadow-sm" data-bs-dismiss="modal">Tutup</button>
 </div>
+
+<!-- SweetAlert2 library fallback if not present -->
+<script>
+if (typeof Swal === 'undefined') {
+    let saScript = document.createElement('script');
+    saScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+    document.head.appendChild(saScript);
+}
+
+function showExportPendingNotice() {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            icon: 'info',
+            title: '⏳ Menunggu Izin Superadmin',
+            html: '<p class="text-muted" style="font-size: 13.5px;">Permintaan izin Export Excel untuk rincian data sales ini sedang dalam status <strong>Menunggu Persetujuan Super Admin</strong>.<br><br>Silakan konfirmasi ke Superadmin untuk menyetujui izin unduh.</p>',
+            confirmButtonText: 'Baik, Saya Mengerti',
+            confirmButtonColor: '#2563EB'
+        });
+    } else {
+        alert("Permintaan izin Export Excel sedang menunggu persetujuan dari Super Admin.");
+    }
+}
+
+function openRequestExportModal(salesId, salesName, periodeBulan, totalItems) {
+    const doShowModal = () => {
+        Swal.fire({
+            title: '🔒 Izin Export Excel Super Admin',
+            html: `
+                <div class="text-start" style="font-size: 13px;">
+                    <div class="alert alert-warning p-2.5 mb-3 border-0 d-flex align-items-center gap-2" style="border-radius: 12px; font-size: 12px;">
+                        <i class="bi bi-shield-lock-fill fs-5 text-warning"></i>
+                        <span>Ekspor rincian transaksi <strong>${salesName}</strong> (${totalItems} data) wajib meminta otorisasi Super Admin.</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark mb-1" style="font-size: 12.5px;">Pilih Cara Otorisasi:</label>
+                        <div class="d-flex gap-2">
+                            <button type="button" id="tabReqPerm" class="btn btn-sm btn-primary w-50 fw-bold rounded-pill" onclick="switchAuthTab('request')">Kirim Permintaan Izin</button>
+                            <button type="button" id="tabPassPerm" class="btn btn-sm btn-outline-secondary w-50 fw-bold rounded-pill" onclick="switchAuthTab('password')">Password Super Admin</button>
+                        </div>
+                    </div>
+
+                    <div id="sectionRequestAuth">
+                        <label class="form-label fw-semibold text-muted mb-1" style="font-size: 12px;">Alasan Ekspor / Keperluan:</label>
+                        <textarea id="export_alasan_input" class="form-control" rows="2" placeholder="Contoh: Untuk laporan rekap omset bulanan ke manajemen..." style="font-size: 12.5px; border-radius: 10px;"></textarea>
+                    </div>
+
+                    <div id="sectionPasswordAuth" style="display: none;">
+                        <label class="form-label fw-semibold text-muted mb-1" style="font-size: 12px;">Masukkan Password Super Admin:</label>
+                        <input type="password" id="superadmin_pass_input" class="form-control" placeholder="Password Super Admin..." style="font-size: 12.5px; border-radius: 10px;">
+                        <small class="text-muted d-block mt-1" style="font-size: 11px;">Gunakan bila Super Admin mendampingi langsung saat ini.</small>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Proses / Kirim',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#2563EB',
+            didOpen: () => {
+                window.activeAuthMethod = 'request';
+                window.switchAuthTab = function(method) {
+                    window.activeAuthMethod = method;
+                    if (method === 'request') {
+                        document.getElementById('tabReqPerm').className = 'btn btn-sm btn-primary w-50 fw-bold rounded-pill';
+                        document.getElementById('tabPassPerm').className = 'btn btn-sm btn-outline-secondary w-50 fw-bold rounded-pill';
+                        document.getElementById('sectionRequestAuth').style.display = 'block';
+                        document.getElementById('sectionPasswordAuth').style.display = 'none';
+                    } else {
+                        document.getElementById('tabReqPerm').className = 'btn btn-sm btn-outline-secondary w-50 fw-bold rounded-pill';
+                        document.getElementById('tabPassPerm').className = 'btn btn-sm btn-primary w-50 fw-bold rounded-pill';
+                        document.getElementById('sectionRequestAuth').style.display = 'none';
+                        document.getElementById('sectionPasswordAuth').style.display = 'block';
+                    }
+                };
+            },
+            preConfirm: () => {
+                if (window.activeAuthMethod === 'password') {
+                    const pass = document.getElementById('superadmin_pass_input').value;
+                    if (!pass.trim()) {
+                        Swal.showValidationMessage('Password Super Admin wajib diisi!');
+                        return false;
+                    }
+                    return { type: 'password', password: pass };
+                } else {
+                    const alasan = document.getElementById('export_alasan_input').value;
+                    if (!alasan.trim()) {
+                        Swal.showValidationMessage('Alasan pengunduhan wajib diisi!');
+                        return false;
+                    }
+                    return { type: 'request', alasan: alasan };
+                }
+            }
+        }).then((res) => {
+            if (res.isConfirmed && res.value) {
+                if (res.value.type === 'password') {
+                    fetch('download_permission_action.php', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: `action=verify_superadmin_password&password=${encodeURIComponent(res.value.password)}&target_sales_id=${salesId}&target_periode=${encodeURIComponent(periodeBulan)}`
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success && data.export_url) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Otorisasi Berhasil! 🎉',
+                                text: 'File Excel sedang diunduh...',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            window.open(data.export_url, '_blank');
+                            switchModalBulanFilter(salesId, periodeBulan);
+                        } else {
+                            Swal.fire('Otorisasi Gagal', data.message || 'Password Super Admin salah.', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        Swal.fire('Error', 'Terjadi kesalahan sistem: ' + err.message, 'error');
+                    });
+                } else {
+                    fetch('download_permission_action.php', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: `action=request_bonus_export&target_sales_id=${salesId}&target_periode=${encodeURIComponent(periodeBulan)}&jumlah_data=${totalItems}&alasan=${encodeURIComponent(res.value.alasan)}`
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Permintaan Dikirim! ⏳',
+                                text: data.message,
+                                confirmButtonText: 'Baik, Saya Mengerti',
+                                confirmButtonColor: '#2563EB'
+                            }).then(() => {
+                                switchModalBulanFilter(salesId, periodeBulan);
+                            });
+                        } else {
+                            Swal.fire('Gagal', data.message, 'error');
+                        }
+                    })
+                    .catch(err => {
+                        Swal.fire('Error', 'Terjadi kesalahan sistem: ' + err.message, 'error');
+                    });
+                }
+            }
+        });
+    };
+
+    if (typeof Swal !== 'undefined') {
+        doShowModal();
+    } else {
+        setTimeout(doShowModal, 400);
+    }
+}
+</script>

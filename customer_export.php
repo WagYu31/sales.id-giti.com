@@ -45,7 +45,7 @@ if ($is_sales) {
 // Ambil semua daftar permintaan izin unduh khusus Superadmin
 $pending_requests = [];
 if ($is_superadmin) {
-    $res_p = $conn->query("SELECT id, sales_name, jumlah_data, alasan, status, created_at FROM download_requests ORDER BY id DESC LIMIT 50");
+    $res_p = $conn->query("SELECT id, sales_name, jumlah_data, alasan, status, created_at, request_type, target_periode FROM download_requests ORDER BY id DESC LIMIT 50");
     if ($res_p) {
         $pending_requests = $res_p->fetch_all(MYSQLI_ASSOC);
     }
@@ -162,6 +162,7 @@ $customers = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
                     <thead class="table-light">
                         <tr>
                             <th>NAMA SALES</th>
+                            <th>TIPE EKSPOR</th>
                             <th>JML DATA</th>
                             <th>ALASAN UNDUH</th>
                             <th>TANGGAL REQUEST</th>
@@ -173,8 +174,19 @@ $customers = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
                         <?php foreach ($pending_requests as $req): ?>
                         <tr id="request-row-<?php echo $req['id']; ?>">
                             <td class="fw-bold text-dark">👤 <?php echo htmlspecialchars($req['sales_name']); ?></td>
-                            <td><span class="badge bg-info"><?php echo $req['jumlah_data']; ?> Customer</span></td>
-                            <td class="small text-muted"><?php echo htmlspecialchars($req['alasan'] ?? 'Untuk follow up'); ?></td>
+                            <td>
+                                <?php if (($req['request_type'] ?? '') === 'bonus_sales_detail'): ?>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2.5 py-1 rounded-pill">
+                                        🏆 Rincian Program Sales
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2.5 py-1 rounded-pill">
+                                        👥 Data Customer
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td><span class="badge bg-info text-dark"><?php echo $req['jumlah_data']; ?> Data</span></td>
+                            <td class="small text-muted"><?php echo htmlspecialchars($req['alasan'] ?? 'Untuk laporan/follow up'); ?></td>
                             <td class="small"><?php echo date('d/m/Y, H:i', strtotime($req['created_at'])); ?></td>
                             <td>
                                 <?php if ($req['status'] === 'Pending'): ?>
