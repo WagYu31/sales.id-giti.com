@@ -91,12 +91,16 @@ if (!$is_authorized) {
 // -------------------------------------------------------------
 // AMBIL DATA SALES & FILTER PERIODE
 // -------------------------------------------------------------
-$stmt_sales = $conn->prepare("SELECT id, nama_lengkap, username, role FROM sales WHERE id = ?");
-$stmt_sales->bind_param('i', $target_sales_id);
-$stmt_sales->execute();
-$res_s = $stmt_sales->get_result();
-$sales = $res_s->fetch_assoc();
-$stmt_sales->close();
+$stmt_sales = $conn->prepare("SELECT id, nama_lengkap, email, role FROM sales WHERE id = ?");
+if ($stmt_sales) {
+    $stmt_sales->bind_param('i', $target_sales_id);
+    $stmt_sales->execute();
+    $sales = $stmt_sales->get_result()->fetch_assoc();
+    $stmt_sales->close();
+} else {
+    $res = $conn->query("SELECT id, nama_lengkap, email, role FROM sales WHERE id = {$target_sales_id}");
+    $sales = $res ? $res->fetch_assoc() : null;
+}
 
 if (!$sales) {
     die("Data sales tidak ditemukan.");
