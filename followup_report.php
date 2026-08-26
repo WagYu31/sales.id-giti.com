@@ -1,4 +1,10 @@
 <?php
+/**
+ * LAPORAN FOLLOW UP SALES — PT. LOEWIX INDONESIA
+ * Built with Taste Skill (tasteskill.dev) Design System
+ * Aesthetic: Linear / Raycast / Modern B2B Data Workbench
+ */
+
 $page_title = "Laporan Follow Up Sales";
 require_once 'includes/db.php';
 require_once 'includes/header.php';
@@ -22,22 +28,22 @@ function get_file_icon($filename) {
 
 $allowed_sort_columns = [
     'tgl_follow_up' => 'fu.tgl_follow_up',
-    'nama_toko' => 'c.nama_toko',
-    'nama_sales' => 's.nama_lengkap',
-    'respon' => 'fu.respon',
-    'no_inv' => 'fu.no_inv'
+    'nama_toko'     => 'c.nama_toko',
+    'nama_sales'    => 's.nama_lengkap',
+    'respon'        => 'fu.respon',
+    'no_inv'        => 'fu.no_inv'
 ];
 
-$tgl_mulai = $_GET['tgl_mulai'] ?? '';
-$tgl_akhir = $_GET['tgl_akhir'] ?? '';
+$tgl_mulai         = trim($_GET['tgl_mulai'] ?? '');
+$tgl_akhir         = trim($_GET['tgl_akhir'] ?? '');
 $selected_sales_id = isset($_GET['sales_id']) && is_numeric($_GET['sales_id']) ? (int)$_GET['sales_id'] : '';
-$search_keyword = trim($_GET['search'] ?? '');
-$respon_filter = trim($_GET['respon'] ?? '');
-$status_filter = trim($_GET['status'] ?? '');
-$limit = $_GET['limit'] ?? 20;
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-$sort_by = isset($_GET['sort_by']) && array_key_exists($_GET['sort_by'], $allowed_sort_columns) ? $_GET['sort_by'] : 'tgl_follow_up';
-$sort_dir = isset($_GET['sort_dir']) && in_array(strtoupper($_GET['sort_dir']), ['ASC', 'DESC']) ? strtoupper($_GET['sort_dir']) : 'DESC';
+$search_keyword    = trim($_GET['search'] ?? '');
+$respon_filter     = trim($_GET['respon'] ?? '');
+$status_filter     = trim($_GET['status'] ?? '');
+$limit             = $_GET['limit'] ?? 20;
+$page              = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$sort_by           = isset($_GET['sort_by']) && array_key_exists($_GET['sort_by'], $allowed_sort_columns) ? $_GET['sort_by'] : 'tgl_follow_up';
+$sort_dir          = isset($_GET['sort_dir']) && in_array(strtoupper($_GET['sort_dir']), ['ASC', 'DESC']) ? strtoupper($_GET['sort_dir']) : 'DESC';
 
 $sales_list_result = $conn->query("SELECT id, nama_lengkap FROM sales WHERE role = 'sales' AND deleted_at IS NULL ORDER BY nama_lengkap ASC");
 
@@ -53,7 +59,16 @@ if ($tgl_mulai && $tgl_akhir) {
     $conditions[] = "DATE(fu.tgl_follow_up) BETWEEN ? AND ?";
     array_push($params, $tgl_mulai, $tgl_akhir);
     $types .= 'ss';
+} elseif ($tgl_mulai) {
+    $conditions[] = "DATE(fu.tgl_follow_up) >= ?";
+    array_push($params, $tgl_mulai);
+    $types .= 's';
+} elseif ($tgl_akhir) {
+    $conditions[] = "DATE(fu.tgl_follow_up) <= ?";
+    array_push($params, $tgl_akhir);
+    $types .= 's';
 }
+
 if ($selected_sales_id) {
     $conditions[] = "fu.sales_id = ?";
     $params[] = $selected_sales_id;
@@ -126,17 +141,17 @@ $followups_result = $stmt->get_result();
 $base_link_params = [
     'tgl_mulai' => $tgl_mulai,
     'tgl_akhir' => $tgl_akhir,
-    'sales_id' => $selected_sales_id,
-    'search' => $search_keyword,
-    'respon' => $respon_filter,
-    'status' => $status_filter,
-    'limit' => $limit
+    'sales_id'  => $selected_sales_id,
+    'search'    => $search_keyword,
+    'respon'    => $respon_filter,
+    'status'    => $status_filter,
+    'limit'     => $limit
 ];
 
 function create_sort_link($column_name, $display_text, $current_sort_by, $current_sort_dir, $base_params) {
     $next_sort_dir = ($current_sort_by == $column_name && $current_sort_dir == 'ASC') ? 'DESC' : 'ASC';
     $link_params = array_merge($base_params, ['sort_by' => $column_name, 'sort_dir' => $next_sort_dir]);
-    $icon = '<i class="bi bi-arrow-down-up opacity-40 ms-1" style="font-size:11px;"></i>';
+    $icon = '<i class="bi bi-arrow-down-up opacity-40 ms-1" style="font-size:10px;"></i>';
     if ($current_sort_by == $column_name) {
         $icon = $current_sort_dir == 'ASC' ? '<i class="bi bi-sort-up-alt text-primary ms-1"></i>' : '<i class="bi bi-sort-down text-primary ms-1"></i>';
     }
@@ -146,15 +161,15 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
 $export_excel_url = 'export_followup_excel.php?' . http_build_query([
     'tgl_mulai' => $tgl_mulai,
     'tgl_akhir' => $tgl_akhir,
-    'sales_id' => $selected_sales_id,
-    'search' => $search_keyword,
-    'respon' => $respon_filter,
-    'status' => $status_filter,
-    'sort_by' => $sort_by,
-    'sort_dir' => $sort_dir
+    'sales_id'  => $selected_sales_id,
+    'search'    => $search_keyword,
+    'respon'    => $respon_filter,
+    'status'    => $status_filter,
+    'sort_by'   => $sort_by,
+    'sort_dir'  => $sort_dir
 ]);
 
-// Query Stats Hari Ini & Total Deal
+// Summary Metrics
 $fu_today_res = $conn->query("SELECT COUNT(*) as t FROM follow_ups WHERE DATE(tgl_follow_up) = CURRENT_DATE() AND deleted_at IS NULL");
 $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
 
@@ -176,13 +191,12 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
     --ts-text-primary: #0F172A;
     --ts-text-secondary: #475569;
     --ts-text-muted: #94A3B8;
-    --ts-brand-primary: #2563EB;
-    --ts-brand-gradient: linear-gradient(135deg, #0F172A 0%, #1E293B 40%, #1D4ED8 100%);
-    --ts-radius-card: 20px;
+    --ts-brand-primary: #1D4ED8;
+    --ts-brand-accent: #059669;
+    --ts-radius-card: 18px;
     --ts-radius-pill: 9999px;
-    --ts-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --ts-shadow-card: 0 10px 30px -10px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.02);
-    --ts-shadow-hover: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+    --ts-shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
+    --ts-shadow-hover: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
 }
 
 /* ── Typography & Tabular Numbers ── */
@@ -191,112 +205,100 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
     font-feature-settings: 'tnum' on, 'lnum' on;
 }
 
-/* ── Hero Banner with Ambient Glow ── */
+/* ── Hero Banner (Linear / Raycast Style) ── */
 .taste-hero {
-    background: linear-gradient(135deg, #091224 0%, #0F1F38 45%, #1E3A8A 100%);
-    border-radius: 24px;
-    padding: 32px 36px;
-    margin-bottom: 28px;
+    background: #0B132B;
+    border-radius: var(--ts-radius-card);
+    padding: 28px 32px;
+    margin-bottom: 24px;
     color: #FFFFFF;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 30px -10px rgba(11, 19, 43, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .taste-hero::before {
     content: '';
     position: absolute;
-    top: -80px; right: -80px;
-    width: 340px; height: 340px;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, rgba(37, 99, 235, 0.05) 60%, transparent 70%);
-    pointer-events: none;
-}
-
-.taste-hero::after {
-    content: '';
-    position: absolute;
-    bottom: -60px; left: 10%;
-    width: 280px; height: 280px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
     pointer-events: none;
 }
 
 .taste-breadcrumb {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 4px 14px;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 3px 12px;
     border-radius: var(--ts-radius-pill);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 11.5px;
     font-weight: 600;
     color: #93C5FD;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .taste-hero-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 800;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.025em;
     color: #FFFFFF;
-    margin-bottom: 6px;
-    line-height: 1.25;
+    margin-bottom: 4px;
+    line-height: 1.2;
 }
 
 .taste-hero-subtitle {
-    font-size: 14px;
-    color: rgba(226, 232, 240, 0.85);
-    max-width: 580px;
+    font-size: 13.5px;
+    color: rgba(226, 232, 240, 0.8);
+    max-width: 540px;
     margin: 0;
-    line-height: 1.5;
+    line-height: 1.45;
 }
 
 /* ── Bento Stat Capsules ── */
 .bento-stat-grid {
     display: flex;
-    gap: 14px;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
 .bento-stat-card {
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: 18px;
-    padding: 16px 22px;
-    min-width: 150px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 14px 20px;
+    min-width: 140px;
     border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .bento-stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .bento-stat-label {
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: #64748B;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
 }
 
 .bento-stat-value {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 900;
     letter-spacing: -0.03em;
     color: #0F172A;
@@ -304,32 +306,26 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 }
 
 .bento-stat-card.active-accent {
-    background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+    background: #059669;
     border-color: #34D399;
     color: #FFFFFF;
 }
 
-.bento-stat-card.active-accent .bento-stat-label {
-    color: #D1FAE5;
-}
+.bento-stat-card.active-accent .bento-stat-label { color: #D1FAE5; }
+.bento-stat-card.active-accent .bento-stat-value { color: #FFFFFF; }
 
-.bento-stat-card.active-accent .bento-stat-value {
-    color: #FFFFFF;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.15);
-}
-
-/* ── Floating Filter Panel ── */
+/* ── Clean Workbench Card ── */
 .taste-card {
     background: #FFFFFF;
     border-radius: var(--ts-radius-card);
     border: 1px solid var(--ts-border-subtle);
     box-shadow: var(--ts-shadow-card);
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     overflow: hidden;
 }
 
 .taste-card-header {
-    padding: 18px 24px;
+    padding: 16px 22px;
     border-bottom: 1px solid var(--ts-border-subtle);
     display: flex;
     align-items: center;
@@ -339,7 +335,7 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 
 .taste-card-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 700;
     color: var(--ts-text-primary);
     margin: 0;
@@ -354,98 +350,98 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: #64748B;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     display: block;
 }
 
 .form-control-taste, .form-select-taste {
-    height: 42px;
+    height: 40px;
     border: 1.5px solid #E2E8F0 !important;
-    border-radius: 12px !important;
-    padding: 8px 14px !important;
-    font-size: 13.5px !important;
+    border-radius: 10px !important;
+    padding: 7px 12px !important;
+    font-size: 13px !important;
     font-weight: 600 !important;
     color: #0F172A !important;
     background-color: #F8FAFC !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: all 0.15s ease !important;
 }
 
 .form-control-taste:focus, .form-select-taste:focus {
     background-color: #FFFFFF !important;
-    border-color: #3B82F6 !important;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12) !important;
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
     outline: none !important;
 }
 
-/* ── Primary Action Buttons with Tactile Depth ── */
+/* ── Tactile Buttons ── */
 .btn-taste-primary {
-    height: 42px;
-    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    height: 40px;
+    background: #1D4ED8;
     color: #FFFFFF;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 700;
     border: none;
-    border-radius: 12px;
-    padding: 0 20px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-    transition: all 0.2s ease;
-    touch-action: manipulation;
-}
-
-.btn-taste-primary:hover {
-    background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
-    color: #FFFFFF;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
-}
-
-.btn-taste-excel {
-    height: 42px;
-    background: linear-gradient(135deg, #059669 0%, #10B981 100%);
-    color: #FFFFFF;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 13.5px;
-    font-weight: 700;
-    border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 0 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-    transition: all 0.2s ease;
-    text-decoration: none !important;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(29, 78, 216, 0.2);
+    transition: all 0.15s ease;
     touch-action: manipulation;
 }
 
-.btn-taste-excel:hover {
-    background: linear-gradient(135deg, #047857 0%, #059669 100%);
+.btn-taste-primary:hover {
+    background: #1E40AF;
     color: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+    box-shadow: 0 4px 10px rgba(29, 78, 216, 0.3);
 }
 
-.btn-taste-light {
-    height: 42px;
-    background: #F8FAFC;
-    color: #475569;
-    border: 1.5px solid #E2E8F0;
+.btn-taste-excel {
+    height: 38px;
+    background: #059669;
+    color: #FFFFFF;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 13.5px;
+    font-size: 12.5px;
     font-weight: 700;
-    border-radius: 12px;
+    border: none;
+    border-radius: 10px;
     padding: 0 16px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
+    transition: all 0.15s ease;
+    text-decoration: none !important;
+    touch-action: manipulation;
+}
+
+.btn-taste-excel:hover {
+    background: #047857;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3);
+}
+
+.btn-taste-light {
+    height: 40px;
+    background: #F8FAFC;
+    color: #475569;
+    border: 1.5px solid #E2E8F0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
     text-decoration: none !important;
     touch-action: manipulation;
 }
@@ -474,22 +470,14 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
     background: #0F172A !important;
     color: #F8FAFC !important;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    padding: 16px 18px !important;
+    padding: 14px 16px !important;
     border: none !important;
     vertical-align: middle;
     white-space: nowrap;
-}
-
-.taste-table thead th:first-child {
-    border-top-left-radius: 0;
-}
-
-.taste-table thead th:last-child {
-    border-top-right-radius: 0;
 }
 
 .sort-header-link {
@@ -505,7 +493,7 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 }
 
 .taste-table tbody tr {
-    transition: background-color 0.15s ease, transform 0.15s ease;
+    transition: background-color 0.12s ease;
     border-bottom: 1px solid #F1F5F9;
 }
 
@@ -514,11 +502,11 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 }
 
 .taste-table tbody td {
-    padding: 16px 18px !important;
+    padding: 14px 16px !important;
     border-top: none;
     border-bottom: 1px solid #F1F5F9;
     vertical-align: top;
-    font-size: 13.5px;
+    font-size: 13px;
     color: #1E293B;
 }
 
@@ -526,11 +514,11 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 .badge-taste-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
+    gap: 5px;
+    padding: 3px 8px;
     border-radius: var(--ts-radius-pill);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
     letter-spacing: 0.02em;
     white-space: nowrap;
@@ -555,121 +543,83 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
     border-color: #BAE6FD;
 }
 
-/* ── Response Pills with Modern Glow ── */
+/* ── Response Pills ── */
 .pill-respon {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 12px;
+    gap: 5px;
+    padding: 4px 10px;
     border-radius: var(--ts-radius-pill);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
     white-space: nowrap;
 }
 
-.pill-respon-deal {
-    background: #ECFDF5;
-    color: #047857;
-    border: 1px solid #A7F3D0;
-}
+.pill-respon-deal    { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+.pill-respon-beli    { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.pill-respon-fu      { background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE; }
+.pill-respon-tanya   { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+.pill-respon-info    { background: #F0FDFA; color: #0F766E; border: 1px solid #99F6E4; }
+.pill-respon-no      { background: #FFF1F2; color: #BE123C; border: 1px solid #FECDD3; }
+.pill-respon-default { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
 
-.pill-respon-beli {
-    background: #EFF6FF;
-    color: #1D4ED8;
-    border: 1px solid #BFDBFE;
-}
-
-.pill-respon-fu {
-    background: #EEF2FF;
-    color: #4338CA;
-    border: 1px solid #C7D2FE;
-}
-
-.pill-respon-tanya {
-    background: #FFFBEB;
-    color: #B45309;
-    border: 1px solid #FDE68A;
-}
-
-.pill-respon-info {
-    background: #F0FDFA;
-    color: #0F766E;
-    border: 1px solid #99F6E4;
-}
-
-.pill-respon-no {
-    background: #FFF1F2;
-    color: #BE123C;
-    border: 1px solid #FECDD3;
-}
-
-.pill-respon-default {
-    background: #F1F5F9;
-    color: #475569;
-    border: 1px solid #E2E8F0;
-}
-
-/* ── Monospace Invoice Pill ── */
 .pill-inv {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     background: #EFF6FF;
     color: #1E40AF;
     border: 1px solid #BFDBFE;
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 2px 7px;
+    border-radius: 5px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
-    margin-top: 5px;
+    margin-top: 4px;
 }
 
-/* ── Sales Avatar & Card Notes ── */
 .sales-chip {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
 }
 
 .sales-avatar-taste {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: #1E293B;
     color: #FFFFFF;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 800;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .note-box-taste {
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
-    border-radius: 10px;
-    padding: 10px 14px;
+    border-radius: 8px;
+    padding: 8px 12px;
     font-family: 'Inter', sans-serif;
-    font-size: 13px;
+    font-size: 12.5px;
     line-height: 1.5;
     color: #334155;
 }
 
-/* ── Media Button ── */
 .btn-media-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     background: #F0FDF4;
     color: #166534;
     border: 1px solid #BBF7D0;
     border-radius: var(--ts-radius-pill);
-    padding: 5px 12px;
-    font-size: 11.5px;
+    padding: 4px 10px;
+    font-size: 11px;
     font-weight: 700;
     text-decoration: none !important;
     transition: all 0.15s ease;
@@ -679,13 +629,12 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
     background: #DCFCE7;
     color: #14532D;
     transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(34, 197, 94, 0.2);
 }
 
 .btn-delete-circle {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     background: #FFF1F2;
     color: #E11D48;
     border: 1px solid #FECDD3;
@@ -702,24 +651,14 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
     transform: scale(1.06);
 }
 
-/* ── Responsive Breakpoints ── */
 @media (max-width: 991.98px) {
-    .taste-hero {
-        padding: 24px 20px;
-        border-radius: 18px;
-    }
-    .bento-stat-grid {
-        width: 100%;
-        margin-top: 18px;
-    }
-    .bento-stat-card {
-        flex: 1 1 calc(50% - 7px);
-        min-width: 130px;
-    }
+    .taste-hero { padding: 20px 18px; }
+    .bento-stat-grid { width: 100%; margin-top: 14px; }
+    .bento-stat-card { flex: 1 1 calc(50% - 6px); min-width: 120px; }
 }
 
 @media (max-width: 575.98px) {
-    .taste-hero-title { font-size: 22px; }
+    .taste-hero-title { font-size: 20px; }
     .bento-stat-card { flex: 1 1 100%; }
 }
 </style>
@@ -766,7 +705,7 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
             <i class="bi bi-funnel-fill text-primary"></i> Filter Laporan Follow Up
         </h5>
     </div>
-    <div class="card-body p-4">
+    <div class="card-body p-3 p-md-4">
         <form action="" method="GET" id="filter-form">
             <!-- Row 1: Search, Dari Tanggal, Sampai Tanggal -->
             <div class="row g-3 mb-3">
@@ -834,39 +773,37 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 </div>
 
 <!-- 3. Toolbar: Limit Select & Quick Export -->
-<div class="card border-0 shadow-sm mb-3" style="border-radius:18px; background:#F8FAFC; border: 1.5px solid #E2E8F0 !important;">
-    <div class="card-body py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <div class="d-flex align-items-center gap-2.5">
-            <span class="badge bg-primary text-white fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="font-size:12px; padding:8px 12px; border-radius:10px; letter-spacing:0.5px;">
+<div class="taste-card mb-3" style="background:#F8FAFC;">
+    <div class="card-body py-2.5 px-3 px-md-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary text-white fw-bold d-inline-flex align-items-center gap-1 shadow-sm" style="font-size:11px; padding:6px 10px; border-radius:8px;">
                 <i class="bi bi-layers-fill"></i> TAMPILKAN
             </span>
-            <select id="limit-select" class="form-select fw-bold border-primary text-primary shadow-sm" style="width: 105px; border-radius:10px; padding:6px 14px; font-size:14px; background-color:#FFFFFF; border-width:1.5px;">
+            <select id="limit-select" class="form-select fw-bold border-primary text-primary shadow-sm" style="width: 95px; border-radius:8px; padding:5px 10px; font-size:13px; background-color:#FFFFFF;">
                 <option value="20" <?php if ($limit == '20') echo 'selected'; ?>>20</option>
                 <option value="40" <?php if ($limit == '40') echo 'selected'; ?>>40</option>
                 <option value="60" <?php if ($limit == '60') echo 'selected'; ?>>60</option>
                 <option value="80" <?php if ($limit == '80') echo 'selected'; ?>>80</option>
                 <option value="100" <?php if ($limit == '100') echo 'selected'; ?>>100</option>
             </select>
-            <span class="text-secondary fw-semibold" style="font-size:13.5px;">entri per halaman</span>
+            <span class="text-secondary fw-semibold" style="font-size:12.5px;">entri</span>
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">
             <a href="<?php echo $export_excel_url; ?>" target="_blank" class="btn-taste-excel" title="Export Data Terfilter ke File Excel (.xlsx)">
-                <i class="bi bi-file-earmark-excel-fill fs-6"></i> Export Excel
+                <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
             </a>
             
-            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-white rounded-pill border shadow-2sm" style="border-color:#E2E8F0; font-size:13.5px; font-weight:700; color:#1E293B;">
+            <div class="d-inline-flex align-items-center gap-1.5 px-3 py-1.5 bg-white rounded-pill border" style="border-color:#E2E8F0; font-size:12.5px; font-weight:700; color:#1E293B;">
                 <i class="bi bi-card-text text-primary"></i> 
                 <?php if ($limit != 'all' && $total_records > 0): ?>
-                    <span>Menampilkan</span> 
-                    <span class="badge bg-primary text-white px-2 py-1 ts-tabular-nums" style="font-size:13px; border-radius:6px;"><?php echo number_format($offset + 1); ?> - <?php echo number_format(min($offset + $limit, $total_records)); ?></span> 
+                    <span>Data:</span> 
+                    <span class="badge bg-primary text-white px-2 py-0.5 ts-tabular-nums" style="font-size:12px; border-radius:5px;"><?php echo number_format($offset + 1); ?> - <?php echo number_format(min($offset + $limit, $total_records)); ?></span> 
                     <span>dari</span> 
-                    <span class="badge bg-dark text-white px-2 py-1 ts-tabular-nums" style="font-size:13px; border-radius:6px;"><?php echo number_format($total_records); ?></span> 
-                    <span>data</span>
+                    <span class="badge bg-dark text-white px-2 py-0.5 ts-tabular-nums" style="font-size:12px; border-radius:5px;"><?php echo number_format($total_records); ?></span>
                 <?php elseif ($total_records > 0): ?>
-                    <span>Menampilkan semua</span> 
-                    <span class="badge bg-primary text-white px-2 py-1 ts-tabular-nums" style="font-size:13px; border-radius:6px;"><?php echo number_format($total_records); ?></span> 
-                    <span>data</span>
+                    <span>Total:</span> 
+                    <span class="badge bg-primary text-white px-2 py-0.5 ts-tabular-nums" style="font-size:12px; border-radius:5px;"><?php echo number_format($total_records); ?></span>
                 <?php endif; ?>
             </div>
         </div>
@@ -880,10 +817,10 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
             <i class="bi bi-card-list text-primary"></i> Riwayat Semua Follow Up
         </h5>
         <div class="d-flex align-items-center gap-2">
-            <a href="<?php echo $export_excel_url; ?>" target="_blank" class="btn btn-sm btn-taste-excel" style="height:36px; padding:0 14px; font-size:12.5px;" title="Export Data Follow Up ke File Excel (.xlsx)">
+            <a href="<?php echo $export_excel_url; ?>" target="_blank" class="btn btn-sm btn-taste-excel" title="Export Data Follow Up ke File Excel (.xlsx)">
                 <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
             </a>
-            <a href="customer_management.php" class="btn btn-sm btn-taste-light" style="height:36px; padding:0 14px; font-size:12.5px;">
+            <a href="customer_management.php" class="btn btn-sm btn-taste-light">
                 <i class="bi bi-grid-fill"></i> Dashboard
             </a>
         </div>
@@ -909,10 +846,10 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
                             <tr id="followup-row-<?php echo $fu['id']; ?>">
                                 <!-- Tanggal -->
                                 <td class="text-nowrap" style="vertical-align:top;">
-                                    <div class="fw-bold text-dark ts-tabular-nums" style="font-size:13.5px; font-family:'Plus Jakarta Sans', sans-serif;">
+                                    <div class="fw-bold text-dark ts-tabular-nums" style="font-size:13px; font-family:'Plus Jakarta Sans', sans-serif;">
                                         <i class="bi bi-calendar-event text-primary me-1"></i><?php echo date('d M Y', strtotime($fu['tgl_follow_up'])); ?>
                                     </div>
-                                    <div class="badge bg-light text-secondary border fw-bold mt-1 ts-tabular-nums" style="font-size:11px; border-radius:8px; padding:3px 8px;">
+                                    <div class="badge bg-light text-secondary border fw-bold mt-1 ts-tabular-nums" style="font-size:10.5px; border-radius:6px; padding:2px 7px;">
                                         <i class="bi bi-clock text-muted me-1"></i><?php echo date('H:i', strtotime($fu['tgl_follow_up'])); ?> WIB
                                     </div>
                                 </td>
@@ -920,11 +857,11 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
                                 <!-- Customer -->
                                 <td style="vertical-align:top;">
                                     <div class="fw-bold mb-1">
-                                        <a href="followup_view.php?customer_id=<?php echo $fu['customer_id']; ?>" class="text-decoration-none text-dark hover-primary" style="font-size:14.5px; font-family:'Plus Jakarta Sans', sans-serif;">
+                                        <a href="followup_view.php?customer_id=<?php echo $fu['customer_id']; ?>" class="text-decoration-none text-dark hover-primary" style="font-size:14px; font-family:'Plus Jakarta Sans', sans-serif;">
                                             <i class="bi bi-shop text-primary me-1"></i><?php echo htmlspecialchars($fu['nama_toko']); ?>
                                         </a>
                                     </div>
-                                    <div class="d-flex gap-1.5 flex-wrap mt-1">
+                                    <div class="d-flex gap-1 flex-wrap mt-1">
                                         <?php if ($fu['acc_boss'] == 'Y'): ?>
                                             <span class="badge-taste-pill badge-acc-boss" title="<?php echo htmlspecialchars($fu['acc_boss_note']); ?>"><i class="bi bi-check-circle-fill"></i> Acc Boss</span>
                                         <?php endif; ?>
@@ -943,7 +880,7 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
                                         <div class="sales-avatar-taste">
                                             <?php echo strtoupper(substr($fu['nama_sales_fu'], 0, 1)); ?>
                                         </div>
-                                        <span style="font-weight:700; font-size:13px; color:#1E293B;">
+                                        <span style="font-weight:700; font-size:12.5px; color:#1E293B;">
                                             <?php echo htmlspecialchars($fu['nama_sales_fu']); ?>
                                         </span>
                                     </div>
@@ -998,7 +935,7 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 
                                 <!-- Media / Bukti -->
                                 <td style="vertical-align:top;">
-                                    <div class="d-flex flex-column gap-1.5">
+                                    <div class="d-flex flex-column gap-1">
                                     <?php for ($i = 1; $i <= 3; $i++): $media_file = $fu['media'.$i]; if ($media_file): 
                                         $ext = strtolower(pathinfo($media_file, PATHINFO_EXTENSION));
                                     ?>
@@ -1021,7 +958,7 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
                         <tr>
                             <td colspan="7" class="text-center p-5">
                                 <div style="max-width:320px; margin:0 auto; padding:20px 0;">
-                                    <div style="font-size:42px; margin-bottom:12px;">🔍</div>
+                                    <div style="font-size:38px; margin-bottom:10px;">🔍</div>
                                     <h6 class="fw-bold text-dark">Tidak Ada Data Ditemukan</h6>
                                     <p class="text-muted small mb-0">Coba ubah kata kunci pencarian atau reset filter tanggal dan sales.</p>
                                 </div>
@@ -1042,23 +979,38 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
             $query_params = http_build_query(array_merge($base_link_params, ['sort_by' => $sort_by, 'sort_dir' => $sort_dir]));
         ?>
         <li class="page-item <?php if($page <= 1){ echo 'disabled'; } ?>">
-            <a class="page-link shadow-2sm" style="border-radius:10px; font-weight:700;" href="?page=<?php echo $page - 1; ?>&<?php echo $query_params; ?>">
+            <a class="page-link shadow-2sm" style="border-radius:8px; font-weight:700;" href="?page=<?php echo $page - 1; ?>&<?php echo $query_params; ?>">
                 <i class="bi bi-chevron-left"></i> Prev
             </a>
         </li>
         <li class="page-item disabled">
-            <span class="page-link bg-white fw-extrabold text-dark shadow-2sm" style="border-radius:10px;">
+            <span class="page-link bg-white fw-extrabold text-dark shadow-2sm" style="border-radius:8px;">
                 Halaman <?php echo $page; ?> / <?php echo $total_pages; ?>
             </span>
         </li>
         <li class="page-item <?php if($page >= $total_pages){ echo 'disabled'; } ?>">
-            <a class="page-link shadow-2sm" style="border-radius:10px; font-weight:700;" href="?page=<?php echo $page + 1; ?>&<?php echo $query_params; ?>">
+            <a class="page-link shadow-2sm" style="border-radius:8px; font-weight:700;" href="?page=<?php echo $page + 1; ?>&<?php echo $query_params; ?>">
                 Next <i class="bi bi-chevron-right"></i>
             </a>
         </li>
     </ul>
 </nav>
 <?php endif; ?>
+
+<!-- 6. Media Viewer Modal -->
+<div class="modal fade" id="mediaModal" tabindex="-1" aria-labelledby="mediaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+            <div class="modal-header bg-dark text-white py-3 px-4">
+                <h5 class="modal-title fs-6 fw-bold" id="mediaModalLabel"><i class="bi bi-paperclip me-1"></i> Preview Lampiran Bukti</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center" id="mediaModalBody" style="background:#F8FAFC;">
+                <!-- Konten dinamis dari JS -->
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php 
 $stmt->close();
@@ -1095,10 +1047,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (data.success) {
                             const row = document.getElementById('followup-row-' + followupId);
                             if (row) {
-                                row.style.transition = 'all 0.4s ease-out';
+                                row.style.transition = 'all 0.3s ease-out';
                                 row.style.opacity = '0';
                                 row.style.transform = 'scale(0.95)';
-                                setTimeout(() => row.remove(), 400);
+                                setTimeout(() => row.remove(), 300);
                             }
                             Swal.fire({
                                 icon: 'success',
@@ -1119,6 +1071,47 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
+
+    // Media Modal Dynamic Content
+    const mediaModal = document.getElementById('mediaModal');
+    if (mediaModal) {
+        mediaModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const fileUrl = button.getAttribute('data-file-url');
+            const fileName = button.getAttribute('data-file-name');
+            const ext = fileName.split('.').pop().toLowerCase();
+            const modalBody = document.getElementById('mediaModalBody');
+
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                modalBody.innerHTML = `<img src="${fileUrl}" class="img-fluid rounded-3 shadow-sm" style="max-height:550px; object-fit:contain;" alt="Bukti Foto">`;
+            } else if (['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext)) {
+                modalBody.innerHTML = `
+                    <div class="py-4">
+                        <div style="font-size:48px; margin-bottom:12px;">🎧</div>
+                        <h6 class="fw-bold mb-3">${fileName}</h6>
+                        <audio controls class="w-100" style="max-width:480px;">
+                            <source src="${fileUrl}" type="audio/${ext}">
+                            Browser Anda tidak mendukung audio player.
+                        </audio>
+                    </div>`;
+            } else if (['mp4', 'webm', 'mov'].includes(ext)) {
+                modalBody.innerHTML = `
+                    <video controls class="w-100 rounded-3 shadow-sm" style="max-height:500px;">
+                        <source src="${fileUrl}" type="video/${ext}">
+                        Browser Anda tidak mendukung video player.
+                    </video>`;
+            } else {
+                modalBody.innerHTML = `
+                    <div class="py-4">
+                        <div style="font-size:48px; margin-bottom:12px;">📄</div>
+                        <h6 class="fw-bold mb-3">${fileName}</h6>
+                        <a href="${fileUrl}" download class="btn btn-primary fw-bold px-4 py-2" style="border-radius:10px;">
+                            <i class="bi bi-download me-1"></i> Unduh File
+                        </a>
+                    </div>`;
+            }
+        });
+    }
 
     const limitSelect = document.getElementById('limit-select');
     if (limitSelect) {
