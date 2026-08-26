@@ -142,6 +142,17 @@ function create_sort_link($column_name, $display_text, $current_sort_by, $curren
     }
     return '<a href="?' . http_build_query($link_params) . '">' . $display_text . $icon . '</a>';
 }
+
+$export_excel_url = 'export_followup_excel.php?' . http_build_query([
+    'tgl_mulai' => $tgl_mulai,
+    'tgl_akhir' => $tgl_akhir,
+    'sales_id' => $selected_sales_id,
+    'search' => $search_keyword,
+    'respon' => $respon_filter,
+    'status' => $status_filter,
+    'sort_by' => $sort_by,
+    'sort_dir' => $sort_dir
+]);
 ?>
 
 <style>
@@ -467,6 +478,9 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
         </div>
 
         <div class="d-flex align-items-center gap-2">
+            <a href="<?php echo $export_excel_url; ?>" target="_blank" class="btn btn-success fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); border: none; border-radius: 12px; padding: 9px 20px; font-size: 14px;" title="Export Data Follow Up ke File Excel (.xlsx)">
+                <i class="bi bi-file-earmark-excel-fill fs-6"></i> Export Excel
+            </a>
             <div class="shadow-sm d-inline-flex align-items-center gap-2" style="background:#FFFFFF; color:#0F172A; border:2px solid #93C5FD; font-size:15px; font-weight:800; padding:9px 22px; border-radius:30px; font-family:'Plus Jakarta Sans', sans-serif;">
                 <i class="bi bi-card-text text-primary fs-5"></i> 
                 <?php if ($limit != 'all' && $total_records > 0): ?>
@@ -487,11 +501,16 @@ $fu_today_count = $fu_today_res ? ($fu_today_res->fetch_assoc()['t'] ?? 0) : 0;
 
 <!-- Main Table Card -->
 <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-card-list"></i> Riwayat Semua Follow Up</h5>
-        <a href="customer_management.php" class="btn btn-sm btn-secondary">
-            <i class="bi bi-grid-fill"></i> Dashboard
-        </a>
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-3 px-4">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-card-list text-primary me-1"></i> Riwayat Semua Follow Up</h5>
+        <div class="d-flex align-items-center gap-2">
+            <a href="<?php echo $export_excel_url; ?>" target="_blank" class="btn btn-sm btn-success fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); border: none; border-radius: 10px; padding: 7px 18px; font-size: 13.5px;" title="Export Data Follow Up ke File Excel (.xlsx)">
+                <i class="bi bi-file-earmark-excel-fill fs-6"></i> Export Excel
+            </a>
+            <a href="customer_management.php" class="btn btn-sm btn-secondary d-inline-flex align-items-center gap-1" style="border-radius: 10px; padding: 7px 14px; font-size: 13.5px;">
+                <i class="bi bi-grid-fill"></i> Dashboard
+            </a>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
