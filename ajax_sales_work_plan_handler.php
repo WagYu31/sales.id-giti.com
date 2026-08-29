@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/includes/db.php';
+global $conn;
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -502,7 +503,7 @@ switch ($action) {
         break;
 
     // -------------------------------------------------------------
-    // 9. SEARCH CUSTOMER AUTOCOMPLETE (SELECT2 COMPATIBLE)
+    // 9. SEARCH CUSTOMER AUTOCOMPLETE (SELECT2 COMPATIBLE - SCOPED TO SALES)
     // -------------------------------------------------------------
     case 'search_customer':
         try {
@@ -511,7 +512,21 @@ switch ($action) {
             $limit = 30;
             $offset = ($page - 1) * $limit;
             
+            // Strictly scope to sales_id:
+            // If user is sales, ONLY show their own assigned customers (c.sales_id = $user_id)
+            // If user is admin, allow filtering by requested sales_id
+            $target_sales_id = 0;
+            if ($user_role === 'sales') {
+                $target_sales_id = $user_id;
+            } elseif (!empty($_GET['sales_id'])) {
+                $target_sales_id = intval($_GET['sales_id']);
+            }
+            
             $where = ["c.deleted_at IS NULL"];
+            if ($target_sales_id > 0) {
+                $where[] = "c.sales_id = {$target_sales_id}";
+            }
+            
             if (!empty($q)) {
                 $q_esc = $conn->real_escape_string($q);
                 $where[] = "(

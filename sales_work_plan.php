@@ -1150,8 +1150,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     dataType: 'json',
                     delay: 250,
                     data: function (params) {
+                        const selectedSalesId = document.getElementById('modal_sales_id') ? document.getElementById('modal_sales_id').value : '';
                         return {
                             action: 'search_customer',
+                            sales_id: selectedSalesId,
                             q: params.term || '',
                             page: params.page || 1
                         };
@@ -1224,6 +1226,15 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('planModalTitle').innerHTML = '<i class="bi bi-calendar-plus text-primary me-2"></i>Tambah Rencana Kerja';
         planModal.show();
     });
+
+    // Reset customer selection when admin changes sales in modal
+    if (document.getElementById('modal_sales_id') && IS_ADMIN) {
+        document.getElementById('modal_sales_id').addEventListener('change', function() {
+            if (typeof $ !== 'undefined' && $('#modal_select_customer').data('select2')) {
+                $('#modal_select_customer').val(null).trigger('change');
+            }
+        });
+    }
 
     // Ensure Select2 is initialized when modal is shown
     document.getElementById('planModal').addEventListener('shown.bs.modal', function () {
@@ -1330,9 +1341,10 @@ document.addEventListener('DOMContentLoaded', function() {
         attachBatchRowEvents();
     }
 
-    // Populate Datalist for Batch Rows from Customer Database
+    // Populate Datalist for Batch Rows from Customer Database (Filtered by Sales)
     function loadCustomerDatalist() {
-        fetch('ajax_sales_work_plan_handler.php?action=search_customer&limit=100')
+        const targetSales = IS_ADMIN && document.getElementById('batch_sales_id') ? document.getElementById('batch_sales_id').value : CURRENT_USER_ID;
+        fetch(`ajax_sales_work_plan_handler.php?action=search_customer&sales_id=${targetSales}&limit=100`)
             .then(res => res.json())
             .then(res => {
                 if (res.success && res.results) {
@@ -1352,6 +1364,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(e => console.warn(e));
     }
     loadCustomerDatalist();
+
+    if (document.getElementById('batch_sales_id') && IS_ADMIN) {
+        document.getElementById('batch_sales_id').addEventListener('change', loadCustomerDatalist);
+    }
 
     document.getElementById('btn-open-batch-add').addEventListener('click', function() {
         initBatchRows();
