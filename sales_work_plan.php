@@ -629,13 +629,22 @@ $bulan_nama = [
                         </div>
 
                         <div class="col-md-12">
-                            <label class="form-label fw-semibold" style="font-size:12.5px;">Nama Customer / Toko <span class="text-danger">*</span></label>
-                            <div class="position-relative">
-                                <input type="text" class="form-control form-control-custom" id="modal_nama_customer" name="nama_customer" placeholder="Ketik nama toko atau pilih dari database..." autocomplete="off" required>
-                                <input type="hidden" id="modal_customer_id" name="customer_id" value="">
-                                <div id="customer-suggestions" class="dropdown-menu shadow-lg w-100 p-1" style="max-height:220px; overflow-y:auto; display:none; position:absolute; z-index:1050;"></div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label fw-semibold mb-0" style="font-size:12.5px;">
+                                    <i class="bi bi-shop text-primary me-1"></i>Nama Customer / Toko <span class="text-danger">*</span>
+                                </label>
+                                <span class="badge bg-primary-subtle text-primary border" style="font-size:10px;">
+                                    <i class="bi bi-database-check me-1"></i>Database Customer Terhubung
+                                </span>
                             </div>
-                            <small class="text-muted" style="font-size:11px;">Mulai ketik nama toko untuk melihat rekomendasi customer yang terdaftar di sistem.</small>
+                            <select class="form-select form-select-custom" id="modal_select_customer" style="width: 100%;" required>
+                                <option value="">-- Cari nama customer di database atau ketik baru --</option>
+                            </select>
+                            <input type="hidden" id="modal_nama_customer" name="nama_customer" value="">
+                            <input type="hidden" id="modal_customer_id" name="customer_id" value="">
+                            <small class="text-muted d-block mt-1" style="font-size:11px;">
+                                <i class="bi bi-info-circle me-1"></i>Ketik nama toko untuk mencari dari database customer. Nomor HP/WA akan terisi otomatis. Anda juga dapat mengetik nama customer baru.
+                            </small>
                         </div>
 
                         <div class="col-md-6">
@@ -1022,6 +1031,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             document.getElementById('modal_aktivitas').value = d.aktivitas || '';
                             document.getElementById('modal_hasil_fu').value = d.hasil_fu || '';
 
+                            // Set Select2 option for editing
+                            if (typeof $ !== 'undefined' && $('#modal_select_customer').data('select2')) {
+                                const newOption = new Option(d.nama_customer, d.customer_id || d.nama_customer, true, true);
+                                $('#modal_select_customer').empty().append(newOption).trigger('change');
+                            }
+
                             document.getElementById('planModalTitle').innerHTML = '<i class="bi bi-pencil-square text-primary me-2"></i>Edit Rencana Kerja';
                             planModal.show();
                         } else {
@@ -1120,20 +1135,118 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // -------------------------------------------------------------
-    // 4. MODAL ADD / EDIT SAVE
+    // 4. SELECT2 CUSTOMER INITIALIZATION
     // -------------------------------------------------------------
+    function initCustomerSelect2() {
+        if (typeof $ !== 'undefined' && $.fn.select2) {
+            $('#modal_select_customer').select2({
+                theme: 'bootstrap-5',
+                dropdownParent: $('#planModal'),
+                placeholder: '🔍 Cari & pilih customer dari database (atau ketik baru)...',
+                allowClear: true,
+                tags: true,
+                ajax: {
+                    url: 'ajax_sales_work_plan_handler.php',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            action: 'search_customer',
+                            q: params.term || '',
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.results || [],
+                            pagination: {
+                                more: data.pagination ? data.pagination.more : false
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0,
+                templateResult: function(item) {
+                    if (item.loading) return item.text;
+                    if (!item.nama_toko) {
+                        return $(`<div><span class="badge bg-secondary me-1">Custom Baru</span> <strong>${escapeHtml(item.text)}</strong></div>`);
+                    }
+                    const kotaBadge = item.kota ? `<span class="badge bg-light text-secondary border me-1">${escapeHtml(item.kota)}</span>` : '';
+                    const phoneBadge = item.phone ? `<span class="badge bg-success-subtle text-success border"><i class="bi bi-telephone"></i> ${escapeHtml(item.phone)}</span>` : '';
+                    return $(`
+                        <div class="py-1">
+                            <div class="fw-bold text-dark">${escapeHtml(item.nama_toko)}</div>
+                            <div class="d-flex align-items-center gap-1 mt-1" style="font-size:11px;">
+                                ${kotaBadge}
+                                ${phoneBadge}
+                                ${item.pic ? `<span class="text-muted ms-1">PIC: ${escapeHtml(item.pic)}</span>` : ''}
+                            </div>
+                        </div>
+                    `);
+                },
+                templateSelection: function(item) {
+                    return item.nama_toko || item.text || 'Pilih Customer...';
+                }
+            }).on('select2:select', function(e) {
+                const data = e.params.data;
+                if (data.id && !isNaN(data.id)) {
+                    document.getElementById('modal_customer_id').value = data.id;
+                    document.getElementById('modal_nama_customer').value = data.nama_toko || data.text;
+                    if (data.phone) {
+                        document.getElementById('modal_kontak_customer').value = data.phone;
+                    }
+                } else {
+                    document.getElementById('modal_customer_id').value = '';
+                    document.getElementById('modal_nama_customer').value = data.text;
+                }
+            }).on('select2:clear', function(e) {
+                document.getElementById('modal_customer_id').value = '';
+                document.getElementById('modal_nama_customer').value = '';
+            });
+        }
+    }
+
+    // Modal open add
     document.getElementById('btn-open-add').addEventListener('click', function() {
         document.getElementById('planForm').reset();
         document.getElementById('plan_id').value = '';
         document.getElementById('modal_customer_id').value = '';
+        document.getElementById('modal_nama_customer').value = '';
         document.getElementById('modal_tanggal').value = TODAY_STR;
         document.getElementById('modal_metode_fu').value = 'Text Whatsapp';
+        
+        if (typeof $ !== 'undefined' && $('#modal_select_customer').data('select2')) {
+            $('#modal_select_customer').val(null).trigger('change');
+        }
+
         document.getElementById('planModalTitle').innerHTML = '<i class="bi bi-calendar-plus text-primary me-2"></i>Tambah Rencana Kerja';
         planModal.show();
     });
 
+    // Ensure Select2 is initialized when modal is shown
+    document.getElementById('planModal').addEventListener('shown.bs.modal', function () {
+        initCustomerSelect2();
+    });
+
     document.getElementById('planForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        // Ensure nama_customer is filled from Select2 if not yet set
+        if (!document.getElementById('modal_nama_customer').value) {
+            const selVal = $('#modal_select_customer').val();
+            const selText = $('#modal_select_customer').find(':selected').text();
+            if (selVal) {
+                document.getElementById('modal_nama_customer').value = selText.split(' (')[0].trim() || selVal;
+            }
+        }
+
+        if (!document.getElementById('modal_nama_customer').value.trim()) {
+            Swal.fire('Perhatian', 'Nama Customer / Toko wajib dipilih atau diisi.', 'warning');
+            return;
+        }
+
         const planId = document.getElementById('plan_id').value;
         const action = planId ? 'update_plan' : 'add_plan';
 
@@ -1174,71 +1287,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Customer Autocomplete for Single Modal
-    const custInput = document.getElementById('modal_nama_customer');
-    const suggestBox = document.getElementById('customer-suggestions');
-    let custTimer = null;
-
-    custInput.addEventListener('input', function() {
-        clearTimeout(custTimer);
-        const q = this.value.trim();
-        if (q.length < 2) {
-            suggestBox.style.display = 'none';
-            return;
-        }
-
-        custTimer = setTimeout(() => {
-            fetch(`ajax_sales_work_plan_handler.php?action=search_customer&q=${encodeURIComponent(q)}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.success && res.results.length > 0) {
-                        let html = '';
-                        res.results.forEach(c => {
-                            html += `
-                                <a href="#" class="dropdown-item py-2 px-3 border-bottom customer-opt" 
-                                   data-id="${c.id}" 
-                                   data-name="${escapeHtml(c.nama_toko)}" 
-                                   data-phone="${escapeHtml(c.phone || '')}" 
-                                   data-email="${escapeHtml(c.email || '')}">
-                                    <div class="fw-bold text-dark">${escapeHtml(c.nama_toko)}</div>
-                                    <div class="text-muted" style="font-size:11px;">
-                                        ${c.phone ? '<i class="bi bi-telephone"></i> ' + c.phone : ''}
-                                        ${c.email ? ' | <i class="bi bi-envelope"></i> ' + c.email : ''}
-                                    </div>
-                                </a>
-                            `;
-                        });
-                        suggestBox.innerHTML = html;
-                        suggestBox.style.display = 'block';
-
-                        document.querySelectorAll('.customer-opt').forEach(opt => {
-                            opt.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                custInput.value = this.getAttribute('data-name');
-                                document.getElementById('modal_customer_id').value = this.getAttribute('data-id');
-                                if (this.getAttribute('data-phone')) {
-                                    document.getElementById('modal_kontak_customer').value = this.getAttribute('data-phone');
-                                }
-                                if (this.getAttribute('data-email')) {
-                                    document.getElementById('modal_email_customer').value = this.getAttribute('data-email');
-                                }
-                                suggestBox.style.display = 'none';
-                            });
-                        });
-                    } else {
-                        suggestBox.style.display = 'none';
-                    }
-                })
-                .catch(() => suggestBox.style.display = 'none');
-        }, 300);
-    });
-
-    document.addEventListener('click', function(e) {
-        if (!custInput.contains(e.target) && !suggestBox.contains(e.target)) {
-            suggestBox.style.display = 'none';
-        }
-    });
-
     // -------------------------------------------------------------
     // 5. BATCH MULTI-ROW ADD MODAL
     // -------------------------------------------------------------
@@ -1247,7 +1295,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <tr class="batch-row" id="batch-row-${idx}">
                 <td class="text-center fw-semibold text-muted align-middle">${idx}</td>
                 <td><input type="date" class="b-tanggal" value="${TODAY_STR}"></td>
-                <td><input type="text" class="b-nama" placeholder="Nama Customer / Toko *"></td>
+                <td>
+                    <input type="text" class="b-nama" list="customer-names-datalist" placeholder="Nama Toko (Ketik untuk cari)...">
+                </td>
                 <td><input type="text" class="b-kontak" placeholder="08xx..."></td>
                 <td>
                     <select class="b-metode">
@@ -1280,6 +1330,29 @@ document.addEventListener('DOMContentLoaded', function() {
         attachBatchRowEvents();
     }
 
+    // Populate Datalist for Batch Rows from Customer Database
+    function loadCustomerDatalist() {
+        fetch('ajax_sales_work_plan_handler.php?action=search_customer&limit=100')
+            .then(res => res.json())
+            .then(res => {
+                if (res.success && res.results) {
+                    let dlist = document.getElementById('customer-names-datalist');
+                    if (!dlist) {
+                        dlist = document.createElement('datalist');
+                        dlist.id = 'customer-names-datalist';
+                        document.body.appendChild(dlist);
+                    }
+                    let opts = '';
+                    res.results.forEach(c => {
+                        opts += `<option value="${escapeHtml(c.nama_toko)}" data-phone="${escapeHtml(c.phone || '')}">${c.kota ? '(' + escapeHtml(c.kota) + ')' : ''}</option>`;
+                    });
+                    dlist.innerHTML = opts;
+                }
+            })
+            .catch(e => console.warn(e));
+    }
+    loadCustomerDatalist();
+
     document.getElementById('btn-open-batch-add').addEventListener('click', function() {
         initBatchRows();
         batchModal.show();
@@ -1301,6 +1374,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     tr.querySelector('.b-kontak').value = '';
                     tr.querySelector('.b-aktivitas').value = '';
                     tr.querySelector('.b-hasil').value = '';
+                }
+            };
+        });
+
+        // Auto-fill phone if selected from datalist in batch row
+        document.querySelectorAll('.b-nama').forEach(input => {
+            input.onchange = function() {
+                const val = this.value;
+                const dlist = document.getElementById('customer-names-datalist');
+                if (dlist) {
+                    const opt = dlist.querySelector(`option[value="${val}"]`);
+                    if (opt && opt.getAttribute('data-phone')) {
+                        const tr = this.closest('tr');
+                        const phoneInput = tr.querySelector('.b-kontak');
+                        if (!phoneInput.value) {
+                            phoneInput.value = opt.getAttribute('data-phone');
+                        }
+                    }
                 }
             };
         });

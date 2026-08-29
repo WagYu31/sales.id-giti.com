@@ -502,30 +502,44 @@ switch ($action) {
         break;
 
     // -------------------------------------------------------------
-    // 9. SEARCH CUSTOMER AUTOCOMPLETE
+    // 9. SEARCH CUSTOMER AUTOCOMPLETE (SELECT2 COMPATIBLE)
     // -------------------------------------------------------------
     case 'search_customer':
         try {
-            $q = trim($_GET['q'] ?? '');
-            if (strlen($q) < 1) {
-                echo json_encode(['success' => true, 'results' => []]);
-                exit;
+            $q = trim($_GET['q'] ?? $_GET['term'] ?? '');
+            $page = max(1, intval($_GET['page'] ?? 1));
+            $limit = 30;
+            $offset = ($page - 1) * $limit;
+            
+            $where = ["c.deleted_at IS NULL"];
+            if (!empty($q)) {
+                $q_esc = $conn->real_escape_string($q);
+                $where[] = "(
+                    c.nama_toko LIKE '%{$q_esc}%' 
+                    OR c.id IN (SELECT cp2.customer_id FROM customer_pics cp2 WHERE (cp2.tlp_pic LIKE '%{$q_esc}%' OR cp2.nama_pic LIKE '%{$q_esc}%') AND cp2.deleted_at IS NULL)
+                    OR c.id IN (SELECT ca2.customer_id FROM customer_addresses ca2 WHERE ca2.kota LIKE '%{$q_esc}%' AND ca2.deleted_at IS NULL)
+                )";
             }
             
-            $q_escaped = $conn->real_escape_string($q);
-            $sales_where = ($user_role === 'sales') ? " AND (c.sales_id = {$user_id} OR c.sales_id IS NULL)" : "";
+            $where_sql = implode(' AND ', $where);
+            
+            // Total count
+            $count_sql = "SELECT COUNT(*) as total FROM customers c WHERE {$where_sql}";
+            $c_res = $conn->query($count_sql);
+            $total_records = $c_res ? (int)$c_res->fetch_assoc()['total'] : 0;
             
             $sql = "
                 SELECT 
                     c.id, 
                     c.nama_toko, 
-                    c.email,
-                    (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) as tlp_pic,
-                    (SELECT cp.email_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) as email_pic
+                    c.kategori,
+                    (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL AND cp.tlp_pic IS NOT NULL AND cp.tlp_pic != '' LIMIT 1) as tlp_pic,
+                    (SELECT cp.nama_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL AND cp.nama_pic != 'unknown' LIMIT 1) as nama_pic,
+                    (SELECT ca.kota FROM customer_addresses ca WHERE ca.customer_id = c.id AND ca.deleted_at IS NULL AND ca.kota IS NOT NULL LIMIT 1) as kota
                 FROM customers c
-                WHERE c.deleted_at IS NULL {$sales_where}
-                  AND (c.nama_toko LIKE '%{$q_escaped}%' OR c.email LIKE '%{$q_escaped}%')
-                LIMIT 15
+                WHERE {$where_sql}
+                ORDER BY c.nama_toko ASC
+                LIMIT {$limit} OFFSET {$offset}
             ";
             
             $res = $conn->query($sql);
@@ -533,18 +547,35 @@ switch ($action) {
             if ($res) {
                 while ($r = $res->fetch_assoc()) {
                     $phone = !empty($r['tlp_pic']) ? $r['tlp_pic'] : '';
-                    $email = !empty($r['email_pic']) ? $r['email_pic'] : $r['email'];
+                    $kota  = !empty($r['kota']) ? $r['kota'] : '';
+                    $pic   = !empty($r['nama_pic']) && $r['nama_pic'] !== 'unknown' ? $r['nama_pic'] : '';
+                    
+                    $extra_info = [];
+                    if ($kota) $extra_info[] = $kota;
+                    if ($phone) $extra_info[] = $phone;
+                    if ($pic) $extra_info[] = "PIC: " . $pic;
+                    
+                    $info_str = !empty($extra_info) ? ' (' . implode(' • ', $extra_info) . ')' : '';
+                    
                     $results[] = [
                         'id' => (int)$r['id'],
-                        'text' => $r['nama_toko'] . ($phone ? " ({$phone})" : ""),
+                        'text' => $r['nama_toko'] . $info_str,
                         'nama_toko' => $r['nama_toko'],
                         'phone' => $phone,
-                        'email' => $email
+                        'kota' => $kota,
+                        'pic' => $pic,
+                        'kategori' => $r['kategori'] ?? ''
                     ];
                 }
             }
             
-            echo json_encode(['success' => true, 'results' => $results]);
+            echo json_encode([
+                'success' => true,
+                'results' => $results,
+                'pagination' => [
+                    'more' => ($offset + count($results)) < $total_records
+                ]
+            ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
@@ -555,3 +586,4 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Aksi tidak dikenali.']);
         break;
 }
+
