@@ -39,4 +39,30 @@ $chk_col = $conn->query("SHOW COLUMNS FROM `follow_ups` LIKE 'nominal_invoice'")
 if ($chk_col && $chk_col->num_rows === 0) {
     $conn->query("ALTER TABLE `follow_ups` ADD COLUMN `nominal_invoice` DECIMAL(15,2) DEFAULT 0 AFTER `no_inv`");
 }
+
+// Auto-ensure sales_work_plans table exists
+$conn->query("
+    CREATE TABLE IF NOT EXISTS `sales_work_plans` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `sales_id` int(11) NOT NULL,
+      `tanggal` date NOT NULL,
+      `nama_customer` varchar(255) NOT NULL,
+      `customer_id` int(11) DEFAULT NULL,
+      `aktivitas` text DEFAULT NULL,
+      `kontak_customer` varchar(100) DEFAULT NULL,
+      `email_customer` varchar(100) DEFAULT NULL,
+      `metode_fu` varchar(100) NOT NULL DEFAULT 'Text Whatsapp',
+      `hasil_fu` text DEFAULT NULL,
+      `is_done` tinyint(1) NOT NULL DEFAULT 0,
+      `verified_by` int(11) DEFAULT NULL,
+      `verified_at` datetime DEFAULT NULL,
+      `created_at` timestamp NULL DEFAULT current_timestamp(),
+      `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+      `deleted_at` datetime DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      KEY `idx_sales_tanggal` (`sales_id`, `tanggal`),
+      KEY `idx_is_done` (`is_done`),
+      KEY `idx_deleted_at` (`deleted_at`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+");
 ?>

@@ -496,9 +496,15 @@ table tr td { font-size: 0.85em; }
             <a href="ads_report.php" class="sidebar-link <?php echo $currentPage=='ads_report.php'?'active':''; ?>">
                 <i class="bi bi-bar-chart-line-fill"></i> Report Saldo & Ads
             </a>
+            <a href="sales_work_plan.php" class="sidebar-link <?php echo $currentPage=='sales_work_plan.php'?'active':''; ?>">
+                <i class="bi bi-calendar-check-fill"></i> Rencana Kerja Sales
+            </a>
         <?php else: ?>
             <a href="customer_management.php" class="sidebar-link <?php echo $currentPage=='customer_management.php'?'active':''; ?>">
                 <i class="bi bi-grid-1x2-fill"></i> Dashboard Sales
+            </a>
+            <a href="sales_work_plan.php" class="sidebar-link <?php echo $currentPage=='sales_work_plan.php'?'active':''; ?>">
+                <i class="bi bi-calendar-check-fill"></i> Rencana Kerja Sales
             </a>
             <?php if ($userRole == 'superadmin'): ?>
             <a href="followup_report.php" class="sidebar-link <?php echo $currentPage=='followup_report.php'?'active':''; ?>">

@@ -115,6 +115,13 @@ if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['superadmin', 'sale
         </li>
         
         <li>
+            <a href="sales_work_plan.php">
+                <i class="bi bi-calendar-check-fill text-indigo" style="color: #6366f1;"></i>
+                Rencana Kerja
+            </a>
+        </li>
+        
+        <li>
             <a href="customer_add.php">
                 <i class="bi bi-person-plus-fill text-secondary"></i>
                 Tambah Customer

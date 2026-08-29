@@ -16398,9 +16398,44 @@ ALTER TABLE `qa_questions`
 -- Constraints for table `sales_broadcasts`
 --
 ALTER TABLE `sales_broadcasts`
-  ADD CONSTRAINT `sales_broadcasts_ibfk_1` FOREIGN KEY (`sales_id`) REFERENCES `sales` (`id`) ON DELETE CASCADE;
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sales_work_plans`
+--
+
+CREATE TABLE `sales_work_plans` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sales_id` int(11) NOT NULL,
+  `tanggal` date NOT NULL,
+  `nama_customer` varchar(255) NOT NULL,
+  `customer_id` int(11) DEFAULT NULL,
+  `aktivitas` text DEFAULT NULL,
+  `kontak_customer` varchar(100) DEFAULT NULL,
+  `email_customer` varchar(100) DEFAULT NULL,
+  `metode_fu` varchar(100) NOT NULL DEFAULT 'Text Whatsapp',
+  `hasil_fu` text DEFAULT NULL,
+  `is_done` tinyint(1) NOT NULL DEFAULT 0,
+  `verified_by` int(11) DEFAULT NULL,
+  `verified_at` datetime DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_sales_tanggal` (`sales_id`, `tanggal`),
+  KEY `idx_is_done` (`is_done`),
+  KEY `idx_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Constraints for table `sales_work_plans`
+--
+ALTER TABLE `sales_work_plans`
+  ADD CONSTRAINT `sales_work_plans_ibfk_1` FOREIGN KEY (`sales_id`) REFERENCES `sales` (`id`) ON DELETE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
