@@ -61,11 +61,14 @@ $sql_where_conditions = ["c.deleted_at IS NULL"];
 $params = [];
 $types = '';
 
+$active_sales_id = 0;
 if (isset($_SESSION['role']) && $_SESSION['role'] == 'sales') {
+    $active_sales_id = (int)$_SESSION['user_id'];
     $sql_where_conditions[] = "c.sales_id = ?";
     $params[] = $_SESSION['user_id'];
     $types .= 'i';
 } elseif ($filter_sales > 0) {
+    $active_sales_id = $filter_sales;
     $sql_where_conditions[] = "c.sales_id = ?";
     $params[] = $filter_sales;
     $types .= 'i';
@@ -84,9 +87,21 @@ if (!empty($filter_kategori)) {
 }
 
 if ($filter_fu === 'sudah') {
-    $sql_where_conditions[] = "c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL)";
+    if ($active_sales_id > 0) {
+        $sql_where_conditions[] = "c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL)";
+        $params[] = $active_sales_id;
+        $types .= 'i';
+    } else {
+        $sql_where_conditions[] = "c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL)";
+    }
 } elseif ($filter_fu === 'belum') {
-    $sql_where_conditions[] = "c.id NOT IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL)";
+    if ($active_sales_id > 0) {
+        $sql_where_conditions[] = "c.id NOT IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL)";
+        $params[] = $active_sales_id;
+        $types .= 'i';
+    } else {
+        $sql_where_conditions[] = "c.id NOT IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL)";
+    }
 }
 
 if (!empty($search_keyword)) {
@@ -208,20 +223,37 @@ if (isset($_SESSION['role']) && $_SESSION['role'] == 'sales') {
 
 $stats_where_sql = implode(' AND ', $stats_where);
 
-$stats_query = "
-    SELECT 
-        COUNT(*) as total_customers,
-        SUM(CASE WHEN c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL) THEN 1 ELSE 0 END) as count_sudah_fu,
-        SUM(CASE WHEN c.id NOT IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL) THEN 1 ELSE 0 END) as count_belum_fu,
-        SUM(CASE WHEN c.kandidat = 'Y' THEN 1 ELSE 0 END) as count_kandidat,
-        SUM(CASE WHEN c.deal = 'Y' THEN 1 ELSE 0 END) as count_deal
-    FROM customers c
-    WHERE {$stats_where_sql}
-";
+if ($active_sales_id > 0) {
+    $stats_query = "
+        SELECT 
+            COUNT(*) as total_customers,
+            SUM(CASE WHEN c.id IN (SELECT DISTINCT fu_sub.customer_id FROM follow_ups fu_sub WHERE fu_sub.sales_id = ? AND fu_sub.deleted_at IS NULL) THEN 1 ELSE 0 END) as count_sudah_fu,
+            SUM(CASE WHEN c.id NOT IN (SELECT DISTINCT fu_sub.customer_id FROM follow_ups fu_sub WHERE fu_sub.sales_id = ? AND fu_sub.deleted_at IS NULL) THEN 1 ELSE 0 END) as count_belum_fu,
+            SUM(CASE WHEN c.kandidat = 'Y' THEN 1 ELSE 0 END) as count_kandidat,
+            SUM(CASE WHEN c.deal = 'Y' THEN 1 ELSE 0 END) as count_deal
+        FROM customers c
+        WHERE {$stats_where_sql}
+    ";
+    $stats_fu_params = array_merge([$active_sales_id, $active_sales_id], $stats_params);
+    $stats_fu_types  = 'ii' . $stats_types;
+} else {
+    $stats_query = "
+        SELECT 
+            COUNT(*) as total_customers,
+            SUM(CASE WHEN c.id IN (SELECT DISTINCT fu_sub.customer_id FROM follow_ups fu_sub WHERE fu_sub.deleted_at IS NULL) THEN 1 ELSE 0 END) as count_sudah_fu,
+            SUM(CASE WHEN c.id NOT IN (SELECT DISTINCT fu_sub.customer_id FROM follow_ups fu_sub WHERE fu_sub.deleted_at IS NULL) THEN 1 ELSE 0 END) as count_belum_fu,
+            SUM(CASE WHEN c.kandidat = 'Y' THEN 1 ELSE 0 END) as count_kandidat,
+            SUM(CASE WHEN c.deal = 'Y' THEN 1 ELSE 0 END) as count_deal
+        FROM customers c
+        WHERE {$stats_where_sql}
+    ";
+    $stats_fu_params = $stats_params;
+    $stats_fu_types  = $stats_types;
+}
 
 $stmt_stats = $conn->prepare($stats_query);
-if (!empty($stats_params)) {
-    $stmt_stats->bind_param($stats_types, ...$stats_params);
+if (!empty($stats_fu_params)) {
+    $stmt_stats->bind_param($stats_fu_types, ...$stats_fu_params);
 }
 $stmt_stats->execute();
 $stats_row = $stmt_stats->get_result()->fetch_assoc();
