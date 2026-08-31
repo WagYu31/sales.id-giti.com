@@ -592,7 +592,7 @@ $stat_deal     = (int)($stats_row['count_deal'] ?? 0);
             <div>
                 <div class="cust-kpi-title text-warning-emphasis">Belum Follow Up</div>
                 <div class="cust-kpi-val text-warning-emphasis"><?php echo number_format($stat_belum_fu); ?></div>
-                <small class="text-muted" style="font-size:11px;">FU = 0 (Perlu FU)</small>
+                <small class="text-muted" style="font-size:11px;">Belum Pernah Di-FU</small>
             </div>
         </a>
 
@@ -604,7 +604,7 @@ $stat_deal     = (int)($stats_row['count_deal'] ?? 0);
             <div>
                 <div class="cust-kpi-title text-primary">Sudah Follow Up</div>
                 <div class="cust-kpi-val text-primary"><?php echo number_format($stat_sudah_fu); ?></div>
-                <small class="text-muted" style="font-size:11px;">FU &gt; 0 (Toko Sudah FU)</small>
+                <small class="text-muted" style="font-size:11px;">Sudah Pernah Di-FU</small>
             </div>
         </a>
 
@@ -723,8 +723,8 @@ $stat_deal     = (int)($stats_row['count_deal'] ?? 0);
                     </label>
                     <select name="filter_fu" id="filter_fu" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
                         <option value="">Semua Status FU</option>
-                        <option value="sudah" <?php if ($filter_fu === 'sudah') echo 'selected'; ?>>✅ Sudah Follow Up (FU > 0)</option>
-                        <option value="belum" <?php if ($filter_fu === 'belum') echo 'selected'; ?>>⏳ Belum Follow Up (FU = 0)</option>
+                        <option value="sudah" <?php if ($filter_fu === 'sudah') echo 'selected'; ?>>✅ Sudah Pernah Di-FU</option>
+                        <option value="belum" <?php if ($filter_fu === 'belum') echo 'selected'; ?>>⏳ Belum Pernah Di-FU</option>
                     </select>
                 </div>
 
