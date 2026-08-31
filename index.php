@@ -259,11 +259,23 @@ $stmt_stats->execute();
 $stats_row = $stmt_stats->get_result()->fetch_assoc();
 $stmt_stats->close();
 
-$stat_total    = (int)($stats_row['total_customers'] ?? 0);
-$stat_sudah_fu = (int)($stats_row['count_sudah_fu'] ?? 0);
-$stat_belum_fu = (int)($stats_row['count_belum_fu'] ?? 0);
-$stat_kandidat = (int)($stats_row['count_kandidat'] ?? 0);
-$stat_deal     = (int)($stats_row['count_deal'] ?? 0);
+$stat_total         = (int)($stats_row['total_customers'] ?? 0);
+$stat_cust_sudah_fu = (int)($stats_row['count_sudah_fu'] ?? 0);
+$stat_belum_fu      = (int)($stats_row['count_belum_fu'] ?? 0);
+$stat_kandidat      = (int)($stats_row['count_kandidat'] ?? 0);
+$stat_deal          = (int)($stats_row['count_deal'] ?? 0);
+
+// Total Activity Follow-Up Count
+if ($active_sales_id > 0) {
+    $stmt_act = $conn->prepare("SELECT COUNT(*) as total_act FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL");
+    $stmt_act->bind_param("i", $active_sales_id);
+    $stmt_act->execute();
+    $stat_sudah_fu = (int)($stmt_act->get_result()->fetch_assoc()['total_act'] ?? 0);
+    $stmt_act->close();
+} else {
+    $r_act = $conn->query("SELECT COUNT(*) as total_act FROM follow_ups WHERE deleted_at IS NULL");
+    $stat_sudah_fu = (int)($r_act->fetch_assoc()['total_act'] ?? 0);
+}
 ?>
 
 <style>
@@ -603,7 +615,7 @@ $stat_deal     = (int)($stats_row['count_deal'] ?? 0);
             <div>
                 <div class="cust-kpi-title text-primary">Sudah Follow Up</div>
                 <div class="cust-kpi-val text-primary"><?php echo number_format($stat_sudah_fu); ?></div>
-                <small class="text-muted" style="font-size:11px;">FU &gt; 0 (Ada Catatan)</small>
+                <small class="text-muted" style="font-size:11px;">Activity FU (<?php echo number_format($stat_cust_sudah_fu); ?> Toko)</small>
             </div>
         </a>
 
