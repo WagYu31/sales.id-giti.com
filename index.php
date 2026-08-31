@@ -265,6 +265,39 @@ $stat_sudah_fu = (int)($stats_row['count_sudah_fu'] ?? 0);
 $stat_belum_fu = (int)($stats_row['count_belum_fu'] ?? 0);
 $stat_kandidat = (int)($stats_row['count_kandidat'] ?? 0);
 $stat_deal     = (int)($stats_row['count_deal'] ?? 0);
+
+// Sync with Leaderboard Activity FU count (129)
+if ($active_sales_id > 0) {
+    $stmt_act = $conn->prepare("
+        SELECT COUNT(DISTINCT CASE 
+            WHEN c.id IS NOT NULL AND (
+                (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '2026-10-31')
+                OR 
+                ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
+                 AND NOT EXISTS (
+                     SELECT 1 FROM follow_ups fu_mid 
+                     WHERE fu_mid.customer_id = c.id 
+                       AND fu_mid.deleted_at IS NULL 
+                       AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
+                       AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
+                       AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
+                 ))
+            )
+            AND fu.tgl_follow_up >= '2026-08-01 00:00:00' AND fu.tgl_follow_up <= '2026-10-31 23:59:59'
+            THEN fu.id 
+        END) AS total_fu
+        FROM follow_ups fu
+        JOIN customers c ON fu.customer_id = c.id
+        WHERE fu.sales_id = ? AND fu.deleted_at IS NULL
+    ");
+    $stmt_act->bind_param("i", $active_sales_id);
+    $stmt_act->execute();
+    $act_res = (int)($stmt_act->get_result()->fetch_assoc()['total_fu'] ?? 0);
+    $stmt_act->close();
+    if ($act_res > 0) {
+        $stat_sudah_fu = $act_res;
+    }
+}
 ?>
 
 <style>
@@ -604,7 +637,7 @@ $stat_deal     = (int)($stats_row['count_deal'] ?? 0);
             <div>
                 <div class="cust-kpi-title text-primary">Sudah Follow Up</div>
                 <div class="cust-kpi-val text-primary"><?php echo number_format($stat_sudah_fu); ?></div>
-                <small class="text-muted" style="font-size:11px;">Sudah Pernah Di-FU</small>
+                <small class="text-muted" style="font-size:11px;">Activity Follow Up</small>
             </div>
         </a>
 
