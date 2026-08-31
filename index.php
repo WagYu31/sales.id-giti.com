@@ -49,6 +49,7 @@ if ($result_qa) {
 $filter_kota = trim($_GET['filter_kota'] ?? '');
 $filter_kategori = trim($_GET['filter_kategori'] ?? '');
 $filter_sales = intval($_GET['filter_sales'] ?? 0);
+$filter_fu = trim($_GET['filter_fu'] ?? '');
 $search_keyword = trim($_GET['search'] ?? '');
 
 $limit = isset($_GET['limit']) && is_numeric($_GET['limit']) ? (int)$_GET['limit'] : 25;
@@ -80,6 +81,12 @@ if (!empty($filter_kategori)) {
     $sql_where_conditions[] = "c.kategori = ?";
     $params[] = $filter_kategori;
     $types .= 's';
+}
+
+if ($filter_fu === 'sudah') {
+    $sql_where_conditions[] = "c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL)";
+} elseif ($filter_fu === 'belum') {
+    $sql_where_conditions[] = "c.id NOT IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL)";
 }
 
 if (!empty($search_keyword)) {
@@ -497,8 +504,20 @@ if ($_SESSION['role'] !== 'sales') {
                 </div>
                 <?php endif; ?>
 
+                <!-- Filter Status Follow Up -->
+                <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-3 col-md-6' : 'col-lg-4 col-md-6'; ?> col-12">
+                    <label for="filter_fu" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                        <i class="bi bi-telephone-outbound-fill text-success me-1"></i> Status Follow Up
+                    </label>
+                    <select name="filter_fu" id="filter_fu" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                        <option value="">Semua Status FU</option>
+                        <option value="sudah" <?php if ($filter_fu === 'sudah') echo 'selected'; ?>>✅ Sudah Follow Up (FU > 0)</option>
+                        <option value="belum" <?php if ($filter_fu === 'belum') echo 'selected'; ?>>⏳ Belum Follow Up (FU = 0)</option>
+                    </select>
+                </div>
+
                 <!-- Entri Per Halaman -->
-                <div class="col-lg-3 col-md-6 col-12">
+                <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-2 col-md-6' : 'col-lg-3 col-md-6'; ?> col-12">
                     <label for="limit" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                         <i class="bi bi-layers-fill text-primary me-1"></i> Entri Per Halaman
                     </label>
@@ -511,11 +530,11 @@ if ($_SESSION['role'] !== 'sales') {
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-6 col-md-12' : 'col-lg-9 col-md-12'; ?> col-12 d-flex gap-2">
+                <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-4 col-md-12' : 'col-lg-5 col-md-12'; ?> col-12 d-flex gap-2">
                     <button type="submit" class="btn btn-primary fw-extrabold flex-grow-1 shadow-sm d-inline-flex align-items-center justify-content-center gap-1.5" style="border-radius:12px; height:42px; font-weight:800; white-space:nowrap; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
                         <i class="bi bi-funnel-fill"></i> Terapkan Filter
                     </button>
-                    <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0 || $limit != 25): ?>
+                    <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0 || !empty($filter_fu) || $limit != 25): ?>
                         <a href="index.php#customer-section" class="btn btn-light border border-slate fw-bold d-inline-flex align-items-center justify-content-center gap-1" title="Reset Filter" style="border-radius:12px; height:42px; padding:0 18px; white-space:nowrap;">
                             <i class="bi bi-arrow-counterclockwise"></i> Reset
                         </a>
@@ -661,6 +680,7 @@ if ($_SESSION['role'] !== 'sales') {
                         'filter_kota' => $filter_kota,
                         'filter_kategori' => $filter_kategori,
                         'filter_sales' => $filter_sales,
+                        'filter_fu' => $filter_fu,
                         'search' => $search_keyword,
                         'limit' => $limit
                     ];
@@ -933,7 +953,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if ($.fn.select2) {
-        $('#filter_kota, #filter_kategori, #filter_sales, #limit').select2({
+        $('#filter_kota, #filter_kategori, #filter_sales, #filter_fu, #limit').select2({
             theme: 'bootstrap-5',
             width: '100%',
             dropdownAutoWidth: true

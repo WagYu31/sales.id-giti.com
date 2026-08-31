@@ -13,6 +13,7 @@ $search_keyword = trim($_GET['search'] ?? '');
 $filter_kota = trim($_GET['filter_kota'] ?? '');
 $filter_kategori = trim($_GET['filter_kategori'] ?? '');
 $filter_sales = intval($_GET['filter_sales'] ?? 0);
+$filter_fu = trim($_GET['filter_fu'] ?? '');
 
 $sql_where_conditions = ["c.deleted_at IS NULL", "c.kandidat = 'Y'"];
 $params = [];
@@ -56,6 +57,12 @@ if (!empty($filter_kategori)) {
     $sql_where_conditions[] = "c.kategori = ?";
     $params[] = $filter_kategori;
     $types .= 's';
+}
+
+if ($filter_fu === 'sudah') {
+    $sql_where_conditions[] = "c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL)";
+} elseif ($filter_fu === 'belum') {
+    $sql_where_conditions[] = "c.id NOT IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL)";
 }
 
 $where_clause = "WHERE " . implode(' AND ', $sql_where_conditions);
@@ -241,7 +248,7 @@ if ($_SESSION['role'] !== 'sales') {
 <div class="card mb-4 border-0 shadow-sm" style="border-radius:18px;">
     <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
         <h5 class="mb-0 text-dark fw-bold" style="font-size:15px;"><i class="bi bi-funnel-fill text-primary me-1"></i> Filter Data Customer</h5>
-        <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0): ?>
+        <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0 || !empty($filter_fu)): ?>
             <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold" style="border-radius:8px;">Filter Aktif</span>
         <?php endif; ?>
     </div>
@@ -272,7 +279,7 @@ if ($_SESSION['role'] !== 'sales') {
                 </div>
 
                 <!-- Filter Kategori -->
-                <div class="col-lg-3 col-md-6 col-12">
+                <div class="col-lg-2 col-md-6 col-12">
                     <label for="filter_kategori" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                         <i class="bi bi-tags-fill text-primary me-1"></i> Filter Kategori
                     </label>
@@ -286,9 +293,21 @@ if ($_SESSION['role'] !== 'sales') {
                     </select>
                 </div>
 
+                <!-- Filter Status Follow Up -->
+                <div class="col-lg-2 col-md-6 col-12">
+                    <label for="filter_fu" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                        <i class="bi bi-telephone-outbound-fill text-success me-1"></i> Status FU
+                    </label>
+                    <select name="filter_fu" id="filter_fu" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                        <option value="">Semua Status FU</option>
+                        <option value="sudah" <?php if ($filter_fu === 'sudah') echo 'selected'; ?>>✅ Sudah FU</option>
+                        <option value="belum" <?php if ($filter_fu === 'belum') echo 'selected'; ?>>⏳ Belum FU</option>
+                    </select>
+                </div>
+
                 <!-- Filter Sales (Superadmin/Adminsales) -->
                 <?php if ($_SESSION['role'] !== 'sales'): ?>
-                <div class="col-lg-3 col-md-6 col-12">
+                <div class="col-lg-2 col-md-6 col-12">
                     <label for="filter_sales" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                         <i class="bi bi-person-badge-fill text-info me-1"></i> Filter Sales
                     </label>
@@ -304,11 +323,11 @@ if ($_SESSION['role'] !== 'sales') {
                 <?php endif; ?>
 
                 <!-- Action Buttons -->
-                <div class="col-lg-3 col-md-6 col-12 d-flex gap-2">
+                <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-12 col-md-12' : 'col-lg-2 col-md-6'; ?> col-12 d-flex gap-2 justify-content-end">
                     <button type="submit" class="btn btn-primary fw-extrabold flex-grow-1 shadow-sm d-inline-flex align-items-center justify-content-center gap-1.5" style="height:42px; border-radius:12px; white-space:nowrap; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
                         <i class="bi bi-funnel-fill"></i> Terapkan Filter
                     </button>
-                    <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0): ?>
+                    <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0 || !empty($filter_fu)): ?>
                         <a href="kandidat_customer.php?filter=<?php echo htmlspecialchars($filter); ?>" class="btn btn-light border border-slate fw-bold d-inline-flex align-items-center justify-content-center gap-1" title="Reset Filter" style="height:42px; padding:0 16px; border-radius:12px; white-space:nowrap;">
                             <i class="bi bi-arrow-counterclockwise"></i> Reset
                         </a>
