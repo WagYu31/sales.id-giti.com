@@ -601,6 +601,17 @@ if ($active_sales_id > 0) {
 </div>
 
 <!-- SECTION 2: DAFTAR CUSTOMER -->
+<?php
+// Direct sync with leaderboard ranking dataset to guarantee exact 100% match
+if (!empty($ranking_data) && $active_sales_id > 0) {
+    foreach ($ranking_data as $rd) {
+        if ((int)$rd['sales_id'] === (int)$active_sales_id) {
+            $stat_sudah_fu = (int)$rd['total_fu'];
+            break;
+        }
+    }
+}
+?>
 <div id="customer-section">
 
     <!-- KPI Summary Metrics Grid -->
