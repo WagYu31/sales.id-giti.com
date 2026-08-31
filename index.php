@@ -136,7 +136,8 @@ $sql = "
         (SELECT GROUP_CONCAT(DISTINCT cp.tlp_pic ORDER BY cp.id SEPARATOR '||') FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL) AS all_phones,
         (SELECT GROUP_CONCAT(DISTINCT ca.kota ORDER BY ca.id SEPARATOR ', ') FROM customer_addresses ca WHERE ca.customer_id = c.id AND ca.deleted_at IS NULL) AS all_cities,
         (SELECT ca.link_google_map FROM customer_addresses ca WHERE ca.customer_id = c.id AND ca.deleted_at IS NULL AND ca.link_google_map IS NOT NULL AND ca.link_google_map != '' LIMIT 1) AS primary_map_link,
-        (SELECT COUNT(*) FROM follow_ups fu WHERE fu.customer_id = c.id AND fu.deleted_at IS NULL) AS fu_count
+        (SELECT COUNT(*) FROM follow_ups fu WHERE fu.customer_id = c.id AND fu.sales_id = c.sales_id AND fu.deleted_at IS NULL) AS fu_count,
+        (SELECT COUNT(*) FROM follow_ups fu WHERE fu.customer_id = c.id AND fu.deleted_at IS NULL) AS total_fu_all_time
     FROM 
         customers c
     LEFT JOIN 
@@ -259,23 +260,11 @@ $stmt_stats->execute();
 $stats_row = $stmt_stats->get_result()->fetch_assoc();
 $stmt_stats->close();
 
-$stat_total         = (int)($stats_row['total_customers'] ?? 0);
-$stat_cust_sudah_fu = (int)($stats_row['count_sudah_fu'] ?? 0);
-$stat_belum_fu      = (int)($stats_row['count_belum_fu'] ?? 0);
-$stat_kandidat      = (int)($stats_row['count_kandidat'] ?? 0);
-$stat_deal          = (int)($stats_row['count_deal'] ?? 0);
-
-// Total Activity Follow-Up Count
-if ($active_sales_id > 0) {
-    $stmt_act = $conn->prepare("SELECT COUNT(*) as total_act FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL");
-    $stmt_act->bind_param("i", $active_sales_id);
-    $stmt_act->execute();
-    $stat_sudah_fu = (int)($stmt_act->get_result()->fetch_assoc()['total_act'] ?? 0);
-    $stmt_act->close();
-} else {
-    $r_act = $conn->query("SELECT COUNT(*) as total_act FROM follow_ups WHERE deleted_at IS NULL");
-    $stat_sudah_fu = (int)($r_act->fetch_assoc()['total_act'] ?? 0);
-}
+$stat_total    = (int)($stats_row['total_customers'] ?? 0);
+$stat_sudah_fu = (int)($stats_row['count_sudah_fu'] ?? 0);
+$stat_belum_fu = (int)($stats_row['count_belum_fu'] ?? 0);
+$stat_kandidat = (int)($stats_row['count_kandidat'] ?? 0);
+$stat_deal     = (int)($stats_row['count_deal'] ?? 0);
 ?>
 
 <style>
@@ -615,7 +604,7 @@ if ($active_sales_id > 0) {
             <div>
                 <div class="cust-kpi-title text-primary">Sudah Follow Up</div>
                 <div class="cust-kpi-val text-primary"><?php echo number_format($stat_sudah_fu); ?></div>
-                <small class="text-muted" style="font-size:11px;">Activity FU (<?php echo number_format($stat_cust_sudah_fu); ?> Toko)</small>
+                <small class="text-muted" style="font-size:11px;">FU &gt; 0 (Toko Sudah FU)</small>
             </div>
         </a>
 
@@ -849,8 +838,8 @@ if ($active_sales_id > 0) {
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center fw-bold">
-                                    <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" title="Lihat Riwayat Follow Up" class="text-decoration-none">
-                                        <span class="badge bg-primary rounded-pill px-2.5 py-1" style="font-size:12px;"><?php echo $customer['fu_count']; ?></span>
+                                    <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" title="<?php echo ($customer['total_fu_all_time'] > $customer['fu_count']) ? 'Di-FU sales saat ini: ' . $customer['fu_count'] . 'x (Total riwayat lama: ' . $customer['total_fu_all_time'] . 'x)' : 'Lihat Riwayat Follow Up (' . $customer['fu_count'] . ')'; ?>" class="text-decoration-none">
+                                        <span class="badge <?php echo $customer['fu_count'] > 0 ? 'bg-primary' : 'bg-secondary-subtle text-secondary border'; ?> rounded-pill px-2.5 py-1" style="font-size:12px;"><?php echo $customer['fu_count']; ?></span>
                                     </a>
                                 </td>
                                 <td class="text-center">
