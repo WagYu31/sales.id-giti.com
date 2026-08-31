@@ -190,9 +190,125 @@ if ($_SESSION['role'] !== 'sales') {
         }
     }
 }
+
+// --- 3. FETCH METRICS FOR KPI STATS CARDS ---
+$stats_where = ["c.deleted_at IS NULL"];
+$stats_params = [];
+$stats_types = '';
+
+if (isset($_SESSION['role']) && $_SESSION['role'] == 'sales') {
+    $stats_where[] = "c.sales_id = ?";
+    $stats_params[] = $_SESSION['user_id'];
+    $stats_types .= 'i';
+} elseif ($filter_sales > 0) {
+    $stats_where[] = "c.sales_id = ?";
+    $stats_params[] = $filter_sales;
+    $stats_types .= 'i';
+}
+
+$stats_where_sql = implode(' AND ', $stats_where);
+
+$stats_query = "
+    SELECT 
+        COUNT(*) as total_customers,
+        SUM(CASE WHEN c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL) THEN 1 ELSE 0 END) as count_sudah_fu,
+        SUM(CASE WHEN c.id NOT IN (SELECT DISTINCT customer_id FROM follow_ups WHERE deleted_at IS NULL) THEN 1 ELSE 0 END) as count_belum_fu,
+        SUM(CASE WHEN c.kandidat = 'Y' THEN 1 ELSE 0 END) as count_kandidat,
+        SUM(CASE WHEN c.deal = 'Y' THEN 1 ELSE 0 END) as count_deal
+    FROM customers c
+    WHERE {$stats_where_sql}
+";
+
+$stmt_stats = $conn->prepare($stats_query);
+if (!empty($stats_params)) {
+    $stmt_stats->bind_param($stats_types, ...$stats_params);
+}
+$stmt_stats->execute();
+$stats_row = $stmt_stats->get_result()->fetch_assoc();
+$stmt_stats->close();
+
+$stat_total    = (int)($stats_row['total_customers'] ?? 0);
+$stat_sudah_fu = (int)($stats_row['count_sudah_fu'] ?? 0);
+$stat_belum_fu = (int)($stats_row['count_belum_fu'] ?? 0);
+$stat_kandidat = (int)($stats_row['count_kandidat'] ?? 0);
+$stat_deal     = (int)($stats_row['count_deal'] ?? 0);
 ?>
 
 <style>
+/* ============ KPI STATS GRID ============ */
+.cust-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+@media (max-width: 1200px) {
+    .cust-kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 768px) {
+    .cust-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 480px) {
+    .cust-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.cust-kpi-card {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+}
+.cust-kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px -5px rgba(15, 23, 42, 0.1);
+    border-color: #CBD5E1;
+    color: inherit;
+}
+.cust-kpi-card.active-kpi {
+    border-color: #2563EB;
+    background: #F8FAFC;
+    box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.2);
+}
+.cust-kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.cust-kpi-val {
+    font-size: 22px;
+    font-weight: 800;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    color: #0F172A;
+    line-height: 1.1;
+}
+.cust-kpi-title {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+}
+
 .cust-hero {
     background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%);
     border-radius: 20px;
@@ -420,6 +536,69 @@ if ($_SESSION['role'] !== 'sales') {
 
 <!-- SECTION 2: DAFTAR CUSTOMER -->
 <div id="customer-section">
+
+    <!-- KPI Summary Metrics Grid -->
+    <div class="cust-kpi-grid">
+        <!-- 1. Total Customer -->
+        <a href="index.php#customer-section" class="cust-kpi-card <?php if (empty($filter_fu)) echo 'active-kpi'; ?>" title="Klik untuk menampilkan semua customer">
+            <div class="cust-kpi-icon" style="background:#F1F5F9; color:#334155;">
+                <i class="bi bi-shop"></i>
+            </div>
+            <div>
+                <div class="cust-kpi-title">Total Customer</div>
+                <div class="cust-kpi-val"><?php echo number_format($stat_total); ?></div>
+                <small class="text-muted" style="font-size:11px;">Semua Customer</small>
+            </div>
+        </a>
+
+        <!-- 2. Belum Follow Up -->
+        <a href="index.php?filter_fu=belum<?php echo $filter_sales ? '&filter_sales=' . $filter_sales : ''; ?>#customer-section" class="cust-kpi-card <?php if ($filter_fu === 'belum') echo 'active-kpi border-warning'; ?>" title="Klik untuk memfilter customer belum follow up">
+            <div class="cust-kpi-icon" style="background:#FEF3C7; color:#D97706;">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div>
+                <div class="cust-kpi-title text-warning-emphasis">Belum Follow Up</div>
+                <div class="cust-kpi-val text-warning-emphasis"><?php echo number_format($stat_belum_fu); ?></div>
+                <small class="text-muted" style="font-size:11px;">FU = 0 (Perlu FU)</small>
+            </div>
+        </a>
+
+        <!-- 3. Sudah Follow Up -->
+        <a href="index.php?filter_fu=sudah<?php echo $filter_sales ? '&filter_sales=' . $filter_sales : ''; ?>#customer-section" class="cust-kpi-card <?php if ($filter_fu === 'sudah') echo 'active-kpi border-primary'; ?>" title="Klik untuk memfilter customer sudah follow up">
+            <div class="cust-kpi-icon" style="background:#EFF6FF; color:#2563EB;">
+                <i class="bi bi-chat-left-dots-fill"></i>
+            </div>
+            <div>
+                <div class="cust-kpi-title text-primary">Sudah Follow Up</div>
+                <div class="cust-kpi-val text-primary"><?php echo number_format($stat_sudah_fu); ?></div>
+                <small class="text-muted" style="font-size:11px;">FU &gt; 0 (Ada Catatan)</small>
+            </div>
+        </a>
+
+        <!-- 4. Kandidat -->
+        <a href="kandidat_customer.php?filter=kandidat" class="cust-kpi-card" title="Buka Halaman Kandidat Customer">
+            <div class="cust-kpi-icon" style="background:#F5F3FF; color:#7C3AED;">
+                <i class="bi bi-star-fill"></i>
+            </div>
+            <div>
+                <div class="cust-kpi-title" style="color:#7C3AED;">Kandidat</div>
+                <div class="cust-kpi-val" style="color:#7C3AED;"><?php echo number_format($stat_kandidat); ?></div>
+                <small class="text-muted" style="font-size:11px;">Toko Kandidat</small>
+            </div>
+        </a>
+
+        <!-- 5. Deal -->
+        <a href="kandidat_customer.php?filter=acc_boss" class="cust-kpi-card" title="Buka Halaman Customer Deal">
+            <div class="cust-kpi-icon" style="background:#ECFDF5; color:#059669;">
+                <i class="bi bi-patch-check-fill"></i>
+            </div>
+            <div>
+                <div class="cust-kpi-title text-success">Deal / Closing</div>
+                <div class="cust-kpi-val text-success"><?php echo number_format($stat_deal); ?></div>
+                <small class="text-muted" style="font-size:11px;">Customer Deal</small>
+            </div>
+        </a>
+    </div>
 
     <!-- Filter Toolbar Card -->
     <div class="filter-card">
