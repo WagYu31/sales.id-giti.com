@@ -117,22 +117,22 @@ $sql_all = "
         fu.sales_id,
         fu.keterangan AS catatan,
         c.id AS customer_id,
-        c.nama_toko AS nama_customer,
+        COALESCE(c.nama_toko, 'Customer') AS nama_customer,
         c.tgl_input AS tgl_input_cust,
         (SELECT MAX(fu_prev.tgl_follow_up)
          FROM follow_ups fu_prev
-         WHERE fu_prev.customer_id = c.id
+         WHERE fu_prev.customer_id = fu.customer_id
            AND fu_prev.deleted_at IS NULL
            AND fu_prev.no_inv IS NOT NULL AND fu_prev.no_inv != ''
            AND fu_prev.tgl_follow_up < '2026-08-01 00:00:00'
         ) AS tgl_terakhir_beli_lama,
-        (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
+        (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = fu.customer_id AND cp.deleted_at IS NULL LIMIT 1) AS no_hp,
         CASE 
             WHEN (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01') THEN 'A'
             ELSE 'B'
         END AS kat_type
     FROM follow_ups fu
-    JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
+    LEFT JOIN customers c ON fu.customer_id = c.id
     WHERE fu.deleted_at IS NULL
       AND fu.sales_id = {$sales_id}
       AND fu.no_inv IS NOT NULL 

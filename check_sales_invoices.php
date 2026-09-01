@@ -64,14 +64,14 @@ $sql_program = "
         fu.nominal_invoice,
         fu.tgl_follow_up,
         c.id AS customer_id,
-        c.nama_toko,
+        COALESCE(c.nama_toko, 'Customer') AS nama_toko,
         c.tgl_input,
         CASE 
             WHEN (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01') THEN 'Akuisisi Baru'
             ELSE 'Reaktivasi Lama'
         END AS kategori_program
     FROM follow_ups fu
-    JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
+    LEFT JOIN customers c ON fu.customer_id = c.id
     WHERE fu.sales_id = {$sales_id}
       AND fu.deleted_at IS NULL
       AND fu.no_inv IS NOT NULL AND TRIM(fu.no_inv) != ''
