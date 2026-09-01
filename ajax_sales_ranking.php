@@ -59,89 +59,33 @@ $sql_ranking_all = "
            AND c_sub.tgl_input <= '{$end_date}'
         ) AS total_cust_baru,
 
-        -- Total Activity FU on Qualified Customers (Cust Baru + Cust Lama Reaktivasi)
+        -- Total Activity FU in Period
         COUNT(DISTINCT CASE 
-            WHEN c.id IS NOT NULL AND (
-                -- Kategori 1: Customer Baru Program
-                (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '{$end_date}')
-                OR 
-                -- Kategori 2: Customer Lama (terakhir belanja <= bulan 5, tidak belanja di bulan 6-7)
-                ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
-                 AND NOT EXISTS (
-                     SELECT 1 FROM follow_ups fu_mid 
-                     WHERE fu_mid.customer_id = c.id 
-                       AND fu_mid.deleted_at IS NULL 
-                       AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
-                       AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
-                       AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
-                 ))
-            )
-            AND fu.tgl_follow_up >= '{$start_dt}' AND fu.tgl_follow_up <= '{$end_dt}'
+            WHEN fu.id IS NOT NULL 
+             AND fu.tgl_follow_up >= '{$start_dt}' AND fu.tgl_follow_up <= '{$end_dt}'
             THEN fu.id 
         END) AS total_fu,
 
-        -- Total Distinct Qualified Customers di-FU
+        -- Total Distinct Customers di-FU in Period
         COUNT(DISTINCT CASE 
-            WHEN c.id IS NOT NULL AND (
-                -- Kategori 1: Customer Baru
-                (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '{$end_date}')
-                OR 
-                -- Kategori 2: Customer Lama Reaktivasi
-                ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
-                 AND NOT EXISTS (
-                     SELECT 1 FROM follow_ups fu_mid 
-                     WHERE fu_mid.customer_id = c.id 
-                       AND fu_mid.deleted_at IS NULL 
-                       AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
-                       AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
-                       AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
-                 ))
-            )
-            AND fu.tgl_follow_up >= '{$start_dt}' AND fu.tgl_follow_up <= '{$end_dt}'
+            WHEN fu.id IS NOT NULL 
+             AND fu.tgl_follow_up >= '{$start_dt}' AND fu.tgl_follow_up <= '{$end_dt}'
             THEN fu.customer_id 
         END) AS total_customer_fu,
 
-        -- Total Jumlah Invoice yang Valid (Cust Baru + Cust Lama Reaktivasi yang Belanja)
+        -- Total Jumlah Invoice Valid in Period
         COUNT(DISTINCT CASE 
-            WHEN c.id IS NOT NULL AND (
-                -- Kategori 1: Customer Baru
-                (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '{$end_date}')
-                OR 
-                -- Kategori 2: Customer Lama Reaktivasi
-                ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
-                 AND NOT EXISTS (
-                     SELECT 1 FROM follow_ups fu_mid 
-                     WHERE fu_mid.customer_id = c.id 
-                       AND fu_mid.deleted_at IS NULL 
-                       AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
-                       AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
-                       AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
-                 ))
-            )
-            AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-            AND fu.tgl_follow_up >= '{$start_dt}' AND fu.tgl_follow_up <= '{$end_dt}'
+            WHEN fu.id IS NOT NULL 
+             AND fu.no_inv IS NOT NULL AND TRIM(fu.no_inv) != ''
+             AND fu.tgl_follow_up >= '{$start_dt}' AND fu.tgl_follow_up <= '{$end_dt}'
             THEN fu.id 
         END) AS total_inv_count,
 
-        -- Total Omset Invoice yang Valid (Rp)
+        -- Total Omset Invoice in Period (Rp)
         COALESCE(SUM(CASE 
-            WHEN c.id IS NOT NULL AND (
-                -- Kategori 1: Customer Baru
-                (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '{$end_date}')
-                OR 
-                -- Kategori 2: Customer Lama Reaktivasi
-                ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
-                 AND NOT EXISTS (
-                     SELECT 1 FROM follow_ups fu_mid 
-                     WHERE fu_mid.customer_id = c.id 
-                       AND fu_mid.deleted_at IS NULL 
-                       AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
-                       AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
-                       AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
-                 ))
-            )
-            AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
-            AND fu.tgl_follow_up >= '{$start_dt}' AND fu.tgl_follow_up <= '{$end_dt}'
+            WHEN fu.id IS NOT NULL 
+             AND fu.no_inv IS NOT NULL AND TRIM(fu.no_inv) != ''
+             AND fu.tgl_follow_up >= '{$start_dt}' AND fu.tgl_follow_up <= '{$end_dt}'
             THEN fu.nominal_invoice 
             ELSE 0 
         END), 0) AS total_omset_invoice

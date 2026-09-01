@@ -15,46 +15,21 @@ $start_date = '2026-08-01';
 $end_date = '2026-08-31';
 $label_periode = 'Bulan 8 (Agustus 2026)';
 
-// Fetch Combined Sales Leaderboard (Kat A + Kat B Combined)
-// 1. Cust Baru: Input in program period (tgl_input >= 2026-08-01)
-// 2. Cust Lama Reaktivasi: Input <= 2026-05-31 & NO invoice in June/July 2026
+// Fetch Combined Sales Leaderboard
 $sql_combined = "
     SELECT 
         s.id AS sales_id,
         s.nama_lengkap AS nama_sales,
         COUNT(DISTINCT CASE WHEN (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01') THEN c.id END) AS total_cust_baru,
-        COUNT(DISTINCT CASE WHEN ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
-                 AND NOT EXISTS (
-                     SELECT 1 FROM follow_ups fu_mid 
-                     WHERE fu_mid.customer_id = c.id 
-                       AND fu_mid.deleted_at IS NULL 
-                       AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
-                       AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
-                       AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
-                 )) THEN fu.customer_id END) AS total_cust_reaktivasi,
+        COUNT(DISTINCT CASE WHEN (c.tgl_input IS NULL OR c.tgl_input < '2026-08-01') THEN fu.customer_id END) AS total_cust_reaktivasi,
         COUNT(DISTINCT fu.customer_id) AS total_cust_belanja,
         COALESCE(SUM(fu.nominal_invoice), 0) AS total_omset_combined
     FROM sales s
     JOIN follow_ups fu ON fu.sales_id = s.id AND fu.deleted_at IS NULL
     JOIN customers c ON fu.customer_id = c.id AND c.deleted_at IS NULL
     WHERE fu.tgl_follow_up >= '{$start_date} 00:00:00' AND fu.tgl_follow_up <= '{$end_date} 23:59:59'
-      AND fu.no_inv IS NOT NULL AND fu.no_inv != ''
+      AND fu.no_inv IS NOT NULL AND TRIM(fu.no_inv) != ''
       AND (s.role = 'sales' OR s.role = 'superadmin')
-      AND (
-          -- Kategori A: Customer Baru
-          (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01')
-          OR 
-          -- Kategori B: Customer Lama Reaktivasi (Terakhir belanja <= bln 5, tidak belanja bln 6-7)
-          ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
-           AND NOT EXISTS (
-               SELECT 1 FROM follow_ups fu_mid 
-               WHERE fu_mid.customer_id = c.id 
-                 AND fu_mid.deleted_at IS NULL 
-                 AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
-                 AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
-                 AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
-           ))
-      )
     GROUP BY s.id, s.nama_lengkap
     ORDER BY total_omset_combined DESC, total_cust_belanja DESC
     LIMIT 10

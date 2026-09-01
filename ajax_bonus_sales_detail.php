@@ -136,22 +136,7 @@ $sql_all = "
     WHERE fu.deleted_at IS NULL
       AND fu.sales_id = {$sales_id}
       AND fu.no_inv IS NOT NULL 
-      AND fu.no_inv != ''
-      AND (
-          -- Kategori A: Customer Baru
-          (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01')
-          OR 
-          -- Kategori B: Customer Lama Reaktivasi (Terakhir belanja <= bln 5, tidak belanja bln 6-7)
-          ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
-           AND NOT EXISTS (
-               SELECT 1 FROM follow_ups fu_mid 
-               WHERE fu_mid.customer_id = c.id 
-                 AND fu_mid.deleted_at IS NULL 
-                 AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
-                 AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
-                 AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
-           ))
-      )
+      AND TRIM(fu.no_inv) != ''
       {$where_date_fu}
     ORDER BY fu.tgl_follow_up DESC
 ";

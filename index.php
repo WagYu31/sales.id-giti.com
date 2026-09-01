@@ -266,29 +266,14 @@ $stat_belum_fu = (int)($stats_row['count_belum_fu'] ?? 0);
 $stat_kandidat = (int)($stats_row['count_kandidat'] ?? 0);
 $stat_deal     = (int)($stats_row['count_deal'] ?? 0);
 
-// Sync with Leaderboard Activity FU count (129)
+// Sync with Leaderboard Activity FU count
 if ($active_sales_id > 0) {
     $stmt_act = $conn->prepare("
-        SELECT COUNT(DISTINCT CASE 
-            WHEN c.id IS NOT NULL AND (
-                (c.tgl_input IS NOT NULL AND c.tgl_input >= '2026-08-01' AND c.tgl_input <= '2026-10-31')
-                OR 
-                ((c.tgl_input IS NULL OR c.tgl_input <= '2026-05-31')
-                 AND NOT EXISTS (
-                     SELECT 1 FROM follow_ups fu_mid 
-                     WHERE fu_mid.customer_id = c.id 
-                       AND fu_mid.deleted_at IS NULL 
-                       AND fu_mid.no_inv IS NOT NULL AND fu_mid.no_inv != '' 
-                       AND fu_mid.tgl_follow_up >= '2026-06-01 00:00:00' 
-                       AND fu_mid.tgl_follow_up <= '2026-07-31 23:59:59'
-                 ))
-            )
-            AND fu.tgl_follow_up >= '2026-08-01 00:00:00' AND fu.tgl_follow_up <= '2026-10-31 23:59:59'
-            THEN fu.id 
-        END) AS total_fu
+        SELECT COUNT(DISTINCT fu.id) AS total_fu
         FROM follow_ups fu
         JOIN customers c ON fu.customer_id = c.id
         WHERE fu.sales_id = ? AND fu.deleted_at IS NULL
+          AND fu.tgl_follow_up >= '2026-08-01 00:00:00' AND fu.tgl_follow_up <= '2026-10-31 23:59:59'
     ");
     $stmt_act->bind_param("i", $active_sales_id);
     $stmt_act->execute();
