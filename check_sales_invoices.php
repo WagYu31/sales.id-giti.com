@@ -21,7 +21,13 @@ if (is_numeric($search_target)) {
     $stmt->bind_param("i", $search_target);
 } else {
     $like = '%' . $search_target . '%';
-    $stmt = $conn->prepare("SELECT id, nama_lengkap, email, role FROM sales WHERE nama_lengkap LIKE ? LIMIT 1");
+    $stmt = $conn->prepare("
+        SELECT id, nama_lengkap, email, role 
+        FROM sales 
+        WHERE nama_lengkap LIKE ? 
+        ORDER BY CASE WHEN email LIKE '%_deleted_%' THEN 1 ELSE 0 END ASC, id DESC 
+        LIMIT 1
+    ");
     $stmt->bind_param("s", $like);
 }
 $stmt->execute();
