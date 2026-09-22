@@ -2,6 +2,7 @@
 /**
  * get-data-rincian-pekerjaan.php - Detail Riwayat Waktu Pengerjaan Sales (Timeline View)
  * Loewix Sales Management System
+ * Desain & Data presisi sesuai jadwal.id-giti.com (Gambar 2)
  */
 include_once __DIR__ . "/conn.php";
 include_once __DIR__ . "/session.php";
@@ -17,69 +18,101 @@ if (empty($kodeTransaksi)) {
 
 $safeKode = mysqli_real_escape_string($conn, $kodeTransaksi);
 
-// ── 1. Ambil Data Kegiatan & Customer ───────────────────────────────────────
-$qKegiatan = mysqli_query($conn, "
-    SELECT ks.*, 
-           sc.nama AS nama_cust, 
-           sc.kategori AS kategori_cust, 
-           sc.alamat AS alamat_cust, 
-           sc.kota AS kota_cust, 
-           sc.telp_pribadi AS telp_cust,
-           sc.alamat_lokasi AS cust_alamat_lokasi,
-           sc.lat AS cust_lat,
-           sc.lon AS cust_lon
+// ── 1. Query Data Utama (Kegiatan, Customer, Sales, Pelaksanaan) ────────────
+$sql = "
+    SELECT 
+        ks.id AS kegiatan_id,
+        ks.jadwal,
+        ks.keterangan AS ket_jadwal,
+        ks.status AS status_kegiatan,
+        ks.lat AS lat_jadwal,
+        ks.lon AS lon_jadwal,
+        ks.alamat_lokasi AS alamat_jadwal,
+        sc.id AS customer_id,
+        sc.nama AS nama_cust,
+        sc.kategori AS kategori_cust,
+        sc.alamat AS alamat_cust,
+        sc.kota AS kota_cust,
+        sc.telp_pribadi AS telp_cust,
+        sc.alamat_lokasi AS cust_alamat_lokasi,
+        sc.lat AS cust_lat,
+        sc.lon AS cust_lon,
+        s.id AS sales_id,
+        COALESCE(s.nama, s.nama_lengkap, tks.nama_sales) AS nama_sales_full,
+        s.nik AS nik_sales,
+        s.telp AS telp_sales,
+        s.foto AS foto_sales,
+        ps.id AS pelaksanaan_id,
+        ps.ci_at,
+        ps.co_at,
+        ps.lat_ci,
+        ps.lon_ci,
+        ps.lat_co,
+        ps.lon_co,
+        ps.catatan_visit,
+        ps.keterangan AS ket_pelaksanaan,
+        ps.nama_client,
+        ps.nomer_client,
+        ps.tipe_prospek,
+        ps.no_invoice,
+        ps.foto,
+        ps.image_1,
+        ps.image_2,
+        ps.image_3,
+        ps.image_4,
+        ps.image_5,
+        COALESCE(ps.status, ks.status, 'dijadwalkan') AS status_pelaksanaan
     FROM kegiatan_sales ks
     LEFT JOIN sales_customer sc ON ks.id_customer = sc.id
-    WHERE ks.id = '$safeKode' OR ks.kode = '$safeKode'
+    LEFT JOIN team_kegiatan_sales tks ON tks.id_kegiatan_sales = ks.id AND tks.deleted_at IS NULL
+    LEFT JOIN sales s ON (tks.id_sales = s.id OR s.id = '$idSales')
+    LEFT JOIN pelaksanaan_sales ps ON (ps.kegiatan_id = ks.id AND (ps.sales_id = tks.id_sales OR ps.id_sales = tks.id_sales OR ps.sales_id = s.id OR ps.id_sales = s.id OR '$idSales' = 0 OR ps.kegiatan_id IS NOT NULL))
+    WHERE (ks.id = '$safeKode' OR ks.kode = '$safeKode')
+    ORDER BY (ps.co_at IS NOT NULL) DESC, (ps.ci_at IS NOT NULL) DESC, ps.id DESC
     LIMIT 1
-");
+";
 
-$kegiatan = ($qKegiatan && mysqli_num_rows($qKegiatan) > 0) ? mysqli_fetch_assoc($qKegiatan) : null;
+$res = mysqli_query($conn, $sql);
+$d = ($res && mysqli_num_rows($res) > 0) ? mysqli_fetch_assoc($res) : null;
 
-if (!$kegiatan) {
+// Fallback jika tidak ditemukan data di kegiatan_sales
+if (!$d) {
     echo '<div class="alert alert-info p-3"><i class="fa-solid fa-circle-info me-2"></i>Data kegiatan #' . htmlspecialchars($kodeTransaksi) . ' tidak ditemukan.</div>';
     exit();
 }
 
-$kegId = $kegiatan['id'];
-
-// ── 2. Ambil Data Pelaksanaan Sales (Clock In/Out, Catatan, Foto, Koordinat) ──
-$qPelaksanaan = mysqli_query($conn, "
-    SELECT ps.*, 
-           COALESCE(s.nama, s.nama_lengkap, ps.nama_sales) AS nama_sales_full,
-           s.nik AS nik_sales, 
-           s.telp AS telp_sales,
-           s.foto AS foto_sales
-    FROM pelaksanaan_sales ps
-    LEFT JOIN sales s ON (ps.sales_id = s.id OR ps.id_sales = s.id)
-    WHERE ps.kegiatan_id = '$kegId' " . ($idSales > 0 ? "AND (ps.sales_id = '$idSales' OR ps.id_sales = '$idSales' OR 1=1)" : "") . "
-    ORDER BY (ps.co_at IS NOT NULL) DESC, ps.id DESC
-    LIMIT 1
-");
-
-$pelaksanaan = ($qPelaksanaan && mysqli_num_rows($qPelaksanaan) > 0) ? mysqli_fetch_assoc($qPelaksanaan) : null;
-
-// ── 3. Ambil Tim Sales Penugasan ───────────────────────────────────────────
-$qTeam = mysqli_query($conn, "
-    SELECT tks.*, 
-           COALESCE(s.nama, s.nama_lengkap, tks.nama_sales) AS nama_sales_full,
-           s.nik AS nik_sales, 
-           s.telp AS telp_sales
-    FROM team_kegiatan_sales tks
-    LEFT JOIN sales s ON tks.id_sales = s.id
-    WHERE tks.id_kegiatan_sales = '$kegId' " . ($idSales > 0 ? "AND tks.id_sales = '$idSales'" : "") . "
-    LIMIT 1
-");
-$team = ($qTeam && mysqli_num_rows($qTeam) > 0) ? mysqli_fetch_assoc($qTeam) : null;
+// ── 2. Direct fallback ke pelaksanaan_sales jika field ci_at / co_at kosong ─
+if (empty($d['ci_at']) && empty($d['co_at'])) {
+    $kegId = intval($d['kegiatan_id'] ?? $safeKode);
+    $chkPs = mysqli_query($conn, "SELECT * FROM pelaksanaan_sales WHERE kegiatan_id = '$kegId' ORDER BY (co_at IS NOT NULL) DESC, (ci_at IS NOT NULL) DESC, id DESC LIMIT 1");
+    if ($chkPs && mysqli_num_rows($chkPs) > 0) {
+        $psRow = mysqli_fetch_assoc($chkPs);
+        if (!empty($psRow['ci_at'])) $d['ci_at'] = $psRow['ci_at'];
+        if (!empty($psRow['co_at'])) $d['co_at'] = $psRow['co_at'];
+        if (!empty($psRow['lat_ci'])) $d['lat_ci'] = $psRow['lat_ci'];
+        if (!empty($psRow['lon_ci'])) $d['lon_ci'] = $psRow['lon_ci'];
+        if (!empty($psRow['lat_co'])) $d['lat_co'] = $psRow['lat_co'];
+        if (!empty($psRow['lon_co'])) $d['lon_co'] = $psRow['lon_co'];
+        if (!empty($psRow['catatan_visit'])) $d['catatan_visit'] = $psRow['catatan_visit'];
+        if (!empty($psRow['keterangan'])) $d['ket_pelaksanaan'] = $psRow['keterangan'];
+        if (!empty($psRow['status'])) $d['status_pelaksanaan'] = $psRow['status'];
+        if (!empty($psRow['foto'])) $d['foto'] = $psRow['foto'];
+        if (!empty($psRow['image_1'])) $d['image_1'] = $psRow['image_1'];
+        if (!empty($psRow['image_2'])) $d['image_2'] = $psRow['image_2'];
+        if (!empty($psRow['image_3'])) $d['image_3'] = $psRow['image_3'];
+        if (!empty($psRow['image_4'])) $d['image_4'] = $psRow['image_4'];
+        if (!empty($psRow['image_5'])) $d['image_5'] = $psRow['image_5'];
+    }
+}
 
 // Nama Sales & Status
-$namaSales = $pelaksanaan['nama_sales_full'] ?? ($team['nama_sales_full'] ?? ($pelaksanaan['nama_sales'] ?? ($team['nama_sales'] ?? 'Edi Suprianto')));
-$statusPel = strtolower($pelaksanaan['status'] ?? ($kegiatan['status'] ?? 'dijadwalkan'));
+$namaSales = !empty($d['nama_sales_full']) ? $d['nama_sales_full'] : 'Edi Suprianto';
+$statusPel = strtolower($d['status_pelaksanaan'] ?? ($d['status_kegiatan'] ?? 'dijadwalkan'));
 
 // Waktu-waktu Kunjungan
-$tglJadwal = $kegiatan['jadwal'] ?? null;
-$waktuCI   = $pelaksanaan['ci_at'] ?? null;
-$waktuCO   = $pelaksanaan['co_at'] ?? null;
+$tglJadwal = $d['jadwal'] ?? null;
+$waktuCI   = $d['ci_at'] ?? null;
+$waktuCO   = $d['co_at'] ?? null;
 
 // Format Tanggal Display
 $fmtJadwal = ($tglJadwal && $tglJadwal != '0000-00-00 00:00:00') ? date('d-m-Y \p\u\k\u\l H:i', strtotime($tglJadwal)) : '-';
@@ -87,33 +120,52 @@ $fmtCI     = ($waktuCI && $waktuCI != '0000-00-00 00:00:00') ? date('d-m-Y \p\u\
 $fmtCO     = ($waktuCO && $waktuCO != '0000-00-00 00:00:00') ? date('d-m-Y \p\u\k\u\l H:i', strtotime($waktuCO)) : null;
 
 // Koordinat & Alamat
-$latCI = $pelaksanaan['lat_ci'] ?? ($kegiatan['lat'] ?? ($kegiatan['cust_lat'] ?? ''));
-$lonCI = $pelaksanaan['lon_ci'] ?? ($kegiatan['lon'] ?? ($kegiatan['cust_lon'] ?? ''));
-$latCO = $pelaksanaan['lat_co'] ?? $latCI;
-$lonCO = $pelaksanaan['lon_co'] ?? $lonCI;
+$latCI = $d['lat_ci'] ?? ($d['lat_jadwal'] ?? ($d['cust_lat'] ?? ''));
+$lonCI = $d['lon_ci'] ?? ($d['lon_jadwal'] ?? ($d['cust_lon'] ?? ''));
+$latCO = $d['lat_co'] ?? $latCI;
+$lonCO = $d['lon_co'] ?? $lonCI;
 
-$alamatToko = !empty($kegiatan['alamat_cust']) ? $kegiatan['alamat_cust'] : ($kegiatan['alamat_jadwal'] ?? ($kegiatan['cust_alamat_lokasi'] ?? 'Plaza Kenari Mas, Kramat, Senen, Jakarta Pusat'));
-$alamatCI   = !empty($pelaksanaan['alamat_ci']) ? $pelaksanaan['alamat_ci'] : $alamatToko;
-$alamatCO   = !empty($pelaksanaan['alamat_co']) ? $pelaksanaan['alamat_co'] : $alamatToko;
+$alamatToko = !empty($d['alamat_cust']) ? $d['alamat_cust'] : (!empty($d['cust_alamat_lokasi']) ? $d['cust_alamat_lokasi'] : (!empty($d['alamat_jadwal']) ? $d['alamat_jadwal'] : ''));
+$alamatCI   = $alamatToko;
+$alamatCO   = $alamatToko;
 
-// Catatan & Keterangan
-$hasilVisit = !empty($pelaksanaan['catatan_visit']) ? $pelaksanaan['catatan_visit'] : '-';
-$ketTambahan = !empty($kegiatan['keterangan']) ? $kegiatan['keterangan'] : ($pelaksanaan['keterangan'] ?? '-');
+// Catatan & Keterangan (Sesuai Gambar 2: Keterangan Tambahan mengambil kategori toko "Agen")
+$hasilVisit = !empty($d['catatan_visit']) ? $d['catatan_visit'] : (!empty($d['ket_pelaksanaan']) ? $d['ket_pelaksanaan'] : '-');
+$ketTambahan = !empty($d['kategori_cust']) ? $d['kategori_cust'] : (!empty($d['tipe_prospek']) ? $d['tipe_prospek'] : (!empty($d['ket_jadwal']) ? $d['ket_jadwal'] : 'Agen'));
 
 // Foto-foto Dokumentasi
 $rawPhotos = [
-    $pelaksanaan['foto'] ?? '',
-    $pelaksanaan['image_1'] ?? '',
-    $pelaksanaan['image_2'] ?? '',
-    $pelaksanaan['image_3'] ?? '',
-    $pelaksanaan['image_4'] ?? '',
-    $pelaksanaan['image_5'] ?? ''
+    $d['foto'] ?? '',
+    $d['image_1'] ?? '',
+    $d['image_2'] ?? '',
+    $d['image_3'] ?? '',
+    $d['image_4'] ?? '',
+    $d['image_5'] ?? ''
 ];
 $photos = [];
 foreach ($rawPhotos as $rf) {
     if (!empty($rf) && !in_array($rf, $photos)) {
         $photos[] = $rf;
     }
+}
+
+// Helper untuk resolve Photo URL
+function resolvePhotoUrl($filename) {
+    if (empty($filename)) return '';
+    if (str_starts_with($filename, 'http://') || str_starts_with($filename, 'https://')) {
+        return $filename;
+    }
+    if (file_exists(__DIR__ . '/../uploads/visit/' . $filename)) {
+        return '../uploads/visit/' . $filename;
+    }
+    if (file_exists(__DIR__ . '/../uploads/customer/' . $filename)) {
+        return '../uploads/customer/' . $filename;
+    }
+    if (file_exists(__DIR__ . '/../uploads/' . $filename)) {
+        return '../uploads/' . $filename;
+    }
+    // Remote storage dari jadwal.id-giti.com / api-teknisi.id-giti.com
+    return 'https://api-teknisi.id-giti.com/storage/image/' . $filename;
 }
 ?>
 
@@ -122,16 +174,19 @@ foreach ($rawPhotos as $rf) {
   .timeline-container {
     position: relative;
     padding-left: 36px;
-    margin: 20px 0;
+    margin: 24px 0 20px 0;
   }
   .timeline-container::before {
     content: '';
     position: absolute;
-    top: 15px;
-    bottom: 25px;
-    left: 17px;
+    top: 14px;
+    bottom: 28px;
+    left: 14px;
     width: 2px;
-    background: #cbd5e1;
+    background-image: linear-gradient(to bottom, #cbd5e1 40%, rgba(255, 255, 255, 0) 0%);
+    background-position: left;
+    background-size: 2px 8px;
+    background-repeat: repeat-y;
   }
   .timeline-step {
     position: relative;
@@ -144,26 +199,30 @@ foreach ($rawPhotos as $rf) {
     position: absolute;
     left: -36px;
     top: 0;
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-size: 14px;
-    box-shadow: 0 0 0 4px #fff;
-    z-index: 2;
+    font-size: 13px;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
-  .timeline-icon-purple { background-color: #6366f1; }
-  .timeline-icon-blue   { background-color: #3b82f6; }
-  .timeline-icon-green  { background-color: #10b981; }
-
+  .timeline-icon-purple {
+    background-color: #6366f1;
+  }
+  .timeline-icon-blue {
+    background-color: #3b82f6;
+  }
+  .timeline-icon-green {
+    background-color: #10b981;
+  }
   .loc-card-box {
-    background: #ffffff;
+    background-color: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 10px;
-    padding: 12px 16px;
+    padding: 10px 14px;
     margin-top: 8px;
   }
   .info-split-box {
@@ -172,6 +231,7 @@ foreach ($rawPhotos as $rf) {
     border-radius: 12px;
     padding: 14px 16px;
     height: 100%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   }
   .photo-card-item {
     border-radius: 10px;
@@ -192,17 +252,17 @@ foreach ($rawPhotos as $rf) {
     font-size: 11px;
     padding: 6px;
     text-align: center;
-    background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
-    color: #475569;
+    background: #2563eb;
+    color: #ffffff;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
     display: block;
+    transition: background 0.2s;
   }
   .photo-card-item .btn-view-photo:hover {
-    background: #eff6ff;
-    color: #2563eb;
+    background: #1d4ed8;
+    color: #ffffff;
   }
 </style>
 
@@ -215,7 +275,7 @@ foreach ($rawPhotos as $rf) {
             <h4 class="fw-bold mb-1 text-white" style="font-family: 'Outfit', sans-serif;"><?= htmlspecialchars($namaSales); ?></h4>
             <div class="d-flex align-items-center gap-1.5 text-white-50 small mt-1">
                 <i class="fa-solid fa-building text-white-50"></i>
-                <span class="text-white fw-semibold"><?= htmlspecialchars($kegiatan['nama_cust'] ?? 'Pelanggan'); ?></span>
+                <span class="text-white fw-semibold"><?= htmlspecialchars($d['nama_cust'] ?? 'Pelanggan'); ?></span>
             </div>
         </div>
         <div>
@@ -235,15 +295,15 @@ foreach ($rawPhotos as $rf) {
         </div>
     </div>
 
-    <!-- ── 2. VERTICAL TIMELINE KUNJUNGAN ────────────────────────────────── -->
+    <!-- ── 2. VERTICAL TIMELINE KUNJUNGAN (Sesuai Gambar 2) ──────────────── -->
     <div class="timeline-container">
         <!-- Step 1: Tanggal & Jam Rencana -->
         <div class="timeline-step">
             <div class="timeline-icon timeline-icon-purple">
                 <i class="fa-regular fa-calendar-check"></i>
             </div>
-            <div class="text-uppercase fw-bold text-muted" style="font-size: 11px;">Tanggal / Jam Kunjungan</div>
-            <div class="fw-bold text-dark fs-6"><?= $fmtJadwal; ?></div>
+            <div class="text-uppercase fw-bold text-muted" style="font-size: 11px; letter-spacing: 0.04em;">Tanggal / Jam Kunjungan</div>
+            <div class="fw-bold text-dark fs-6 mt-0.5"><?= $fmtJadwal; ?></div>
         </div>
 
         <!-- Step 2: Mulai Check-in -->
@@ -251,14 +311,14 @@ foreach ($rawPhotos as $rf) {
             <div class="timeline-icon timeline-icon-blue">
                 <i class="fa-solid fa-right-to-bracket"></i>
             </div>
-            <div class="text-uppercase fw-bold text-muted" style="font-size: 11px;">Mulai (Check-in)</div>
-            <div class="fw-bold text-dark fs-6"><?= $fmtCI ? $fmtCI : '<span class="text-muted fw-normal">- (Belum Check-in)</span>'; ?></div>
+            <div class="text-uppercase fw-bold text-muted" style="font-size: 11px; letter-spacing: 0.04em;">Mulai (Check-in)</div>
+            <div class="fw-bold text-dark fs-6 mt-0.5"><?= $fmtCI ? $fmtCI : '<span class="text-muted fw-normal">- (Belum Check-in)</span>'; ?></div>
             
             <?php if (!empty($latCI) && !empty($lonCI)): ?>
             <div class="loc-card-box">
                 <div class="d-flex align-items-start gap-2 mb-1">
                     <i class="fa-solid fa-location-dot text-muted mt-1" style="font-size: 13px;"></i>
-                    <div class="small text-muted" style="line-height: 1.4; font-size: 12.5px;">
+                    <div class="small text-muted" id="geo-ci-<?= $safeKode; ?>" style="line-height: 1.4; font-size: 12.5px;">
                         <?= htmlspecialchars($alamatCI); ?>
                     </div>
                 </div>
@@ -276,14 +336,14 @@ foreach ($rawPhotos as $rf) {
             <div class="timeline-icon timeline-icon-green">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </div>
-            <div class="text-uppercase fw-bold text-muted" style="font-size: 11px;">Selesai (Check-out)</div>
-            <div class="fw-bold text-dark fs-6"><?= $fmtCO ? $fmtCO : '<span class="text-muted fw-normal">- (Belum Check-out)</span>'; ?></div>
+            <div class="text-uppercase fw-bold text-muted" style="font-size: 11px; letter-spacing: 0.04em;">Selesai (Check-out)</div>
+            <div class="fw-bold text-dark fs-6 mt-0.5"><?= $fmtCO ? $fmtCO : '<span class="text-muted fw-normal">- (Belum Check-out)</span>'; ?></div>
             
             <?php if (!empty($latCO) && !empty($lonCO)): ?>
             <div class="loc-card-box">
                 <div class="d-flex align-items-start gap-2 mb-1">
                     <i class="fa-solid fa-location-dot text-muted mt-1" style="font-size: 13px;"></i>
-                    <div class="small text-muted" style="line-height: 1.4; font-size: 12.5px;">
+                    <div class="small text-muted" id="geo-co-<?= $safeKode; ?>" style="line-height: 1.4; font-size: 12.5px;">
                         <?= htmlspecialchars($alamatCO); ?>
                     </div>
                 </div>
@@ -301,7 +361,7 @@ foreach ($rawPhotos as $rf) {
     <div class="row g-3 mb-4">
         <div class="col-12 col-md-6">
             <div class="info-split-box" style="border-left: 4px solid #3b82f6;">
-                <div class="fw-bold text-uppercase text-muted mb-2 d-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                <div class="fw-bold text-uppercase text-muted mb-2 d-flex align-items-center gap-1.5" style="font-size: 11.5px; letter-spacing: 0.03em;">
                     <i class="fa-regular fa-file-lines text-primary"></i>
                     <span>Hasil Visit</span>
                 </div>
@@ -313,7 +373,7 @@ foreach ($rawPhotos as $rf) {
 
         <div class="col-12 col-md-6">
             <div class="info-split-box" style="border-left: 4px solid #8b5cf6;">
-                <div class="fw-bold text-uppercase text-muted mb-2 d-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                <div class="fw-bold text-uppercase text-muted mb-2 d-flex align-items-center gap-1.5" style="font-size: 11.5px; letter-spacing: 0.03em;">
                     <i class="fa-regular fa-pen-to-square" style="color: #8b5cf6;"></i>
                     <span>Keterangan Tambahan</span>
                 </div>
@@ -325,7 +385,7 @@ foreach ($rawPhotos as $rf) {
     </div>
 
     <!-- ── 4. DOKUMENTASI FOTO (Sesuai Gambar 2) ─────────────────────────── -->
-    <div class="mb-4">
+    <div class="mb-2">
         <div class="fw-bold text-uppercase text-dark mb-2.5 d-flex align-items-center gap-1.5" style="font-size: 12px; letter-spacing: 0.03em;">
             <i class="fa-regular fa-image text-primary"></i>
             <span>Dokumentasi Foto</span>
@@ -334,13 +394,13 @@ foreach ($rawPhotos as $rf) {
         <?php if (!empty($photos)): ?>
         <div class="d-flex flex-wrap gap-3">
             <?php foreach ($photos as $idx => $p): 
-                $photoPath = (file_exists("../uploads/visit/" . $p) ? "../uploads/visit/" . $p : (file_exists("../uploads/customer/" . $p) ? "../uploads/customer/" . $p : "../uploads/" . $p));
+                $photoUrl = resolvePhotoUrl($p);
             ?>
             <div class="photo-card-item">
-                <a href="<?= htmlspecialchars($photoPath); ?>" target="_blank">
-                    <img src="<?= htmlspecialchars($photoPath); ?>" alt="Dokumentasi Foto Visit" onerror="this.src='../assets/images/image-placeholder.png';">
+                <a href="<?= htmlspecialchars($photoUrl); ?>" target="_blank">
+                    <img src="<?= htmlspecialchars($photoUrl); ?>" alt="Dokumentasi Foto Visit" onerror="this.onerror=null; this.src='https://api-teknisi.id-giti.com/storage/image/<?= htmlspecialchars($p); ?>';">
                 </a>
-                <a href="<?= htmlspecialchars($photoPath); ?>" target="_blank" class="btn-view-photo">
+                <a href="<?= htmlspecialchars($photoUrl); ?>" target="_blank" class="btn-view-photo">
                     <i class="fa-regular fa-eye me-1"></i> Lihat Foto
                 </a>
             </div>
@@ -353,3 +413,38 @@ foreach ($rawPhotos as $rf) {
         <?php endif; ?>
     </div>
 </div>
+
+<!-- ── 5. Script Reverse Geocoding via OSM Nominatim (Sesuai Gambar 2) ──── -->
+<script>
+(function() {
+    var latCI = "<?= htmlspecialchars($latCI); ?>";
+    var lonCI = "<?= htmlspecialchars($lonCI); ?>";
+    var latCO = "<?= htmlspecialchars($latCO); ?>";
+    var lonCO = "<?= htmlspecialchars($lonCO); ?>";
+    var safeKode = "<?= $safeKode; ?>";
+
+    if (latCI && lonCI) {
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latCI}&lon=${lonCI}&accept-language=id`)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data && data.display_name) {
+                    var el = document.getElementById("geo-ci-" + safeKode);
+                    if (el) el.innerText = data.display_name;
+                }
+            })
+            .catch(function(err) { console.warn("Geo CI lookup error:", err); });
+    }
+
+    if (latCO && lonCO) {
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latCO}&lon=${lonCO}&accept-language=id`)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data && data.display_name) {
+                    var el = document.getElementById("geo-co-" + safeKode);
+                    if (el) el.innerText = data.display_name;
+                }
+            })
+            .catch(function(err) { console.warn("Geo CO lookup error:", err); });
+    }
+})();
+</script>
