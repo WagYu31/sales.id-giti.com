@@ -2,7 +2,7 @@
 /**
  * get-data-rincian-pekerjaan.php - Detail Riwayat Waktu Pengerjaan Sales (Timeline View)
  * Loewix Sales Management System
- * Desain & Data presisi sesuai jadwal.id-giti.com (Gambar 2)
+ * Dioptimalkan untuk performa cepat (Fast indexed queries, instant modal render, cached geocoding)
  */
 include_once __DIR__ . "/conn.php";
 include_once __DIR__ . "/session.php";
@@ -122,7 +122,7 @@ $alamatToko = !empty($kegiatan['alamat_cust']) ? $kegiatan['alamat_cust'] : (!em
 $alamatCI   = $alamatToko;
 $alamatCO   = $alamatToko;
 
-// Hasil Visit & Keterangan Tambahan (Gambar 2: Keterangan Tambahan = "Agen")
+// Hasil Visit & Keterangan Tambahan
 $hasilVisit = !empty($pelaksanaan['catatan_visit']) ? $pelaksanaan['catatan_visit'] : '-';
 $ketTambahan = !empty($kegiatan['kategori_cust']) ? $kegiatan['kategori_cust'] : (!empty($pelaksanaan['tipe_prospek']) ? $pelaksanaan['tipe_prospek'] : (!empty($kegiatan['keterangan']) ? $kegiatan['keterangan'] : 'Agen'));
 
@@ -147,15 +147,6 @@ function resolvePhotoUrl($filename) {
     if (empty($filename)) return '';
     if (str_starts_with($filename, 'http://') || str_starts_with($filename, 'https://')) {
         return $filename;
-    }
-    if (file_exists(__DIR__ . '/../uploads/visit/' . $filename)) {
-        return '../uploads/visit/' . $filename;
-    }
-    if (file_exists(__DIR__ . '/../uploads/customer/' . $filename)) {
-        return '../uploads/customer/' . $filename;
-    }
-    if (file_exists(__DIR__ . '/../uploads/' . $filename)) {
-        return '../uploads/' . $filename;
     }
     return 'https://api-teknisi.id-giti.com/storage/image/' . $filename;
 }
@@ -390,7 +381,7 @@ function resolvePhotoUrl($filename) {
             ?>
             <div class="photo-card-item">
                 <a href="<?= htmlspecialchars($photoUrl); ?>" target="_blank">
-                    <img src="<?= htmlspecialchars($photoUrl); ?>" alt="Dokumentasi Foto Visit" onerror="this.onerror=null; this.src='https://api-teknisi.id-giti.com/storage/image/<?= htmlspecialchars($p); ?>';">
+                    <img src="<?= htmlspecialchars($photoUrl); ?>" alt="Dokumentasi Foto Visit" loading="lazy" onerror="this.onerror=null; this.src='https://api-teknisi.id-giti.com/storage/image/<?= htmlspecialchars($p); ?>';">
                 </a>
                 <a href="<?= htmlspecialchars($photoUrl); ?>" target="_blank" class="btn-view-photo">
                     <i class="fa-regular fa-eye me-1"></i> Lihat Foto
@@ -406,37 +397,46 @@ function resolvePhotoUrl($filename) {
     </div>
 </div>
 
-<!-- ── 5. Script Reverse Geocoding via OSM Nominatim (Sesuai Gambar 2) ──── -->
+<!-- ── 5. Script Reverse Geocoding Ringan dengan Client-side Cache ──────── -->
 <script>
 (function() {
+    function fetchCachedAddress(lat, lon, elementId) {
+        if (!lat || !lon) return;
+        var cacheKey = "geo_" + parseFloat(lat).toFixed(4) + "_" + parseFloat(lon).toFixed(4);
+        var cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+            var el = document.getElementById(elementId);
+            if (el) el.innerText = cached;
+            return;
+        }
+
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function() { controller.abort(); }, 2500);
+
+        fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" + lat + "&lon=" + lon + "&accept-language=id", {
+            signal: controller.signal
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            clearTimeout(timeoutId);
+            if (data && data.display_name) {
+                sessionStorage.setItem(cacheKey, data.display_name);
+                var el = document.getElementById(elementId);
+                if (el) el.innerText = data.display_name;
+            }
+        })
+        .catch(function() {
+            // Biarkan teks alamat fallback default jika fetch timeout/error
+        });
+    }
+
     var latCI = "<?= htmlspecialchars($latCI); ?>";
     var lonCI = "<?= htmlspecialchars($lonCI); ?>";
     var latCO = "<?= htmlspecialchars($latCO); ?>";
     var lonCO = "<?= htmlspecialchars($lonCO); ?>";
     var kegId = "<?= $realKegiatanId; ?>";
 
-    if (latCI && lonCI) {
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latCI}&lon=${lonCI}&accept-language=id`)
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-                if (data && data.display_name) {
-                    var el = document.getElementById("geo-ci-" + kegId);
-                    if (el) el.innerText = data.display_name;
-                }
-            })
-            .catch(function(err) { console.warn("Geo CI lookup error:", err); });
-    }
-
-    if (latCO && lonCO) {
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latCO}&lon=${lonCO}&accept-language=id`)
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-                if (data && data.display_name) {
-                    var el = document.getElementById("geo-co-" + kegId);
-                    if (el) el.innerText = data.display_name;
-                }
-            })
-            .catch(function(err) { console.warn("Geo CO lookup error:", err); });
-    }
+    fetchCachedAddress(latCI, lonCI, "geo-ci-" + kegId);
+    fetchCachedAddress(latCO, lonCO, "geo-co-" + kegId);
 })();
 </script>
