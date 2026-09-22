@@ -140,6 +140,12 @@ $salesMigrations = [
     "nomer_client" => "ALTER TABLE `pelaksanaan_sales` ADD COLUMN `nomer_client` VARCHAR(30) NULL DEFAULT NULL COMMENT 'Nomor Telepon Client / Kontak'",
     "tipe_prospek" => "ALTER TABLE `pelaksanaan_sales` ADD COLUMN `tipe_prospek` VARCHAR(30) NULL DEFAULT 'Biasa' COMMENT 'Kategori prospek customer'",
     "no_invoice"   => "ALTER TABLE `pelaksanaan_sales` ADD COLUMN `no_invoice` VARCHAR(100) NULL DEFAULT NULL COMMENT 'Nomor invoice opsional jika ada transaksi'",
+    "sales_id"     => "ALTER TABLE `pelaksanaan_sales` ADD COLUMN `sales_id` INT NULL DEFAULT NULL",
+    "image_1"      => "ALTER TABLE `pelaksanaan_sales` ADD COLUMN `image_1` VARCHAR(255) NULL DEFAULT NULL",
+    "image_2"      => "ALTER TABLE `pelaksanaan_sales` ADD COLUMN `image_2` VARCHAR(255) NULL DEFAULT NULL",
+    "image_3"      => "ALTER TABLE `pelaksanaan_sales` ADD COLUMN `image_3` VARCHAR(255) NULL DEFAULT NULL",
+    "image_4"      => "ALTER TABLE `pelaksanaan_sales` ADD COLUMN `image_4` VARCHAR(255) NULL DEFAULT NULL",
+    "image_5"      => "ALTER TABLE `pelaksanaan_sales` ADD COLUMN `image_5` VARCHAR(255) NULL DEFAULT NULL",
 ];
 foreach ($salesMigrations as $col => $sql) {
     $chk = mysqli_query($conn, "SHOW COLUMNS FROM `pelaksanaan_sales` LIKE '$col'");
