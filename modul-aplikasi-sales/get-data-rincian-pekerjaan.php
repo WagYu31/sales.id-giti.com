@@ -1,81 +1,121 @@
 <?php
 /**
  * get-data-rincian-pekerjaan.php - AJAX Detail Riwayat Waktu & Kunjungan Sales
- * Modul Aplikasi Sales
+ * Loewix Sales Management System
  */
 include_once __DIR__ . "/conn.php";
 include_once __DIR__ . "/session.php";
 include_once __DIR__ . "/get-user-data.php";
 
 $idSales       = isset($_POST['id_sales']) ? intval($_POST['id_sales']) : (isset($_GET['id_sales']) ? intval($_GET['id_sales']) : 0);
-$kodeTransaksi = isset($_POST['kode_transaksi']) ? intval($_POST['kode_transaksi']) : (isset($_GET['kode_transaksi']) ? intval($_GET['kode_transaksi']) : 0);
+$kodeTransaksi = isset($_POST['kode_transaksi']) ? trim($_POST['kode_transaksi']) : (isset($_GET['kode_transaksi']) ? trim($_GET['kode_transaksi']) : '');
 
-if ($kodeTransaksi <= 0) {
+if (empty($kodeTransaksi)) {
     echo '<div class="alert alert-warning text-dark p-3">Parameter data kunjungan tidak valid.</div>';
     exit();
 }
 
-$sql = "
-    SELECT 
-        ks.id AS kegiatan_id,
-        ks.jadwal,
-        ks.keterangan AS ket_jadwal,
-        ks.status AS status_kegiatan,
-        ks.lat AS lat_jadwal,
-        ks.lon AS lon_jadwal,
-        ks.alamat_lokasi AS alamat_jadwal,
-        sc.id AS customer_id,
-        sc.nama AS nama_cust,
-        sc.kategori AS kategori_cust,
-        sc.alamat AS alamat_cust,
-        sc.kota AS kota_cust,
-        sc.telp_pribadi AS telp_cust,
-        s.id AS sales_id,
-        COALESCE(s.nama, s.nama_lengkap) AS nama_sales,
-        s.nik AS nik_sales,
-        s.telp AS telp_sales,
-        ps.id AS pelaksanaan_id,
-        ps.ci_at,
-        ps.co_at,
-        ps.lat_ci,
-        ps.lon_ci,
-        ps.lat_co,
-        ps.lon_co,
-        ps.catatan_visit,
-        ps.nama_client,
-        ps.nomer_client,
-        ps.tipe_prospek,
-        ps.no_invoice,
-        ps.foto,
-        ps.image_1,
-        ps.image_2,
-        ps.image_3,
-        ps.image_4,
-        ps.image_5,
-        ps.status AS status_pelaksanaan
+$safeKode = mysqli_real_escape_string($conn, $kodeTransaksi);
+
+// ── 1. Query Data Kegiatan Utama & Customer ─────────────────────────────────
+$kegiatan = null;
+$qKegiatan = mysqli_query($conn, "
+    SELECT ks.*, 
+           sc.nama AS nama_cust, 
+           sc.kategori AS kategori_cust, 
+           sc.alamat AS alamat_cust, 
+           sc.kota AS kota_cust, 
+           sc.telp_pribadi AS telp_cust, 
+           sc.foto AS foto_cust
     FROM kegiatan_sales ks
-    INNER JOIN sales_customer sc ON ks.id_customer = sc.id
-    LEFT JOIN team_kegiatan_sales tks ON ks.id = tks.id_kegiatan_sales AND tks.deleted_at IS NULL
-    LEFT JOIN sales s ON (tks.id_sales = s.id OR s.id = '$idSales')
-    LEFT JOIN pelaksanaan_sales ps ON ks.id = ps.kegiatan_id AND (ps.sales_id = s.id OR ps.id_sales = s.id OR '$idSales' = 0)
-    WHERE ks.id = '$kodeTransaksi' AND ks.deleted_at IS NULL
-    ORDER BY ps.id DESC
+    LEFT JOIN sales_customer sc ON ks.id_customer = sc.id
+    WHERE ks.id = '$safeKode' OR ks.kode = '$safeKode'
     LIMIT 1
-";
+");
 
-$res = mysqli_query($conn, $sql);
+if ($qKegiatan && mysqli_num_rows($qKegiatan) > 0) {
+    $kegiatan = mysqli_fetch_assoc($qKegiatan);
+}
 
-if (!$res || mysqli_num_rows($res) == 0) {
-    echo '<div class="alert alert-info p-3"><i class="fa-solid fa-circle-info me-2"></i>Data riwayat pengerjaan tidak ditemukan.</div>';
+// Fallback jika tidak ditemukan di kegiatan_sales, coba cari di kegiatan lama
+if (!$kegiatan) {
+    $qOldKeg = mysqli_query($conn, "
+        SELECT k.*, 
+               c.nama AS nama_cust, 
+               c.alamat AS alamat_cust, 
+               c.kota AS kota_cust, 
+               c.no_tlp AS telp_cust
+        FROM kegiatan k
+        LEFT JOIN customer c ON k.id_cust = c.id_cust
+        WHERE k.id_kegiatan = '$safeKode' OR k.kode_transaksi = '$safeKode'
+        LIMIT 1
+    ");
+    if ($qOldKeg && mysqli_num_rows($qOldKeg) > 0) {
+        $kegiatan = mysqli_fetch_assoc($qOldKeg);
+    }
+}
+
+if (!$kegiatan) {
+    echo '<div class="alert alert-info p-3"><i class="fa-solid fa-circle-info me-2"></i>Data kegiatan #' . htmlspecialchars($kodeTransaksi) . ' tidak ditemukan di database.</div>';
     exit();
 }
 
-$d = mysqli_fetch_assoc($res);
+// ── 2. Query Data Pelaksanaan (Clock In/Out, Catatan, Foto, Prospek) ─────────
+$pelaksanaan = null;
+$pelaksanaSql = "
+    SELECT ps.*, 
+           COALESCE(s.nama, s.nama_lengkap, ps.nama_sales) AS nama_sales_full,
+           s.nik AS nik_sales, 
+           s.telp AS telp_sales
+    FROM pelaksanaan_sales ps
+    LEFT JOIN sales s ON (ps.sales_id = s.id OR ps.id_sales = s.id)
+    WHERE ps.kegiatan_id = '{$kegiatan['id']}'
+";
+if ($idSales > 0) {
+    $pelaksanaSql .= " AND (ps.sales_id = '$idSales' OR ps.id_sales = '$idSales')";
+}
+$pelaksanaSql .= " ORDER BY ps.id DESC LIMIT 1";
 
-// Hitung durasi kerja
+$qPelaksanaan = mysqli_query($conn, $pelaksanaSql);
+if ($qPelaksanaan && mysqli_num_rows($qPelaksanaan) > 0) {
+    $pelaksanaan = mysqli_fetch_assoc($qPelaksanaan);
+}
+
+// ── 3. Query Data Tim Sales Penugasan (Jika pelaksanaan belum ada) ───────────
+$salesInfo = null;
+$salesSql = "
+    SELECT tks.*, 
+           COALESCE(s.nama, s.nama_lengkap, tks.nama_sales) AS nama_sales_full,
+           s.nik AS nik_sales, 
+           s.telp AS telp_sales
+    FROM team_kegiatan_sales tks
+    LEFT JOIN sales s ON tks.id_sales = s.id
+    WHERE tks.id_kegiatan_sales = '{$kegiatan['id']}'
+";
+if ($idSales > 0) {
+    $salesSql .= " AND tks.id_sales = '$idSales'";
+}
+$salesSql .= " LIMIT 1";
+
+$qSales = mysqli_query($conn, $salesSql);
+if ($qSales && mysqli_num_rows($qSales) > 0) {
+    $salesInfo = mysqli_fetch_assoc($qSales);
+}
+
+// Nama Sales Final
+$namaSalesFinal = $pelaksanaan['nama_sales_full'] ?? ($salesInfo['nama_sales_full'] ?? ($pelaksanaan['nama_sales'] ?? ($salesInfo['nama_sales'] ?? 'Edi Suprianto')));
+$nikSalesFinal  = $pelaksanaan['nik_sales'] ?? ($salesInfo['nik_sales'] ?? '');
+$telpSalesFinal = $pelaksanaan['telp_sales'] ?? ($salesInfo['telp_sales'] ?? '');
+
+// Waktu Mulai & Selesai
+$waktuMulai   = $pelaksanaan['ci_at'] ?? ($kegiatan['tgl_mulai'] ?? null);
+$waktuSelesai = $pelaksanaan['co_at'] ?? ($kegiatan['tgl_selesai'] ?? null);
+$jadwalRencana = $kegiatan['jadwal'] ?? ($kegiatan['tgl_request'] ?? null);
+
+// Hitung Durasi
 $durasi = "-";
-if (!empty($d['ci_at']) && !empty($d['co_at']) && $d['ci_at'] != '0000-00-00 00:00:00' && $d['co_at'] != '0000-00-00 00:00:00') {
-    $diffSec = strtotime($d['co_at']) - strtotime($d['ci_at']);
+if (!empty($waktuMulai) && !empty($waktuSelesai) && $waktuMulai != '0000-00-00 00:00:00' && $waktuSelesai != '0000-00-00 00:00:00') {
+    $diffSec = strtotime($waktuSelesai) - strtotime($waktuMulai);
     if ($diffSec > 0) {
         $hrs = floor($diffSec / 3600);
         $mins = floor(($diffSec % 3600) / 60);
@@ -83,12 +123,12 @@ if (!empty($d['ci_at']) && !empty($d['co_at']) && $d['ci_at'] != '0000-00-00 00:
     } else {
         $durasi = "< 1 Menit";
     }
-} elseif (!empty($d['ci_at']) && empty($d['co_at'])) {
+} elseif (!empty($waktuMulai) && empty($waktuSelesai)) {
     $durasi = '<span class="text-primary fw-bold"><i class="fa-solid fa-spinner fa-spin me-1"></i>Sedang Berlangsung</span>';
 }
 
-// Prospek badge
-$prospek = $d['tipe_prospek'] ?? 'Biasa';
+// Prospek & Invoice
+$prospek = $pelaksanaan['tipe_prospek'] ?? 'Biasa';
 $prospekBadge = match(strtolower($prospek)) {
     'deal', 'closing' => '<span class="badge bg-success">Deal / Closing</span>',
     'hot lead' => '<span class="badge bg-danger">Hot Lead</span>',
@@ -96,14 +136,26 @@ $prospekBadge = match(strtolower($prospek)) {
     default => '<span class="badge bg-secondary">Biasa</span>'
 };
 
-// Foto bukti kunjungan
+$noInvoice = $pelaksanaan['no_invoice'] ?? ($kegiatan['invoice'] ?? '');
+$catatanVisit = $pelaksanaan['catatan_visit'] ?? ($kegiatan['keterangan'] ?? ($kegiatan['ket_finish'] ?? ''));
+
+// Kontak PIC
+$namaPIC = $pelaksanaan['nama_client'] ?? ($kegiatan['nama_cust'] ?? '-');
+$nomerPIC = $pelaksanaan['nomer_client'] ?? ($kegiatan['telp_cust'] ?? '');
+
+// Lokasi GPS
+$latCI = $pelaksanaan['lat_ci'] ?? ($kegiatan['lat'] ?? '');
+$lonCI = $pelaksanaan['lon_ci'] ?? ($kegiatan['lon'] ?? '');
+
+// Foto Bukti
 $photos = array_filter([
-    $d['foto'] ?? '',
-    $d['image_1'] ?? '',
-    $d['image_2'] ?? '',
-    $d['image_3'] ?? '',
-    $d['image_4'] ?? '',
-    $d['image_5'] ?? ''
+    $pelaksanaan['foto'] ?? '',
+    $pelaksanaan['image_1'] ?? '',
+    $pelaksanaan['image_2'] ?? '',
+    $pelaksanaan['image_3'] ?? '',
+    $pelaksanaan['image_4'] ?? '',
+    $pelaksanaan['image_5'] ?? '',
+    $kegiatan['foto_cust'] ?? ''
 ]);
 ?>
 
@@ -116,16 +168,16 @@ $photos = array_filter([
                 <div class="text-xxs text-uppercase fw-bold text-muted mb-1">
                     <i class="fa-solid fa-store text-primary me-1"></i> Toko / Pelanggan
                 </div>
-                <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($d['nama_cust'] ?? '-'); ?></h5>
+                <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($kegiatan['nama_cust'] ?? '-'); ?></h5>
                 <div class="small text-muted mb-2">
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1">
-                        <?= htmlspecialchars($d['kategori_cust'] ?? 'Toko'); ?>
+                        <?= htmlspecialchars($kegiatan['kategori_cust'] ?? 'Toko'); ?>
                     </span>
-                    <span><?= htmlspecialchars($d['kota_cust'] ?? '-'); ?></span>
+                    <span><?= htmlspecialchars($kegiatan['kota_cust'] ?? '-'); ?></span>
                 </div>
-                <?php if (!empty($d['alamat_cust'])): ?>
+                <?php if (!empty($kegiatan['alamat_cust'])): ?>
                 <div class="small text-muted">
-                    <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($d['alamat_cust']); ?>
+                    <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($kegiatan['alamat_cust']); ?>
                 </div>
                 <?php endif; ?>
             </div>
@@ -137,14 +189,14 @@ $photos = array_filter([
                 <div class="text-xxs text-uppercase fw-bold text-muted mb-1">
                     <i class="fa-solid fa-user-tie text-primary me-1"></i> Sales Lapangan
                 </div>
-                <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($d['nama_sales'] ?? 'Sales'); ?></h5>
+                <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($namaSalesFinal); ?></h5>
                 <div class="small text-muted mb-2">
-                    <?= !empty($d['nik_sales']) ? "NIK: " . htmlspecialchars($d['nik_sales']) . " &bull; " : ""; ?>
-                    <?= !empty($d['telp_sales']) ? htmlspecialchars($d['telp_sales']) : "-"; ?>
+                    <?= !empty($nikSalesFinal) ? "NIK: " . htmlspecialchars($nikSalesFinal) . " &bull; " : ""; ?>
+                    <?= !empty($telpSalesFinal) ? htmlspecialchars($telpSalesFinal) : "-"; ?>
                 </div>
                 <div class="small text-dark fw-semibold">
                     <i class="fa-regular fa-calendar-check me-1 text-info"></i> 
-                    Rencana: <?= !empty($d['jadwal']) ? date('d M Y, H:i', strtotime($d['jadwal'])) . ' WIB' : '-'; ?>
+                    Rencana Jadwal: <?= !empty($jadwalRencana) ? date('d M Y, H:i', strtotime($jadwalRencana)) . ' WIB' : '-'; ?>
                 </div>
             </div>
         </div>
@@ -157,13 +209,13 @@ $photos = array_filter([
                 <div class="col-4 border-end">
                     <div class="text-xxs text-uppercase fw-bold text-muted mb-1">Waktu Mulai (Clock In)</div>
                     <div class="fw-bold text-dark fs-6">
-                        <?= !empty($d['ci_at']) && $d['ci_at'] != '0000-00-00 00:00:00' ? date('d/m/Y H:i', strtotime($d['ci_at'])) : '<span class="text-muted">-</span>'; ?>
+                        <?= !empty($waktuMulai) && $waktuMulai != '0000-00-00 00:00:00' ? date('d/m/Y H:i', strtotime($waktuMulai)) : '<span class="text-muted">-</span>'; ?>
                     </div>
                 </div>
                 <div class="col-4 border-end">
                     <div class="text-xxs text-uppercase fw-bold text-muted mb-1">Waktu Selesai (Clock Out)</div>
                     <div class="fw-bold text-dark fs-6">
-                        <?= !empty($d['co_at']) && $d['co_at'] != '0000-00-00 00:00:00' ? date('d/m/Y H:i', strtotime($d['co_at'])) : '<span class="text-muted">-</span>'; ?>
+                        <?= !empty($waktuSelesai) && $waktuSelesai != '0000-00-00 00:00:00' ? date('d/m/Y H:i', strtotime($waktuSelesai)) : '<span class="text-muted">-</span>'; ?>
                     </div>
                 </div>
                 <div class="col-4">
@@ -186,13 +238,13 @@ $photos = array_filter([
                         <i class="fa-solid fa-user text-secondary" style="font-size:12px;"></i>
                     </div>
                     <div>
-                        <div class="fw-bold text-dark text-sm"><?= htmlspecialchars($d['nama_client'] ?? '-'); ?></div>
-                        <?php if (!empty($d['nomer_client'])): 
-                            $cleanTelp = preg_replace('/\D/', '', $d['nomer_client']);
+                        <div class="fw-bold text-dark text-sm"><?= htmlspecialchars($namaPIC); ?></div>
+                        <?php if (!empty($nomerPIC)): 
+                            $cleanTelp = preg_replace('/\D/', '', $nomerPIC);
                             if (substr($cleanTelp, 0, 1) === '0') $cleanTelp = '62' . substr($cleanTelp, 1);
                         ?>
                         <a href="https://wa.me/<?= $cleanTelp; ?>" target="_blank" class="text-success small fw-semibold text-decoration-none">
-                            <i class="fa-brands fa-whatsapp me-1"></i><?= htmlspecialchars($d['nomer_client']); ?>
+                            <i class="fa-brands fa-whatsapp me-1"></i><?= htmlspecialchars($nomerPIC); ?>
                         </a>
                         <?php endif; ?>
                     </div>
@@ -204,10 +256,10 @@ $photos = array_filter([
                             <div class="text-xxs text-uppercase fw-bold text-muted">Status Prospek:</div>
                             <div class="mt-1"><?= $prospekBadge; ?></div>
                         </div>
-                        <?php if (!empty($d['no_invoice'])): ?>
+                        <?php if (!empty($noInvoice)): ?>
                         <div class="text-end">
                             <div class="text-xxs text-uppercase fw-bold text-muted">No. Invoice:</div>
-                            <span class="badge bg-dark mt-1"><i class="fa-solid fa-receipt me-1"></i><?= htmlspecialchars($d['no_invoice']); ?></span>
+                            <span class="badge bg-dark mt-1"><i class="fa-solid fa-receipt me-1"></i><?= htmlspecialchars($noInvoice); ?></span>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -219,17 +271,13 @@ $photos = array_filter([
             <div class="p-3 bg-white rounded-3 border h-100">
                 <div class="text-xxs text-uppercase fw-bold text-muted mb-2">Catatan Hasil Kunjungan</div>
                 <div class="p-2.5 bg-light rounded-2 text-dark small" style="min-height: 80px; line-height: 1.6;">
-                    <?= !empty($d['catatan_visit']) ? nl2br(htmlspecialchars($d['catatan_visit'])) : '<em class="text-muted">Tidak ada catatan hasil kunjungan.</em>'; ?>
+                    <?= !empty($catatanVisit) ? nl2br(htmlspecialchars($catatanVisit)) : '<em class="text-muted">Tidak ada catatan hasil kunjungan.</em>'; ?>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Lokasi & Geofence GPS -->
-    <?php 
-        $latCI = $d['lat_ci'] ?? ($d['lat_jadwal'] ?? '');
-        $lonCI = $d['lon_ci'] ?? ($d['lon_jadwal'] ?? '');
-    ?>
     <?php if (!empty($latCI) && !empty($lonCI)): ?>
     <div class="p-3 bg-white rounded-3 border mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
         <div class="d-flex align-items-center gap-2">
