@@ -487,6 +487,12 @@ table tr td { font-size: 0.85em; }
         <div class="nav-section-label">Menu</div>
 
         <?php if ($userRole == 'adminsales'): ?>
+            <a href="index.php" class="sidebar-link <?php echo $currentPage=='index.php'?'active':''; ?>">
+                <i class="bi bi-trophy-fill text-warning"></i> Dashboard & Leaderboard
+            </a>
+            <a href="customer_management.php" class="sidebar-link <?php echo $currentPage=='customer_management.php'?'active':''; ?>">
+                <i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Sales
+            </a>
             <a href="promosi_management.php" class="sidebar-link <?php echo $currentPage=='promosi_management.php'?'active':''; ?>">
                 <i class="bi bi-tags-fill"></i> Promosi
             </a>
@@ -499,9 +505,29 @@ table tr td { font-size: 0.85em; }
             <a href="sales_work_plan.php" class="sidebar-link <?php echo $currentPage=='sales_work_plan.php'?'active':''; ?>">
                 <i class="bi bi-calendar-check-fill"></i> Rencana Kerja Sales
             </a>
+
+            <!-- APLIKASI SALES (MOBILE) FOR ADMINSALES -->
+            <div class="nav-section-label" style="margin-top:8px; color:#38BDF8;">
+                <i class="bi bi-phone me-1"></i> Aplikasi Sales (Mobile)
+            </div>
+            <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php','kegiatan-baru.php'])?'active':''; ?>">
+                <i class="bi bi-calendar-range-fill text-primary"></i> Jadwal Kunjungan App
+            </a>
+            <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>">
+                <i class="bi bi-geo-alt-fill text-info"></i> Laporan Visit (GPS)
+            </a>
+            <a href="modul-aplikasi-sales/tiptok.php" class="sidebar-link <?php echo $currentPage=='tiptok.php'?'active':''; ?>">
+                <i class="bi bi-box-seam-fill text-warning"></i> TIP TOK (Konsinyasi)
+            </a>
+            <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>">
+                <i class="bi bi-shop-window text-success"></i> Customer Toko / Dealer
+            </a>
         <?php else: ?>
+            <a href="index.php" class="sidebar-link <?php echo $currentPage=='index.php'?'active':''; ?>">
+                <i class="bi bi-trophy-fill text-warning"></i> Dashboard & Leaderboard
+            </a>
             <a href="customer_management.php" class="sidebar-link <?php echo $currentPage=='customer_management.php'?'active':''; ?>">
-                <i class="bi bi-grid-1x2-fill"></i> Dashboard Sales
+                <i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Sales
             </a>
             <a href="sales_work_plan.php" class="sidebar-link <?php echo $currentPage=='sales_work_plan.php'?'active':''; ?>">
                 <i class="bi bi-calendar-check-fill"></i> Rencana Kerja Sales
@@ -519,6 +545,29 @@ table tr td { font-size: 0.85em; }
                 <i class="bi bi-people-fill"></i> Sales Management
             </a>
             <?php endif; ?>
+
+            <!-- ═════════════════════════════════════════════════════════ -->
+            <!-- SEKSI KHUSUS: APLIKASI SALES (MOBILE)                     -->
+            <!-- ═════════════════════════════════════════════════════════ -->
+            <div class="nav-section-label" style="margin-top:8px; color:#38BDF8;">
+                <i class="bi bi-phone me-1"></i> Aplikasi Sales (Mobile)
+            </div>
+
+            <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php','kegiatan-baru.php'])?'active':''; ?>">
+                <i class="bi bi-calendar-range-fill text-primary"></i> Jadwal Kunjungan App
+            </a>
+            <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>">
+                <i class="bi bi-geo-alt-fill text-info"></i> Laporan Visit (GPS)
+            </a>
+            <a href="modul-aplikasi-sales/tiptok.php" class="sidebar-link <?php echo $currentPage=='tiptok.php'?'active':''; ?>">
+                <i class="bi bi-box-seam-fill text-warning"></i> TIP TOK (Konsinyasi)
+            </a>
+            <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>">
+                <i class="bi bi-shop-window text-success"></i> Customer Toko / Dealer
+            </a>
+            <a href="modul-aplikasi-sales/scraping-gmaps.php" class="sidebar-link <?php echo $currentPage=='scraping-gmaps.php'?'active':''; ?>">
+                <i class="bi bi-crosshair2 text-danger"></i> Scraper Leads Maps
+            </a>
 
             <div class="nav-section-label" style="margin-top:8px;">Tools</div>
 
