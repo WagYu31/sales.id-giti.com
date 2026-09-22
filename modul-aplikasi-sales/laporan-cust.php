@@ -315,22 +315,21 @@ $(document).ready(function() {
     });
     
     
-        $(".detailBtn").click(function(){
-            var id_sales = $(this).data('id'); // Ambil id_teknisi dari data-id
-            var kode_transaksi = $(this).data('kode'); // Ambil kode transaksi dari data-kode
+        $(document).on('click', '.detailBtn', function(){
+            var id_sales = $(this).data('id');
+            var kode_transaksi = $(this).data('kode');
             
-            // Kirim permintaan AJAX untuk mendapatkan data berdasarkan id_teknisi dan kode transaksi
+            $("#dataDetailTek").html('<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><div class="small text-muted mt-2">Memuat rincian kunjungan...</div></div>');
+            
             $.ajax({
-                url: 'get-data-rincian-pekerjaan.php', // Ganti dengan URL skrip PHP yang mengambil data dari database
+                url: 'get-data-rincian-pekerjaan.php',
                 type: 'POST',
                 data: {id_sales: id_sales, kode_transaksi: kode_transaksi},
                 success: function(response) {
-                    // Isi div #dataTek dengan data yang diterima dari server
                     $("#dataDetailTek").html(response);
                 },
                 error: function(xhr, status, error) {
-                    // Tangani kesalahan jika ada
-                    console.error(xhr.responseText);
+                    $("#dataDetailTek").html('<div class="alert alert-danger p-3">Gagal memuat rincian data kunjungan: ' + error + '</div>');
                 }
             });
         });

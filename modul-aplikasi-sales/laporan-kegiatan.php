@@ -217,9 +217,11 @@ $role = $_SESSION['role'] ?? 'sales';
             });
         });
 
-        $(".detailBtn").click(function(){
+        $(document).on('click', '.detailBtn', function(){
             var id_sales = $(this).data('id');
             var kode_transaksi = $(this).data('kode');
+            
+            $("#dataDetailTek").html('<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><div class="small text-muted mt-2">Memuat rincian kunjungan...</div></div>');
             
             $.ajax({
                 url: 'get-data-rincian-pekerjaan.php',
@@ -229,7 +231,7 @@ $role = $_SESSION['role'] ?? 'sales';
                     $("#dataDetailTek").html(response);
                 },
                 error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
+                    $("#dataDetailTek").html('<div class="alert alert-danger p-3">Gagal memuat rincian data kunjungan: ' + error + '</div>');
                 }
             });
         });
