@@ -117,21 +117,21 @@ $role = $_SESSION['role'] ?? 'sales';
         </div>
     </div>
 
-    <!-- Modal Riwayat Waktu / Detail -->
+    <!-- Modal Riwayat Waktu / Detail (Sesuai Gambar 2) -->
     <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable modalDetail">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Riwayat Waktu Kunjungan Sales</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
+                <div class="modal-header border-bottom py-3 px-4" style="background: #ffffff;">
+                    <h5 class="modal-title font-weight-bold text-dark fs-6" id="detailModalLabel">Riwayat Waktu Pengerjaan</h5>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="w-100 mt-2">
+                <div class="modal-body p-3 p-md-4">
+                    <div class="w-100">
                         <div id="dataDetailTek" style="width: 100%;"></div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-danger" data-bs-dismiss="modal">Tutup</button>
+                <div class="modal-footer border-top py-2 px-4 bg-light">
+                    <button type="button" class="btn btn-danger px-4 py-2 text-uppercase fw-bold" style="border-radius: 8px; font-size: 13px;" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
