@@ -1,14 +1,15 @@
 <?php
-include "../conn.php";
-include "../session.php";
-include "../get-user-data.php";
+include_once __DIR__ . "/conn.php";
+include_once __DIR__ . "/session.php";
+include_once __DIR__ . "/get-user-data.php";
 $pageNow = "Data Sales";
-    // Tangkap data dari form
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-      $nik = $_POST["nik"];
-      $nama = $_POST["nama"];
-      $no_wa = $_POST["no_wa"];
-      $jbtn = "Sales";
+
+// Tangkap data dari form
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $nik = $_POST["nik"];
+    $nama = $_POST["nama"];
+    $no_wa = $_POST["no_wa"];
+    $jbtn = "Sales";
       
       // Hilangkan karakter selain angka dari nomor telepon
       $no_tlp = preg_replace("/[^0-9]/", "", $no_wa);

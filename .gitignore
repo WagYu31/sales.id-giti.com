@@ -2,3 +2,5 @@
 assets/uploads/*.zip
 WhatsApp Video 2026-08-08 at 00.26.19.mp4
 assets/nailong_ref_video.mp4
+.DS_Store
+*/.DS_Store

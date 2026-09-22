@@ -1,7 +1,7 @@
 <?php
-include "conn.php";
-include "session.php";
-include "get-user-data.php";
+include_once __DIR__ . "/conn.php";
+include_once __DIR__ . "/session.php";
+include_once __DIR__ . "/get-user-data.php";
 $pageNow = "Data Customer";
 $currentPage = "Today";
 
@@ -1611,7 +1611,7 @@ $salesData = mysqli_query($conn, $queryStr);
       </div>
     </div>
 
-    <?php include "floating-menu.php"; ?>
+    <?php if (file_exists(__DIR__ . "/floating-menu.php")) { include_once __DIR__ . "/floating-menu.php"; } ?>
     <?php include "footer.php"; ?>
   </div>
 </main>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "../conn.php";
+include_once __DIR__ . "/conn.php";
 
 // Fungsi untuk menghasilkan ID acak dengan 3 digit huruf dan angka
 function generateUniqueID()

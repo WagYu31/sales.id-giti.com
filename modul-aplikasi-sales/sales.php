@@ -1,7 +1,7 @@
 <?php
-include "conn.php";
-include "session.php";
-include "get-user-data.php";
+include_once __DIR__ . "/conn.php";
+include_once __DIR__ . "/session.php";
+include_once __DIR__ . "/get-user-data.php";
 $pageNow = "Sales";
 $currentPage = "Today";
 
@@ -452,16 +452,17 @@ $salesData = mysqli_query($conn, "
             <?php $no = 1; while ($row = mysqli_fetch_assoc($salesData)): ?>
             <tr>
               <td style="text-align: center; font-weight: 600; color: #64748b;"><?= $no++; ?></td>
-              <td><span class="nik-badge"><?= htmlspecialchars($row['nik']); ?></span></td>
+              <td><span class="nik-badge"><?= htmlspecialchars($row['nik'] ?? '-'); ?></span></td>
               <td>
                 <div class="sales-identity-cell">
                   <div class="avatar-initials-table">
                     <?php 
-                      $words = explode(' ', $row['nama']);
+                      $displayName = $row['nama'] ?? ($row['nama_lengkap'] ?? 'Sales');
+                      $words = explode(' ', trim($displayName));
                       echo strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : ''));
                     ?>
                   </div>
-                  <span style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($row['nama']); ?></span>
+                  <span style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($row['nama'] ?? ($row['nama_lengkap'] ?? '-')); ?></span>
                 </div>
               </td>
               <td>
@@ -471,9 +472,9 @@ $salesData = mysqli_query($conn, "
               </td>
               <td>
                 <?php if (!empty($row['telp'])): ?>
-                <a href="https://wa.me/<?= htmlspecialchars($row['telp']); ?>" target="_blank" class="wa-link">
+                <a href="https://wa.me/<?= htmlspecialchars($row['telp'] ?? ''); ?>" target="_blank" class="wa-link">
                   <i class="fab fa-whatsapp" style="font-size: 16px;"></i> 
-                  <?= htmlspecialchars(preg_replace('/^62/', '0', $row['telp'])); ?>
+                  <?= htmlspecialchars(preg_replace('/^62/', '0', $row['telp'] ?? '')); ?>
                 </a>
                 <?php else: ?>
                 <span class="text-muted">-</span>
@@ -482,10 +483,10 @@ $salesData = mysqli_query($conn, "
               <td style="text-align: center;">
                 <button type="button" class="btn-act btn-act-edit editBtn" 
                   data-id="<?= $row['id']; ?>" 
-                  data-nama="<?= htmlspecialchars($row['nama']); ?>" 
-                  data-nik="<?= htmlspecialchars($row['nik']); ?>" 
-                  data-telp="<?= htmlspecialchars($row['telp']); ?>" 
-                  data-id-wilayah="<?= $row['id_wilayah']; ?>"
+                  data-nama="<?= htmlspecialchars($row['nama'] ?? ($row['nama_lengkap'] ?? '')); ?>" 
+                  data-nik="<?= htmlspecialchars($row['nik'] ?? ''); ?>" 
+                  data-telp="<?= htmlspecialchars($row['telp'] ?? ''); ?>" 
+                  data-id-wilayah="<?= $row['id_wilayah'] ?? 0; ?>"
                   data-bs-toggle="modal" data-bs-target="#editModal" title="Ubah Data & Sandi">
                   <span class="material-symbols-outlined">edit</span>
                 </button>

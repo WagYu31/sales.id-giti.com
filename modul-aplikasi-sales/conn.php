@@ -4,33 +4,36 @@
  * Terhubung ke database sales.id-giti.com
  */
 
-if (file_exists(__DIR__ . '/../includes/db.php')) {
-    require_once __DIR__ . '/../includes/db.php';
-} else {
-    $host_only = explode(':', $_SERVER['HTTP_HOST'] ?? '')[0];
-    $is_local = (in_array($host_only, ['localhost', '127.0.0.1']) || php_sapi_name() === 'cli');
+mysqli_report(MYSQLI_REPORT_OFF);
+$host = 'localhost';
 
-    mysqli_report(MYSQLI_REPORT_OFF);
-    $host = 'localhost';
+// 1. Prioritas Utama: Database Aplikasi Sales / Jadwal (teknisi_api_root di server)
+$conn = @new mysqli($host, 'teknisi_api_root', 'OffOff@18', 'teknisi_api_root');
 
-    // 1. Try local dev credentials
-    $conn = @new mysqli($host, 'root', '', 'sales_id_giti');
+if ($conn->connect_error) {
+    $conn = @new mysqli($host, 'teknisi_api_root', 'WagyuA531052002.', 'teknisi_api_root');
+}
 
-    // 2. Fallback to production credentials
+// 2. Prioritas Kedua: u836263092_jadwaltest
+if ($conn->connect_error) {
+    $conn = @new mysqli($host, 'u836263092_jadwaltest', 'Eddie@1819', 'u836263092_jadwalTest');
+}
+
+// 3. Prioritas Ketiga: Local dev root
+if ($conn->connect_error) {
+    $conn = @new mysqli($host, 'root', '', 'teknisi_api_root');
     if ($conn->connect_error) {
-        $user_prod = 'u836263092_sales';
-        $pass_prod = 'bkmRa2a5bDfwZLYX';
-        $db_prod   = 'u836263092_sales';
-        $conn = @new mysqli($host, $user_prod, $pass_prod, $db_prod);
-        
-        if ($conn->connect_error) {
-            $conn = @new mysqli($host, $user_prod, $pass_prod, 'sales_id_giti');
-        }
+        $conn = @new mysqli($host, 'root', '', 'sales_id_giti');
     }
+}
 
-    if ($conn->connect_error) {
-        die("Koneksi gagal: " . $conn->connect_error);
-    }
+// 4. Fallback Terakhir: Database sales_id_giti produksi
+if ($conn->connect_error) {
+    $conn = @new mysqli($host, 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales');
+}
+
+if ($conn->connect_error) {
+    die("Koneksi Database Gagal: " . $conn->connect_error);
 }
 
 // Set karakter set ke UTF-8 & timezone Jakarta

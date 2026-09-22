@@ -1,7 +1,7 @@
 <?php
-include "../conn.php";
-include "../session.php";
-include "../get-user-data.php";
+include_once __DIR__ . "/conn.php";
+include_once __DIR__ . "/session.php";
+include_once __DIR__ . "/get-user-data.php";
 $pageNow = "Target Tercapai";
 $currentPage = "Today";
 $role = $_SESSION['role'];

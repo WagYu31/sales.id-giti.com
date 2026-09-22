@@ -1,8 +1,9 @@
 <?php
-include "../conn.php";
-include "../session.php";
-include "../get-user-data.php";
+include_once __DIR__ . "/conn.php";
+include_once __DIR__ . "/session.php";
+include_once __DIR__ . "/get-user-data.php";
 $pageNow = "Data Customer";
+
 // Tangkap data dari form
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["id"])) {
     $id_customer = $_GET["id"];

@@ -1,12 +1,7 @@
 <?php
-session_start();
-if (file_exists("../conn.php")) {
-    include_once "../conn.php";
-} else {
-    include_once "conn.php";
-}
-include_once "session.php";
-include_once "get-user-data.php";
+include_once __DIR__ . "/conn.php";
+include_once __DIR__ . "/session.php";
+include_once __DIR__ . "/get-user-data.php";
 
 header('Content-Type: application/json; charset=utf-8');
 
