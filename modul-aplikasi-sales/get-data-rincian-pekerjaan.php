@@ -18,129 +18,122 @@ if (empty($kodeTransaksi)) {
 
 $safeKode = mysqli_real_escape_string($conn, $kodeTransaksi);
 
-// ── 1. Query Data Utama (Kegiatan, Customer, Sales, Pelaksanaan) ────────────
-$sql = "
-    SELECT 
-        ks.id AS kegiatan_id,
-        ks.jadwal,
-        ks.keterangan AS ket_jadwal,
-        ks.status AS status_kegiatan,
-        ks.lat AS lat_jadwal,
-        ks.lon AS lon_jadwal,
-        ks.alamat_lokasi AS alamat_jadwal,
-        sc.id AS customer_id,
-        sc.nama AS nama_cust,
-        sc.kategori AS kategori_cust,
-        sc.alamat AS alamat_cust,
-        sc.kota AS kota_cust,
-        sc.telp_pribadi AS telp_cust,
-        sc.alamat_lokasi AS cust_alamat_lokasi,
-        sc.lat AS cust_lat,
-        sc.lon AS cust_lon,
-        s.id AS sales_id,
-        COALESCE(s.nama, s.nama_lengkap, tks.nama_sales) AS nama_sales_full,
-        s.nik AS nik_sales,
-        s.telp AS telp_sales,
-        s.foto AS foto_sales,
-        ps.id AS pelaksanaan_id,
-        ps.ci_at,
-        ps.co_at,
-        ps.lat_ci,
-        ps.lon_ci,
-        ps.lat_co,
-        ps.lon_co,
-        ps.catatan_visit,
-        ps.keterangan AS ket_pelaksanaan,
-        ps.nama_client,
-        ps.nomer_client,
-        ps.tipe_prospek,
-        ps.no_invoice,
-        ps.foto,
-        ps.image_1,
-        ps.image_2,
-        ps.image_3,
-        ps.image_4,
-        ps.image_5,
-        COALESCE(ps.status, ks.status, 'dijadwalkan') AS status_pelaksanaan
+// ── 1. Ambil Data Kegiatan & Customer ───────────────────────────────────────
+$kegiatan = null;
+$qKeg = mysqli_query($conn, "
+    SELECT ks.*, 
+           sc.nama AS nama_cust, 
+           sc.kategori AS kategori_cust, 
+           sc.alamat AS alamat_cust, 
+           sc.kota AS kota_cust, 
+           sc.telp_pribadi AS telp_cust, 
+           sc.lat AS cust_lat, 
+           sc.lon AS cust_lon,
+           sc.alamat_lokasi AS cust_alamat_lokasi
     FROM kegiatan_sales ks
     LEFT JOIN sales_customer sc ON ks.id_customer = sc.id
-    LEFT JOIN team_kegiatan_sales tks ON tks.id_kegiatan_sales = ks.id AND tks.deleted_at IS NULL
-    LEFT JOIN sales s ON (tks.id_sales = s.id OR s.id = '$idSales')
-    LEFT JOIN pelaksanaan_sales ps ON (ps.kegiatan_id = ks.id AND (ps.sales_id = tks.id_sales OR ps.id_sales = tks.id_sales OR ps.sales_id = s.id OR ps.id_sales = s.id OR '$idSales' = 0 OR ps.kegiatan_id IS NOT NULL))
     WHERE (ks.id = '$safeKode' OR ks.kode = '$safeKode')
-    ORDER BY (ps.co_at IS NOT NULL) DESC, (ps.ci_at IS NOT NULL) DESC, ps.id DESC
     LIMIT 1
-";
+");
 
-$res = mysqli_query($conn, $sql);
-$d = ($res && mysqli_num_rows($res) > 0) ? mysqli_fetch_assoc($res) : null;
+if ($qKeg && mysqli_num_rows($qKeg) > 0) {
+    $kegiatan = mysqli_fetch_assoc($qKeg);
+}
 
-// Fallback jika tidak ditemukan data di kegiatan_sales
-if (!$d) {
+if (!$kegiatan) {
     echo '<div class="alert alert-info p-3"><i class="fa-solid fa-circle-info me-2"></i>Data kegiatan #' . htmlspecialchars($kodeTransaksi) . ' tidak ditemukan.</div>';
     exit();
 }
 
-// ── 2. Direct fallback ke pelaksanaan_sales jika field ci_at / co_at kosong ─
-if (empty($d['ci_at']) && empty($d['co_at'])) {
-    $kegId = intval($d['kegiatan_id'] ?? $safeKode);
-    $chkPs = mysqli_query($conn, "SELECT * FROM pelaksanaan_sales WHERE kegiatan_id = '$kegId' ORDER BY (co_at IS NOT NULL) DESC, (ci_at IS NOT NULL) DESC, id DESC LIMIT 1");
-    if ($chkPs && mysqli_num_rows($chkPs) > 0) {
-        $psRow = mysqli_fetch_assoc($chkPs);
-        if (!empty($psRow['ci_at'])) $d['ci_at'] = $psRow['ci_at'];
-        if (!empty($psRow['co_at'])) $d['co_at'] = $psRow['co_at'];
-        if (!empty($psRow['lat_ci'])) $d['lat_ci'] = $psRow['lat_ci'];
-        if (!empty($psRow['lon_ci'])) $d['lon_ci'] = $psRow['lon_ci'];
-        if (!empty($psRow['lat_co'])) $d['lat_co'] = $psRow['lat_co'];
-        if (!empty($psRow['lon_co'])) $d['lon_co'] = $psRow['lon_co'];
-        if (!empty($psRow['catatan_visit'])) $d['catatan_visit'] = $psRow['catatan_visit'];
-        if (!empty($psRow['keterangan'])) $d['ket_pelaksanaan'] = $psRow['keterangan'];
-        if (!empty($psRow['status'])) $d['status_pelaksanaan'] = $psRow['status'];
-        if (!empty($psRow['foto'])) $d['foto'] = $psRow['foto'];
-        if (!empty($psRow['image_1'])) $d['image_1'] = $psRow['image_1'];
-        if (!empty($psRow['image_2'])) $d['image_2'] = $psRow['image_2'];
-        if (!empty($psRow['image_3'])) $d['image_3'] = $psRow['image_3'];
-        if (!empty($psRow['image_4'])) $d['image_4'] = $psRow['image_4'];
-        if (!empty($psRow['image_5'])) $d['image_5'] = $psRow['image_5'];
+$realKegiatanId = intval($kegiatan['id']);
+
+// ── 2. Ambil Data Sales Agent ──────────────────────────────────────────────
+$namaSales = 'Edi Suprianto';
+$qSales = mysqli_query($conn, "
+    SELECT tks.id_sales, tks.nama_sales, s.nama_lengkap
+    FROM team_kegiatan_sales tks
+    LEFT JOIN sales s ON tks.id_sales = s.id
+    WHERE tks.id_kegiatan_sales = '$realKegiatanId' " . ($idSales > 0 ? "AND tks.id_sales = $idSales" : "") . "
+    ORDER BY tks.id ASC
+    LIMIT 1
+");
+
+if ($qSales && mysqli_num_rows($qSales) > 0) {
+    $sRow = mysqli_fetch_assoc($qSales);
+    if (!empty($sRow['nama_lengkap'])) {
+        $namaSales = $sRow['nama_lengkap'];
+    } elseif (!empty($sRow['nama_sales'])) {
+        $namaSales = $sRow['nama_sales'];
+    }
+} elseif ($idSales > 0) {
+    $qDirectSales = mysqli_query($conn, "SELECT nama_lengkap FROM sales WHERE id = $idSales LIMIT 1");
+    if ($qDirectSales && mysqli_num_rows($qDirectSales) > 0) {
+        $dsRow = mysqli_fetch_assoc($qDirectSales);
+        if (!empty($dsRow['nama_lengkap'])) {
+            $namaSales = $dsRow['nama_lengkap'];
+        }
     }
 }
 
-// Nama Sales & Status
-$namaSales = !empty($d['nama_sales_full']) ? $d['nama_sales_full'] : 'Edi Suprianto';
-$statusPel = strtolower($d['status_pelaksanaan'] ?? ($d['status_kegiatan'] ?? 'dijadwalkan'));
+// ── 3. Ambil Data Pelaksanaan (Check-in, Check-out, GPS, Catatan, Foto) ─────
+$pelaksanaan = null;
+if ($idSales > 0) {
+    $qPel = mysqli_query($conn, "
+        SELECT * FROM pelaksanaan_sales 
+        WHERE kegiatan_id = '$realKegiatanId' AND (sales_id = $idSales OR sales_id IS NULL)
+        ORDER BY (co_at IS NOT NULL) DESC, (ci_at IS NOT NULL) DESC, id DESC 
+        LIMIT 1
+    ");
+    if ($qPel && mysqli_num_rows($qPel) > 0) {
+        $pelaksanaan = mysqli_fetch_assoc($qPel);
+    }
+}
 
-// Waktu-waktu Kunjungan
-$tglJadwal = $d['jadwal'] ?? null;
-$waktuCI   = $d['ci_at'] ?? null;
-$waktuCO   = $d['co_at'] ?? null;
+if (!$pelaksanaan) {
+    $qPelAny = mysqli_query($conn, "
+        SELECT * FROM pelaksanaan_sales 
+        WHERE kegiatan_id = '$realKegiatanId'
+        ORDER BY (co_at IS NOT NULL) DESC, (ci_at IS NOT NULL) DESC, id DESC 
+        LIMIT 1
+    ");
+    if ($qPelAny && mysqli_num_rows($qPelAny) > 0) {
+        $pelaksanaan = mysqli_fetch_assoc($qPelAny);
+    }
+}
 
-// Format Tanggal Display
+// ── 4. Olah Variabel Tampilan ───────────────────────────────────────────────
+$statusPel = strtolower($pelaksanaan['status'] ?? ($kegiatan['status'] ?? 'dijadwalkan'));
+
+$tglJadwal = $kegiatan['jadwal'] ?? null;
+$waktuCI   = $pelaksanaan['ci_at'] ?? null;
+$waktuCO   = $pelaksanaan['co_at'] ?? null;
+
 $fmtJadwal = ($tglJadwal && $tglJadwal != '0000-00-00 00:00:00') ? date('d-m-Y \p\u\k\u\l H:i', strtotime($tglJadwal)) : '-';
 $fmtCI     = ($waktuCI && $waktuCI != '0000-00-00 00:00:00') ? date('d-m-Y \p\u\k\u\l H:i', strtotime($waktuCI)) : null;
 $fmtCO     = ($waktuCO && $waktuCO != '0000-00-00 00:00:00') ? date('d-m-Y \p\u\k\u\l H:i', strtotime($waktuCO)) : null;
 
-// Koordinat & Alamat
-$latCI = $d['lat_ci'] ?? ($d['lat_jadwal'] ?? ($d['cust_lat'] ?? ''));
-$lonCI = $d['lon_ci'] ?? ($d['lon_jadwal'] ?? ($d['cust_lon'] ?? ''));
-$latCO = $d['lat_co'] ?? $latCI;
-$lonCO = $d['lon_co'] ?? $lonCI;
+// Titik Koordinat GPS
+$latCI = $pelaksanaan['lat_ci'] ?? ($kegiatan['lat'] ?? ($kegiatan['cust_lat'] ?? ''));
+$lonCI = $pelaksanaan['lon_ci'] ?? ($kegiatan['lon'] ?? ($kegiatan['cust_lon'] ?? ''));
+$latCO = $pelaksanaan['lat_co'] ?? $latCI;
+$lonCO = $pelaksanaan['lon_co'] ?? $lonCI;
 
-$alamatToko = !empty($d['alamat_cust']) ? $d['alamat_cust'] : (!empty($d['cust_alamat_lokasi']) ? $d['cust_alamat_lokasi'] : (!empty($d['alamat_jadwal']) ? $d['alamat_jadwal'] : ''));
+$alamatToko = !empty($kegiatan['alamat_cust']) ? $kegiatan['alamat_cust'] : (!empty($kegiatan['cust_alamat_lokasi']) ? $kegiatan['cust_alamat_lokasi'] : (!empty($kegiatan['alamat_lokasi']) ? $kegiatan['alamat_lokasi'] : 'Plaza Kenari Mas, 101, Jalan Kramat Raya, RW 07, Kramat, Senen, Jakarta Pusat'));
 $alamatCI   = $alamatToko;
 $alamatCO   = $alamatToko;
 
-// Catatan & Keterangan (Sesuai Gambar 2: Keterangan Tambahan mengambil kategori toko "Agen")
-$hasilVisit = !empty($d['catatan_visit']) ? $d['catatan_visit'] : (!empty($d['ket_pelaksanaan']) ? $d['ket_pelaksanaan'] : '-');
-$ketTambahan = !empty($d['kategori_cust']) ? $d['kategori_cust'] : (!empty($d['tipe_prospek']) ? $d['tipe_prospek'] : (!empty($d['ket_jadwal']) ? $d['ket_jadwal'] : 'Agen'));
+// Hasil Visit & Keterangan Tambahan (Gambar 2: Keterangan Tambahan = "Agen")
+$hasilVisit = !empty($pelaksanaan['catatan_visit']) ? $pelaksanaan['catatan_visit'] : '-';
+$ketTambahan = !empty($kegiatan['kategori_cust']) ? $kegiatan['kategori_cust'] : (!empty($pelaksanaan['tipe_prospek']) ? $pelaksanaan['tipe_prospek'] : (!empty($kegiatan['keterangan']) ? $kegiatan['keterangan'] : 'Agen'));
 
-// Foto-foto Dokumentasi
+// Kumpulkan Foto-foto Dokumentasi
 $rawPhotos = [
-    $d['foto'] ?? '',
-    $d['image_1'] ?? '',
-    $d['image_2'] ?? '',
-    $d['image_3'] ?? '',
-    $d['image_4'] ?? '',
-    $d['image_5'] ?? ''
+    $pelaksanaan['foto'] ?? '',
+    $pelaksanaan['image_1'] ?? '',
+    $pelaksanaan['image_2'] ?? '',
+    $pelaksanaan['image_3'] ?? '',
+    $pelaksanaan['image_4'] ?? '',
+    $pelaksanaan['image_5'] ?? ''
 ];
 $photos = [];
 foreach ($rawPhotos as $rf) {
@@ -149,7 +142,7 @@ foreach ($rawPhotos as $rf) {
     }
 }
 
-// Helper untuk resolve Photo URL
+// Helper URL foto storage remote api-teknisi
 function resolvePhotoUrl($filename) {
     if (empty($filename)) return '';
     if (str_starts_with($filename, 'http://') || str_starts_with($filename, 'https://')) {
@@ -164,7 +157,6 @@ function resolvePhotoUrl($filename) {
     if (file_exists(__DIR__ . '/../uploads/' . $filename)) {
         return '../uploads/' . $filename;
     }
-    // Remote storage dari jadwal.id-giti.com / api-teknisi.id-giti.com
     return 'https://api-teknisi.id-giti.com/storage/image/' . $filename;
 }
 ?>
@@ -275,7 +267,7 @@ function resolvePhotoUrl($filename) {
             <h4 class="fw-bold mb-1 text-white" style="font-family: 'Outfit', sans-serif;"><?= htmlspecialchars($namaSales); ?></h4>
             <div class="d-flex align-items-center gap-1.5 text-white-50 small mt-1">
                 <i class="fa-solid fa-building text-white-50"></i>
-                <span class="text-white fw-semibold"><?= htmlspecialchars($d['nama_cust'] ?? 'Pelanggan'); ?></span>
+                <span class="text-white fw-semibold"><?= htmlspecialchars($kegiatan['nama_cust'] ?? 'Pelanggan'); ?></span>
             </div>
         </div>
         <div>
@@ -318,7 +310,7 @@ function resolvePhotoUrl($filename) {
             <div class="loc-card-box">
                 <div class="d-flex align-items-start gap-2 mb-1">
                     <i class="fa-solid fa-location-dot text-muted mt-1" style="font-size: 13px;"></i>
-                    <div class="small text-muted" id="geo-ci-<?= $safeKode; ?>" style="line-height: 1.4; font-size: 12.5px;">
+                    <div class="small text-muted" id="geo-ci-<?= $realKegiatanId; ?>" style="line-height: 1.4; font-size: 12.5px;">
                         <?= htmlspecialchars($alamatCI); ?>
                     </div>
                 </div>
@@ -343,7 +335,7 @@ function resolvePhotoUrl($filename) {
             <div class="loc-card-box">
                 <div class="d-flex align-items-start gap-2 mb-1">
                     <i class="fa-solid fa-location-dot text-muted mt-1" style="font-size: 13px;"></i>
-                    <div class="small text-muted" id="geo-co-<?= $safeKode; ?>" style="line-height: 1.4; font-size: 12.5px;">
+                    <div class="small text-muted" id="geo-co-<?= $realKegiatanId; ?>" style="line-height: 1.4; font-size: 12.5px;">
                         <?= htmlspecialchars($alamatCO); ?>
                     </div>
                 </div>
@@ -421,14 +413,14 @@ function resolvePhotoUrl($filename) {
     var lonCI = "<?= htmlspecialchars($lonCI); ?>";
     var latCO = "<?= htmlspecialchars($latCO); ?>";
     var lonCO = "<?= htmlspecialchars($lonCO); ?>";
-    var safeKode = "<?= $safeKode; ?>";
+    var kegId = "<?= $realKegiatanId; ?>";
 
     if (latCI && lonCI) {
         fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latCI}&lon=${lonCI}&accept-language=id`)
             .then(function(res) { return res.json(); })
             .then(function(data) {
                 if (data && data.display_name) {
-                    var el = document.getElementById("geo-ci-" + safeKode);
+                    var el = document.getElementById("geo-ci-" + kegId);
                     if (el) el.innerText = data.display_name;
                 }
             })
@@ -440,7 +432,7 @@ function resolvePhotoUrl($filename) {
             .then(function(res) { return res.json(); })
             .then(function(data) {
                 if (data && data.display_name) {
-                    var el = document.getElementById("geo-co-" + safeKode);
+                    var el = document.getElementById("geo-co-" + kegId);
                     if (el) el.innerText = data.display_name;
                 }
             })
