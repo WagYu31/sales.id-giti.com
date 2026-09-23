@@ -43,6 +43,10 @@ $total_notif_count = $notif_pending_fu + $notif_kandidat + $notif_maintenance;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title ?? 'Dashboard'; ?> — Loewix Sales</title>
+    <!-- Loewix Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/favicon.png?v=2">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=2">
+    <link rel="apple-touch-icon" href="assets/images/favicon.png?v=2">
     <script>
     (function() {
         var savedTheme = localStorage.getItem('loewix_theme');

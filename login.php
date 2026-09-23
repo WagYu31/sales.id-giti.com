@@ -42,6 +42,10 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Login ke Loewix Sales — platform manajemen tim sales internal.">
     <title>Login — Loewix Sales</title>
+    <!-- Loewix Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/favicon.png?v=2">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=2">
+    <link rel="apple-touch-icon" href="assets/images/favicon.png?v=2">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
