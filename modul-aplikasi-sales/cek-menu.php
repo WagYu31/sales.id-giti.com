@@ -107,6 +107,19 @@ $userInitials = strtoupper(substr($userName, 0, 2));
             <span>Kalkulator Sales</span>
         </a>
 
+        <?php if (strtolower(trim($userRole)) === 'superadmin'): ?>
+        <!-- ═════════════════════════════════════════════════════════ -->
+        <!-- KHUSUS SUPER ADMIN                                        -->
+        <!-- ═════════════════════════════════════════════════════════ -->
+        <div class="nav-section-label" style="margin-top: 10px; color: #F59E0B;">
+            <i class="bi bi-shield-lock-fill me-1"></i> Super Admin
+        </div>
+        <a href="../role_menu_access.php" class="sidebar-link <?php echo in_array($currFile, ['role_menu_access.php', 'role-menu.php']) ? 'active' : ''; ?>">
+            <i class="bi bi-shield-lock-fill text-warning"></i>
+            <span>Akses Role Menu</span>
+        </a>
+        <?php endif; ?>
+
         <div class="nav-section-label" style="margin-top: 10px;">Akun</div>
         <a href="../logout.php" class="sidebar-link" style="color: #F87171;">
             <i class="bi bi-box-arrow-left"></i>

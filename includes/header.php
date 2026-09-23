@@ -619,6 +619,18 @@ table tr td { font-size: 0.85em; }
                 </div>
             </div>
 
+            <?php if (strtolower(trim($userRole)) === 'superadmin'): ?>
+            <!-- ═════════════════════════════════════════════════════════ -->
+            <!-- KHUSUS SUPER ADMIN                                        -->
+            <!-- ═════════════════════════════════════════════════════════ -->
+            <div class="nav-section-label" style="margin-top:8px; color:#F59E0B;">
+                <i class="bi bi-shield-lock-fill me-1"></i> Super Admin
+            </div>
+            <a href="role_menu_access.php" class="sidebar-link <?php echo $currentPage=='role_menu_access.php'?'active':''; ?>">
+                <i class="bi bi-shield-lock-fill text-warning"></i> Akses Role Menu
+            </a>
+            <?php endif; ?>
+
             <div class="nav-section-label" style="margin-top:8px;">Akun</div>
             <a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
                 <i class="bi bi-key-fill"></i> Ganti Password
