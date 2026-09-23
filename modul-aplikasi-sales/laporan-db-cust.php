@@ -668,35 +668,38 @@ $result = mysqli_query($conn, $sql);
                 $alamatC    = $row['alamat_cust'] ?? '';
                 $kotaC      = $row['kota_cust'] ?? '';
 
-                // Ambil tim & pelaksanaan kegiatan ini
-                $sqlLapTek = "SELECT tks.*, 
-                                     COALESCE(s.nama, tks.nama_sales, 'Sales') AS nama_sales, 
-                                     tks.id_sales,
-                                     IFNULL(ps.status, ks.status) AS status,
+                // Ambil tim & pelaksanaan kegiatan ini secara komprehensif
+                $sqlLapTek = "SELECT 
+                                     tks.id AS id_tks,
+                                     COALESCE(tks.id_sales, ps.sales_id, 0) AS id_sales,
+                                     COALESCE(s.nama, tks.nama_sales, ps_s.nama, '') AS nama_sales,
+                                     COALESCE(NULLIF(ps.status, ''), NULLIF(ks.status, ''), 'dijadwalkan') AS status,
                                      ps.ci_at AS tgl_mulai, 
                                      ps.co_at AS tgl_selesai,
                                      ks.id AS kode_transaksi, 
                                      ks.jadwal AS tgl_visits,
-                                     COALESCE(NULLIF(ps.catatan_visit, ''), ps.keterangan) AS hasil_visits,
+                                     COALESCE(NULLIF(ps.catatan_visit, ''), NULLIF(ps.keterangan, ''), NULLIF(ks.keterangan, '')) AS hasil_visits,
                                      ps.foto_visit_url
-                              FROM team_kegiatan_sales tks
+                              FROM kegiatan_sales ks
+                              LEFT JOIN team_kegiatan_sales tks ON ks.id = tks.id_kegiatan_sales AND tks.deleted_at IS NULL
                               LEFT JOIN sales s ON tks.id_sales = s.id
-                              JOIN kegiatan_sales ks ON tks.id_kegiatan_sales = ks.id
-                              LEFT JOIN pelaksanaan_sales ps ON ps.kegiatan_id = tks.id_kegiatan_sales AND ps.sales_id = tks.id_sales
-                              WHERE tks.id_kegiatan_sales = '$kegiatanId' AND tks.deleted_at IS NULL";
+                              LEFT JOIN pelaksanaan_sales ps ON ps.kegiatan_id = ks.id AND (ps.sales_id = tks.id_sales OR tks.id_sales IS NULL)
+                              LEFT JOIN sales ps_s ON ps.sales_id = ps_s.id
+                              WHERE ks.id = '$kegiatanId' AND ks.deleted_at IS NULL";
                               
                 if ($filterSales > 0) {
-                    $sqlLapTek .= " AND tks.id_sales = $filterSales";
+                    $sqlLapTek .= " AND (tks.id_sales = $filterSales OR ps.sales_id = $filterSales)";
                 }
                 if (!empty($filterStatus)) {
                     if ($filterStatus === 'dijadwalkan') {
-                        $sqlLapTek .= " AND (ps.status IS NULL OR ps.status = 'dijadwalkan' OR ps.status = '')";
+                        $sqlLapTek .= " AND (ps.status IS NULL OR ps.status = 'dijadwalkan' OR ps.status = '') AND ks.status != 'selesai'";
                     } else if ($filterStatus === 'berjalan') {
-                        $sqlLapTek .= " AND ps.status IN ('berjalan', 'proses')";
+                        $sqlLapTek .= " AND (ps.status IN ('berjalan', 'proses') OR ks.status = 'berjalan')";
                     } else if ($filterStatus === 'selesai') {
                         $sqlLapTek .= " AND (ps.status = 'selesai' OR ks.status = 'selesai')";
                     }
                 }
+                $sqlLapTek .= " GROUP BY COALESCE(tks.id, ps.id, ks.id)";
                 $resLapTek = mysqli_query($conn, $sqlLapTek);
                 $activityCount = ($resLapTek) ? mysqli_num_rows($resLapTek) : 0;
         ?>
@@ -750,11 +753,13 @@ $result = mysqli_query($conn, $sql);
                     <?php
                     if ($resLapTek && mysqli_num_rows($resLapTek) > 0) {
                         while ($rowLT = mysqli_fetch_assoc($resLapTek)) {
-                            $idT = $rowLT["id_sales"];
-                            $namaSalesItem = $rowLT["nama_sales"];
-                            $initials = strtoupper(substr($namaSalesItem, 0, 2));
-                            $colorIdx = abs(crc32($namaSalesItem)) % count($avatarColors);
-                            $avatarBg = $avatarColors[$colorIdx];
+                            $idT = intval($rowLT["id_sales"]);
+                            $namaSalesItem = trim($rowLT["nama_sales"] ?? '');
+                            $hasSales = !empty($namaSalesItem) && $idT > 0;
+
+                            $initials = $hasSales ? strtoupper(substr($namaSalesItem, 0, 2)) : '??';
+                            $colorIdx = $hasSales ? (abs(crc32($namaSalesItem)) % count($avatarColors)) : 0;
+                            $avatarBg = $hasSales ? $avatarColors[$colorIdx] : '#94a3b8';
 
                             $hslVisits = trim($rowLT['hasil_visits'] ?? '');
                             $datetime = $rowLT["tgl_visits"];
@@ -802,15 +807,26 @@ $result = mysqli_query($conn, $sql);
 
                             <!-- 2. Sales Agent -->
                             <div>
-                                <div class="lp-sales-pill">
-                                    <div class="lp-sales-avatar" style="background: <?= $avatarBg; ?>;">
-                                        <?= $initials; ?>
+                                <?php if ($hasSales): ?>
+                                    <div class="lp-sales-pill">
+                                        <div class="lp-sales-avatar" style="background: <?= $avatarBg; ?>;">
+                                            <?= $initials; ?>
+                                        </div>
+                                        <div class="lp-sales-text">
+                                            <div class="lp-sales-name"><?= htmlspecialchars($namaSalesItem); ?></div>
+                                            <span class="text-muted" style="font-size: 10.5px;">Sales Canvas</span>
+                                        </div>
                                     </div>
-                                    <div class="lp-sales-text">
-                                        <div class="lp-sales-name"><?= htmlspecialchars($namaSalesItem); ?></div>
-                                        <span class="text-muted" style="font-size: 10.5px;">Sales Canvas</span>
+                                <?php else: ?>
+                                    <div class="lp-sales-pill">
+                                        <div class="lp-sales-avatar" style="background: #e2e8f0; color: #64748b;">
+                                            <i class="bi bi-person-dash"></i>
+                                        </div>
+                                        <div class="lp-sales-text">
+                                            <span class="badge bg-light text-muted border" style="font-size: 10.5px;">Belum Ditugaskan</span>
+                                        </div>
                                     </div>
-                                </div>
+                                <?php endif; ?>
                             </div>
 
                             <!-- 3. Jadwal Visit -->
@@ -890,60 +906,7 @@ $result = mysqli_query($conn, $sql);
                         </div>
                     <?php
                         }
-                    } else {
-                        // Fallback jika sales belum ditugaskan
-                        $datetimeFallback = $row["tgl_visits"];
-                        $formattedDateFb = ($datetimeFallback && $datetimeFallback != '0000-00-00 00:00:00') ? date("d M Y", strtotime($datetimeFallback)) : '-';
-                        $formattedTimeFb = ($datetimeFallback && $datetimeFallback != '0000-00-00 00:00:00') ? date("H:i", strtotime($datetimeFallback)) : '-';
-                    ?>
-                        <div class="lp-item-row">
-                            <!-- 1. Status & ID -->
-                            <div>
-                                <span class="lp-status-badge lp-status-dijadwalkan">
-                                    <i class="bi bi-clock"></i> Dijadwalkan
-                                </span>
-                                <span class="badge bg-light text-muted border font-monospace mt-0.5 d-block text-start" style="font-size: 10px; width: fit-content;">
-                                    #<?= $row['kode_transaksi']; ?>
-                                </span>
-                            </div>
-                            <!-- 2. Sales Agent -->
-                            <div>
-                                <span class="badge bg-light text-muted border py-1 px-2" style="font-size: 11px;">
-                                    <i class="bi bi-person-dash me-1"></i>Belum ditugaskan
-                                </span>
-                            </div>
-                            <!-- 3. Jadwal Visit -->
-                            <div>
-                                <span class="fw-semibold text-dark" style="font-size: 12.5px;">
-                                    <i class="bi bi-calendar3 text-primary me-1"></i><?= $formattedDateFb; ?>
-                                </span>
-                                <div class="text-muted fw-bold" style="font-size: 11px; margin-left: 17px;"><?= $formattedTimeFb; ?> WIB</div>
-                            </div>
-                            <!-- 4. Waktu GPS -->
-                            <div>
-                                <span class="text-muted" style="font-size: 11.5px;">
-                                    <i class="bi bi-geo-alt text-muted me-1"></i>Belum Masuk
-                                </span>
-                            </div>
-                            <!-- 5. Catatan Visit -->
-                            <div>
-                                <span class="text-muted" style="font-size: 11.5px; font-style: italic;">
-                                    <i class="bi bi-hourglass-split me-1"></i>Menunggu kunjungan sales
-                                </span>
-                            </div>
-                            <!-- 6. Aksi Buttons -->
-                            <div class="text-end">
-                                <div class="d-flex align-items-center justify-content-end gap-1">
-                                    <button type="button" class="lp-action-btn lp-action-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="0" data-kode="<?= $row['kode_transaksi']; ?>" title="Lihat Rincian">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </button>
-                                    <button type="button" class="lp-action-btn lp-action-edit editVisitBtn" data-id="<?= $row['kode_transaksi']; ?>" data-sales="0" title="Tugaskan Sales Agent">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    <?php } ?>
+                    } ?>
                 </div>
             </div>
         <?php
