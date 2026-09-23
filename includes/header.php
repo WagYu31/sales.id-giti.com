@@ -514,8 +514,11 @@ table tr td { font-size: 0.85em; }
             <div class="nav-section-label" style="margin-top:8px; color:#38BDF8;">
                 <i class="bi bi-phone me-1"></i> Aplikasi Sales Canvas (Mobile)
             </div>
-            <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php','kegiatan-baru.php'])?'active':''; ?>">
+            <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php'])?'active':''; ?>">
                 <i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Sales Canvas
+            </a>
+            <a href="modul-aplikasi-sales/kegiatan-baru.php" class="sidebar-link <?php echo ($currentPage=='kegiatan-baru.php')?'active':''; ?>">
+                <i class="bi bi-calendar-plus-fill text-primary"></i> Tambah Kegiatan Baru
             </a>
             <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>">
                 <i class="bi bi-geo-alt-fill text-info"></i> Laporan Visit (GPS)
@@ -557,8 +560,11 @@ table tr td { font-size: 0.85em; }
                 <i class="bi bi-phone me-1"></i> Aplikasi Sales Canvas (Mobile)
             </div>
 
-            <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php','kegiatan-baru.php'])?'active':''; ?>">
+            <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php'])?'active':''; ?>">
                 <i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Sales Canvas
+            </a>
+            <a href="modul-aplikasi-sales/kegiatan-baru.php" class="sidebar-link <?php echo ($currentPage=='kegiatan-baru.php')?'active':''; ?>">
+                <i class="bi bi-calendar-plus-fill text-primary"></i> Tambah Kegiatan Baru
             </a>
             <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>">
                 <i class="bi bi-geo-alt-fill text-info"></i> Laporan Visit (GPS)
@@ -568,6 +574,9 @@ table tr td { font-size: 0.85em; }
             </a>
             <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>">
                 <i class="bi bi-shop-window text-success"></i> Customer Toko / Dealer
+            </a>
+            <a href="modul-aplikasi-sales/sales.php" class="sidebar-link <?php echo in_array($currentPage,['sales.php','sales-detail.php'])?'active':''; ?>">
+                <i class="bi bi-person-badge-fill text-cyan"></i> Akun & Sales App
             </a>
             <a href="modul-aplikasi-sales/scraping-gmaps.php" class="sidebar-link <?php echo $currentPage=='scraping-gmaps.php'?'active':''; ?>">
                 <i class="bi bi-crosshair2 text-danger"></i> Scraper Leads Maps

@@ -50,9 +50,14 @@ $userInitials = strtoupper(substr($userName, 0, 2));
             <i class="bi bi-phone me-1"></i> Aplikasi Sales Canvas (Mobile)
         </div>
 
-        <a href="kegiatan.php" class="sidebar-link <?php echo in_array($currFile, ['kegiatan.php', 'kegiatan-selesai.php', 'kegiatan-db.php', 'kegiatan-baru.php', 'detail_kegiatan.php']) ? 'active' : ''; ?>">
+        <a href="kegiatan.php" class="sidebar-link <?php echo in_array($currFile, ['kegiatan.php', 'kegiatan-selesai.php', 'kegiatan-db.php', 'detail_kegiatan.php']) ? 'active' : ''; ?>">
             <i class="bi bi-grid-1x2-fill text-primary"></i>
             <span>Dashboard Sales Canvas</span>
+        </a>
+
+        <a href="kegiatan-baru.php" class="sidebar-link <?php echo ($currFile === 'kegiatan-baru.php') ? 'active' : ''; ?>">
+            <i class="bi bi-calendar-plus-fill text-primary"></i>
+            <span>Tambah Kegiatan Baru</span>
         </a>
 
         <a href="laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currFile, ['laporan-kegiatan.php', 'laporan-cust.php', 'laporan-db-kegiatan.php']) ? 'active' : ''; ?>">
