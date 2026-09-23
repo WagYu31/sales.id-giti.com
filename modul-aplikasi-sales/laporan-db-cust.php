@@ -340,7 +340,7 @@ $result = mysqli_query($conn, $sql);
   background: #f8fafc;
   border-bottom: 1px solid var(--lp-slate-200);
   display: grid;
-  grid-template-columns: 140px 180px 170px 160px 1fr 100px;
+  grid-template-columns: 130px 175px 155px 150px minmax(180px, 1fr) 95px;
   align-items: center;
   gap: 16px;
   font-size: 10px;
@@ -354,7 +354,7 @@ $result = mysqli_query($conn, $sql);
   padding: 12px 20px;
   border-bottom: 1px solid var(--lp-slate-100);
   display: grid;
-  grid-template-columns: 140px 180px 170px 160px 1fr 100px;
+  grid-template-columns: 130px 175px 155px 150px minmax(180px, 1fr) 95px;
   align-items: center;
   gap: 16px;
   transition: background 0.15s ease;
@@ -405,14 +405,31 @@ $result = mysqli_query($conn, $sql);
   background: var(--lp-slate-50);
   border: 1px solid var(--lp-slate-200);
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 5px 10px;
   font-size: 12px;
-  color: var(--lp-slate-600);
-  line-height: 1.4;
+  color: var(--lp-slate-700);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 320px;
+  width: fit-content;
+  transition: all 0.15s ease;
+  cursor: default;
+}
+
+.lp-note-box:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.lp-note-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  max-width: 275px;
+  display: inline-block;
+  font-weight: 500;
 }
 
 .lp-action-btn {
@@ -863,8 +880,8 @@ $result = mysqli_query($conn, $sql);
                             <div>
                                 <?php if (!empty($hslVisits)): ?>
                                     <div class="lp-note-box" title="<?= htmlspecialchars($hslVisits); ?>">
-                                        <i class="bi bi-chat-quote text-primary me-1"></i>
-                                        <?= htmlspecialchars($hslVisits); ?>
+                                        <i class="bi bi-chat-quote-fill text-primary flex-shrink-0" style="font-size: 11px;"></i>
+                                        <span class="lp-note-text"><?= htmlspecialchars($hslVisits); ?></span>
                                     </div>
                                 <?php elseif ($status === 'selesai'): ?>
                                     <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 11px;">
@@ -1028,8 +1045,8 @@ $result = mysqli_query($conn, $sql);
                             <div>
                                 <?php if (!empty($hslVisitsFb)): ?>
                                     <div class="lp-note-box" title="<?= htmlspecialchars($hslVisitsFb); ?>">
-                                        <i class="bi bi-chat-quote text-primary me-1"></i>
-                                        <?= htmlspecialchars($hslVisitsFb); ?>
+                                        <i class="bi bi-chat-quote-fill text-primary flex-shrink-0" style="font-size: 11px;"></i>
+                                        <span class="lp-note-text"><?= htmlspecialchars($hslVisitsFb); ?></span>
                                     </div>
                                 <?php elseif ($statusFb === 'selesai'): ?>
                                     <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 11px;">
