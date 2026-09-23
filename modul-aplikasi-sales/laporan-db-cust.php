@@ -334,12 +334,27 @@ $result = mysqli_query($conn, $sql);
   max-width: 580px;
 }
 
-/* Activity Item Row */
+/* Table Header & Activity Item Row */
+.lp-table-head {
+  padding: 8px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--lp-slate-200);
+  display: grid;
+  grid-template-columns: 140px 180px 170px 160px 1fr 100px;
+  align-items: center;
+  gap: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--lp-slate-500);
+}
+
 .lp-item-row {
-  padding: 14px 20px;
+  padding: 12px 20px;
   border-bottom: 1px solid var(--lp-slate-100);
   display: grid;
-  grid-template-columns: 140px 180px 170px 150px 1fr 110px;
+  grid-template-columns: 140px 180px 170px 160px 1fr 100px;
   align-items: center;
   gap: 16px;
   transition: background 0.15s ease;
@@ -720,6 +735,16 @@ $result = mysqli_query($conn, $sql);
                     </div>
                 </div>
 
+                <!-- Activities Table Header (Desktop Only) -->
+                <div class="lp-table-head d-none d-lg-grid">
+                    <div>Status &amp; ID</div>
+                    <div>Sales Agent</div>
+                    <div>Jadwal Visit</div>
+                    <div>Waktu GPS (In / Out)</div>
+                    <div>Catatan / Hasil Visit</div>
+                    <div class="text-end">Aksi</div>
+                </div>
+
                 <!-- Activities List -->
                 <div>
                     <?php
@@ -808,7 +833,7 @@ $result = mysqli_query($conn, $sql);
                                             <i class="bi bi-box-arrow-in-right"></i> IN: <?= $formattedTimeMli; ?>
                                         </div>
                                     <?php else: ?>
-                                        <span class="text-muted" style="font-size: 11.5px;">— Belum Masuk</span>
+                                        <span class="text-muted" style="font-size: 11.5px;"><i class="bi bi-geo-alt text-muted me-1"></i>Belum Masuk</span>
                                     <?php endif; ?>
 
                                     <?php if ($formattedTimeSls): ?>
@@ -837,8 +862,8 @@ $result = mysqli_query($conn, $sql);
                                         <i class="bi bi-geo-alt me-1"></i> Sedang di Lokasi Toko
                                     </span>
                                 <?php else: ?>
-                                    <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 11px;">
-                                        <i class="bi bi-hourglass-split me-1"></i> Menunggu Sales
+                                    <span class="text-muted" style="font-size: 11.5px; font-style: italic;">
+                                        <i class="bi bi-hourglass-split me-1"></i>Menunggu kunjungan sales
                                     </span>
                                 <?php endif; ?>
                             </div>
@@ -872,6 +897,7 @@ $result = mysqli_query($conn, $sql);
                         $formattedTimeFb = ($datetimeFallback && $datetimeFallback != '0000-00-00 00:00:00') ? date("H:i", strtotime($datetimeFallback)) : '-';
                     ?>
                         <div class="lp-item-row">
+                            <!-- 1. Status & ID -->
                             <div>
                                 <span class="lp-status-badge lp-status-dijadwalkan">
                                     <i class="bi bi-clock"></i> Dijadwalkan
@@ -880,23 +906,41 @@ $result = mysqli_query($conn, $sql);
                                     #<?= $row['kode_transaksi']; ?>
                                 </span>
                             </div>
+                            <!-- 2. Sales Agent -->
                             <div>
-                                <span class="text-muted small">Sales belum ditugaskan</span>
+                                <span class="badge bg-light text-muted border py-1 px-2" style="font-size: 11px;">
+                                    <i class="bi bi-person-dash me-1"></i>Belum ditugaskan
+                                </span>
                             </div>
+                            <!-- 3. Jadwal Visit -->
                             <div>
-                                <span class="fw-semibold text-dark" style="font-size: 12.5px;"><?= $formattedDateFb; ?></span>
-                                <div class="text-muted small"><?= $formattedTimeFb; ?> WIB</div>
+                                <span class="fw-semibold text-dark" style="font-size: 12.5px;">
+                                    <i class="bi bi-calendar3 text-primary me-1"></i><?= $formattedDateFb; ?>
+                                </span>
+                                <div class="text-muted fw-bold" style="font-size: 11px; margin-left: 17px;"><?= $formattedTimeFb; ?> WIB</div>
                             </div>
+                            <!-- 4. Waktu GPS -->
                             <div>
-                                <span class="text-muted small">—</span>
+                                <span class="text-muted" style="font-size: 11.5px;">
+                                    <i class="bi bi-geo-alt text-muted me-1"></i>Belum Masuk
+                                </span>
                             </div>
+                            <!-- 5. Catatan Visit -->
                             <div>
-                                <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 11px;">Menunggu Penugasan</span>
+                                <span class="text-muted" style="font-size: 11.5px; font-style: italic;">
+                                    <i class="bi bi-hourglass-split me-1"></i>Menunggu kunjungan sales
+                                </span>
                             </div>
+                            <!-- 6. Aksi Buttons -->
                             <div class="text-end">
-                                <button type="button" class="lp-action-btn lp-action-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="0" data-kode="<?= $row['kode_transaksi']; ?>" title="Lihat Rincian">
-                                    <i class="bi bi-eye-fill"></i>
-                                </button>
+                                <div class="d-flex align-items-center justify-content-end gap-1">
+                                    <button type="button" class="lp-action-btn lp-action-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="0" data-kode="<?= $row['kode_transaksi']; ?>" title="Lihat Rincian">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                    <button type="button" class="lp-action-btn lp-action-edit editVisitBtn" data-id="<?= $row['kode_transaksi']; ?>" data-sales="0" title="Tugaskan Sales Agent">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     <?php } ?>
