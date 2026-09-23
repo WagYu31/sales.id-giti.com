@@ -179,73 +179,532 @@ $resPenitipan = $conn->query($sqlPenitipan);
 
     <style>
         /* ═════════════════════════════════════════════════════════
-           SENIOR-FRIENDLY & HIGH-CONTRAST DESIGN SYSTEM FOR TIP TOK
+           VIBRANT, HIGH-CONTRAST & SENIOR-FRIENDLY DESIGN SYSTEM
            ═════════════════════════════════════════════════════════ */
         :root {
-            --bg-canvas: #f8fafc;
+            --bg-canvas: #f1f5f9;
             --surface-card: #ffffff;
             --border-subtle: #cbd5e1;
             --border-hover: #94a3b8;
-            --text-primary: #020617;
+            --text-primary: #0f172a;
             --text-secondary: #334155;
             --text-muted: #64748b;
             --accent-dark: #0f172a;
-            --accent-blue: #1d4ed8;
+            --accent-blue: #2563eb;
             --accent-blue-light: #eff6ff;
-            --accent-emerald: #047857;
+            --accent-emerald: #059669;
             --accent-emerald-light: #ecfdf5;
             --accent-amber: #d97706;
             --accent-amber-light: #fffbeb;
-            --accent-rose: #b91c1c;
+            --accent-purple: #7c3aed;
+            --accent-purple-light: #faf5ff;
+            --accent-rose: #dc2626;
             --accent-rose-light: #fee2e2;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-canvas);
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             color: var(--text-primary);
             letter-spacing: -0.01em;
+            min-height: 100vh;
         }
 
-        /* ── Header Area ── */
-        .page-header-container {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding-bottom: 20px;
+        /* ── HERO BANNER HEADER ── */
+        .hero-banner-tiptok {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e293b 100%);
+            border-radius: 20px;
+            padding: 26px 30px;
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.08);
             margin-bottom: 24px;
-            border-bottom: 2px solid var(--border-subtle);
         }
-        .page-eyebrow {
-            font-size: 13px;
+        .hero-banner-tiptok::after {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .hero-tag {
+            font-size: 12.5px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: var(--accent-blue);
-            margin-bottom: 6px;
-            display: flex;
+            background: rgba(59, 130, 246, 0.25);
+            color: #93c5fd;
+            border: 1px solid rgba(147, 197, 253, 0.4);
+            padding: 5px 14px;
+            border-radius: 20px;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
+            margin-bottom: 10px;
         }
-        .page-title {
+        .hero-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 900;
-            color: var(--text-primary);
+            color: #ffffff;
             letter-spacing: -0.02em;
             margin: 0;
             line-height: 1.2;
         }
-        .page-subtitle {
+        .hero-title-highlight {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc {
             font-size: 14.5px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: 500;
+            color: #cbd5e1;
             margin: 6px 0 0 0;
+            max-width: 680px;
+            line-height: 1.5;
+        }
+        .btn-hero-claim {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 11px 22px;
+            font-size: 14.5px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 16px rgba(217, 119, 6, 0.35);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-hero-claim:hover {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45);
+        }
+        .btn-hero-add {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            border: 2px solid #34d399;
+            border-radius: 12px;
+            padding: 11px 24px;
+            font-size: 14.5px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-hero-add:hover {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
         }
 
-        /* ── Action Buttons ── */
+        /* ── Bento Metrics Grid (Vibrant Theme) ── */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 1100px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .metrics-grid { grid-template-columns: 1fr; } }
+
+        .metric-card-themed {
+            border-radius: 18px;
+            padding: 22px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+        }
+        .metric-card-themed:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.12);
+        }
+        
+        /* Themed Variations */
+        .metric-theme-blue {
+            background: linear-gradient(145deg, #ffffff 0%, #eff6ff 100%);
+            border: 2px solid #bfdbfe;
+            border-top: 6px solid #2563eb;
+        }
+        .metric-theme-emerald {
+            background: linear-gradient(145deg, #ffffff 0%, #ecfdf5 100%);
+            border: 2px solid #a7f3d0;
+            border-top: 6px solid #059669;
+        }
+        .metric-theme-amber {
+            background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%);
+            border: 2px solid #fde68a;
+            border-top: 6px solid #d97706;
+        }
+        .metric-theme-purple {
+            background: linear-gradient(145deg, #ffffff 0%, #faf5ff 100%);
+            border: 2px solid #e9d5ff;
+            border-top: 6px solid #7c3aed;
+        }
+
+        .metric-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .icon-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .icon-emerald { background: linear-gradient(135deg, #10b981, #047857); color: #fff; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
+        .icon-amber { background: linear-gradient(135deg, #f59e0b, #b45309); color: #fff; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); }
+        .icon-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+
+        .metric-label-txt {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #475569;
+        }
+        .metric-val-large {
+            font-family: 'Outfit', sans-serif;
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin: 8px 0;
+        }
+
+        /* ── Segmented Nav & Search ── */
+        .segmented-control-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .segmented-nav-vibrant {
+            background: #ffffff;
+            padding: 5px;
+            border-radius: 14px;
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+        .segment-btn-vibrant {
+            border: 1.5px solid transparent;
+            background: transparent;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .segment-btn-vibrant:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        .segment-btn-vibrant.active {
+            background: #0f172a;
+            color: #ffffff;
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.25);
+        }
+        .segment-btn-vibrant.active .segment-badge-vibrant {
+            background: #334155;
+            color: #ffffff;
+        }
+        .segment-badge-vibrant {
+            font-size: 12px;
+            font-weight: 800;
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+        .btn-tab-claim-vibrant {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            border: 1.5px solid #f59e0b;
+        }
+        .btn-tab-claim-vibrant:hover {
+            background: linear-gradient(135deg, #fde68a, #fcd34d);
+            color: #78350f;
+        }
+
+        .search-container-vibrant {
+            position: relative;
+            min-width: 320px;
+            flex: 1;
+            max-width: 420px;
+        }
+        .search-icon-vibrant {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 15px;
+            color: #3b82f6;
+            pointer-events: none;
+        }
+        .search-input-vibrant {
+            width: 100%;
+            height: 48px;
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 14px;
+            padding: 8px 16px 8px 44px;
+            font-size: 14.5px;
+            font-weight: 600;
+            color: #0f172a;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+        .search-input-vibrant:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+        }
+
+        /* ── Data Surface Table (Colorful Overhaul) ── */
+        .data-card-vibrant {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+            margin-bottom: 24px;
+        }
+        .table-vibrant {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 0;
+        }
+        .table-vibrant th {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            font-size: 12.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 16px 18px;
+            border-bottom: 3px solid #3b82f6;
+            white-space: nowrap;
+        }
+        .table-vibrant td {
+            padding: 16px 18px;
+            vertical-align: middle;
+            border-bottom: 1.5px solid #e2e8f0;
+            font-size: 14.5px;
+            color: #0f172a;
+            background-color: #ffffff;
+            transition: background-color 0.15s ease;
+        }
+        .table-vibrant tr:nth-child(even) td {
+            background-color: #fbfcfe;
+        }
+        .table-vibrant tr:hover td {
+            background-color: #eff6ff !important;
+        }
+        .table-vibrant tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Badges & Micro Chips */
+        .taste-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 800;
+            border: 1.5px solid transparent;
+            line-height: 1.2;
+        }
+        .badge-neutral { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
+        .badge-dealer-tag { background: #dbeafe; color: #1e40af; border-color: #93c5fd; font-weight: 800; }
+        .badge-active-tag { background: #dcfce7; color: #15803d; border-color: #86efac; font-weight: 800; }
+        .badge-invoice-tag { background: #fef3c7; color: #92400e; border-color: #fcd34d; font-family: monospace; font-size: 13px; font-weight: 800; }
+        .badge-danger-tag { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; font-weight: 800; }
+        .badge-sales-tag { background: #f3e8ff; color: #6b21a8; border-color: #d8b4fe; font-weight: 800; }
+
+        /* Item Row Pill */
+        .taste-item-pill {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 4px 0;
+            box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
+            transition: all 0.15s ease;
+        }
+        .taste-item-pill:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 4px 8px rgba(15, 23, 42, 0.08);
+        }
+
+        /* Solid High-Contrast Table Action Buttons */
+        .btn-table-primary {
+            background: #0f172a;
+            color: #ffffff;
+            border: 1.5px solid #0f172a;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.2);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-table-primary:hover {
+            background: #1e293b;
+            color: #ffffff;
+            border-color: #334155;
+            transform: translateY(-1px);
+        }
+        .btn-table-secondary {
+            background: #2563eb;
+            color: #ffffff;
+            border: 1.5px solid #1d4ed8;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-table-secondary:hover {
+            background: #1d4ed8;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        .btn-table-warning {
+            background: #f59e0b;
+            color: #ffffff;
+            border: 1.5px solid #d97706;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+            box-shadow: 0 3px 8px rgba(245, 158, 11, 0.3);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-table-warning:hover {
+            background: #d97706;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        .btn-table-danger {
+            background: #ef4444;
+            color: #ffffff;
+            border: 1.5px solid #dc2626;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+            box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-table-danger:hover {
+            background: #dc2626;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* Modal Styles */
+        .modal-taste .modal-content {
+            border-radius: 20px;
+            border: 2px solid var(--border-subtle);
+            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.25);
+            overflow: hidden;
+        }
+        .modal-taste .modal-header {
+            padding: 20px 24px;
+            border-bottom: 2px solid #e2e8f0;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        .modal-taste .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 21px;
+            font-weight: 900;
+            color: #020617;
+        }
+        .form-label-taste {
+            font-size: 13.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #1e293b;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .form-control-taste {
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-size: 14.5px;
+            font-weight: 600;
+            color: #0f172a;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            background-color: #ffffff;
+        }
+        .form-control-taste:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+            outline: none;
+        }
         .btn-taste-primary {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #ffffff;
@@ -254,7 +713,6 @@ $resPenitipan = $conn->query($sqlPenitipan);
             padding: 10px 20px;
             font-size: 14px;
             font-weight: 800;
-            letter-spacing: -0.01em;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -266,9 +724,6 @@ $resPenitipan = $conn->query($sqlPenitipan);
         .btn-taste-primary:hover {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             color: #ffffff;
-            border-color: #334155;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.22);
         }
         .btn-taste-secondary {
             background-color: #ffffff;
@@ -288,364 +743,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
         }
         .btn-taste-secondary:hover {
             background-color: #f1f5f9;
-            border-color: var(--border-hover);
             color: var(--text-primary);
-            transform: translateY(-1px);
-        }
-
-        /* ── Bento Metrics Grid ── */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        @media (max-width: 1100px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .metrics-grid { grid-template-columns: 1fr; } }
-
-        .metric-card {
-            background: #ffffff;
-            border: 2px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 20px 22px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .metric-card:hover {
-            border-color: var(--border-hover);
-            box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.12);
-            transform: translateY(-2px);
-        }
-        .metric-label {
-            font-size: 12.5px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .metric-value {
-            font-family: 'Outfit', sans-serif;
-            font-size: 34px;
-            font-weight: 900;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-            line-height: 1.1;
-            margin-bottom: 8px;
-        }
-        .metric-sub {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        /* Segmented Control Filter Tabs */
-        .segmented-control-container {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-        .segmented-nav {
-            background: #ffffff;
-            padding: 4px;
-            border-radius: 12px;
-            display: inline-flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            border: 2px solid var(--border-subtle);
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-        }
-        .segment-btn {
-            border: none;
-            background: transparent;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13.5px;
-            font-weight: 800;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.15s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .segment-btn:hover {
-            color: var(--text-primary);
-            background: #f1f5f9;
-        }
-        .segment-btn.active {
-            background: #0f172a;
-            color: #ffffff;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
-        }
-        .segment-badge {
-            font-size: 12px;
-            font-weight: 800;
-            background: #e2e8f0;
-            color: #0f172a;
-            padding: 2px 8px;
-            border-radius: 6px;
-        }
-        .segment-btn.active .segment-badge {
-            background: #334155;
-            color: #ffffff;
-        }
-
-        /* Search Input */
-        .search-container {
-            position: relative;
-            min-width: 300px;
-            flex: 1;
-            max-width: 400px;
-        }
-        .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-            color: #475569;
-            pointer-events: none;
-        }
-        .search-input-refined {
-            width: 100%;
-            height: 46px;
-            background: #ffffff;
-            border: 2px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 8px 14px 8px 40px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
-        }
-        .search-input-refined:focus {
-            border-color: var(--accent-blue);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
-        }
-
-        /* ── Data Surface Table ── */
-        .data-card {
-            background: #ffffff;
-            border: 2px solid var(--border-subtle);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-            margin-bottom: 24px;
-        }
-        .taste-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin: 0;
-        }
-        .taste-table th {
-            background: #f1f5f9;
-            color: #0f172a;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 14px 16px;
-            border-bottom: 2px solid var(--border-subtle);
-            white-space: nowrap;
-        }
-        .taste-table td {
-            padding: 16px;
-            vertical-align: middle;
-            border-bottom: 1.5px solid #e2e8f0;
-            font-size: 14.5px;
-            color: var(--text-primary);
-        }
-        .taste-table tr:last-child td {
-            border-bottom: none;
-        }
-        .taste-table tr:hover td {
-            background-color: #f8fafc;
-        }
-
-        /* Badges & Micro Chips */
-        .taste-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 12.5px;
-            font-weight: 800;
-            border: 1.5px solid transparent;
-            line-height: 1.2;
-        }
-        .badge-neutral { background: #f1f5f9; color: var(--text-secondary); border-color: #cbd5e1; }
-        .badge-dealer-tag { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; font-weight: 800; }
-        .badge-active-tag { background: #dcfce7; color: #15803d; border-color: #86efac; }
-        .badge-invoice-tag { background: #fef3c7; color: #92400e; border-color: #fcd34d; font-family: monospace; font-size: 13px; font-weight: 800; }
-        .badge-danger-tag { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
-
-        /* Item Row Pill */
-        .taste-item-pill {
-            background: #ffffff;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin: 4px 0;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
-            transition: border-color 0.15s ease;
-        }
-        .taste-item-pill:hover {
-            border-color: #cbd5e1;
-        }
-
-        /* Table Action Buttons */
-        .btn-table-primary {
-            background: #0f172a;
-            color: #ffffff;
-            border: 1.5px solid #0f172a;
-            border-radius: 8px;
-            padding: 7px 14px;
-            font-size: 13px;
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.15s ease;
-            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.12);
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .btn-table-primary:hover {
-            background: #1e293b;
-            color: #ffffff;
-            border-color: #1e293b;
-            transform: translateY(-1px);
-        }
-        .btn-table-secondary {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1.5px solid #bfdbfe;
-            border-radius: 8px;
-            padding: 7px 12px;
-            font-size: 13px;
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: all 0.15s ease;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .btn-table-secondary:hover {
-            background: #dbeafe;
-            color: #1e40af;
-            border-color: #93c5fd;
-            transform: translateY(-1px);
-        }
-        .btn-table-warning {
-            background: #fffbeb;
-            color: #d97706;
-            border: 1.5px solid #fcd34d;
-            border-radius: 8px;
-            padding: 7px 12px;
-            font-size: 13px;
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: all 0.15s ease;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .btn-table-warning:hover {
-            background: #fef3c7;
-            color: #b45309;
-            border-color: #f59e0b;
-            transform: translateY(-1px);
-        }
-        .btn-table-danger {
-            background: #fee2e2;
-            color: #b91c1c;
-            border: 1.5px solid #fca5a5;
-            border-radius: 8px;
-            padding: 7px 12px;
-            font-size: 13px;
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: all 0.15s ease;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .btn-table-danger:hover {
-            background: #fecaca;
-            color: #991b1b;
-            border-color: #ef4444;
-            transform: translateY(-1px);
-        }
-
-        /* Modal Styles */
-        .modal-taste .modal-content {
-            border-radius: 18px;
-            border: 2px solid var(--border-subtle);
-            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
-            overflow: hidden;
-        }
-        .modal-taste .modal-header {
-            padding: 18px 24px;
-            border-bottom: 2px solid var(--border-subtle);
-            background: #f8fafc;
-        }
-        .modal-taste .modal-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 20px;
-            font-weight: 800;
-            color: #020617;
-        }
-        .form-label-taste {
-            font-size: 13.5px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #1e293b;
-            margin-bottom: 6px;
-            display: block;
-        }
-        .form-control-taste {
-            border: 2px solid #cbd5e1;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 14.5px;
-            font-weight: 600;
-            color: #0f172a;
-            transition: border-color 0.15s, box-shadow 0.15s;
-            background-color: #ffffff;
-        }
-        .form-control-taste:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
-            outline: none;
         }
     </style>
 </head>
@@ -659,132 +757,145 @@ $resPenitipan = $conn->query($sqlPenitipan);
 
         <div class="container-fluid py-4 px-4">
 
-            <!-- 1. Refined Senior-Friendly Page Header -->
-            <div class="page-header-container">
-                <div>
-                    <div class="page-eyebrow">
-                        <i class="fa-solid fa-boxes-packing text-primary"></i> APLIKASI SALES / KONSINYASI
+            <!-- 1. VIBRANT HERO BANNER HEADER -->
+            <div class="hero-banner-tiptok">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div>
+                        <div class="hero-tag">
+                            <i class="fa-solid fa-sparkles text-warning me-1"></i> APLIKASI SALES & KONSINYASI
+                        </div>
+                        <h1 class="hero-title">
+                            TIP TOK <span class="hero-title-highlight">(Titip Barang Di Toko)</span>
+                        </h1>
+                        <p class="hero-desc">
+                            Manajemen penitipan stok toko dealer mitra, pemantauan sisa fisik kunjungan, dan klaim reward insentif min. 50 unit.
+                        </p>
                     </div>
-                    <h1 class="page-title">TIP TOK (Titip Barang Di Toko)</h1>
-                    <p class="page-subtitle">
-                        Manajemen penitipan stok toko dealer, laporan sisa fisik kunjungan, dan klaim insentif min. 50 unit.
-                    </p>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button class="btn-taste-secondary" onclick="openTabKlaimInsentif()">
-                        <i class="fa-solid fa-hand-holding-dollar text-warning" style="font-size: 16px;"></i> Klaim Insentif
-                    </button>
-                    <button class="btn-taste-primary" onclick="openModalTambahPenitipan()">
-                        <i class="fa-solid fa-plus" style="font-size: 16px;"></i> Titip Barang Baru
-                    </button>
+                    <div class="d-flex align-items-center gap-2.5 flex-wrap">
+                        <button class="btn-hero-claim" onclick="openTabKlaimInsentif()">
+                            <i class="fa-solid fa-hand-holding-dollar text-warning-light" style="font-size: 18px;"></i>
+                            <span>Klaim Insentif</span>
+                        </button>
+                        <button class="btn-hero-add" onclick="openModalTambahPenitipan()">
+                            <i class="fa-solid fa-circle-plus" style="font-size: 18px;"></i>
+                            <span>Titip Barang Baru</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- 2. High-Contrast Bento Metrics Grid -->
+            <!-- 2. HIGH-CONTRAST COLORFUL BENTO METRICS GRID -->
             <div class="metrics-grid">
-                <!-- Metric 1: Toko Aktif -->
-                <div class="metric-card">
-                    <div class="metric-label">
-                        <span>Toko Dealer Aktif</span>
-                        <div style="background:#eff6ff; color:#1d4ed8; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; border: 1.5px solid #bfdbfe;">
-                            <i class="fa-solid fa-store" style="font-size:16px;"></i>
+                <!-- Metric 1: Toko Aktif (Ocean Blue Theme) -->
+                <div class="metric-card-themed metric-theme-blue">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="metric-label-txt">Toko Dealer Aktif</span>
+                        <div class="metric-icon-box icon-blue">
+                            <i class="fa-solid fa-store"></i>
                         </div>
                     </div>
-                    <div class="metric-value"><?php echo number_format($totalTokoAktif, 0, ',', '.'); ?></div>
-                    <div class="metric-sub">
-                        <span class="taste-badge badge-active-tag" style="font-size:12px; padding:2px 8px;"><i class="fa-solid fa-circle text-xxs me-1"></i> Aktif</span>
-                        <span style="font-weight: 700; color: #334155;">dengan stok konsinyasi</span>
+                    <div class="metric-val-large" style="color: #1d4ed8;">
+                        <?php echo number_format($totalTokoAktif, 0, ',', '.'); ?>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="taste-badge badge-active-tag" style="font-size:12px; padding:3px 10px;">
+                            <i class="fa-solid fa-circle text-xxs me-1"></i> Aktif
+                        </span>
+                        <span style="font-weight: 700; color: #334155; font-size: 13.5px;">dengan stok titipan</span>
                     </div>
                 </div>
 
-                <!-- Metric 2: Sisa Stok di Toko -->
-                <div class="metric-card">
-                    <div class="metric-label">
-                        <span>Sisa Stok di Toko</span>
-                        <div style="background:#ecfdf5; color:#047857; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; border: 1.5px solid #a7f3d0;">
-                            <i class="fa-solid fa-boxes-stacked" style="font-size:16px;"></i>
+                <!-- Metric 2: Sisa Stok di Toko (Emerald Mint Theme) -->
+                <div class="metric-card-themed metric-theme-emerald">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="metric-label-txt">Sisa Stok di Toko</span>
+                        <div class="metric-icon-box icon-emerald">
+                            <i class="fa-solid fa-boxes-stacked"></i>
                         </div>
                     </div>
-                    <div class="metric-value" style="color: #047857;">
+                    <div class="metric-val-large" style="color: #047857;">
                         <?php echo number_format($totalUnitSisa, 0, ',', '.'); ?> 
-                        <span style="font-size: 16px; font-weight: 700; color: #64748b;">/ <?php echo number_format($totalUnitTitip, 0, ',', '.'); ?> unit</span>
+                        <span style="font-size: 16px; font-weight: 800; color: #64748b;">/ <?php echo number_format($totalUnitTitip, 0, ',', '.'); ?> unit</span>
                     </div>
-                    <div class="metric-sub">
-                        Terjual: <strong class="text-danger" style="font-weight: 800; font-size: 14.5px;"><?php echo number_format($totalUnitTerjual, 0, ',', '.'); ?> unit</strong>
+                    <div class="d-flex align-items-center gap-2" style="font-size: 13.5px; font-weight: 700; color: #334155;">
+                        <span>Terjual:</span>
+                        <span class="taste-badge badge-danger-tag" style="font-size: 13px; padding: 2px 10px;">
+                            <?php echo number_format($totalUnitTerjual, 0, ',', '.'); ?> Unit
+                        </span>
                     </div>
                 </div>
 
-                <!-- Metric 3: Akumulasi Insentif -->
-                <div class="metric-card">
-                    <div class="metric-label">
-                        <span>Akumulasi Insentif</span>
-                        <div style="background:#fef3c7; color:#d97706; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; border: 1.5px solid #fcd34d;">
-                            <i class="fa-solid fa-coins" style="font-size:16px;"></i>
+                <!-- Metric 3: Akumulasi Insentif (Golden Amber Theme) -->
+                <div class="metric-card-themed metric-theme-amber">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="metric-label-txt">Akumulasi Insentif</span>
+                        <div class="metric-icon-box icon-amber">
+                            <i class="fa-solid fa-coins"></i>
                         </div>
                     </div>
-                    <div class="metric-value" style="font-size: 28px; color: #047857;">
+                    <div class="metric-val-large" style="font-size: 30px; color: #b45309;">
                         Rp <?php echo number_format($totalInsentifPool, 0, ',', '.'); ?>
                     </div>
-                    <div class="metric-sub">
-                        Dari total unit yang telah terjual
+                    <div style="font-size: 13px; font-weight: 700; color: #64748b;">
+                        <i class="fa-solid fa-circle-check text-success me-1"></i> Dari total unit yang telah terjual
                     </div>
                 </div>
 
-                <!-- Metric 4: Target Klaim 50 Unit -->
-                <div class="metric-card">
-                    <div class="metric-label">
-                        <span>Target Klaim (Min. 50 Unit)</span>
-                        <span class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>" style="font-size: 12px;">
+                <!-- Metric 4: Target Klaim 50 Unit (Royal Purple Theme) -->
+                <div class="metric-card-themed metric-theme-purple">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="metric-label-txt">Target Klaim (Min. 50 Unit)</span>
+                        <span class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>" style="font-size: 12px; padding: 3px 8px;">
                             <?php echo $isClaimEligible ? 'SIAP KLAIM' : 'PROSES'; ?>
                         </span>
                     </div>
-                    <div class="metric-value">
+                    <div class="metric-val-large" style="color: #6d28d9;">
                         <?php echo $unclaimedUnits; ?> 
-                        <span style="font-size: 16px; font-weight: 700; color: #64748b;">/ 50 unit</span>
+                        <span style="font-size: 16px; font-weight: 800; color: #64748b;">/ 50 unit</span>
                     </div>
-                    <div class="progress mt-2 mb-1" style="height: 8px; background-color: #e2e8f0; border-radius: 10px;">
-                        <div class="progress-bar" style="width: <?php echo $claimProgress; ?>%; background: <?php echo $isClaimEligible ? '#047857' : 'linear-gradient(90deg, #1d4ed8, #2563eb)'; ?>; border-radius: 10px;"></div>
+                    <div class="progress mt-1 mb-1" style="height: 10px; background-color: #e2e8f0; border-radius: 20px; overflow: hidden;">
+                        <div class="progress-bar" style="width: <?php echo $claimProgress; ?>%; background: <?php echo $isClaimEligible ? '#059669' : 'linear-gradient(90deg, #7c3aed, #ec4899)'; ?>; border-radius: 20px;"></div>
                     </div>
-                    <div class="d-flex justify-content-between" style="font-size: 12.5px; font-weight: 700; color: #475569;">
-                        <span><?php echo $claimProgress; ?>% tercapai</span>
-                        <span style="color: <?php echo $isClaimEligible ? '#047857' : '#b91c1c'; ?>;"><?php echo $isClaimEligible ? 'Target tercapai' : "Kurang $sisaTarget unit"; ?></span>
+                    <div class="d-flex justify-content-between" style="font-size: 12.5px; font-weight: 800;">
+                        <span style="color: #64748b;"><?php echo $claimProgress; ?>% tercapai</span>
+                        <span style="color: <?php echo $isClaimEligible ? '#059669' : '#dc2626'; ?>;"><?php echo $isClaimEligible ? 'Target tercapai!' : "Kurang $sisaTarget unit"; ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- 3. Segmented Controls & Search Bar -->
+            <!-- 3. SEGMENTED CONTROLS & SEARCH BAR -->
             <div class="segmented-control-container">
-                <div class="segmented-nav">
-                    <button class="segment-btn active" onclick="filterTable('all', this)">
-                        Semua <span class="segment-badge" id="badgeCountAll">0</span>
+                <div class="segmented-nav-vibrant">
+                    <button class="segment-btn-vibrant active" onclick="filterTable('all', this)">
+                        <i class="fa-solid fa-list-ul me-1"></i> Semua <span class="segment-badge-vibrant" id="badgeCountAll">0</span>
                     </button>
-                    <button class="segment-btn" onclick="filterTable('aktif', this)">
-                        Stok Aktif <span class="segment-badge" id="badgeCountAktif">0</span>
+                    <button class="segment-btn-vibrant" onclick="filterTable('aktif', this)">
+                        <i class="fa-solid fa-circle-check text-success me-1"></i> Stok Aktif <span class="segment-badge-vibrant" id="badgeCountAktif">0</span>
                     </button>
-                    <button class="segment-btn" onclick="filterTable('terjual', this)">
-                        Ada Penjualan <span class="segment-badge" id="badgeCountTerjual">0</span>
+                    <button class="segment-btn-vibrant" onclick="filterTable('terjual', this)">
+                        <i class="fa-solid fa-fire text-warning me-1"></i> Ada Penjualan <span class="segment-badge-vibrant" id="badgeCountTerjual">0</span>
                     </button>
-                    <button class="segment-btn" onclick="filterTable('selesai', this)">
-                        Selesai <span class="segment-badge" id="badgeCountSelesai">0</span>
+                    <button class="segment-btn-vibrant" onclick="filterTable('selesai', this)">
+                        <i class="fa-solid fa-flag-checkered text-secondary me-1"></i> Selesai <span class="segment-badge-vibrant" id="badgeCountSelesai">0</span>
                     </button>
-                    <button class="segment-btn" onclick="switchViewToClaims()">
+                    <button class="segment-btn-vibrant btn-tab-claim-vibrant" onclick="switchViewToClaims()">
                         <i class="fa-solid fa-receipt text-warning"></i> Tab Klaim Insentif
                     </button>
                 </div>
 
-                <div class="search-container">
-                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" id="tiptokSearchInput" class="search-input-refined" placeholder="Cari toko, barang, invoice..." onkeyup="searchTiptokTable()">
+                <div class="search-container-vibrant">
+                    <i class="fa-solid fa-magnifying-glass search-icon-vibrant"></i>
+                    <input type="text" id="tiptokSearchInput" class="search-input-vibrant" placeholder="Cari toko, barang, invoice..." onkeyup="searchTiptokTable()">
                 </div>
             </div>
 
-            <!-- 4. Main Data Table -->
-            <div id="viewPenitipanTable" class="data-card">
+            <!-- 4. MAIN DATA TABLE (VIBRANT & HIGH CONTRAST) -->
+            <div id="viewPenitipanTable" class="data-card-vibrant">
                 <div class="table-responsive">
-                    <table class="table taste-table" id="mainTiptokTable">
+                    <table class="table table-vibrant" id="mainTiptokTable">
                         <thead>
                             <tr>
-                                <th style="width: 4%;">#</th>
+                                <th style="width: 4%; text-align: center;">#</th>
                                 <th style="width: 26%;">TOKO / DEALER</th>
                                 <th style="width: 14%;">KODE & TGL</th>
                                 <th style="width: 24%;">BARANG & MONITORING STOK</th>
@@ -830,19 +941,21 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                     if (substr($telpRaw, 0, 1) === '0') $telpRaw = '62' . substr($telpRaw, 1);
                                     ?>
                                     <tr class="tiptok-row" data-category="<?php echo $filterCat; ?>">
-                                        <td class="text-center font-weight-bold" style="font-size: 14px; color: #64748b;"><?php echo $no++; ?></td>
+                                        <td class="text-center font-weight-bold" style="font-size: 14px; color: #475569;">
+                                            <span style="background: #e2e8f0; color: #0f172a; padding: 4px 8px; border-radius: 6px; font-weight: 800;"><?php echo $no++; ?></span>
+                                        </td>
                                         
                                         <!-- Toko -->
                                         <td>
                                             <div class="d-flex align-items-center gap-2 flex-wrap">
-                                                <span class="font-weight-bold" style="font-size: 16px; color: #020617; line-height: 1.3;"><?php echo htmlspecialchars($row['nama_toko'] ?? 'Toko Tidak Ditemukan'); ?></span>
+                                                <span class="font-weight-bold" style="font-size: 16px; color: #0f172a; line-height: 1.3;"><?php echo htmlspecialchars($row['nama_toko'] ?? 'Toko Tidak Ditemukan'); ?></span>
                                                 <span class="taste-badge badge-dealer-tag"><?php echo htmlspecialchars($row['kategori_customer'] ?? 'Dealer'); ?></span>
                                             </div>
                                             <div style="font-size: 13.5px; font-weight: 600; color: #334155; margin-top: 4px; line-height: 1.4;">
                                                 <?php echo htmlspecialchars($row['alamat_toko'] ?? '-'); ?><?php echo !empty($row['kota_toko']) ? ', ' . htmlspecialchars($row['kota_toko']) : ''; ?>
                                             </div>
                                             <?php if (!empty($telpRaw)) : ?>
-                                                <a href="https://wa.me/<?php echo $telpRaw; ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; color: #047857; border: 1.5px solid #a7f3d0; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 800; text-decoration: none; margin-top: 6px;">
+                                                <a href="https://wa.me/<?php echo $telpRaw; ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 800; text-decoration: none; margin-top: 6px;">
                                                     <i class="fa-brands fa-whatsapp"></i> <?php echo htmlspecialchars($row['telp_toko']); ?>
                                                 </a>
                                             <?php endif; ?>
@@ -850,14 +963,16 @@ $resPenitipan = $conn->query($sqlPenitipan);
 
                                         <!-- Kode & Tanggal -->
                                         <td>
-                                            <div class="font-monospace" style="font-size: 13.5px; font-weight: 800; color: #020617; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; border: 1.5px solid #cbd5e1; display: inline-block;">
+                                            <div class="font-monospace" style="font-size: 13.5px; font-weight: 800; color: #0f172a; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; border: 1.5px solid #cbd5e1; border-left: 4px solid #2563eb; display: inline-block;">
                                                 <?php echo htmlspecialchars($row['kode_titip']); ?>
                                             </div>
-                                            <div style="font-size: 13.5px; font-weight: 700; color: #334155; margin-top: 4px;">
+                                            <div style="font-size: 13.5px; font-weight: 700; color: #334155; margin-top: 5px;">
                                                 <i class="fa-regular fa-calendar me-1 text-primary"></i><?php echo date('d M Y', strtotime($row['tgl_titip'])); ?>
                                             </div>
-                                            <div style="font-size: 13px; font-weight: 600; color: #475569; margin-top: 2px;">
-                                                Sales: <strong style="color: #020617; font-weight: 800;"><?php echo htmlspecialchars($row['nama_sales'] ?? 'Sales'); ?></strong>
+                                            <div style="margin-top: 3px;">
+                                                <span class="taste-badge badge-sales-tag" style="font-size: 12px; padding: 2px 8px;">
+                                                    <i class="fa-solid fa-user-tie me-1"></i><?php echo htmlspecialchars($row['nama_sales'] ?? 'Sales'); ?>
+                                                </span>
                                             </div>
                                         </td>
 
@@ -870,13 +985,13 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                                     $insPerUnit = floatval($it['insentif_per_unit']);
                                                 ?>
                                                     <div class="taste-item-pill">
-                                                        <span class="font-weight-bold" style="font-size: 14px; color: #020617;"><?php echo htmlspecialchars($it['nama_barang']); ?></span>
+                                                        <span class="font-weight-bold" style="font-size: 14px; color: #0f172a;"><?php echo htmlspecialchars($it['nama_barang']); ?></span>
                                                         <div class="d-flex align-items-center gap-2 ms-auto">
                                                             <span style="font-size: 13px; font-weight: 700; color: #475569;">
-                                                                Sisa: <strong class="text-success" style="font-size: 13.5px; font-weight: 900; background: #dcfce7; border: 1.5px solid #86efac; padding: 2px 8px; border-radius: 6px;"><?php echo $sisa; ?></strong>
+                                                                Sisa: <strong style="font-size: 13px; font-weight: 900; background: #10b981; color: #ffffff; padding: 2px 8px; border-radius: 6px; box-shadow: 0 2px 5px rgba(16,185,129,0.3);"><?php echo $sisa; ?></strong>
                                                             </span>
                                                             <?php if ($terjual > 0) : ?>
-                                                                <span class="text-danger" style="font-size: 13px; font-weight: 900; background: #fee2e2; border: 1.5px solid #fca5a5; padding: 2px 8px; border-radius: 6px;">
+                                                                <span style="font-size: 13px; font-weight: 900; background: #ef4444; color: #ffffff; padding: 2px 8px; border-radius: 6px; box-shadow: 0 2px 5px rgba(239,68,68,0.3);">
                                                                     Laku: <?php echo $terjual; ?>
                                                                 </span>
                                                             <?php endif; ?>
@@ -895,11 +1010,11 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                             <?php else: ?>
                                                 <div style="font-size: 13px; font-weight: 600; color: #64748b; font-style: italic; margin-bottom: 4px;">Belum ada invoice</div>
                                             <?php endif; ?>
-                                            <div style="font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 900; color: #047857; line-height: 1.2;">
+                                            <div style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 900; color: #047857; line-height: 1.2;">
                                                 Rp <?php echo number_format($sumInsentif, 0, ',', '.'); ?>
                                             </div>
                                             <div style="font-size: 13px; font-weight: 700; color: #475569; margin-top: 2px;">
-                                                (Terjual: <?php echo $sumTerjual; ?> unit)
+                                                (Terjual: <strong style="color: #0f172a;"><?php echo $sumTerjual; ?> unit</strong>)
                                             </div>
                                         </td>
 
@@ -955,7 +1070,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
             </div>
 
             <!-- 5. View Tab Klaim Insentif -->
-            <div id="viewKlaimInsentif" class="data-card d-none p-4">
+            <div id="viewKlaimInsentif" class="data-card-vibrant d-none p-4">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
                     <div>
                         <h3 class="font-weight-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">Klaim Insentif Penjualan</h3>
@@ -968,18 +1083,18 @@ $resPenitipan = $conn->query($sqlPenitipan);
 
                 <div class="row mb-4">
                     <div class="col-md-6 mb-3">
-                        <div class="metric-card h-100">
-                            <div class="metric-label">
-                                <span>Unit Terjual Siap Klaim</span>
+                        <div class="metric-card-themed metric-theme-purple h-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="metric-label-txt">Unit Terjual Siap Klaim</span>
                                 <span class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>" style="font-size: 12.5px;">
                                     <?php echo $isClaimEligible ? 'SYARAT TERPENUHI (>= 50)' : 'BELUM MEMENUHI (< 50)'; ?>
                                 </span>
                             </div>
-                            <div class="metric-value"><?php echo $unclaimedUnits; ?> <span style="font-size: 16px; font-weight: 700; color: #64748b;">/ 50 unit minimal</span></div>
-                            <div class="progress my-2" style="height: 8px; background-color: #e2e8f0; border-radius: 10px;">
-                                <div class="progress-bar" style="width: <?php echo $claimProgress; ?>%; background: #047857; border-radius: 10px;"></div>
+                            <div class="metric-val-large" style="color: #6d28d9;"><?php echo $unclaimedUnits; ?> <span style="font-size: 16px; font-weight: 700; color: #64748b;">/ 50 unit minimal</span></div>
+                            <div class="progress my-2" style="height: 10px; background-color: #e2e8f0; border-radius: 10px;">
+                                <div class="progress-bar" style="width: <?php echo $claimProgress; ?>%; background: linear-gradient(90deg, #7c3aed, #ec4899); border-radius: 10px;"></div>
                             </div>
-                            <div class="text-sm font-weight-bold">
+                            <div class="text-sm font-weight-bold mt-2">
                                 <?php if ($isClaimEligible) : ?>
                                     <span class="text-success"><i class="fa-solid fa-check-circle me-1"></i>Syarat 50 unit terpenuhi. Anda siap mengajukan klaim insentif.</span>
                                 <?php else : ?>
@@ -990,17 +1105,22 @@ $resPenitipan = $conn->query($sqlPenitipan);
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <div class="metric-card h-100 d-flex flex-column justify-content-between">
+                        <div class="metric-card-themed metric-theme-emerald h-100 d-flex flex-column justify-content-between">
                             <div>
-                                <div class="metric-label">Total Nominal Insentif Siap Cair</div>
-                                <div class="metric-value text-success" style="font-size: 32px;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="metric-label-txt">Total Nominal Insentif Siap Cair</span>
+                                    <div class="metric-icon-box icon-emerald">
+                                        <i class="fa-solid fa-wallet"></i>
+                                    </div>
+                                </div>
+                                <div class="metric-val-large" style="font-size: 32px; color: #047857;">
                                     Rp <?php echo number_format($unclaimedNominal, 0, ',', '.'); ?>
                                 </div>
                                 <p class="text-sm font-weight-bold text-secondary mb-0">Total akumulasi dari unit barang yang terjual dengan No. Invoice valid.</p>
                             </div>
                             <div class="mt-3">
                                 <?php if ($isClaimEligible) : ?>
-                                    <button class="btn-taste-primary w-100 justify-content-center" onclick="openModalSubmitClaim()">
+                                    <button class="btn-hero-claim w-100 justify-content-center" onclick="openModalSubmitClaim()">
                                         <i class="fa-solid fa-paper-plane me-1"></i> Ajukan Klaim Insentif Sekarang
                                     </button>
                                 <?php else : ?>
@@ -1014,8 +1134,8 @@ $resPenitipan = $conn->query($sqlPenitipan);
                 </div>
 
                 <div class="font-weight-bold text-dark text-sm text-uppercase mb-2" style="letter-spacing: 0.05em;">Rincian Unit Terjual Belum Diklaim</div>
-                <div class="table-responsive border rounded-3 mb-4" style="border: 2px solid #cbd5e1 !important;">
-                    <table class="table taste-table mb-0" id="tableUnclaimedItems">
+                <div class="table-responsive border rounded-3 mb-4" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden;">
+                    <table class="table table-vibrant mb-0" id="tableUnclaimedItems">
                         <thead>
                             <tr>
                                 <th>TGL KUNJUNGAN</th>
@@ -1034,8 +1154,8 @@ $resPenitipan = $conn->query($sqlPenitipan);
                 </div>
 
                 <div class="font-weight-bold text-dark text-sm text-uppercase mb-2" style="letter-spacing: 0.05em;">Riwayat Pengajuan Klaim</div>
-                <div class="table-responsive border rounded-3" style="border: 2px solid #cbd5e1 !important;">
-                    <table class="table taste-table mb-0" id="tableClaimHistory">
+                <div class="table-responsive border rounded-3" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden;">
+                    <table class="table table-vibrant mb-0" id="tableClaimHistory">
                         <thead>
                             <tr>
                                 <th>KODE KLAIM</th>
