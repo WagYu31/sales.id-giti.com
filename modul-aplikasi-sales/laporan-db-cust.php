@@ -668,11 +668,10 @@ $result = mysqli_query($conn, $sql);
                 $alamatC    = $row['alamat_cust'] ?? '';
                 $kotaC      = $row['kota_cust'] ?? '';
 
-                // Ambil tim & pelaksanaan kegiatan ini secara komprehensif
-                $sqlLapTek = "SELECT 
-                                     tks.id AS id_tks,
-                                     COALESCE(tks.id_sales, ps.sales_id, 0) AS id_sales,
-                                     COALESCE(s.nama, tks.nama_sales, ps_s.nama, '') AS nama_sales,
+                // Ambil tim & pelaksanaan kegiatan ini
+                $sqlLapTek = "SELECT tks.*, 
+                                     COALESCE(s.nama, tks.nama_sales, 'Sales') AS nama_sales, 
+                                     tks.id_sales,
                                      COALESCE(NULLIF(ps.status, ''), NULLIF(ks.status, ''), 'dijadwalkan') AS status,
                                      ps.ci_at AS tgl_mulai, 
                                      ps.co_at AS tgl_selesai,
@@ -680,15 +679,14 @@ $result = mysqli_query($conn, $sql);
                                      ks.jadwal AS tgl_visits,
                                      COALESCE(NULLIF(ps.catatan_visit, ''), NULLIF(ps.keterangan, ''), NULLIF(ks.keterangan, '')) AS hasil_visits,
                                      ps.foto_visit_url
-                              FROM kegiatan_sales ks
-                              LEFT JOIN team_kegiatan_sales tks ON ks.id = tks.id_kegiatan_sales AND tks.deleted_at IS NULL
+                              FROM team_kegiatan_sales tks
                               LEFT JOIN sales s ON tks.id_sales = s.id
-                              LEFT JOIN pelaksanaan_sales ps ON ps.kegiatan_id = ks.id AND (ps.sales_id = tks.id_sales OR tks.id_sales IS NULL)
-                              LEFT JOIN sales ps_s ON ps.sales_id = ps_s.id
-                              WHERE ks.id = '$kegiatanId' AND ks.deleted_at IS NULL";
+                              JOIN kegiatan_sales ks ON tks.id_kegiatan_sales = ks.id
+                              LEFT JOIN pelaksanaan_sales ps ON ps.kegiatan_id = tks.id_kegiatan_sales AND (ps.sales_id = tks.id_sales OR ps.sales_id IS NULL)
+                              WHERE tks.id_kegiatan_sales = '$kegiatanId' AND tks.deleted_at IS NULL";
                               
                 if ($filterSales > 0) {
-                    $sqlLapTek .= " AND (tks.id_sales = $filterSales OR ps.sales_id = $filterSales)";
+                    $sqlLapTek .= " AND tks.id_sales = $filterSales";
                 }
                 if (!empty($filterStatus)) {
                     if ($filterStatus === 'dijadwalkan') {
@@ -699,7 +697,6 @@ $result = mysqli_query($conn, $sql);
                         $sqlLapTek .= " AND (ps.status = 'selesai' OR ks.status = 'selesai')";
                     }
                 }
-                $sqlLapTek .= " GROUP BY COALESCE(tks.id, ps.id, ks.id)";
                 $resLapTek = mysqli_query($conn, $sqlLapTek);
                 $activityCount = ($resLapTek) ? mysqli_num_rows($resLapTek) : 0;
         ?>
@@ -755,7 +752,7 @@ $result = mysqli_query($conn, $sql);
                         while ($rowLT = mysqli_fetch_assoc($resLapTek)) {
                             $idT = intval($rowLT["id_sales"]);
                             $namaSalesItem = trim($rowLT["nama_sales"] ?? '');
-                            $hasSales = !empty($namaSalesItem) && $idT > 0;
+                            $hasSales = !empty($namaSalesItem) && $idT > 0 && $namaSalesItem !== 'Sales';
 
                             $initials = $hasSales ? strtoupper(substr($namaSalesItem, 0, 2)) : '??';
                             $colorIdx = $hasSales ? (abs(crc32($namaSalesItem)) % count($avatarColors)) : 0;
@@ -906,7 +903,165 @@ $result = mysqli_query($conn, $sql);
                         </div>
                     <?php
                         }
-                    } ?>
+                    } else {
+                        // Fallback row untuk kegiatan yang belum memiliki tim di team_kegiatan_sales
+                        $qSingle = mysqli_query($conn, "
+                            SELECT ks.id AS kode_transaksi, ks.jadwal AS tgl_visits,
+                                   COALESCE(NULLIF(ps.status, ''), NULLIF(ks.status, ''), 'dijadwalkan') AS status,
+                                   ps.ci_at AS tgl_mulai, ps.co_at AS tgl_selesai,
+                                   COALESCE(NULLIF(ps.catatan_visit, ''), NULLIF(ps.keterangan, ''), NULLIF(ks.keterangan, '')) AS hasil_visits,
+                                   s.nama AS nama_sales,
+                                   COALESCE(ps.sales_id, 0) AS id_sales
+                            FROM kegiatan_sales ks
+                            LEFT JOIN pelaksanaan_sales ps ON ps.kegiatan_id = ks.id
+                            LEFT JOIN sales s ON ps.sales_id = s.id
+                            WHERE ks.id = '$kegiatanId'
+                            LIMIT 1
+                        ");
+                        $rowSingle = ($qSingle) ? mysqli_fetch_assoc($qSingle) : null;
+
+                        $singleStatus = strtolower($rowSingle['status'] ?? ($row['status_kegiatan'] ?? 'dijadwalkan'));
+                        if ($singleStatus === 'proses' || $singleStatus === 'berjalan') {
+                            $statusFb = 'berjalan';
+                        } elseif ($singleStatus === 'selesai') {
+                            $statusFb = 'selesai';
+                        } else {
+                            $statusFb = 'dijadwalkan';
+                        }
+
+                        $datetimeFallback = $rowSingle['tgl_visits'] ?? $row["tgl_visits"];
+                        $formattedDateFb = ($datetimeFallback && $datetimeFallback != '0000-00-00 00:00:00') ? date("d M Y", strtotime($datetimeFallback)) : '-';
+                        $formattedTimeFb = ($datetimeFallback && $datetimeFallback != '0000-00-00 00:00:00') ? date("H:i", strtotime($datetimeFallback)) : '-';
+
+                        $singleMulai = $rowSingle['tgl_mulai'] ?? null;
+                        $formattedTimeMliFb = ($singleMulai && $singleMulai != '0000-00-00 00:00:00') ? date("H:i", strtotime($singleMulai)) : null;
+
+                        $singleSelesai = $rowSingle['tgl_selesai'] ?? null;
+                        $formattedTimeSlsFb = ($singleSelesai && $singleSelesai != '0000-00-00 00:00:00') ? date("H:i", strtotime($singleSelesai)) : null;
+
+                        $hslVisitsFb = trim($rowSingle['hasil_visits'] ?? ($row['agenda_kunjungan'] ?? ''));
+                        $salesNameFb = trim($rowSingle['nama_sales'] ?? '');
+                        $salesIdFb = intval($rowSingle['id_sales'] ?? 0);
+                    ?>
+                        <div class="lp-item-row">
+                            <!-- 1. Status & ID -->
+                            <div>
+                                <div class="d-flex flex-column gap-1">
+                                    <?php if ($statusFb === 'selesai'): ?>
+                                        <span class="lp-status-badge lp-status-selesai">
+                                            <i class="bi bi-check-circle-fill"></i> Selesai
+                                        </span>
+                                    <?php elseif ($statusFb === 'berjalan'): ?>
+                                        <span class="lp-status-badge lp-status-berjalan">
+                                            <span class="spinner-grow spinner-grow-sm" style="width: 6px; height: 6px;"></span> Diproses
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="lp-status-badge lp-status-dijadwalkan">
+                                            <i class="bi bi-clock"></i> Dijadwalkan
+                                        </span>
+                                    <?php endif; ?>
+
+                                    <span class="badge bg-light text-muted border font-monospace mt-0.5 text-start" style="font-size: 10px; width: fit-content;">
+                                        #<?= $row['kode_transaksi']; ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- 2. Sales Agent -->
+                            <div>
+                                <?php if (!empty($salesNameFb) && $salesIdFb > 0): ?>
+                                    <div class="lp-sales-pill">
+                                        <div class="lp-sales-avatar" style="background: #2563eb;">
+                                            <?= strtoupper(substr($salesNameFb, 0, 2)); ?>
+                                        </div>
+                                        <div class="lp-sales-text">
+                                            <div class="lp-sales-name"><?= htmlspecialchars($salesNameFb); ?></div>
+                                            <span class="text-muted" style="font-size: 10.5px;">Sales Canvas</span>
+                                        </div>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="lp-sales-pill">
+                                        <div class="lp-sales-avatar" style="background: #e2e8f0; color: #64748b;">
+                                            <i class="bi bi-person-dash"></i>
+                                        </div>
+                                        <div class="lp-sales-text">
+                                            <span class="badge bg-light text-muted border" style="font-size: 10.5px;">Belum Ditugaskan</span>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- 3. Jadwal Visit -->
+                            <div>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-semibold text-dark" style="font-size: 12.5px;">
+                                        <i class="bi bi-calendar3 text-primary me-1"></i><?= $formattedDateFb; ?>
+                                    </span>
+                                    <span class="text-muted fw-bold" style="font-size: 11px; margin-left: 17px;">
+                                        <?= $formattedTimeFb; ?> WIB
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- 4. Waktu GPS -->
+                            <div>
+                                <div class="d-flex flex-column gap-0.5">
+                                    <?php if ($formattedTimeMliFb): ?>
+                                        <div class="text-success fw-bold font-monospace" style="font-size: 11px;">
+                                            <i class="bi bi-box-arrow-in-right"></i> IN: <?= $formattedTimeMliFb; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <span class="text-muted" style="font-size: 11.5px;"><i class="bi bi-geo-alt text-muted me-1"></i>Belum Masuk</span>
+                                    <?php endif; ?>
+
+                                    <?php if ($formattedTimeSlsFb): ?>
+                                        <div class="text-primary fw-bold font-monospace" style="font-size: 11px;">
+                                            <i class="bi bi-box-arrow-right"></i> OUT: <?= $formattedTimeSlsFb; ?>
+                                        </div>
+                                    <?php elseif ($formattedTimeMliFb): ?>
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace px-1.5 py-0.5 text-start" style="font-size: 9.5px; width: fit-content;">Sedang Visit</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- 5. Catatan Visit -->
+                            <div>
+                                <?php if (!empty($hslVisitsFb)): ?>
+                                    <div class="lp-note-box" title="<?= htmlspecialchars($hslVisitsFb); ?>">
+                                        <i class="bi bi-chat-quote text-primary me-1"></i>
+                                        <?= htmlspecialchars($hslVisitsFb); ?>
+                                    </div>
+                                <?php elseif ($statusFb === 'selesai'): ?>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 11px;">
+                                        <i class="bi bi-check me-1"></i> Kunjungan Selesai
+                                    </span>
+                                <?php elseif ($statusFb === 'berjalan'): ?>
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1" style="font-size: 11px;">
+                                        <i class="bi bi-geo-alt me-1"></i> Sedang di Lokasi Toko
+                                    </span>
+                                <?php else: ?>
+                                    <span class="text-muted" style="font-size: 11.5px; font-style: italic;">
+                                        <i class="bi bi-hourglass-split me-1"></i>Menunggu kunjungan sales
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- 6. Aksi Buttons -->
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1">
+                                    <button type="button" class="lp-action-btn lp-action-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="<?= $salesIdFb; ?>" data-kode="<?= $row['kode_transaksi']; ?>" title="Lihat Rincian & Lokasi GPS">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                    <button type="button" class="lp-action-btn lp-action-edit editVisitBtn" data-id="<?= $row['kode_transaksi']; ?>" data-sales="<?= $salesIdFb; ?>" title="Edit Laporan Kunjungan">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button type="button" class="lp-action-btn lp-action-delete deleteVisitBtn" data-id="<?= $row['kode_transaksi']; ?>" data-sales="<?= $salesIdFb; ?>" data-status="<?= $statusFb; ?>" data-cust="<?= htmlspecialchars($namaC); ?>" title="Hapus / Reset Kunjungan">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
                 </div>
             </div>
         <?php
