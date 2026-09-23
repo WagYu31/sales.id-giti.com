@@ -1,7 +1,6 @@
 <?php
 /**
- * laporan-db-cust.php - Laporan Kunjungan & Visit Sales (Modern & User-Friendly)
- * Loewix Sales Management System
+ * laporan-db-cust.php - Laporan Kunjungan & Visit Sales (Loewix Sales Design)
  */
 
 // Filter variables
@@ -12,7 +11,7 @@ $filterStatus  = isset($_GET['status']) ? trim(strtolower($_GET['status'])) : ''
 
 if (!empty($filterTanggal)) {
     $current_date = $filterTanggal;
-    $dateLabel = date('d M Y', strtotime($filterTanggal));
+    $dateLabel = date('d F Y', strtotime($filterTanggal));
 } else {
     $current_date = $filterBulan . '-01';
     $dateLabel = date('F Y', strtotime($filterBulan . '-01'));
@@ -63,7 +62,6 @@ $kpiBerjalan = ($qBerjalan && $rB = mysqli_fetch_assoc($qBerjalan)) ? (int)$rB['
 
 // Dijadwalkan
 $kpiDijadwalkan = max(0, $kpiTotal - $kpiSelesai - $kpiBerjalan);
-$pctSelesai = ($kpiTotal > 0) ? round(($kpiSelesai / $kpiTotal) * 100) : 0;
 
 // ── 2. Build Query Utama Kunjungan ─────────────────────────────────────────
 $whereClauses = ["ks.deleted_at IS NULL"];
@@ -98,40 +96,63 @@ $result = mysqli_query($conn, $sql);
 ?>
 
 <style>
-/* ── LOEWIX MODERN REPORT DESIGN SYSTEM ─────────────────────────────────── */
-.kpi-card {
+/* ── STAT CARDS PREMIUM DESIGN (LOEWIX SALES STANDARD) ─────────────────── */
+.stat-card-premium {
     background: #ffffff;
-    border-radius: 14px;
-    border: 1px solid #e2e8f0;
+    border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.03);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e2e8f0;
     cursor: pointer;
-    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
     overflow: hidden;
 }
-.kpi-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.07);
+.stat-card-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 }
-.kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; bottom: 0;
-    width: 4px;
+.stat-label-premium {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 4px;
 }
-.kpi-card.kpi-total::before { background: #3b82f6; }
-.kpi-card.kpi-selesai::before { background: #10b981; }
-.kpi-card.kpi-berjalan::before { background: #f59e0b; }
-.kpi-card.kpi-jadwal::before { background: #64748b; }
+.stat-count-premium {
+    font-size: 28px;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    color: #0f172a;
+    margin: 0;
+}
+.stat-icon-premium {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.stat-footer-premium {
+    padding: 8px 16px;
+    border-top: 1px solid #f1f5f9;
+    background: #fafafa;
+}
+.stat-footer-premium p {
+    font-size: 11.5px;
+    color: #94a3b8;
+    font-weight: 600;
+    margin: 0;
+}
 
 .customer-report-card {
     background: #ffffff;
-    border-radius: 14px;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
     transition: all 0.25s ease;
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 .customer-report-card:hover {
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
@@ -139,7 +160,7 @@ $result = mysqli_query($conn, $sql);
 }
 .customer-card-header {
     background: #ffffff;
-    padding: 14px 20px;
+    padding: 12px 18px;
     border-bottom: 1px solid #f1f5f9;
     display: flex;
     align-items: center;
@@ -151,7 +172,7 @@ $result = mysqli_query($conn, $sql);
     background: #f8fafc;
     border-top: 1px solid #f1f5f9;
     border-bottom: 1px solid #e2e8f0;
-    padding: 10px 20px;
+    padding: 9px 18px;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -160,7 +181,7 @@ $result = mysqli_query($conn, $sql);
 }
 
 .report-item-row {
-    padding: 14px 20px;
+    padding: 12px 18px;
     border-bottom: 1px solid #f8fafc;
     transition: background 0.2s;
 }
@@ -172,14 +193,14 @@ $result = mysqli_query($conn, $sql);
 }
 
 .avatar-initial {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 11.5px;
     color: #ffffff;
     flex-shrink: 0;
 }
@@ -229,155 +250,114 @@ $result = mysqli_query($conn, $sql);
 .note-bubble {
     background: #f8fafc;
     border-left: 3px solid #3b82f6;
-    padding: 8px 12px;
+    padding: 7px 11px;
     border-radius: 0 8px 8px 0;
     font-size: 12px;
     color: #334155;
     line-height: 1.4;
     word-break: break-word;
 }
-
-.quick-filter-chip {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 11.5px;
-    font-weight: 600;
-    text-decoration: none;
-    border: 1px solid #e2e8f0;
-    color: #475569;
-    background: #ffffff;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-.quick-filter-chip:hover, .quick-filter-chip.active {
-    background: #2563eb;
-    color: #ffffff;
-    border-color: #2563eb;
-}
 </style>
 
 <div class="col-12">
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- 1. TOP KPI SUMMARY STATS CARDS                                          -->
+    <!-- 1. TOP STAT CARDS (SESUAI GAMBAR 1 & 2)                                 -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div class="row g-3 mb-4">
-        <!-- Total Kunjungan -->
-        <div class="col-6 col-lg-3">
-            <div class="kpi-card kpi-total p-3 p-md-3.5" onclick="window.location.href='laporan-kegiatan.php?status=&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-uppercase fw-bold text-muted" style="font-size: 10.5px; letter-spacing: 0.04em;">Total Visit</span>
-                    <div class="d-flex align-items-center justify-content-center rounded-3" style="width: 34px; height: 34px; background: #eff6ff; color: #2563eb;">
-                        <i class="fa-solid fa-route" style="font-size: 15px;"></i>
+        <!-- Card 1: Total Visit -->
+        <div class="col-6 col-md-3">
+            <div class="stat-card-premium" style="border-left: 4px solid #64748b;" onclick="window.location.href='laporan-kegiatan.php?status=&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label-premium">TOTAL VISIT</p>
+                            <h3 class="stat-count-premium"><?= number_format($kpiTotal); ?></h3>
+                        </div>
+                        <div class="stat-icon-premium" style="background-color: #f1f5f9; color: #475569;">
+                            <span class="material-symbols-outlined" style="color: #475569;">event_available</span>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h3 class="fw-bolder mb-0 text-dark" style="font-family:'Outfit',sans-serif; font-size: 26px;"><?= number_format($kpiTotal); ?></h3>
-                    <span class="text-muted small">kegiatan</span>
-                </div>
-                <div class="text-muted mt-1" style="font-size: 11px;">
-                    <i class="fa-regular fa-calendar-check me-1"></i>Periode: <?= htmlspecialchars($dateLabel); ?>
+                <div class="stat-footer-premium">
+                    <p><?= htmlspecialchars($dateLabel); ?></p>
                 </div>
             </div>
         </div>
 
-        <!-- Selesai (Completed) -->
-        <div class="col-6 col-lg-3">
-            <div class="kpi-card kpi-selesai p-3 p-md-3.5" onclick="window.location.href='laporan-kegiatan.php?status=selesai&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-uppercase fw-bold text-muted" style="font-size: 10.5px; letter-spacing: 0.04em;">Visit Selesai</span>
-                    <div class="d-flex align-items-center justify-content-center rounded-3" style="width: 34px; height: 34px; background: #ecfdf5; color: #10b981;">
-                        <i class="fa-solid fa-circle-check" style="font-size: 15px;"></i>
+        <!-- Card 2: Dijadwalkan -->
+        <div class="col-6 col-md-3">
+            <div class="stat-card-premium" style="border-left: 4px solid #3b82f6;" onclick="window.location.href='laporan-kegiatan.php?status=dijadwalkan&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label-premium">DIJADWALKAN</p>
+                            <h3 class="stat-count-premium" style="color: #2563eb;"><?= number_format($kpiDijadwalkan); ?></h3>
+                        </div>
+                        <div class="stat-icon-premium" style="background-color: #eff6ff; color: #2563eb;">
+                            <span class="material-symbols-outlined" style="color: #2563eb;">event</span>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h3 class="fw-bolder mb-0 text-success" style="font-family:'Outfit',sans-serif; font-size: 26px;"><?= number_format($kpiSelesai); ?></h3>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill font-monospace" style="font-size: 10px;"><?= $pctSelesai; ?>%</span>
-                </div>
-                <div class="text-success mt-1" style="font-size: 11px;">
-                    <i class="fa-solid fa-check-double me-1"></i>Laporan pengerjaan lengkap
+                <div class="stat-footer-premium">
+                    <p>Jadwal Mendatang</p>
                 </div>
             </div>
         </div>
 
-        <!-- Sedang Diproses -->
-        <div class="col-6 col-lg-3">
-            <div class="kpi-card kpi-berjalan p-3 p-md-3.5" onclick="window.location.href='laporan-kegiatan.php?status=berjalan&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-uppercase fw-bold text-muted" style="font-size: 10.5px; letter-spacing: 0.04em;">Diproses / Clock In</span>
-                    <div class="d-flex align-items-center justify-content-center rounded-3" style="width: 34px; height: 34px; background: #fffbeb; color: #f59e0b;">
-                        <i class="fa-solid fa-person-walking-arrow-right" style="font-size: 15px;"></i>
+        <!-- Card 3: Diproses -->
+        <div class="col-6 col-md-3">
+            <div class="stat-card-premium" style="border-left: 4px solid #f59e0b;" onclick="window.location.href='laporan-kegiatan.php?status=berjalan&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label-premium">DIPROSES</p>
+                            <h3 class="stat-count-premium" style="color: #d97706;"><?= number_format($kpiBerjalan); ?></h3>
+                        </div>
+                        <div class="stat-icon-premium" style="background-color: #fffbeb; color: #d97706;">
+                            <span class="material-symbols-outlined" style="color: #d97706;">hourglass_top</span>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h3 class="fw-bolder mb-0 text-warning" style="font-family:'Outfit',sans-serif; font-size: 26px;"><?= number_format($kpiBerjalan); ?></h3>
-                    <span class="text-muted small">di lokasi</span>
-                </div>
-                <div class="text-warning mt-1" style="font-size: 11px;">
-                    <i class="fa-solid fa-clock-rotate-left me-1"></i>Menunggu clock-out
+                <div class="stat-footer-premium">
+                    <p>Sedang di Lokasi</p>
                 </div>
             </div>
         </div>
 
-        <!-- Dijadwalkan -->
-        <div class="col-6 col-lg-3">
-            <div class="kpi-card kpi-jadwal p-3 p-md-3.5" onclick="window.location.href='laporan-kegiatan.php?status=dijadwalkan&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-uppercase fw-bold text-muted" style="font-size: 10.5px; letter-spacing: 0.04em;">Dijadwalkan</span>
-                    <div class="d-flex align-items-center justify-content-center rounded-3" style="width: 34px; height: 34px; background: #f1f5f9; color: #64748b;">
-                        <i class="fa-regular fa-calendar-clock" style="font-size: 15px;"></i>
+        <!-- Card 4: Selesai -->
+        <div class="col-6 col-md-3">
+            <div class="stat-card-premium" style="border-left: 4px solid #10b981;" onclick="window.location.href='laporan-kegiatan.php?status=selesai&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label-premium">SELESAI</p>
+                            <h3 class="stat-count-premium" style="color: #059669;"><?= number_format($kpiSelesai); ?></h3>
+                        </div>
+                        <div class="stat-icon-premium" style="background-color: #ecfdf5; color: #059669;">
+                            <span class="material-symbols-outlined" style="color: #059669;">task_alt</span>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h3 class="fw-bolder mb-0 text-secondary" style="font-family:'Outfit',sans-serif; font-size: 26px;"><?= number_format($kpiDijadwalkan); ?></h3>
-                    <span class="text-muted small">terdaftar</span>
-                </div>
-                <div class="text-secondary mt-1" style="font-size: 11px;">
-                    <i class="fa-regular fa-hourglass-half me-1"></i>Belum dikerjakan
+                <div class="stat-footer-premium">
+                    <p>Kunjungan Selesai</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- 2. MODERN FILTER & TOOLBAR CARD                                         -->
+    <!-- 2. FILTER & TOOLBAR CARD                                                -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
-        <div class="card-body p-3 p-md-4">
-            <!-- Header Filter & Action Buttons -->
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-3 border-bottom">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="d-flex align-items-center justify-content-center rounded-3" style="width: 32px; height: 32px; background: #eff6ff; color: #2563eb;">
-                        <i class="fa-solid fa-sliders" style="font-size: 14px;"></i>
-                    </span>
-                    <div>
-                        <h6 class="fw-bold mb-0 text-dark" style="font-family:'Outfit',sans-serif;">Filter & Pencarian Laporan</h6>
-                        <span class="text-muted small">Saring data berdasarkan sales, status kunjungan, dan rentang tanggal</span>
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1.5 rounded-3 px-3 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#syncSheetsModal">
-                        <i class="fa-solid fa-file-excel"></i>
-                        <span>Sync Google Sheets</span>
-                    </button>
-                    <a href="laporan-kegiatan.php" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 rounded-3 px-3 py-2 fw-semibold">
-                        <i class="fa-solid fa-rotate-right"></i>
-                        <span>Reset</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Form Filter Utama -->
-            <form method="GET" action="laporan-kegiatan.php" class="row g-3">
-                <!-- Sales Agent -->
-                <div class="col-12 col-sm-6 col-lg-3">
+    <div class="card border-0 shadow-sm rounded-3 mb-4" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
+        <div class="card-body p-3">
+            <form method="GET" action="laporan-kegiatan.php" class="row g-2 align-items-end">
+                <!-- Filter Sales -->
+                <div class="col-12 col-md-3">
                     <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                        <i class="fa-solid fa-user-tie text-primary me-1"></i> Sales Agent
+                        <i class="fa-solid fa-user-tie text-primary me-1"></i> Filter Sales
                     </label>
-                    <select name="id_sales" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 13px;">
-                        <option value="0">-- Semua Sales Agent --</option>
+                    <select name="id_sales" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
+                        <option value="0">-- Semua Sales --</option>
                         <?php foreach ($salesOptions as $opt) : ?>
                             <option value="<?= $opt['id']; ?>" <?= ($filterSales == $opt['id']) ? 'selected' : ''; ?>>
                                 <?= htmlspecialchars($opt['nama']); ?>
@@ -387,65 +367,60 @@ $result = mysqli_query($conn, $sql);
                 </div>
 
                 <!-- Status Kunjungan -->
-                <div class="col-12 col-sm-6 col-lg-3">
+                <div class="col-12 col-md-2">
                     <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                        <i class="fa-solid fa-filter text-primary me-1"></i> Status Kunjungan
+                        <i class="fa-solid fa-filter text-primary me-1"></i> Status
                     </label>
-                    <select name="status" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 13px;">
+                    <select name="status" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
                         <option value="">-- Semua Status --</option>
-                        <option value="selesai" <?= ($filterStatus === 'selesai') ? 'selected' : ''; ?>>✅ Selesai (Completed)</option>
-                        <option value="berjalan" <?= ($filterStatus === 'berjalan') ? 'selected' : ''; ?>>⏳ Diproses (In Progress)</option>
-                        <option value="dijadwalkan" <?= ($filterStatus === 'dijadwalkan') ? 'selected' : ''; ?>>📅 Dijadwalkan (Upcoming)</option>
+                        <option value="selesai" <?= ($filterStatus === 'selesai') ? 'selected' : ''; ?>>Selesai</option>
+                        <option value="berjalan" <?= ($filterStatus === 'berjalan') ? 'selected' : ''; ?>>Diproses</option>
+                        <option value="dijadwalkan" <?= ($filterStatus === 'dijadwalkan') ? 'selected' : ''; ?>>Dijadwalkan</option>
                     </select>
                 </div>
 
                 <!-- Filter Bulan -->
-                <div class="col-12 col-sm-6 col-lg-2">
+                <div class="col-6 col-md-2">
                     <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                        <i class="fa-regular fa-calendar-days text-primary me-1"></i> Periode Bulan
+                        <i class="fa-regular fa-calendar-days text-primary me-1"></i> Bulan
                     </label>
-                    <input type="month" name="bulan" value="<?= htmlspecialchars($filterBulan); ?>" class="form-control form-control-sm text-dark" style="border-radius: 8px; font-size: 13px;">
+                    <input type="month" name="bulan" value="<?= htmlspecialchars($filterBulan); ?>" class="form-control form-control-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
                 </div>
 
                 <!-- Filter Tanggal Spesifik -->
-                <div class="col-12 col-sm-6 col-lg-2">
+                <div class="col-6 col-md-2">
                     <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                        <i class="fa-regular fa-calendar-day text-primary me-1"></i> Tanggal Spesifik
+                        <i class="fa-regular fa-calendar-day text-primary me-1"></i> Tanggal
                     </label>
-                    <input type="date" name="tanggal" value="<?= htmlspecialchars($filterTanggal); ?>" class="form-control form-control-sm text-dark" style="border-radius: 8px; font-size: 13px;">
+                    <input type="date" name="tanggal" value="<?= htmlspecialchars($filterTanggal); ?>" class="form-control form-control-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
                 </div>
 
-                <!-- Tombol Submit Cari -->
-                <div class="col-12 col-lg-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1.5 py-2" style="background: #2563eb; border-radius: 8px; font-size: 12.5px; letter-spacing: 0.03em;">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span>Cari Laporan</span>
+                <!-- Buttons -->
+                <div class="col-12 col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm flex-grow-1 fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px; background: #3b82f6;">
+                        <i class="fa-solid fa-magnifying-glass"></i> Cari
+                    </button>
+                    <a href="laporan-kegiatan.php" class="btn btn-outline-secondary btn-sm fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px;" title="Reset Filter">
+                        <i class="fa-solid fa-rotate-right"></i> Reset
+                    </a>
+                    <button type="button" class="btn btn-outline-success btn-sm fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px;" data-bs-toggle="modal" data-bs-target="#syncSheetsModal" title="Sync ke Google Sheets">
+                        <i class="fa-solid fa-file-excel"></i> Sync
                     </button>
                 </div>
             </form>
 
-            <!-- Quick Chips & Live Instant Filter -->
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-3 pt-3 border-top">
-                <!-- Quick Filter Chips -->
-                <div class="d-flex flex-wrap align-items-center gap-1.5">
-                    <span class="text-muted small fw-semibold me-1">Pintasan:</span>
-                    <a href="laporan-kegiatan.php?tanggal=<?= date('Y-m-d'); ?>" class="quick-filter-chip <?= ($filterTanggal === date('Y-m-d')) ? 'active' : ''; ?>">
-                        <i class="fa-solid fa-calendar-day"></i> Hari Ini
-                    </a>
-                    <a href="laporan-kegiatan.php?bulan=<?= date('Y-m'); ?>" class="quick-filter-chip <?= ($filterBulan === date('Y-m') && empty($filterTanggal)) ? 'active' : ''; ?>">
-                        <i class="fa-solid fa-calendar-days"></i> Bulan Ini
-                    </a>
-                    <a href="laporan-kegiatan.php?status=selesai&bulan=<?= $filterBulan; ?>" class="quick-filter-chip <?= ($filterStatus === 'selesai') ? 'active' : ''; ?>">
-                        <i class="fa-solid fa-check text-success"></i> Selesai Saja
-                    </a>
-                </div>
-
-                <!-- Instant Live Filter Input -->
-                <div class="position-relative" style="min-width: 260px; max-width: 380px; width: 100%;">
-                    <i class="fa-solid fa-store position-absolute text-muted" style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px;"></i>
-                    <input type="text" id="liveSearchCustomerInput" class="form-control form-control-sm ps-4 pe-4" placeholder="Ketik cepat nama toko / alamat..." style="border-radius: 20px; font-size: 12.5px; border-color: #cbd5e1;">
-                    <span id="clearLiveSearch" class="position-absolute text-muted cursor-pointer d-none" style="right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; cursor: pointer;">
+            <!-- Instant Search Bar -->
+            <div class="mt-3 pt-2.5 border-top d-flex align-items-center justify-content-between">
+                <div class="position-relative w-100" style="max-width: 420px;">
+                    <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px;"></i>
+                    <input type="text" id="liveSearchCustomerInput" class="form-control form-control-sm ps-4 pe-4" placeholder="Ketik cepat nama toko / alamat customer..." style="border-radius: 8px; font-size: 12.5px; border-color: #cbd5e1;">
+                    <span id="clearLiveSearch" class="position-absolute text-muted d-none" style="right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; cursor: pointer;">
                         <i class="fa-solid fa-xmark"></i>
+                    </span>
+                </div>
+                <div class="d-none d-md-flex align-items-center gap-2">
+                    <span class="badge bg-light text-secondary border font-monospace px-2.5 py-1.5" style="font-size: 11px;">
+                        <i class="fa-solid fa-calendar-check me-1 text-primary"></i> <?= htmlspecialchars($dateLabel); ?>
                     </span>
                 </div>
             </div>
@@ -453,12 +428,11 @@ $result = mysqli_query($conn, $sql);
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- 3. DAFTAR KUNJUNGAN PER CUSTOMER (MODERN CARDS)                         -->
+    <!-- 3. DAFTAR KUNJUNGAN PER CUSTOMER                                        -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div id="customerListContainer">
         <?php
         $avatarColors = ['#2563eb', '#7c3aed', '#059669', '#d97706', '#db2777', '#0891b2', '#4f46e5'];
-        $totalRenderedCards = 0;
 
         if ($result && mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
@@ -467,7 +441,6 @@ $result = mysqli_query($conn, $sql);
                 $namaC      = $row['nama_cust'];
                 $alamatC    = $row['alamat_cust'] ?? '';
                 $kotaC      = $row['kota_cust'] ?? '';
-                $totalRenderedCards++;
 
                 // Ambil tim & pelaksanaan kegiatan ini
                 $sqlLapTek = "SELECT tks.*, 
@@ -506,12 +479,12 @@ $result = mysqli_query($conn, $sql);
                 <!-- Card Header -->
                 <div class="customer-card-header">
                     <div class="d-flex align-items-center gap-2.5">
-                        <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 38px; height: 38px; background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe;">
-                            <i class="fa-solid fa-store" style="font-size: 15px;"></i>
+                        <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width: 34px; height: 34px; background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe;">
+                            <i class="fa-solid fa-store" style="font-size: 14px;"></i>
                         </div>
                         <div>
                             <div class="d-flex flex-wrap align-items-center gap-2">
-                                <h6 class="mb-0 text-dark fw-bold" style="font-family:'Outfit',sans-serif; font-size: 15.5px; letter-spacing: -0.01em;">
+                                <h6 class="mb-0 text-dark fw-bold" style="font-family:'Outfit',sans-serif; font-size: 15px; letter-spacing: -0.01em;">
                                     <?= htmlspecialchars($namaC); ?>
                                 </h6>
                                 <?php if (!empty($kotaC)): ?>
