@@ -135,19 +135,41 @@ if ($action === 'search_dealer') {
     $q = trim($_GET['q'] ?? '');
     $qLike = "%$q%";
     
+    // Check if table tiptok_penitipan exists
+    $hasTiptokTbl = false;
+    $chkTiptok = @$conn->query("SHOW TABLES LIKE 'tiptok_penitipan'");
+    if ($chkTiptok && $chkTiptok->num_rows > 0) {
+        $hasTiptokTbl = true;
+    }
+
     if ($hasSalesCustomer) {
+        // Ensure is_tiptok column exists
+        $colCheck = @$conn->query("SHOW COLUMNS FROM sales_customer LIKE 'is_tiptok'");
+        if (!$colCheck || $colCheck->num_rows == 0) {
+            @$conn->query("ALTER TABLE sales_customer ADD COLUMN is_tiptok TINYINT(1) NOT NULL DEFAULT 0 AFTER kategori");
+        }
+
+        // Only show stores marked as TIP TOK or with existing consignment records
+        $whereTiptok = " (is_tiptok = 1";
+        if ($hasTiptokTbl) {
+            $whereTiptok .= " OR id IN (SELECT DISTINCT id_customer FROM tiptok_penitipan WHERE deleted_at IS NULL)";
+        }
+        $whereTiptok .= ") ";
+
         if (!empty($q)) {
             $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
                                    FROM sales_customer 
                                    WHERE deleted_at IS NULL 
+                                     AND $whereTiptok
                                      AND (nama LIKE ? OR telp_pribadi LIKE ? OR alamat LIKE ? OR kota LIKE ?) 
-                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 50");
+                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 100");
             $stmt->bind_param("ssss", $qLike, $qLike, $qLike, $qLike);
         } else {
             $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
                                    FROM sales_customer 
                                    WHERE deleted_at IS NULL 
-                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 50");
+                                     AND $whereTiptok
+                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 100");
         }
     } else {
         if (!empty($q)) {
@@ -159,7 +181,7 @@ if ($action === 'search_dealer') {
                                    FROM customers c 
                                    WHERE c.deleted_at IS NULL 
                                      AND (c.nama_toko LIKE ? OR c.kategori LIKE ? OR EXISTS (SELECT 1 FROM customer_addresses ca WHERE ca.customer_id = c.id AND (ca.alamat LIKE ? OR ca.kota LIKE ?))) 
-                                   ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 50");
+                                   ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 100");
             $stmt->bind_param("ssss", $qLike, $qLike, $qLike, $qLike);
         } else {
             $stmt = $conn->prepare("SELECT c.id, c.id AS kode_customer, c.nama_toko AS nama, c.kategori, 
@@ -169,7 +191,7 @@ if ($action === 'search_dealer') {
                                            (SELECT link_google_map FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_lokasi
                                    FROM customers c 
                                    WHERE c.deleted_at IS NULL 
-                                   ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 50");
+                                   ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 100");
         }
     }
     

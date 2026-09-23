@@ -1374,9 +1374,9 @@ $resPenitipan = $conn->query($sqlPenitipan);
                     <div class="modal-body p-4">
                         <div class="row g-3 mb-3">
                             <div class="col-md-8">
-                                <label class="form-label-taste">Toko / Dealer Tujuan <span class="text-danger">*</span></label>
+                                <label class="form-label-taste">Toko / Dealer Tujuan (Mitra TIP TOK) <span class="text-danger">*</span></label>
                                 <select name="id_customer" id="selectDealer" class="form-control-taste w-100" required onchange="onDealerSelected()">
-                                    <option value="">-- Pilih Toko Customer --</option>
+                                    <option value="">-- Pilih Toko Mitra TIP TOK --</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -1438,9 +1438,9 @@ $resPenitipan = $conn->query($sqlPenitipan);
                     <div class="modal-body p-4">
                         <div class="row g-3 mb-3">
                             <div class="col-md-5">
-                                <label class="form-label-taste">Toko / Dealer Tujuan <span class="text-danger">*</span></label>
+                                <label class="form-label-taste">Toko / Dealer Tujuan (Mitra TIP TOK) <span class="text-danger">*</span></label>
                                 <select name="id_customer" id="editSelectDealer" class="form-control-taste w-100" required onchange="onEditDealerSelected()">
-                                    <option value="">-- Pilih Toko Customer --</option>
+                                    <option value="">-- Pilih Toko Mitra TIP TOK --</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -2008,11 +2008,15 @@ $resPenitipan = $conn->query($sqlPenitipan);
                         dealersList = res.data;
                         const sel = document.getElementById('selectDealer');
                         if (sel) {
-                            sel.innerHTML = '<option value="">-- Pilih Toko Customer / Dealer --</option>';
-                            dealersList.forEach(d => {
-                                const katBadge = d.kategori ? `[${d.kategori}] ` : '';
-                                sel.innerHTML += `<option value="${d.id}">${katBadge}${escapeHtml(d.nama)} - ${escapeHtml(d.kota || '')}</option>`;
-                            });
+                            sel.innerHTML = '<option value="">-- Pilih Toko Mitra TIP TOK --</option>';
+                            if (dealersList.length === 0) {
+                                sel.innerHTML += '<option value="" disabled>⚠️ Belum ada toko bertanda TIP TOK. Tandai toko di menu Customer terlebih dahulu.</option>';
+                            } else {
+                                dealersList.forEach(d => {
+                                    const katBadge = d.kategori ? `[${d.kategori}] ` : '';
+                                    sel.innerHTML += `<option value="${d.id}">${katBadge}${escapeHtml(d.nama)} - ${escapeHtml(d.kota || '')}</option>`;
+                                });
+                            }
                         }
                     }
                 })
@@ -2154,7 +2158,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
                         // Dropdown dealer
                         const sel = document.getElementById('editSelectDealer');
                         if (sel) {
-                            sel.innerHTML = '<option value="">-- Pilih Toko Customer / Dealer --</option>';
+                            sel.innerHTML = '<option value="">-- Pilih Toko Mitra TIP TOK --</option>';
                             dealersList.forEach(d => {
                                 const katBadge = d.kategori ? `[${d.kategori}] ` : '';
                                 const selected = (d.id == m.id_customer) ? 'selected' : '';
