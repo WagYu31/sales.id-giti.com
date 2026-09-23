@@ -33,12 +33,19 @@ if (isset($_GET['delete_id'])) {
     exit();
 }
 
+// Auto-ensure is_tiptok column exists
+$chkCol = @$conn->query("SHOW COLUMNS FROM sales_customer LIKE 'is_tiptok'");
+if ($chkCol && $chkCol->num_rows == 0) {
+    @$conn->query("ALTER TABLE sales_customer ADD COLUMN `is_tiptok` TINYINT(1) NOT NULL DEFAULT 0 AFTER `kategori`");
+}
+
 // UPDATE
 $successMsg = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'])) {
     $id = $_POST['update_id'];
     $nama = $_POST['edit_nama'];
     $kategori = $_POST['edit_kategori'];
+    $is_tiptok = isset($_POST['edit_is_tiptok']) ? 1 : 0;
     $email = $_POST['edit_email'];
     $alamat = $_POST['edit_alamat'];
     $kota = $_POST['edit_kota'];
@@ -117,8 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'])) {
     $merged_photos = array_slice($merged_photos, 0, 10);
     $foto_json_updated = !empty($merged_photos) ? json_encode($merged_photos) : NULL;
 
-    $stmt = $conn->prepare("UPDATE sales_customer SET nama = ?, kategori = ?, telp_pribadi = ?, email = ?, alamat = ?, kota = ?, id_wilayah = ?, foto = ?, lat = ?, lon = ?, rad = ?, alamat_lokasi = ?, updated_at = NOW() WHERE id = ?");
-    $stmt->bind_param("ssssssisssssi", $nama, $kategori, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json_updated, $lat, $lon, $rad, $location_address, $id);
+    $stmt = $conn->prepare("UPDATE sales_customer SET nama = ?, kategori = ?, is_tiptok = ?, telp_pribadi = ?, email = ?, alamat = ?, kota = ?, id_wilayah = ?, foto = ?, lat = ?, lon = ?, rad = ?, alamat_lokasi = ?, updated_at = NOW() WHERE id = ?");
+    $stmt->bind_param("ssisssssisssssi", $nama, $kategori, $is_tiptok, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json_updated, $lat, $lon, $rad, $location_address, $id);
     $stmt->execute();
     $stmt->close();
 
@@ -129,6 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_id'])) {
     $nama = $_POST['nama'];
     $kategori = $_POST['kategori'];
+    $is_tiptok = isset($_POST['is_tiptok']) ? 1 : 0;
     $email = $_POST['email'];
     $alamat = $_POST['alamat'];
     $kota = $_POST['kota'];
@@ -184,8 +192,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_id'])) {
     }
     $kode_customer = 'CUST-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
 
-    $stmt = $conn->prepare("INSERT INTO sales_customer (kode_customer, kategori, nama, telp_pribadi, email, alamat, kota, id_wilayah, foto, lat, lon, rad, alamat_lokasi, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
-    $stmt->bind_param("sssssssisssss", $kode_customer, $kategori, $nama, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json, $lat, $lon, $rad, $location_address);
+    $stmt = $conn->prepare("INSERT INTO sales_customer (kode_customer, kategori, is_tiptok, nama, telp_pribadi, email, alamat, kota, id_wilayah, foto, lat, lon, rad, alamat_lokasi, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+    $stmt->bind_param("ssisssssisssss", $kode_customer, $kategori, $is_tiptok, $nama, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json, $lat, $lon, $rad, $location_address);
     $stmt->execute();
     $stmt->close();
 
@@ -200,8 +208,24 @@ $filterSearch = isset($_GET['search']) ? trim($_GET['search']) : '';
 $filterWilayah = isset($_GET['wilayah']) ? trim($_GET['wilayah']) : 'all';
 $filterKategori = isset($_GET['kategori']) ? trim($_GET['kategori']) : 'all';
 
+// Check if tiptok_penitipan exists
+$hasTiptokTbl = false;
+$chkTiptok = @$conn->query("SHOW TABLES LIKE 'tiptok_penitipan'");
+if ($chkTiptok && $chkTiptok->num_rows > 0) {
+    $hasTiptokTbl = true;
+}
+
+$tiptokSelect = "";
+if ($hasTiptokTbl) {
+    $tiptokSelect = ", (SELECT COUNT(*) FROM tiptok_penitipan tp WHERE tp.id_customer = c.id AND tp.status = 'aktif') AS tiptok_aktif_count,
+                       (SELECT SUM(ti.qty_sisa) FROM tiptok_items ti JOIN tiptok_penitipan tp ON ti.id_penitipan = tp.id WHERE tp.id_customer = c.id AND tp.status = 'aktif') AS tiptok_sisa_qty,
+                       (SELECT COUNT(*) FROM tiptok_penitipan tp WHERE tp.id_customer = c.id) AS tiptok_total_count ";
+} else {
+    $tiptokSelect = ", 0 AS tiptok_aktif_count, 0 AS tiptok_sisa_qty, 0 AS tiptok_total_count ";
+}
+
 // Build the query
-$queryStr = "SELECT c.*, w.nama AS nama_wilayah 
+$queryStr = "SELECT c.*, w.nama AS nama_wilayah $tiptokSelect 
              FROM sales_customer c 
              LEFT JOIN wilayah w ON c.id_wilayah = w.id 
              WHERE c.deleted_at IS NULL ";
@@ -216,7 +240,13 @@ if ($filterWilayah !== 'all') {
     $queryStr .= " AND c.id_wilayah = '$safeWilayah' ";
 }
 
-if ($filterKategori !== 'all') {
+if ($filterKategori === 'tiptok') {
+    if ($hasTiptokTbl) {
+        $queryStr .= " AND (c.is_tiptok = 1 OR c.id IN (SELECT DISTINCT id_customer FROM tiptok_penitipan WHERE status = 'aktif' OR deleted_at IS NULL)) ";
+    } else {
+        $queryStr .= " AND c.is_tiptok = 1 ";
+    }
+} elseif ($filterKategori !== 'all') {
     $safeKategori = mysqli_real_escape_string($conn, $filterKategori);
     $queryStr .= " AND c.kategori = '$safeKategori' ";
 }
@@ -514,6 +544,57 @@ $salesData = mysqli_query($conn, $queryStr);
     .badge-installer { background: #faf5ff; color: #6b21a8; border-color: #f3e8ff; }
     .badge-user { background: #ecfdf5; color: #065f46; border-color: #d1fae5; }
     .badge-default { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
+
+    /* ── TIP TOK Badge Styling ── */
+    .badge-tiptok {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #ffffff !important;
+      font-size: 8.5px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 30px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: inline-flex;
+      align-items: center;
+      gap: 3.5px;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .badge-tiptok:hover {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.5);
+      color: #ffffff !important;
+    }
+    .badge-tiptok i {
+      font-size: 8.5px;
+    }
+    .badge-tiptok-qty {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-size: 8px;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 10px;
+      margin-left: 2px;
+    }
+
+    /* Action button quick TIP TOK toggle */
+    .btn-act-tiptok {
+      background: #fef3c7;
+      color: #d97706;
+      border: 1px solid #fde68a;
+    }
+    .btn-act-tiptok:hover, .btn-act-tiptok.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #ffffff;
+      border-color: #d97706;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);
+    }
  
     /* ── Table custom styling ── */
     .premium-table {
@@ -907,6 +988,22 @@ $salesData = mysqli_query($conn, $queryStr);
                     </label>
                     <input type="text" name="alamat" class="input-premium" placeholder="Masukkan alamat lengkap toko/mitra...">
                   </div>
+
+                  <!-- TIP TOK Store Switch -->
+                  <div class="col-md-12 form-group-premium mt-2">
+                    <div class="d-flex align-items-center justify-content-between p-3 rounded-3" style="background: rgba(245, 158, 11, 0.08); border: 1.5px dashed rgba(245, 158, 11, 0.4);">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined text-warning" style="font-size:22px;">inventory_2</span>
+                        <div>
+                          <span style="font-weight:800; font-size:13px; color:#92400e; display:block;">Mitra TIP TOK (Konsinyasi Toko)</span>
+                          <span style="font-size:11.5px; color:#b45309;">Aktifkan tanda ini jika toko dititipkan barang konsinyasi display Loewix</span>
+                        </div>
+                      </div>
+                      <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" name="is_tiptok" id="create_is_tiptok" value="1" style="width: 2.2em; height: 1.2em; cursor: pointer;">
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1030,6 +1127,7 @@ $salesData = mysqli_query($conn, $queryStr);
                   <div class="input-group input-group-outline">
                       <select name="kategori" class="form-select form-control bg-white px-3" style="border:1px solid #d2d6da; border-radius:0.375rem; -webkit-appearance: auto; -moz-appearance: auto; appearance: auto;">
                           <option value="all">Semua Kategori</option>
+                          <option value="tiptok" <?= ($filterKategori === 'tiptok') ? 'selected' : ''; ?>>📦 Toko Mitra TIP TOK</option>
                           <?php foreach($kategoriList as $k): ?>
                               <option value="<?= $k; ?>" <?= ($filterKategori === $k) ? 'selected' : ''; ?>><?= $k; ?></option>
                           <?php endforeach; ?>
@@ -1102,6 +1200,13 @@ $salesData = mysqli_query($conn, $queryStr);
               } else {
                   $wBadge = 'background: linear-gradient(135deg, #374151, #4b5563); color: #fff;';
               }
+
+              // TIP TOK Status & Consignment details
+              $isTiptokManual = intval($row['is_tiptok'] ?? 0);
+              $tiptokAktifCount = intval($row['tiptok_aktif_count'] ?? 0);
+              $tiptokTotalCount = intval($row['tiptok_total_count'] ?? 0);
+              $tiptokSisa = intval($row['tiptok_sisa_qty'] ?? 0);
+              $isTiptok = ($isTiptokManual === 1 || $tiptokAktifCount > 0 || $tiptokTotalCount > 0);
             ?>
             <tr>
               <td style="text-align: center; font-weight: 700; color: #64748b; font-size:12px;"><?= $no++; ?></td>
@@ -1127,11 +1232,19 @@ $salesData = mysqli_query($conn, $queryStr);
                   
                   <div style="display:flex; flex-direction:column; gap:4px;">
                     <span style="font-weight: 700; color: #0f172a; font-size:14px; line-height:1.2;"><?= htmlspecialchars($row['nama'] ?? ''); ?></span>
-                    <div style="display:flex; gap:6px; align-items:center;">
+                    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                       <span class="category-badge <?= $badgeClass; ?>"><?= $kat; ?></span>
                       <span class="badge text-capitalize" style="font-size: 8.5px; padding: 3px 8px; font-weight: 700; letter-spacing: 0.05em; border-radius:30px; text-transform: uppercase; <?= $wBadge; ?>">
                         <?= htmlspecialchars($regionName); ?>
                       </span>
+                      <?php if ($isTiptok): ?>
+                        <a href="tiptok.php?search=<?= urlencode($row['nama'] ?? ''); ?>" target="_blank" class="badge-tiptok" title="Toko Mitra TIP TOK (Konsinyasi). Klik untuk lihat konsinyasi">
+                          <i class="fa-solid fa-box-open"></i> TIP TOK
+                          <?php if ($tiptokSisa > 0): ?>
+                            <span class="badge-tiptok-qty"><?= $tiptokSisa ?> Unit</span>
+                          <?php endif; ?>
+                        </a>
+                      <?php endif; ?>
                     </div>
                     <?php if (!empty($row['kode_customer'])): ?>
                       <span style="font-size:10px; font-family:monospace; color:#3b82f6; font-weight:700; letter-spacing:0.5px;"><?= htmlspecialchars($row['kode_customer']); ?></span>
@@ -1212,11 +1325,21 @@ $salesData = mysqli_query($conn, $queryStr);
               </td>
               
               <td style="text-align: center;">
+                <!-- QUICK TIPTOK TOGGLE BUTTON -->
+                <button type="button" class="btn-act btn-act-tiptok <?= $isTiptokManual ? 'active' : '' ?>" 
+                  onclick="toggleTiptokQuick(<?= $row['id']; ?>, this)" 
+                  title="<?= $isTiptokManual ? 'Mitra TIP TOK Aktif (Klik untuk lepas tanda)' : 'Tandai Toko sebagai Mitra TIP TOK' ?>">
+                  <i class="fa-solid fa-box-open"></i>
+                </button>
+
                 <!-- VIEW DETAIL BUTTON -->
                 <button type="button" class="btn-act btn-act-view viewDetailBtn"
                   data-id="<?= $row['id']; ?>"
                   data-nama="<?= htmlspecialchars($row['nama'] ?? ''); ?>"
                   data-kategori="<?= htmlspecialchars($row['kategori'] ?? ''); ?>"
+                  data-is-tiptok="<?= $isTiptok ? '1' : '0' ?>"
+                  data-is-tiptok-manual="<?= $isTiptokManual ?>"
+                  data-tiptok-sisa="<?= $tiptokSisa ?>"
                   data-telp="<?= htmlspecialchars($row['telp_pribadi'] ?? ''); ?>"
                   data-email="<?= htmlspecialchars($row['email'] ?? ''); ?>"
                   data-alamat="<?= htmlspecialchars($row['alamat'] ?? ''); ?>"
@@ -1232,10 +1355,14 @@ $salesData = mysqli_query($conn, $queryStr);
                   data-bs-toggle="modal" data-bs-target="#detailModal" title="Lihat Detail Customer">
                   <span class="material-symbols-outlined">visibility</span>
                 </button>
+
+                <!-- EDIT BUTTON -->
                 <button type="button" class="btn-act btn-act-edit editBtn"
                   data-id="<?= $row['id']; ?>"
                   data-nama="<?= htmlspecialchars($row['nama'] ?? ''); ?>"
                   data-kategori="<?= htmlspecialchars($row['kategori'] ?? ''); ?>"
+                  data-is-tiptok="<?= $isTiptokManual ? '1' : '0' ?>"
+                  data-is-tiptok-manual="<?= $isTiptokManual ?>"
                   data-telp="<?= htmlspecialchars($row['telp_pribadi'] ?? ''); ?>"
                   data-email="<?= htmlspecialchars($row['email'] ?? ''); ?>"
                   data-alamat="<?= htmlspecialchars($row['alamat'] ?? ''); ?>"
@@ -1249,6 +1376,8 @@ $salesData = mysqli_query($conn, $queryStr);
                   data-bs-toggle="modal" data-bs-target="#editModal" title="Ubah Data Customer">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
+
+                <!-- DELETE BUTTON -->
                 <a href="?delete_id=<?= $row['id']; ?>" class="btn-act btn-act-delete" onclick="return confirm('Yakin ingin menghapus customer ini?')" title="Hapus Customer">
                   <span class="material-symbols-outlined">delete</span>
                 </a>
@@ -1286,9 +1415,10 @@ $salesData = mysqli_query($conn, $queryStr);
                     <div id="detail_avatar_container" class="avatar-initials-table" style="width: 54px; height: 54px; font-size:18px; margin:0; cursor:default; box-shadow:none;"></div>
                     <div>
                       <h4 id="detail_nama" style="margin:0; font-size:18px; font-weight:800; color:#0f172a;">-</h4>
-                      <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
+                      <div style="display:flex; gap:6px; margin-top:4px; align-items:center; flex-wrap:wrap;">
                         <span id="detail_kategori" class="category-badge">-</span>
                         <span id="detail_wilayah" class="badge" style="font-size: 8.5px; padding: 4px 10px; border-radius:30px; background:#475569; color:#fff; text-transform:uppercase; font-weight:700;">-</span>
+                        <span id="detail_tiptok_badge" class="badge-tiptok d-none"><i class="fa-solid fa-box-open"></i> TIP TOK <span id="detail_tiptok_qty" class="badge-tiptok-qty"></span></span>
                       </div>
                     </div>
                   </div>
@@ -1469,6 +1599,22 @@ $salesData = mysqli_query($conn, $queryStr);
                   <div class="col-md-12 form-group-premium">
                     <label class="form-label-premium">Alamat Lengkap</label>
                     <input type="text" name="edit_alamat" id="edit_alamat" class="input-premium">
+                  </div>
+
+                  <!-- Edit TIP TOK Store Switch -->
+                  <div class="col-md-12 form-group-premium mt-2">
+                    <div class="d-flex align-items-center justify-content-between p-3 rounded-3" style="background: rgba(245, 158, 11, 0.08); border: 1.5px dashed rgba(245, 158, 11, 0.4);">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined text-warning" style="font-size:22px;">inventory_2</span>
+                        <div>
+                          <span style="font-weight:800; font-size:13px; color:#92400e; display:block;">Mitra TIP TOK (Konsinyasi Toko)</span>
+                          <span style="font-size:11.5px; color:#b45309;">Toko dititipkan stok barang konsinyasi display Loewix</span>
+                        </div>
+                      </div>
+                      <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" name="edit_is_tiptok" id="edit_is_tiptok" value="1" style="width: 2.2em; height: 1.2em; cursor: pointer;">
+                      </div>
+                    </div>
                   </div>
 
                   <!-- Existing Photos -->
@@ -2116,6 +2262,12 @@ $salesData = mysqli_query($conn, $queryStr);
       document.getElementById('edit_kota').value = btn.dataset.kota;
       document.getElementById('edit_id_wilayah').value = btn.dataset.idWilayah || "";
 
+      // TIP TOK Switch
+      const editTiptokSwitch = document.getElementById('edit_is_tiptok');
+      if (editTiptokSwitch) {
+        editTiptokSwitch.checked = (btn.dataset.isTiptok === '1');
+      }
+
       // GPS Data Populate
       document.getElementById('edit_lat').value = btn.dataset.lat || "";
       document.getElementById('edit_lon').value = btn.dataset.lon || "";
@@ -2166,6 +2318,55 @@ $salesData = mysqli_query($conn, $queryStr);
     });
   });
 
+  // ── Quick Toggle TIP TOK AJAX Function ──
+  window.toggleTiptokQuick = function(id, btn) {
+    if (!id) return;
+    const isCurrentlyActive = btn.classList.contains('active');
+    const newStatus = isCurrentlyActive ? 0 : 1;
+    
+    fetch('ajax_toggle_tiptok.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'id=' + encodeURIComponent(id) + '&set_status=' + encodeURIComponent(newStatus)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            icon: 'success',
+            title: res.is_tiptok === 1 ? '🏷️ Ditandai TIP TOK' : 'Tanda TIP TOK Dicabut',
+            text: res.message,
+            timer: 1500,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+          });
+        }
+        // Update button visual
+        if (res.is_tiptok === 1) {
+          btn.classList.add('active');
+          btn.title = 'Mitra TIP TOK Aktif (Klik untuk nonaktifkan)';
+        } else {
+          btn.classList.remove('active');
+          btn.title = 'Tandai Toko sebagai Mitra TIP TOK';
+        }
+        // Auto refresh table after short delay
+        setTimeout(() => { window.location.reload(); }, 900);
+      } else {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({ icon: 'error', title: 'Gagal', text: res.message || 'Terjadi kesalahan.' });
+        } else {
+          alert(res.message || 'Gagal mengubah status.');
+        }
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Terjadi kesalahan jaringan.');
+    });
+  };
+
   // ── Detail Modal View Logic ──
   let mapDetailInstance = null;
   let markerDetail = null;
@@ -2176,6 +2377,8 @@ $salesData = mysqli_query($conn, $queryStr);
       const id = btn.dataset.id;
       const nama = btn.dataset.nama;
       const kategori = btn.dataset.kategori;
+      const isTiptok = (btn.dataset.isTiptok === '1');
+      const tiptokSisa = parseInt(btn.dataset.tiptokSisa || '0');
       const telp = btn.dataset.telp;
       const email = btn.dataset.email || "-";
       const alamat = btn.dataset.alamat || "-";
@@ -2206,6 +2409,21 @@ $salesData = mysqli_query($conn, $queryStr);
         kategori === 'Installer' ? 'badge-installer' :
         kategori === 'User' ? 'badge-user' : 'badge-default'
       );
+
+      // Populate TIP TOK badge in detail modal
+      const tiptokBadgeEl = document.getElementById('detail_tiptok_badge');
+      const tiptokQtyEl = document.getElementById('detail_tiptok_qty');
+      if (tiptokBadgeEl) {
+        if (isTiptok) {
+          tiptokBadgeEl.classList.remove('d-none');
+          if (tiptokQtyEl) {
+            tiptokQtyEl.innerText = tiptokSisa > 0 ? (tiptokSisa + ' Unit') : '';
+            tiptokQtyEl.style.display = tiptokSisa > 0 ? 'inline-block' : 'none';
+          }
+        } else {
+          tiptokBadgeEl.classList.add('d-none');
+        }
+      }
 
       // Populate avatar initials
       const avatarContainer = document.getElementById('detail_avatar_container');
