@@ -560,6 +560,50 @@ $resPenitipan = $conn->query($sqlPenitipan);
             border-color: #93c5fd;
             transform: translateY(-1px);
         }
+        .btn-table-warning {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1.5px solid #fcd34d;
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-size: 13px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-table-warning:hover {
+            background: #fef3c7;
+            color: #b45309;
+            border-color: #f59e0b;
+            transform: translateY(-1px);
+        }
+        .btn-table-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1.5px solid #fca5a5;
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-size: 13px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-table-danger:hover {
+            background: #fecaca;
+            color: #991b1b;
+            border-color: #ef4444;
+            transform: translateY(-1px);
+        }
 
         /* Modal Styles */
         .modal-taste .modal-content {
@@ -741,11 +785,11 @@ $resPenitipan = $conn->query($sqlPenitipan);
                         <thead>
                             <tr>
                                 <th style="width: 4%;">#</th>
-                                <th style="width: 27%;">TOKO / DEALER</th>
-                                <th style="width: 15%;">KODE & TGL</th>
-                                <th style="width: 25%;">BARANG & MONITORING STOK</th>
-                                <th style="width: 15%;">INVOICE & INSENTIF</th>
-                                <th style="width: 9%;">STATUS</th>
+                                <th style="width: 26%;">TOKO / DEALER</th>
+                                <th style="width: 14%;">KODE & TGL</th>
+                                <th style="width: 24%;">BARANG & MONITORING STOK</th>
+                                <th style="width: 14%;">INVOICE & INSENTIF</th>
+                                <th style="width: 8%;">STATUS</th>
                                 <th style="width: 10%; text-align: right;">AKSI</th>
                             </tr>
                         </thead>
@@ -872,7 +916,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
 
                                         <!-- Aksi -->
                                         <td style="text-align: right;">
-                                            <div class="d-inline-flex gap-2">
+                                            <div class="d-inline-flex gap-1.5 align-items-center">
                                                 <?php if ($statusPen === 'aktif' && $sumSisa > 0) : ?>
                                                     <button class="btn-table-primary" onclick="openModalLaporKunjungan(<?php echo $idPen; ?>)" title="Lapor Kunjungan / Cek Stok Sisa">
                                                         <i class="fa-solid fa-check"></i> Cek Sisa
@@ -880,6 +924,12 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                                 <?php endif; ?>
                                                 <button class="btn-table-secondary" onclick="openModalDetailTiptok(<?php echo $idPen; ?>)" title="Lihat Riwayat Lengkap">
                                                     <i class="fa-solid fa-eye"></i>
+                                                </button>
+                                                <button class="btn-table-warning" onclick="openModalEditPenitipan(<?php echo $idPen; ?>)" title="Edit Data Penitipan">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button class="btn-table-danger" onclick="hapusPenitipan(<?php echo $idPen; ?>, '<?php echo htmlspecialchars($row['kode_titip']); ?>', '<?php echo htmlspecialchars(addslashes($row['nama_toko'] ?? '')); ?>')" title="Hapus Penitipan">
+                                                    <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -1065,6 +1115,78 @@ $resPenitipan = $conn->query($sqlPenitipan);
                         <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" id="btnSimpanPenitipan" class="btn-taste-primary">
                             <i class="fa-solid fa-check me-1"></i> Simpan Penitipan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL EDIT PENITIPAN                                                      -->
+    <!-- ========================================================================= -->
+    <div class="modal fade modal-taste" id="modalEditPenitipan" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title font-weight-bold text-dark mb-0">Edit Data Penitipan Barang</h5>
+                        <div class="text-secondary text-sm font-weight-bold" id="editModalSubtitle">Perbarui data toko, tanggal, atau daftar barang titipan</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <form id="formEditPenitipan" onsubmit="submitEditPenitipan(event)">
+                    <input type="hidden" name="id_penitipan" id="editIdPenitipan">
+                    <div class="modal-body p-4">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-5">
+                                <label class="form-label-taste">Toko / Dealer Tujuan <span class="text-danger">*</span></label>
+                                <select name="id_customer" id="editSelectDealer" class="form-control-taste w-100" required onchange="onEditDealerSelected()">
+                                    <option value="">-- Pilih Toko Customer --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-taste">Tanggal Titip <span class="text-danger">*</span></label>
+                                <input type="date" name="tgl_titip" id="editTglTitip" class="form-control-taste w-100" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label-taste">Status Penitipan <span class="text-danger">*</span></label>
+                                <select name="status" id="editStatusPenitipan" class="form-control-taste w-100" required>
+                                    <option value="aktif">Aktif</option>
+                                    <option value="selesai">Selesai</option>
+                                    <option value="ditarik">Ditarik</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="editDealerPreview" class="p-3 mb-3 rounded-3 bg-light border d-none" style="border: 2px solid #cbd5e1 !important;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="font-weight-bold text-dark text-base" id="editPrevNamaToko">-</span>
+                                <span class="taste-badge badge-dealer-tag" id="editPrevKategoriToko">Dealer</span>
+                            </div>
+                            <div class="text-sm text-secondary font-weight-bold mt-1" id="editPrevAlamatToko">-</div>
+                            <div class="text-sm text-success font-weight-bold mt-1" id="editPrevTelpToko">-</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
+                            <label class="form-label-taste mb-0">Daftar Barang Dititipkan <span class="text-danger">*</span></label>
+                            <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="tambahBarisBarangEdit()">
+                                <i class="fa-solid fa-plus me-1"></i> Tambah Baris
+                            </button>
+                        </div>
+
+                        <div id="editContainerItemRows"></div>
+
+                        <div class="mt-3">
+                            <label class="form-label-taste">Catatan Penitipan (Opsional)</label>
+                            <textarea name="catatan" id="editCatatan" class="form-control-taste w-100" rows="2" placeholder="Catatan perjanjian penitipan stok..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer p-3 bg-light border-top">
+                        <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" id="btnSimpanEditPenitipan" class="btn-taste-primary">
+                            <i class="fa-solid fa-check me-1"></i> Simpan Perubahan
                         </button>
                     </div>
                 </form>
@@ -1348,6 +1470,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
         let dealersList = [];
         let currentLoadedPenitipan = null;
         let currentClaimId = 0;
+        let editItemRowIndex = 0;
 
         document.addEventListener('DOMContentLoaded', function() {
             updateBadgeCounts();
@@ -1514,6 +1637,225 @@ $resPenitipan = $conn->query($sqlPenitipan);
                     btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Penitipan';
                     Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
                 });
+        }
+
+        // =========================================================================
+        // EDIT PENITIPAN BARANG
+        // =========================================================================
+        function openModalEditPenitipan(idPenitipan) {
+            document.getElementById('editIdPenitipan').value = idPenitipan;
+            const container = document.getElementById('editContainerItemRows');
+            container.innerHTML = '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-dark"></div> Memuat data...</div>';
+            
+            new bootstrap.Modal(document.getElementById('modalEditPenitipan')).show();
+
+            fetch(`tiptok-ajax.php?action=get_detail&id=${idPenitipan}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        const m = res.data.master;
+                        document.getElementById('editModalSubtitle').textContent = `Kode: ${m.kode_titip} - Sales: ${m.nama_sales || 'Sales'}`;
+                        document.getElementById('editTglTitip').value = m.tgl_titip;
+                        document.getElementById('editCatatan').value = m.catatan || '';
+                        document.getElementById('editStatusPenitipan').value = m.status;
+
+                        // Dropdown dealer
+                        const sel = document.getElementById('editSelectDealer');
+                        sel.innerHTML = '<option value="">-- Pilih Toko Customer / Dealer --</option>';
+                        dealersList.forEach(d => {
+                            const katBadge = d.kategori ? `[${d.kategori}] ` : '';
+                            const selected = (d.id == m.id_customer) ? 'selected' : '';
+                            sel.innerHTML += `<option value="${d.id}" ${selected}>${katBadge}${d.nama} - ${d.kota || ''}</option>`;
+                        });
+                        onEditDealerSelected();
+
+                        // Render items
+                        container.innerHTML = '';
+                        editItemRowIndex = 0;
+                        res.data.items.forEach(it => {
+                            editItemRowIndex++;
+                            const isSold = parseInt(it.qty_terjual) > 0;
+                            const deleteBtn = isSold ? 
+                                `<span class="taste-badge badge-danger-tag" style="font-size:12px;">Terjual ${it.qty_terjual} unit (Terkunci)</span>` : 
+                                `<button type="button" class="btn btn-sm btn-link text-danger p-0 mb-0 font-weight-bold" onclick="hapusBarisBarangEdit(${editItemRowIndex})">
+                                    <i class="fa-solid fa-trash-can me-1"></i> Hapus
+                                 </button>`;
+
+                            const rowHtml = `
+                                <div class="p-3 mb-2 rounded-3 bg-light border" id="editItemRow_${editItemRowIndex}" style="border: 2px solid #cbd5e1 !important;">
+                                    <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="${it.id}">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="taste-badge badge-neutral" style="font-size: 13px;">Item #${editItemRowIndex}</span>
+                                        ${deleteBtn}
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-md-5">
+                                            <label class="form-label-taste mb-1">NAMA BARANG <span class="text-danger">*</span></label>
+                                            <input type="text" name="items[${editItemRowIndex}][nama_barang]" class="form-control-taste w-100" value="${escapeHtml(it.nama_barang)}" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label-taste mb-1">TIPE / KATEGORI</label>
+                                            <input type="text" name="items[${editItemRowIndex}][tipe_barang]" class="form-control-taste w-100" value="${escapeHtml(it.tipe_barang || '')}">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label-taste mb-1">QTY TITIP <span class="text-danger">*</span></label>
+                                            <input type="number" name="items[${editItemRowIndex}][qty_titip]" min="${it.qty_terjual || 1}" class="form-control-taste w-100 text-center" value="${it.qty_titip}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
+                                            <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end" value="${it.insentif_per_unit}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            container.insertAdjacentHTML('beforeend', rowHtml);
+                        });
+                    }
+                });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function onEditDealerSelected() {
+            const id = document.getElementById('editSelectDealer').value;
+            const dealer = dealersList.find(d => d.id == id);
+            const prev = document.getElementById('editDealerPreview');
+            if (dealer) {
+                document.getElementById('editPrevNamaToko').textContent = dealer.nama;
+                document.getElementById('editPrevKategoriToko').textContent = dealer.kategori || 'Dealer';
+                document.getElementById('editPrevAlamatToko').textContent = (dealer.alamat || '') + (dealer.kota ? ', ' + dealer.kota : '');
+                document.getElementById('editPrevTelpToko').textContent = dealer.telp_pribadi ? 'WA / Telp: ' + dealer.telp_pribadi : '';
+                prev.classList.remove('d-none');
+            } else {
+                prev.classList.add('d-none');
+            }
+        }
+
+        function tambahBarisBarangEdit() {
+            editItemRowIndex++;
+            const container = document.getElementById('editContainerItemRows');
+            const rowHtml = `
+                <div class="p-3 mb-2 rounded-3 bg-light border" id="editItemRow_${editItemRowIndex}" style="border: 2px solid #cbd5e1 !important;">
+                    <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="0">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="taste-badge badge-neutral" style="font-size: 13px;">Item Baru #${editItemRowIndex}</span>
+                        <button type="button" class="btn btn-sm btn-link text-danger p-0 mb-0 font-weight-bold" onclick="hapusBarisBarangEdit(${editItemRowIndex})">
+                            <i class="fa-solid fa-trash-can me-1"></i> Hapus
+                        </button>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <label class="form-label-taste mb-1">NAMA BARANG <span class="text-danger">*</span></label>
+                            <input type="text" name="items[${editItemRowIndex}][nama_barang]" class="form-control-taste w-100" placeholder="Nama Barang" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label-taste mb-1">TIPE / KATEGORI</label>
+                            <input type="text" name="items[${editItemRowIndex}][tipe_barang]" class="form-control-taste w-100" placeholder="CCTV / NVR">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label-taste mb-1">QTY TITIP <span class="text-danger">*</span></label>
+                            <input type="number" name="items[${editItemRowIndex}][qty_titip]" min="1" class="form-control-taste w-100 text-center" placeholder="Jml" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
+                            <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end" placeholder="15000" required>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', rowHtml);
+        }
+
+        function hapusBarisBarangEdit(idx) {
+            const el = document.getElementById(`editItemRow_${idx}`);
+            if (el) el.remove();
+        }
+
+        function submitEditPenitipan(e) {
+            e.preventDefault();
+            const form = document.getElementById('formEditPenitipan');
+            const formData = new FormData(form);
+            formData.append('action', 'update_penitipan');
+
+            const btn = document.getElementById('btnSimpanEditPenitipan');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan Perubahan...';
+
+            fetch('tiptok-ajax.php', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(res => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Perubahan';
+
+                    if (res.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil Diperbarui!',
+                            text: res.message,
+                            timer: 1800,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Gagal Menyimpan', html: res.message });
+                    }
+                })
+                .catch(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Perubahan';
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
+                });
+        }
+
+        // =========================================================================
+        // HAPUS PENITIPAN BARANG
+        // =========================================================================
+        function hapusPenitipan(idPenitipan, kodeTitip, namaToko) {
+            Swal.fire({
+                title: 'Hapus Data Penitipan?',
+                html: `Apakah Anda yakin ingin menghapus data penitipan <strong>[${kodeTitip}]</strong> di toko <strong>${namaToko}</strong>?<br><br><span class="text-danger font-weight-bold">Perhatian: Seluruh data barang & histori log terkait akan dihapus secara permanen!</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fa-solid fa-trash-can me-1"></i> Ya, Hapus Sekarang',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Menghapus...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    const formData = new FormData();
+                    formData.append('action', 'hapus_penitipan');
+                    formData.append('id_penitipan', idPenitipan);
+
+                    fetch('tiptok-ajax.php', { method: 'POST', body: formData })
+                        .then(r => r.json())
+                        .then(res => {
+                            if (res.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil Dihapus!',
+                                    text: res.message,
+                                    timer: 1800,
+                                    showConfirmButton: false
+                                }).then(() => location.reload());
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Gagal Menghapus', html: res.message });
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan saat menghapus data.' });
+                        });
+                }
+            });
         }
 
         function openModalLaporKunjungan(idPenitipan) {

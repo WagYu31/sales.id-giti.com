@@ -717,6 +717,167 @@ if ($action === 'update_status_penitipan') {
     exit;
 }
 
+// -------------------------------------------------------------
+// 10. EDIT / UPDATE PENITIPAN BARANG
+// -------------------------------------------------------------
+if ($action === 'update_penitipan') {
+    $id_penitipan = intval($_POST['id_penitipan'] ?? 0);
+    $id_customer = intval($_POST['id_customer'] ?? 0);
+    $tgl_titip = trim($_POST['tgl_titip'] ?? date('Y-m-d'));
+    $catatan = trim($_POST['catatan'] ?? '');
+    $status = trim($_POST['status'] ?? 'aktif');
+    $items = $_POST['items'] ?? [];
+
+    if ($id_penitipan <= 0) {
+        echo json_encode(['status' => 'error', 'message' => 'ID penitipan tidak valid.']);
+        exit;
+    }
+
+    if ($id_customer <= 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Silakan pilih toko/dealer tujuan.']);
+        exit;
+    }
+
+    if (empty($items) || !is_array($items)) {
+        echo json_encode(['status' => 'error', 'message' => 'Wajib ada minimal 1 barang titipan.']);
+        exit;
+    }
+
+    // Cek keberadaan data master
+    $qCheck = $conn->query("SELECT * FROM tiptok_penitipan WHERE id = $id_penitipan");
+    if (!$qCheck || $qCheck->num_rows === 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Data penitipan tidak ditemukan.']);
+        exit;
+    }
+    $master = $qCheck->fetch_assoc();
+
+    if ($jabatanUser === 'Sales' && $master['id_sales'] != $idUser) {
+        echo json_encode(['status' => 'error', 'message' => 'Anda hanya dapat mengedit data penitipan milik Anda sendiri.']);
+        exit;
+    }
+
+    $conn->begin_transaction();
+    try {
+        // Update master
+        $stmtUp = $conn->prepare("UPDATE tiptok_penitipan SET id_customer = ?, tgl_titip = ?, catatan = ?, status = ?, updated_at = NOW() WHERE id = ?");
+        $stmtUp->bind_param("isssi", $id_customer, $tgl_titip, $catatan, $status, $id_penitipan);
+        $stmtUp->execute();
+        $stmtUp->close();
+
+        // Ambil existing items di database
+        $qExist = $conn->query("SELECT * FROM tiptok_items WHERE id_penitipan = $id_penitipan");
+        $existItems = [];
+        while ($row = $qExist->fetch_assoc()) {
+            $existItems[$row['id']] = $row;
+        }
+
+        $submittedItemIds = [];
+        $kode_titip = $master['kode_titip'];
+
+        foreach ($items as $item) {
+            $id_item = intval($item['id_item'] ?? 0);
+            $nama_barang = trim($item['nama_barang'] ?? '');
+            $tipe_barang = trim($item['tipe_barang'] ?? '');
+            $qty_titip = intval($item['qty_titip'] ?? 0);
+            $insentif_per_unit = floatval(str_replace(['.', ','], ['', '.'], $item['insentif_per_unit'] ?? 0));
+
+            if (empty($nama_barang) || $qty_titip <= 0) continue;
+
+            if ($id_item > 0 && isset($existItems[$id_item])) {
+                // Update existing item
+                $submittedItemIds[] = $id_item;
+                $prevItem = $existItems[$id_item];
+                $terjual = intval($prevItem['qty_terjual']);
+
+                if ($qty_titip < $terjual) {
+                    throw new Exception("Qty Titip '{$nama_barang}' ($qty_titip) tidak boleh lebih kecil dari jumlah yang sudah terjual ($terjual).");
+                }
+
+                $qty_sisa = $qty_titip - $terjual;
+                $total_insentif = $terjual * $insentif_per_unit;
+                $status_item = ($qty_sisa === 0 && $terjual > 0) ? 'habis_terjual' : 'titip';
+
+                $stmtItemUp = $conn->prepare("UPDATE tiptok_items SET nama_barang = ?, tipe_barang = ?, qty_titip = ?, qty_sisa = ?, insentif_per_unit = ?, total_insentif = ?, status_item = ?, updated_at = NOW() WHERE id = ? AND id_penitipan = ?");
+                $stmtItemUp->bind_param("ssiiddsii", $nama_barang, $tipe_barang, $qty_titip, $qty_sisa, $insentif_per_unit, $total_insentif, $status_item, $id_item, $id_penitipan);
+                $stmtItemUp->execute();
+                $stmtItemUp->close();
+            } else {
+                // Insert new item added during edit
+                $qty_sisa = $qty_titip;
+                $stmtItemIns = $conn->prepare("INSERT INTO tiptok_items (id_penitipan, kode_titip, nama_barang, tipe_barang, qty_titip, qty_sisa, qty_terjual, insentif_per_unit, total_insentif, status_item, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 0, ?, 0, 'titip', NOW(), NOW())");
+                $stmtItemIns->bind_param("isssiid", $id_penitipan, $kode_titip, $nama_barang, $tipe_barang, $qty_titip, $qty_sisa, $insentif_per_unit);
+                $stmtItemIns->execute();
+                $submittedItemIds[] = $stmtItemIns->insert_id;
+                $stmtItemIns->close();
+            }
+        }
+
+        // Hapus items yang di-remove oleh user (hanya jika belum ada penjualan)
+        foreach ($existItems as $exId => $exItem) {
+            if (!in_array($exId, $submittedItemIds)) {
+                if ($exItem['qty_terjual'] > 0) {
+                    throw new Exception("Barang '{$exItem['nama_barang']}' tidak dapat dihapus karena sudah ada penjualan tercatat ({$exItem['qty_terjual']} unit).");
+                }
+                $conn->query("DELETE FROM tiptok_items WHERE id = $exId AND id_penitipan = $id_penitipan");
+            }
+        }
+
+        $conn->commit();
+        echo json_encode(['status' => 'success', 'message' => "Perubahan data penitipan [{$kode_titip}] berhasil disimpan."]);
+    } catch (Exception $e) {
+        $conn->rollback();
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+// -------------------------------------------------------------
+// 11. HAPUS DATA PENITIPAN BARANG
+// -------------------------------------------------------------
+if ($action === 'hapus_penitipan') {
+    $id_penitipan = intval($_POST['id_penitipan'] ?? 0);
+    if ($id_penitipan <= 0) {
+        echo json_encode(['status' => 'error', 'message' => 'ID penitipan tidak valid.']);
+        exit;
+    }
+
+    // Cek data master
+    $qCheck = $conn->query("SELECT * FROM tiptok_penitipan WHERE id = $id_penitipan");
+    if (!$qCheck || $qCheck->num_rows === 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Data penitipan tidak ditemukan.']);
+        exit;
+    }
+    $master = $qCheck->fetch_assoc();
+
+    if ($jabatanUser === 'Sales' && $master['id_sales'] != $idUser) {
+        echo json_encode(['status' => 'error', 'message' => 'Anda hanya dapat menghapus data penitipan milik Anda sendiri.']);
+        exit;
+    }
+
+    // Cek apakah ada kunjungan yang sudah masuk klaim
+    $qClaimed = $conn->query("SELECT COUNT(*) as total FROM tiptok_kunjungan WHERE id_penitipan = $id_penitipan AND id_claim IS NOT NULL");
+    $claimedCount = $qClaimed ? ($qClaimed->fetch_assoc()['total'] ?? 0) : 0;
+    if ($claimedCount > 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Penitipan ini tidak dapat dihapus karena sebagian penjualan sudah masuk ke dalam proses klaim insentif.']);
+        exit;
+    }
+
+    $conn->begin_transaction();
+    try {
+        $conn->query("DELETE FROM tiptok_claim_detail WHERE id_penitipan = $id_penitipan");
+        $conn->query("DELETE FROM tiptok_kunjungan WHERE id_penitipan = $id_penitipan");
+        $conn->query("DELETE FROM tiptok_items WHERE id_penitipan = $id_penitipan");
+        $conn->query("DELETE FROM tiptok_penitipan WHERE id = $id_penitipan");
+        $conn->commit();
+
+        echo json_encode(['status' => 'success', 'message' => "Data penitipan [{$master['kode_titip']}] berhasil dihapus secara permanen."]);
+    } catch (Exception $e) {
+        $conn->rollback();
+        echo json_encode(['status' => 'error', 'message' => 'Gagal menghapus data: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
 // Default error
 echo json_encode(['status' => 'error', 'message' => 'Aksi tidak dikenali.']);
 exit;
