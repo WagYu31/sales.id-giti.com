@@ -420,24 +420,25 @@ $resPenitipan = $conn->query($sqlPenitipan);
         }
         .segmented-nav-vibrant {
             background: #ffffff;
-            padding: 5px;
+            padding: 6px;
             border-radius: 14px;
             display: inline-flex;
             flex-wrap: wrap;
+            align-items: center;
             gap: 6px;
             border: 2px solid #cbd5e1;
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
         }
         .segment-btn-vibrant {
             border: 1.5px solid transparent;
-            background: transparent;
+            background: #ffffff;
             padding: 8px 16px;
             border-radius: 10px;
             font-size: 13.5px;
             font-weight: 800;
-            color: #334155;
+            color: #475569;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.18s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -445,15 +446,17 @@ $resPenitipan = $conn->query($sqlPenitipan);
         .segment-btn-vibrant:hover {
             background: #f1f5f9;
             color: #0f172a;
+            border-color: #cbd5e1;
         }
         .segment-btn-vibrant.active {
-            background: #0f172a;
-            color: #ffffff;
-            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.25);
+            background: #0f172a !important;
+            color: #ffffff !important;
+            border-color: #0f172a !important;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
         }
         .segment-btn-vibrant.active .segment-badge-vibrant {
-            background: #334155;
-            color: #ffffff;
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
         }
         .segment-badge-vibrant {
             font-size: 12px;
@@ -462,15 +465,26 @@ $resPenitipan = $conn->query($sqlPenitipan);
             color: #0f172a;
             padding: 2px 8px;
             border-radius: 6px;
+            transition: all 0.18s ease;
         }
         .btn-tab-claim-vibrant {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            background: #fffbeb;
             color: #92400e;
-            border: 1.5px solid #f59e0b;
+            border: 1.5px solid #fde68a;
         }
         .btn-tab-claim-vibrant:hover {
-            background: linear-gradient(135deg, #fde68a, #fcd34d);
+            background: #fef3c7;
             color: #78350f;
+            border-color: #f59e0b;
+        }
+        .btn-tab-claim-vibrant.active {
+            background: #0f172a !important;
+            color: #fbbf24 !important;
+            border-color: #0f172a !important;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+        }
+        .btn-tab-claim-vibrant.active i {
+            color: #fbbf24 !important;
         }
 
         .search-container-vibrant {
@@ -1014,19 +1028,19 @@ $resPenitipan = $conn->query($sqlPenitipan);
             <!-- 3. SEGMENTED CONTROLS & SEARCH BAR -->
             <div class="segmented-control-container">
                 <div class="segmented-nav-vibrant">
-                    <button class="segment-btn-vibrant active" onclick="filterTable('all', this)">
+                    <button id="btnFilterAll" class="segment-btn-vibrant active" onclick="filterTable('all', this)">
                         <i class="fa-solid fa-list-ul me-1"></i> Semua <span class="segment-badge-vibrant" id="badgeCountAll">0</span>
                     </button>
-                    <button class="segment-btn-vibrant" onclick="filterTable('aktif', this)">
+                    <button id="btnFilterAktif" class="segment-btn-vibrant" onclick="filterTable('aktif', this)">
                         <i class="fa-solid fa-circle-check text-success me-1"></i> Stok Aktif <span class="segment-badge-vibrant" id="badgeCountAktif">0</span>
                     </button>
-                    <button class="segment-btn-vibrant" onclick="filterTable('terjual', this)">
+                    <button id="btnFilterTerjual" class="segment-btn-vibrant" onclick="filterTable('terjual', this)">
                         <i class="fa-solid fa-fire text-warning me-1"></i> Ada Penjualan <span class="segment-badge-vibrant" id="badgeCountTerjual">0</span>
                     </button>
-                    <button class="segment-btn-vibrant" onclick="filterTable('selesai', this)">
+                    <button id="btnFilterSelesai" class="segment-btn-vibrant" onclick="filterTable('selesai', this)">
                         <i class="fa-solid fa-flag-checkered text-secondary me-1"></i> Selesai <span class="segment-badge-vibrant" id="badgeCountSelesai">0</span>
                     </button>
-                    <button class="segment-btn-vibrant btn-tab-claim-vibrant" onclick="switchViewToClaims()">
+                    <button id="btnTabKlaimInsentif" class="segment-btn-vibrant btn-tab-claim-vibrant" onclick="switchViewToClaims(this)">
                         <i class="fa-solid fa-receipt text-warning"></i> Tab Klaim Insentif
                     </button>
                 </div>
@@ -1905,9 +1919,19 @@ $resPenitipan = $conn->query($sqlPenitipan);
             if (bSelesai) bSelesai.textContent = '<?php echo $countSelesai; ?>';
         }
 
+        let currentFilterCategory = 'all';
+
         function filterTable(category, btn) {
-            document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
+            currentFilterCategory = category;
+            switchViewToTable();
+
+            document.querySelectorAll('.segment-btn-vibrant').forEach(b => b.classList.remove('active'));
+            if (btn) {
+                btn.classList.add('active');
+            } else {
+                const targetBtn = document.getElementById(category === 'all' ? 'btnFilterAll' : (category === 'aktif' ? 'btnFilterAktif' : (category === 'terjual' ? 'btnFilterTerjual' : 'btnFilterSelesai')));
+                if (targetBtn) targetBtn.classList.add('active');
+            }
 
             const rows = document.querySelectorAll('#mainTiptokTable tbody tr.tiptok-row');
             rows.forEach(row => {
@@ -1929,11 +1953,17 @@ $resPenitipan = $conn->query($sqlPenitipan);
             });
         }
 
-        function switchViewToClaims() {
+        function switchViewToClaims(btn) {
             const vTable = document.getElementById('viewPenitipanTable');
             const vClaim = document.getElementById('viewKlaimInsentif');
             if (vTable) vTable.classList.add('d-none');
             if (vClaim) vClaim.classList.remove('d-none');
+            
+            // Remove active from all filter buttons and activate ONLY claim tab button
+            document.querySelectorAll('.segment-btn-vibrant').forEach(b => b.classList.remove('active'));
+            const claimBtn = btn || document.getElementById('btnTabKlaimInsentif');
+            if (claimBtn) claimBtn.classList.add('active');
+
             loadClaimSummary();
         }
 
@@ -1942,6 +1972,18 @@ $resPenitipan = $conn->query($sqlPenitipan);
             const vClaim = document.getElementById('viewKlaimInsentif');
             if (vClaim) vClaim.classList.add('d-none');
             if (vTable) vTable.classList.remove('d-none');
+
+            // Deactivate claim tab button
+            const claimBtn = document.getElementById('btnTabKlaimInsentif');
+            if (claimBtn) claimBtn.classList.remove('active');
+
+            // Activate current active filter button
+            const activeFilter = document.querySelector('.segment-btn-vibrant.active');
+            if (!activeFilter || activeFilter === claimBtn) {
+                document.querySelectorAll('.segment-btn-vibrant').forEach(b => b.classList.remove('active'));
+                const targetBtn = document.getElementById(currentFilterCategory === 'all' ? 'btnFilterAll' : (currentFilterCategory === 'aktif' ? 'btnFilterAktif' : (currentFilterCategory === 'terjual' ? 'btnFilterTerjual' : 'btnFilterSelesai')));
+                if (targetBtn) targetBtn.classList.add('active');
+            }
         }
 
         function openTabKlaimInsentif() {
