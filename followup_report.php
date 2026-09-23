@@ -186,17 +186,17 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 :root {
     --ts-bg-surface: #FFFFFF;
     --ts-bg-subtle: #F8FAFC;
-    --ts-border-subtle: #E2E8F0;
-    --ts-border-strong: #CBD5E1;
+    --ts-border-subtle: #CBD5E1;
+    --ts-border-strong: #94A3B8;
     --ts-text-primary: #0F172A;
-    --ts-text-secondary: #475569;
-    --ts-text-muted: #94A3B8;
-    --ts-brand-primary: #1D4ED8;
-    --ts-brand-accent: #059669;
-    --ts-radius-card: 18px;
+    --ts-text-secondary: #334155;
+    --ts-text-muted: #64748B;
+    --ts-brand-primary: #2563EB;
+    --ts-brand-accent: #10B981;
+    --ts-radius-card: 20px;
     --ts-radius-pill: 9999px;
-    --ts-shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
-    --ts-shadow-hover: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+    --ts-shadow-card: 0 8px 25px -4px rgba(15, 23, 42, 0.08);
+    --ts-shadow-hover: 0 14px 30px -4px rgba(15, 23, 42, 0.14);
 }
 
 /* ── Typography & Tabular Numbers ── */
@@ -205,26 +205,26 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
     font-feature-settings: 'tnum' on, 'lnum' on;
 }
 
-/* ── Hero Banner (Linear / Raycast Style) ── */
+/* ── Hero Banner ── */
 .taste-hero {
-    background: #0B132B;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e3a8a 100%);
     border-radius: var(--ts-radius-card);
-    padding: 28px 32px;
+    padding: 28px 34px;
     margin-bottom: 24px;
     color: #FFFFFF;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 12px 30px -10px rgba(11, 19, 43, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 35px -8px rgba(15, 23, 42, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.12);
 }
 
 .taste-hero::before {
     content: '';
     position: absolute;
-    top: -60px; right: -60px;
-    width: 320px; height: 320px;
+    top: -50px; right: -50px;
+    width: 280px; height: 280px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -232,112 +232,121 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(255, 255, 255, 0.06);
-    padding: 3px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 14px;
     border-radius: var(--ts-radius-pill);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     font-size: 11.5px;
-    font-weight: 600;
-    color: #93C5FD;
+    font-weight: 700;
+    color: #93c5fd;
     margin-bottom: 10px;
 }
 
 .taste-hero-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: -0.025em;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
     color: #FFFFFF;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     line-height: 1.2;
 }
 
 .taste-hero-subtitle {
     font-size: 13.5px;
-    color: rgba(226, 232, 240, 0.8);
-    max-width: 540px;
+    color: #cbd5e1;
+    max-width: 580px;
     margin: 0;
-    line-height: 1.45;
+    line-height: 1.5;
 }
 
 /* ── Bento Stat Capsules ── */
 .bento-stat-grid {
     display: flex;
-    gap: 12px;
+    gap: 14px;
     flex-wrap: wrap;
 }
 
 .bento-stat-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 14px;
-    padding: 14px 20px;
-    min-width: 140px;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background: linear-gradient(145deg, #ffffff 0%, #eff6ff 100%);
+    border-radius: 16px;
+    padding: 14px 22px;
+    min-width: 145px;
+    border: 2px solid #bfdbfe;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .bento-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
 }
 
 .bento-stat-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #64748B;
-    margin-bottom: 2px;
+    color: #1e40af;
+    margin-bottom: 4px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 }
 
 .bento-stat-value {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 26px;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    font-size: 28px;
     font-weight: 900;
     letter-spacing: -0.03em;
-    color: #0F172A;
+    color: #1d4ed8;
     line-height: 1.1;
 }
 
 .bento-stat-card.active-accent {
-    background: #059669;
-    border-color: #34D399;
+    background: linear-gradient(145deg, #10b981 0%, #059669 100%);
+    border: 2px solid #34d399;
     color: #FFFFFF;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
 }
 
-.bento-stat-card.active-accent .bento-stat-label { color: #D1FAE5; }
+.bento-stat-card.active-accent .bento-stat-label { color: #d1fae5; }
 .bento-stat-card.active-accent .bento-stat-value { color: #FFFFFF; }
 
-/* ── Clean Workbench Card ── */
+.bento-stat-card.deal-accent {
+    background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%);
+    border: 2px solid #fde68a;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+}
+.bento-stat-card.deal-accent .bento-stat-label { color: #92400e; }
+.bento-stat-card.deal-accent .bento-stat-value { color: #b45309; }
+
+/* ── Filter Card ── */
 .taste-card {
     background: #FFFFFF;
     border-radius: var(--ts-radius-card);
-    border: 1px solid var(--ts-border-subtle);
+    border: 2px solid #cbd5e1;
     box-shadow: var(--ts-shadow-card);
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     overflow: hidden;
 }
 
 .taste-card-header {
-    padding: 16px 22px;
-    border-bottom: 1px solid var(--ts-border-subtle);
+    padding: 16px 24px;
+    border-bottom: 2px solid #e2e8f0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #FFFFFF;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .taste-card-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 14.5px;
-    font-weight: 700;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
     color: var(--ts-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     margin: 0;
     display: flex;
     align-items: center;
@@ -345,98 +354,98 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 }
 
 .form-label-taste {
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #64748B;
-    margin-bottom: 5px;
+    color: #334155;
+    margin-bottom: 6px;
     display: block;
 }
 
 .form-control-taste, .form-select-taste {
-    height: 40px;
-    border: 1.5px solid #E2E8F0 !important;
-    border-radius: 10px !important;
-    padding: 7px 12px !important;
-    font-size: 13px !important;
+    height: 42px;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    padding: 8px 14px !important;
+    font-size: 13.5px !important;
     font-weight: 600 !important;
-    color: #0F172A !important;
-    background-color: #F8FAFC !important;
+    color: #0f172a !important;
+    background-color: #ffffff !important;
     transition: all 0.15s ease !important;
 }
 
 .form-control-taste:focus, .form-select-taste:focus {
     background-color: #FFFFFF !important;
-    border-color: #2563EB !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
     outline: none !important;
 }
 
 /* ── Tactile Buttons ── */
 .btn-taste-primary {
-    height: 40px;
-    background: #1D4ED8;
+    height: 42px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     color: #FFFFFF;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 13px;
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    padding: 0 18px;
+    font-weight: 800;
+    border: 1.5px solid #3b82f6;
+    border-radius: 12px;
+    padding: 0 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    box-shadow: 0 2px 6px rgba(29, 78, 216, 0.2);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
     transition: all 0.15s ease;
     touch-action: manipulation;
 }
 
 .btn-taste-primary:hover {
-    background: #1E40AF;
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
     color: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(29, 78, 216, 0.3);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
 }
 
 .btn-taste-excel {
-    height: 38px;
-    background: #059669;
+    height: 40px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: #FFFFFF;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 12.5px;
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 800;
+    border: 1.5px solid #34d399;
+    border-radius: 12px;
+    padding: 0 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
     transition: all 0.15s ease;
     text-decoration: none !important;
     touch-action: manipulation;
 }
 
 .btn-taste-excel:hover {
-    background: #047857;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
     color: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
 }
 
 .btn-taste-light {
-    height: 40px;
-    background: #F8FAFC;
-    color: #475569;
-    border: 1.5px solid #E2E8F0;
+    height: 42px;
+    background: #FFFFFF;
+    color: #334155;
+    border: 1.5px solid #cbd5e1;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 13px;
     font-weight: 700;
-    border-radius: 10px;
-    padding: 0 14px;
+    border-radius: 12px;
+    padding: 0 16px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -447,9 +456,9 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 }
 
 .btn-taste-light:hover {
-    background: #FFFFFF;
-    color: #0F172A;
-    border-color: #CBD5E1;
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
     transform: translateY(-1px);
 }
 
@@ -467,198 +476,209 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
 }
 
 .taste-table thead th {
-    background: #0F172A !important;
-    color: #F8FAFC !important;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: #FFFFFF !important;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
-    padding: 14px 16px !important;
+    letter-spacing: 0.06em;
+    padding: 16px 18px !important;
     border: none !important;
+    border-bottom: 3px solid #3b82f6 !important;
     vertical-align: middle;
     white-space: nowrap;
 }
 
 .sort-header-link {
-    color: #E2E8F0 !important;
+    color: #FFFFFF !important;
     text-decoration: none !important;
     transition: color 0.15s ease;
     display: inline-flex;
     align-items: center;
+    font-weight: 800;
 }
 
 .sort-header-link:hover {
-    color: #60A5FA !important;
+    color: #93c5fd !important;
 }
 
 .taste-table tbody tr {
-    transition: background-color 0.12s ease;
-    border-bottom: 1px solid #F1F5F9;
+    transition: background-color 0.15s ease;
+    border-bottom: 1px solid #e2e8f0;
 }
 
-.taste-table tbody tr:hover {
-    background-color: #F8FAFC !important;
+.taste-table tbody tr:nth-child(even) td {
+    background-color: #fbfcfe;
+}
+
+.taste-table tbody tr:hover td {
+    background-color: #eff6ff !important;
 }
 
 .taste-table tbody td {
-    padding: 14px 16px !important;
+    padding: 15px 18px !important;
     border-top: none;
-    border-bottom: 1px solid #F1F5F9;
+    border-bottom: 1px solid #e2e8f0;
     vertical-align: top;
-    font-size: 13px;
-    color: #1E293B;
+    font-size: 13.5px;
+    color: #0f172a;
+    background-color: #ffffff;
 }
 
-/* ── Refined Status Badges (Taste Skill Aesthetic) ── */
+/* ── Refined Status Badges ── */
 .badge-taste-pill {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 3px 8px;
-    border-radius: var(--ts-radius-pill);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-    border: 1px solid transparent;
-}
-
-.badge-acc-boss {
-    background: #ECFDF5;
-    color: #065F46;
-    border-color: #A7F3D0;
-}
-
-.badge-potensial {
-    background: #FFFBEB;
-    color: #92400E;
-    border-color: #FDE68A;
-}
-
-.badge-kandidat {
-    background: #F0F9FF;
-    color: #075985;
-    border-color: #BAE6FD;
-}
-
-/* ── Response Pills ── */
-.pill-respon {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 10px;
+    padding: 4px 9px;
     border-radius: var(--ts-radius-pill);
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    border: 1.5px solid transparent;
+}
+
+.badge-acc-boss {
+    background: #ecfdf5;
+    color: #065f46;
+    border-color: #86efac;
+}
+
+.badge-potensial {
+    background: #fffbeb;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+
+.badge-kandidat {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+/* ── Response Pills (Vibrant & High-Contrast) ── */
+.pill-respon {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
     white-space: nowrap;
 }
 
-.pill-respon-deal    { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
-.pill-respon-beli    { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
-.pill-respon-fu      { background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE; }
-.pill-respon-tanya   { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
-.pill-respon-info    { background: #F0FDFA; color: #0F766E; border: 1px solid #99F6E4; }
-.pill-respon-no      { background: #FFF1F2; color: #BE123C; border: 1px solid #FECDD3; }
-.pill-respon-default { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+.pill-respon-deal    { background: #dcfce7; color: #047857; border: 1.5px solid #86efac; }
+.pill-respon-beli    { background: #dbeafe; color: #1e40af; border: 1.5px solid #93c5fd; }
+.pill-respon-fu      { background: #e0e7ff; color: #3730a3; border: 1.5px solid #a5b4fc; }
+.pill-respon-tanya   { background: #fef3c7; color: #92400e; border: 1.5px solid #fcd34d; }
+.pill-respon-info    { background: #ccfbf1; color: #0f766e; border: 1.5px solid #5eead4; }
+.pill-respon-no      { background: #fee2e2; color: #991b1b; border: 1.5px solid #fca5a5; }
+.pill-respon-default { background: #f1f5f9; color: #334155; border: 1.5px solid #cbd5e1; }
 
 .pill-inv {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    background: #EFF6FF;
-    color: #1E40AF;
-    border: 1px solid #BFDBFE;
-    padding: 2px 7px;
-    border-radius: 5px;
+    gap: 5px;
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1.5px solid #93c5fd;
+    padding: 3px 8px;
+    border-radius: 6px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    font-weight: 700;
-    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 800;
+    margin-top: 5px;
 }
 
 .sales-chip {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
 }
 
 .sales-avatar-taste {
-    width: 26px;
-    height: 26px;
-    border-radius: 7px;
-    background: #1E293B;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
     color: #FFFFFF;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 10.5px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 900;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
 }
 
 .note-box-taste {
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-radius: 8px;
-    padding: 8px 12px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 14px;
     font-family: 'Inter', sans-serif;
-    font-size: 12.5px;
+    font-size: 13px;
     line-height: 1.5;
-    color: #334155;
+    color: #1e293b;
 }
 
 .btn-media-pill {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    background: #F0FDF4;
-    color: #166534;
-    border: 1px solid #BBF7D0;
-    border-radius: var(--ts-radius-pill);
-    padding: 4px 10px;
-    font-size: 11px;
-    font-weight: 700;
+    gap: 6px;
+    background: #dcfce7;
+    color: #047857;
+    border: 1.5px solid #86efac;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 11.5px;
+    font-weight: 800;
     text-decoration: none !important;
     transition: all 0.15s ease;
 }
 
 .btn-media-pill:hover {
-    background: #DCFCE7;
-    color: #14532D;
+    background: #bbf7d0;
+    color: #065f46;
     transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
 }
 
 .btn-delete-circle {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 8px;
-    background: #FFF1F2;
-    color: #E11D48;
-    border: 1px solid #FECDD3;
+    background: #ef4444;
+    color: #ffffff;
+    border: 1px solid #dc2626;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: all 0.15s ease;
     cursor: pointer;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
 }
 
 .btn-delete-circle:hover {
-    background: #FFE4E6;
-    color: #BE123C;
-    transform: scale(1.06);
+    background: #dc2626;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.35);
 }
 
 @media (max-width: 991.98px) {
-    .taste-hero { padding: 20px 18px; }
+    .taste-hero { padding: 22px 20px; }
     .bento-stat-grid { width: 100%; margin-top: 14px; }
     .bento-stat-card { flex: 1 1 calc(50% - 6px); min-width: 120px; }
 }
 
 @media (max-width: 575.98px) {
-    .taste-hero-title { font-size: 20px; }
+    .taste-hero-title { font-size: 22px; }
     .bento-stat-card { flex: 1 1 100%; }
 }
 </style>
@@ -692,6 +712,15 @@ $fu_deal_nominal = $deal_data['total_nom'] ?? 0;
                 </div>
                 <div class="bento-stat-value ts-tabular-nums">
                     <?php echo number_format($fu_today_count); ?>
+                </div>
+            </div>
+
+            <div class="bento-stat-card deal-accent">
+                <div class="bento-stat-label">
+                    <i class="bi bi-trophy-fill text-warning"></i> DEAL / CLOSING
+                </div>
+                <div class="bento-stat-value ts-tabular-nums">
+                    <?php echo number_format($fu_deal_count); ?>
                 </div>
             </div>
         </div>

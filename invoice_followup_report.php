@@ -118,197 +118,343 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
 ?>
 
 <style>
-.inv-header-card {
-    background: #FFFFFF;
-    border-radius: 24px;
-    padding: 24px 28px;
+/* ── Hero Banner ── */
+.inv-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e3a8a 100%);
+    border-radius: 20px;
+    padding: 28px 34px;
     margin-bottom: 24px;
-    border: 1.5px solid #E2E8F0;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    color: #FFFFFF;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 12px 35px -8px rgba(15, 23, 42, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.12);
 }
 
-.inv-header-card::before {
+.inv-hero::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #2563EB, #38BDF8, #818CF8);
+    top: -50px; right: -50px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
 }
 
+.inv-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 14px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #93c5fd;
+    margin-bottom: 10px;
+}
+
+.inv-hero-title {
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 6px;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.5px;
+    color: #FFFFFF;
+}
+
+.inv-hero-subtitle {
+    font-size: 13.5px;
+    color: #cbd5e1;
+    margin: 0;
+    max-width: 620px;
+    line-height: 1.5;
+}
+
+/* ── 4 Themed Bento Stat Cards ── */
 .inv-stat-card {
-    background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
     border-radius: 18px;
     padding: 20px 22px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.02);
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
     transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .inv-stat-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.06);
-    border-color: #CBD5E1;
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.12);
 }
 
+.inv-stat-card .icon-box {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.card-inv-total {
+    background: linear-gradient(145deg, #ffffff 0%, #eff6ff 100%);
+    border: 2px solid #bfdbfe;
+    border-top: 5px solid #2563eb;
+}
+.card-inv-total .icon-box { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color:#fff; }
+.card-inv-total .card-label { color: #1e40af; }
+.card-inv-total .card-val { color: #1d4ed8; }
+
+.card-inv-perlu {
+    background: linear-gradient(145deg, #ffffff 0%, #fff1f2 100%);
+    border: 2px solid #fecdd3;
+    border-top: 5px solid #ef4444;
+}
+.card-inv-perlu .icon-box { background: linear-gradient(135deg, #ef4444, #dc2626); color:#fff; }
+.card-inv-perlu .card-label { color: #991b1b; }
+.card-inv-perlu .card-val { color: #dc2626; }
+
+.card-inv-sudah {
+    background: linear-gradient(145deg, #ffffff 0%, #ecfdf5 100%);
+    border: 2px solid #a7f3d0;
+    border-top: 5px solid #10b981;
+}
+.card-inv-sudah .icon-box { background: linear-gradient(135deg, #10b981, #059669); color:#fff; }
+.card-inv-sudah .card-label { color: #065f46; }
+.card-inv-sudah .card-val { color: #059669; }
+
+.card-inv-menunggu {
+    background: linear-gradient(145deg, #ffffff 0%, #eef2ff 100%);
+    border: 2px solid #c7d2fe;
+    border-top: 5px solid #6366f1;
+}
+.card-inv-menunggu .icon-box { background: linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; }
+.card-inv-menunggu .card-label { color: #3730a3; }
+.card-inv-menunggu .card-val { color: #4f46e5; }
+
+.card-label {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+}
+
+.card-val {
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 4px 0;
+}
+
+/* ── Filter & Table Card ── */
 .inv-table-card {
     background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
+    border: 2px solid #cbd5e1;
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    box-shadow: 0 8px 25px -4px rgba(15, 23, 42, 0.08);
     overflow: hidden;
 }
 
+.inv-table-card thead th {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: #FFFFFF !important;
+    font-size: 11.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 16px 18px !important;
+    border: none !important;
+    border-bottom: 3px solid #3b82f6 !important;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.inv-table-card td {
+    padding: 15px 18px !important;
+    vertical-align: middle;
+    font-size: 13.5px;
+    color: #0f172a;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    transition: background-color 0.15s ease;
+}
+
+.inv-table-card tbody tr:nth-child(even) td {
+    background-color: #fbfcfe;
+}
+
+.inv-table-card tbody tr:hover td {
+    background-color: #eff6ff !important;
+}
+
 .badge-soft-danger {
-    background-color: #FEF2F2 !important;
-    color: #B91C1C !important;
-    border: 1px solid #FECACA !important;
-    font-weight: 700 !important;
-    font-size: 11.5px !important;
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+    border: 1.5px solid #fca5a5 !important;
+    font-weight: 800 !important;
+    font-size: 12px !important;
 }
 
 .badge-soft-success {
-    background-color: #ECFDF5 !important;
+    background-color: #dcfce7 !important;
     color: #047857 !important;
-    border: 1px solid #A7F3D0 !important;
-    font-weight: 700 !important;
-    font-size: 11.5px !important;
+    border: 1.5px solid #86efac !important;
+    font-weight: 800 !important;
+    font-size: 12px !important;
 }
 
 .badge-soft-primary {
-    background-color: #EFF6FF !important;
-    color: #1D4ED8 !important;
-    border: 1px solid #BFDBFE !important;
-    font-weight: 700 !important;
-    font-size: 11.5px !important;
+    background-color: #e0e7ff !important;
+    color: #3730a3 !important;
+    border: 1.5px solid #a5b4fc !important;
+    font-weight: 800 !important;
+    font-size: 12px !important;
 }
 
 .btn-detail-fu {
-    background: #F1F5F9;
-    color: #2563EB;
-    border: 1px solid #CBD5E1;
-    font-weight: 700;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    border: 1px solid #3b82f6;
+    font-weight: 800;
     font-size: 12px;
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: 10px;
     text-decoration: none;
     transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
 }
 
 .btn-detail-fu:hover {
-    background: #2563EB;
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
     color: #FFFFFF;
-    border-color: #2563EB;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45);
 }
 
 .btn-back-dash {
-    background: #F8FAFC;
-    color: #475569;
-    border: 1.5px solid #CBD5E1;
-    font-weight: 700;
+    background: #FFFFFF;
+    color: #0f172a;
+    border: 2px solid #bfdbfe;
+    font-weight: 800;
     font-size: 13px;
     padding: 9px 20px;
-    border-radius: 30px;
+    border-radius: 12px;
     text-decoration: none;
     transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .btn-back-dash:hover {
-    background: #0F172A;
-    color: #FFFFFF;
-    border-color: #0F172A;
+    background: #eff6ff;
+    color: #1d4ed8;
+    transform: translateY(-1px);
 }
 
 .filter-pill-btn {
-    border: 1px solid #CBD5E1;
-    background: #F8FAFC;
-    color: #64748B;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 6px 16px;
-    border-radius: 30px;
+    border: 1.5px solid #cbd5e1;
+    background: #FFFFFF;
+    color: #475569;
+    font-weight: 800;
+    font-size: 12.5px;
+    padding: 7px 16px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .filter-pill-btn.active, .filter-pill-btn:hover {
-    background: #2563EB;
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
     color: #FFFFFF;
-    border-color: #2563EB;
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .quick-date-btn {
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 12px;
-    border: 1px solid #CBD5E1;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #cbd5e1;
     background: #FFFFFF;
-    color: #475569;
+    color: #334155;
     cursor: pointer;
     transition: all 0.15s ease;
 }
 
 .quick-date-btn:hover {
-    background: #E2E8F0;
-    color: #0F172A;
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
 }
 </style>
 
 <div class="main-content-wrapper p-4">
-    <!-- Page Header -->
-    <div class="inv-header-card d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <div class="d-flex align-items-center gap-3">
-            <div class="rounded-3 d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 46px; height: 46px; background: linear-gradient(135deg, #2563EB, #1D4ED8); font-size: 22px;">
-                🧾
-            </div>
+    <!-- Page Header (Vibrant Hero) -->
+    <div class="inv-hero">
+        <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
             <div>
-                <h3 class="mb-0 fw-bold text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; letter-spacing: -0.4px;">
-                    Laporan Follow Up Invoice
-                </h3>
-                <p class="text-muted mb-0" style="font-size: 13.5px; font-family: 'Inter', sans-serif;">Riwayat penagihan invoice & pemantauan status follow up penjualan tim sales</p>
+                <div class="inv-breadcrumb">
+                    <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
+                    <span>›</span>
+                    <span>Follow Up Invoice</span>
+                </div>
+                <h1 class="inv-hero-title">Laporan Follow Up Invoice 🧾</h1>
+                <p class="inv-hero-subtitle">Riwayat penagihan invoice & pemantauan status follow up penjualan tim sales secara terpusat.</p>
             </div>
-        </div>
-        <div>
-            <a href="customer_management.php" class="btn-back-dash">
-                <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
-            </a>
+            <div class="mt-3 mt-md-0">
+                <a href="customer_management.php" class="btn-back-dash">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- 4 KPI Stat Summary Cards -->
+    <!-- 4 Themed Bento Stat Cards -->
     <div class="row g-3 mb-4">
         <div class="col-md-3 col-6">
-            <div class="inv-stat-card" style="border-top: 4px solid #2563EB;">
-                <div class="text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">TOTAL INVOICE FU</div>
-                <div class="fs-3 fw-bold text-dark my-1" style="font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo number_format($total_count, 0, ',', '.'); ?></div>
-                <div class="text-muted" style="font-size: 12px;">Data invoice terdaftar</div>
+            <div class="inv-stat-card card-inv-total">
+                <div class="icon-box"><i class="bi bi-receipt-cutoff"></i></div>
+                <div>
+                    <div class="card-label">TOTAL INVOICE FU</div>
+                    <div class="card-val"><?php echo number_format($total_count, 0, ',', '.'); ?></div>
+                    <div class="text-secondary fw-semibold" style="font-size: 12px;">Data invoice terdaftar</div>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-6">
-            <div class="inv-stat-card" style="border-top: 4px solid #EF4444;">
-                <div class="text-danger fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">🔴 PERLU FOLLOW UP</div>
-                <div class="fs-3 fw-bold text-danger my-1" style="font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo number_format($perlu_fu_count, 0, ',', '.'); ?></div>
-                <div class="text-muted" style="font-size: 12px;">Perlu segera ditindak</div>
+            <div class="inv-stat-card card-inv-perlu">
+                <div class="icon-box"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <div>
+                    <div class="card-label">PERLU FOLLOW UP</div>
+                    <div class="card-val"><?php echo number_format($perlu_fu_count, 0, ',', '.'); ?></div>
+                    <div class="text-secondary fw-semibold" style="font-size: 12px;">Perlu segera ditindak</div>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-6">
-            <div class="inv-stat-card" style="border-top: 4px solid #10B981;">
-                <div class="text-success fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">🟢 SUDAH FOLLOW UP</div>
-                <div class="fs-3 fw-bold text-success my-1" style="font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo number_format($sudah_fu_count, 0, ',', '.'); ?></div>
-                <div class="text-muted" style="font-size: 12px;">Telah ditindaklanjuti</div>
+            <div class="inv-stat-card card-inv-sudah">
+                <div class="icon-box"><i class="bi bi-patch-check-fill"></i></div>
+                <div>
+                    <div class="card-label">SUDAH FOLLOW UP</div>
+                    <div class="card-val"><?php echo number_format($sudah_fu_count, 0, ',', '.'); ?></div>
+                    <div class="text-secondary fw-semibold" style="font-size: 12px;">Telah ditindaklanjuti</div>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-6">
-            <div class="inv-stat-card" style="border-top: 4px solid #3B82F6;">
-                <div class="text-primary fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">🔵 MENUNGGU FU</div>
-                <div class="fs-3 fw-bold text-primary my-1" style="font-family: 'Plus Jakarta Sans', sans-serif;"><?php echo number_format($menunggu_fu_count, 0, ',', '.'); ?></div>
-                <div class="text-muted" style="font-size: 12px;">Dalam tenggat < 7 hari</div>
+            <div class="inv-stat-card card-inv-menunggu">
+                <div class="icon-box"><i class="bi bi-clock-history"></i></div>
+                <div>
+                    <div class="card-label">MENUNGGU FU</div>
+                    <div class="card-val"><?php echo number_format($menunggu_fu_count, 0, ',', '.'); ?></div>
+                    <div class="text-secondary fw-semibold" style="font-size: 12px;">Dalam tenggat &lt; 7 hari</div>
+                </div>
             </div>
         </div>
     </div>
@@ -316,7 +462,7 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
     <!-- Data Table Card & Complete Filter Suite -->
     <div class="inv-table-card">
         <!-- Enterprise Multi-Filter Bar -->
-        <div class="p-4 border-bottom bg-white">
+        <div class="p-4 border-bottom" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);">
             <div class="row g-3 align-items-center mb-3">
                 <!-- Status Filter Pills -->
                 <div class="col-lg-6 col-12">
@@ -333,7 +479,7 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                 <div class="col-lg-6 col-12">
                     <div class="position-relative">
                         <i class="bi bi-search position-absolute text-muted" style="left: 14px; top: 11px; font-size: 14px;"></i>
-                        <input type="text" id="liveSearchInput" class="form-control ps-5 rounded-pill" placeholder="Cari no. invoice, nama toko, sales rep..." style="font-size: 13.5px; border-color: #CBD5E1;" onkeyup="applyAllFilters()">
+                        <input type="text" id="liveSearchInput" class="form-control ps-5 rounded-pill" placeholder="Cari no. invoice, nama toko, sales rep..." style="font-size: 13.5px; border: 1.5px solid #cbd5e1; height:42px;" onkeyup="applyAllFilters()">
                     </div>
                 </div>
             </div>
@@ -345,7 +491,7 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                     <label class="form-label mb-1 fw-bold text-secondary" style="font-size: 11.5px; text-transform: uppercase;">
                         <i class="bi bi-person-badge-fill text-primary"></i> Sales Rep
                     </label>
-                    <select id="salesFilterSelect" class="form-select rounded-3" style="font-size: 13px; border-color: #CBD5E1;" onchange="applyAllFilters()">
+                    <select id="salesFilterSelect" class="form-select rounded-3 fw-semibold" style="font-size: 13px; border: 1.5px solid #cbd5e1; height:40px;" onchange="applyAllFilters()">
                         <option value="all">-- Semua Sales Representative --</option>
                         <?php foreach ($sales_list as $sl): ?>
                             <option value="<?php echo $sl['id']; ?>"><?php echo htmlspecialchars($sl['nama_lengkap']); ?></option>
@@ -358,7 +504,7 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                     <label class="form-label mb-1 fw-bold text-secondary" style="font-size: 11.5px; text-transform: uppercase;">
                         <i class="bi bi-calendar-event text-primary"></i> Dari Tanggal
                     </label>
-                    <input type="date" id="dateStartInput" class="form-control rounded-3" style="font-size: 13px; border-color: #CBD5E1;" onchange="applyAllFilters()">
+                    <input type="date" id="dateStartInput" class="form-control rounded-3 fw-semibold" style="font-size: 13px; border: 1.5px solid #cbd5e1; height:40px;" onchange="applyAllFilters()">
                 </div>
 
                 <!-- Date Range End Filter -->
@@ -366,12 +512,12 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                     <label class="form-label mb-1 fw-bold text-secondary" style="font-size: 11.5px; text-transform: uppercase;">
                         <i class="bi bi-calendar-event-fill text-primary"></i> Sampai Tanggal
                     </label>
-                    <input type="date" id="dateEndInput" class="form-control rounded-3" style="font-size: 13px; border-color: #CBD5E1;" onchange="applyAllFilters()">
+                    <input type="date" id="dateEndInput" class="form-control rounded-3 fw-semibold" style="font-size: 13px; border: 1.5px solid #cbd5e1; height:40px;" onchange="applyAllFilters()">
                 </div>
 
                 <!-- Quick Presets & Reset Button -->
                 <div class="col-lg-3 col-md-6 col-12 d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-outline-secondary w-100 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-1.5" style="font-size: 13px; height: 38px;" onclick="resetAllFilters()">
+                    <button type="button" class="btn btn-light border border-slate w-100 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-1.5" style="font-size: 13px; height: 40px;" onclick="resetAllFilters()">
                         <i class="bi bi-arrow-counterclockwise"></i> Reset Filter
                     </button>
                 </div>
@@ -379,12 +525,12 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
 
             <!-- Preset Quick Date Bar -->
             <div class="d-flex align-items-center gap-2 mt-2 pt-2 border-top">
-                <span class="text-muted fw-semibold" style="font-size: 11.5px;">Quick Date:</span>
+                <span class="text-muted fw-bold" style="font-size: 11.5px;">Quick Date:</span>
                 <button type="button" class="quick-date-btn" onclick="setQuickDate('today')">Hari Ini</button>
                 <button type="button" class="quick-date-btn" onclick="setQuickDate('this_month')">Bulan Ini</button>
                 <button type="button" class="quick-date-btn" onclick="setQuickDate('last_month')">Bulan Lalu</button>
                 <button type="button" class="quick-date-btn" onclick="setQuickDate('all')">Semua Waktu</button>
-                <span class="ms-auto badge bg-light text-secondary border fw-bold px-3 py-1.5 rounded-pill" style="font-size: 12px;" id="activeFilterResultCount">
+                <span class="ms-auto badge bg-white text-dark border fw-bold px-3 py-1.5 rounded-pill shadow-sm" style="font-size: 12px;" id="activeFilterResultCount">
                     <?php echo $total_count; ?> Data Ditampilkan
                 </span>
             </div>
@@ -392,25 +538,25 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
 
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0;">
+                <thead>
                     <tr>
-                        <th class="py-3 px-4 text-secondary" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                        <th class="py-3 px-4 text-white" style="font-size: 12px; font-weight: 800; text-transform: uppercase;">
                             <?php echo create_sort_link_fu('tgl_invoice', 'Tgl. Invoice', $sort_by, $sort_dir); ?>
                         </th>
-                        <th class="py-3 px-3 text-secondary" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                        <th class="py-3 px-3 text-white" style="font-size: 12px; font-weight: 800; text-transform: uppercase;">
                             <?php echo create_sort_link_fu('no_inv', 'No. Invoice', $sort_by, $sort_dir); ?>
                         </th>
-                        <th class="py-3 px-3 text-secondary" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                        <th class="py-3 px-3 text-white" style="font-size: 12px; font-weight: 800; text-transform: uppercase;">
                             NOMINAL INVOICE (RP)
                         </th>
-                        <th class="py-3 px-3 text-secondary" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                        <th class="py-3 px-3 text-white" style="font-size: 12px; font-weight: 800; text-transform: uppercase;">
                             <?php echo create_sort_link_fu('nama_toko', 'Nama Toko / Klien', $sort_by, $sort_dir); ?>
                         </th>
-                        <th class="py-3 px-3 text-secondary" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                        <th class="py-3 px-3 text-white" style="font-size: 12px; font-weight: 800; text-transform: uppercase;">
                             <?php echo create_sort_link_fu('nama_sales', 'Sales Rep', $sort_by, $sort_dir); ?>
                         </th>
-                        <th class="py-3 px-3 text-secondary" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">STATUS FOLLOW UP</th>
-                        <th class="py-3 px-4 text-secondary text-end" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">AKSI</th>
+                        <th class="py-3 px-3 text-white" style="font-size: 12px; font-weight: 800; text-transform: uppercase;">STATUS FOLLOW UP</th>
+                        <th class="py-3 px-4 text-white text-end" style="font-size: 12px; font-weight: 800; text-transform: uppercase;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody id="invoiceReportTableBody">
@@ -438,26 +584,29 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                                 data-status="<?php echo $calc_status; ?>"
                                 data-sales-id="<?php echo $fu['sales_id']; ?>"
                                 data-date="<?php echo $date_iso; ?>">
-                                <td class="px-4 text-muted" style="font-size: 13px;">
-                                    📅 <?php echo date('d M Y, H:i', $invoice_timestamp); ?>
+                                <td class="px-4 text-nowrap">
+                                    <div class="fw-bold text-dark" style="font-size:13px;"><i class="bi bi-calendar-event text-primary me-1"></i><?php echo date('d M Y', $invoice_timestamp); ?></div>
+                                    <small class="text-muted fw-semibold"><?php echo date('H:i', $invoice_timestamp); ?> WIB</small>
                                 </td>
                                 <td class="px-3">
-                                    <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-2 font-monospace" style="font-size: 13px; font-weight: 700;">
-                                        <?php echo htmlspecialchars($fu['no_inv']); ?>
+                                    <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-2 font-monospace" style="font-size: 12.5px; font-weight: 800; border-color:#cbd5e1 !important;">
+                                        <i class="bi bi-receipt me-1 text-secondary"></i><?php echo htmlspecialchars($fu['no_inv']); ?>
                                     </span>
                                 </td>
                                 <td class="px-3">
-                                    <span class="badge bg-success bg-opacity-10 text-success border border-success font-monospace px-3 py-1.5 rounded-pill" style="font-size: 13px; font-weight: 800;">
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success font-monospace px-3 py-1.5 rounded-pill" style="font-size: 13px; font-weight: 900;">
                                         Rp <?php echo number_format((float)($fu['nominal_invoice'] ?? 0), 0, ',', '.'); ?>
                                     </span>
                                 </td>
                                 <td class="px-3">
-                                    <div class="fw-bold text-dark" style="font-size: 14.5px; font-family: 'Plus Jakarta Sans', sans-serif;">
-                                        <?php echo htmlspecialchars($fu['nama_toko']); ?>
+                                    <div class="fw-bold text-dark" style="font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                                        <i class="bi bi-shop text-primary me-1"></i><?php echo htmlspecialchars($fu['nama_toko']); ?>
                                     </div>
                                 </td>
-                                <td class="px-3 text-secondary" style="font-size: 13.5px; font-weight: 600;">
-                                    👤 <?php echo htmlspecialchars($fu['nama_sales']); ?>
+                                <td class="px-3">
+                                    <span class="badge" style="background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; font-size:12px; font-weight:800; padding:5px 10px; border-radius:8px;">
+                                        <i class="bi bi-person-fill me-1"></i><?php echo htmlspecialchars($fu['nama_sales']); ?>
+                                    </span>
                                 </td>
                                 <td class="px-3">
                                     <span class="badge <?php echo $badge_class; ?> px-3 py-1.5 rounded-pill">
@@ -465,10 +614,10 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                                     </span>
                                 </td>
                                 <td class="px-4 text-end">
-                                    <a href="followup_edit.php?id=<?php echo $fu['id']; ?>&redirect=<?php echo urlencode('invoice_followup_report.php'); ?>" class="btn btn-sm btn-outline-primary rounded-pill me-1" title="Edit Follow Up & Nominal Invoice" style="font-size: 12px; font-weight: 700; padding: 5px 12px;">
+                                    <a href="followup_edit.php?id=<?php echo $fu['id']; ?>&redirect=<?php echo urlencode('invoice_followup_report.php'); ?>" class="btn btn-sm btn-warning text-white fw-bold shadow-sm rounded-pill me-1" title="Edit Follow Up & Nominal Invoice" style="font-size: 12px; padding: 5px 14px; background:#f59e0b; border:1px solid #d97706;">
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </a>
-                                    <a href="followup_view.php?customer_id=<?php echo $fu['customer_id']; ?>" target="_blank" class="btn-detail-fu" title="Lihat Riwayat Follow Up Customer">
+                                    <a href="followup_view.php?customer_id=<?php echo $fu['customer_id']; ?>" target="_blank" class="btn-detail-fu rounded-pill" title="Lihat Riwayat Follow Up Customer">
                                         <i class="bi bi-eye-fill"></i> Detail
                                     </a>
                                 </td>
@@ -476,7 +625,7 @@ function create_sort_link_fu($column_name, $display_text, $current_sort_by, $cur
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" class="text-center py-5 text-muted" style="font-size: 14px;">
+                            <td colspan="7" class="text-center py-5 text-muted" style="font-size: 14px;">
                                 📋 Tidak ada data follow up invoice yang ditemukan.
                             </td>
                         </tr>

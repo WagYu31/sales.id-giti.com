@@ -150,76 +150,175 @@ if ($_SESSION['role'] !== 'sales') {
 
 <style>
 .kandidat-hero {
-    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #2563EB 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e3a8a 100%);
     border-radius: 20px;
-    padding: 32px 36px;
-    margin-bottom: 28px;
+    padding: 28px 34px;
+    margin-bottom: 24px;
     color: #FFFFFF;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 12px 35px -8px rgba(15, 23, 42, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.12);
 }
 
 .kandidat-hero::before {
     content: '';
     position: absolute;
     top: -50px; right: -50px;
-    width: 250px; height: 250px;
+    width: 280px; height: 280px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
 }
 
 .kandidat-hero-title {
-    font-size: 26px;
-    font-weight: 800;
+    font-size: 28px;
+    font-weight: 900;
     margin-bottom: 6px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
     letter-spacing: -0.5px;
+    color: #FFFFFF;
 }
 
 .kandidat-hero-subtitle {
-    font-size: 14px;
-    color: rgba(226, 232, 240, 0.85);
+    font-size: 13.5px;
+    color: #cbd5e1;
     margin: 0;
-    max-width: 600px;
+    max-width: 620px;
+    line-height: 1.5;
 }
 
+/* ── Distinct Tab Pills ── */
 .nav-pills-custom .nav-link {
     border-radius: 12px;
     padding: 10px 22px;
-    font-size: 14px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    color: #475569;
+    font-size: 13.5px;
+    font-weight: 800;
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    color: #334155;
     background: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    transition: all 0.25s ease;
+    border: 2px solid #cbd5e1;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
 .nav-pills-custom .nav-link:hover {
-    color: #2563EB;
-    border-color: #BFDBFE;
-    background: #EFF6FF;
+    color: #1d4ed8;
+    border-color: #93c5fd;
+    background: #eff6ff;
+    transform: translateY(-1px);
 }
 
-.nav-pills-custom .nav-link.active {
-    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+.nav-pills-custom .nav-link.tab-kandidat.active {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
     color: #FFFFFF !important;
-    border-color: #2563EB !important;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4) !important;
+}
+
+.nav-pills-custom .nav-link.tab-potensial.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #FFFFFF !important;
+    border-color: #34d399 !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4) !important;
+}
+
+.nav-pills-custom .nav-link.tab-acc.active {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%) !important;
+    color: #FFFFFF !important;
+    border-color: #a78bfa !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* ── Filter Card ── */
+.kandidat-filter-card {
+    background: #FFFFFF;
+    border: 2px solid #cbd5e1;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px -4px rgba(15, 23, 42, 0.06);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.kandidat-filter-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 16px 24px;
+    border-bottom: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ── Table & Badges ── */
+.kandidat-table-card {
+    background: #FFFFFF;
+    border: 2px solid #cbd5e1;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px -4px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+}
+
+.kandidat-table th {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: #FFFFFF !important;
+    font-size: 11.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 16px 18px !important;
+    border: none !important;
+    border-bottom: 3px solid #3b82f6 !important;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.kandidat-table td {
+    padding: 15px 18px !important;
+    vertical-align: middle;
+    font-size: 13.5px;
+    color: #0f172a;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    transition: background-color 0.15s ease;
+}
+
+.kandidat-table tbody tr:nth-child(even) td {
+    background-color: #fbfcfe;
+}
+
+.kandidat-table tbody tr:hover td {
+    background-color: #eff6ff !important;
 }
 
 .sales-avatar-badge-small {
-    width: 26px; height: 26px;
+    width: 28px; height: 28px;
     border-radius: 8px;
-    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
     color: #FFF;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 900;
     margin-right: 8px;
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3);
+}
+
+.badge-cat-installer { background: #dbeafe; color: #1e40af; border: 1.5px solid #93c5fd; }
+.badge-cat-master { background: #fef3c7; color: #92400e; border: 1.5px solid #fcd34d; }
+.badge-cat-dealer { background: #f3e8ff; color: #6b21a8; border: 1.5px solid #d8b4fe; }
+.badge-cat-user { background: #dcfce7; color: #047857; border: 1.5px solid #86efac; }
+.badge-cat-default { background: #f1f5f9; color: #334155; border: 1.5px solid #cbd5e1; }
+
+.form-check-input.status-checkbox {
+    width: 38px;
+    height: 22px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.form-check-input.status-checkbox:checked {
+    background-color: #2563eb;
+    border-color: #2563eb;
 }
 </style>
 
@@ -242,29 +341,31 @@ if ($_SESSION['role'] !== 'sales') {
 <div class="d-flex align-items-center mb-4">
     <ul class="nav nav-pills nav-pills-custom gap-2">
         <li class="nav-item">
-            <a class="nav-link <?php if ($filter === 'kandidat') echo 'active'; ?>" href="kandidat_customer.php?filter=kandidat">
-                <i class="bi bi-star me-1"></i> Kandidat
+            <a class="nav-link tab-kandidat <?php if ($filter === 'kandidat') echo 'active'; ?>" href="kandidat_customer.php?filter=kandidat">
+                <i class="bi bi-star-fill text-warning me-1.5"></i> Kandidat
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link <?php if ($filter === 'potensial') echo 'active'; ?>" href="kandidat_customer.php?filter=potensial">
-                <i class="bi bi-graph-up-arrow me-1"></i> Potensial
+            <a class="nav-link tab-potensial <?php if ($filter === 'potensial') echo 'active'; ?>" href="kandidat_customer.php?filter=potensial">
+                <i class="bi bi-graph-up-arrow me-1.5"></i> Potensial
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link <?php if ($filter === 'acc_boss') echo 'active'; ?>" href="kandidat_customer.php?filter=acc_boss">
-                <i class="bi bi-shield-check me-1"></i> Acc Boss
+            <a class="nav-link tab-acc <?php if ($filter === 'acc_boss') echo 'active'; ?>" href="kandidat_customer.php?filter=acc_boss">
+                <i class="bi bi-shield-check me-1.5"></i> Acc Boss
             </a>
         </li>
     </ul>
 </div>
 
 <!-- Filter Suite Card -->
-<div class="card mb-4 border-0 shadow-sm" style="border-radius:18px;">
-    <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
-        <h5 class="mb-0 text-dark fw-bold" style="font-size:15px;"><i class="bi bi-funnel-fill text-primary me-1"></i> Filter Data Customer</h5>
+<div class="kandidat-filter-card">
+    <div class="kandidat-filter-header">
+        <h5 class="mb-0 text-dark fw-bold" style="font-size:15px; font-family:'Outfit', sans-serif;"><i class="bi bi-funnel-fill text-primary me-1"></i> Filter Data Customer</h5>
         <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0 || !empty($filter_fu)): ?>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold" style="border-radius:8px;">Filter Aktif</span>
+            <span class="badge bg-primary text-white shadow-sm fw-bold" style="border-radius:8px; padding: 6px 12px; font-size: 11.5px;">
+                <i class="bi bi-check-circle-fill me-1"></i> Filter Aktif
+            </span>
         <?php endif; ?>
     </div>
     <div class="card-body p-4">
@@ -274,18 +375,18 @@ if ($_SESSION['role'] !== 'sales') {
             <div class="row g-3 align-items-end">
                 <!-- Filter Kata Kunci / Search -->
                 <div class="col-lg-3 col-md-6 col-12">
-                    <label for="search" class="form-label fw-bold text-muted mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <label for="search" class="form-label fw-bold text-secondary mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                         <i class="bi bi-search text-primary me-1"></i> Cari Kata Kunci / Toko
                     </label>
-                    <input type="text" name="search" id="search" class="form-control fw-semibold" placeholder="Nama toko, PIC, atau hp..." value="<?php echo htmlspecialchars($search_keyword); ?>" style="border-radius:12px; height:42px;">
+                    <input type="text" name="search" id="search" class="form-control fw-semibold" placeholder="Nama toko, PIC, atau hp..." value="<?php echo htmlspecialchars($search_keyword); ?>" style="border-radius:12px; height:42px; border:1.5px solid #cbd5e1;">
                 </div>
 
                 <!-- Filter Kota -->
                 <div class="col-lg-3 col-md-6 col-12">
-                    <label for="filter_kota" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <label for="filter_kota" class="form-label text-secondary fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                         <i class="bi bi-geo-alt-fill text-danger me-1"></i> Filter Kota
                     </label>
-                    <input type="text" name="filter_kota" id="filter_kota" class="form-control fw-semibold" list="kota_list" placeholder="Pilih atau ketik kota..." value="<?php echo htmlspecialchars($filter_kota); ?>" style="border-radius:12px; height:42px;">
+                    <input type="text" name="filter_kota" id="filter_kota" class="form-control fw-semibold" list="kota_list" placeholder="Pilih atau ketik kota..." value="<?php echo htmlspecialchars($filter_kota); ?>" style="border-radius:12px; height:42px; border:1.5px solid #cbd5e1;">
                     <datalist id="kota_list">
                         <?php foreach ($cities as $city): ?>
                             <option value="<?php echo htmlspecialchars($city); ?>">
@@ -295,10 +396,10 @@ if ($_SESSION['role'] !== 'sales') {
 
                 <!-- Filter Kategori -->
                 <div class="col-lg-2 col-md-6 col-12">
-                    <label for="filter_kategori" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <label for="filter_kategori" class="form-label text-secondary fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                         <i class="bi bi-tags-fill text-primary me-1"></i> Filter Kategori
                     </label>
-                    <select name="filter_kategori" id="filter_kategori" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                    <select name="filter_kategori" id="filter_kategori" class="form-select fw-semibold" style="border-radius:12px; height:42px; border:1.5px solid #cbd5e1;">
                         <option value="">Semua Kategori</option>
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?php echo htmlspecialchars($cat); ?>" <?php if ($filter_kategori === $cat) echo 'selected'; ?>>
@@ -310,10 +411,10 @@ if ($_SESSION['role'] !== 'sales') {
 
                 <!-- Filter Status Follow Up -->
                 <div class="col-lg-2 col-md-6 col-12">
-                    <label for="filter_fu" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <label for="filter_fu" class="form-label text-secondary fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                         <i class="bi bi-telephone-outbound-fill text-success me-1"></i> Status FU
                     </label>
-                    <select name="filter_fu" id="filter_fu" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                    <select name="filter_fu" id="filter_fu" class="form-select fw-semibold" style="border-radius:12px; height:42px; border:1.5px solid #cbd5e1;">
                         <option value="">Semua Status FU</option>
                         <option value="sudah" <?php if ($filter_fu === 'sudah') echo 'selected'; ?>>✅ Sudah FU</option>
                         <option value="belum" <?php if ($filter_fu === 'belum') echo 'selected'; ?>>⏳ Belum FU</option>
@@ -323,10 +424,10 @@ if ($_SESSION['role'] !== 'sales') {
                 <!-- Filter Sales (Superadmin/Adminsales) -->
                 <?php if ($_SESSION['role'] !== 'sales'): ?>
                 <div class="col-lg-2 col-md-6 col-12">
-                    <label for="filter_sales" class="form-label text-muted fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+                    <label for="filter_sales" class="form-label text-secondary fw-bold mb-1" style="font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
                         <i class="bi bi-person-badge-fill text-info me-1"></i> Filter Sales
                     </label>
-                    <select name="filter_sales" id="filter_sales" class="form-select fw-semibold" style="border-radius:12px; height:42px;">
+                    <select name="filter_sales" id="filter_sales" class="form-select fw-semibold" style="border-radius:12px; height:42px; border:1.5px solid #cbd5e1;">
                         <option value="">Semua Sales</option>
                         <?php foreach ($all_sales as $s): ?>
                             <option value="<?php echo $s['id']; ?>" <?php if ($filter_sales === intval($s['id'])) echo 'selected'; ?>>
@@ -339,7 +440,7 @@ if ($_SESSION['role'] !== 'sales') {
 
                 <!-- Action Buttons -->
                 <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-12 col-md-12' : 'col-lg-2 col-md-6'; ?> col-12 d-flex gap-2 justify-content-end">
-                    <button type="submit" class="btn btn-primary fw-extrabold flex-grow-1 shadow-sm d-inline-flex align-items-center justify-content-center gap-1.5" style="height:42px; border-radius:12px; white-space:nowrap; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
+                    <button type="submit" class="btn btn-primary fw-extrabold flex-grow-1 shadow-sm d-inline-flex align-items-center justify-content-center gap-1.5" style="height:42px; border-radius:12px; white-space:nowrap; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); border: 1.5px solid #3b82f6;">
                         <i class="bi bi-funnel-fill"></i> Terapkan Filter
                     </button>
                     <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0 || !empty($filter_fu)): ?>
@@ -355,107 +456,113 @@ if ($_SESSION['role'] !== 'sales') {
 
 <div id="notification" class="alert" style="display:none;"></div>
 
-<div class="card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-dark-header">
-                    <tr>
-                        <th style="width: 25%;">NAMA TOKO</th>
-                        <th style="width: 25%;">PIC & KONTAK</th>
-                        <th style="width: 12%;">KATEGORI</th>
-                        <th style="width: 12%;">KOTA</th>
-                        <th style="width: 14%;">SALES</th>
-                        <th class="text-center" style="width: 4%;">MAPS</th>
+<div class="kandidat-table-card">
+    <div class="table-responsive">
+        <table class="table kandidat-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">NAMA TOKO</th>
+                    <th style="width: 25%;">PIC & KONTAK</th>
+                    <th style="width: 12%;">KATEGORI</th>
+                    <th style="width: 12%;">KOTA</th>
+                    <th style="width: 14%;">SALES</th>
+                    <th class="text-center" style="width: 6%;">MAPS</th>
+                    <?php if ($filter === 'kandidat'): ?>
+                        <th class="text-center" style="width: 8%;">KANDIDAT</th>
+                    <?php endif; ?>
+                    <?php if ($filter !== 'acc_boss'): ?>
+                         <th class="text-center" style="width: 8%;">POTENSIAL</th>
+                    <?php endif; ?>
+                     <?php if ($filter === 'potensial' || $filter === 'acc_boss'): ?>
+                        <th class="text-center" style="width: 8%;">ACC BOSS</th>
+                    <?php endif; ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($customers)): ?>
+                    <?php foreach ($customers as $customer): ?>
+                    <?php 
+                        $catClass = 'badge-cat-default';
+                        $cUpper = strtoupper($customer['kategori'] ?? '');
+                        if (str_contains($cUpper, 'INSTALLER')) $catClass = 'badge-cat-installer';
+                        elseif (str_contains($cUpper, 'MASTER')) $catClass = 'badge-cat-master';
+                        elseif (str_contains($cUpper, 'DEALER')) $catClass = 'badge-cat-dealer';
+                        elseif (str_contains($cUpper, 'USER')) $catClass = 'badge-cat-user';
+                    ?>
+                    <tr id="customer-row-<?php echo $customer['id']; ?>">
+                        <td>
+                            <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" class="fw-bold text-dark text-decoration-none" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:14px;">
+                                <i class="bi bi-shop text-primary me-1.5"></i>
+                                <?php echo htmlspecialchars($customer['nama_toko']); ?>
+                            </a>
+                        </td>
+                        <td>
+                            <?php
+                            $pics = !empty($customer['all_pics']) ? explode('||', $customer['all_pics']) : [];
+                            $phones = !empty($customer['all_phones']) ? explode('||', $customer['all_phones']) : [];
+                            if (!empty($pics)) {
+                                foreach ($pics as $key => $pic_name) {
+                                    $phone_number = $phones[$key] ?? '';
+                                    echo '<div class="small fw-semibold text-dark mb-1"><i class="bi bi-person-fill text-muted me-1"></i>' . htmlspecialchars($pic_name);
+                                    if (!empty($phone_number)) {
+                                        $cleaned_tel = preg_replace('/[^0-9]/', '', $phone_number);
+                                        $wa_number = (substr($cleaned_tel, 0, 1) === '0') ? '62' . substr($cleaned_tel, 1) : $cleaned_tel;
+                                        echo ' <a href="https://wa.me/' . $wa_number . '" target="_blank" class="badge bg-success bg-opacity-10 text-success border border-success fw-bold text-decoration-none ms-1 px-2 py-1" style="border-radius:6px;"><i class="bi bi-whatsapp me-1"></i>' . htmlspecialchars($phone_number) . '</a>';
+                                    }
+                                    echo '</div>';
+                                }
+                            } else { echo '<span class="text-muted small">-</span>'; }
+                            ?>
+                        </td>
+                        <td><span class="badge <?php echo $catClass; ?> fw-bold px-2.5 py-1.5" style="border-radius:8px; font-size:11.5px;"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span></td>
+                        <td class="fw-semibold text-dark" style="font-size:13px;"><i class="bi bi-geo-alt text-muted me-1"></i><?php echo htmlspecialchars($customer['all_cities'] ?? '-'); ?></td>
+                        <td>
+                            <?php if ($customer['nama_sales']): ?>
+                                <div class="d-flex align-items-center">
+                                    <div class="sales-avatar-badge-small">
+                                        <?php echo strtoupper(substr($customer['nama_sales'], 0, 1)); ?>
+                                    </div>
+                                    <span class="fw-bold text-dark" style="font-size:13px;"><?php echo htmlspecialchars($customer['nama_sales']); ?></span>
+                                </div>
+                            <?php else: ?>
+                                <span class="badge bg-warning text-dark fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i>Belum Di-assign</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="text-center">
+                            <?php if (!empty($customer['primary_map_link'])): ?>
+                                <a href="<?php echo htmlspecialchars($customer['primary_map_link']); ?>" target="_blank" class="btn btn-sm btn-success fw-bold shadow-sm" style="background:#10b981; border:1px solid #059669; border-radius:8px; padding:4px 10px;" title="Buka di Google Maps"><i class="bi bi-geo-alt-fill"></i></a>
+                            <?php else: ?>
+                                <button class="btn btn-sm btn-outline-secondary" style="border-radius:8px; padding:4px 10px;" disabled><i class="bi bi-geo-alt"></i></button>
+                            <?php endif; ?>
+                        </td>
                         <?php if ($filter === 'kandidat'): ?>
-                            <th class="text-center" style="width: 8%;">KANDIDAT</th>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-flex justify-content-center"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="kandidat" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['kandidat'] == 'Y') echo 'checked'; ?>></div>
+                        </td>
                         <?php endif; ?>
-                        <?php if ($filter !== 'acc_boss'): ?>
-                             <th class="text-center" style="width: 8%;">POTENSIAL</th>
+                         <?php if ($filter !== 'acc_boss'): ?>
+                         <td class="text-center">
+                            <div class="form-check form-switch d-flex justify-content-center"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="potensial" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['potensial'] == 'Y') echo 'checked'; ?>></div>
+                        </td>
                         <?php endif; ?>
                          <?php if ($filter === 'potensial' || $filter === 'acc_boss'): ?>
-                            <th class="text-center" style="width: 8%;">ACC BOSS</th>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-flex justify-content-center align-items-center">
+                                <input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="acc_boss" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['acc_boss'] == 'Y') echo 'checked'; ?> <?php if (!$is_superadmin) echo 'disabled'; ?>>
+                                <?php if (!empty($customer['acc_boss_note'])): ?>
+                                    <i class="bi bi-info-circle-fill ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo htmlspecialchars($customer['acc_boss_note']); ?>"></i>
+                                <?php endif; ?>
+                            </div>
+                        </td>
                         <?php endif; ?>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($customers)): ?>
-                        <?php foreach ($customers as $customer): ?>
-                        <tr id="customer-row-<?php echo $customer['id']; ?>">
-                            <td>
-                                <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" class="fw-bold text-dark text-decoration-none" style="font-family:'Plus Jakarta Sans', sans-serif;">
-                                    <i class="bi bi-shop text-primary me-1"></i>
-                                    <?php echo htmlspecialchars($customer['nama_toko']); ?>
-                                </a>
-                            </td>
-                            <td>
-                                <?php
-                                $pics = !empty($customer['all_pics']) ? explode('||', $customer['all_pics']) : [];
-                                $phones = !empty($customer['all_phones']) ? explode('||', $customer['all_phones']) : [];
-                                if (!empty($pics)) {
-                                    foreach ($pics as $key => $pic_name) {
-                                        $phone_number = $phones[$key] ?? '';
-                                        echo '<div class="small fw-semibold text-dark"><i class="bi bi-person-fill text-muted me-1"></i>' . htmlspecialchars($pic_name);
-                                        if (!empty($phone_number)) {
-                                            $cleaned_tel = preg_replace('/[^0-9]/', '', $phone_number);
-                                            $wa_number = (substr($cleaned_tel, 0, 1) === '0') ? '62' . substr($cleaned_tel, 1) : $cleaned_tel;
-                                            echo ' <a href="https://wa.me/' . $wa_number . '" target="_blank" class="badge bg-light text-success border text-decoration-none ms-1"><i class="bi bi-whatsapp me-1"></i>' . htmlspecialchars($phone_number) . '</a>';
-                                        }
-                                        echo '</div>';
-                                    }
-                                } else { echo '<span class="text-muted small">-</span>'; }
-                                ?>
-                            </td>
-                            <td><span class="badge bg-light text-dark border fw-semibold"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span></td>
-                            <td class="small fw-semibold text-muted"><?php echo htmlspecialchars($customer['all_cities'] ?? '-'); ?></td>
-                            <td>
-                                <?php if ($customer['nama_sales']): ?>
-                                    <div class="d-flex align-items-center">
-                                        <div class="sales-avatar-badge-small">
-                                            <?php echo strtoupper(substr($customer['nama_sales'], 0, 1)); ?>
-                                        </div>
-                                        <span class="fw-semibold text-dark" style="font-size:12.5px;"><?php echo htmlspecialchars($customer['nama_sales']); ?></span>
-                                    </div>
-                                <?php else: ?>
-                                    <span class="badge bg-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>Belum Di-assign</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-center">
-                                <?php if (!empty($customer['primary_map_link'])): ?>
-                                    <a href="<?php echo htmlspecialchars($customer['primary_map_link']); ?>" target="_blank" class="btn btn-sm btn-outline-success" title="Buka di Google Maps"><i class="bi bi-geo-alt-fill"></i></a>
-                                <?php else: ?>
-                                    <button class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-geo-alt"></i></button>
-                                <?php endif; ?>
-                            </td>
-                            <?php if ($filter === 'kandidat'): ?>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-flex justify-content-center"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="kandidat" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['kandidat'] == 'Y') echo 'checked'; ?>></div>
-                            </td>
-                            <?php endif; ?>
-                             <?php if ($filter !== 'acc_boss'): ?>
-                             <td class="text-center">
-                                <div class="form-check form-switch d-flex justify-content-center"><input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="potensial" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['potensial'] == 'Y') echo 'checked'; ?>></div>
-                            </td>
-                            <?php endif; ?>
-                             <?php if ($filter === 'potensial' || $filter === 'acc_boss'): ?>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-flex justify-content-center align-items-center">
-                                    <input class="form-check-input status-checkbox" type="checkbox" role="switch" data-type="acc_boss" data-customer-id="<?php echo $customer['id']; ?>" <?php if ($customer['acc_boss'] == 'Y') echo 'checked'; ?> <?php if (!$is_superadmin) echo 'disabled'; ?>>
-                                    <?php if (!empty($customer['acc_boss_note'])): ?>
-                                        <i class="bi bi-info-circle-fill ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo htmlspecialchars($customer['acc_boss_note']); ?>"></i>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                            <?php endif; ?>
-                        </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr><td colspan="8" class="text-center p-5 text-muted">Tidak ada data customer yang cocok dengan filter ini.</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr><td colspan="8" class="text-center p-5 text-muted fw-bold">Tidak ada data customer yang cocok dengan filter ini.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+</div>
 </div>
 
 <?php require_once 'includes/footer.php'; ?>
