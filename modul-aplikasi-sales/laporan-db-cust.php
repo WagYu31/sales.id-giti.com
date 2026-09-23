@@ -5,10 +5,10 @@
  */
 
 // Filter variables
-$filterSales = isset($_GET['id_sales']) ? intval($_GET['id_sales']) : 0;
-$filterBulan = isset($_GET['bulan']) ? trim($_GET['bulan']) : date("Y-m");
+$filterSales   = isset($_GET['id_sales']) ? intval($_GET['id_sales']) : 0;
+$filterBulan   = isset($_GET['bulan']) ? trim($_GET['bulan']) : date("Y-m");
 $filterTanggal = isset($_GET['tanggal']) ? trim($_GET['tanggal']) : '';
-$filterStatus = isset($_GET['status']) ? trim(strtolower($_GET['status'])) : '';
+$filterStatus  = isset($_GET['status']) ? trim(strtolower($_GET['status'])) : '';
 
 if (!empty($filterTanggal)) {
     $current_date = $filterTanggal;
@@ -19,7 +19,7 @@ if (!empty($filterTanggal)) {
 }
 
 // Fetch sales list for dropdown
-$resSalesList = mysqli_query($conn, "SELECT id, COALESCE(nama_lengkap, nama) AS nama_sales FROM sales WHERE deleted_at IS NULL ORDER BY COALESCE(nama_lengkap, nama) ASC");
+$resSalesList = mysqli_query($conn, "SELECT id, nama FROM sales WHERE deleted_at IS NULL ORDER BY nama ASC");
 $salesOptions = [];
 if ($resSalesList) {
     while ($rS = mysqli_fetch_assoc($resSalesList)) {
@@ -87,12 +87,10 @@ if (!empty($filterStatus)) {
 
 $whereSql = implode(" AND ", $whereClauses);
 
-$sql = "SELECT ks.id, ks.id AS kode_transaksi, ks.jadwal AS tgl_visits, 
-               sc.nama AS nama_cust, sc.id AS id_cust, sc.alamat AS alamat_cust, 
-               COALESCE(w.nama, sc.kota, '') AS wilayah_cust
+$sql = "SELECT ks.id, ks.id AS kode_transaksi, ks.jadwal AS tgl_visits, ks.status AS status_kegiatan,
+               sc.nama AS nama_cust, sc.id AS id_cust, sc.alamat AS alamat_cust, sc.kota AS kota_cust
         FROM kegiatan_sales ks
         INNER JOIN sales_customer sc ON ks.id_customer = sc.id
-        LEFT JOIN wilayah w ON sc.id_wilayah = w.id
         WHERE $whereSql
         ORDER BY ks.jadwal DESC";
 
@@ -382,7 +380,7 @@ $result = mysqli_query($conn, $sql);
                         <option value="0">-- Semua Sales Agent --</option>
                         <?php foreach ($salesOptions as $opt) : ?>
                             <option value="<?= $opt['id']; ?>" <?= ($filterSales == $opt['id']) ? 'selected' : ''; ?>>
-                                <?= htmlspecialchars($opt['nama_sales']); ?>
+                                <?= htmlspecialchars($opt['nama']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -465,15 +463,15 @@ $result = mysqli_query($conn, $sql);
         if ($result && mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $kegiatanId = $row['id'];
-                $idC = $row['id_cust'];
-                $namaC = $row['nama_cust'];
-                $alamatC = $row['alamat_cust'] ?? '';
-                $wilayahC = $row['wilayah_cust'] ?? '';
+                $idC        = $row['id_cust'];
+                $namaC      = $row['nama_cust'];
+                $alamatC    = $row['alamat_cust'] ?? '';
+                $kotaC      = $row['kota_cust'] ?? '';
                 $totalRenderedCards++;
 
                 // Ambil tim & pelaksanaan kegiatan ini
                 $sqlLapTek = "SELECT tks.*, 
-                                     COALESCE(s.nama_lengkap, s.nama, tks.nama_sales, 'Sales') AS nama_sales, 
+                                     COALESCE(s.nama, tks.nama_sales, 'Sales') AS nama_sales, 
                                      tks.id_sales,
                                      IFNULL(ps.status, ks.status) AS status,
                                      ps.ci_at AS tgl_mulai, 
@@ -502,10 +500,9 @@ $result = mysqli_query($conn, $sql);
                 }
                 $resLapTek = mysqli_query($conn, $sqlLapTek);
                 $activityCount = ($resLapTek) ? mysqli_num_rows($resLapTek) : 0;
-                if ($activityCount === 0) continue;
         ?>
             <!-- Customer Card -->
-            <div class="customer-report-card" data-customer-name="<?= strtolower(htmlspecialchars($namaC)); ?>" data-customer-address="<?= strtolower(htmlspecialchars($alamatC . ' ' . $wilayahC)); ?>">
+            <div class="customer-report-card" data-customer-name="<?= strtolower(htmlspecialchars($namaC)); ?>" data-customer-address="<?= strtolower(htmlspecialchars($alamatC . ' ' . $kotaC)); ?>">
                 <!-- Card Header -->
                 <div class="customer-card-header">
                     <div class="d-flex align-items-center gap-2.5">
@@ -517,9 +514,9 @@ $result = mysqli_query($conn, $sql);
                                 <h6 class="mb-0 text-dark fw-bold" style="font-family:'Outfit',sans-serif; font-size: 15.5px; letter-spacing: -0.01em;">
                                     <?= htmlspecialchars($namaC); ?>
                                 </h6>
-                                <?php if (!empty($wilayahC)): ?>
+                                <?php if (!empty($kotaC)): ?>
                                     <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5 font-monospace" style="font-size: 10px;">
-                                        <i class="fa-solid fa-location-dot text-danger me-1"></i><?= htmlspecialchars($wilayahC); ?>
+                                        <i class="fa-solid fa-location-dot text-danger me-1"></i><?= htmlspecialchars($kotaC); ?>
                                     </span>
                                 <?php endif; ?>
                             </div>
@@ -533,7 +530,7 @@ $result = mysqli_query($conn, $sql);
 
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1" style="font-size: 11px; font-weight: 600;">
-                            <?= $activityCount; ?> Penugasan
+                            <?= max(1, $activityCount); ?> Penugasan
                         </span>
                     </div>
                 </div>
@@ -551,32 +548,33 @@ $result = mysqli_query($conn, $sql);
                 <!-- Activities List -->
                 <div class="p-0">
                     <?php
-                    while ($rowLT = mysqli_fetch_assoc($resLapTek)) {
-                        $idT = $rowLT["id_sales"];
-                        $namaSalesItem = $rowLT["nama_sales"];
-                        $initials = strtoupper(substr($namaSalesItem, 0, 2));
-                        $colorIdx = abs(crc32($namaSalesItem)) % count($avatarColors);
-                        $avatarBg = $avatarColors[$colorIdx];
+                    if ($resLapTek && mysqli_num_rows($resLapTek) > 0) {
+                        while ($rowLT = mysqli_fetch_assoc($resLapTek)) {
+                            $idT = $rowLT["id_sales"];
+                            $namaSalesItem = $rowLT["nama_sales"];
+                            $initials = strtoupper(substr($namaSalesItem, 0, 2));
+                            $colorIdx = abs(crc32($namaSalesItem)) % count($avatarColors);
+                            $avatarBg = $avatarColors[$colorIdx];
 
-                        $hslVisits = trim($rowLT['hasil_visits'] ?? '');
-                        $datetime = $rowLT["tgl_visits"];
-                        $formattedDate = ($datetime && $datetime != '0000-00-00 00:00:00') ? date("d M Y", strtotime($datetime)) : '-';
-                        $formattedTime = ($datetime && $datetime != '0000-00-00 00:00:00') ? date("H:i", strtotime($datetime)) : '-';
+                            $hslVisits = trim($rowLT['hasil_visits'] ?? '');
+                            $datetime = $rowLT["tgl_visits"];
+                            $formattedDate = ($datetime && $datetime != '0000-00-00 00:00:00') ? date("d M Y", strtotime($datetime)) : '-';
+                            $formattedTime = ($datetime && $datetime != '0000-00-00 00:00:00') ? date("H:i", strtotime($datetime)) : '-';
 
-                        $tglMulai = $rowLT["tgl_mulai"];
-                        $formattedTimeMli = ($tglMulai && $tglMulai != '0000-00-00 00:00:00') ? date("H:i", strtotime($tglMulai)) : null;
+                            $tglMulai = $rowLT["tgl_mulai"];
+                            $formattedTimeMli = ($tglMulai && $tglMulai != '0000-00-00 00:00:00') ? date("H:i", strtotime($tglMulai)) : null;
 
-                        $tglSelesai = $rowLT["tgl_selesai"];
-                        $formattedTimeSls = ($tglSelesai && $tglSelesai != '0000-00-00 00:00:00') ? date("H:i", strtotime($tglSelesai)) : null;
+                            $tglSelesai = $rowLT["tgl_selesai"];
+                            $formattedTimeSls = ($tglSelesai && $tglSelesai != '0000-00-00 00:00:00') ? date("H:i", strtotime($tglSelesai)) : null;
 
-                        $rawStatus = strtolower($rowLT['status'] ?? 'dijadwalkan');
-                        if ($rawStatus === 'proses' || $rawStatus === 'berjalan') {
-                            $status = 'berjalan';
-                        } elseif ($rawStatus === 'selesai') {
-                            $status = 'selesai';
-                        } else {
-                            $status = 'dijadwalkan';
-                        }
+                            $rawStatus = strtolower($rowLT['status'] ?? 'dijadwalkan');
+                            if ($rawStatus === 'proses' || $rawStatus === 'berjalan') {
+                                $status = 'berjalan';
+                            } elseif ($rawStatus === 'selesai') {
+                                $status = 'selesai';
+                            } else {
+                                $status = 'dijadwalkan';
+                            }
                     ?>
                         <div class="report-item-row row gx-3 align-items-center m-0">
                             <!-- 1. Status & ID -->
@@ -692,6 +690,42 @@ $result = mysqli_query($conn, $sql);
                                 </div>
                             </div>
                         </div>
+                    <?php
+                        }
+                    } else {
+                        // Fallback row jika team belum terdaftar
+                        $datetimeFallback = $row["tgl_visits"];
+                        $formattedDateFb = ($datetimeFallback && $datetimeFallback != '0000-00-00 00:00:00') ? date("d M Y", strtotime($datetimeFallback)) : '-';
+                        $formattedTimeFb = ($datetimeFallback && $datetimeFallback != '0000-00-00 00:00:00') ? date("H:i", strtotime($datetimeFallback)) : '-';
+                    ?>
+                        <div class="report-item-row row gx-3 align-items-center m-0">
+                            <div class="col-12 col-lg-2 mb-2 mb-lg-0">
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2.5 py-1 fw-bold" style="font-size: 11px;">
+                                    <i class="fa-regular fa-clock me-1"></i> Dijadwalkan
+                                </span>
+                                <span class="badge bg-light text-primary border font-monospace px-2 py-1 ms-1" style="font-size: 11px;">
+                                    #<?= $row['kode_transaksi']; ?>
+                                </span>
+                            </div>
+                            <div class="col-12 col-lg-2 mb-2 mb-lg-0">
+                                <span class="text-muted small">Sales belum ditugaskan</span>
+                            </div>
+                            <div class="col-6 col-lg-2 mb-2 mb-lg-0">
+                                <span class="text-dark fw-semibold" style="font-size: 12.5px;"><?= $formattedDateFb; ?></span>
+                                <span class="text-muted ms-1 small"><?= $formattedTimeFb; ?> WIB</span>
+                            </div>
+                            <div class="col-6 col-lg-2 mb-2 mb-lg-0">
+                                <span class="text-muted small">—</span>
+                            </div>
+                            <div class="col-12 col-lg-3 mb-2 mb-lg-0">
+                                <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 11px;">Menunggu Penugasan</span>
+                            </div>
+                            <div class="col-12 col-lg-1 text-lg-end mt-2 mt-lg-0">
+                                <button type="button" class="action-btn-modern action-btn-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="0" data-kode="<?= $row['kode_transaksi']; ?>" title="Lihat Rincian">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
                     <?php } ?>
                 </div>
             </div>
@@ -783,7 +817,7 @@ $result = mysqli_query($conn, $sql);
                             if ($filterSales > 0) {
                                 foreach ($salesOptions as $opt) {
                                     if ($opt['id'] == $filterSales) {
-                                        $selectedSalesName = $opt['nama_sales'];
+                                        $selectedSalesName = $opt['nama'];
                                         break;
                                     }
                                 }
