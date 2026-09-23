@@ -6,7 +6,7 @@ include_once __DIR__ . "/conn.php";
 include_once __DIR__ . "/session.php";
 include_once __DIR__ . "/get-user-data.php";
 
-$pageNow = "Laporan";
+$pageNow = "Laporan Visit (GPS)";
 $currentPage = "Today";
 $role = $_SESSION['role'] ?? 'sales';
 ?>
@@ -16,7 +16,7 @@ $role = $_SESSION['role'] ?? 'sales';
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Laporan Kunjungan Sales — Loewix Sales</title>
+  <title>Laporan Visit (GPS) — Loewix Sales</title>
   <?php include __DIR__ . "/head.php"; ?>
   
   <style>
