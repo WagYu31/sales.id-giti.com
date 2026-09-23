@@ -704,7 +704,7 @@ foreach ($allModules as $mod) {
                                 <tr>
                                     <th>Nama Pengguna</th>
                                     <th>Email</th>
-                                    <th>No. WhatsApp</th>
+                                    <th>Terdaftar Sejak</th>
                                     <th>Role Saat Ini</th>
                                 </tr>
                             </thead>
@@ -936,26 +936,30 @@ function showRoleUsersModal(role, roleLabel) {
                 tr.innerHTML = `
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width:32px;height:32px;font-size:11px;">
+                            <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width:34px;height:34px;font-size:11px;flex-shrink:0;">
                                 ${u.nama ? u.nama.substring(0, 2).toUpperCase() : 'US'}
                             </div>
-                            <span class="fw-bold text-dark">${u.nama || '-'}</span>
+                            <div>
+                                <div class="fw-bold text-dark">${u.nama || '-'}</div>
+                                <small class="text-muted font-monospace" style="font-size:10px;">ID: #${u.id}</small>
+                            </div>
                         </div>
                     </td>
-                    <td><span class="text-muted">${u.email || '-'}</span></td>
-                    <td><span class="text-success fw-semibold"><i class="bi bi-whatsapp me-1"></i>${u.no_hp || '-'}</span></td>
-                    <td><span class="badge bg-light text-dark border">${u.role || '-'}</span></td>
+                    <td><span class="text-muted"><i class="bi bi-envelope me-1"></i>${u.email || '-'}</span></td>
+                    <td><span class="text-secondary small"><i class="bi bi-calendar-event me-1"></i>${u.created_at || '-'}</span></td>
+                    <td><span class="badge bg-light text-dark border px-2.5 py-1.5 fw-bold text-uppercase" style="font-size:10.5px;">${u.role || '-'}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
         } else {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">Belum ada pengguna dengan role ini.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">Belum ada pengguna yang terdaftar dengan role ini.</td></tr>`;
         }
     })
-    .catch(() => {
+    .catch((err) => {
+        console.error("Error loading users:", err);
         document.getElementById('roleUsersLoading').style.display = 'none';
         document.getElementById('roleUsersContent').style.display = 'block';
-        document.getElementById('roleUsersTbody').innerHTML = `<tr><td colspan="4" class="text-center text-danger">Gagal memuat data pengguna.</td></tr>`;
+        document.getElementById('roleUsersTbody').innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle me-1"></i> Gagal memuat data pengguna.</td></tr>`;
     });
 }
 </script>

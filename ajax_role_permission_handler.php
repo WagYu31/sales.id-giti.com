@@ -209,7 +209,23 @@ switch ($action) {
             exit();
         }
 
-        $stmt = $conn->prepare("SELECT id, nama_lengkap, email, no_hp, role, foto FROM sales WHERE (LOWER(role) = ? OR role = ?) AND deleted_at IS NULL ORDER BY nama_lengkap ASC");
+        // Cek kolom yang tersedia di tabel sales
+        $hasHp = false;
+        $hasFoto = false;
+        $chkHp = $conn->query("SHOW COLUMNS FROM sales LIKE 'no_hp'");
+        if ($chkHp && $chkHp->num_rows > 0) $hasHp = true;
+        $chkFoto = $conn->query("SHOW COLUMNS FROM sales LIKE 'foto'");
+        if ($chkFoto && $chkFoto->num_rows > 0) $hasFoto = true;
+
+        $selectFields = "id, nama_lengkap, email, role, created_at";
+        if ($hasHp) $selectFields .= ", no_hp";
+        if ($hasFoto) $selectFields .= ", foto";
+
+        $stmt = $conn->prepare("SELECT $selectFields FROM sales WHERE (LOWER(role) = ? OR role = ?) AND deleted_at IS NULL ORDER BY nama_lengkap ASC");
+        if (!$stmt) {
+            echo json_encode(['success' => false, 'message' => 'Database query error: ' . $conn->error]);
+            exit();
+        }
         $stmt->bind_param("ss", $roleName, $roleName);
         $stmt->execute();
         $res = $stmt->get_result();
@@ -218,11 +234,11 @@ switch ($action) {
         while ($row = $res->fetch_assoc()) {
             $users[] = [
                 'id' => $row['id'],
-                'nama' => $row['nama_lengkap'],
-                'email' => $row['email'],
-                'no_hp' => $row['no_hp'],
-                'role' => $row['role'],
-                'foto' => $row['foto']
+                'nama' => $row['nama_lengkap'] ?? '',
+                'email' => $row['email'] ?? '',
+                'no_hp' => $row['no_hp'] ?? '-',
+                'role' => $row['role'] ?? '',
+                'created_at' => !empty($row['created_at']) ? date('d M Y', strtotime($row['created_at'])) : '-'
             ];
         }
         $stmt->close();
