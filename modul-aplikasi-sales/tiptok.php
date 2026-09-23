@@ -146,9 +146,26 @@ $claimProgress = min(100, round(($unclaimedUnits / $claimTarget) * 100, 1));
 $isClaimEligible = ($unclaimedUnits >= $claimTarget);
 $sisaTarget = max(0, $claimTarget - $unclaimedUnits);
 
-// Query Data Master Penitipan
-$sqlPenitipan = "SELECT p.*, c.nama AS nama_toko, c.kategori AS kategori_customer, c.telp_pribadi AS telp_toko, 
-                        c.alamat AS alamat_toko, c.kota AS kota_toko, c.alamat_lokasi,
+// Query Data Master Penitipan (Dukungan database ganda: sales_customer & customers)
+$hasSalesCustomer = false;
+$chkSC = $conn->query("SHOW TABLES LIKE 'sales_customer'");
+if ($chkSC && $chkSC->num_rows > 0) {
+    $hasSalesCustomer = true;
+}
+
+if ($hasSalesCustomer) {
+    $custJoin = "LEFT JOIN sales_customer c ON p.id_customer = c.id";
+    $custSelect = "c.nama AS nama_toko, c.kategori AS kategori_customer, c.telp_pribadi AS telp_toko, c.alamat AS alamat_toko, c.kota AS kota_toko, c.alamat_lokasi";
+} else {
+    $custJoin = "LEFT JOIN customers c ON p.id_customer = c.id";
+    $custSelect = "c.nama_toko AS nama_toko, c.kategori AS kategori_customer, 
+                  (SELECT tlp_pic FROM customer_pics WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS telp_toko, 
+                  (SELECT alamat FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_toko, 
+                  (SELECT kota FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS kota_toko, 
+                  (SELECT link_google_map FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_lokasi";
+}
+
+$sqlPenitipan = "SELECT p.*, $custSelect,
                         COUNT(i.id) AS total_jenis_barang,
                         SUM(i.qty_titip) AS sum_titip,
                         SUM(i.qty_sisa) AS sum_sisa,
@@ -157,7 +174,7 @@ $sqlPenitipan = "SELECT p.*, c.nama AS nama_toko, c.kategori AS kategori_custome
                         (SELECT k.no_inv FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id AND k.no_inv IS NOT NULL AND k.no_inv != '' ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_no_inv,
                         (SELECT k.tgl_kunjungan FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_kunjungan
                  FROM tiptok_penitipan p 
-                 LEFT JOIN sales_customer c ON p.id_customer = c.id 
+                 $custJoin 
                  LEFT JOIN tiptok_items i ON p.id = i.id_penitipan 
                  WHERE 1=1 $filterSales 
                  GROUP BY p.id 
@@ -1033,17 +1050,22 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                         <td style="text-align: right;">
                                             <div class="d-inline-flex gap-1.5 align-items-center">
                                                 <?php if ($statusPen === 'aktif' && $sumSisa > 0) : ?>
-                                                    <button class="btn-table-primary" onclick="openModalLaporKunjungan(<?php echo $idPen; ?>)" title="Lapor Kunjungan / Cek Stok Sisa">
+                                                    <button type="button" class="btn-table-primary" onclick="openModalLaporKunjungan(<?php echo $idPen; ?>)" title="Lapor Kunjungan / Cek Stok Sisa">
                                                         <i class="fa-solid fa-check"></i> Cek Sisa
                                                     </button>
                                                 <?php endif; ?>
-                                                <button class="btn-table-secondary" onclick="openModalDetailTiptok(<?php echo $idPen; ?>)" title="Lihat Riwayat Lengkap">
+                                                <button type="button" class="btn-table-secondary" onclick="openModalDetailTiptok(<?php echo $idPen; ?>)" title="Lihat Riwayat Lengkap">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </button>
-                                                <button class="btn-table-warning" onclick="openModalEditPenitipan(<?php echo $idPen; ?>)" title="Edit Data Penitipan">
+                                                <button type="button" class="btn-table-warning" onclick="openModalEditPenitipan(<?php echo $idPen; ?>)" title="Edit Data Penitipan">
                                                     <i class="fa-solid fa-pen-to-square"></i>
                                                 </button>
-                                                <button class="btn-table-danger" onclick="hapusPenitipan(<?php echo $idPen; ?>, '<?php echo htmlspecialchars($row['kode_titip']); ?>', '<?php echo htmlspecialchars(addslashes($row['nama_toko'] ?? '')); ?>')" title="Hapus Penitipan">
+                                                <button type="button" class="btn-table-danger" 
+                                                        data-id="<?php echo $idPen; ?>" 
+                                                        data-kode="<?php echo htmlspecialchars($row['kode_titip'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" 
+                                                        data-toko="<?php echo htmlspecialchars($row['nama_toko'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" 
+                                                        onclick="hapusPenitipanFromBtn(this)" 
+                                                        title="Hapus Penitipan">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </div>
@@ -1585,12 +1607,47 @@ $resPenitipan = $conn->query($sqlPenitipan);
         </div>
     </div>
 
+    <!-- Include Core JS Libraries (jQuery, Bootstrap 5 Bundle, DataTables, Select2) -->
+    <?php include "js-include.php"; ?>
+
     <!-- JavaScript & Logic -->
     <script>
         let dealersList = [];
         let currentLoadedPenitipan = null;
         let currentClaimId = 0;
         let editItemRowIndex = 0;
+
+        function escapeHtml(text) {
+            if (!text && text !== 0) return '';
+            return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function getBootstrapModal(modalId) {
+            const el = document.getElementById(modalId);
+            if (!el) return null;
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                return bootstrap.Modal.getOrCreateInstance(el);
+            }
+            return null;
+        }
+
+        function showModalSafe(modalId) {
+            const m = getBootstrapModal(modalId);
+            if (m) {
+                m.show();
+            } else if (typeof $ !== 'undefined' && $(document.getElementById(modalId)).modal) {
+                $(document.getElementById(modalId)).modal('show');
+            }
+        }
+
+        function hideModalSafe(modalId) {
+            const m = getBootstrapModal(modalId);
+            if (m) {
+                m.hide();
+            } else if (typeof $ !== 'undefined' && $(document.getElementById(modalId)).modal) {
+                $(document.getElementById(modalId)).modal('hide');
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             updateBadgeCounts();
@@ -1599,10 +1656,14 @@ $resPenitipan = $conn->query($sqlPenitipan);
         });
 
         function updateBadgeCounts() {
-            document.getElementById('badgeCountAll').textContent = '<?php echo $countAll; ?>';
-            document.getElementById('badgeCountAktif').textContent = '<?php echo $countAktif; ?>';
-            document.getElementById('badgeCountTerjual').textContent = '<?php echo $countTerjual; ?>';
-            document.getElementById('badgeCountSelesai').textContent = '<?php echo $countSelesai; ?>';
+            const bAll = document.getElementById('badgeCountAll');
+            const bAktif = document.getElementById('badgeCountAktif');
+            const bTerjual = document.getElementById('badgeCountTerjual');
+            const bSelesai = document.getElementById('badgeCountSelesai');
+            if (bAll) bAll.textContent = '<?php echo $countAll; ?>';
+            if (bAktif) bAktif.textContent = '<?php echo $countAktif; ?>';
+            if (bTerjual) bTerjual.textContent = '<?php echo $countTerjual; ?>';
+            if (bSelesai) bSelesai.textContent = '<?php echo $countSelesai; ?>';
         }
 
         function filterTable(category, btn) {
@@ -1621,7 +1682,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
         }
 
         function searchTiptokTable() {
-            const query = document.getElementById('tiptokSearchInput').value.toLowerCase();
+            const query = (document.getElementById('tiptokSearchInput')?.value || '').toLowerCase();
             const rows = document.querySelectorAll('#mainTiptokTable tbody tr.tiptok-row');
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
@@ -1630,14 +1691,18 @@ $resPenitipan = $conn->query($sqlPenitipan);
         }
 
         function switchViewToClaims() {
-            document.getElementById('viewPenitipanTable').classList.add('d-none');
-            document.getElementById('viewKlaimInsentif').classList.remove('d-none');
+            const vTable = document.getElementById('viewPenitipanTable');
+            const vClaim = document.getElementById('viewKlaimInsentif');
+            if (vTable) vTable.classList.add('d-none');
+            if (vClaim) vClaim.classList.remove('d-none');
             loadClaimSummary();
         }
 
         function switchViewToTable() {
-            document.getElementById('viewKlaimInsentif').classList.add('d-none');
-            document.getElementById('viewPenitipanTable').classList.remove('d-none');
+            const vTable = document.getElementById('viewPenitipanTable');
+            const vClaim = document.getElementById('viewKlaimInsentif');
+            if (vClaim) vClaim.classList.add('d-none');
+            if (vTable) vTable.classList.remove('d-none');
         }
 
         function openTabKlaimInsentif() {
@@ -1648,29 +1713,34 @@ $resPenitipan = $conn->query($sqlPenitipan);
             fetch('tiptok-ajax.php?action=search_dealer')
                 .then(r => r.json())
                 .then(res => {
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success' && Array.isArray(res.data)) {
                         dealersList = res.data;
                         const sel = document.getElementById('selectDealer');
-                        sel.innerHTML = '<option value="">-- Pilih Toko Customer / Dealer --</option>';
-                        dealersList.forEach(d => {
-                            const katBadge = d.kategori ? `[${d.kategori}] ` : '';
-                            sel.innerHTML += `<option value="${d.id}">${katBadge}${d.nama} - ${d.kota || ''}</option>`;
-                        });
+                        if (sel) {
+                            sel.innerHTML = '<option value="">-- Pilih Toko Customer / Dealer --</option>';
+                            dealersList.forEach(d => {
+                                const katBadge = d.kategori ? `[${d.kategori}] ` : '';
+                                sel.innerHTML += `<option value="${d.id}">${katBadge}${escapeHtml(d.nama)} - ${escapeHtml(d.kota || '')}</option>`;
+                            });
+                        }
                     }
-                });
+                })
+                .catch(err => console.error('Error loading dealers:', err));
         }
 
         function onDealerSelected() {
-            const id = document.getElementById('selectDealer').value;
+            const selEl = document.getElementById('selectDealer');
+            if (!selEl) return;
+            const id = selEl.value;
             const dealer = dealersList.find(d => d.id == id);
             const prev = document.getElementById('dealerPreview');
-            if (dealer) {
-                document.getElementById('prevNamaToko').textContent = dealer.nama;
+            if (dealer && prev) {
+                document.getElementById('prevNamaToko').textContent = dealer.nama || '-';
                 document.getElementById('prevKategoriToko').textContent = dealer.kategori || 'Dealer';
                 document.getElementById('prevAlamatToko').textContent = (dealer.alamat || '') + (dealer.kota ? ', ' + dealer.kota : '');
                 document.getElementById('prevTelpToko').textContent = dealer.telp_pribadi ? 'WA / Telp: ' + dealer.telp_pribadi : '';
                 prev.classList.remove('d-none');
-            } else {
+            } else if (prev) {
                 prev.classList.add('d-none');
             }
         }
@@ -1679,6 +1749,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
         function tambahBarisBarang() {
             itemRowIndex++;
             const container = document.getElementById('containerItemRows');
+            if (!container) return;
             const rowHtml = `
                 <div class="p-3 mb-2 rounded-3 bg-light border" id="itemRow_${itemRowIndex}" style="border: 2px solid #cbd5e1 !important;">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -1716,12 +1787,15 @@ $resPenitipan = $conn->query($sqlPenitipan);
         }
 
         function openModalTambahPenitipan() {
-            document.getElementById('formTambahPenitipan').reset();
-            document.getElementById('dealerPreview').classList.add('d-none');
-            document.getElementById('containerItemRows').innerHTML = '';
+            const form = document.getElementById('formTambahPenitipan');
+            if (form) form.reset();
+            const prev = document.getElementById('dealerPreview');
+            if (prev) prev.classList.add('d-none');
+            const container = document.getElementById('containerItemRows');
+            if (container) container.innerHTML = '';
             itemRowIndex = 0;
             tambahBarisBarang();
-            new bootstrap.Modal(document.getElementById('modalTambahPenitipan')).show();
+            showModalSafe('modalTambahPenitipan');
         }
 
         function submitTambahPenitipan(e) {
@@ -1731,16 +1805,20 @@ $resPenitipan = $conn->query($sqlPenitipan);
             formData.append('action', 'simpan_penitipan');
 
             const btn = document.getElementById('btnSimpanPenitipan');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan...';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan...';
+            }
 
             fetch('tiptok-ajax.php', { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(res => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Penitipan';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Penitipan';
+                    }
 
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil!',
@@ -1749,13 +1827,16 @@ $resPenitipan = $conn->query($sqlPenitipan);
                             showConfirmButton: false
                         }).then(() => location.reload());
                     } else {
-                        Swal.fire({ icon: 'error', title: 'Gagal', html: res.message });
+                        Swal.fire({ icon: 'error', title: 'Gagal', html: (res && res.message) ? res.message : 'Gagal menyimpan data.' });
                     }
                 })
-                .catch(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Penitipan';
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
+                .catch(err => {
+                    console.error(err);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Penitipan';
+                    }
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan saat menyimpan penitipan.' });
                 });
         }
 
@@ -1767,89 +1848,98 @@ $resPenitipan = $conn->query($sqlPenitipan);
             const container = document.getElementById('editContainerItemRows');
             container.innerHTML = '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-dark"></div> Memuat data...</div>';
             
-            new bootstrap.Modal(document.getElementById('modalEditPenitipan')).show();
+            showModalSafe('modalEditPenitipan');
 
             fetch(`tiptok-ajax.php?action=get_detail&id=${idPenitipan}`)
                 .then(r => r.json())
                 .then(res => {
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         const m = res.data.master;
-                        document.getElementById('editModalSubtitle').textContent = `Kode: ${m.kode_titip} - Sales: ${m.nama_sales || 'Sales'}`;
-                        document.getElementById('editTglTitip').value = m.tgl_titip;
+                        document.getElementById('editModalSubtitle').textContent = `Kode: ${m.kode_titip || '-'} - Sales: ${m.nama_sales || 'Sales'}`;
+                        document.getElementById('editTglTitip').value = m.tgl_titip || '';
                         document.getElementById('editCatatan').value = m.catatan || '';
-                        document.getElementById('editStatusPenitipan').value = m.status;
+                        document.getElementById('editStatusPenitipan').value = m.status || 'aktif';
 
                         // Dropdown dealer
                         const sel = document.getElementById('editSelectDealer');
-                        sel.innerHTML = '<option value="">-- Pilih Toko Customer / Dealer --</option>';
-                        dealersList.forEach(d => {
-                            const katBadge = d.kategori ? `[${d.kategori}] ` : '';
-                            const selected = (d.id == m.id_customer) ? 'selected' : '';
-                            sel.innerHTML += `<option value="${d.id}" ${selected}>${katBadge}${d.nama} - ${d.kota || ''}</option>`;
-                        });
+                        if (sel) {
+                            sel.innerHTML = '<option value="">-- Pilih Toko Customer / Dealer --</option>';
+                            dealersList.forEach(d => {
+                                const katBadge = d.kategori ? `[${d.kategori}] ` : '';
+                                const selected = (d.id == m.id_customer) ? 'selected' : '';
+                                sel.innerHTML += `<option value="${d.id}" ${selected}>${katBadge}${escapeHtml(d.nama)} - ${escapeHtml(d.kota || '')}</option>`;
+                            });
+                        }
                         onEditDealerSelected();
 
                         // Render items
                         container.innerHTML = '';
                         editItemRowIndex = 0;
-                        res.data.items.forEach(it => {
-                            editItemRowIndex++;
-                            const isSold = parseInt(it.qty_terjual) > 0;
-                            const deleteBtn = isSold ? 
-                                `<span class="taste-badge badge-danger-tag" style="font-size:12px;">Terjual ${it.qty_terjual} unit (Terkunci)</span>` : 
-                                `<button type="button" class="btn btn-sm btn-link text-danger p-0 mb-0 font-weight-bold" onclick="hapusBarisBarangEdit(${editItemRowIndex})">
-                                    <i class="fa-solid fa-trash-can me-1"></i> Hapus
-                                 </button>`;
+                        if (!res.data.items || res.data.items.length === 0) {
+                            tambahBarisBarangEdit();
+                        } else {
+                            res.data.items.forEach(it => {
+                                editItemRowIndex++;
+                                const isSold = parseInt(it.qty_terjual) > 0;
+                                const deleteBtn = isSold ? 
+                                    `<span class="taste-badge badge-danger-tag" style="font-size:12px;">Terjual ${it.qty_terjual} unit (Terkunci)</span>` : 
+                                    `<button type="button" class="btn btn-sm btn-link text-danger p-0 mb-0 font-weight-bold" onclick="hapusBarisBarangEdit(${editItemRowIndex})">
+                                        <i class="fa-solid fa-trash-can me-1"></i> Hapus
+                                     </button>`;
 
-                            const rowHtml = `
-                                <div class="p-3 mb-2 rounded-3 bg-light border" id="editItemRow_${editItemRowIndex}" style="border: 2px solid #cbd5e1 !important;">
-                                    <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="${it.id}">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="taste-badge badge-neutral" style="font-size: 13px;">Item #${editItemRowIndex}</span>
-                                        ${deleteBtn}
+                                const rowHtml = `
+                                    <div class="p-3 mb-2 rounded-3 bg-light border" id="editItemRow_${editItemRowIndex}" style="border: 2px solid #cbd5e1 !important;">
+                                        <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="${it.id}">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="taste-badge badge-neutral" style="font-size: 13px;">Item #${editItemRowIndex}</span>
+                                            ${deleteBtn}
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-md-5">
+                                                <label class="form-label-taste mb-1">NAMA BARANG <span class="text-danger">*</span></label>
+                                                <input type="text" name="items[${editItemRowIndex}][nama_barang]" class="form-control-taste w-100" value="${escapeHtml(it.nama_barang)}" required>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label-taste mb-1">TIPE / KATEGORI</label>
+                                                <input type="text" name="items[${editItemRowIndex}][tipe_barang]" class="form-control-taste w-100" value="${escapeHtml(it.tipe_barang || '')}">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label-taste mb-1">QTY TITIP <span class="text-danger">*</span></label>
+                                                <input type="number" name="items[${editItemRowIndex}][qty_titip]" min="${Math.max(1, parseInt(it.qty_terjual) || 1)}" class="form-control-taste w-100 text-center" value="${it.qty_titip}" required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
+                                                <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end" value="${it.insentif_per_unit}" required>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="row g-2">
-                                        <div class="col-md-5">
-                                            <label class="form-label-taste mb-1">NAMA BARANG <span class="text-danger">*</span></label>
-                                            <input type="text" name="items[${editItemRowIndex}][nama_barang]" class="form-control-taste w-100" value="${escapeHtml(it.nama_barang)}" required>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <label class="form-label-taste mb-1">TIPE / KATEGORI</label>
-                                            <input type="text" name="items[${editItemRowIndex}][tipe_barang]" class="form-control-taste w-100" value="${escapeHtml(it.tipe_barang || '')}">
-                                        </div>
-                                        <div class="col-md-2">
-                                            <label class="form-label-taste mb-1">QTY TITIP <span class="text-danger">*</span></label>
-                                            <input type="number" name="items[${editItemRowIndex}][qty_titip]" min="${it.qty_terjual || 1}" class="form-control-taste w-100 text-center" value="${it.qty_titip}" required>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
-                                            <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end" value="${it.insentif_per_unit}" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                            container.insertAdjacentHTML('beforeend', rowHtml);
-                        });
+                                `;
+                                container.insertAdjacentHTML('beforeend', rowHtml);
+                            });
+                        }
+                    } else {
+                        container.innerHTML = `<div class="p-3 text-center text-danger font-weight-bold">${(res && res.message) ? res.message : 'Gagal memuat data.'}</div>`;
                     }
+                })
+                .catch(err => {
+                    console.error(err);
+                    container.innerHTML = '<div class="p-3 text-center text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat data.</div>';
                 });
         }
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
         function onEditDealerSelected() {
-            const id = document.getElementById('editSelectDealer').value;
+            const selEl = document.getElementById('editSelectDealer');
+            if (!selEl) return;
+            const id = selEl.value;
             const dealer = dealersList.find(d => d.id == id);
             const prev = document.getElementById('editDealerPreview');
-            if (dealer) {
-                document.getElementById('editPrevNamaToko').textContent = dealer.nama;
+            if (dealer && prev) {
+                document.getElementById('editPrevNamaToko').textContent = dealer.nama || '-';
                 document.getElementById('editPrevKategoriToko').textContent = dealer.kategori || 'Dealer';
                 document.getElementById('editPrevAlamatToko').textContent = (dealer.alamat || '') + (dealer.kota ? ', ' + dealer.kota : '');
                 document.getElementById('editPrevTelpToko').textContent = dealer.telp_pribadi ? 'WA / Telp: ' + dealer.telp_pribadi : '';
                 prev.classList.remove('d-none');
-            } else {
+            } else if (prev) {
                 prev.classList.add('d-none');
             }
         }
@@ -1857,6 +1947,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
         function tambahBarisBarangEdit() {
             editItemRowIndex++;
             const container = document.getElementById('editContainerItemRows');
+            if (!container) return;
             const rowHtml = `
                 <div class="p-3 mb-2 rounded-3 bg-light border" id="editItemRow_${editItemRowIndex}" style="border: 2px solid #cbd5e1 !important;">
                     <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="0">
@@ -1901,16 +1992,20 @@ $resPenitipan = $conn->query($sqlPenitipan);
             formData.append('action', 'update_penitipan');
 
             const btn = document.getElementById('btnSimpanEditPenitipan');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan Perubahan...';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan Perubahan...';
+            }
 
             fetch('tiptok-ajax.php', { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(res => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Perubahan';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Perubahan';
+                    }
 
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil Diperbarui!',
@@ -1919,23 +2014,35 @@ $resPenitipan = $conn->query($sqlPenitipan);
                             showConfirmButton: false
                         }).then(() => location.reload());
                     } else {
-                        Swal.fire({ icon: 'error', title: 'Gagal Menyimpan', html: res.message });
+                        Swal.fire({ icon: 'error', title: 'Gagal Menyimpan', html: (res && res.message) ? res.message : 'Gagal menyimpan data.' });
                     }
                 })
-                .catch(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Perubahan';
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
+                .catch(err => {
+                    console.error(err);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Perubahan';
+                    }
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan saat memperbarui data.' });
                 });
         }
 
         // =========================================================================
         // HAPUS PENITIPAN BARANG
         // =========================================================================
+        function hapusPenitipanFromBtn(btn) {
+            const id = btn.getAttribute('data-id');
+            const kode = btn.getAttribute('data-kode');
+            const toko = btn.getAttribute('data-toko');
+            hapusPenitipan(id, kode, toko);
+        }
+
         function hapusPenitipan(idPenitipan, kodeTitip, namaToko) {
+            const safeKode = kodeTitip || 'Penitipan';
+            const safeToko = namaToko || 'Toko';
             Swal.fire({
                 title: 'Hapus Data Penitipan?',
-                html: `Apakah Anda yakin ingin menghapus data penitipan <strong>[${kodeTitip}]</strong> di toko <strong>${namaToko}</strong>?<br><br><span class="text-danger font-weight-bold">Perhatian: Seluruh data barang & histori log terkait akan dihapus secara permanen!</span>`,
+                html: `Apakah Anda yakin ingin menghapus data penitipan <strong>[${escapeHtml(safeKode)}]</strong> di toko <strong>${escapeHtml(safeToko)}</strong>?<br><br><span class="text-danger font-weight-bold">Perhatian: Seluruh data barang & histori log terkait akan dihapus secara permanen!</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
@@ -1959,7 +2066,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
                     fetch('tiptok-ajax.php', { method: 'POST', body: formData })
                         .then(r => r.json())
                         .then(res => {
-                            if (res.status === 'success') {
+                            if (res && res.status === 'success') {
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Berhasil Dihapus!',
@@ -1968,40 +2075,48 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                     showConfirmButton: false
                                 }).then(() => location.reload());
                             } else {
-                                Swal.fire({ icon: 'error', title: 'Gagal Menghapus', html: res.message });
+                                Swal.fire({ icon: 'error', title: 'Gagal Menghapus', html: (res && res.message) ? res.message : 'Gagal menghapus data.' });
                             }
                         })
-                        .catch(() => {
+                        .catch(err => {
+                            console.error(err);
                             Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan saat menghapus data.' });
                         });
                 }
             });
         }
 
+        // =========================================================================
+        // CEK SISA / LAPOR KUNJUNGAN
+        // =========================================================================
         function openModalLaporKunjungan(idPenitipan) {
             document.getElementById('kunjunganIdPenitipan').value = idPenitipan;
             const tbody = document.getElementById('kunjunganItemsBody');
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm text-dark"></div> Memuat barang...</td></tr>';
 
-            new bootstrap.Modal(document.getElementById('modalLaporKunjungan')).show();
+            showModalSafe('modalLaporKunjungan');
 
             fetch(`tiptok-ajax.php?action=get_detail&id=${idPenitipan}`)
                 .then(r => r.json())
                 .then(res => {
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         const m = res.data.master;
-                        document.getElementById('kunjunganNamaToko').textContent = m.nama_toko;
-                        document.getElementById('kunjunganKodeTitip').textContent = m.kode_titip;
-                        document.getElementById('kunjunganAlamatToko').textContent = m.alamat_toko + (m.kota_toko ? ', ' + m.kota_toko : '');
+                        document.getElementById('kunjunganNamaToko').textContent = m.nama_toko || 'Toko Customer';
+                        document.getElementById('kunjunganKodeTitip').textContent = m.kode_titip || '';
+                        document.getElementById('kunjunganAlamatToko').textContent = (m.alamat_toko || '') + (m.kota_toko ? ', ' + m.kota_toko : '');
 
                         tbody.innerHTML = '';
+                        if (!res.data.items || res.data.items.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted font-weight-bold">Tidak ada barang titipan terdaftar.</td></tr>';
+                            return;
+                        }
                         res.data.items.forEach((it, idx) => {
-                            const sisaCur = parseInt(it.qty_sisa);
+                            const sisaCur = parseInt(it.qty_sisa) || 0;
                             tbody.innerHTML += `
                                 <tr>
                                     <td>
                                         <input type="hidden" name="items[${idx}][id_item]" value="${it.id}">
-                                        <div class="font-weight-bold" style="font-size: 14.5px; color: #020617;">${it.nama_barang}</div>
+                                        <div class="font-weight-bold" style="font-size: 14.5px; color: #020617;">${escapeHtml(it.nama_barang)}</div>
                                         <div style="font-size: 13px; font-weight: 700; color: #047857;">Insentif: Rp ${new Intl.NumberFormat('id-ID').format(it.insentif_per_unit)}/unit</div>
                                     </td>
                                     <td class="text-center font-weight-bold text-dark">
@@ -2030,7 +2145,13 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                 </tr>
                             `;
                         });
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-3 text-danger font-weight-bold">${(res && res.message) ? res.message : 'Gagal memuat data.'}</td></tr>`;
                     }
+                })
+                .catch(err => {
+                    console.error(err);
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat data barang.</td></tr>';
                 });
         }
 
@@ -2041,16 +2162,18 @@ $resPenitipan = $conn->query($sqlPenitipan);
             const disp = document.getElementById(`terjualDisplay_${idx}`);
             const inv = document.getElementById(`noInv_${idx}`);
 
-            if (terjual > 0) {
-                disp.innerHTML = `<span class="taste-badge badge-danger-tag" style="font-size: 13px;">${terjual} Laku</span>`;
-                inv.setAttribute('required', 'required');
-                inv.style.borderColor = '#ef4444';
-                inv.style.boxShadow = '0 0 0 2px rgba(239, 68, 68, 0.2)';
-            } else {
-                disp.innerHTML = `<span class="taste-badge badge-neutral" style="font-size: 13px;">0</span>`;
-                inv.removeAttribute('required');
-                inv.style.borderColor = '';
-                inv.style.boxShadow = '';
+            if (disp && inv) {
+                if (terjual > 0) {
+                    disp.innerHTML = `<span class="taste-badge badge-danger-tag" style="font-size: 13px;">${terjual} Laku</span>`;
+                    inv.setAttribute('required', 'required');
+                    inv.style.borderColor = '#ef4444';
+                    inv.style.boxShadow = '0 0 0 2px rgba(239, 68, 68, 0.2)';
+                } else {
+                    disp.innerHTML = `<span class="taste-badge badge-neutral" style="font-size: 13px;">0</span>`;
+                    inv.removeAttribute('required');
+                    inv.style.borderColor = '';
+                    inv.style.boxShadow = '';
+                }
             }
         }
 
@@ -2061,16 +2184,20 @@ $resPenitipan = $conn->query($sqlPenitipan);
             formData.append('action', 'simpan_kunjungan');
 
             const btn = document.getElementById('btnSimpanKunjungan');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan...';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan...';
+            }
 
             fetch('tiptok-ajax.php', { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(res => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Laporan';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Laporan';
+                    }
 
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Laporan Tersimpan!',
@@ -2078,137 +2205,162 @@ $resPenitipan = $conn->query($sqlPenitipan);
                             confirmButtonText: 'OK'
                         }).then(() => location.reload());
                     } else {
-                        Swal.fire({ icon: 'error', title: 'Validasi Gagal', html: res.message });
+                        Swal.fire({ icon: 'error', title: 'Validasi Gagal', html: (res && res.message) ? res.message : 'Gagal menyimpan laporan.' });
                     }
                 })
-                .catch(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Laporan';
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
+                .catch(err => {
+                    console.error(err);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Laporan';
+                    }
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan saat menyimpan laporan.' });
                 });
         }
 
+        // =========================================================================
+        // DETAIL PENITIPAN / HISTORI
+        // =========================================================================
         function openModalDetailTiptok(idPenitipan) {
             document.getElementById('detailLoading').classList.remove('d-none');
             document.getElementById('detailContent').classList.add('d-none');
-            new bootstrap.Modal(document.getElementById('modalDetailTiptok')).show();
+            showModalSafe('modalDetailTiptok');
 
             fetch(`tiptok-ajax.php?action=get_detail&id=${idPenitipan}`)
                 .then(r => r.json())
                 .then(res => {
                     document.getElementById('detailLoading').classList.add('d-none');
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         document.getElementById('detailContent').classList.remove('d-none');
                         const m = res.data.master;
-                        document.getElementById('detailKodeTitip').textContent = 'Kode: ' + m.kode_titip;
-                        document.getElementById('detNamaToko').textContent = m.nama_toko;
-                        document.getElementById('detAlamatToko').textContent = m.alamat_toko + (m.kota_toko ? ', ' + m.kota_toko : '');
+                        document.getElementById('detailKodeTitip').textContent = 'Kode: ' + (m.kode_titip || '-');
+                        document.getElementById('detNamaToko').textContent = m.nama_toko || 'Toko Customer';
+                        document.getElementById('detAlamatToko').textContent = (m.alamat_toko || '') + (m.kota_toko ? ', ' + m.kota_toko : '');
                         document.getElementById('detTelpToko').textContent = m.telp_toko ? 'WA / Telp: ' + m.telp_toko : '';
-                        document.getElementById('detKodeTitip').textContent = m.kode_titip;
-                        document.getElementById('detTglTitip').textContent = m.tgl_titip;
+                        document.getElementById('detKodeTitip').textContent = m.kode_titip || '-';
+                        document.getElementById('detTglTitip').textContent = m.tgl_titip || '-';
                         document.getElementById('detNamaSales').textContent = m.nama_sales || 'Sales';
 
                         const itemBody = document.getElementById('detItemsBody');
                         itemBody.innerHTML = '';
-                        res.data.items.forEach(it => {
-                            itemBody.innerHTML += `
-                                <tr>
-                                    <td><strong style="font-size: 14.5px; color: #020617;">${it.nama_barang}</strong> <span class="text-xs text-muted">(${it.tipe_barang || '-'})</span></td>
-                                    <td class="text-center font-weight-bold">${it.qty_titip}</td>
-                                    <td class="text-center font-weight-bold text-success" style="font-size: 14.5px;">${it.qty_sisa}</td>
-                                    <td class="text-center font-weight-bold text-danger" style="font-size: 14.5px;">${it.qty_terjual}</td>
-                                    <td class="text-end font-weight-bold">Rp ${new Intl.NumberFormat('id-ID').format(it.insentif_per_unit)}</td>
-                                    <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(it.total_insentif)}</td>
-                                </tr>
-                            `;
-                        });
+                        if (!res.data.items || res.data.items.length === 0) {
+                            itemBody.innerHTML = '<tr><td colspan="6" class="text-center py-3 text-muted font-weight-bold">Tidak ada barang titipan.</td></tr>';
+                        } else {
+                            res.data.items.forEach(it => {
+                                itemBody.innerHTML += `
+                                    <tr>
+                                        <td><strong style="font-size: 14.5px; color: #020617;">${escapeHtml(it.nama_barang)}</strong> <span class="text-xs text-muted">(${escapeHtml(it.tipe_barang || '-')})</span></td>
+                                        <td class="text-center font-weight-bold">${it.qty_titip}</td>
+                                        <td class="text-center font-weight-bold text-success" style="font-size: 14.5px;">${it.qty_sisa}</td>
+                                        <td class="text-center font-weight-bold text-danger" style="font-size: 14.5px;">${it.qty_terjual}</td>
+                                        <td class="text-end font-weight-bold">Rp ${new Intl.NumberFormat('id-ID').format(it.insentif_per_unit)}</td>
+                                        <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(it.total_insentif)}</td>
+                                    </tr>
+                                `;
+                            });
+                        }
 
                         const logBody = document.getElementById('detLogsBody');
                         logBody.innerHTML = '';
-                        if (res.data.logs.length === 0) {
+                        if (!res.data.logs || res.data.logs.length === 0) {
                             logBody.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted font-weight-bold">Belum ada riwayat kunjungan audit.</td></tr>';
                         } else {
                             res.data.logs.forEach(l => {
-                                const invBadge = l.no_inv ? `<span class="taste-badge badge-invoice-tag">${l.no_inv}</span>` : '-';
+                                const invBadge = l.no_inv ? `<span class="taste-badge badge-invoice-tag">${escapeHtml(l.no_inv)}</span>` : '-';
                                 logBody.innerHTML += `
                                     <tr>
                                         <td class="font-weight-bold">${l.tgl_kunjungan}</td>
-                                        <td><strong>${l.nama_sales || '-'}</strong></td>
-                                        <td><strong>${l.nama_barang}</strong></td>
+                                        <td><strong>${escapeHtml(l.nama_sales || '-')}</strong></td>
+                                        <td><strong>${escapeHtml(l.nama_barang)}</strong></td>
                                         <td class="text-center font-weight-bold text-success">${l.stok_sisa}</td>
                                         <td class="text-center font-weight-bold text-danger">${l.qty_terjual_kunjungan}</td>
                                         <td>${invBadge}</td>
                                         <td class="text-end font-weight-bold text-success">Rp ${new Intl.NumberFormat('id-ID').format(l.insentif_didapat)}</td>
-                                        <td class="text-sm text-secondary font-weight-bold">${l.catatan_kunjungan || '-'}</td>
+                                        <td class="text-sm text-secondary font-weight-bold">${escapeHtml(l.catatan_kunjungan || '-')}</td>
                                     </tr>
                                 `;
                             });
                         }
+                    } else {
+                        document.getElementById('detailContent').innerHTML = `<div class="p-4 text-center text-danger font-weight-bold">${(res && res.message) ? res.message : 'Gagal memuat riwayat.'}</div>`;
+                        document.getElementById('detailContent').classList.remove('d-none');
                     }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('detailLoading').classList.add('d-none');
+                    document.getElementById('detailContent').innerHTML = '<div class="p-4 text-center text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat detail.</div>';
+                    document.getElementById('detailContent').classList.remove('d-none');
                 });
         }
 
+        // =========================================================================
+        // KLAIM INSENTIF
+        // =========================================================================
         function loadClaimSummary() {
             fetch('tiptok-ajax.php?action=get_claim_summary')
                 .then(r => r.json())
                 .then(res => {
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         const d = res.data;
                         const bodyUnclaimed = document.getElementById('bodyUnclaimedItems');
-                        bodyUnclaimed.innerHTML = '';
-
-                        if (d.unclaimed_items.length === 0) {
-                            bodyUnclaimed.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-muted font-weight-bold">Tidak ada unit terjual yang menunggu klaim.</td></tr>';
-                        } else {
-                            d.unclaimed_items.forEach(u => {
-                                bodyUnclaimed.innerHTML += `
-                                    <tr>
-                                        <td class="font-weight-bold">${u.tgl_kunjungan}</td>
-                                        <td><strong>${u.nama_toko}</strong></td>
-                                        <td><strong>${u.nama_barang}</strong></td>
-                                        <td><span class="taste-badge badge-invoice-tag">${u.no_inv || '-'}</span></td>
-                                        <td class="text-center font-weight-bold text-danger" style="font-size: 15px;">${u.qty_terjual_kunjungan}</td>
-                                        <td class="text-end font-weight-bold">Rp ${new Intl.NumberFormat('id-ID').format(u.insentif_per_unit)}</td>
-                                        <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(u.insentif_didapat)}</td>
-                                    </tr>
-                                `;
-                            });
+                        if (bodyUnclaimed) {
+                            bodyUnclaimed.innerHTML = '';
+                            if (!d.unclaimed_items || d.unclaimed_items.length === 0) {
+                                bodyUnclaimed.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-muted font-weight-bold">Tidak ada unit terjual yang menunggu klaim.</td></tr>';
+                            } else {
+                                d.unclaimed_items.forEach(u => {
+                                    bodyUnclaimed.innerHTML += `
+                                        <tr>
+                                            <td class="font-weight-bold">${u.tgl_kunjungan}</td>
+                                            <td><strong>${escapeHtml(u.nama_toko)}</strong></td>
+                                            <td><strong>${escapeHtml(u.nama_barang)}</strong></td>
+                                            <td><span class="taste-badge badge-invoice-tag">${escapeHtml(u.no_inv || '-')}</span></td>
+                                            <td class="text-center font-weight-bold text-danger" style="font-size: 15px;">${u.qty_terjual_kunjungan}</td>
+                                            <td class="text-end font-weight-bold">Rp ${new Intl.NumberFormat('id-ID').format(u.insentif_per_unit)}</td>
+                                            <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(u.insentif_didapat)}</td>
+                                        </tr>
+                                    `;
+                                });
+                            }
                         }
 
                         const bodyClaim = document.getElementById('bodyClaimHistory');
-                        bodyClaim.innerHTML = '';
-                        if (d.claim_history.length === 0) {
-                            bodyClaim.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-muted font-weight-bold">Belum ada riwayat pengajuan klaim.</td></tr>';
-                        } else {
-                            d.claim_history.forEach(c => {
-                                let stBadge = 'badge-neutral';
-                                if (c.status_claim === 'disetujui') stBadge = 'badge-active-tag';
-                                else if (c.status_claim === 'cair') stBadge = 'badge-active-tag';
-                                else if (c.status_claim === 'menunggu_approval') stBadge = 'badge-invoice-tag';
+                        if (bodyClaim) {
+                            bodyClaim.innerHTML = '';
+                            if (!d.claim_history || d.claim_history.length === 0) {
+                                bodyClaim.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-muted font-weight-bold">Belum ada riwayat pengajuan klaim.</td></tr>';
+                            } else {
+                                d.claim_history.forEach(c => {
+                                    let stBadge = 'badge-neutral';
+                                    if (c.status_claim === 'disetujui' || c.status_claim === 'cair') stBadge = 'badge-active-tag';
+                                    else if (c.status_claim === 'menunggu_approval') stBadge = 'badge-invoice-tag';
 
-                                bodyClaim.innerHTML += `
-                                    <tr>
-                                        <td class="font-monospace font-weight-bold" style="font-size: 14px;">${c.kode_claim}</td>
-                                        <td><strong>${c.nama_sales}</strong></td>
-                                        <td class="font-weight-bold">${c.tgl_claim}</td>
-                                        <td class="text-center font-weight-bold" style="font-size: 14.5px;">${c.total_unit_terjual} Unit</td>
-                                        <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(c.total_nominal_insentif)}</td>
-                                        <td class="text-center"><span class="taste-badge ${stBadge}">${c.status_claim.toUpperCase()}</span></td>
-                                        <td style="text-align: right;">
-                                            <button class="btn-table-secondary" onclick="openModalDetailClaim(${c.id})">
-                                                <i class="fa-solid fa-eye me-1"></i> Rincian
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `;
-                            });
+                                    bodyClaim.innerHTML += `
+                                        <tr>
+                                            <td class="font-monospace font-weight-bold" style="font-size: 14px;">${escapeHtml(c.kode_claim)}</td>
+                                            <td><strong>${escapeHtml(c.nama_sales)}</strong></td>
+                                            <td class="font-weight-bold">${c.tgl_claim}</td>
+                                            <td class="text-center font-weight-bold" style="font-size: 14.5px;">${c.total_unit_terjual} Unit</td>
+                                            <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(c.total_nominal_insentif)}</td>
+                                            <td class="text-center"><span class="taste-badge ${stBadge}">${escapeHtml((c.status_claim || '').toUpperCase())}</span></td>
+                                            <td style="text-align: right;">
+                                                <button type="button" class="btn-table-secondary" onclick="openModalDetailClaim(${c.id})">
+                                                    <i class="fa-solid fa-eye me-1"></i> Rincian
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                });
+                            }
                         }
                     }
-                });
+                })
+                .catch(err => console.error('Error loading claim summary:', err));
         }
 
         function openModalSubmitClaim() {
-            new bootstrap.Modal(document.getElementById('modalSubmitClaim')).show();
+            showModalSafe('modalSubmitClaim');
         }
 
         function submitKlaimInsentif(e) {
@@ -2218,16 +2370,20 @@ $resPenitipan = $conn->query($sqlPenitipan);
             formData.append('action', 'ajukan_claim');
 
             const btn = document.getElementById('btnProsesClaim');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Memproses...';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Memproses...';
+            }
 
             fetch('tiptok-ajax.php', { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(res => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Klaim';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Klaim';
+                    }
 
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Klaim Diajukan!',
@@ -2235,28 +2391,38 @@ $resPenitipan = $conn->query($sqlPenitipan);
                             confirmButtonText: 'OK'
                         }).then(() => location.reload());
                     } else {
-                        Swal.fire({ icon: 'error', title: 'Gagal', html: res.message });
+                        Swal.fire({ icon: 'error', title: 'Gagal', html: (res && res.message) ? res.message : 'Gagal mengajukan klaim.' });
                     }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Klaim';
+                    }
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan saat mengajukan klaim.' });
                 });
         }
 
         function openModalDetailClaim(idClaim) {
             currentClaimId = idClaim;
-            new bootstrap.Modal(document.getElementById('modalClaimApproval')).show();
+            showModalSafe('modalClaimApproval');
 
             fetch(`tiptok-ajax.php?action=get_claim_detail&id_claim=${idClaim}`)
                 .then(r => r.json())
                 .then(res => {
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         const cl = res.data.claim;
-                        document.getElementById('claimKodeTitle').textContent = 'Kode Klaim: ' + cl.kode_claim;
-                        document.getElementById('claimSalesName').textContent = cl.nama_sales;
-                        document.getElementById('claimTgl').textContent = 'Tgl: ' + cl.tgl_claim + ' (' + cl.total_unit_terjual + ' Unit)';
-                        document.getElementById('claimNominal').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(cl.total_nominal_insentif);
+                        document.getElementById('claimKodeTitle').textContent = 'Kode Klaim: ' + (cl.kode_claim || '-');
+                        document.getElementById('claimSalesName').textContent = cl.nama_sales || '-';
+                        document.getElementById('claimTgl').textContent = 'Tgl: ' + (cl.tgl_claim || '-') + ' (' + (cl.total_unit_terjual || 0) + ' Unit)';
+                        document.getElementById('claimNominal').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(cl.total_nominal_insentif || 0);
 
                         const badge = document.getElementById('claimStatusBadge');
-                        badge.className = 'taste-badge ' + (cl.status_claim === 'cair' ? 'badge-active-tag' : (cl.status_claim === 'disetujui' ? 'badge-active-tag' : 'badge-invoice-tag'));
-                        badge.textContent = cl.status_claim.toUpperCase();
+                        if (badge) {
+                            badge.className = 'taste-badge ' + (cl.status_claim === 'cair' || cl.status_claim === 'disetujui' ? 'badge-active-tag' : 'badge-invoice-tag');
+                            badge.textContent = (cl.status_claim || '').toUpperCase();
+                        }
 
                         const selStatus = document.getElementById('updateClaimStatusSelect');
                         if (selStatus) selStatus.value = cl.status_claim;
@@ -2265,26 +2431,35 @@ $resPenitipan = $conn->query($sqlPenitipan);
                         if (noteAdmin) noteAdmin.value = cl.catatan_admin || '';
 
                         const tbody = document.getElementById('claimDetailItemsBody');
-                        tbody.innerHTML = '';
-                        res.data.details.forEach(d => {
-                            tbody.innerHTML += `
-                                <tr>
-                                    <td><strong>${d.nama_toko}</strong></td>
-                                    <td><strong>${d.nama_barang}</strong></td>
-                                    <td><span class="taste-badge badge-invoice-tag">${d.no_inv || '-'}</span></td>
-                                    <td class="text-center font-weight-bold" style="font-size: 14.5px;">${d.qty_terjual}</td>
-                                    <td class="text-end font-weight-bold">Rp ${new Intl.NumberFormat('id-ID').format(d.insentif_per_unit)}</td>
-                                    <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(d.subtotal_insentif)}</td>
-                                </tr>
-                            `;
-                        });
+                        if (tbody) {
+                            tbody.innerHTML = '';
+                            if (!res.data.details || res.data.details.length === 0) {
+                                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-3 text-muted">Tidak ada rincian item.</td></tr>';
+                            } else {
+                                res.data.details.forEach(d => {
+                                    tbody.innerHTML += `
+                                        <tr>
+                                            <td><strong>${escapeHtml(d.nama_toko)}</strong></td>
+                                            <td><strong>${escapeHtml(d.nama_barang)}</strong></td>
+                                            <td><span class="taste-badge badge-invoice-tag">${escapeHtml(d.no_inv || '-')}</span></td>
+                                            <td class="text-center font-weight-bold" style="font-size: 14.5px;">${d.qty_terjual}</td>
+                                            <td class="text-end font-weight-bold">Rp ${new Intl.NumberFormat('id-ID').format(d.insentif_per_unit)}</td>
+                                            <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(d.subtotal_insentif)}</td>
+                                        </tr>
+                                    `;
+                                });
+                            }
+                        }
                     }
-                });
+                })
+                .catch(err => console.error('Error loading claim detail:', err));
         }
 
         function submitUpdateClaimStatus() {
-            const status = document.getElementById('updateClaimStatusSelect').value;
-            const note = document.getElementById('updateClaimAdminNote').value;
+            const selEl = document.getElementById('updateClaimStatusSelect');
+            const noteEl = document.getElementById('updateClaimAdminNote');
+            const status = selEl ? selEl.value : '';
+            const note = noteEl ? noteEl.value : '';
 
             const formData = new FormData();
             formData.append('action', 'update_status_claim');
@@ -2295,15 +2470,19 @@ $resPenitipan = $conn->query($sqlPenitipan);
             fetch('tiptok-ajax.php', { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(res => {
-                    if (res.status === 'success') {
+                    if (res && res.status === 'success') {
                         Swal.fire({ icon: 'success', title: 'Sukses', text: res.message, timer: 1500, showConfirmButton: false })
                             .then(() => {
-                                bootstrap.Modal.getInstance(document.getElementById('modalClaimApproval')).hide();
+                                hideModalSafe('modalClaimApproval');
                                 loadClaimSummary();
                             });
                     } else {
-                        Swal.fire({ icon: 'error', title: 'Gagal', text: res.message });
+                        Swal.fire({ icon: 'error', title: 'Gagal', text: (res && res.message) ? res.message : 'Gagal memperbarui status.' });
                     }
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
                 });
         }
     </script>

@@ -115,6 +115,12 @@ $idUser = $_SESSION['id'];
 $namaUser = $_SESSION['nama'] ?? ($nmUser ?? 'Sales');
 $jabatanUser = $_SESSION['jabatan'] ?? ($role ?? 'Sales');
 
+$hasSalesCustomer = false;
+$chkSC = $conn->query("SHOW TABLES LIKE 'sales_customer'");
+if ($chkSC && $chkSC->num_rows > 0) {
+    $hasSalesCustomer = true;
+}
+
 $action = $_GET['action'] ?? ($_POST['action'] ?? '');
 
 if (empty($action)) {
@@ -129,27 +135,53 @@ if ($action === 'search_dealer') {
     $q = trim($_GET['q'] ?? '');
     $qLike = "%$q%";
     
-    if (!empty($q)) {
-        $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
-                               FROM sales_customer 
-                               WHERE deleted_at IS NULL 
-                                 AND (nama LIKE ? OR telp_pribadi LIKE ? OR alamat LIKE ? OR kota LIKE ?) 
-                               ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 20");
-        $stmt->bind_param("ssss", $qLike, $qLike, $qLike, $qLike);
+    if ($hasSalesCustomer) {
+        if (!empty($q)) {
+            $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
+                                   FROM sales_customer 
+                                   WHERE deleted_at IS NULL 
+                                     AND (nama LIKE ? OR telp_pribadi LIKE ? OR alamat LIKE ? OR kota LIKE ?) 
+                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 50");
+            $stmt->bind_param("ssss", $qLike, $qLike, $qLike, $qLike);
+        } else {
+            $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
+                                   FROM sales_customer 
+                                   WHERE deleted_at IS NULL 
+                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 50");
+        }
     } else {
-        $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
-                               FROM sales_customer 
-                               WHERE deleted_at IS NULL 
-                               ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 20");
+        if (!empty($q)) {
+            $stmt = $conn->prepare("SELECT c.id, c.id AS kode_customer, c.nama_toko AS nama, c.kategori, 
+                                           (SELECT tlp_pic FROM customer_pics WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS telp_pribadi,
+                                           (SELECT alamat FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat,
+                                           (SELECT kota FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS kota,
+                                           (SELECT link_google_map FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_lokasi
+                                   FROM customers c 
+                                   WHERE c.deleted_at IS NULL 
+                                     AND (c.nama_toko LIKE ? OR c.kategori LIKE ? OR EXISTS (SELECT 1 FROM customer_addresses ca WHERE ca.customer_id = c.id AND (ca.alamat LIKE ? OR ca.kota LIKE ?))) 
+                                   ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 50");
+            $stmt->bind_param("ssss", $qLike, $qLike, $qLike, $qLike);
+        } else {
+            $stmt = $conn->prepare("SELECT c.id, c.id AS kode_customer, c.nama_toko AS nama, c.kategori, 
+                                           (SELECT tlp_pic FROM customer_pics WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS telp_pribadi,
+                                           (SELECT alamat FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat,
+                                           (SELECT kota FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS kota,
+                                           (SELECT link_google_map FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_lokasi
+                                   FROM customers c 
+                                   WHERE c.deleted_at IS NULL 
+                                   ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 50");
+        }
     }
     
-    $stmt->execute();
-    $res = $stmt->get_result();
     $dealers = [];
-    while ($row = $res->fetch_assoc()) {
-        $dealers[] = $row;
+    if ($stmt) {
+        $stmt->execute();
+        $res = $stmt->get_result();
+        while ($row = $res->fetch_assoc()) {
+            $dealers[] = $row;
+        }
+        $stmt->close();
     }
-    $stmt->close();
     
     echo json_encode(['status' => 'success', 'data' => $dealers]);
     exit;
@@ -244,11 +276,23 @@ if ($action === 'get_detail') {
     }
 
     // Master & Customer
-    $stmt = $conn->prepare("SELECT p.*, c.nama AS nama_toko, c.kategori AS kategori_customer, c.telp_pribadi AS telp_toko, 
-                                  c.alamat AS alamat_toko, c.kota AS kota_toko, c.alamat_lokasi 
-                           FROM tiptok_penitipan p 
-                           LEFT JOIN sales_customer c ON p.id_customer = c.id 
-                           WHERE p.id = ?");
+    if ($hasSalesCustomer) {
+        $sqlM = "SELECT p.*, c.nama AS nama_toko, c.kategori AS kategori_customer, c.telp_pribadi AS telp_toko, 
+                        c.alamat AS alamat_toko, c.kota AS kota_toko, c.alamat_lokasi 
+                 FROM tiptok_penitipan p 
+                 LEFT JOIN sales_customer c ON p.id_customer = c.id 
+                 WHERE p.id = ?";
+    } else {
+        $sqlM = "SELECT p.*, c.nama_toko AS nama_toko, c.kategori AS kategori_customer, 
+                        (SELECT tlp_pic FROM customer_pics WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS telp_toko, 
+                        (SELECT alamat FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_toko, 
+                        (SELECT kota FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS kota_toko, 
+                        (SELECT link_google_map FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_lokasi 
+                 FROM tiptok_penitipan p 
+                 LEFT JOIN customers c ON p.id_customer = c.id 
+                 WHERE p.id = ?";
+    }
+    $stmt = $conn->prepare($sqlM);
     $stmt->bind_param("i", $id_penitipan);
     $stmt->execute();
     $resMaster = $stmt->get_result();
@@ -461,14 +505,17 @@ if ($action === 'get_claim_summary') {
         $whereSales = " AND k.id_sales = '$idUser' ";
     }
 
+    $custJoin = $hasSalesCustomer ? "JOIN sales_customer c ON p.id_customer = c.id" : "JOIN customers c ON p.id_customer = c.id";
+    $custField = $hasSalesCustomer ? "c.nama" : "c.nama_toko";
+
     $sql = "SELECT k.id AS id_kunjungan, k.id_penitipan, k.id_item, k.kode_kunjungan, k.nama_sales, k.tgl_kunjungan, 
                    k.qty_terjual_kunjungan, k.no_inv, k.tgl_invoice, k.insentif_didapat, 
                    i.nama_barang, i.tipe_barang, i.insentif_per_unit, 
-                   p.kode_titip, c.nama AS nama_toko 
+                   p.kode_titip, $custField AS nama_toko 
             FROM tiptok_kunjungan k 
             JOIN tiptok_items i ON k.id_item = i.id 
             JOIN tiptok_penitipan p ON k.id_penitipan = p.id 
-            JOIN sales_customer c ON p.id_customer = c.id 
+            $custJoin 
             WHERE k.id_claim IS NULL 
               AND k.qty_terjual_kunjungan > 0 
               $whereSales 
@@ -629,10 +676,13 @@ if ($action === 'get_claim_detail') {
         exit;
     }
 
-    $stmtDetails = $conn->prepare("SELECT d.*, p.kode_titip, c.nama AS nama_toko 
+    $custJoin = $hasSalesCustomer ? "JOIN sales_customer c ON p.id_customer = c.id" : "JOIN customers c ON p.id_customer = c.id";
+    $custField = $hasSalesCustomer ? "c.nama" : "c.nama_toko";
+
+    $stmtDetails = $conn->prepare("SELECT d.*, p.kode_titip, $custField AS nama_toko 
                                   FROM tiptok_claim_detail d 
                                   JOIN tiptok_penitipan p ON d.id_penitipan = p.id 
-                                  JOIN sales_customer c ON p.id_customer = c.id 
+                                  $custJoin 
                                   WHERE d.id_claim = ? 
                                   ORDER BY d.id ASC");
     $stmtDetails->bind_param("i", $id_claim);

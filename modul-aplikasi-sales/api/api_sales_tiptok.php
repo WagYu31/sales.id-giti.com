@@ -117,6 +117,10 @@ if (empty($action) && isset($jsonInput['action'])) {
     $action = $jsonInput['action'];
 }
 
+// Cek apakah tabel sales_customer ada, jika tidak gunakan tabel customers + customer_addresses + customer_pics
+$chkSC = $conn->query("SHOW TABLES LIKE 'sales_customer'");
+$hasSalesCustomer = ($chkSC && $chkSC->num_rows > 0);
+
 // ─────────────────────────────────────────────────────────────
 // 1. GET DASHBOARD & LIST TITIPAN SALES
 // ─────────────────────────────────────────────────────────────
@@ -152,21 +156,41 @@ if ($action === 'get_dashboard') {
     $isClaimEligible = ($unclaimedUnits >= $claimTarget);
 
     // List Penitipan
-    $sqlList = "SELECT p.*, c.nama AS nama_toko, c.kategori AS kategori_customer, c.telp_pribadi AS telp_toko, 
-                       c.alamat AS alamat_toko, c.kota AS kota_toko,
-                       COUNT(i.id) AS total_jenis_barang,
-                       SUM(i.qty_titip) AS sum_titip,
-                       SUM(i.qty_sisa) AS sum_sisa,
-                       SUM(i.qty_terjual) AS sum_terjual,
-                       SUM(i.total_insentif) AS sum_insentif,
-                       (SELECT k.no_inv FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id AND k.no_inv IS NOT NULL AND k.no_inv != '' ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_no_inv,
-                       (SELECT k.tgl_kunjungan FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_kunjungan
-                FROM tiptok_penitipan p 
-                LEFT JOIN sales_customer c ON p.id_customer = c.id 
-                LEFT JOIN tiptok_items i ON p.id = i.id_penitipan 
-                WHERE 1=1 $filterSales 
-                GROUP BY p.id 
-                ORDER BY p.id DESC";
+    if ($hasSalesCustomer) {
+        $sqlList = "SELECT p.*, c.nama AS nama_toko, c.kategori AS kategori_customer, c.telp_pribadi AS telp_toko, 
+                           c.alamat AS alamat_toko, c.kota AS kota_toko,
+                           COUNT(i.id) AS total_jenis_barang,
+                           SUM(i.qty_titip) AS sum_titip,
+                           SUM(i.qty_sisa) AS sum_sisa,
+                           SUM(i.qty_terjual) AS sum_terjual,
+                           SUM(i.total_insentif) AS sum_insentif,
+                           (SELECT k.no_inv FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id AND k.no_inv IS NOT NULL AND k.no_inv != '' ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_no_inv,
+                           (SELECT k.tgl_kunjungan FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_kunjungan
+                    FROM tiptok_penitipan p 
+                    LEFT JOIN sales_customer c ON p.id_customer = c.id 
+                    LEFT JOIN tiptok_items i ON p.id = i.id_penitipan 
+                    WHERE 1=1 $filterSales 
+                    GROUP BY p.id 
+                    ORDER BY p.id DESC";
+    } else {
+        $sqlList = "SELECT p.*, c.nama_toko AS nama_toko, c.kategori AS kategori_customer, pic.tlp_pic AS telp_toko, 
+                           ca.alamat AS alamat_toko, ca.kota AS kota_toko,
+                           COUNT(i.id) AS total_jenis_barang,
+                           SUM(i.qty_titip) AS sum_titip,
+                           SUM(i.qty_sisa) AS sum_sisa,
+                           SUM(i.qty_terjual) AS sum_terjual,
+                           SUM(i.total_insentif) AS sum_insentif,
+                           (SELECT k.no_inv FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id AND k.no_inv IS NOT NULL AND k.no_inv != '' ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_no_inv,
+                           (SELECT k.tgl_kunjungan FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_kunjungan
+                    FROM tiptok_penitipan p 
+                    LEFT JOIN customers c ON p.id_customer = c.id 
+                    LEFT JOIN customer_addresses ca ON c.id = ca.customer_id AND ca.deleted_at IS NULL
+                    LEFT JOIN customer_pics pic ON c.id = pic.customer_id AND pic.deleted_at IS NULL
+                    LEFT JOIN tiptok_items i ON p.id = i.id_penitipan 
+                    WHERE 1=1 $filterSales 
+                    GROUP BY p.id 
+                    ORDER BY p.id DESC";
+    }
     $resList = $conn->query($sqlList);
     $penitipanList = [];
     if ($resList) {
@@ -227,28 +251,55 @@ if ($action === 'get_dashboard') {
 if ($action === 'get_dealers') {
     $salesId = intval($_GET['sales_id'] ?? ($jsonInput['sales_id'] ?? 0));
     $search = $conn->real_escape_string($_GET['q'] ?? ($jsonInput['q'] ?? ''));
-    $whereSearch = $search !== '' ? " AND (c.nama LIKE '%$search%' OR c.alamat LIKE '%$search%' OR c.kota LIKE '%$search%') " : "";
     
-    if ($salesId > 0) {
-        // HANYA toko yang ADA DI JADWAL KUNJUNGAN resmi dari Admin untuk sales ini PADA HARI INI!
-        $sql = "SELECT DISTINCT c.id, c.nama, c.kategori, c.telp_pribadi, c.alamat, c.kota, ks.jadwal, ks.id AS id_kegiatan
-                FROM team_kegiatan_sales tks
-                JOIN kegiatan_sales ks ON ks.id = tks.id_kegiatan_sales AND ks.deleted_at IS NULL
-                JOIN sales_customer c  ON c.id  = ks.id_customer        AND c.deleted_at IS NULL
-                WHERE tks.id_sales = $salesId
-                  AND tks.deleted_at IS NULL
-                  AND DATE(ks.jadwal) = CURDATE()
-                  AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
-                  AND (ks.reschedule_reason IS NULL OR ks.reschedule_reason = '')
-                  $whereSearch
-                ORDER BY ks.jadwal DESC
-                LIMIT 50";
+    if ($hasSalesCustomer) {
+        $whereSearch = $search !== '' ? " AND (c.nama LIKE '%$search%' OR c.alamat LIKE '%$search%' OR c.kota LIKE '%$search%') " : "";
+        if ($salesId > 0) {
+            $sql = "SELECT DISTINCT c.id, c.nama, c.kategori, c.telp_pribadi, c.alamat, c.kota, ks.jadwal, ks.id AS id_kegiatan
+                    FROM team_kegiatan_sales tks
+                    JOIN kegiatan_sales ks ON ks.id = tks.id_kegiatan_sales AND ks.deleted_at IS NULL
+                    JOIN sales_customer c  ON c.id  = ks.id_customer        AND c.deleted_at IS NULL
+                    WHERE tks.id_sales = $salesId
+                      AND tks.deleted_at IS NULL
+                      AND DATE(ks.jadwal) = CURDATE()
+                      AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
+                      AND (ks.reschedule_reason IS NULL OR ks.reschedule_reason = '')
+                      $whereSearch
+                    ORDER BY ks.jadwal DESC
+                    LIMIT 50";
+        } else {
+            $sql = "SELECT id, nama, kategori, telp_pribadi, alamat, kota 
+                    FROM sales_customer c
+                    WHERE deleted_at IS NULL $whereSearch 
+                    ORDER BY (kategori = 'Dealer') DESC, nama ASC 
+                    LIMIT 50";
+        }
     } else {
-        $sql = "SELECT id, nama, kategori, telp_pribadi, alamat, kota 
-                FROM sales_customer c
-                WHERE deleted_at IS NULL $whereSearch 
-                ORDER BY (kategori = 'Dealer') DESC, nama ASC 
-                LIMIT 50";
+        $whereSearch = $search !== '' ? " AND (c.nama_toko LIKE '%$search%' OR ca.alamat LIKE '%$search%' OR ca.kota LIKE '%$search%') " : "";
+        if ($salesId > 0) {
+            $sql = "SELECT DISTINCT c.id, c.nama_toko AS nama, c.kategori, pic.tlp_pic AS telp_pribadi, ca.alamat, ca.kota, ks.jadwal, ks.id AS id_kegiatan
+                    FROM team_kegiatan_sales tks
+                    JOIN kegiatan_sales ks ON ks.id = tks.id_kegiatan_sales AND ks.deleted_at IS NULL
+                    JOIN customers c       ON c.id  = ks.id_customer        AND c.deleted_at IS NULL
+                    LEFT JOIN customer_addresses ca ON c.id = ca.customer_id AND ca.deleted_at IS NULL
+                    LEFT JOIN customer_pics pic ON c.id = pic.customer_id AND pic.deleted_at IS NULL
+                    WHERE tks.id_sales = $salesId
+                      AND tks.deleted_at IS NULL
+                      AND DATE(ks.jadwal) = CURDATE()
+                      AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
+                      AND (ks.reschedule_reason IS NULL OR ks.reschedule_reason = '')
+                      $whereSearch
+                    ORDER BY ks.jadwal DESC
+                    LIMIT 50";
+        } else {
+            $sql = "SELECT c.id, c.nama_toko AS nama, c.kategori, pic.tlp_pic AS telp_pribadi, ca.alamat, ca.kota 
+                    FROM customers c
+                    LEFT JOIN customer_addresses ca ON c.id = ca.customer_id AND ca.deleted_at IS NULL
+                    LEFT JOIN customer_pics pic ON c.id = pic.customer_id AND pic.deleted_at IS NULL
+                    WHERE c.deleted_at IS NULL $whereSearch 
+                    ORDER BY (c.kategori = 'Dealer') DESC, c.nama_toko ASC 
+                    LIMIT 50";
+        }
     }
     
     $res = $conn->query($sql);
