@@ -680,26 +680,117 @@ $resPenitipan = $conn->query($sqlPenitipan);
             transform: translateY(-1px);
         }
 
-        /* Modal Styles */
+        /* Modal Styles & Smooth Scrolling Architecture */
+        .modal-taste .modal-dialog {
+            max-height: calc(100vh - 40px);
+            margin: 20px auto;
+        }
         .modal-taste .modal-content {
             border-radius: 20px;
             border: 2px solid var(--border-subtle);
-            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.25);
+            box-shadow: 0 24px 50px -12px rgba(15, 23, 42, 0.35);
+            max-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
+            background-color: #ffffff;
+        }
+        .modal-taste .modal-content > form,
+        .modal-taste form {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: 100%;
+            overflow: hidden;
+            margin-bottom: 0;
         }
         .modal-taste .modal-header {
-            padding: 20px 24px;
+            flex-shrink: 0;
+            padding: 18px 24px;
             border-bottom: 2px solid #e2e8f0;
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            z-index: 5;
         }
         .modal-taste .modal-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 900;
             color: #020617;
         }
+        .modal-taste .modal-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            padding: 22px 24px;
+        }
+        .modal-taste .modal-footer {
+            flex-shrink: 0;
+            padding: 14px 24px;
+            border-top: 2px solid #e2e8f0;
+            background-color: #f8fafc;
+            z-index: 5;
+        }
+
+        /* Sleek Modern Scrollbar for Modals */
+        .modal-taste .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-taste .modal-body::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .modal-taste .modal-body::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .modal-taste .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Item Row Cards for Tambah & Edit */
+        .item-card-row {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .item-card-row:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+
+        /* Detail Modal Stat Cards */
+        .detail-stat-card {
+            border-radius: 14px;
+            padding: 14px 16px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .detail-stat-card.stat-blue {
+            background-color: var(--accent-blue-light);
+            border-color: #bfdbfe;
+        }
+        .detail-stat-card.stat-emerald {
+            background-color: var(--accent-emerald-light);
+            border-color: #a7f3d0;
+        }
+        .detail-stat-card.stat-amber {
+            background-color: var(--accent-amber-light);
+            border-color: #fde68a;
+        }
+        .detail-stat-card.stat-purple {
+            background-color: var(--accent-purple-light);
+            border-color: #e9d5ff;
+        }
+
         .form-label-taste {
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -710,8 +801,8 @@ $resPenitipan = $conn->query($sqlPenitipan);
         .form-control-taste {
             border: 2px solid #cbd5e1;
             border-radius: 12px;
-            padding: 11px 14px;
-            font-size: 14.5px;
+            padding: 10px 14px;
+            font-size: 14px;
             font-weight: 600;
             color: #0f172a;
             transition: border-color 0.15s, box-shadow 0.15s;
@@ -761,6 +852,46 @@ $resPenitipan = $conn->query($sqlPenitipan);
         .btn-taste-secondary:hover {
             background-color: #f1f5f9;
             color: var(--text-primary);
+        }
+        .btn-taste-emerald {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: #ffffff;
+            border: 2px solid #047857;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 13.5px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.15s ease;
+            box-shadow: 0 3px 10px rgba(5, 150, 105, 0.2);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-taste-emerald:hover {
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+            color: #ffffff;
+        }
+        .btn-taste-amber {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            color: #ffffff;
+            border: 2px solid #b45309;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 13.5px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.15s ease;
+            box-shadow: 0 3px 10px rgba(217, 119, 6, 0.2);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-taste-amber:hover {
+            background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+            color: #ffffff;
         }
     </style>
 </head>
@@ -1410,17 +1541,29 @@ $resPenitipan = $conn->query($sqlPenitipan);
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 3: DETAIL LENGKAP & RIWAYAT KUNJUNGAN TOKO                          -->
+    <!-- MODAL 3: DETAIL LENGKAP & RIWAYAT KUNJUNGAN TOKO (PROFESIONAL & KOMPLIT)   -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalDetailTiptok" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div>
-                        <h5 class="modal-title font-weight-bold text-dark mb-0">Detail Konsinyasi & Histori Audit</h5>
-                        <div class="text-secondary text-sm font-weight-bold" id="detailKodeTitip">-</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <h5 class="modal-title font-weight-bold text-dark mb-0">Detail Konsinyasi & Histori Audit</h5>
+                            <span class="taste-badge badge-neutral font-monospace font-weight-bold" id="detBadgeKode">-</span>
+                            <span class="taste-badge badge-active-tag" id="detBadgeStatus">Aktif</span>
+                        </div>
+                        <div class="text-secondary text-sm font-weight-bold" id="detailKodeTitip">Ringkasan stok titipan toko dan histori audit kunjungan</div>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="cetakSuratJalanDetail()" title="Cetak Surat Jalan / Bukti Titip">
+                            <i class="fa-solid fa-print me-1 text-primary"></i> Cetak Surat Titip
+                        </button>
+                        <button type="button" class="btn-taste-emerald btn-sm py-1" onclick="shareWhatsappDetail()" title="Bagikan Ringkasan Stok ke WhatsApp">
+                            <i class="fa-brands fa-whatsapp me-1"></i> Share WA
+                        </button>
+                        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                 </div>
                 
                 <div class="modal-body p-4">
@@ -1430,40 +1573,130 @@ $resPenitipan = $conn->query($sqlPenitipan);
                     </div>
 
                     <div id="detailContent" class="d-none">
-                        <div class="p-3 mb-4 rounded-3 bg-light border" style="border: 2px solid #cbd5e1 !important;">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h5 class="font-weight-bold text-dark mb-1" id="detNamaToko">-</h5>
-                                    <div class="text-sm text-secondary font-weight-bold" id="detAlamatToko">-</div>
-                                    <div class="text-sm text-success font-weight-bold mt-1" id="detTelpToko">-</div>
+                        <!-- 1. EXECUTIVE KPI SUMMARY METRICS -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-md-3">
+                                <div class="detail-stat-card stat-blue">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <span class="text-xs font-weight-bold text-uppercase" style="color: #1e40af; letter-spacing: 0.05em;">Total Titip Awal</span>
+                                        <i class="fa-solid fa-boxes-stacked" style="color: #2563eb; font-size: 16px;"></i>
+                                    </div>
+                                    <h3 class="font-weight-bolder mb-0" id="detKpiTitip" style="font-family: 'Outfit', sans-serif; color: #1e3a8a;">0 Unit</h3>
+                                    <div class="text-xs font-weight-bold text-muted mt-1">Stok diserahkan</div>
                                 </div>
-                                <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                                    <span class="taste-badge badge-neutral font-monospace font-weight-bold" id="detKodeTitip">-</span>
-                                    <div class="text-sm text-secondary font-weight-bold mt-1">Tgl Titip: <strong id="detTglTitip" class="text-dark">-</strong></div>
-                                    <div class="text-sm text-secondary font-weight-bold">Sales: <strong id="detNamaSales" class="text-dark">-</strong></div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="detail-stat-card stat-emerald">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <span class="text-xs font-weight-bold text-uppercase" style="color: #065f46; letter-spacing: 0.05em;">Sisa Stok Fisik</span>
+                                        <i class="fa-solid fa-warehouse" style="color: #059669; font-size: 16px;"></i>
+                                    </div>
+                                    <h3 class="font-weight-bolder mb-0" id="detKpiSisa" style="font-family: 'Outfit', sans-serif; color: #047857;">0 Unit</h3>
+                                    <div class="text-xs font-weight-bold text-muted mt-1">Masih di toko</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="detail-stat-card stat-amber">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <span class="text-xs font-weight-bold text-uppercase" style="color: #92400e; letter-spacing: 0.05em;">Total Terjual</span>
+                                        <i class="fa-solid fa-cart-shopping" style="color: #d97706; font-size: 16px;"></i>
+                                    </div>
+                                    <h3 class="font-weight-bolder mb-0" id="detKpiTerjual" style="font-family: 'Outfit', sans-serif; color: #b45309;">0 Unit</h3>
+                                    <div class="text-xs font-weight-bold text-muted mt-1" id="detKpiSellRate">0% laku terjual</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="detail-stat-card stat-purple">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <span class="text-xs font-weight-bold text-uppercase" style="color: #6b21a8; letter-spacing: 0.05em;">Total Insentif</span>
+                                        <i class="fa-solid fa-sack-dollar" style="color: #9333ea; font-size: 16px;"></i>
+                                    </div>
+                                    <h3 class="font-weight-bolder mb-0" id="detKpiInsentif" style="font-family: 'Outfit', sans-serif; color: #7e22ce;">Rp 0</h3>
+                                    <div class="text-xs font-weight-bold text-muted mt-1">Reward terakumulasi</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-label-taste mb-2">Rincian Stok Barang</div>
-                        <div class="table-responsive border rounded-3 mb-4" style="border: 2px solid #cbd5e1 !important;">
+                        <!-- 2. STORE & SALES PROFILE CARD -->
+                        <div class="p-3 mb-4 rounded-3 bg-light border" style="border: 2px solid #cbd5e1 !important;">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md-7 border-end-md">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h5 class="font-weight-bold text-dark mb-0" id="detNamaToko">-</h5>
+                                        <span class="taste-badge badge-dealer-tag" id="detKategoriToko">Dealer</span>
+                                    </div>
+                                    <div class="text-sm text-secondary font-weight-bold" id="detAlamatToko">-</div>
+                                    <div class="d-flex align-items-center gap-3 mt-2 flex-wrap">
+                                        <a href="javascript:void(0)" id="detLinkWa" target="_blank" class="text-xs font-weight-bold text-success d-inline-flex align-items-center gap-1">
+                                            <i class="fa-brands fa-whatsapp" style="font-size: 14px;"></i> <span id="detTelpToko">-</span>
+                                        </a>
+                                        <a href="javascript:void(0)" id="detLinkGmaps" target="_blank" class="text-xs font-weight-bold text-primary d-inline-flex align-items-center gap-1">
+                                            <i class="fa-solid fa-location-dot" style="font-size: 13px;"></i> Lihat Peta Lokasi
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="d-flex flex-column gap-1">
+                                        <div class="d-flex justify-content-between text-sm">
+                                            <span class="text-secondary font-weight-bold">Sales Penanggung Jawab:</span>
+                                            <strong class="text-dark" id="detNamaSales">-</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-sm">
+                                            <span class="text-secondary font-weight-bold">Tanggal Titip Barang:</span>
+                                            <strong class="text-dark" id="detTglTitip">-</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-sm">
+                                            <span class="text-secondary font-weight-bold">Audit Terakhir:</span>
+                                            <strong class="text-primary" id="detLastAudit">-</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-sm mt-1" id="detRowCatatan">
+                                            <span class="text-secondary font-weight-bold">Catatan:</span>
+                                            <span class="text-dark font-weight-bold text-end" id="detCatatan">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. ACTION SHORTCUT BUTTONS -->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                            <div class="form-label-taste mb-0">Rincian Stok Barang Titipan</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn-taste-primary btn-sm py-1" onclick="openCekSisaFromDetail()">
+                                    <i class="fa-solid fa-clipboard-check me-1"></i> Input Cek Sisa Fisik
+                                </button>
+                                <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="openEditFromDetail()">
+                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit Titipan
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 4. TABEL RINCIAN STOK BARANG -->
+                        <div class="table-responsive border rounded-3 mb-4" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden;">
                             <table class="table taste-table mb-0">
                                 <thead>
                                     <tr>
-                                        <th>NAMA BARANG</th>
-                                        <th class="text-center">STOK AWAL</th>
-                                        <th class="text-center">SISA STOK</th>
-                                        <th class="text-center">TERJUAL</th>
-                                        <th class="text-end">INSENTIF / UNIT</th>
-                                        <th class="text-end">TOTAL INSENTIF</th>
+                                        <th style="width: 5%;">#</th>
+                                        <th style="width: 32%;">NAMA BARANG & TIPE</th>
+                                        <th style="width: 10%; text-align: center;">STOK AWAL</th>
+                                        <th style="width: 10%; text-align: center;">SISA STOK</th>
+                                        <th style="width: 10%; text-align: center;">TERJUAL</th>
+                                        <th style="width: 13%; text-align: center;">STATUS</th>
+                                        <th style="width: 15%; text-align: right;">INSENTIF / UNIT</th>
+                                        <th style="width: 15%; text-align: right;">TOTAL INSENTIF</th>
                                     </tr>
                                 </thead>
                                 <tbody id="detItemsBody"></tbody>
+                                <tfoot id="detItemsFoot" style="background-color: #f8fafc; border-top: 2px solid #cbd5e1; font-weight: 800;"></tfoot>
                             </table>
                         </div>
 
-                        <div class="form-label-taste mb-2">Riwayat Kunjungan & Laporan Sisa Stok</div>
-                        <div class="table-responsive border rounded-3" style="border: 2px solid #cbd5e1 !important;">
+                        <!-- 5. RIWAYAT KUNJUNGAN & AUDIT SISA STOK -->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                            <div class="form-label-taste mb-0">Riwayat Audit Kunjungan & Laporan Penjualan</div>
+                            <span class="text-xs font-weight-bold text-muted" id="detTotalKunjunganBadge">0 Kunjungan Terdata</span>
+                        </div>
+                        <div class="table-responsive border rounded-3 mb-2" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden;">
                             <table class="table taste-table mb-0">
                                 <thead>
                                     <tr>
@@ -1471,9 +1704,10 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                         <th>SALES</th>
                                         <th>BARANG DIAUDIT</th>
                                         <th class="text-center">SISA FISIK</th>
-                                        <th class="text-center">TERJUAL</th>
+                                        <th class="text-center">LAKU</th>
                                         <th>NO. INVOICE</th>
                                         <th class="text-end">INSENTIF</th>
+                                        <th class="text-center">BUKTI</th>
                                         <th>CATATAN</th>
                                     </tr>
                                 </thead>
@@ -1483,8 +1717,13 @@ $resPenitipan = $conn->query($sqlPenitipan);
                     </div>
                 </div>
 
-                <div class="modal-footer p-3 bg-light border-top">
-                    <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Tutup</button>
+                <div class="modal-footer p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                    <div class="text-xs text-secondary font-weight-bold">
+                        <i class="fa-solid fa-shield-halved text-success me-1"></i> Data diverifikasi oleh Sistem Sales Loewix
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1751,7 +1990,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
             const container = document.getElementById('containerItemRows');
             if (!container) return;
             const rowHtml = `
-                <div class="p-3 mb-2 rounded-3 bg-light border" id="itemRow_${itemRowIndex}" style="border: 2px solid #cbd5e1 !important;">
+                <div class="item-card-row" id="itemRow_${itemRowIndex}">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="taste-badge badge-neutral" style="font-size: 13px;">Item #${itemRowIndex}</span>
                         <button type="button" class="btn btn-sm btn-link text-danger p-0 mb-0 font-weight-bold" onclick="hapusBarisBarang(${itemRowIndex})">
@@ -1888,7 +2127,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                      </button>`;
 
                                 const rowHtml = `
-                                    <div class="p-3 mb-2 rounded-3 bg-light border" id="editItemRow_${editItemRowIndex}" style="border: 2px solid #cbd5e1 !important;">
+                                    <div class="item-card-row" id="editItemRow_${editItemRowIndex}">
                                         <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="${it.id}">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <span class="taste-badge badge-neutral" style="font-size: 13px;">Item #${editItemRowIndex}</span>
@@ -1949,7 +2188,7 @@ $resPenitipan = $conn->query($sqlPenitipan);
             const container = document.getElementById('editContainerItemRows');
             if (!container) return;
             const rowHtml = `
-                <div class="p-3 mb-2 rounded-3 bg-light border" id="editItemRow_${editItemRowIndex}" style="border: 2px solid #cbd5e1 !important;">
+                <div class="item-card-row" id="editItemRow_${editItemRowIndex}">
                     <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="0">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="taste-badge badge-neutral" style="font-size: 13px;">Item Baru #${editItemRowIndex}</span>
@@ -2219,8 +2458,10 @@ $resPenitipan = $conn->query($sqlPenitipan);
         }
 
         // =========================================================================
-        // DETAIL PENITIPAN / HISTORI
+        // DETAIL PENITIPAN / HISTORI (PROFESIONAL & EXECUTIVE ENGINE)
         // =========================================================================
+        let currentDetailData = null;
+
         function openModalDetailTiptok(idPenitipan) {
             document.getElementById('detailLoading').classList.remove('d-none');
             document.getElementById('detailContent').classList.add('d-none');
@@ -2231,51 +2472,186 @@ $resPenitipan = $conn->query($sqlPenitipan);
                 .then(res => {
                     document.getElementById('detailLoading').classList.add('d-none');
                     if (res && res.status === 'success') {
+                        currentDetailData = res.data;
                         document.getElementById('detailContent').classList.remove('d-none');
                         const m = res.data.master;
-                        document.getElementById('detailKodeTitip').textContent = 'Kode: ' + (m.kode_titip || '-');
-                        document.getElementById('detNamaToko').textContent = m.nama_toko || 'Toko Customer';
-                        document.getElementById('detAlamatToko').textContent = (m.alamat_toko || '') + (m.kota_toko ? ', ' + m.kota_toko : '');
-                        document.getElementById('detTelpToko').textContent = m.telp_toko ? 'WA / Telp: ' + m.telp_toko : '';
-                        document.getElementById('detKodeTitip').textContent = m.kode_titip || '-';
-                        document.getElementById('detTglTitip').textContent = m.tgl_titip || '-';
-                        document.getElementById('detNamaSales').textContent = m.nama_sales || 'Sales';
+                        const summary = res.data.summary || {};
+                        const items = res.data.items || [];
+                        const logs = res.data.logs || [];
 
-                        const itemBody = document.getElementById('detItemsBody');
-                        itemBody.innerHTML = '';
-                        if (!res.data.items || res.data.items.length === 0) {
-                            itemBody.innerHTML = '<tr><td colspan="6" class="text-center py-3 text-muted font-weight-bold">Tidak ada barang titipan.</td></tr>';
+                        // 1. Header & Badges
+                        const kodeTitip = m.kode_titip || '-';
+                        document.getElementById('detBadgeKode').textContent = kodeTitip;
+                        const stBadge = document.getElementById('detBadgeStatus');
+                        if (stBadge) {
+                            if (m.status === 'selesai') {
+                                stBadge.className = 'taste-badge badge-neutral';
+                                stBadge.textContent = 'Selesai';
+                            } else if (m.status === 'ditarik') {
+                                stBadge.className = 'taste-badge badge-danger-tag';
+                                stBadge.textContent = 'Ditarik';
+                            } else {
+                                stBadge.className = 'taste-badge badge-active-tag';
+                                stBadge.textContent = 'Aktif';
+                            }
+                        }
+                        document.getElementById('detailKodeTitip').textContent = `Tgl Titip: ${m.tgl_titip || '-'} • Sales: ${m.nama_sales || 'Sales'}`;
+
+                        // 2. Executive KPI Cards
+                        const sumTitip = parseInt(summary.total_titip) || 0;
+                        const sumSisa = parseInt(summary.total_sisa) || 0;
+                        const sumTerjual = parseInt(summary.total_terjual) || 0;
+                        const sumInsentif = parseFloat(summary.total_insentif) || 0;
+
+                        document.getElementById('detKpiTitip').textContent = sumTitip + ' Unit';
+                        document.getElementById('detKpiSisa').textContent = sumSisa + ' Unit';
+                        document.getElementById('detKpiTerjual').textContent = sumTerjual + ' Unit';
+                        document.getElementById('detKpiInsentif').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(sumInsentif);
+
+                        const sellRate = sumTitip > 0 ? Math.round((sumTerjual / sumTitip) * 100) : 0;
+                        document.getElementById('detKpiSellRate').textContent = `${sellRate}% dari stok titipan`;
+
+                        // 3. Store & Sales Profile Card
+                        document.getElementById('detNamaToko').textContent = m.nama_toko || 'Toko Customer';
+                        document.getElementById('detKategoriToko').textContent = m.kategori_customer || 'Dealer';
+                        document.getElementById('detAlamatToko').textContent = (m.alamat_toko || '-') + (m.kota_toko ? ', ' + m.kota_toko : '');
+                        
+                        const telp = m.telp_toko || '';
+                        const linkWa = document.getElementById('detLinkWa');
+                        const spanTelp = document.getElementById('detTelpToko');
+                        if (telp) {
+                            spanTelp.textContent = telp;
+                            let cleanPhone = telp.replace(/[^0-9]/g, '');
+                            if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.substring(1);
+                            linkWa.href = `https://wa.me/${cleanPhone}`;
+                            linkWa.classList.remove('d-none');
                         } else {
-                            res.data.items.forEach(it => {
+                            spanTelp.textContent = 'Tidak ada telepon';
+                            linkWa.removeAttribute('href');
+                        }
+
+                        const linkGmaps = document.getElementById('detLinkGmaps');
+                        if (m.alamat_lokasi && m.alamat_lokasi.startsWith('http')) {
+                            linkGmaps.href = m.alamat_lokasi;
+                            linkGmaps.classList.remove('d-none');
+                        } else {
+                            const queryAddr = encodeURIComponent((m.nama_toko || '') + ' ' + (m.alamat_toko || '') + ' ' + (m.kota_toko || ''));
+                            linkGmaps.href = `https://www.google.com/maps/search/?api=1&query=${queryAddr}`;
+                            linkGmaps.classList.remove('d-none');
+                        }
+
+                        document.getElementById('detNamaSales').textContent = m.nama_sales || 'Sales In-Charge';
+                        document.getElementById('detTglTitip').textContent = m.tgl_titip || '-';
+
+                        const lastLog = logs.length > 0 ? logs[0].tgl_kunjungan : null;
+                        document.getElementById('detLastAudit').textContent = lastLog ? lastLog : 'Belum pernah diaudit';
+
+                        const catEl = document.getElementById('detCatatan');
+                        const rowCat = document.getElementById('detRowCatatan');
+                        if (m.catatan && m.catatan.trim() !== '') {
+                            catEl.textContent = m.catatan;
+                            if (rowCat) rowCat.classList.remove('d-none');
+                        } else {
+                            if (rowCat) rowCat.classList.add('d-none');
+                        }
+
+                        // 4. Rincian Stok Items Table
+                        const itemBody = document.getElementById('detItemsBody');
+                        const itemFoot = document.getElementById('detItemsFoot');
+                        itemBody.innerHTML = '';
+                        if (!items || items.length === 0) {
+                            itemBody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted font-weight-bold">Tidak ada barang titipan terdaftar.</td></tr>';
+                            if (itemFoot) itemFoot.innerHTML = '';
+                        } else {
+                            items.forEach((it, idx) => {
+                                const qTitip = parseInt(it.qty_titip) || 0;
+                                const qSisa = parseInt(it.qty_sisa) || 0;
+                                const qTerjual = parseInt(it.qty_terjual) || 0;
+                                const insUnit = parseFloat(it.insentif_per_unit) || 0;
+                                const totalIns = parseFloat(it.total_insentif) || 0;
+
+                                let statusBadge = '';
+                                if (qTerjual === 0) {
+                                    statusBadge = `<span class="taste-badge badge-active-tag" style="font-size:12px;">100% Utuh</span>`;
+                                } else if (qSisa === 0) {
+                                    statusBadge = `<span class="taste-badge badge-danger-tag" style="font-size:12px;">Habis Terjual</span>`;
+                                } else {
+                                    statusBadge = `<span class="taste-badge badge-warning-tag" style="font-size:12px;">${qTerjual} Terjual</span>`;
+                                }
+
                                 itemBody.innerHTML += `
                                     <tr>
-                                        <td><strong style="font-size: 14.5px; color: #020617;">${escapeHtml(it.nama_barang)}</strong> <span class="text-xs text-muted">(${escapeHtml(it.tipe_barang || '-')})</span></td>
-                                        <td class="text-center font-weight-bold">${it.qty_titip}</td>
-                                        <td class="text-center font-weight-bold text-success" style="font-size: 14.5px;">${it.qty_sisa}</td>
-                                        <td class="text-center font-weight-bold text-danger" style="font-size: 14.5px;">${it.qty_terjual}</td>
-                                        <td class="text-end font-weight-bold">Rp ${new Intl.NumberFormat('id-ID').format(it.insentif_per_unit)}</td>
-                                        <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(it.total_insentif)}</td>
+                                        <td class="font-weight-bold text-secondary text-center">${idx + 1}</td>
+                                        <td>
+                                            <div class="font-weight-bold" style="font-size: 14.5px; color: #020617;">${escapeHtml(it.nama_barang)}</div>
+                                            <span class="text-xs text-muted font-weight-bold">${escapeHtml(it.tipe_barang || 'Perangkat Loewix')}</span>
+                                        </td>
+                                        <td class="text-center font-weight-bold text-dark" style="font-size: 14.5px;">${qTitip}</td>
+                                        <td class="text-center font-weight-bold text-success" style="font-size: 15px;">${qSisa}</td>
+                                        <td class="text-center font-weight-bold text-danger" style="font-size: 15px;">${qTerjual}</td>
+                                        <td class="text-center">${statusBadge}</td>
+                                        <td class="text-end font-weight-bold" style="font-size: 13.5px;">Rp ${new Intl.NumberFormat('id-ID').format(insUnit)}</td>
+                                        <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(totalIns)}</td>
                                     </tr>
                                 `;
                             });
+
+                            if (itemFoot) {
+                                itemFoot.innerHTML = `
+                                    <tr>
+                                        <td colspan="2" class="text-end text-dark font-weight-bolder py-3" style="font-size: 14px; letter-spacing: 0.05em;">TOTAL KESELURUHAN:</td>
+                                        <td class="text-center font-weight-bolder text-dark" style="font-size: 15px;">${sumTitip}</td>
+                                        <td class="text-center font-weight-bolder text-success" style="font-size: 15px;">${sumSisa}</td>
+                                        <td class="text-center font-weight-bolder text-danger" style="font-size: 15px;">${sumTerjual}</td>
+                                        <td class="text-center font-weight-bold text-muted">${sellRate}% Laku</td>
+                                        <td class="text-end text-muted">-</td>
+                                        <td class="text-end font-weight-bolder text-success" style="font-size: 16px;">Rp ${new Intl.NumberFormat('id-ID').format(sumInsentif)}</td>
+                                    </tr>
+                                `;
+                            }
                         }
 
+                        // 5. Riwayat Kunjungan Logs
                         const logBody = document.getElementById('detLogsBody');
+                        const totKunjunganBadge = document.getElementById('detTotalKunjunganBadge');
+                        if (totKunjunganBadge) totKunjunganBadge.textContent = `${logs.length} Kunjungan Terdata`;
+
                         logBody.innerHTML = '';
-                        if (!res.data.logs || res.data.logs.length === 0) {
-                            logBody.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted font-weight-bold">Belum ada riwayat kunjungan audit.</td></tr>';
+                        if (!logs || logs.length === 0) {
+                            logBody.innerHTML = `
+                                <tr>
+                                    <td colspan="9" class="text-center py-5 text-muted">
+                                        <i class="fa-solid fa-clipboard-list mb-2" style="font-size: 32px; color: #94a3b8; display: block;"></i>
+                                        <div class="font-weight-bold text-dark text-base">Belum Ada Riwayat Kunjungan Audit</div>
+                                        <p class="text-xs mb-3 text-muted">Lakukan kunjungan ke toko untuk memeriksa sisa stok fisik dan mencatat penjualan.</p>
+                                        <button type="button" class="btn-taste-primary btn-sm" onclick="openCekSisaFromDetail()">
+                                            <i class="fa-solid fa-plus me-1"></i> Input Kunjungan Pertama
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
                         } else {
-                            res.data.logs.forEach(l => {
-                                const invBadge = l.no_inv ? `<span class="taste-badge badge-invoice-tag">${escapeHtml(l.no_inv)}</span>` : '-';
+                            logs.forEach(l => {
+                                const invBadge = l.no_inv ? `<span class="taste-badge badge-invoice-tag">${escapeHtml(l.no_inv)}</span>` : '<span class="text-muted text-xs">-</span>';
+                                const lakuVal = parseInt(l.qty_terjual_kunjungan) || 0;
+                                const lakuDisplay = lakuVal > 0 ? `<span class="taste-badge badge-danger-tag">${lakuVal} Laku</span>` : `<span class="taste-badge badge-neutral">0</span>`;
+                                const insVal = parseFloat(l.insentif_didapat) || 0;
+                                
+                                let fotoBtn = '<span class="text-muted text-xs">-</span>';
+                                if (l.foto_kunjungan) {
+                                    fotoBtn = `<a href="uploads/tiptok/${escapeHtml(l.foto_kunjungan)}" target="_blank" class="btn btn-sm btn-outline-dark py-0 px-2 font-weight-bold" style="font-size: 11px;"><i class="fa-solid fa-image me-1"></i> Foto</a>`;
+                                }
+
                                 logBody.innerHTML += `
                                     <tr>
-                                        <td class="font-weight-bold">${l.tgl_kunjungan}</td>
-                                        <td><strong>${escapeHtml(l.nama_sales || '-')}</strong></td>
-                                        <td><strong>${escapeHtml(l.nama_barang)}</strong></td>
-                                        <td class="text-center font-weight-bold text-success">${l.stok_sisa}</td>
-                                        <td class="text-center font-weight-bold text-danger">${l.qty_terjual_kunjungan}</td>
+                                        <td class="font-weight-bold text-dark">${escapeHtml(l.tgl_kunjungan)}</td>
+                                        <td><strong>${escapeHtml(l.nama_sales || 'Sales')}</strong></td>
+                                        <td><strong>${escapeHtml(l.nama_barang || 'Semua Barang')}</strong></td>
+                                        <td class="text-center font-weight-bold text-success" style="font-size: 14.5px;">${l.stok_sisa}</td>
+                                        <td class="text-center font-weight-bold">${lakuDisplay}</td>
                                         <td>${invBadge}</td>
-                                        <td class="text-end font-weight-bold text-success">Rp ${new Intl.NumberFormat('id-ID').format(l.insentif_didapat)}</td>
+                                        <td class="text-end font-weight-bold text-success">Rp ${new Intl.NumberFormat('id-ID').format(insVal)}</td>
+                                        <td class="text-center">${fotoBtn}</td>
                                         <td class="text-sm text-secondary font-weight-bold">${escapeHtml(l.catatan_kunjungan || '-')}</td>
                                     </tr>
                                 `;
@@ -2292,6 +2668,228 @@ $resPenitipan = $conn->query($sqlPenitipan);
                     document.getElementById('detailContent').innerHTML = '<div class="p-4 text-center text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat detail.</div>';
                     document.getElementById('detailContent').classList.remove('d-none');
                 });
+        }
+
+        function openCekSisaFromDetail() {
+            if (!currentDetailData || !currentDetailData.master) return;
+            const m = currentDetailData.master;
+            hideModalSafe('modalDetailTiptok');
+            setTimeout(() => {
+                openModalLaporKunjungan(m.id);
+            }, 300);
+        }
+
+        function openEditFromDetail() {
+            if (!currentDetailData || !currentDetailData.master) return;
+            const m = currentDetailData.master;
+            hideModalSafe('modalDetailTiptok');
+            setTimeout(() => {
+                openModalEditPenitipan(m.id);
+            }, 300);
+        }
+
+        function shareWhatsappDetail() {
+            if (!currentDetailData || !currentDetailData.master) return;
+            const m = currentDetailData.master;
+            const items = currentDetailData.items || [];
+            const summary = currentDetailData.summary || {};
+
+            let text = `*SURAT PENITIPAN BARANG (TIP TOK)*\n`;
+            text += `*LOEWIX CCTV & SECURITY SYSTEM*\n`;
+            text += `====================================\n`;
+            text += `*No. Dokumen:* ${m.kode_titip || '-'}\n`;
+            text += `*Toko / Dealer:* ${m.nama_toko || '-'}\n`;
+            text += `*Kategori:* ${m.kategori_customer || 'Dealer'}\n`;
+            text += `*Alamat:* ${m.alamat_toko || '-'}${m.kota_toko ? ', ' + m.kota_toko : ''}\n`;
+            text += `*Sales:* ${m.nama_sales || '-'}\n`;
+            text += `*Tgl Titip:* ${m.tgl_titip || '-'}\n`;
+            text += `*Status:* ${m.status ? m.status.toUpperCase() : 'AKTIF'}\n`;
+            text += `====================================\n\n`;
+            text += `*RINCIAN STOK BARANG:*\n`;
+
+            items.forEach((it, i) => {
+                text += `${i + 1}. *${it.nama_barang}* (${it.tipe_barang || 'CCTV'})\n`;
+                text += `   - Titip Awal: ${it.qty_titip} unit\n`;
+                text += `   - Sisa Stok: ${it.qty_sisa} unit\n`;
+                text += `   - Terjual: ${it.qty_terjual} unit\n`;
+                text += `   - Insentif: Rp ${new Intl.NumberFormat('id-ID').format(it.insentif_per_unit)}/unit\n\n`;
+            });
+
+            text += `*TOTAL REKAP:* \n`;
+            text += `📦 Total Titip: ${summary.total_titip || 0} Unit\n`;
+            text += `🟢 Sisa di Toko: ${summary.total_sisa || 0} Unit\n`;
+            text += `🛒 Total Terjual: ${summary.total_terjual || 0} Unit\n`;
+            text += `💰 Total Insentif: Rp ${new Intl.NumberFormat('id-ID').format(summary.total_insentif || 0)}\n`;
+            text += `====================================\n`;
+            text += `_Dokumen otomatis dari Loewix Sales System_`;
+
+            let phone = m.telp_toko ? m.telp_toko.replace(/[^0-9]/g, '') : '';
+            if (phone.startsWith('0')) phone = '62' + phone.substring(1);
+
+            const waUrl = phone ? 
+                `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}` : 
+                `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+
+            window.open(waUrl, '_blank');
+        }
+
+        function cetakSuratJalanDetail() {
+            if (!currentDetailData || !currentDetailData.master) return;
+            const m = currentDetailData.master;
+            const items = currentDetailData.items || [];
+            const summary = currentDetailData.summary || {};
+
+            let rowsHtml = '';
+            items.forEach((it, idx) => {
+                rowsHtml += `
+                    <tr>
+                        <td style="text-align: center; border: 1px solid #333; padding: 8px;">${idx + 1}</td>
+                        <td style="border: 1px solid #333; padding: 8px;"><strong>${escapeHtml(it.nama_barang)}</strong><br><span style="font-size: 12px; color: #555;">${escapeHtml(it.tipe_barang || '-')}</span></td>
+                        <td style="text-align: center; border: 1px solid #333; padding: 8px; font-weight: bold;">${it.qty_titip} Unit</td>
+                        <td style="text-align: center; border: 1px solid #333; padding: 8px; font-weight: bold; color: green;">${it.qty_sisa} Unit</td>
+                        <td style="text-align: center; border: 1px solid #333; padding: 8px; font-weight: bold; color: red;">${it.qty_terjual} Unit</td>
+                        <td style="border: 1px solid #333; padding: 8px;">Kondisi Baik & Siap Display</td>
+                    </tr>
+                `;
+            });
+
+            const printHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Surat Penitipan Barang - ${escapeHtml(m.kode_titip || 'TIPTOK')}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 30px; color: #111; font-size: 13.5px; line-height: 1.5; }
+                        .header-table { width: 100%; border-bottom: 3px double #111; padding-bottom: 12px; margin-bottom: 20px; }
+                        .title { text-align: center; font-size: 18px; font-weight: bold; text-decoration: underline; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+                        .doc-no { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: #333; }
+                        .meta-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+                        .meta-table td { padding: 4px 6px; vertical-align: top; }
+                        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+                        .items-table th { background: #f1f5f9; border: 1px solid #333; padding: 8px; text-align: center; font-size: 13px; }
+                        .sign-table { width: 100%; border-collapse: collapse; margin-top: 40px; page-break-inside: avoid; }
+                        .sign-box { text-align: center; width: 33.33%; vertical-align: top; }
+                        .sign-space { height: 75px; }
+                        .terms { font-size: 11.5px; color: #444; border: 1px dashed #666; padding: 10px; margin-top: 20px; border-radius: 6px; }
+                        @media print {
+                            @page { margin: 15mm; size: portrait; }
+                            body { margin: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <table class="header-table">
+                        <tr>
+                            <td style="width: 65%;">
+                                <h2 style="margin: 0; font-size: 22px; font-weight: 900; letter-spacing: 0.05em; color: #020617;">LOEWIX SECURITY SYSTEM</h2>
+                                <div style="font-size: 12px; color: #334155; font-weight: 600;">PT. Giti Indonesia • CCTV, DVR, NVR & Security Solutions</div>
+                                <div style="font-size: 11px; color: #64748b;">Layanan Resmi Konsinyasi & Manajemen Stok Toko (TIP TOK)</div>
+                            </td>
+                            <td style="width: 35%; text-align: right; vertical-align: middle;">
+                                <div style="font-size: 11.5px; font-weight: bold; color: #020617;">TANGGAL CETAK:</div>
+                                <div style="font-size: 13px; font-weight: bold;">${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="title">SURAT PENITIPAN BARANG KONSINYASI</div>
+                    <div class="doc-no">NOMOR DOKUMEN: ${escapeHtml(m.kode_titip || '-')}</div>
+
+                    <table class="meta-table">
+                        <tr>
+                            <td style="width: 18%; font-weight: bold;">Toko / Dealer</td>
+                            <td style="width: 2%;">:</td>
+                            <td style="width: 38%; font-weight: bold;">${escapeHtml(m.nama_toko || '-')} (${escapeHtml(m.kategori_customer || 'Dealer')})</td>
+                            <td style="width: 18%; font-weight: bold;">Sales Penyerah</td>
+                            <td style="width: 2%;">:</td>
+                            <td style="width: 22%; font-weight: bold;">${escapeHtml(m.nama_sales || '-')}</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Alamat Toko</td>
+                            <td>:</td>
+                            <td>${escapeHtml(m.alamat_toko || '-')}${m.kota_toko ? ', ' + escapeHtml(m.kota_toko) : ''}</td>
+                            <td style="font-weight: bold;">Tanggal Penitipan</td>
+                            <td>:</td>
+                            <td>${escapeHtml(m.tgl_titip || '-')}</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Kontak / Telp</td>
+                            <td>:</td>
+                            <td>${escapeHtml(m.telp_toko || '-')}</td>
+                            <td style="font-weight: bold;">Status Berkas</td>
+                            <td>:</td>
+                            <td><strong>${m.status ? m.status.toUpperCase() : 'AKTIF'}</strong></td>
+                        </tr>
+                    </table>
+
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 6%;">NO</th>
+                                <th style="width: 44%;">NAMA & DESKRIPSI BARANG</th>
+                                <th style="width: 12%;">QTY TITIP</th>
+                                <th style="width: 12%;">SISA STOK</th>
+                                <th style="width: 12%;">TERJUAL</th>
+                                <th style="width: 14%;">KETERANGAN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                            <tr style="background: #f8fafc; font-weight: bold;">
+                                <td colspan="2" style="text-align: right; border: 1px solid #333; padding: 8px;">TOTAL UNIT:</td>
+                                <td style="text-align: center; border: 1px solid #333; padding: 8px; font-weight: bold;">${summary.total_titip || 0} Unit</td>
+                                <td style="text-align: center; border: 1px solid #333; padding: 8px; font-weight: bold; color: green;">${summary.total_sisa || 0} Unit</td>
+                                <td style="text-align: center; border: 1px solid #333; padding: 8px; font-weight: bold; color: red;">${summary.total_terjual || 0} Unit</td>
+                                <td style="border: 1px solid #333; padding: 8px; text-align: center;">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="terms">
+                        <strong>Syarat & Ketentuan Konsinyasi:</strong><br>
+                        1. Barang di atas diserahkan dalam kondisi baru, lengkap, dan berfungsi normal untuk didisplay/dijual di toko penerima.<br>
+                        2. Kepemilikan barang tetap berada pada PT. Giti Indonesia (Loewix) sampai barang tersebut terjual dan diterbitkan invoice resmi.<br>
+                        3. Pihak toko berkewajiban merawat fisik unit dari kerusakan/kehilangan, dan bersedia diaudit stok fisik secara berkala oleh Sales Loewix.
+                    </div>
+
+                    <table class="sign-table">
+                        <tr>
+                            <td class="sign-box">
+                                <strong>Yang Menyerahkan (Sales)</strong>
+                                <div class="sign-space"></div>
+                                <div>( <u>${escapeHtml(m.nama_sales || '........................')}</u> )</div>
+                                <div style="font-size: 11px; color: #666;">Sales Representative</div>
+                            </td>
+                            <td class="sign-box">
+                                <strong>Yang Menerima (Toko/Dealer)</strong>
+                                <div class="sign-space"></div>
+                                <div>( <u>${escapeHtml(m.nama_toko || '........................')}</u> )</div>
+                                <div style="font-size: 11px; color: #666;">Cap & Tanda Tangan Toko</div>
+                            </td>
+                            <td class="sign-box">
+                                <strong>Mengetahui (Admin Sales)</strong>
+                                <div class="sign-space"></div>
+                                <div>( <u>Loewix Management</u> )</div>
+                                <div style="font-size: 11px; color: #666;">Admin / Head Office</div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            const printWin = window.open('', '_blank', 'width=900,height=750');
+            if (printWin) {
+                printWin.document.open();
+                printWin.document.write(printHtml);
+                printWin.document.close();
+            }
         }
 
         // =========================================================================
