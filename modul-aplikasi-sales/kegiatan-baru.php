@@ -112,40 +112,44 @@ $salesResult = mysqli_query($conn, "
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   
   <style>
-    /* ─── Taste-Skill Design Architecture ─── */
+    /* ─── Senior-Friendly & High-Contrast Design Architecture ─── */
     :root {
-      --kb-primary: #2563eb;
-      --kb-primary-hover: #1d4ed8;
+      --kb-primary: #1d4ed8;
+      --kb-primary-hover: #1e40af;
       --kb-primary-light: #eff6ff;
-      --kb-primary-border: #bfdbfe;
+      --kb-primary-border: #93c5fd;
+      --kb-slate-950: #020617;
       --kb-slate-900: #0f172a;
       --kb-slate-800: #1e293b;
       --kb-slate-700: #334155;
       --kb-slate-600: #475569;
       --kb-slate-500: #64748b;
       --kb-slate-400: #94a3b8;
+      --kb-slate-300: #cbd5e1;
       --kb-slate-200: #e2e8f0;
       --kb-slate-100: #f1f5f9;
       --kb-slate-50: #f8fafc;
-      --kb-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 8px 24px -4px rgba(15, 23, 42, 0.04);
-      --kb-card-hover: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
-      --kb-radius-lg: 16px;
+      --kb-card-shadow: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+      --kb-card-hover: 0 8px 24px -4px rgba(15, 23, 42, 0.14);
+      --kb-radius-lg: 18px;
       --kb-radius-md: 12px;
       --kb-radius-sm: 8px;
     }
 
     body {
-      background-color: #f8fafc !important;
+      background-color: #f1f5f9 !important;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--kb-slate-800);
+      color: var(--kb-slate-900);
+      font-size: 14.5px;
+      line-height: 1.5;
     }
 
     /* ─── Page Header Card ─── */
     .kb-header-card {
       background: #ffffff;
-      border: 1px solid var(--kb-slate-200);
+      border: 2px solid var(--kb-slate-300);
       border-radius: var(--kb-radius-lg);
-      padding: 20px 24px;
+      padding: 22px 28px;
       box-shadow: var(--kb-card-shadow);
       margin-bottom: 24px;
       display: flex;
@@ -158,46 +162,47 @@ $salesResult = mysqli_query($conn, "
     .kb-header-title {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
     }
 
     .kb-header-icon {
-      width: 48px;
-      height: 48px;
+      width: 54px;
+      height: 54px;
       border-radius: var(--kb-radius-md);
-      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-      color: var(--kb-primary);
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid var(--kb-primary-border);
+      box-shadow: 0 4px 14px rgba(29, 78, 216, 0.35);
       flex-shrink: 0;
     }
 
     .kb-header-icon .material-symbols-outlined {
-      font-size: 26px;
-      font-variation-settings: 'FILL' 1, 'wght' 600;
+      font-size: 30px;
+      font-variation-settings: 'FILL' 1, 'wght' 700;
     }
 
     .kb-header-text h1 {
       font-family: 'Outfit', sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--kb-slate-900);
+      font-size: 23px;
+      font-weight: 800;
+      color: var(--kb-slate-950);
       margin: 0;
       letter-spacing: -0.02em;
     }
 
     .kb-header-text p {
-      font-size: 13px;
-      color: var(--kb-slate-500);
-      margin: 2px 0 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--kb-slate-600);
+      margin: 3px 0 0;
     }
 
     /* ─── Form Container & Sections ─── */
     .kb-form-container {
       background: #ffffff;
-      border: 1px solid var(--kb-slate-200);
+      border: 2px solid var(--kb-slate-300);
       border-radius: var(--kb-radius-lg);
       box-shadow: var(--kb-card-shadow);
       overflow: hidden;
@@ -205,30 +210,42 @@ $salesResult = mysqli_query($conn, "
     }
 
     .kb-form-body {
-      padding: 32px;
+      padding: 34px;
     }
 
     .kb-section-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 700;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--kb-slate-700);
-      background: var(--kb-slate-100);
-      border: 1px solid var(--kb-slate-200);
-      padding: 6px 12px;
-      border-radius: 20px;
-      margin-bottom: 18px;
+      letter-spacing: 0.05em;
+      color: #1e40af;
+      background: #eff6ff;
+      border: 2px solid #93c5fd;
+      padding: 8px 16px;
+      border-radius: 24px;
+      margin-bottom: 22px;
+    }
+
+    .kb-section-badge-purple {
+      color: #5b21b6;
+      background: #f5f3ff;
+      border-color: #c4b5fd;
+    }
+
+    .kb-section-badge-green {
+      color: #065f46;
+      background: #ecfdf5;
+      border-color: #86efac;
     }
 
     .kb-section-badge .dot {
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: var(--kb-primary);
+      background: currentColor;
     }
 
     /* ─── Modern Form Controls ─── */
@@ -236,21 +253,21 @@ $salesResult = mysqli_query($conn, "
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--kb-slate-700);
-      margin-bottom: 8px;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--kb-slate-900);
+      margin-bottom: 10px;
     }
 
     .kb-label-icon {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .kb-label-icon .material-symbols-outlined,
     .kb-label-icon i {
-      font-size: 16px;
+      font-size: 19px;
       color: var(--kb-primary);
     }
 
@@ -260,31 +277,33 @@ $salesResult = mysqli_query($conn, "
 
     .kb-input {
       width: 100%;
-      height: 46px;
+      height: 50px;
       background-color: #ffffff;
-      border: 1.5px solid var(--kb-slate-200);
+      border: 2px solid var(--kb-slate-300);
       border-radius: var(--kb-radius-md);
-      padding: 10px 14px;
-      font-size: 13.5px;
-      color: var(--kb-slate-800);
+      padding: 10px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--kb-slate-950);
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       outline: none;
     }
 
     .kb-input:focus {
       border-color: var(--kb-primary);
-      box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.12);
+      box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.22);
       background-color: #ffffff;
     }
 
     .kb-input::placeholder {
-      color: var(--kb-slate-400);
-      font-size: 13px;
+      color: var(--kb-slate-500);
+      font-size: 14px;
+      font-weight: 500;
     }
 
     textarea.kb-input {
       height: auto;
-      min-height: 105px;
+      min-height: 115px;
       line-height: 1.6;
       resize: vertical;
     }
@@ -292,19 +311,19 @@ $salesResult = mysqli_query($conn, "
     /* ─── Datetime Row ─── */
     .kb-datetime-grid {
       display: grid;
-      grid-template-columns: 1fr 100px 100px;
-      gap: 10px;
+      grid-template-columns: 1fr 115px 115px;
+      gap: 12px;
     }
 
     .kb-select {
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%231e293b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
       background-repeat: no-repeat;
-      background-position: right 10px center;
-      background-size: 14px;
-      padding-right: 32px !important;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 36px !important;
       cursor: pointer;
     }
 
@@ -315,11 +334,11 @@ $salesResult = mysqli_query($conn, "
 
     .kb-dropdown-btn {
       width: 100%;
-      height: 48px;
+      height: 52px;
       background: #ffffff;
-      border: 1.5px solid var(--kb-slate-200);
+      border: 2px solid var(--kb-slate-300);
       border-radius: var(--kb-radius-md);
-      padding: 10px 14px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -329,39 +348,42 @@ $salesResult = mysqli_query($conn, "
     }
 
     .kb-dropdown-btn:hover {
-      border-color: var(--kb-slate-400);
+      border-color: var(--kb-slate-500);
       background: var(--kb-slate-50);
     }
 
     .kb-dropdown-btn:focus,
     .kb-dropdown-btn.active {
       border-color: var(--kb-primary);
-      box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.12);
+      box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.22);
       outline: none;
     }
 
     .kb-dropdown-btn-content {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
       flex: 1;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--kb-slate-900);
     }
 
     .kb-dropdown-panel {
       display: none;
       position: absolute;
-      top: calc(100% + 6px);
+      top: calc(100% + 8px);
       left: 0;
       right: 0;
       background: #ffffff;
-      border: 1px solid var(--kb-slate-200);
+      border: 2px solid var(--kb-slate-300);
       border-radius: var(--kb-radius-md);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.2);
       z-index: 1050;
-      max-height: 280px;
+      max-height: 320px;
       overflow-y: auto;
     }
 
@@ -369,19 +391,21 @@ $salesResult = mysqli_query($conn, "
       position: sticky;
       top: 0;
       background: #ffffff;
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--kb-slate-200);
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--kb-slate-200);
       z-index: 2;
     }
 
     .kb-dropdown-search {
       width: 100%;
-      height: 38px;
+      height: 44px;
       background: var(--kb-slate-50);
-      border: 1px solid var(--kb-slate-200);
+      border: 2px solid var(--kb-slate-300);
       border-radius: 8px;
-      padding: 6px 12px 6px 34px;
-      font-size: 13px;
+      padding: 8px 14px 8px 38px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--kb-slate-950);
       outline: none;
     }
 
@@ -392,22 +416,22 @@ $salesResult = mysqli_query($conn, "
 
     .kb-dropdown-search-icon {
       position: absolute;
-      left: 20px;
+      left: 24px;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--kb-slate-400);
-      font-size: 15px;
+      color: var(--kb-slate-600);
+      font-size: 18px;
       pointer-events: none;
     }
 
     .kb-dropdown-item {
-      padding: 10px 14px;
+      padding: 12px 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      border-bottom: 1px solid var(--kb-slate-100);
+      gap: 14px;
+      border-bottom: 1px solid var(--kb-slate-200);
       transition: background 0.15s ease;
     }
 
@@ -420,33 +444,33 @@ $salesResult = mysqli_query($conn, "
     }
 
     .kb-dropdown-item.selected {
-      background-color: var(--kb-primary-light);
-      font-weight: 600;
+      background-color: #dbeafe;
+      font-weight: 700;
     }
 
     /* ─── Sales Agent Cards ─── */
     .kb-sales-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 14px;
     }
 
     .kb-sales-card {
       position: relative;
       background: #ffffff;
-      border: 1.5px solid var(--kb-slate-200);
+      border: 2px solid var(--kb-slate-300);
       border-radius: var(--kb-radius-md);
-      padding: 12px 14px;
+      padding: 14px 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       user-select: none;
     }
 
     .kb-sales-card:hover {
-      border-color: var(--kb-slate-400);
+      border-color: var(--kb-slate-500);
       background: var(--kb-slate-50);
       transform: translateY(-1px);
     }
@@ -457,18 +481,18 @@ $salesResult = mysqli_query($conn, "
 
     .kb-sales-checkbox:checked + .kb-sales-card {
       border-color: var(--kb-primary);
-      background: var(--kb-primary-light);
-      box-shadow: 0 0 0 1px var(--kb-primary);
+      background: #eff6ff;
+      box-shadow: 0 0 0 2px var(--kb-primary), var(--kb-card-shadow);
     }
 
     .kb-sales-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-      color: var(--kb-slate-700);
-      font-size: 13px;
-      font-weight: 700;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -477,8 +501,9 @@ $salesResult = mysqli_query($conn, "
     }
 
     .kb-sales-checkbox:checked + .kb-sales-card .kb-sales-avatar {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
       color: #ffffff;
+      box-shadow: 0 3px 10px rgba(29, 78, 216, 0.4);
     }
 
     .kb-sales-info {
@@ -487,9 +512,9 @@ $salesResult = mysqli_query($conn, "
     }
 
     .kb-sales-name {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--kb-slate-900);
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--kb-slate-950);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -497,20 +522,17 @@ $salesResult = mysqli_query($conn, "
     }
 
     .kb-sales-badge {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--kb-slate-500);
-      margin-top: 2px;
+      margin-top: 4px;
       display: flex;
       align-items: center;
       gap: 4px;
     }
 
     .kb-sales-check-icon {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
-      border: 1.5px solid var(--kb-slate-300);
+      border: 2px solid var(--kb-slate-400);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -527,88 +549,94 @@ $salesResult = mysqli_query($conn, "
 
     /* ─── Map & Geofence Elements ─── */
     #map {
-      height: 290px;
+      height: 310px;
       width: 100%;
       border-radius: var(--kb-radius-md);
-      border: 1.5px solid var(--kb-slate-200);
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+      border: 2px solid var(--kb-slate-300);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
       z-index: 1;
     }
 
     .kb-map-search-wrap {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
 
     .kb-radius-presets {
       display: flex;
-      gap: 6px;
-      margin-top: 8px;
+      gap: 8px;
+      margin-top: 10px;
     }
 
     .kb-preset-btn {
       flex: 1;
-      padding: 5px 8px;
-      font-size: 11px;
-      font-weight: 600;
-      background: var(--kb-slate-100);
-      border: 1px solid var(--kb-slate-200);
-      border-radius: 6px;
-      color: var(--kb-slate-600);
+      padding: 8px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      background: #ffffff;
+      border: 2px solid var(--kb-slate-300);
+      border-radius: 8px;
+      color: var(--kb-slate-700);
       cursor: pointer;
       transition: all 0.15s ease;
       text-align: center;
     }
 
-    .kb-preset-btn:hover,
-    .kb-preset-btn.active {
-      background: var(--kb-primary-light);
-      border-color: var(--kb-primary-border);
+    .kb-preset-btn:hover {
+      border-color: var(--kb-primary);
       color: var(--kb-primary);
+      background: var(--kb-primary-light);
+    }
+
+    .kb-preset-btn.active {
+      background: var(--kb-primary) !important;
+      border-color: var(--kb-primary) !important;
+      color: #ffffff !important;
+      box-shadow: 0 3px 10px rgba(29, 78, 216, 0.35);
     }
 
     .kb-coord-badge {
-      background: var(--kb-slate-50);
-      border: 1px solid var(--kb-slate-200);
+      background: #f8fafc;
+      border: 2px solid var(--kb-slate-300);
       border-radius: var(--kb-radius-sm);
-      padding: 8px 12px;
+      padding: 10px 14px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
-      color: var(--kb-slate-700);
+      font-size: 13.5px;
+      color: var(--kb-slate-950);
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
     }
 
     .kb-coord-label {
-      font-size: 9.5px;
+      font-size: 11px;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      color: var(--kb-slate-400);
+      font-weight: 800;
+      color: var(--kb-slate-600);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
 
     /* ─── Footer Action Bar ─── */
     .kb-form-footer {
       background: #ffffff;
-      border-top: 1px solid var(--kb-slate-200);
-      padding: 20px 32px;
+      border-top: 2px solid var(--kb-slate-200);
+      padding: 22px 34px;
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 12px;
+      gap: 14px;
     }
 
     .kb-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 12px 24px;
-      font-size: 13.5px;
-      font-weight: 600;
+      gap: 10px;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 700;
       border-radius: var(--kb-radius-md);
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
@@ -617,26 +645,27 @@ $salesResult = mysqli_query($conn, "
     }
 
     .kb-btn-secondary {
-      background: var(--kb-slate-100);
-      color: var(--kb-slate-700);
-      border: 1px solid var(--kb-slate-200);
+      background: #ffffff;
+      color: var(--kb-slate-800);
+      border: 2px solid var(--kb-slate-300);
     }
 
     .kb-btn-secondary:hover {
-      background: var(--kb-slate-200);
-      color: var(--kb-slate-900);
+      background: var(--kb-slate-100);
+      border-color: var(--kb-slate-500);
+      color: var(--kb-slate-950);
     }
 
     .kb-btn-primary {
-      background: var(--kb-primary);
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
       color: #ffffff !important;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 4px 16px rgba(29, 78, 216, 0.35);
     }
 
     .kb-btn-primary:hover {
-      background: var(--kb-primary-hover);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
-      transform: translateY(-1px);
+      background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+      box-shadow: 0 6px 24px rgba(29, 78, 216, 0.45);
+      transform: translateY(-2px);
     }
 
     .kb-btn-primary:active {
@@ -645,22 +674,23 @@ $salesResult = mysqli_query($conn, "
 
     /* ─── Region Badges ─── */
     .badge-region {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 7px;
-      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
-    .badge-region-jkt { background: #dbeafe; color: #1e40af; }
-    .badge-region-jatim { background: #ffedd5; color: #9a3412; }
-    .badge-region-jateng { background: #dcfce7; color: #166534; }
-    .badge-region-jabar { background: #f3e8ff; color: #6b21a8; }
-    .badge-region-other { background: #f1f5f9; color: #475569; }
+    .badge-region-jkt { background: #dbeafe; color: #1e40af; border: 1.5px solid #93c5fd; }
+    .badge-region-jatim { background: #ffedd5; color: #9a3412; border: 1.5px solid #fdba74; }
+    .badge-region-jateng { background: #dcfce7; color: #166534; border: 1.5px solid #86efac; }
+    .badge-region-jabar { background: #f3e8ff; color: #6b21a8; border: 1.5px solid #d8b4fe; }
+    .badge-region-other { background: #e2e8f0; color: #334155; border: 1.5px solid #cbd5e1; }
 
     /* Custom range styling */
     input[type=range].kb-range {
       accent-color: var(--kb-primary);
+      height: 8px;
     }
 
     /* ─── Responsive Media Queries ─── */
@@ -749,22 +779,22 @@ $salesResult = mysqli_query($conn, "
             <div class="row g-4">
 
               <!-- ════ LEFT COLUMN: Detail Jadwal & Sales Assignment ════ -->
-              <div class="col-lg-7 pe-lg-4" style="border-right: 1px solid #f1f5f9;">
+              <div class="col-lg-7 pe-lg-4" style="border-right: 2px solid #e2e8f0;">
                 
                 <!-- Section 1 Header -->
                 <div class="kb-section-badge">
                   <span class="dot"></span>
-                  <span>01. Informasi &amp; Jadwal Kunjungan</span>
+                  <span>01. INFORMASI &amp; JADWAL KUNJUNGAN</span>
                 </div>
 
                 <!-- Jadwal Visit Date & Time -->
                 <div class="mb-4">
                   <label class="kb-label">
                     <span class="kb-label-icon">
-                      <i class="bi bi-calendar3"></i>
+                      <i class="bi bi-calendar3-event-fill text-primary"></i>
                       <span>Tanggal &amp; Waktu Visit</span>
                     </span>
-                    <span class="text-xs text-muted">Wajib diisi</span>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-0.5 fw-bold" style="font-size: 11px;">* Wajib Diisi</span>
                   </label>
                   <div class="kb-datetime-grid">
                     <div>
@@ -790,37 +820,37 @@ $salesResult = mysqli_query($conn, "
                 <div class="mb-4">
                   <label for="visit" class="kb-label">
                     <span class="kb-label-icon">
-                      <i class="bi bi-chat-left-text"></i>
+                      <i class="bi bi-chat-left-text-fill text-primary"></i>
                       <span>Keperluan &amp; Agenda Kunjungan</span>
                     </span>
-                    <span class="text-xs text-muted">Wajib diisi</span>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-0.5 fw-bold" style="font-size: 11px;">* Wajib Diisi</span>
                   </label>
-                  <textarea class="kb-input" name="visit" id="visit" rows="3" placeholder="Tuliskan tujuan kunjungan (contoh: Follow-up penawaran CCTV Loewix, audit display toko, atau demo produk baru)..." required></textarea>
+                  <textarea class="kb-input" name="visit" id="visit" rows="3" placeholder="Tuliskan tujuan kunjungan (contoh: Follow-up penawaran CCTV Loewix, audit display toko, demo produk baru)..." required></textarea>
                 </div>
 
                 <!-- Customer Dropdown Selector -->
                 <div class="mb-4">
                   <label class="kb-label">
                     <span class="kb-label-icon">
-                      <i class="bi bi-shop"></i>
+                      <i class="bi bi-shop-window text-primary"></i>
                       <span>Pilih Customer (Toko / Mitra)</span>
                     </span>
-                    <span class="text-xs text-primary fw-bold" id="selectedCustomerBadge" style="display:none;">Customer Terpilih</span>
+                    <span class="badge bg-primary px-2.5 py-1 fw-bold" id="selectedCustomerBadge" style="display:none; font-size: 11px;">Customer Terpilih</span>
                   </label>
                   
                   <div class="kb-dropdown-wrapper">
                     <button type="button" class="kb-dropdown-btn" id="dropdownCustBtn">
                       <div class="kb-dropdown-btn-content" id="dropdownCustDisplay">
-                        <i class="bi bi-search text-muted"></i>
-                        <span class="text-muted">-- Cari &amp; Pilih Customer Toko --</span>
+                        <i class="bi bi-search text-primary fs-5"></i>
+                        <span class="text-dark fw-bold">-- Cari &amp; Pilih Customer Toko --</span>
                       </div>
-                      <i class="bi bi-chevron-down text-muted fs-6"></i>
+                      <i class="bi bi-chevron-down text-dark fs-6 fw-bold"></i>
                     </button>
 
                     <div class="kb-dropdown-panel" id="dropdownCustMenu">
                       <div class="kb-dropdown-search-wrap">
                         <i class="bi bi-search kb-dropdown-search-icon"></i>
-                        <input type="text" class="kb-dropdown-search" id="dropdownCustSearch" placeholder="Ketik nama toko, kode, atau kota..." autocomplete="off">
+                        <input type="text" class="kb-dropdown-search" id="dropdownCustSearch" placeholder="Ketik nama toko, kode customer, atau kota..." autocomplete="off">
                       </div>
                       <div id="dropdownCustList">
                         <?php while ($c = mysqli_fetch_assoc($customerResult)): ?>
@@ -844,14 +874,14 @@ $salesResult = mysqli_query($conn, "
                                data-alamat="<?php echo htmlspecialchars($c['alamat_lokasi'] ?? ''); ?>">
                             <div>
                               <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-light text-dark border font-monospace" style="font-size: 10px;">
+                                <span class="badge bg-light text-dark border font-monospace fw-bold" style="font-size: 11px;">
                                   <?php echo htmlspecialchars($c['kode_customer'] ?? 'CUST'); ?>
                                 </span>
-                                <span class="fw-semibold text-dark fs-7"><?php echo htmlspecialchars($c['nama']); ?></span>
+                                <span class="fw-bold text-dark fs-6"><?php echo htmlspecialchars($c['nama']); ?></span>
                               </div>
                               <?php if (!empty($c['alamat_lokasi'])): ?>
-                                <div class="text-xs text-muted text-truncate mt-0.5" style="max-width: 320px;">
-                                  <i class="bi bi-geo-alt"></i> <?php echo htmlspecialchars($c['alamat_lokasi']); ?>
+                                <div class="text-xs text-muted text-truncate mt-1" style="max-width: 320px; font-weight: 500;">
+                                  <i class="bi bi-geo-alt-fill text-danger"></i> <?php echo htmlspecialchars($c['alamat_lokasi']); ?>
                                 </div>
                               <?php endif; ?>
                             </div>
@@ -865,21 +895,21 @@ $salesResult = mysqli_query($conn, "
                   </div>
                   <!-- Hidden Customer ID input -->
                   <input type="hidden" id="id_customer" name="id_customer" required>
-                  <div class="form-text text-xs text-muted mt-1.5" id="customerLocationNote" style="display: none;">
-                    <i class="bi bi-info-circle text-primary"></i> Titik koordinat peta otomatis disesuaikan dari profil toko ini.
+                  <div class="form-text text-xs text-muted mt-2 fw-semibold" id="customerLocationNote" style="display: none;">
+                    <i class="bi bi-info-circle-fill text-primary"></i> Titik koordinat peta otomatis disesuaikan dari profil toko ini.
                   </div>
                 </div>
 
                 <!-- Section 2 Header -->
-                <div class="kb-section-badge mt-4">
+                <div class="kb-section-badge kb-section-badge-purple mt-4">
                   <span class="dot"></span>
-                  <span>02. Penugasan Sales Agent</span>
+                  <span>02. PENUGASAN SALES AGENT</span>
                 </div>
 
                 <div class="mb-3">
                   <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-xs text-muted">Pilih 1 atau lebih sales yang bertanggung jawab dalam kunjungan ini:</span>
-                    <span id="salesFilterNotice" class="badge bg-light text-primary border" style="font-size: 10px; display: none;"></span>
+                    <span class="text-sm fw-bold text-dark">Pilih 1 atau lebih sales yang bertanggung jawab:</span>
+                    <span id="salesFilterNotice" class="badge bg-light text-primary border" style="font-size: 11px; display: none;"></span>
                   </div>
 
                   <div class="kb-sales-grid" id="salesGridContainer">
@@ -908,7 +938,7 @@ $salesResult = mysqli_query($conn, "
                             </div>
                           </div>
                           <div class="kb-sales-check-icon">
-                            <i class="bi bi-check fs-6"></i>
+                            <i class="bi bi-check-lg fs-6 fw-bold"></i>
                           </div>
                         </label>
                       </div>
@@ -922,22 +952,22 @@ $salesResult = mysqli_query($conn, "
               <div class="col-lg-5 kb-col-right ps-lg-4">
                 
                 <!-- Section 3 Header -->
-                <div class="kb-section-badge">
-                  <span class="dot" style="background: #10b981;"></span>
-                  <span>03. Titik Lokasi &amp; Geofence GPS</span>
+                <div class="kb-section-badge kb-section-badge-green">
+                  <span class="dot"></span>
+                  <span>03. TITIK LOKASI &amp; GEOFENCE GPS</span>
                 </div>
 
                 <!-- Map Search Input -->
                 <div class="mb-3">
                   <label class="kb-label">
                     <span class="kb-label-icon">
-                      <i class="bi bi-pin-map text-success"></i>
+                      <i class="bi bi-geo-alt-fill text-success"></i>
                       <span>Cari Koordinat / Alamat Toko</span>
                     </span>
                   </label>
                   <div class="kb-map-search-wrap">
                     <input type="text" id="gmap_search" class="kb-input" placeholder="Cari nama lokasi atau -6.123, 106.827...">
-                    <button type="button" id="gmap_search_btn" class="kb-btn kb-btn-secondary px-3 py-2 flex-shrink-0" style="font-size: 12.5px;">
+                    <button type="button" id="gmap_search_btn" class="kb-btn kb-btn-primary px-3.5 py-2 flex-shrink-0" style="font-size: 14px;">
                       <i class="bi bi-search"></i>
                       <span>Cari</span>
                     </button>
@@ -948,22 +978,22 @@ $salesResult = mysqli_query($conn, "
                 <div id="map"></div>
 
                 <!-- GPS Location & Quick Actions -->
-                <div class="d-flex justify-content-between align-items-center mt-2.5">
-                  <button type="button" id="btn_get_location" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1.5 py-1.5 px-3 rounded-pill fw-semibold" style="font-size: 11.5px;">
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <button type="button" id="btn_get_location" class="btn btn-sm d-flex align-items-center gap-2 py-2 px-3.5 rounded-pill fw-bold text-white" style="font-size: 13px; background: #059669; border: none; box-shadow: 0 3px 10px rgba(5, 150, 105, 0.3);">
                     <i class="bi bi-crosshair fs-6"></i>
                     <span>Dapatkan Lokasi Saya (GPS)</span>
                   </button>
-                  <div class="d-flex align-items-center gap-1.5">
-                    <span class="text-xs text-muted font-monospace">Radius:</span>
-                    <span class="badge bg-primary px-2 py-1 font-monospace" id="slider_val">100m</span>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="text-xs fw-bold text-dark font-monospace">Radius:</span>
+                    <span class="badge bg-primary px-2.5 py-1.5 font-monospace fs-7 fw-bold" id="slider_val">100m</span>
                   </div>
                 </div>
 
                 <!-- Geofence Radius Slider -->
-                <div class="mt-3 p-3 bg-light rounded-3 border">
-                  <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="text-xs fw-bold text-dark">Radius Geofence Check-in</span>
-                    <span class="text-xs text-muted">Maksimal jarak toleransi absen</span>
+                <div class="mt-3 p-3.5 bg-white rounded-3 border" style="border: 2px solid #cbd5e1 !important;">
+                  <div class="d-flex justify-content-between align-items-center mb-1.5">
+                    <span class="text-sm fw-bold text-dark">Radius Geofence Check-in</span>
+                    <span class="text-xs text-muted fw-semibold">Jarak toleransi absen</span>
                   </div>
                   <input type="range" id="radius_slider" min="10" max="1000" step="10" value="100" class="kb-range w-100">
                   
@@ -994,10 +1024,10 @@ $salesResult = mysqli_query($conn, "
                 </div>
 
                 <!-- Reverse Geocoded Address Preview -->
-                <div class="mt-2.5">
-                  <div class="p-2.5 bg-light rounded-2 border text-xs text-muted d-flex align-items-start gap-2">
-                    <i class="bi bi-geo-alt-fill text-primary mt-0.5"></i>
-                    <span id="location_address_text" class="text-truncate-2">Mengarahkan pin peta ke titik lokasi target...</span>
+                <div class="mt-3">
+                  <div class="p-3 rounded-3 text-sm text-dark d-flex align-items-start gap-2.5" style="border: 2px solid #93c5fd; background: #eff6ff;">
+                    <i class="bi bi-geo-alt-fill text-primary fs-5 mt-0.5"></i>
+                    <span id="location_address_text" class="fw-bold text-dark">Mengarahkan pin peta ke titik lokasi target...</span>
                   </div>
                 </div>
 

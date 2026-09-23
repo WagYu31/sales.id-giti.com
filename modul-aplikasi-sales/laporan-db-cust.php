@@ -96,31 +96,33 @@ $result = mysqli_query($conn, $sql);
 ?>
 
 <style>
-/* ─── Taste-Skill Design Architecture for Laporan Visit ─── */
+/* ─── Senior-Friendly & High-Contrast Design Architecture for Laporan Visit ─── */
 :root {
-  --lp-primary: #2563eb;
-  --lp-primary-hover: #1d4ed8;
+  --lp-primary: #1d4ed8;
+  --lp-primary-hover: #1e40af;
   --lp-primary-light: #eff6ff;
-  --lp-primary-border: #bfdbfe;
+  --lp-primary-border: #93c5fd;
+  --lp-slate-950: #020617;
   --lp-slate-900: #0f172a;
   --lp-slate-800: #1e293b;
   --lp-slate-700: #334155;
   --lp-slate-600: #475569;
   --lp-slate-500: #64748b;
   --lp-slate-400: #94a3b8;
+  --lp-slate-300: #cbd5e1;
   --lp-slate-200: #e2e8f0;
   --lp-slate-100: #f1f5f9;
   --lp-slate-50: #f8fafc;
-  --lp-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 8px 24px -4px rgba(15, 23, 42, 0.04);
-  --lp-card-hover: 0 6px 20px -2px rgba(15, 23, 42, 0.08);
+  --lp-card-shadow: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --lp-card-hover: 0 8px 24px -4px rgba(15, 23, 42, 0.12);
 }
 
 /* ─── KPI Metric Cards ─── */
 .lp-kpi-card {
   background: #ffffff;
-  border: 1px solid var(--lp-slate-200);
-  border-radius: 14px;
-  padding: 18px 20px;
+  border: 2px solid var(--lp-slate-300);
+  border-radius: 16px;
+  padding: 20px 22px;
   box-shadow: var(--lp-card-shadow);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -135,13 +137,13 @@ $result = mysqli_query($conn, $sql);
 .lp-kpi-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--lp-card-hover);
-  border-color: var(--lp-slate-400);
+  border-color: var(--lp-slate-500);
 }
 
 .lp-kpi-card.active-filter {
   border-color: var(--lp-primary);
   background: #ffffff;
-  box-shadow: 0 0 0 2px var(--lp-primary), var(--lp-card-shadow);
+  box-shadow: 0 0 0 2.5px var(--lp-primary), var(--lp-card-shadow);
 }
 
 .lp-kpi-top {
@@ -152,28 +154,28 @@ $result = mysqli_query($conn, $sql);
 }
 
 .lp-kpi-label {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--lp-slate-500);
+  color: var(--lp-slate-700);
   margin-bottom: 6px;
 }
 
 .lp-kpi-value {
   font-family: 'Outfit', sans-serif;
-  font-size: 30px;
-  font-weight: 800;
+  font-size: 34px;
+  font-weight: 900;
   line-height: 1.1;
-  color: var(--lp-slate-900);
+  color: var(--lp-slate-950);
   margin: 0;
   letter-spacing: -0.02em;
 }
 
 .lp-kpi-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,57 +183,59 @@ $result = mysqli_query($conn, $sql);
 }
 
 .lp-kpi-icon span.material-symbols-outlined {
-  font-size: 24px;
+  font-size: 28px;
+  font-variation-settings: 'FILL' 1, 'wght' 700;
 }
 
 .lp-kpi-footer {
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px solid var(--lp-slate-100);
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 2px solid var(--lp-slate-100);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11.5px;
-  color: var(--lp-slate-400);
-  font-weight: 600;
+  font-size: 13px;
+  color: var(--lp-slate-600);
+  font-weight: 700;
 }
 
 /* ─── Filter & Search Toolbar ─── */
 .lp-toolbar-card {
   background: #ffffff;
-  border: 1px solid var(--lp-slate-200);
-  border-radius: 14px;
-  padding: 16px 20px;
+  border: 2px solid var(--lp-slate-300);
+  border-radius: 16px;
+  padding: 18px 22px;
   box-shadow: var(--lp-card-shadow);
   margin-bottom: 24px;
 }
 
 .lp-input {
-  height: 40px;
-  border: 1.5px solid var(--lp-slate-200);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  color: var(--lp-slate-800);
+  height: 46px;
+  border: 2px solid var(--lp-slate-300);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lp-slate-950);
   transition: all 0.15s ease;
   outline: none;
 }
 
 .lp-input:focus {
   border-color: var(--lp-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.2);
 }
 
 .lp-btn {
-  height: 40px;
-  padding: 0 16px;
-  font-size: 12.5px;
-  font-weight: 600;
-  border-radius: 8px;
+  height: 46px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   transition: all 0.15s ease;
   border: none;
   cursor: pointer;
@@ -240,121 +244,125 @@ $result = mysqli_query($conn, $sql);
 }
 
 .lp-btn-primary {
-  background: var(--lp-primary);
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
   color: #ffffff !important;
+  box-shadow: 0 3px 12px rgba(29, 78, 216, 0.35);
 }
 .lp-btn-primary:hover {
-  background: var(--lp-primary-hover);
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
   transform: translateY(-1px);
 }
 
 .lp-btn-secondary {
-  background: var(--lp-slate-100);
-  color: var(--lp-slate-700);
-  border: 1px solid var(--lp-slate-200);
+  background: #ffffff;
+  color: var(--lp-slate-800);
+  border: 2px solid var(--lp-slate-300);
 }
 .lp-btn-secondary:hover {
-  background: var(--lp-slate-200);
-  color: var(--lp-slate-900);
+  background: var(--lp-slate-100);
+  border-color: var(--lp-slate-500);
+  color: var(--lp-slate-950);
 }
 
 .lp-btn-success {
   background: #059669;
   color: #ffffff !important;
+  box-shadow: 0 3px 12px rgba(5, 150, 105, 0.35);
 }
 .lp-btn-success:hover {
   background: #047857;
   transform: translateY(-1px);
 }
 
-/* ─── Customer Activity Card (Clean SaaS Feed) ─── */
+/* ─── Customer Activity Card ─── */
 .lp-cust-card {
   background: #ffffff;
-  border: 1px solid var(--lp-slate-200);
-  border-radius: 14px;
+  border: 2px solid var(--lp-slate-300);
+  border-radius: 16px;
   box-shadow: var(--lp-card-shadow);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   overflow: hidden;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .lp-cust-card:hover {
   box-shadow: var(--lp-card-hover);
-  border-color: #cbd5e1;
+  border-color: var(--lp-slate-500);
 }
 
 .lp-cust-header {
-  padding: 14px 20px;
+  padding: 16px 22px;
   background: #ffffff;
-  border-bottom: 1px solid var(--lp-slate-100);
+  border-bottom: 2px solid var(--lp-slate-200);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
 }
 
 .lp-cust-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
 .lp-cust-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: var(--lp-primary-light);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #eff6ff;
   color: var(--lp-primary);
-  border: 1px solid var(--lp-primary-border);
+  border: 2px solid var(--lp-primary-border);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .lp-cust-name {
   font-family: 'Outfit', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--lp-slate-900);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--lp-slate-950);
   margin: 0;
   line-height: 1.2;
 }
 
 .lp-cust-addr {
-  font-size: 12px;
-  color: var(--lp-slate-500);
-  margin-top: 2px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--lp-slate-700);
+  margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 580px;
+  max-width: 620px;
 }
 
 /* Table Header & Activity Item Row */
 .lp-table-head {
-  padding: 8px 20px;
+  padding: 10px 22px;
   background: #f8fafc;
-  border-bottom: 1px solid var(--lp-slate-200);
+  border-bottom: 2px solid var(--lp-slate-200);
   display: grid;
-  grid-template-columns: 130px 175px 155px 150px minmax(180px, 1fr) 95px;
+  grid-template-columns: 140px 185px 165px 160px minmax(180px, 1fr) 105px;
   align-items: center;
   gap: 16px;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11.5px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--lp-slate-500);
+  letter-spacing: 0.05em;
+  color: var(--lp-slate-700);
 }
 
 .lp-item-row {
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--lp-slate-100);
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--lp-slate-200);
   display: grid;
-  grid-template-columns: 130px 175px 155px 150px minmax(180px, 1fr) 95px;
+  grid-template-columns: 140px 185px 165px 160px minmax(180px, 1fr) 105px;
   align-items: center;
   gap: 16px;
   transition: background 0.15s ease;
@@ -365,26 +373,27 @@ $result = mysqli_query($conn, $sql);
 }
 
 .lp-item-row:hover {
-  background: #fcfdfe;
+  background: #f8fafc;
 }
 
 .lp-sales-pill {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .lp-sales-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 11px;
+  font-weight: 800;
+  font-size: 13px;
   color: #ffffff;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .lp-sales-text {
@@ -392,9 +401,9 @@ $result = mysqli_query($conn, $sql);
 }
 
 .lp-sales-name {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--lp-slate-800);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--lp-slate-950);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -402,16 +411,16 @@ $result = mysqli_query($conn, $sql);
 }
 
 .lp-note-box {
-  background: var(--lp-slate-50);
-  border: 1px solid var(--lp-slate-200);
+  background: #f8fafc;
+  border: 1.5px solid var(--lp-slate-300);
   border-radius: 8px;
-  padding: 5px 10px;
-  font-size: 12px;
-  color: var(--lp-slate-700);
+  padding: 6px 12px;
+  font-size: 13.5px;
+  color: var(--lp-slate-900);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  max-width: 320px;
+  gap: 8px;
+  max-width: 340px;
   width: fit-content;
   transition: all 0.15s ease;
   cursor: default;
@@ -419,64 +428,64 @@ $result = mysqli_query($conn, $sql);
 
 .lp-note-box:hover {
   background: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  border-color: var(--lp-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .lp-note-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 275px;
+  max-width: 290px;
   display: inline-block;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .lp-action-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
   transition: all 0.15s ease;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
   text-decoration: none;
 }
 
 .lp-action-btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .lp-action-view {
   background: #eff6ff;
-  color: #2563eb;
-  border-color: #dbeafe;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
 }
 .lp-action-view:hover {
-  background: #2563eb;
+  background: #1d4ed8;
   color: #ffffff;
 }
 
 .lp-action-edit {
   background: #ecfdf5;
-  color: #059669;
+  color: #047857;
   border-color: #a7f3d0;
 }
 .lp-action-edit:hover {
-  background: #059669;
+  background: #047857;
   color: #ffffff;
 }
 
 .lp-action-delete {
   background: #fef2f2;
-  color: #dc2626;
+  color: #b91c1c;
   border-color: #fecaca;
 }
 .lp-action-delete:hover {
-  background: #dc2626;
+  background: #b91c1c;
   color: #ffffff;
 }
 
@@ -484,37 +493,37 @@ $result = mysqli_query($conn, $sql);
 .lp-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 9px;
+  gap: 6px;
+  padding: 5px 12px;
   border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 800;
   letter-spacing: 0.02em;
 }
 
 .lp-status-selesai {
-  background: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  background: #dcfce7;
+  color: #14532d;
+  border: 1.5px solid #86efac;
 }
 
 .lp-status-berjalan {
-  background: #fffbeb;
-  color: #92400e;
-  border: 1px solid #fde68a;
+  background: #fef3c7;
+  color: #78350f;
+  border: 1.5px solid #fcd34d;
 }
 
 .lp-status-dijadwalkan {
   background: #f1f5f9;
-  color: #475569;
-  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  border: 1.5px solid #cbd5e1;
 }
 
 @media (max-width: 991.98px) {
   .lp-item-row {
     grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 14px 16px;
+    gap: 12px;
+    padding: 16px;
   }
 }
 </style>
@@ -723,43 +732,43 @@ $result = mysqli_query($conn, $sql);
                 <div class="lp-cust-header">
                     <div class="lp-cust-info">
                         <div class="lp-cust-icon">
-                            <i class="bi bi-shop"></i>
+                            <i class="bi bi-shop-window"></i>
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <span class="badge bg-light text-dark border font-monospace px-2 py-0.5" style="font-size: 10px;">
+                                <span class="badge bg-light text-dark border font-monospace px-2 py-0.5 fw-bold" style="font-size: 11px; border: 1.5px solid #cbd5e1 !important;">
                                     <?= htmlspecialchars($kodeC); ?>
                                 </span>
                                 <h6 class="lp-cust-name"><?= htmlspecialchars($namaC); ?></h6>
                                 <?php if (!empty($kotaC)): ?>
-                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5" style="font-size: 10px;">
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-0.5 fw-bold" style="font-size: 11px;">
                                         <i class="bi bi-geo-alt-fill me-0.5"></i><?= htmlspecialchars($kotaC); ?>
                                     </span>
                                 <?php endif; ?>
                             </div>
                             <?php if (!empty($alamatC)): ?>
                                 <div class="lp-cust-addr" title="<?= htmlspecialchars($alamatC); ?>">
-                                    <i class="bi bi-pin-map text-muted me-1"></i><?= htmlspecialchars($alamatC); ?>
+                                    <i class="bi bi-geo-alt text-danger me-1"></i><?= htmlspecialchars($alamatC); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-light text-secondary border rounded-pill px-2.5 py-1" style="font-size: 11px; font-weight: 600;">
-                            <?= max(1, $activityCount); ?> Penugasan
+                        <span class="badge bg-light text-dark border rounded-pill px-3 py-1.5 fw-bold" style="font-size: 12px; border: 1.5px solid #cbd5e1 !important;">
+                            <i class="bi bi-person-check-fill text-primary me-1"></i> <?= max(1, $activityCount); ?> Penugasan
                         </span>
                     </div>
                 </div>
 
                 <!-- Activities Table Header (Desktop Only) -->
                 <div class="lp-table-head d-none d-lg-grid">
-                    <div>Status &amp; ID</div>
-                    <div>Sales Agent</div>
-                    <div>Jadwal Visit</div>
-                    <div>Waktu GPS (In / Out)</div>
-                    <div>Catatan / Hasil Visit</div>
-                    <div class="text-end">Aksi</div>
+                    <div>STATUS &amp; ID</div>
+                    <div>SALES AGENT</div>
+                    <div>JADWAL VISIT</div>
+                    <div>WAKTU GPS (IN / OUT)</div>
+                    <div>CATATAN / HASIL VISIT</div>
+                    <div class="text-end">AKSI</div>
                 </div>
 
                 <!-- Activities List -->
@@ -773,7 +782,7 @@ $result = mysqli_query($conn, $sql);
 
                             $initials = $hasSales ? strtoupper(substr($namaSalesItem, 0, 2)) : '??';
                             $colorIdx = $hasSales ? (abs(crc32($namaSalesItem)) % count($avatarColors)) : 0;
-                            $avatarBg = $hasSales ? $avatarColors[$colorIdx] : '#94a3b8';
+                            $avatarBg = $hasSales ? $avatarColors[$colorIdx] : '#475569';
 
                             $hslVisits = trim($rowLT['hasil_visits'] ?? '');
                             $datetime = $rowLT["tgl_visits"];
@@ -805,15 +814,15 @@ $result = mysqli_query($conn, $sql);
                                         </span>
                                     <?php elseif ($status === 'berjalan'): ?>
                                         <span class="lp-status-badge lp-status-berjalan">
-                                            <span class="spinner-grow spinner-grow-sm" style="width: 6px; height: 6px;"></span> Diproses
+                                            <span class="spinner-grow spinner-grow-sm" style="width: 7px; height: 7px;"></span> Diproses
                                         </span>
                                     <?php else: ?>
                                         <span class="lp-status-badge lp-status-dijadwalkan">
-                                            <i class="bi bi-clock"></i> Dijadwalkan
+                                            <i class="bi bi-clock-fill"></i> Dijadwalkan
                                         </span>
                                     <?php endif; ?>
 
-                                    <span class="badge bg-light text-muted border font-monospace mt-0.5 text-start" style="font-size: 10px; width: fit-content;">
+                                    <span class="badge bg-light text-dark border font-monospace mt-0.5 text-start fw-bold" style="font-size: 11px; width: fit-content; border: 1.5px solid #cbd5e1 !important;">
                                         #<?= $rowLT['kode_transaksi']; ?>
                                     </span>
                                 </div>
@@ -828,16 +837,16 @@ $result = mysqli_query($conn, $sql);
                                         </div>
                                         <div class="lp-sales-text">
                                             <div class="lp-sales-name"><?= htmlspecialchars($namaSalesItem); ?></div>
-                                            <span class="text-muted" style="font-size: 10.5px;">Sales Canvas</span>
+                                            <span class="text-secondary fw-semibold" style="font-size: 11.5px;">Sales Canvas</span>
                                         </div>
                                     </div>
                                 <?php else: ?>
                                     <div class="lp-sales-pill">
-                                        <div class="lp-sales-avatar" style="background: #e2e8f0; color: #64748b;">
-                                            <i class="bi bi-person-dash"></i>
+                                        <div class="lp-sales-avatar" style="background: #e2e8f0; color: #475569;">
+                                            <i class="bi bi-person-dash fs-6"></i>
                                         </div>
                                         <div class="lp-sales-text">
-                                            <span class="badge bg-light text-muted border" style="font-size: 10.5px;">Belum Ditugaskan</span>
+                                            <span class="badge bg-light text-dark border fw-bold" style="font-size: 11.5px;">Belum Ditugaskan</span>
                                         </div>
                                     </div>
                                 <?php endif; ?>
@@ -846,10 +855,10 @@ $result = mysqli_query($conn, $sql);
                             <!-- 3. Jadwal Visit -->
                             <div>
                                 <div class="d-flex flex-column">
-                                    <span class="fw-semibold text-dark" style="font-size: 12.5px;">
+                                    <span class="fw-bold text-dark" style="font-size: 13.5px;">
                                         <i class="bi bi-calendar3 text-primary me-1"></i><?= $formattedDate; ?>
                                     </span>
-                                    <span class="text-muted fw-bold" style="font-size: 11px; margin-left: 17px;">
+                                    <span class="fw-bold text-primary" style="font-size: 12.5px; margin-left: 17px;">
                                         <?= $formattedTime; ?> WIB
                                     </span>
                                 </div>
@@ -857,21 +866,21 @@ $result = mysqli_query($conn, $sql);
 
                             <!-- 4. Waktu Pelaksanaan GPS -->
                             <div>
-                                <div class="d-flex flex-column gap-0.5">
+                                <div class="d-flex flex-column gap-1">
                                     <?php if ($formattedTimeMli): ?>
-                                        <div class="text-success fw-bold font-monospace" style="font-size: 11px;">
+                                        <div class="text-success fw-bold font-monospace" style="font-size: 12px;">
                                             <i class="bi bi-box-arrow-in-right"></i> IN: <?= $formattedTimeMli; ?>
                                         </div>
                                     <?php else: ?>
-                                        <span class="text-muted" style="font-size: 11.5px;"><i class="bi bi-geo-alt text-muted me-1"></i>Belum Masuk</span>
+                                        <span class="text-muted fw-semibold" style="font-size: 12px;"><i class="bi bi-geo-alt text-muted me-1"></i>Belum Masuk</span>
                                     <?php endif; ?>
 
                                     <?php if ($formattedTimeSls): ?>
-                                        <div class="text-primary fw-bold font-monospace" style="font-size: 11px;">
+                                        <div class="text-primary fw-bold font-monospace" style="font-size: 12px;">
                                             <i class="bi bi-box-arrow-right"></i> OUT: <?= $formattedTimeSls; ?>
                                         </div>
                                     <?php elseif ($formattedTimeMli): ?>
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace px-1.5 py-0.5 text-start" style="font-size: 9.5px; width: fit-content;">Sedang Visit</span>
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace px-1.5 py-0.5 text-start fw-bold" style="font-size: 10px; width: fit-content;">Sedang Visit</span>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -880,19 +889,19 @@ $result = mysqli_query($conn, $sql);
                             <div>
                                 <?php if (!empty($hslVisits)): ?>
                                     <div class="lp-note-box" title="<?= htmlspecialchars($hslVisits); ?>">
-                                        <i class="bi bi-chat-quote-fill text-primary flex-shrink-0" style="font-size: 11px;"></i>
+                                        <i class="bi bi-chat-quote-fill text-primary flex-shrink-0" style="font-size: 13px;"></i>
                                         <span class="lp-note-text"><?= htmlspecialchars($hslVisits); ?></span>
                                     </div>
                                 <?php elseif ($status === 'selesai'): ?>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 11px;">
-                                        <i class="bi bi-check me-1"></i> Kunjungan Selesai
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 fw-bold" style="font-size: 12px;">
+                                        <i class="bi bi-check-lg me-1"></i> Kunjungan Selesai
                                     </span>
                                 <?php elseif ($status === 'berjalan'): ?>
-                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1" style="font-size: 11px;">
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 fw-bold" style="font-size: 12px;">
                                         <i class="bi bi-geo-alt me-1"></i> Sedang di Lokasi Toko
                                     </span>
                                 <?php else: ?>
-                                    <span class="text-muted" style="font-size: 11.5px; font-style: italic;">
+                                    <span class="text-muted fw-semibold" style="font-size: 12px; font-style: italic;">
                                         <i class="bi bi-hourglass-split me-1"></i>Menunggu kunjungan sales
                                     </span>
                                 <?php endif; ?>
@@ -900,7 +909,7 @@ $result = mysqli_query($conn, $sql);
 
                             <!-- 6. Aksi Buttons -->
                             <div class="text-end">
-                                <div class="d-flex align-items-center justify-content-end gap-1">
+                                <div class="d-flex align-items-center justify-content-end gap-1.5">
                                     <!-- View Detail Modal -->
                                     <button type="button" class="lp-action-btn lp-action-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="<?= $idT; ?>" data-kode="<?= $rowLT['kode_transaksi']; ?>" title="Lihat Rincian & Lokasi GPS">
                                         <i class="bi bi-eye-fill"></i>
@@ -970,15 +979,15 @@ $result = mysqli_query($conn, $sql);
                                         </span>
                                     <?php elseif ($statusFb === 'berjalan'): ?>
                                         <span class="lp-status-badge lp-status-berjalan">
-                                            <span class="spinner-grow spinner-grow-sm" style="width: 6px; height: 6px;"></span> Diproses
+                                            <span class="spinner-grow spinner-grow-sm" style="width: 7px; height: 7px;"></span> Diproses
                                         </span>
                                     <?php else: ?>
                                         <span class="lp-status-badge lp-status-dijadwalkan">
-                                            <i class="bi bi-clock"></i> Dijadwalkan
+                                            <i class="bi bi-clock-fill"></i> Dijadwalkan
                                         </span>
                                     <?php endif; ?>
 
-                                    <span class="badge bg-light text-muted border font-monospace mt-0.5 text-start" style="font-size: 10px; width: fit-content;">
+                                    <span class="badge bg-light text-dark border font-monospace mt-0.5 text-start fw-bold" style="font-size: 11px; width: fit-content; border: 1.5px solid #cbd5e1 !important;">
                                         #<?= $row['kode_transaksi']; ?>
                                     </span>
                                 </div>
@@ -988,21 +997,21 @@ $result = mysqli_query($conn, $sql);
                             <div>
                                 <?php if (!empty($salesNameFb) && $salesIdFb > 0): ?>
                                     <div class="lp-sales-pill">
-                                        <div class="lp-sales-avatar" style="background: #2563eb;">
+                                        <div class="lp-sales-avatar" style="background: #1d4ed8;">
                                             <?= strtoupper(substr($salesNameFb, 0, 2)); ?>
                                         </div>
                                         <div class="lp-sales-text">
                                             <div class="lp-sales-name"><?= htmlspecialchars($salesNameFb); ?></div>
-                                            <span class="text-muted" style="font-size: 10.5px;">Sales Canvas</span>
+                                            <span class="text-secondary fw-semibold" style="font-size: 11.5px;">Sales Canvas</span>
                                         </div>
                                     </div>
                                 <?php else: ?>
                                     <div class="lp-sales-pill">
-                                        <div class="lp-sales-avatar" style="background: #e2e8f0; color: #64748b;">
-                                            <i class="bi bi-person-dash"></i>
+                                        <div class="lp-sales-avatar" style="background: #e2e8f0; color: #475569;">
+                                            <i class="bi bi-person-dash fs-6"></i>
                                         </div>
                                         <div class="lp-sales-text">
-                                            <span class="badge bg-light text-muted border" style="font-size: 10.5px;">Belum Ditugaskan</span>
+                                            <span class="badge bg-light text-dark border fw-bold" style="font-size: 11.5px;">Belum Ditugaskan</span>
                                         </div>
                                     </div>
                                 <?php endif; ?>
@@ -1011,10 +1020,10 @@ $result = mysqli_query($conn, $sql);
                             <!-- 3. Jadwal Visit -->
                             <div>
                                 <div class="d-flex flex-column">
-                                    <span class="fw-semibold text-dark" style="font-size: 12.5px;">
+                                    <span class="fw-bold text-dark" style="font-size: 13.5px;">
                                         <i class="bi bi-calendar3 text-primary me-1"></i><?= $formattedDateFb; ?>
                                     </span>
-                                    <span class="text-muted fw-bold" style="font-size: 11px; margin-left: 17px;">
+                                    <span class="fw-bold text-primary" style="font-size: 12.5px; margin-left: 17px;">
                                         <?= $formattedTimeFb; ?> WIB
                                     </span>
                                 </div>
@@ -1022,21 +1031,21 @@ $result = mysqli_query($conn, $sql);
 
                             <!-- 4. Waktu GPS -->
                             <div>
-                                <div class="d-flex flex-column gap-0.5">
+                                <div class="d-flex flex-column gap-1">
                                     <?php if ($formattedTimeMliFb): ?>
-                                        <div class="text-success fw-bold font-monospace" style="font-size: 11px;">
+                                        <div class="text-success fw-bold font-monospace" style="font-size: 12px;">
                                             <i class="bi bi-box-arrow-in-right"></i> IN: <?= $formattedTimeMliFb; ?>
                                         </div>
                                     <?php else: ?>
-                                        <span class="text-muted" style="font-size: 11.5px;"><i class="bi bi-geo-alt text-muted me-1"></i>Belum Masuk</span>
+                                        <span class="text-muted fw-semibold" style="font-size: 12px;"><i class="bi bi-geo-alt text-muted me-1"></i>Belum Masuk</span>
                                     <?php endif; ?>
 
                                     <?php if ($formattedTimeSlsFb): ?>
-                                        <div class="text-primary fw-bold font-monospace" style="font-size: 11px;">
+                                        <div class="text-primary fw-bold font-monospace" style="font-size: 12px;">
                                             <i class="bi bi-box-arrow-right"></i> OUT: <?= $formattedTimeSlsFb; ?>
                                         </div>
                                     <?php elseif ($formattedTimeMliFb): ?>
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace px-1.5 py-0.5 text-start" style="font-size: 9.5px; width: fit-content;">Sedang Visit</span>
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace px-1.5 py-0.5 text-start fw-bold" style="font-size: 10px; width: fit-content;">Sedang Visit</span>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -1045,19 +1054,19 @@ $result = mysqli_query($conn, $sql);
                             <div>
                                 <?php if (!empty($hslVisitsFb)): ?>
                                     <div class="lp-note-box" title="<?= htmlspecialchars($hslVisitsFb); ?>">
-                                        <i class="bi bi-chat-quote-fill text-primary flex-shrink-0" style="font-size: 11px;"></i>
+                                        <i class="bi bi-chat-quote-fill text-primary flex-shrink-0" style="font-size: 13px;"></i>
                                         <span class="lp-note-text"><?= htmlspecialchars($hslVisitsFb); ?></span>
                                     </div>
                                 <?php elseif ($statusFb === 'selesai'): ?>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 11px;">
-                                        <i class="bi bi-check me-1"></i> Kunjungan Selesai
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 fw-bold" style="font-size: 12px;">
+                                        <i class="bi bi-check-lg me-1"></i> Kunjungan Selesai
                                     </span>
                                 <?php elseif ($statusFb === 'berjalan'): ?>
-                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1" style="font-size: 11px;">
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 fw-bold" style="font-size: 12px;">
                                         <i class="bi bi-geo-alt me-1"></i> Sedang di Lokasi Toko
                                     </span>
                                 <?php else: ?>
-                                    <span class="text-muted" style="font-size: 11.5px; font-style: italic;">
+                                    <span class="text-muted fw-semibold" style="font-size: 12px; font-style: italic;">
                                         <i class="bi bi-hourglass-split me-1"></i>Menunggu kunjungan sales
                                     </span>
                                 <?php endif; ?>
@@ -1065,7 +1074,7 @@ $result = mysqli_query($conn, $sql);
 
                             <!-- 6. Aksi Buttons -->
                             <div class="text-end">
-                                <div class="d-flex align-items-center justify-content-end gap-1">
+                                <div class="d-flex align-items-center justify-content-end gap-1.5">
                                     <button type="button" class="lp-action-btn lp-action-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="<?= $salesIdFb; ?>" data-kode="<?= $row['kode_transaksi']; ?>" title="Lihat Rincian & Lokasi GPS">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
