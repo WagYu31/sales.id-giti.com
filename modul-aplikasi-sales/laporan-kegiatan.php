@@ -41,7 +41,7 @@ $role = $_SESSION['role'] ?? 'sales';
     $todayDate = formatTanggal('dd MMMM yyyy');
     ?>
 
-    <div class="container-fluid px-3 px-md-4 py-2">
+    <div class="container-fluid px-2 px-sm-3 px-md-4 py-2">
       <div class="row mb-4 mt-0">
         <?php include __DIR__ . "/laporan-db-cust.php"; ?>
       </div>
