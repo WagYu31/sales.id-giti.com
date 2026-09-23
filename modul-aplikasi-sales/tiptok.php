@@ -604,94 +604,104 @@ $resPenitipan = $conn->query($sqlPenitipan);
             box-shadow: 0 4px 8px rgba(15, 23, 42, 0.08);
         }
 
-        /* Solid High-Contrast Table Action Buttons */
+        /* Modern Vibrant Table Action Buttons */
         .btn-table-primary {
-            background: #0f172a;
-            color: #ffffff;
-            border: 1.5px solid #0f172a;
-            border-radius: 8px;
-            padding: 8px 14px;
-            font-size: 13px;
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.15s ease;
-            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.2);
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .btn-table-primary:hover {
-            background: #1e293b;
-            color: #ffffff;
-            border-color: #334155;
-            transform: translateY(-1px);
-        }
-        .btn-table-secondary {
-            background: #2563eb;
-            color: #ffffff;
-            border: 1.5px solid #1d4ed8;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 13px;
-            font-weight: 800;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: #ffffff !important;
+            border: none;
+            border-radius: 9px;
+            height: 33px;
+            padding: 0 13px;
+            font-size: 12.5px;
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            transition: all 0.15s ease;
-            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+            gap: 6px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.32);
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+        }
+        .btn-table-primary:hover {
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
+            color: #ffffff !important;
+        }
+        .btn-table-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-table-secondary {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            color: #ffffff !important;
+            border: none;
+            border-radius: 9px;
+            width: 33px;
+            height: 33px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
             cursor: pointer;
             text-decoration: none;
         }
         .btn-table-secondary:hover {
-            background: #1d4ed8;
-            color: #ffffff;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.4);
+            color: #ffffff !important;
         }
+
         .btn-table-warning {
-            background: #f59e0b;
-            color: #ffffff;
-            border: 1.5px solid #d97706;
-            border-radius: 8px;
-            padding: 8px 12px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff !important;
+            border: none;
+            border-radius: 9px;
+            width: 33px;
+            height: 33px;
             font-size: 13px;
-            font-weight: 800;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            transition: all 0.15s ease;
-            box-shadow: 0 3px 8px rgba(245, 158, 11, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 3px 8px rgba(245, 158, 11, 0.25);
             cursor: pointer;
             text-decoration: none;
         }
         .btn-table-warning:hover {
-            background: #d97706;
-            color: #ffffff;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(245, 158, 11, 0.4);
+            color: #ffffff !important;
         }
+
         .btn-table-danger {
-            background: #ef4444;
-            color: #ffffff;
-            border: 1.5px solid #dc2626;
-            border-radius: 8px;
-            padding: 8px 12px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff !important;
+            border: none;
+            border-radius: 9px;
+            width: 33px;
+            height: 33px;
             font-size: 13px;
-            font-weight: 800;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            transition: all 0.15s ease;
-            box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 3px 8px rgba(239, 68, 68, 0.25);
             cursor: pointer;
             text-decoration: none;
         }
         .btn-table-danger:hover {
-            background: #dc2626;
-            color: #ffffff;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(239, 68, 68, 0.4);
+            color: #ffffff !important;
         }
 
         /* Modal Styles & Smooth Scrolling Architecture */
@@ -1192,11 +1202,11 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                         </td>
 
                                         <!-- Aksi -->
-                                        <td style="text-align: right;">
-                                            <div class="d-inline-flex gap-1.5 align-items-center">
+                                        <td style="text-align: right; white-space: nowrap;">
+                                            <div class="d-inline-flex gap-1.5 align-items-center justify-content-end">
                                                 <?php if ($statusPen === 'aktif' && $sumSisa > 0) : ?>
-                                                    <button type="button" class="btn-table-primary" onclick="openModalLaporKunjungan(<?php echo $idPen; ?>)" title="Lapor Kunjungan / Cek Stok Sisa">
-                                                        <i class="fa-solid fa-check"></i> Cek Sisa
+                                                    <button type="button" class="btn-table-primary" onclick="openModalLaporKunjungan(<?php echo $idPen; ?>)" title="Lapor Kunjungan &amp; Cek Sisa Fisik">
+                                                        <i class="fa-solid fa-clipboard-check"></i> Cek Sisa
                                                     </button>
                                                 <?php endif; ?>
                                                 <button type="button" class="btn-table-secondary" onclick="openModalDetailTiptok(<?php echo $idPen; ?>)" title="Lihat Riwayat Lengkap">
