@@ -20,24 +20,13 @@ $role = $_SESSION['role'] ?? 'sales';
   <?php include __DIR__ . "/head.php"; ?>
   
   <style>
-    ul#data-tek li:nth-child(odd), ul#data-rincian li:nth-child(odd) {
-      background-color: white;
-    }
-
-    ul#data-tek li:nth-child(even), ul#data-rincian li:nth-child(even) {
-      background-color: #efefef;
-      border-radius: 0;
-    }
-    #toggleLoadMore {
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-    }
     .modal-lg {
-        width: 60vw !important;
+        max-width: 800px;
     }
     @media (max-width: 767px) {
         .modal-lg {
-            width: 95vw !important;
+            max-width: 95vw !important;
+            margin: 10px auto;
         }
     }
   </style>
@@ -52,7 +41,7 @@ $role = $_SESSION['role'] ?? 'sales';
     $todayDate = formatTanggal('dd MMMM yyyy');
     ?>
 
-    <div class="container-fluid p-0">
+    <div class="container-fluid px-3 px-md-4 py-2">
       <div class="row mb-4 mt-0">
         <?php include __DIR__ . "/laporan-db-cust.php"; ?>
       </div>

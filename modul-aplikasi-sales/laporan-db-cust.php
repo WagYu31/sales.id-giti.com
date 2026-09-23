@@ -1,6 +1,6 @@
 <?php
 /**
- * laporan-db-cust.php - Laporan Kunjungan & Visit Sales (Loewix Sales Design)
+ * laporan-db-cust.php - Laporan Kunjungan & Visit Sales (Taste-Skill Modern Design)
  */
 
 // Filter variables
@@ -86,7 +86,7 @@ if (!empty($filterStatus)) {
 $whereSql = implode(" AND ", $whereClauses);
 
 $sql = "SELECT ks.id, ks.id AS kode_transaksi, ks.jadwal AS tgl_visits, ks.status AS status_kegiatan,
-               sc.nama AS nama_cust, sc.id AS id_cust, sc.alamat AS alamat_cust, sc.kota AS kota_cust
+               sc.nama AS nama_cust, sc.id AS id_cust, sc.alamat AS alamat_cust, sc.kota AS kota_cust, sc.kode_customer
         FROM kegiatan_sales ks
         INNER JOIN sales_customer sc ON ks.id_customer = sc.id
         WHERE $whereSql
@@ -96,268 +96,501 @@ $result = mysqli_query($conn, $sql);
 ?>
 
 <style>
-/* ── STAT CARDS PREMIUM DESIGN (LOEWIX SALES STANDARD) ─────────────────── */
-.stat-card-premium {
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.03);
-    border: 1px solid #e2e8f0;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    overflow: hidden;
-}
-.stat-card-premium:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-}
-.stat-label-premium {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #64748b;
-    margin-bottom: 4px;
-}
-.stat-count-premium {
-    font-size: 28px;
-    font-weight: 800;
-    font-family: 'Outfit', sans-serif;
-    color: #0f172a;
-    margin: 0;
-}
-.stat-icon-premium {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.stat-footer-premium {
-    padding: 8px 16px;
-    border-top: 1px solid #f1f5f9;
-    background: #fafafa;
-}
-.stat-footer-premium p {
-    font-size: 11.5px;
-    color: #94a3b8;
-    font-weight: 600;
-    margin: 0;
+/* ─── Taste-Skill Design Architecture for Laporan Visit ─── */
+:root {
+  --lp-primary: #2563eb;
+  --lp-primary-hover: #1d4ed8;
+  --lp-primary-light: #eff6ff;
+  --lp-primary-border: #bfdbfe;
+  --lp-slate-900: #0f172a;
+  --lp-slate-800: #1e293b;
+  --lp-slate-700: #334155;
+  --lp-slate-600: #475569;
+  --lp-slate-500: #64748b;
+  --lp-slate-400: #94a3b8;
+  --lp-slate-200: #e2e8f0;
+  --lp-slate-100: #f1f5f9;
+  --lp-slate-50: #f8fafc;
+  --lp-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 8px 24px -4px rgba(15, 23, 42, 0.04);
+  --lp-card-hover: 0 6px 20px -2px rgba(15, 23, 42, 0.08);
 }
 
-.customer-report-card {
-    background: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
-    transition: all 0.25s ease;
-    overflow: hidden;
-    margin-bottom: 18px;
-}
-.customer-report-card:hover {
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-    border-color: #cbd5e1;
-}
-.customer-card-header {
-    background: #ffffff;
-    padding: 12px 18px;
-    border-bottom: 1px solid #f1f5f9;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+/* ─── KPI Metric Cards ─── */
+.lp-kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--lp-slate-200);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: var(--lp-card-shadow);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.report-table-header {
-    background: #f8fafc;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 9px 18px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #64748b;
+.lp-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--lp-card-hover);
+  border-color: var(--lp-slate-400);
 }
 
-.report-item-row {
-    padding: 12px 18px;
-    border-bottom: 1px solid #f8fafc;
-    transition: background 0.2s;
-}
-.report-item-row:last-child {
-    border-bottom: none;
-}
-.report-item-row:hover {
-    background: #fcfdfe;
+.lp-kpi-card.active-filter {
+  border-color: var(--lp-primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 2px var(--lp-primary), var(--lp-card-shadow);
 }
 
-.avatar-initial {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 11.5px;
-    color: #ffffff;
-    flex-shrink: 0;
+.lp-kpi-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.action-btn-modern {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    transition: all 0.15s ease;
-    font-size: 13px;
-}
-.action-btn-modern:hover {
-    transform: translateY(-1px);
-}
-.action-btn-view {
-    background: #eff6ff;
-    color: #2563eb;
-    border-color: #dbeafe;
-}
-.action-btn-view:hover {
-    background: #2563eb;
-    color: #ffffff;
-}
-.action-btn-edit {
-    background: #ecfdf5;
-    color: #059669;
-    border-color: #a7f3d0;
-}
-.action-btn-edit:hover {
-    background: #059669;
-    color: #ffffff;
-}
-.action-btn-delete {
-    background: #fef2f2;
-    color: #dc2626;
-    border-color: #fecaca;
-}
-.action-btn-delete:hover {
-    background: #dc2626;
-    color: #ffffff;
+.lp-kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--lp-slate-500);
+  margin-bottom: 6px;
 }
 
-.note-bubble {
-    background: #f8fafc;
-    border-left: 3px solid #3b82f6;
-    padding: 7px 11px;
-    border-radius: 0 8px 8px 0;
-    font-size: 12px;
-    color: #334155;
-    line-height: 1.4;
-    word-break: break-word;
+.lp-kpi-value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--lp-slate-900);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.lp-kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lp-kpi-icon span.material-symbols-outlined {
+  font-size: 24px;
+}
+
+.lp-kpi-footer {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--lp-slate-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--lp-slate-400);
+  font-weight: 600;
+}
+
+/* ─── Filter & Search Toolbar ─── */
+.lp-toolbar-card {
+  background: #ffffff;
+  border: 1px solid var(--lp-slate-200);
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: var(--lp-card-shadow);
+  margin-bottom: 24px;
+}
+
+.lp-input {
+  height: 40px;
+  border: 1.5px solid var(--lp-slate-200);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--lp-slate-800);
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.lp-input:focus {
+  border-color: var(--lp-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.lp-btn {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.lp-btn-primary {
+  background: var(--lp-primary);
+  color: #ffffff !important;
+}
+.lp-btn-primary:hover {
+  background: var(--lp-primary-hover);
+  transform: translateY(-1px);
+}
+
+.lp-btn-secondary {
+  background: var(--lp-slate-100);
+  color: var(--lp-slate-700);
+  border: 1px solid var(--lp-slate-200);
+}
+.lp-btn-secondary:hover {
+  background: var(--lp-slate-200);
+  color: var(--lp-slate-900);
+}
+
+.lp-btn-success {
+  background: #059669;
+  color: #ffffff !important;
+}
+.lp-btn-success:hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+/* ─── Customer Activity Card (Clean SaaS Feed) ─── */
+.lp-cust-card {
+  background: #ffffff;
+  border: 1px solid var(--lp-slate-200);
+  border-radius: 14px;
+  box-shadow: var(--lp-card-shadow);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lp-cust-card:hover {
+  box-shadow: var(--lp-card-hover);
+  border-color: #cbd5e1;
+}
+
+.lp-cust-header {
+  padding: 14px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--lp-slate-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.lp-cust-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.lp-cust-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--lp-primary-light);
+  color: var(--lp-primary);
+  border: 1px solid var(--lp-primary-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.lp-cust-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--lp-slate-900);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.lp-cust-addr {
+  font-size: 12px;
+  color: var(--lp-slate-500);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 580px;
+}
+
+/* Activity Item Row */
+.lp-item-row {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--lp-slate-100);
+  display: grid;
+  grid-template-columns: 140px 180px 170px 150px 1fr 110px;
+  align-items: center;
+  gap: 16px;
+  transition: background 0.15s ease;
+}
+
+.lp-item-row:last-child {
+  border-bottom: none;
+}
+
+.lp-item-row:hover {
+  background: #fcfdfe;
+}
+
+.lp-sales-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lp-sales-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 11px;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.lp-sales-text {
+  min-width: 0;
+}
+
+.lp-sales-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--lp-slate-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.lp-note-box {
+  background: var(--lp-slate-50);
+  border: 1px solid var(--lp-slate-200);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--lp-slate-600);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.lp-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.lp-action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.lp-action-view {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #dbeafe;
+}
+.lp-action-view:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.lp-action-edit {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+}
+.lp-action-edit:hover {
+  background: #059669;
+  color: #ffffff;
+}
+
+.lp-action-delete {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+.lp-action-delete:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+/* Status Badges */
+.lp-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.lp-status-selesai {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.lp-status-berjalan {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.lp-status-dijadwalkan {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+@media (max-width: 991.98px) {
+  .lp-item-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 14px 16px;
+  }
 }
 </style>
 
 <div class="col-12">
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- 1. TOP STAT CARDS (SESUAI GAMBAR 1 & 2)                                 -->
+    <!-- 1. TOP STAT KPI METRICS (TASTE-SKILL STANDARD)                         -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div class="row g-3 mb-4">
         <!-- Card 1: Total Visit -->
         <div class="col-6 col-md-3">
-            <div class="stat-card-premium" style="border-left: 4px solid #64748b;" onclick="window.location.href='laporan-kegiatan.php?status=&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="stat-label-premium">TOTAL VISIT</p>
-                            <h3 class="stat-count-premium"><?= number_format($kpiTotal); ?></h3>
-                        </div>
-                        <div class="stat-icon-premium" style="background-color: #f1f5f9; color: #475569;">
-                            <span class="material-symbols-outlined" style="color: #475569;">event_available</span>
-                        </div>
+            <div class="lp-kpi-card <?= (empty($filterStatus)) ? 'active-filter' : ''; ?>" onclick="window.location.href='laporan-kegiatan.php?status=&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
+                <div class="lp-kpi-top">
+                    <div>
+                        <div class="lp-kpi-label">TOTAL VISIT</div>
+                        <h3 class="lp-kpi-value"><?= number_format($kpiTotal); ?></h3>
+                    </div>
+                    <div class="lp-kpi-icon" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0;">
+                        <span class="material-symbols-outlined">event_available</span>
                     </div>
                 </div>
-                <div class="stat-footer-premium">
-                    <p><?= htmlspecialchars($dateLabel); ?></p>
+                <div class="lp-kpi-footer">
+                    <span><i class="bi bi-calendar-check me-1"></i> Periode</span>
+                    <span class="text-dark fw-bold"><?= htmlspecialchars($dateLabel); ?></span>
                 </div>
             </div>
         </div>
 
         <!-- Card 2: Dijadwalkan -->
         <div class="col-6 col-md-3">
-            <div class="stat-card-premium" style="border-left: 4px solid #3b82f6;" onclick="window.location.href='laporan-kegiatan.php?status=dijadwalkan&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="stat-label-premium">DIJADWALKAN</p>
-                            <h3 class="stat-count-premium" style="color: #2563eb;"><?= number_format($kpiDijadwalkan); ?></h3>
-                        </div>
-                        <div class="stat-icon-premium" style="background-color: #eff6ff; color: #2563eb;">
-                            <span class="material-symbols-outlined" style="color: #2563eb;">event</span>
-                        </div>
+            <div class="lp-kpi-card <?= ($filterStatus === 'dijadwalkan') ? 'active-filter' : ''; ?>" onclick="window.location.href='laporan-kegiatan.php?status=dijadwalkan&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
+                <div class="lp-kpi-top">
+                    <div>
+                        <div class="lp-kpi-label">DIJADWALKAN</div>
+                        <h3 class="lp-kpi-value" style="color: #2563eb;"><?= number_format($kpiDijadwalkan); ?></h3>
+                    </div>
+                    <div class="lp-kpi-icon" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;">
+                        <span class="material-symbols-outlined">event</span>
                     </div>
                 </div>
-                <div class="stat-footer-premium">
-                    <p>Jadwal Mendatang</p>
+                <div class="lp-kpi-footer">
+                    <span><i class="bi bi-clock-history me-1"></i> Status</span>
+                    <span class="text-primary fw-bold">Jadwal Mendatang</span>
                 </div>
             </div>
         </div>
 
         <!-- Card 3: Diproses -->
         <div class="col-6 col-md-3">
-            <div class="stat-card-premium" style="border-left: 4px solid #f59e0b;" onclick="window.location.href='laporan-kegiatan.php?status=berjalan&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="stat-label-premium">DIPROSES</p>
-                            <h3 class="stat-count-premium" style="color: #d97706;"><?= number_format($kpiBerjalan); ?></h3>
-                        </div>
-                        <div class="stat-icon-premium" style="background-color: #fffbeb; color: #d97706;">
-                            <span class="material-symbols-outlined" style="color: #d97706;">hourglass_top</span>
-                        </div>
+            <div class="lp-kpi-card <?= ($filterStatus === 'berjalan') ? 'active-filter' : ''; ?>" onclick="window.location.href='laporan-kegiatan.php?status=berjalan&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
+                <div class="lp-kpi-top">
+                    <div>
+                        <div class="lp-kpi-label">DIPROSES (GPS)</div>
+                        <h3 class="lp-kpi-value" style="color: #d97706;"><?= number_format($kpiBerjalan); ?></h3>
+                    </div>
+                    <div class="lp-kpi-icon" style="background:#fffbeb; color:#d97706; border:1px solid #fde68a;">
+                        <span class="material-symbols-outlined">location_searching</span>
                     </div>
                 </div>
-                <div class="stat-footer-premium">
-                    <p>Sedang di Lokasi</p>
+                <div class="lp-kpi-footer">
+                    <span><i class="bi bi-geo-alt-fill me-1"></i> Status</span>
+                    <span class="text-warning fw-bold">Sedang di Lokasi</span>
                 </div>
             </div>
         </div>
 
         <!-- Card 4: Selesai -->
         <div class="col-6 col-md-3">
-            <div class="stat-card-premium" style="border-left: 4px solid #10b981;" onclick="window.location.href='laporan-kegiatan.php?status=selesai&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
-                <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="stat-label-premium">SELESAI</p>
-                            <h3 class="stat-count-premium" style="color: #059669;"><?= number_format($kpiSelesai); ?></h3>
-                        </div>
-                        <div class="stat-icon-premium" style="background-color: #ecfdf5; color: #059669;">
-                            <span class="material-symbols-outlined" style="color: #059669;">task_alt</span>
-                        </div>
+            <div class="lp-kpi-card <?= ($filterStatus === 'selesai') ? 'active-filter' : ''; ?>" onclick="window.location.href='laporan-kegiatan.php?status=selesai&id_sales=<?= $filterSales; ?>&bulan=<?= $filterBulan; ?>&tanggal=<?= $filterTanggal; ?>'">
+                <div class="lp-kpi-top">
+                    <div>
+                        <div class="lp-kpi-label">SELESAI</div>
+                        <h3 class="lp-kpi-value" style="color: #059669;"><?= number_format($kpiSelesai); ?></h3>
+                    </div>
+                    <div class="lp-kpi-icon" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;">
+                        <span class="material-symbols-outlined">task_alt</span>
                     </div>
                 </div>
-                <div class="stat-footer-premium">
-                    <p>Kunjungan Selesai</p>
+                <div class="lp-kpi-footer">
+                    <span><i class="bi bi-check2-all me-1"></i> Status</span>
+                    <span class="text-success fw-bold">Kunjungan Rampung</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- 2. FILTER & TOOLBAR CARD                                                -->
+    <!-- 2. CONTROL TOOLBAR (SEARCH & FILTERS)                                   -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <div class="card border-0 shadow-sm rounded-3 mb-4" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
-        <div class="card-body p-3">
-            <form method="GET" action="laporan-kegiatan.php" class="row g-2 align-items-end">
-                <!-- Filter Sales -->
-                <div class="col-12 col-md-3">
-                    <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                        <i class="fa-solid fa-user-tie text-primary me-1"></i> Filter Sales
-                    </label>
-                    <select name="id_sales" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
-                        <option value="0">-- Semua Sales --</option>
+    <div class="lp-toolbar-card">
+        <form method="GET" action="laporan-kegiatan.php">
+            <div class="row g-2 align-items-center">
+                
+                <!-- Live Search Box -->
+                <div class="col-12 col-lg-3">
+                    <div class="position-relative">
+                        <i class="bi bi-search position-absolute text-muted" style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px;"></i>
+                        <input type="text" id="liveSearchCustomerInput" class="lp-input w-100 ps-4 pe-4" placeholder="Cari nama toko atau alamat..." autocomplete="off">
+                        <span id="clearLiveSearch" class="position-absolute text-muted d-none" style="right: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; cursor: pointer;">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Filter Sales Dropdown -->
+                <div class="col-6 col-lg-2">
+                    <select name="id_sales" class="lp-input w-100" style="font-size: 12.5px;">
+                        <option value="0">Semua Sales Agent</option>
                         <?php foreach ($salesOptions as $opt) : ?>
                             <option value="<?= $opt['id']; ?>" <?= ($filterSales == $opt['id']) ? 'selected' : ''; ?>>
                                 <?= htmlspecialchars($opt['nama']); ?>
@@ -366,69 +599,46 @@ $result = mysqli_query($conn, $sql);
                     </select>
                 </div>
 
-                <!-- Status Kunjungan -->
-                <div class="col-12 col-md-2">
-                    <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                        <i class="fa-solid fa-filter text-primary me-1"></i> Status
-                    </label>
-                    <select name="status" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
-                        <option value="">-- Semua Status --</option>
-                        <option value="selesai" <?= ($filterStatus === 'selesai') ? 'selected' : ''; ?>>Selesai</option>
-                        <option value="berjalan" <?= ($filterStatus === 'berjalan') ? 'selected' : ''; ?>>Diproses</option>
+                <!-- Filter Status Dropdown -->
+                <div class="col-6 col-lg-2">
+                    <select name="status" class="lp-input w-100" style="font-size: 12.5px;">
+                        <option value="">Semua Status</option>
                         <option value="dijadwalkan" <?= ($filterStatus === 'dijadwalkan') ? 'selected' : ''; ?>>Dijadwalkan</option>
+                        <option value="berjalan" <?= ($filterStatus === 'berjalan') ? 'selected' : ''; ?>>Diproses (GPS)</option>
+                        <option value="selesai" <?= ($filterStatus === 'selesai') ? 'selected' : ''; ?>>Selesai</option>
                     </select>
                 </div>
 
                 <!-- Filter Bulan -->
-                <div class="col-6 col-md-2">
-                    <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                        <i class="fa-regular fa-calendar-days text-primary me-1"></i> Bulan
-                    </label>
-                    <input type="month" name="bulan" value="<?= htmlspecialchars($filterBulan); ?>" class="form-control form-control-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
+                <div class="col-6 col-lg-2">
+                    <input type="month" name="bulan" value="<?= htmlspecialchars($filterBulan); ?>" class="lp-input w-100" title="Pilih Bulan">
                 </div>
 
-                <!-- Filter Tanggal Spesifik -->
-                <div class="col-6 col-md-2">
-                    <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                        <i class="fa-regular fa-calendar-day text-primary me-1"></i> Tanggal
-                    </label>
-                    <input type="date" name="tanggal" value="<?= htmlspecialchars($filterTanggal); ?>" class="form-control form-control-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
+                <!-- Filter Tanggal -->
+                <div class="col-6 col-lg-1">
+                    <input type="date" name="tanggal" value="<?= htmlspecialchars($filterTanggal); ?>" class="lp-input w-100" title="Pilih Tanggal Spesifik">
                 </div>
 
-                <!-- Buttons -->
-                <div class="col-12 col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary btn-sm flex-grow-1 fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px; background: #3b82f6;">
-                        <i class="fa-solid fa-magnifying-glass"></i> Cari
+                <!-- Action Buttons -->
+                <div class="col-12 col-lg-2 d-flex gap-1.5 justify-content-end">
+                    <button type="submit" class="lp-btn lp-btn-primary flex-grow-1" title="Terapkan Filter">
+                        <i class="bi bi-funnel-fill"></i>
+                        <span>Filter</span>
                     </button>
-                    <a href="laporan-kegiatan.php" class="btn btn-outline-secondary btn-sm fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px;" title="Reset Filter">
-                        <i class="fa-solid fa-rotate-right"></i> Reset
+                    <a href="laporan-kegiatan.php" class="lp-btn lp-btn-secondary px-2.5" title="Reset Filter">
+                        <i class="bi bi-arrow-counterclockwise"></i>
                     </a>
-                    <button type="button" class="btn btn-outline-success btn-sm fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px;" data-bs-toggle="modal" data-bs-target="#syncSheetsModal" title="Sync ke Google Sheets">
-                        <i class="fa-solid fa-file-excel"></i> Sync
+                    <button type="button" class="lp-btn lp-btn-success px-2.5" data-bs-toggle="modal" data-bs-target="#syncSheetsModal" title="Sync ke Google Sheets">
+                        <i class="bi bi-file-earmark-spreadsheet-fill"></i>
                     </button>
                 </div>
-            </form>
 
-            <!-- Instant Search Bar -->
-            <div class="mt-3 pt-2.5 border-top d-flex align-items-center justify-content-between">
-                <div class="position-relative w-100" style="max-width: 420px;">
-                    <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px;"></i>
-                    <input type="text" id="liveSearchCustomerInput" class="form-control form-control-sm ps-4 pe-4" placeholder="Ketik cepat nama toko / alamat customer..." style="border-radius: 8px; font-size: 12.5px; border-color: #cbd5e1;">
-                    <span id="clearLiveSearch" class="position-absolute text-muted d-none" style="right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; cursor: pointer;">
-                        <i class="fa-solid fa-xmark"></i>
-                    </span>
-                </div>
-                <div class="d-none d-md-flex align-items-center gap-2">
-                    <span class="badge bg-light text-secondary border font-monospace px-2.5 py-1.5" style="font-size: 11px;">
-                        <i class="fa-solid fa-calendar-check me-1 text-primary"></i> <?= htmlspecialchars($dateLabel); ?>
-                    </span>
-                </div>
             </div>
-        </div>
+        </form>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- 3. DAFTAR KUNJUNGAN PER CUSTOMER                                        -->
+    <!-- 3. DAFTAR KUNJUNGAN PER CUSTOMER (CLEAN FEED)                           -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div id="customerListContainer">
         <?php
@@ -439,6 +649,7 @@ $result = mysqli_query($conn, $sql);
                 $kegiatanId = $row['id'];
                 $idC        = $row['id_cust'];
                 $namaC      = $row['nama_cust'];
+                $kodeC      = $row['kode_customer'] ?? 'CUST';
                 $alamatC    = $row['alamat_cust'] ?? '';
                 $kotaC      = $row['kota_cust'] ?? '';
 
@@ -475,51 +686,42 @@ $result = mysqli_query($conn, $sql);
                 $activityCount = ($resLapTek) ? mysqli_num_rows($resLapTek) : 0;
         ?>
             <!-- Customer Card -->
-            <div class="customer-report-card" data-customer-name="<?= strtolower(htmlspecialchars($namaC)); ?>" data-customer-address="<?= strtolower(htmlspecialchars($alamatC . ' ' . $kotaC)); ?>">
+            <div class="lp-cust-card" data-customer-name="<?= strtolower(htmlspecialchars($namaC)); ?>" data-customer-address="<?= strtolower(htmlspecialchars($alamatC . ' ' . $kotaC)); ?>">
                 <!-- Card Header -->
-                <div class="customer-card-header">
-                    <div class="d-flex align-items-center gap-2.5">
-                        <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width: 34px; height: 34px; background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe;">
-                            <i class="fa-solid fa-store" style="font-size: 14px;"></i>
+                <div class="lp-cust-header">
+                    <div class="lp-cust-info">
+                        <div class="lp-cust-icon">
+                            <i class="bi bi-shop"></i>
                         </div>
                         <div>
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                <h6 class="mb-0 text-dark fw-bold" style="font-family:'Outfit',sans-serif; font-size: 15px; letter-spacing: -0.01em;">
-                                    <?= htmlspecialchars($namaC); ?>
-                                </h6>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <span class="badge bg-light text-dark border font-monospace px-2 py-0.5" style="font-size: 10px;">
+                                    <?= htmlspecialchars($kodeC); ?>
+                                </span>
+                                <h6 class="lp-cust-name"><?= htmlspecialchars($namaC); ?></h6>
                                 <?php if (!empty($kotaC)): ?>
-                                    <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5 font-monospace" style="font-size: 10px;">
-                                        <i class="fa-solid fa-location-dot text-danger me-1"></i><?= htmlspecialchars($kotaC); ?>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5" style="font-size: 10px;">
+                                        <i class="bi bi-geo-alt-fill me-0.5"></i><?= htmlspecialchars($kotaC); ?>
                                     </span>
                                 <?php endif; ?>
                             </div>
                             <?php if (!empty($alamatC)): ?>
-                                <div class="text-muted text-truncate" style="font-size: 12px; max-width: 550px;">
-                                    <?= htmlspecialchars($alamatC); ?>
+                                <div class="lp-cust-addr" title="<?= htmlspecialchars($alamatC); ?>">
+                                    <i class="bi bi-pin-map text-muted me-1"></i><?= htmlspecialchars($alamatC); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1" style="font-size: 11px; font-weight: 600;">
+                        <span class="badge bg-light text-secondary border rounded-pill px-2.5 py-1" style="font-size: 11px; font-weight: 600;">
                             <?= max(1, $activityCount); ?> Penugasan
                         </span>
                     </div>
                 </div>
 
-                <!-- Desktop Table Header -->
-                <div class="report-table-header d-none d-lg-flex row gx-3 align-items-center m-0">
-                    <div class="col-lg-2">Status & ID</div>
-                    <div class="col-lg-2">Sales Agent</div>
-                    <div class="col-lg-2">Jadwal Visit</div>
-                    <div class="col-lg-2">Waktu Pelaksanaan</div>
-                    <div class="col-lg-3">Hasil / Catatan Visit</div>
-                    <div class="col-lg-1 text-end">Aksi</div>
-                </div>
-
                 <!-- Activities List -->
-                <div class="p-0">
+                <div>
                     <?php
                     if ($resLapTek && mysqli_num_rows($resLapTek) > 0) {
                         while ($rowLT = mysqli_fetch_assoc($resLapTek)) {
@@ -549,71 +751,69 @@ $result = mysqli_query($conn, $sql);
                                 $status = 'dijadwalkan';
                             }
                     ?>
-                        <div class="report-item-row row gx-3 align-items-center m-0">
+                        <div class="lp-item-row">
                             <!-- 1. Status & ID -->
-                            <div class="col-12 col-lg-2 mb-2 mb-lg-0">
-                                <div class="d-flex flex-wrap align-items-center gap-1.5">
+                            <div>
+                                <div class="d-flex flex-column gap-1">
                                     <?php if ($status === 'selesai'): ?>
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-bold d-inline-flex align-items-center gap-1" style="font-size: 11px;">
-                                            <i class="fa-solid fa-circle-check"></i> Selesai
+                                        <span class="lp-status-badge lp-status-selesai">
+                                            <i class="bi bi-check-circle-fill"></i> Selesai
                                         </span>
                                     <?php elseif ($status === 'berjalan'): ?>
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 fw-bold d-inline-flex align-items-center gap-1" style="font-size: 11px;">
-                                            <span class="spinner-grow spinner-grow-sm" style="width: 7px; height: 7px;"></span> Diproses
+                                        <span class="lp-status-badge lp-status-berjalan">
+                                            <span class="spinner-grow spinner-grow-sm" style="width: 6px; height: 6px;"></span> Diproses
                                         </span>
                                     <?php else: ?>
-                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2.5 py-1 fw-bold d-inline-flex align-items-center gap-1" style="font-size: 11px;">
-                                            <i class="fa-regular fa-clock"></i> Dijadwalkan
+                                        <span class="lp-status-badge lp-status-dijadwalkan">
+                                            <i class="bi bi-clock"></i> Dijadwalkan
                                         </span>
                                     <?php endif; ?>
 
-                                    <a href="javascript:void(0)" class="badge bg-light text-primary border font-monospace text-decoration-none px-2 py-1 detailBtn" data-id="<?= $idT; ?>" data-kode="<?= $rowLT['kode_transaksi']; ?>" title="Lihat Riwayat Waktu" style="font-size: 11px;">
+                                    <span class="badge bg-light text-muted border font-monospace mt-0.5 text-start" style="font-size: 10px; width: fit-content;">
                                         #<?= $rowLT['kode_transaksi']; ?>
-                                    </a>
+                                    </span>
                                 </div>
                             </div>
 
                             <!-- 2. Sales Agent -->
-                            <div class="col-12 col-lg-2 mb-2 mb-lg-0">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="avatar-initial" style="background: <?= $avatarBg; ?>;">
+                            <div>
+                                <div class="lp-sales-pill">
+                                    <div class="lp-sales-avatar" style="background: <?= $avatarBg; ?>;">
                                         <?= $initials; ?>
                                     </div>
-                                    <div>
-                                        <div class="text-dark fw-bold" style="font-size: 13px; line-height: 1.2;">
-                                            <?= htmlspecialchars($namaSalesItem); ?>
-                                        </div>
-                                        <span class="text-muted" style="font-size: 11px;">Sales Team</span>
+                                    <div class="lp-sales-text">
+                                        <div class="lp-sales-name"><?= htmlspecialchars($namaSalesItem); ?></div>
+                                        <span class="text-muted" style="font-size: 10.5px;">Sales Canvas</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- 3. Jadwal Visit -->
-                            <div class="col-6 col-lg-2 mb-2 mb-lg-0">
+                            <div>
                                 <div class="d-flex flex-column">
-                                    <span class="text-dark fw-semibold" style="font-size: 12.5px;">
-                                        <i class="fa-regular fa-calendar text-primary me-1"></i><?= $formattedDate; ?>
+                                    <span class="fw-semibold text-dark" style="font-size: 12.5px;">
+                                        <i class="bi bi-calendar3 text-primary me-1"></i><?= $formattedDate; ?>
                                     </span>
-                                    <span class="text-secondary fw-bold ms-3.5" style="font-size: 11px;">
-                                        <i class="fa-regular fa-clock text-muted me-1"></i><?= $formattedTime; ?> WIB
+                                    <span class="text-muted fw-bold" style="font-size: 11px; margin-left: 17px;">
+                                        <?= $formattedTime; ?> WIB
                                     </span>
                                 </div>
                             </div>
 
-                            <!-- 4. Waktu Pelaksanaan (Clock In & Out) -->
-                            <div class="col-6 col-lg-2 mb-2 mb-lg-0">
-                                <div class="d-flex flex-column gap-1">
+                            <!-- 4. Waktu Pelaksanaan GPS -->
+                            <div>
+                                <div class="d-flex flex-column gap-0.5">
                                     <?php if ($formattedTimeMli): ?>
-                                        <div class="d-inline-flex align-items-center gap-1 text-success fw-bold font-monospace" style="font-size: 11.5px;">
-                                            <i class="fa-solid fa-arrow-right-to-bracket text-success"></i> IN: <?= $formattedTimeMli; ?>
+                                        <div class="text-success fw-bold font-monospace" style="font-size: 11px;">
+                                            <i class="bi bi-box-arrow-in-right"></i> IN: <?= $formattedTimeMli; ?>
                                         </div>
                                     <?php else: ?>
-                                        <span class="text-muted" style="font-size: 12px;"><i class="fa-solid fa-minus text-muted me-1"></i> Belum Masuk</span>
+                                        <span class="text-muted" style="font-size: 11.5px;">— Belum Masuk</span>
                                     <?php endif; ?>
 
                                     <?php if ($formattedTimeSls): ?>
-                                        <div class="d-inline-flex align-items-center gap-1 text-primary fw-bold font-monospace" style="font-size: 11.5px;">
-                                            <i class="fa-solid fa-arrow-right-from-bracket text-primary"></i> OUT: <?= $formattedTimeSls; ?>
+                                        <div class="text-primary fw-bold font-monospace" style="font-size: 11px;">
+                                            <i class="bi bi-box-arrow-right"></i> OUT: <?= $formattedTimeSls; ?>
                                         </div>
                                     <?php elseif ($formattedTimeMli): ?>
                                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace px-1.5 py-0.5 text-start" style="font-size: 9.5px; width: fit-content;">Sedang Visit</span>
@@ -621,44 +821,44 @@ $result = mysqli_query($conn, $sql);
                                 </div>
                             </div>
 
-                            <!-- 5. Hasil & Catatan Visit -->
-                            <div class="col-12 col-lg-3 mb-2 mb-lg-0">
+                            <!-- 5. Catatan / Ringkasan Visit -->
+                            <div>
                                 <?php if (!empty($hslVisits)): ?>
-                                    <div class="note-bubble">
-                                        <i class="fa-solid fa-quote-left text-muted me-1" style="font-size: 10px;"></i>
-                                        <?= htmlspecialchars(mb_strimwidth($hslVisits, 0, 100, '...')); ?>
+                                    <div class="lp-note-box" title="<?= htmlspecialchars($hslVisits); ?>">
+                                        <i class="bi bi-chat-quote text-primary me-1"></i>
+                                        <?= htmlspecialchars($hslVisits); ?>
                                     </div>
                                 <?php elseif ($status === 'selesai'): ?>
                                     <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 11px;">
-                                        <i class="fa-solid fa-check me-1"></i> Kunjungan Selesai
+                                        <i class="bi bi-check me-1"></i> Kunjungan Selesai
                                     </span>
                                 <?php elseif ($status === 'berjalan'): ?>
                                     <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1" style="font-size: 11px;">
-                                        <i class="fa-solid fa-location-dot me-1"></i> Sedang di Lokasi Toko
+                                        <i class="bi bi-geo-alt me-1"></i> Sedang di Lokasi Toko
                                     </span>
                                 <?php else: ?>
                                     <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 11px;">
-                                        <i class="fa-regular fa-clock me-1"></i> Menunggu Sales
+                                        <i class="bi bi-hourglass-split me-1"></i> Menunggu Sales
                                     </span>
                                 <?php endif; ?>
                             </div>
 
                             <!-- 6. Aksi Buttons -->
-                            <div class="col-12 col-lg-1 text-lg-end mt-2 mt-lg-0">
-                                <div class="d-flex align-items-center justify-content-start justify-content-lg-end gap-1.5">
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1">
                                     <!-- View Detail Modal -->
-                                    <button type="button" class="action-btn-modern action-btn-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="<?= $idT; ?>" data-kode="<?= $rowLT['kode_transaksi']; ?>" title="Lihat Rincian & Lokasi (GPS)">
-                                        <i class="fa-solid fa-eye"></i>
+                                    <button type="button" class="lp-action-btn lp-action-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="<?= $idT; ?>" data-kode="<?= $rowLT['kode_transaksi']; ?>" title="Lihat Rincian & Lokasi GPS">
+                                        <i class="bi bi-eye-fill"></i>
                                     </button>
 
                                     <!-- Edit Visit Modal -->
-                                    <button type="button" class="action-btn-modern action-btn-edit editVisitBtn" data-id="<?= $rowLT['kode_transaksi']; ?>" data-sales="<?= $idT; ?>" title="Edit Laporan Kunjungan">
-                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    <button type="button" class="lp-action-btn lp-action-edit editVisitBtn" data-id="<?= $rowLT['kode_transaksi']; ?>" data-sales="<?= $idT; ?>" title="Edit Laporan Kunjungan">
+                                        <i class="bi bi-pencil-square"></i>
                                     </button>
 
                                     <!-- Delete / Reset Visit -->
-                                    <button type="button" class="action-btn-modern action-btn-delete deleteVisitBtn" data-id="<?= $rowLT['kode_transaksi']; ?>" data-sales="<?= $idT; ?>" data-status="<?= $status; ?>" data-cust="<?= htmlspecialchars($namaC); ?>" title="Hapus / Reset Kunjungan">
-                                        <i class="fa-solid fa-trash-can"></i>
+                                    <button type="button" class="lp-action-btn lp-action-delete deleteVisitBtn" data-id="<?= $rowLT['kode_transaksi']; ?>" data-sales="<?= $idT; ?>" data-status="<?= $status; ?>" data-cust="<?= htmlspecialchars($namaC); ?>" title="Hapus / Reset Kunjungan">
+                                        <i class="bi bi-trash-fill"></i>
                                     </button>
                                 </div>
                             </div>
@@ -666,36 +866,36 @@ $result = mysqli_query($conn, $sql);
                     <?php
                         }
                     } else {
-                        // Fallback row jika team belum terdaftar
+                        // Fallback jika sales belum ditugaskan
                         $datetimeFallback = $row["tgl_visits"];
                         $formattedDateFb = ($datetimeFallback && $datetimeFallback != '0000-00-00 00:00:00') ? date("d M Y", strtotime($datetimeFallback)) : '-';
                         $formattedTimeFb = ($datetimeFallback && $datetimeFallback != '0000-00-00 00:00:00') ? date("H:i", strtotime($datetimeFallback)) : '-';
                     ?>
-                        <div class="report-item-row row gx-3 align-items-center m-0">
-                            <div class="col-12 col-lg-2 mb-2 mb-lg-0">
-                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2.5 py-1 fw-bold" style="font-size: 11px;">
-                                    <i class="fa-regular fa-clock me-1"></i> Dijadwalkan
+                        <div class="lp-item-row">
+                            <div>
+                                <span class="lp-status-badge lp-status-dijadwalkan">
+                                    <i class="bi bi-clock"></i> Dijadwalkan
                                 </span>
-                                <span class="badge bg-light text-primary border font-monospace px-2 py-1 ms-1" style="font-size: 11px;">
+                                <span class="badge bg-light text-muted border font-monospace mt-0.5 d-block text-start" style="font-size: 10px; width: fit-content;">
                                     #<?= $row['kode_transaksi']; ?>
                                 </span>
                             </div>
-                            <div class="col-12 col-lg-2 mb-2 mb-lg-0">
+                            <div>
                                 <span class="text-muted small">Sales belum ditugaskan</span>
                             </div>
-                            <div class="col-6 col-lg-2 mb-2 mb-lg-0">
-                                <span class="text-dark fw-semibold" style="font-size: 12.5px;"><?= $formattedDateFb; ?></span>
-                                <span class="text-muted ms-1 small"><?= $formattedTimeFb; ?> WIB</span>
+                            <div>
+                                <span class="fw-semibold text-dark" style="font-size: 12.5px;"><?= $formattedDateFb; ?></span>
+                                <div class="text-muted small"><?= $formattedTimeFb; ?> WIB</div>
                             </div>
-                            <div class="col-6 col-lg-2 mb-2 mb-lg-0">
+                            <div>
                                 <span class="text-muted small">—</span>
                             </div>
-                            <div class="col-12 col-lg-3 mb-2 mb-lg-0">
+                            <div>
                                 <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 11px;">Menunggu Penugasan</span>
                             </div>
-                            <div class="col-12 col-lg-1 text-lg-end mt-2 mt-lg-0">
-                                <button type="button" class="action-btn-modern action-btn-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="0" data-kode="<?= $row['kode_transaksi']; ?>" title="Lihat Rincian">
-                                    <i class="fa-solid fa-eye"></i>
+                            <div class="text-end">
+                                <button type="button" class="lp-action-btn lp-action-view detailBtn" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="0" data-kode="<?= $row['kode_transaksi']; ?>" title="Lihat Rincian">
+                                    <i class="bi bi-eye-fill"></i>
                                 </button>
                             </div>
                         </div>
@@ -707,15 +907,15 @@ $result = mysqli_query($conn, $sql);
         } else {
         ?>
             <!-- Empty State -->
-            <div class="card border-0 shadow-sm rounded-4 text-center py-5" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
+            <div class="card border-0 shadow-sm rounded-4 text-center py-5" style="background: #ffffff; border: 1px solid var(--lp-slate-200) !important;">
                 <div class="card-body">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 64px; height: 64px; background: #f1f5f9; color: #94a3b8;">
-                        <i class="fa-solid fa-clipboard-question" style="font-size: 28px;"></i>
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; background: #f1f5f9; color: #64748b;">
+                        <i class="bi bi-calendar-x fs-3"></i>
                     </div>
-                    <h5 class="fw-bold text-dark mb-1" style="font-family:'Outfit',sans-serif;">Data Laporan Kunjungan Tidak Ditemukan</h5>
-                    <p class="text-muted small mb-3">Tidak ada jadwal atau riwayat kunjungan yang sesuai dengan filter yang dipilih.</p>
-                    <a href="laporan-kegiatan.php" class="btn btn-sm btn-primary rounded-3 px-3 py-2 fw-semibold" style="background: #2563eb;">
-                        <i class="fa-solid fa-rotate-right me-1"></i> Reset Semua Filter
+                    <h5 class="fw-bold text-dark mb-1" style="font-family:'Outfit',sans-serif;">Data Kunjungan Tidak Ditemukan</h5>
+                    <p class="text-muted small mb-3">Tidak ada riwayat kunjungan yang sesuai dengan filter yang dipilih.</p>
+                    <a href="laporan-kegiatan.php" class="lp-btn lp-btn-primary px-3 py-2 d-inline-flex">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset Filter
                     </a>
                 </div>
             </div>
@@ -729,10 +929,10 @@ $result = mysqli_query($conn, $sql);
 <div class="modal fade" id="syncSheetsModal" tabindex="-1" aria-labelledby="syncSheetsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-            <div class="modal-header border-0 pb-0">
+            <div class="modal-header border-bottom py-3 px-4">
                 <div class="d-flex align-items-center gap-2">
                     <span class="d-flex align-items-center justify-content-center rounded-circle" style="width: 34px; height: 34px; background: #ecfdf5; color: #059669;">
-                        <i class="fa-solid fa-file-excel"></i>
+                        <i class="bi bi-file-earmark-spreadsheet-fill fs-6"></i>
                     </span>
                     <h5 class="modal-title font-weight-bold text-dark fs-6 mb-0" id="syncSheetsModalLabel">
                         Sync ke Google Sheets
@@ -741,9 +941,9 @@ $result = mysqli_query($conn, $sql);
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="syncSheetsForm">
-                <div class="modal-body py-3">
-                    <div class="alert alert-info text-white text-xs border-0 mb-3" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); border-radius: 12px; line-height: 1.5;">
-                        <i class="fa-solid fa-circle-info me-1.5 text-sm"></i>
+                <div class="modal-body py-3 px-4">
+                    <div class="alert alert-info text-white text-xs border-0 mb-3" style="background: linear-gradient(135deg, #1d4ed8, #2563eb); border-radius: 12px; line-height: 1.5;">
+                        <i class="bi bi-info-circle-fill me-1 text-sm"></i>
                         Pastikan Anda telah membagikan Spreadsheet target sebagai <strong>Editor</strong> ke email service account berikut:<br>
                         <code class="text-white bg-dark px-2 py-1 mt-1.5 d-inline-block rounded select-all" style="font-family: monospace; font-size: 11px;">sheets-sync@loewix-sales.iam.gserviceaccount.com</code>
                     </div>
@@ -801,9 +1001,9 @@ $result = mysqli_query($conn, $sql);
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-link text-secondary mb-0" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success mb-0 fw-bold" id="btnDoSync" style="border-radius: 8px; background: #059669;">
+                <div class="modal-footer border-top py-2.5 px-4 bg-light">
+                    <button type="button" class="btn btn-sm btn-link text-secondary mb-0" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-sm btn-success mb-0 fw-bold px-3 py-2 rounded-2" id="btnDoSync" style="background: #059669;">
                         <span id="syncSpinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
                         Mulai Sync
                     </button>
@@ -819,10 +1019,10 @@ $result = mysqli_query($conn, $sql);
 <div class="modal fade" id="editVisitModal" tabindex="-1" aria-labelledby="editVisitModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-            <div class="modal-header border-0 pb-0">
+            <div class="modal-header border-bottom py-3 px-4">
                 <div class="d-flex align-items-center gap-2">
                     <span class="d-flex align-items-center justify-content-center rounded-circle" style="width: 34px; height: 34px; background: #eff6ff; color: #2563eb;">
-                        <i class="fa-solid fa-pen-to-square"></i>
+                        <i class="bi bi-pencil-square fs-6"></i>
                     </span>
                     <h5 class="modal-title font-weight-bold text-dark fs-6 mb-0" id="editVisitModalLabel">
                         Edit Laporan Kunjungan
@@ -835,7 +1035,7 @@ $result = mysqli_query($conn, $sql);
                 <input type="hidden" name="sales_id" id="edit_sales_id">
                 <input type="hidden" name="status_kegiatan" id="edit_status_kegiatan">
                 
-                <div class="modal-body py-3">
+                <div class="modal-body py-3 px-4">
                     <div class="row">
                         <!-- Customer & Sales (Readonly) -->
                         <div class="col-md-6 mb-3">
@@ -898,9 +1098,9 @@ $result = mysqli_query($conn, $sql);
                         <textarea name="catatan_visit" id="edit_catatan_visit" rows="2" class="form-control border p-2 text-sm" style="border-radius: 8px;" placeholder="Catatan tambahan..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-link text-secondary mb-0" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary mb-0 fw-bold" style="border-radius: 8px; background: #2563eb;">Simpan Perubahan</button>
+                <div class="modal-footer border-top py-2.5 px-4 bg-light">
+                    <button type="button" class="btn btn-sm btn-link text-secondary mb-0" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-sm btn-primary mb-0 fw-bold px-3 py-2 rounded-2" style="background: #2563eb;">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -912,7 +1112,7 @@ $(document).ready(function() {
     // ── Live Instant Search Customer ──
     const searchInput = document.getElementById('liveSearchCustomerInput');
     const clearBtn = document.getElementById('clearLiveSearch');
-    const cards = document.querySelectorAll('.customer-report-card');
+    const cards = document.querySelectorAll('.lp-cust-card');
 
     if (searchInput) {
         searchInput.addEventListener('input', function() {
