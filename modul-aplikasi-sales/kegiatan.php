@@ -64,18 +64,6 @@ $currentPage = "Today";
     <?php include __DIR__ . "/nav-top.php"; ?>
 
     <div class="container-fluid p-0">
-      <!-- Quick Action: Buat Jadwal Baru -->
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <div>
-          <h4 class="fw-bold mb-1" style="font-family:'Outfit',sans-serif;">Dashboard Sales Canvas</h4>
-          <p class="text-muted small mb-0">Kelola dan pantau seluruh jadwal penugasan sales canvasser ke toko & dealer mitra.</p>
-        </div>
-        <a href="kegiatan-baru.php" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2 fw-semibold shadow-sm">
-          <i class="bi bi-plus-circle-fill"></i>
-          <span>Buat Jadwal Baru</span>
-        </a>
-      </div>
-
       <div class="row mb-4">
         <?php include __DIR__ . "/kegiatan-db.php"; ?>
       </div>

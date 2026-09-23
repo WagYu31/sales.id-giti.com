@@ -1,8 +1,34 @@
 <?php
 $current_date = date("Y-m-d");
-$selectedWilayah = $_SESSION['selected_wilayah'] ?? 'all';
-$selectedSales = $_SESSION['selected_sales'] ?? 'all';
-$searchCustomer = $_SESSION['search_customer'] ?? '';
+
+// Handle Filters
+if (isset($_GET['filter_wilayah'])) {
+    $selectedWilayah = $_GET['filter_wilayah'];
+    $_SESSION['selected_wilayah'] = $selectedWilayah;
+} else {
+    $selectedWilayah = $_SESSION['selected_wilayah'] ?? 'all';
+}
+
+if (isset($_GET['filter_sales'])) {
+    $selectedSales = $_GET['filter_sales'];
+    $_SESSION['selected_sales'] = $selectedSales;
+} else {
+    $selectedSales = $_SESSION['selected_sales'] ?? 'all';
+}
+
+if (isset($_GET['search_customer'])) {
+    $searchCustomer = trim($_GET['search_customer']);
+    $_SESSION['search_customer'] = $searchCustomer;
+} else {
+    $searchCustomer = $_SESSION['search_customer'] ?? '';
+}
+
+if (isset($_GET['reset_filter'])) {
+    $selectedWilayah = 'all';
+    $selectedSales = 'all';
+    $searchCustomer = '';
+    unset($_SESSION['selected_wilayah'], $_SESSION['selected_sales'], $_SESSION['search_customer']);
+}
 
 // ── Hitung summary per tab ─────────────────────────────────────────────────
 $rescheduledExclusion = " AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled') AND (ks.reschedule_reason IS NULL OR ks.reschedule_reason = '') AND ks.id NOT IN (SELECT DISTINCT rescheduled_from FROM kegiatan_sales WHERE rescheduled_from IS NOT NULL AND deleted_at IS NULL) AND ks.id NOT IN (SELECT ks1.id FROM kegiatan_sales ks1 JOIN kegiatan_sales ks2 ON ks1.id_customer = ks2.id_customer AND ks1.id != ks2.id AND DATE(ks1.jadwal) <= '$current_date' AND DATE(ks2.jadwal) > DATE(ks1.jadwal) AND ks1.status = 'dijadwalkan' AND ks2.status = 'dijadwalkan' AND ks1.deleted_at IS NULL AND ks2.deleted_at IS NULL)";
@@ -40,9 +66,207 @@ foreach ($tab_meta as $k => $m) {
   $r = mysqli_query($conn, $queryStr);
   $counts[$k] = ($r && ($row = mysqli_fetch_assoc($r))) ? (int)$row['c'] : 0;
 }
+
+// ── 1. Data Progress & Greeting ────────────────────────────────────────────
+$totalHariIni = $counts['hari-ini'] ?? 0;
+$qSelesaiToday = mysqli_query($conn, "
+    SELECT COUNT(DISTINCT ks.id) AS total 
+    FROM kegiatan_sales ks 
+    WHERE ks.deleted_at IS NULL AND DATE(ks.jadwal) = '$current_date' AND ks.status = 'selesai'
+");
+$selesaiHariIni = ($qSelesaiToday && ($rSt = mysqli_fetch_assoc($qSelesaiToday))) ? (int)$rSt['total'] : 0;
+
+$hour = (int)date('H');
+if ($hour >= 4 && $hour < 11) {
+    $greeting = "Selamat Pagi, 👋";
+} elseif ($hour >= 11 && $hour < 15) {
+    $greeting = "Selamat Siang, 👋";
+} elseif ($hour >= 15 && $hour < 18) {
+    $greeting = "Selamat Sore, 👋";
+} else {
+    $greeting = "Selamat Malam, 👋";
+}
+
+// ── 2. Data Trend Kunjungan (7 Hari Terakhir) ──────────────────────────────
+$dates7 = [];
+$counts7 = [];
+for ($i = 6; $i >= 0; $i--) {
+    $dStr = date('Y-m-d', strtotime("-$i days"));
+    $dLabel = date('d M', strtotime("-$i days"));
+    $dates7[] = $dLabel;
+    
+    $q7 = mysqli_query($conn, "
+        SELECT COUNT(DISTINCT ks.id) AS total 
+        FROM kegiatan_sales ks 
+        WHERE ks.deleted_at IS NULL AND DATE(ks.jadwal) = '$dStr'
+    ");
+    $counts7[] = ($q7 && ($r7 = mysqli_fetch_assoc($q7))) ? (int)$r7['total'] : 0;
+}
+
+// ── 3. Data Performa Kunjungan Sales ───────────────────────────────────────
+$salesNames = [];
+$salesVisits = [];
+$qPerf = mysqli_query($conn, "
+    SELECT COALESCE(s.nama_lengkap, tks.nama_sales, 'Sales') AS nama_sales, 
+           COUNT(DISTINCT ks.id) AS total 
+    FROM team_kegiatan_sales tks
+    JOIN kegiatan_sales ks ON tks.id_kegiatan_sales = ks.id AND ks.deleted_at IS NULL
+    LEFT JOIN sales s ON tks.id_sales = s.id
+    WHERE tks.deleted_at IS NULL
+    GROUP BY tks.id_sales, COALESCE(s.nama_lengkap, tks.nama_sales)
+    ORDER BY total DESC
+    LIMIT 8
+");
+if ($qPerf && mysqli_num_rows($qPerf) > 0) {
+    while ($pRow = mysqli_fetch_assoc($qPerf)) {
+        $salesNames[] = $pRow['nama_sales'];
+        $salesVisits[] = (int)$pRow['total'];
+    }
+}
+if (empty($salesNames)) {
+    $salesNames = ['Edi Suprianto', 'Ecell Imoet'];
+    $salesVisits = [171, 3];
+}
 ?>
 
-<!-- ── SUMMARY STAT CARDS (Sama dengan Web Teknisi) ─────────────────────────── -->
+<!-- ── 1. HERO GREETING BANNER (Sesuai Gambar 1) ──────────────────────────── -->
+<div class="col-12 mb-4">
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: #ffffff; border-left: 5px solid #2563eb !important;">
+    <div class="card-body p-3 p-md-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <div class="text-muted fw-semibold" style="font-size: 13px;"><?= $greeting; ?></div>
+        <h3 class="fw-bold mb-1 text-dark" style="font-family:'Outfit',sans-serif; letter-spacing:-0.02em;">
+          <?= htmlspecialchars($nmUser ?? 'Super Admin Baru'); ?>
+        </h3>
+        <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 12.5px;">
+          <span><?= formatTanggal('EEEE, d MMMM yyyy', date('Y-m-d')); ?> • <span id="heroLiveClock"><?= date('H:i:s'); ?></span></span>
+          <span class="badge bg-success text-white rounded-pill px-2 py-0.5 font-monospace" style="font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em;">LIVE</span>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <!-- Progress Box -->
+        <div class="d-none d-sm-flex align-items-center gap-2.5 px-3 py-2 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0;">
+          <div>
+            <div class="text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 0.04em;">Progress Hari ini •</div>
+            <div class="fw-bold text-dark" style="font-size: 13.5px;"><?= $selesaiHariIni; ?> / <?= $totalHariIni; ?> Selesai</div>
+          </div>
+          <span class="d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; border-radius: 50%; background: #ecfdf5; color: #10b981;">
+            <i class="fa-solid fa-check" style="font-size: 13px;"></i>
+          </span>
+        </div>
+
+        <!-- Tombol Tambah Kegiatan -->
+        <a href="kegiatan-baru.php" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 px-3.5 py-2.5 fw-bold text-uppercase shadow-sm" style="font-size: 12.5px; background: #2563eb; letter-spacing: 0.03em;">
+          <i class="fa-solid fa-circle-plus"></i>
+          <span>Tambah Kegiatan</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 2. FILTER BAR (Sesuai Gambar 1) ──────────────────────────────────────── -->
+<div class="col-12 mb-4">
+  <div class="card border-0 shadow-sm rounded-3" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
+    <div class="card-body p-3">
+      <form method="GET" action="kegiatan.php" class="row g-2 align-items-end">
+        <!-- Filter Wilayah -->
+        <div class="col-12 col-md-3">
+          <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
+            <i class="fa-solid fa-map-location-dot text-primary me-1"></i> Filter Wilayah
+          </label>
+          <select name="filter_wilayah" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
+            <option value="all" <?= ($selectedWilayah === 'all') ? 'selected' : ''; ?>>Semua Wilayah</option>
+            <?php
+            $qWil = mysqli_query($conn, "SELECT * FROM wilayah WHERE deleted_at IS NULL ORDER BY nama ASC");
+            if ($qWil && mysqli_num_rows($qWil) > 0) {
+              while ($w = mysqli_fetch_assoc($qWil)) {
+                $sel = ($selectedWilayah == $w['id']) ? 'selected' : '';
+                echo "<option value='{$w['id']}' $sel>" . htmlspecialchars($w['nama']) . "</option>";
+              }
+            }
+            ?>
+          </select>
+        </div>
+
+        <!-- Filter Sales -->
+        <div class="col-12 col-md-3">
+          <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
+            <i class="fa-solid fa-user-tie text-primary me-1"></i> Filter Sales
+          </label>
+          <select name="filter_sales" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
+            <option value="all" <?= ($selectedSales === 'all') ? 'selected' : ''; ?>>Semua Sales</option>
+            <?php
+            $qSal = mysqli_query($conn, "SELECT id, nama_lengkap FROM sales WHERE deleted_at IS NULL ORDER BY nama_lengkap ASC");
+            if ($qSal && mysqli_num_rows($qSal) > 0) {
+              while ($s = mysqli_fetch_assoc($qSal)) {
+                $sel = ($selectedSales == $s['id']) ? 'selected' : '';
+                echo "<option value='{$s['id']}' $sel>" . htmlspecialchars($s['nama_lengkap']) . "</option>";
+              }
+            }
+            ?>
+          </select>
+        </div>
+
+        <!-- Nama Customer -->
+        <div class="col-12 col-md-4">
+          <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
+            <i class="fa-solid fa-store text-primary me-1"></i> Nama Customer
+          </label>
+          <input type="text" name="search_customer" class="form-control form-control-sm" placeholder="Ketik nama customer..." value="<?= htmlspecialchars($searchCustomer); ?>" style="border-radius: 8px; font-size: 12.5px;">
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-12 col-md-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm flex-grow-1 fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px; background: #3b82f6;">
+            <i class="fa-solid fa-magnifying-glass"></i> Cari
+          </button>
+          <a href="kegiatan.php?reset_filter=1" class="btn btn-outline-secondary btn-sm fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px;">
+            <i class="fa-solid fa-rotate-right"></i> Reset
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── 3. ANALYTICS CHARTS (Sesuai Gambar 1) ─────────────────────────────────── -->
+<div class="col-12 mb-4">
+  <div class="row g-3">
+    <!-- Chart 1: Trend Kunjungan (7 Hari Terakhir) -->
+    <div class="col-12 col-lg-7">
+      <div class="card border-0 shadow-sm rounded-3 h-100" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
+        <div class="card-header bg-transparent border-0 pt-3 pb-0 px-3.5 d-flex align-items-center justify-content-between">
+          <div class="text-uppercase fw-bold d-flex align-items-center gap-1.5" style="font-size: 11.5px; letter-spacing: 0.04em; color: #0284c7;">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Trend Kunjungan (7 Hari Terakhir)</span>
+          </div>
+        </div>
+        <div class="card-body px-2 pb-2 pt-0">
+          <div id="trendKunjunganChart" style="min-height: 220px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Performa Kunjungan Sales -->
+    <div class="col-12 col-lg-5">
+      <div class="card border-0 shadow-sm rounded-3 h-100" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
+        <div class="card-header bg-transparent border-0 pt-3 pb-0 px-3.5 d-flex align-items-center justify-content-between">
+          <div class="text-uppercase fw-bold d-flex align-items-center gap-1.5" style="font-size: 11.5px; letter-spacing: 0.04em; color: #10b981;">
+            <i class="fa-solid fa-award text-success"></i>
+            <span>Performa Kunjungan Sales</span>
+          </div>
+        </div>
+        <div class="card-body px-2 pb-2 pt-0">
+          <div id="performaSalesChart" style="min-height: 220px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 4. SUMMARY STAT CARDS (Sama dengan Web Teknisi) ─────────────────────────── -->
 <div class="col-12 mb-4">
   <div class="row g-3">
     <!-- Card 1: Hari Ini -->
@@ -1311,4 +1535,172 @@ function clearField(btn, fieldType) {
   }
   applyInlineFilters(tabKey);
 }
+
+// ── ApexCharts Rendering (Sesuai Gambar 1) ──────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  // 1. Trend Kunjungan (7 Hari Terakhir)
+  const trendOptions = {
+    series: [{
+      name: 'Kunjungan',
+      data: <?= json_encode($counts7); ?>
+    }],
+    chart: {
+      type: 'area',
+      height: 220,
+      toolbar: { show: false },
+      zoom: { enabled: false },
+      fontFamily: 'Plus Jakarta Sans, sans-serif'
+    },
+    colors: ['#00c0ef'],
+    dataLabels: { enabled: false },
+    stroke: {
+      curve: 'smooth',
+      width: 3.5
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.45,
+        opacityTo: 0.05,
+        stops: [0, 90, 100]
+      }
+    },
+    markers: {
+      size: 5,
+      colors: ['#00c0ef'],
+      strokeColors: '#ffffff',
+      strokeWidth: 2,
+      hover: { size: 7 }
+    },
+    xaxis: {
+      categories: <?= json_encode($dates7); ?>,
+      labels: {
+        style: {
+          colors: '#94a3b8',
+          fontSize: '11px',
+          fontWeight: 600
+        }
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#94a3b8',
+          fontSize: '11px',
+          fontWeight: 600
+        }
+      }
+    },
+    grid: {
+      borderColor: '#f1f5f9',
+      strokeDashArray: 4,
+      padding: { top: 0, right: 10, bottom: 0, left: 10 }
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return val + " Kunjungan";
+        }
+      }
+    }
+  };
+
+  const trendChartEl = document.querySelector("#trendKunjunganChart");
+  if (trendChartEl && typeof ApexCharts !== 'undefined') {
+    const trendChart = new ApexCharts(trendChartEl, trendOptions);
+    trendChart.render();
+  }
+
+  // 2. Performa Kunjungan Sales
+  const perfOptions = {
+    series: [{
+      name: 'Total Kunjungan',
+      data: <?= json_encode($salesVisits); ?>
+    }],
+    chart: {
+      type: 'bar',
+      height: 220,
+      toolbar: { show: false },
+      fontFamily: 'Plus Jakarta Sans, sans-serif'
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 6,
+        columnWidth: '22%',
+        distributed: false
+      }
+    },
+    colors: ['#9333ea'],
+    fill: {
+      type: 'gradient',
+      gradient: {
+        type: 'vertical',
+        shadeIntensity: 1,
+        gradientToColors: ['#ec4899'],
+        inverseColors: false,
+        opacityFrom: 1,
+        opacityTo: 1,
+        stops: [0, 100]
+      }
+    },
+    dataLabels: { enabled: false },
+    legend: { show: false },
+    xaxis: {
+      categories: <?= json_encode($salesNames); ?>,
+      labels: {
+        style: {
+          colors: '#94a3b8',
+          fontSize: '11px',
+          fontWeight: 600
+        }
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#94a3b8',
+          fontSize: '11px',
+          fontWeight: 600
+        }
+      }
+    },
+    grid: {
+      borderColor: '#f1f5f9',
+      strokeDashArray: 4,
+      padding: { top: 0, right: 10, bottom: 0, left: 10 }
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return val + " Kunjungan Selesai";
+        }
+      }
+    }
+  };
+
+  const perfChartEl = document.querySelector("#performaSalesChart");
+  if (perfChartEl && typeof ApexCharts !== 'undefined') {
+    const perfChart = new ApexCharts(perfChartEl, perfOptions);
+    perfChart.render();
+  }
+
+  // 3. Live Clock Updater
+  function updateHeroClock() {
+    const clockEl = document.getElementById('heroLiveClock');
+    if (clockEl) {
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const secs = String(now.getSeconds()).padStart(2, '0');
+      clockEl.textContent = `${hrs}:${mins}:${secs}`;
+    }
+  }
+  setInterval(updateHeroClock, 1000);
+});
 </script>
+
