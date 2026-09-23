@@ -253,6 +253,33 @@ if ($filterKategori === 'tiptok') {
 
 $queryStr .= " ORDER BY c.id DESC";
 $salesData = mysqli_query($conn, $queryStr);
+
+// Calculate statistics for vibrant stat counters
+$statTotalCust = 0;
+$statDealer = 0;
+$statInstaller = 0;
+$statUser = 0;
+$statTiptok = 0;
+$statMapped = 0;
+
+$qStats = mysqli_query($conn, "SELECT 
+    COUNT(*) AS total,
+    SUM(CASE WHEN kategori = 'Dealer' THEN 1 ELSE 0 END) AS count_dealer,
+    SUM(CASE WHEN kategori = 'Installer' THEN 1 ELSE 0 END) AS count_installer,
+    SUM(CASE WHEN kategori = 'User' THEN 1 ELSE 0 END) AS count_user,
+    SUM(CASE WHEN (is_tiptok = 1 " . ($hasTiptokTbl ? "OR id IN (SELECT DISTINCT id_customer FROM tiptok_penitipan WHERE deleted_at IS NULL)" : "") . ") THEN 1 ELSE 0 END) AS count_tiptok,
+    SUM(CASE WHEN lat IS NOT NULL AND lat != '' AND lon IS NOT NULL AND lon != '' THEN 1 ELSE 0 END) AS count_mapped
+FROM sales_customer 
+WHERE deleted_at IS NULL");
+
+if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
+    $statTotalCust = intval($rStats['total'] ?? 0);
+    $statDealer = intval($rStats['count_dealer'] ?? 0);
+    $statInstaller = intval($rStats['count_installer'] ?? 0);
+    $statUser = intval($rStats['count_user'] ?? 0);
+    $statTiptok = intval($rStats['count_tiptok'] ?? 0);
+    $statMapped = intval($rStats['count_mapped'] ?? 0);
+}
 ?>
 
 <!DOCTYPE html>
@@ -264,89 +291,580 @@ $salesData = mysqli_query($conn, $queryStr);
   <!-- Leaflet Map CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    /* ── Premium Styling ── */
-    .card-premium {
-      background: #fff;
-      border: none;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-      margin-bottom: 24px;
-    }
-    
-    .section-header-premium {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 24px;
-      background: #1e293b;
-      color: #fff;
-    }
-    
-    .section-header-premium h6 {
-      margin: 0;
-      font-size: 13px;
-      font-weight: 700;
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      display: flex;
-      align-items: center;
-    }
-    
-    .card-body-premium {
-      padding: 36px 40px;
+    /* ── TASTE-SKILL VIBRANT COLORFUL DESIGN SYSTEM ── */
+    :root {
+      --primary-blue: #2563eb;
+      --primary-indigo: #4f46e5;
+      --primary-purple: #7c3aed;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --surface-bg: #f8fafc;
+      --card-radius: 18px;
     }
 
-    /* ── Form inputs ── */
+    /* ── KPI Stat Cards (Top Vibrant Strip) ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      border-radius: var(--card-radius);
+      padding: 22px 24px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 125px;
+      text-decoration: none !important;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.22);
+      color: #fff !important;
+    }
+
+    .kpi-card-blue {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+    }
+
+    .kpi-card-amber {
+      background: linear-gradient(135deg, #78350f 0%, #d97706 50%, #f59e0b 100%);
+    }
+
+    .kpi-card-purple {
+      background: linear-gradient(135deg, #3b0764 0%, #6d28d9 50%, #8b5cf6 100%);
+    }
+
+    .kpi-card-emerald {
+      background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #10b981 100%);
+    }
+
+    .kpi-deco-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+
+    .kpi-icon-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #fff;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.85;
+      margin: 0;
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.1;
+      margin: 4px 0 2px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-sub {
+      font-size: 11.5px;
+      opacity: 0.75;
+      font-weight: 600;
+    }
+
+    /* ── Premium Card Containers ── */
+    .card-premium {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.04);
+      margin-bottom: 24px;
+    }
+
+    .card-body-premium {
+      padding: 32px 36px;
+    }
+
+    /* ── Form Inputs & Focus Rings ── */
     .form-group-premium {
       margin-bottom: 20px;
     }
-    
+
     .form-label-premium {
       display: flex;
       align-items: center;
       gap: 6px;
       font-size: 11px;
-      font-weight: 700;
-      color: #64748b;
-      margin-bottom: 10px;
+      font-weight: 800;
+      color: #475569;
+      margin-bottom: 8px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
     }
-    
+
     .input-premium {
       width: 100%;
       height: 48px !important;
-      border: 1.5px solid #e2e8f0;
+      border: 1.5px solid #cbd5e1;
       border-radius: 12px;
       padding: 12px 16px !important;
-      font-size: 14px;
-      color: #1e293b;
+      font-size: 13.5px;
+      color: #0f172a;
       background-color: #fff;
-      transition: all 0.2s ease-in-out;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       box-sizing: border-box;
+      font-weight: 500;
     }
-    
+
     .input-premium:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
       outline: none;
       background-color: #fff;
     }
 
-    /* ── Maps containers ── */
-    #map_create, #map_edit, #map_detail {
-      height: 290px;
-      width: 100%;
-      border-radius: 14px;
-      border: 1.5px solid #e2e8f0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-      margin-top: 10px;
+    /* ── Quick Filter Chips (One-Click Category Filters) ── */
+    .filter-chip-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed #e2e8f0;
     }
-    
-    #map_detail {
-      height: 320px;
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      background: #f1f5f9;
+      border: 1.5px solid transparent;
+      text-decoration: none !important;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .filter-chip:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+      transform: translateY(-1px);
+    }
+
+    .filter-chip.active {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .filter-chip-tiptok.active {
+      background: linear-gradient(135deg, #b45309 0%, #f59e0b 100%);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+    }
+
+    .filter-chip-dealer.active {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+    }
+
+    .filter-chip-installer.active {
+      background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+    }
+
+    .filter-chip-user.active {
+      background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+
+    .filter-chip-count {
+      background: rgba(0, 0, 0, 0.08);
+      color: inherit;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 12px;
+    }
+
+    .filter-chip.active .filter-chip-count {
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+
+    /* ── Category Pill Group (Radio Switcher in Form) ── */
+    .category-pill-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .category-pill-label {
+      cursor: pointer;
+      margin: 0;
+      flex: 1;
+    }
+
+    .category-pill-input {
+      display: none;
+    }
+
+    .category-pill-span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 48px;
+      font-size: 12.5px;
+      font-weight: 800;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
+      color: #64748b;
+      background: #fff;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-sizing: border-box;
+    }
+
+    #kategori_dealer:checked + .span-dealer {
+      border-color: #2563eb;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      color: #1d4ed8;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);
+    }
+
+    #kategori_installer:checked + .span-installer {
+      border-color: #7c3aed;
+      background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+      color: #6d28d9;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.15);
+    }
+
+    #kategori_user:checked + .span-user {
+      border-color: #059669;
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      color: #047857;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.15);
+    }
+
+    /* ── Avatars in Table with Vibrant Rings ── */
+    .avatar-initials-table {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 14px;
+      vertical-align: middle;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+      border: 2px solid #fff;
+    }
+
+    .avatar-initials-table:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .avatar-tiptok-glow {
+      box-shadow: 0 0 0 2.5px #f59e0b, 0 4px 14px rgba(245, 158, 11, 0.45) !important;
+    }
+
+    .customer-identity-cell {
+      display: flex;
+      align-items: center;
+      text-align: left;
+    }
+
+    /* ── Vibrant Badges ── */
+    .category-badge {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: inline-block;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+
+    .badge-dealer {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    .badge-installer {
+      background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+      color: #6b21a8;
+      border: 1px solid #e9d5ff;
+    }
+
+    .badge-user {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .badge-default {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+
+    /* ── Glowing TIP TOK Badge ── */
+    .badge-tiptok {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #ffffff !important;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3.5px 9px;
+      border-radius: 30px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 3px 10px rgba(245, 158, 11, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      text-decoration: none !important;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .badge-tiptok:hover {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      transform: translateY(-1.5px) scale(1.03);
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.6);
+      color: #ffffff !important;
+    }
+
+    .badge-tiptok-qty {
+      background: rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      font-size: 8.5px;
+      font-weight: 900;
+      padding: 1.5px 6px;
+      border-radius: 12px;
+      margin-left: 2px;
+    }
+
+    /* ── Table Styling ── */
+    .premium-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .premium-table th {
+      background: #f8fafc;
+      border-bottom: 2px solid #e2e8f0;
+      color: #475569;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 18px 20px;
+      text-align: left;
+    }
+
+    .premium-table td {
+      padding: 18px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      font-size: 13.5px;
+      vertical-align: middle;
+    }
+
+    .premium-table tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    .premium-table tbody tr:hover {
+      background-color: #f8fafc;
+      box-shadow: inset 3px 0 0 0 #2563eb;
+    }
+
+    /* ── Solid WhatsApp Button ── */
+    .wa-pill {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      border: none !important;
+      color: #fff !important;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 30px;
+      text-decoration: none !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      width: fit-content;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .wa-pill:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(16, 185, 129, 0.4);
+      color: #fff !important;
+    }
+
+    /* ── Map Pin Button ── */
+    .btn-map-pin {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.22s ease;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-map-pin:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      transform: scale(1.12);
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    /* ── Action Buttons ── */
+    .btn-act {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      text-decoration: none !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-act:hover {
+      transform: scale(1.14);
+    }
+
+    .btn-act:active {
+      transform: scale(0.96);
+    }
+
+    .btn-act .material-symbols-outlined {
+      font-size: 18px;
+    }
+
+    .btn-act-tiptok {
+      background: #fef3c7;
+      color: #b45309;
+      border-color: #fde68a;
+    }
+
+    .btn-act-tiptok:hover, .btn-act-tiptok.active {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #ffffff;
+      border-color: #d97706;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.45);
+    }
+
+    .btn-act-view {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-color: #bae6fd;
+      margin-left: 6px;
+    }
+
+    .btn-act-view:hover {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn-act-edit {
+      background: #faf5ff;
+      color: #6b21a8;
+      border-color: #f3e8ff;
+      margin-left: 6px;
+    }
+
+    .btn-act-edit:hover {
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+    }
+
+    .btn-act-delete {
+      background: #fef2f2;
+      color: #dc2626;
+      border-color: #fee2e2;
+      margin-left: 6px;
+    }
+
+    .btn-act-delete:hover {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+    }
+
+    .btn-submit-premium {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #2563eb 100%);
+      color: #fff !important;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25);
+      transition: all 0.22s ease;
+      cursor: pointer;
+    }
+
+    .btn-submit-premium:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(37, 99, 235, 0.4);
     }
 
     /* ── Drag & Drop Zone ── */
@@ -360,18 +878,18 @@ $salesData = mysqli_query($conn, $queryStr);
       transition: all 0.2s ease-in-out;
       user-select: none;
     }
-    
+
     .dropzone-area:hover, .dropzone-area.dragover {
-      border-color: #3b82f6;
-      background: #f0f7ff;
+      border-color: #2563eb;
+      background: #eff6ff;
     }
-    
+
     .dropzone-icon {
       font-size: 32px;
       color: #64748b;
       margin-bottom: 6px;
     }
-    
+
     .dropzone-text {
       font-size: 12.5px;
       font-weight: 600;
@@ -385,7 +903,7 @@ $salesData = mysqli_query($conn, $queryStr);
       gap: 12px;
       margin-top: 14px;
     }
-    
+
     .preview-item {
       position: relative;
       width: 80px;
@@ -393,15 +911,15 @@ $salesData = mysqli_query($conn, $queryStr);
       border-radius: 10px;
       overflow: hidden;
       border: 1.5px solid #e2e8f0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     }
-    
+
     .preview-item img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     .preview-remove {
       position: absolute;
       top: 3px;
@@ -418,410 +936,16 @@ $salesData = mysqli_query($conn, $queryStr);
       cursor: pointer;
       border: none;
       font-weight: 700;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
 
-    /* Existing Photos List in Edit */
-    .edit-photo-thumb {
-      position: relative;
-      width: 72px;
-      height: 72px;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1.5px solid #e2e8f0;
-    }
-    .edit-photo-thumb img {
-      width: 100%; height: 100%; object-fit: cover;
-    }
-
-    /* ── Custom Styled Select arrow ── */
-    select.input-premium {
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      background-size: 16px;
-      padding-right: 40px !important;
-      cursor: pointer;
-    }
-
-    /* ── Category Pill Group (Radio Switcher) ── */
-    .category-pill-group {
-      display: flex;
-      gap: 10px;
-    }
-    
-    .category-pill-label {
-      cursor: pointer;
-      margin: 0;
-      flex: 1;
-    }
-    
-    .category-pill-input {
-      display: none;
-    }
-    
-    .category-pill-span {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 48px;
-      font-size: 12px;
-      font-weight: 700;
-      border-radius: 12px;
-      border: 1.5px solid #e2e8f0;
-      color: #64748b;
-      background: #fff;
-      transition: all 0.2s ease-in-out;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      box-sizing: border-box;
-    }
-    
-    /* Dealer checked style */
-    #kategori_dealer:checked + .span-dealer {
-      border-color: #3b82f6;
-      background: #eff6ff;
-      color: #1d4ed8;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.05);
-    }
-    /* Installer checked style */
-    #kategori_installer:checked + .span-installer {
-      border-color: #8b5cf6;
-      background: #f5f3ff;
-      color: #6d28d9;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.05);
-    }
-    /* User checked style */
-    #kategori_user:checked + .span-user {
-      border-color: #10b981;
-      background: #ecfdf5;
-      color: #047857;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.05);
-    }
-
-    /* ── Avatars in Table ── */
-    .avatar-initials-table {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      color: #fff;
-      font-size: 14px; font-weight: 700;
-      display: inline-flex; align-items: center; justify-content: center;
-      margin-right: 14px;
-      vertical-align: middle;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-      cursor: pointer;
-      transition: all 0.25s;
-      flex-shrink: 0;
-    }
-
-    .avatar-initials-table:hover {
-      transform: scale(1.08);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-    }
-    
-    .customer-identity-cell {
-      display: flex;
-      align-items: center;
-      text-align: left;
-    }
-
-    /* ── Category Badges ── */
-    .category-badge {
-      font-size: 9.5px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      display: inline-block;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-      border: 1px solid rgba(0,0,0,0.03);
-    }
-    .badge-dealer { background: #eff6ff; color: #1e40af; border-color: #dbeafe; }
-    .badge-installer { background: #faf5ff; color: #6b21a8; border-color: #f3e8ff; }
-    .badge-user { background: #ecfdf5; color: #065f46; border-color: #d1fae5; }
-    .badge-default { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
-
-    /* ── TIP TOK Badge Styling ── */
-    .badge-tiptok {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      color: #ffffff !important;
-      font-size: 8.5px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 30px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      display: inline-flex;
-      align-items: center;
-      gap: 3.5px;
-      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      text-decoration: none;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-    .badge-tiptok:hover {
-      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.5);
-      color: #ffffff !important;
-    }
-    .badge-tiptok i {
-      font-size: 8.5px;
-    }
-    .badge-tiptok-qty {
-      background: rgba(255, 255, 255, 0.25);
-      color: #ffffff;
-      font-size: 8px;
-      font-weight: 900;
-      padding: 1px 5px;
-      border-radius: 10px;
-      margin-left: 2px;
-    }
-
-    /* Action button quick TIP TOK toggle */
-    .btn-act-tiptok {
-      background: #fef3c7;
-      color: #d97706;
-      border: 1px solid #fde68a;
-    }
-    .btn-act-tiptok:hover, .btn-act-tiptok.active {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #ffffff;
-      border-color: #d97706;
-      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);
-    }
- 
-    /* ── Table custom styling ── */
-    .premium-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-    
-    .premium-table th {
-      background: #f8fafc;
-      border-bottom: 2px solid #e2e8f0;
-      color: #64748b;
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 18px 20px;
-      text-align: left;
-    }
-    
-    .premium-table td {
-      padding: 18px 20px;
-      border-bottom: 1px solid #f1f5f9;
-      color: #334155;
-      font-size: 13.5px;
-      vertical-align: middle;
-    }
-    
-    .premium-table tbody tr {
-      transition: all 0.2s ease-in-out;
-    }
-
-    .premium-table tbody tr:hover td {
-      background-color: #f8fafc;
-    }
-    
-    /* WhatsApp Pill style - Solid Premium Green Badge */
-    .wa-pill {
-      background: #25D366 !important;
-      border: none !important;
-      color: #fff !important;
-      font-size: 12px; 
-      font-weight: 700;
-      padding: 6px 14px;
-      border-radius: 30px;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease-in-out;
-      width: fit-content;
-      box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
-    }
-    .wa-pill:hover {
-      background: #20ba59 !important;
-      color: #fff !important;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(37, 211, 102, 0.3);
-    }
-    .wa-pill svg {
-      flex-shrink: 0;
-      fill: #fff !important;
-    }
-
-    /* Map Pin Button */
-    .btn-map-pin {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #2563eb;
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      display: inline-flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.05);
-    }
-    .btn-map-pin:hover {
-      background: #2563eb;
-      color: #fff;
-      transform: scale(1.1);
-      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-    }
-    .btn-map-pin .material-symbols-outlined {
-      font-size: 18px;
-    }
-
-    /* ── Action Buttons ── */
-    .btn-act {
-      width: 36px; height: 36px; padding: 0; display: inline-flex;
-      align-items: center; justify-content: center; border-radius: 50%;
-      border: 1px solid transparent; transition: all 0.2s; cursor: pointer; text-decoration: none;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    .btn-act:hover { transform: scale(1.1); }
-    .btn-act .material-symbols-outlined { font-size: 18px; }
-    .btn-act-view { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
-    .btn-act-view:hover { background: #0369a1; color: #fff; box-shadow: 0 4px 10px rgba(3, 105, 161, 0.2); }
-    .btn-act-edit { background: #fffbeb; color: #d97706; border-color: #fef3c7; margin-left: 8px; }
-    .btn-act-edit:hover { background: #d97706; color: #fff; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.2); }
-    .btn-act-delete { background: #fef2f2; color: #dc2626; border-color: #fee2e2; margin-left: 8px; }
-    .btn-act-delete:hover { background: #dc2626; color: #fff; box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2); }
- 
-    .btn-submit-premium {
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #2563eb 100%);
-      color: #fff !important;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 28px;
-      font-size: 14px; font-weight: 700;
-      display: inline-flex; align-items: center; gap: 6px;
-      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25);
-      transition: all 0.22s ease;
-      cursor: pointer;
-    }
-    
-    .btn-submit-premium:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(37, 99, 235, 0.4);
-    }
-    
-    .btn-submit-premium:active {
-      transform: translateY(0);
-    }
-    
-    .btn-submit-premium .material-symbols-outlined {
-      font-size: 18px;
-    }
-
-    /* ── Modal Premium Styling ── */
-    .modal-content-premium {
-      border-radius: 16px;
-      border: none;
-      overflow: hidden;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-    }
-    
-    .modal-header-premium {
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
-      color: #fff;
-      padding: 20px 24px;
-      border-bottom: none;
-    }
-    
-    .modal-title-premium {
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .modal-body-premium {
-      padding: 28px 24px;
-      background: #fff;
-    }
-    
-    .modal-footer-premium {
-      background: #f8fafc;
-      padding: 16px 24px;
-      border-top: 1px solid #f1f5f9;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
-    input[type="checkbox"] {
-      -webkit-appearance: checkbox;
-      -moz-appearance: checkbox;
-      appearance: checkbox;
-    }
-    
-    /* Detail View Styling */
-    .detail-info-row {
-      display: flex;
-      border-bottom: 1.5px solid #f1f5f9;
-      padding: 12px 0;
-      align-items: center;
-    }
-    .detail-info-label {
-      width: 140px;
-      font-size: 11px;
-      font-weight: 800;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      flex-shrink: 0;
-    }
-    .detail-info-value {
-      font-size: 14px;
-      color: #1e293b;
-      font-weight: 600;
-    }
-    
-    .detail-photo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 14px;
-    }
-    
-    .detail-photo-card {
-      height: 110px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1.5px solid #e2e8f0;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-      transition: all 0.22s;
-    }
-    .detail-photo-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.1);
-      border-color: #3b82f6;
-    }
-    .detail-photo-card img {
-      width: 100%; height: 100%; object-fit: cover;
-    }
-
-    <?php include "css/floating-menu2.css"; ?>
-  
-    /* ── Mobile Responsive Enhancements ── */
+    /* ── Mobile Responsive ── */
     @media (max-width: 991.98px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
       .card-body-premium {
         padding: 20px 16px !important;
-      }
-      .section-header-premium {
-        padding: 14px 16px !important;
       }
       .category-pill-group {
         flex-wrap: wrap !important;
@@ -830,26 +954,10 @@ $salesData = mysqli_query($conn, $queryStr);
         flex: 1 1 calc(33.333% - 8px) !important;
         min-width: 85px !important;
       }
-      .btn-submit-premium {
-        width: 100% !important;
-        justify-content: center !important;
-        min-height: 48px !important;
-        touch-action: manipulation !important;
-      }
       .premium-table th, .premium-table td {
         padding: 12px 10px !important;
       }
-      .btn-act {
-        min-width: 38px !important;
-        min-height: 38px !important;
-        margin: 2px !important;
-        touch-action: manipulation !important;
-      }
-      .modal-dialog {
-        margin: 10px !important;
-      }
     }
-
   </style>
 </head>
 <body class="g-sidenav-show bg-gray-200">
@@ -860,11 +968,88 @@ $salesData = mysqli_query($conn, $queryStr);
     
     <!-- Success Alert -->
     <?php if (!empty($successMsg)): ?>
-      <div class="alert alert-success text-white font-weight-bold mb-4" style="background: #10b981; border: none; border-radius: 10px; padding: 14px 20px;">
+      <div class="alert alert-success text-white font-weight-bold mb-4" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: none; border-radius: 12px; padding: 14px 20px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);">
         <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 8px;">check_circle</span>
         <?php echo $successMsg; ?>
       </div>
     <?php endif; ?>
+
+    <!-- ── VIBRANT STAT METRIC CARDS ── -->
+    <div class="kpi-grid">
+      <!-- 1. Total Customer -->
+      <a href="customer.php" class="kpi-card kpi-card-blue">
+        <div class="kpi-deco-circle" style="top: -20px; right: -20px; width: 110px; height: 110px;"></div>
+        <div class="kpi-deco-circle" style="bottom: -30px; left: 40px; width: 80px; height: 80px;"></div>
+        <div class="d-flex justify-content-between align-items-start position-relative">
+          <div>
+            <p class="kpi-label">Total Customer</p>
+            <h3 class="kpi-value"><?= number_format($statTotalCust); ?></h3>
+          </div>
+          <div class="kpi-icon-badge">
+            <span class="material-symbols-outlined">storefront</span>
+          </div>
+        </div>
+        <div class="kpi-sub position-relative">
+          <span class="badge bg-white text-dark font-weight-bold" style="font-size:10px; padding:3px 8px; border-radius:20px; margin-right:4px;">Aktif</span>
+          Database Mitra Terdaftar
+        </div>
+      </a>
+
+      <!-- 2. Mitra TIP TOK -->
+      <a href="customer.php?kategori=tiptok" class="kpi-card kpi-card-amber">
+        <div class="kpi-deco-circle" style="top: -25px; right: -15px; width: 120px; height: 120px; background: rgba(255,255,255,0.12);"></div>
+        <div class="d-flex justify-content-between align-items-start position-relative">
+          <div>
+            <p class="kpi-label">🏷️ Mitra TIP TOK</p>
+            <h3 class="kpi-value"><?= number_format($statTiptok); ?> <span style="font-size:14px; font-weight:700;">Toko</span></h3>
+          </div>
+          <div class="kpi-icon-badge" style="background: rgba(255,255,255,0.25);">
+            <i class="fa-solid fa-box-open" style="font-size:18px;"></i>
+          </div>
+        </div>
+        <div class="kpi-sub position-relative">
+          <span class="badge bg-white text-warning font-weight-bold" style="font-size:10px; padding:3px 8px; border-radius:20px; margin-right:4px;">Konsinyasi</span>
+          Stok Display Dititipkan
+        </div>
+      </a>
+
+      <!-- 3. Dealer & Installer -->
+      <a href="customer.php?kategori=Dealer" class="kpi-card kpi-card-purple">
+        <div class="kpi-deco-circle" style="top: -15px; right: -25px; width: 100px; height: 100px;"></div>
+        <div class="d-flex justify-content-between align-items-start position-relative">
+          <div>
+            <p class="kpi-label">Dealer &amp; Mitra</p>
+            <h3 class="kpi-value"><?= number_format($statDealer); ?> <span style="font-size:14px; font-weight:600; opacity:0.85;">/ <?= number_format($statInstaller); ?> Inst.</span></h3>
+          </div>
+          <div class="kpi-icon-badge">
+            <span class="material-symbols-outlined">verified</span>
+          </div>
+        </div>
+        <div class="kpi-sub position-relative">
+          <?= number_format($statDealer); ?> Dealer • <?= number_format($statInstaller); ?> Installer • <?= number_format($statUser); ?> User
+        </div>
+      </a>
+
+      <!-- 4. Geofence GPS -->
+      <div class="kpi-card kpi-card-emerald">
+        <div class="kpi-deco-circle" style="top: -20px; right: -20px; width: 110px; height: 110px;"></div>
+        <div class="d-flex justify-content-between align-items-start position-relative">
+          <div>
+            <p class="kpi-label">Geofence Lokasi</p>
+            <h3 class="kpi-value"><?= number_format($statMapped); ?> <span style="font-size:14px; font-weight:600; opacity:0.85;">/ <?= number_format($statTotalCust); ?></span></h3>
+          </div>
+          <div class="kpi-icon-badge">
+            <span class="material-symbols-outlined">location_on</span>
+          </div>
+        </div>
+        <div class="kpi-sub position-relative">
+          <span class="badge bg-white text-success font-weight-bold" style="font-size:10px; padding:3px 8px; border-radius:20px; margin-right:4px;">
+            <?= $statTotalCust > 0 ? round(($statMapped / $statTotalCust) * 100) : 0 ?>% Terpetakan
+          </span>
+          Koordinat GPS Toko
+        </div>
+      </div>
+    </div>
 
     <!-- Card Tambah Sales Customer (COLLAPSIBLE / Buka Tutup Drawer) -->
     <div class="card-premium">
@@ -1088,30 +1273,63 @@ $salesData = mysqli_query($conn, $queryStr);
           <div style="position:absolute;top:-40px;right:-20px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.04);"></div>
           <div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;">
               <div style="display:flex;align-items:center;gap:12px;">
-                  <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);">
-                      <span class="material-symbols-outlined" style="color:#fff;font-size:18px;">groups</span>
+                  <div style="width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.18);">
+                      <span class="material-symbols-outlined" style="color:#fff;font-size:20px;">groups</span>
                   </div>
                   <div>
-                      <h5 style="color:#fff;margin:0;font-size:15px;font-weight:700;letter-spacing:-0.2px;">Daftar Sales Customer</h5>
+                      <h5 style="color:#fff;margin:0;font-size:16px;font-weight:800;letter-spacing:-0.2px;">Daftar Sales Customer</h5>
+                      <span style="color:rgba(255,255,255,0.7); font-size:11.5px; font-weight:600;">Kelola data toko mitra, dealer, konsinyasi, dan lokasi geofence</span>
                   </div>
               </div>
-              <span class="badge bg-light text-dark font-weight-bold" style="font-size: 11px; padding: 6px 14px; border-radius: 10px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.08);"><?= mysqli_num_rows($salesData); ?> Customer Terdaftar</span>
+              <span class="badge bg-white text-dark font-weight-bold" style="font-size: 11.5px; padding: 7px 16px; border-radius: 30px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><?= mysqli_num_rows($salesData); ?> Customer Ditampilkan</span>
           </div>
       </div>
       
-      <!-- Premium Filter Bar -->
+      <!-- Premium Filter Bar with Quick Chips -->
       <div style="background:#f8fafc; padding:20px 28px; border-bottom:1px solid #e2e8f0;">
+          
+          <!-- 1-Click Quick Filter Chips -->
+          <div class="filter-chip-bar">
+            <span style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 4px;">Quick Filter:</span>
+            
+            <a href="customer.php" class="filter-chip <?= ($filterKategori === 'all' && $filterWilayah === 'all' && empty($filterSearch)) ? 'active' : ''; ?>">
+              <span>Semua</span>
+              <span class="filter-chip-count"><?= $statTotalCust ?></span>
+            </a>
+
+            <a href="customer.php?kategori=tiptok" class="filter-chip filter-chip-tiptok <?= ($filterKategori === 'tiptok') ? 'active' : ''; ?>">
+              <i class="fa-solid fa-box-open" style="font-size:11px;"></i>
+              <span>Toko TIP TOK</span>
+              <span class="filter-chip-count"><?= $statTiptok ?></span>
+            </a>
+
+            <a href="customer.php?kategori=Dealer" class="filter-chip filter-chip-dealer <?= ($filterKategori === 'Dealer') ? 'active' : ''; ?>">
+              <span>🏢 Dealer</span>
+              <span class="filter-chip-count"><?= $statDealer ?></span>
+            </a>
+
+            <a href="customer.php?kategori=Installer" class="filter-chip filter-chip-installer <?= ($filterKategori === 'Installer') ? 'active' : ''; ?>">
+              <span>🔧 Installer</span>
+              <span class="filter-chip-count"><?= $statInstaller ?></span>
+            </a>
+
+            <a href="customer.php?kategori=User" class="filter-chip filter-chip-user <?= ($filterKategori === 'User') ? 'active' : ''; ?>">
+              <span>👤 User</span>
+              <span class="filter-chip-count"><?= $statUser ?></span>
+            </a>
+          </div>
+
           <form method="GET" action="customer.php" class="row g-3 align-items-end">
               <div class="col-12 col-md-4">
                   <label class="form-label text-xs font-weight-bold text-uppercase text-secondary mb-1">Cari Customer</label>
                   <div class="input-group input-group-outline">
-                      <input type="text" name="search" class="form-control bg-white" placeholder="Nama, kode, telp, atau alamat..." value="<?= htmlspecialchars($filterSearch); ?>">
+                      <input type="text" name="search" class="form-control bg-white" placeholder="Nama toko, kode, telp, atau alamat..." value="<?= htmlspecialchars($filterSearch); ?>">
                   </div>
               </div>
               <div class="col-6 col-md-3">
                   <label class="form-label text-xs font-weight-bold text-uppercase text-secondary mb-1">Wilayah / Area</label>
                   <div class="input-group input-group-outline">
-                      <select name="wilayah" class="form-select form-control bg-white px-3" style="border:1px solid #d2d6da; border-radius:0.375rem; -webkit-appearance: auto; -moz-appearance: auto; appearance: auto;">
+                      <select name="wilayah" class="form-select form-control bg-white px-3" style="border:1.5px solid #cbd5e1; border-radius:0.5rem; -webkit-appearance: auto; -moz-appearance: auto; appearance: auto; font-size:13px; font-weight:600;">
                           <option value="all">Semua Wilayah</option>
                           <?php 
                           mysqli_data_seek($wilayahList, 0);
@@ -1125,7 +1343,7 @@ $salesData = mysqli_query($conn, $queryStr);
               <div class="col-6 col-md-3">
                   <label class="form-label text-xs font-weight-bold text-uppercase text-secondary mb-1">Kategori</label>
                   <div class="input-group input-group-outline">
-                      <select name="kategori" class="form-select form-control bg-white px-3" style="border:1px solid #d2d6da; border-radius:0.375rem; -webkit-appearance: auto; -moz-appearance: auto; appearance: auto;">
+                      <select name="kategori" class="form-select form-control bg-white px-3" style="border:1.5px solid #cbd5e1; border-radius:0.5rem; -webkit-appearance: auto; -moz-appearance: auto; appearance: auto; font-size:13px; font-weight:600;">
                           <option value="all">Semua Kategori</option>
                           <option value="tiptok" <?= ($filterKategori === 'tiptok') ? 'selected' : ''; ?>>📦 Toko Mitra TIP TOK</option>
                           <?php foreach($kategoriList as $k): ?>
@@ -1135,11 +1353,11 @@ $salesData = mysqli_query($conn, $queryStr);
                   </div>
               </div>
               <div class="col-12 col-md-2 d-flex gap-2">
-                  <button type="submit" class="btn bg-gradient-info w-100 mb-0 font-weight-bold" style="padding:10.5px 20px;">
-                      <span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:4px;">search</span> Cari
+                  <button type="submit" class="btn bg-gradient-info w-100 mb-0 font-weight-bold" style="padding:10.5px 20px; border-radius:10px;">
+                      <span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:4px;">search</span> Filter
                   </button>
                   <?php if($filterSearch !== '' || $filterWilayah !== 'all' || $filterKategori !== 'all'): ?>
-                      <a href="customer.php" class="btn bg-gradient-secondary mb-0 font-weight-bold" style="padding:10.5px 15px;" title="Reset Filter">
+                      <a href="customer.php" class="btn bg-gradient-secondary mb-0 font-weight-bold" style="padding:10.5px 15px; border-radius:10px;" title="Reset Filter">
                           <span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle;">restart_alt</span>
                       </a>
                   <?php endif; ?>
@@ -1214,15 +1432,18 @@ $salesData = mysqli_query($conn, $queryStr);
               <td>
                 <div class="customer-identity-cell">
                   <!-- Gallery Trigger Avatar -->
+                  <?php 
+                    $avatarClass = 'avatar-initials-table' . ($isTiptok ? ' avatar-tiptok-glow' : '');
+                  ?>
                   <?php if (!empty($firstPhoto) && file_exists("../uploads/customer/" . $firstPhoto)): ?>
-                    <div class="avatar-initials-table openGalleryBtn" 
+                    <div class="<?= $avatarClass ?> openGalleryBtn" 
                          style="background: <?= $avatarBg; ?>; overflow: hidden; padding: 0;"
                          data-photos='<?= htmlspecialchars(json_encode($photos)); ?>'
                          data-name="<?= htmlspecialchars($row['nama'] ?? ''); ?>">
                       <img src="../uploads/customer/<?= htmlspecialchars($firstPhoto); ?>" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                   <?php else: ?>
-                    <div class="avatar-initials-table" style="background: <?= $avatarBg; ?>; cursor: default;">
+                    <div class="<?= $avatarClass ?>" style="background: <?= $avatarBg; ?>; cursor: default;">
                       <?php 
                         $words = explode(' ', $row['nama'] ?? '');
                         echo strtoupper(substr($words[0] ?? '', 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : ''));
