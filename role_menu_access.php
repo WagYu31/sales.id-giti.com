@@ -706,6 +706,7 @@ foreach ($allModules as $mod) {
                                     <th>Email</th>
                                     <th>Terdaftar Sejak</th>
                                     <th>Role Saat Ini</th>
+                                    <th class="text-center" style="width: 120px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="roleUsersTbody">
@@ -931,7 +932,9 @@ function showRoleUsersModal(role, roleLabel) {
         tbody.innerHTML = '';
 
         if (data.success && data.data.length > 0) {
+            const currentUserId = data.current_user_id || 0;
             data.data.forEach(u => {
+                const isSelf = (parseInt(u.id) === currentUserId);
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
@@ -940,7 +943,7 @@ function showRoleUsersModal(role, roleLabel) {
                                 ${u.nama ? u.nama.substring(0, 2).toUpperCase() : 'US'}
                             </div>
                             <div>
-                                <div class="fw-bold text-dark">${u.nama || '-'}</div>
+                                <div class="fw-bold text-dark">${u.nama || '-'} ${isSelf ? '<span class="badge bg-primary text-white ms-1" style="font-size:9px;">Akun Anda</span>' : ''}</div>
                                 <small class="text-muted font-monospace" style="font-size:10px;">ID: #${u.id}</small>
                             </div>
                         </div>
@@ -948,18 +951,147 @@ function showRoleUsersModal(role, roleLabel) {
                     <td><span class="text-muted"><i class="bi bi-envelope me-1"></i>${u.email || '-'}</span></td>
                     <td><span class="text-secondary small"><i class="bi bi-calendar-event me-1"></i>${u.created_at || '-'}</span></td>
                     <td><span class="badge bg-light text-dark border px-2.5 py-1.5 fw-bold text-uppercase" style="font-size:10.5px;">${u.role || '-'}</span></td>
+                    <td class="text-center">
+                        <div class="d-inline-flex gap-1.5 align-items-center">
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-2 px-2 py-1" title="Ubah Role Pengguna" onclick="changeUserRole(${u.id}, '${escapeHtml(u.nama)}', '${u.role}', '${role}', '${escapeHtml(roleLabel)}')">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </button>
+                            ${!isSelf ? `
+                            <button type="button" class="btn btn-sm btn-outline-danger rounded-2 px-2 py-1" title="Hapus Akun Pengguna" onclick="deleteUserAccount(${u.id}, '${escapeHtml(u.nama)}', '${role}', '${escapeHtml(roleLabel)}')">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                            ` : `
+                            <span class="text-muted small" title="Tidak dapat menghapus akun sendiri"><i class="bi bi-lock-fill"></i></span>
+                            `}
+                        </div>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         } else {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">Belum ada pengguna yang terdaftar dengan role ini.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada pengguna yang terdaftar dengan role ini.</td></tr>`;
         }
     })
     .catch((err) => {
         console.error("Error loading users:", err);
         document.getElementById('roleUsersLoading').style.display = 'none';
         document.getElementById('roleUsersContent').style.display = 'block';
-        document.getElementById('roleUsersTbody').innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle me-1"></i> Gagal memuat data pengguna.</td></tr>`;
+        document.getElementById('roleUsersTbody').innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle me-1"></i> Gagal memuat data pengguna.</td></tr>`;
+    });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// Handler Hapus User
+function deleteUserAccount(userId, userName, currentRole, roleLabel) {
+    Swal.fire({
+        title: 'Hapus Akun Pengguna?',
+        html: `<p class="text-muted mb-0">Akun <strong>${userName}</strong> akan dihapus dari sistem.<br><small class="text-danger">Tindakan ini akan menonaktifkan login pengguna tersebut.</small></p>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#DC2626',
+        cancelButtonColor: '#64748B',
+        confirmButtonText: '<i class="bi bi-trash3 me-1"></i> Ya, Hapus Akun',
+        cancelButtonText: 'Batal'
+    }).then(result => {
+        if (result.isConfirmed) {
+            Swal.showLoading();
+            const formData = new URLSearchParams();
+            formData.append('action', 'delete_user');
+            formData.append('user_id', userId);
+
+            fetch('ajax_role_permission_handler.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Berhasil', data.message, 'success').then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            })
+            .catch(() => {
+                Swal.fire('Error', 'Gagal memproses permintaan hapus.', 'error');
+            });
+        }
+    });
+}
+
+// Handler Ubah Role User
+function changeUserRole(userId, userName, currentRole, activeTabRole, roleLabel) {
+    const rolesOptions = {
+        'superadmin': 'Super Admin (Full Akses)',
+        'admin': 'Admin (Operasional)',
+        'adminsales': 'Admin Sales (Support Promosi & Ads)',
+        'sales': 'Sales (Field Canvas & Mobile App)',
+        'manager': 'Sales Manager (Supervisor & Approval)',
+        'finance': 'Finance / Kasir (Keuangan & Price List)'
+    };
+
+    let optionsHtml = '';
+    for (const [key, label] of Object.entries(rolesOptions)) {
+        const isSelected = (key.toLowerCase() === currentRole.toLowerCase()) ? 'selected' : '';
+        optionsHtml += `<option value="${key}" ${isSelected}>${label}</option>`;
+    }
+
+    Swal.fire({
+        title: 'Ubah Role Pengguna',
+        html: `
+            <div class="text-start mb-3">
+                <p class="text-muted small mb-2">Pilih role baru untuk akun <strong>${userName}</strong>:</p>
+                <select id="swalNewRoleSelect" class="form-select" style="font-size: 13.5px; border-radius: 10px;">
+                    ${optionsHtml}
+                </select>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563EB',
+        cancelButtonColor: '#64748B',
+        confirmButtonText: '<i class="bi bi-check-lg me-1"></i> Simpan Role Baru',
+        cancelButtonText: 'Batal',
+        preConfirm: () => {
+            const newRole = document.getElementById('swalNewRoleSelect').value;
+            if (!newRole) {
+                Swal.showValidationMessage('Silakan pilih role baru!');
+            }
+            return newRole;
+        }
+    }).then(result => {
+        if (result.isConfirmed) {
+            Swal.showLoading();
+            const formData = new URLSearchParams();
+            formData.append('action', 'change_user_role');
+            formData.append('user_id', userId);
+            formData.append('new_role', result.value);
+
+            fetch('ajax_role_permission_handler.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Berhasil', data.message, 'success').then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            })
+            .catch(() => {
+                Swal.fire('Error', 'Gagal memproses perubahan role.', 'error');
+            });
+        }
     });
 }
 </script>

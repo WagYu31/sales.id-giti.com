@@ -243,7 +243,57 @@ switch ($action) {
         }
         $stmt->close();
 
-        echo json_encode(['success' => true, 'data' => $users, 'total' => count($users)]);
+        echo json_encode(['success' => true, 'data' => $users, 'total' => count($users), 'current_user_id' => (int)$_SESSION['user_id']]);
+        break;
+
+    case 'delete_user':
+        $userId = (int)($_POST['user_id'] ?? 0);
+        if ($userId <= 0) {
+            echo json_encode(['success' => false, 'message' => 'ID pengguna tidak valid.']);
+            exit();
+        }
+
+        if ($userId === (int)$_SESSION['user_id']) {
+            echo json_encode(['success' => false, 'message' => 'Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif login!']);
+            exit();
+        }
+
+        // Set customers sales_id to NULL agar data customer tidak hilang
+        $stmt_reassign = $conn->prepare("UPDATE customers SET sales_id = NULL WHERE sales_id = ?");
+        if ($stmt_reassign) {
+            $stmt_reassign->bind_param("i", $userId);
+            $stmt_reassign->execute();
+            $stmt_reassign->close();
+        }
+
+        // Soft delete akun sales
+        $stmt_del = $conn->prepare("UPDATE sales SET deleted_at = NOW(), email = CONCAT(email, '_deleted_', UNIX_TIMESTAMP()) WHERE id = ?");
+        $stmt_del->bind_param("i", $userId);
+        if ($stmt_del->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Akun pengguna berhasil dihapus.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Gagal menghapus pengguna: ' . $conn->error]);
+        }
+        $stmt_del->close();
+        break;
+
+    case 'change_user_role':
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $newRole = strtolower(trim($_POST['new_role'] ?? ''));
+
+        if ($userId <= 0 || empty($newRole)) {
+            echo json_encode(['success' => false, 'message' => 'Data perpindahan role tidak lengkap.']);
+            exit();
+        }
+
+        $stmt_role = $conn->prepare("UPDATE sales SET role = ? WHERE id = ?");
+        $stmt_role->bind_param("si", $newRole, $userId);
+        if ($stmt_role->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Role pengguna berhasil dipindahkan ke ' . strtoupper($newRole) . '.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Gagal memperbarui role pengguna: ' . $conn->error]);
+        }
+        $stmt_role->close();
         break;
 
     default:
