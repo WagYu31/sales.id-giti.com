@@ -42,42 +42,44 @@ $bulan_nama = [
 <style>
 /* ================= PAGE HERO ================= */
 .workplan-hero {
-    background: linear-gradient(135deg, #0A192F 0%, #1E3A8A 50%, #2563EB 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e3a8a 100%);
     border-radius: 22px;
-    padding: 30px 36px;
+    padding: 28px 34px;
     margin-bottom: 24px;
     color: #FFFFFF;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.45);
+    box-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.35);
+    border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .workplan-hero::before {
     content: '';
     position: absolute;
-    top: -60px; right: -60px;
-    width: 260px; height: 260px;
+    top: -50px; right: -50px;
+    width: 240px; height: 240px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
 }
 
 .workplan-hero-title {
-    font-size: 26px;
-    font-weight: 800;
+    font-size: 28px;
+    font-weight: 900;
     margin-bottom: 6px;
     letter-spacing: -0.5px;
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    color: #ffffff;
 }
 
 .workplan-hero-subtitle {
-    font-size: 13.5px;
-    color: rgba(226, 232, 240, 0.88);
+    font-size: 14px;
+    color: #cbd5e1;
     margin: 0;
     max-width: 680px;
     line-height: 1.5;
 }
 
-/* ================= SUMMARY STAT CARDS ================= */
+/* ================= SUMMARY STAT CARDS (VIBRANT & COLORFUL) ================= */
 .stat-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -86,141 +88,208 @@ $bulan_nama = [
 }
 
 .method-card {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
     border-radius: 18px;
-    padding: 18px 20px;
+    padding: 20px 22px;
     position: relative;
     overflow: hidden;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .method-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 24px -4px rgba(0,0,0,0.08);
-    border-color: #CBD5E1;
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.12);
 }
 
 .method-card .icon-box {
-    width: 42px; height: 42px;
+    width: 44px; height: 44px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 19px;
+    font-size: 20px;
     margin-bottom: 12px;
 }
 
 .method-card .card-label {
     font-size: 12px;
-    font-weight: 600;
-    color: #64748B;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
     margin-bottom: 4px;
 }
 
 .method-card .card-value {
-    font-size: 24px;
-    font-weight: 800;
-    color: #0F172A;
+    font-size: 28px;
+    font-weight: 900;
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
-    line-height: 1;
+    line-height: 1.1;
 }
 
-/* Specific Card Themes */
-.card-phone .icon-box { background: #EFF6FF; color: #2563EB; }
-.card-phone:hover { border-color: #93C5FD; }
+/* 1. Phone Card (Ocean Blue) */
+.card-phone {
+    background: linear-gradient(145deg, #ffffff 0%, #eff6ff 100%);
+    border: 2px solid #bfdbfe;
+    border-top: 5px solid #2563eb;
+}
+.card-phone .icon-box {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+.card-phone .card-label { color: #1e40af; }
+.card-phone .card-value { color: #1d4ed8; }
 
-.card-wa .icon-box { background: #ECFDF5; color: #10B981; }
-.card-wa:hover { border-color: #86EFAC; }
+/* 2. WhatsApp Card (Emerald Mint) */
+.card-wa {
+    background: linear-gradient(145deg, #ffffff 0%, #ecfdf5 100%);
+    border: 2px solid #a7f3d0;
+    border-top: 5px solid #10b981;
+}
+.card-wa .icon-box {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+.card-wa .card-label { color: #065f46; }
+.card-wa .card-value { color: #047857; }
 
-.card-email .icon-box { background: #FEF3C7; color: #D97706; }
-.card-email:hover { border-color: #FDE68A; }
+/* 3. Email Card (Amber Gold) */
+.card-email {
+    background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%);
+    border: 2px solid #fde68a;
+    border-top: 5px solid #f59e0b;
+}
+.card-email .icon-box {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+.card-email .card-label { color: #92400e; }
+.card-email .card-value { color: #b45309; }
 
-.card-ketemu .icon-box { background: #F3E8FF; color: #8B5CF6; }
-.card-ketemu:hover { border-color: #D8B4FE; }
+/* 4. Ketemu Langsung Card (Royal Purple) */
+.card-ketemu {
+    background: linear-gradient(145deg, #ffffff 0%, #faf5ff 100%);
+    border: 2px solid #e9d5ff;
+    border-top: 5px solid #8b5cf6;
+}
+.card-ketemu .icon-box {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+.card-ketemu .card-label { color: #5b21b6; }
+.card-ketemu .card-value { color: #6d28d9; }
 
-.card-total .icon-box { background: #F1F5F9; color: #475569; }
-.card-total:hover { border-color: #CBD5E1; }
+/* 5. Total Rencana Card (Deep Slate) */
+.card-total {
+    background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+    border: 2px solid #cbd5e1;
+    border-top: 5px solid #0f172a;
+}
+.card-total .icon-box {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+}
+.card-total .card-label { color: #334155; }
+.card-total .card-value { color: #0f172a; }
 
-.card-progress .icon-box { background: #E0E7FF; color: #4F46E5; }
-.card-progress:hover { border-color: #A5B4FC; }
+/* 6. Progress Done Card (Vibrant Teal / Green) */
+.card-progress {
+    background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
+    border: 2px solid #86efac;
+    border-top: 5px solid #059669;
+}
+.card-progress .icon-box {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+}
+.card-progress .card-label { color: #166534; }
+.card-progress .card-value { color: #059669; }
 
 /* ================= FILTER TOOLBAR ================= */
 .filter-card {
     background: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    border: 2px solid #cbd5e1;
     border-radius: 18px;
-    padding: 20px 24px;
+    padding: 22px 24px;
     margin-bottom: 24px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
 }
 
 .filter-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #334155;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #0f172a;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 14px;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .form-label-custom {
-    font-size: 12px;
-    font-weight: 600;
-    color: #475569;
-    margin-bottom: 5px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 6px;
 }
 
 .form-select-custom, .form-control-custom {
-    border-radius: 10px;
-    border: 1px solid #CBD5E1;
-    font-size: 13px;
-    padding: 7px 12px;
-    background-color: #F8FAFC;
+    border-radius: 12px;
+    border: 1.5px solid #cbd5e1;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 9px 14px;
+    background-color: #ffffff;
     transition: all 0.2s ease;
+    color: #0f172a;
 }
 
 .form-select-custom:focus, .form-control-custom:focus {
-    border-color: #2563EB;
+    border-color: #2563eb;
     background-color: #FFFFFF;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    outline: none;
 }
 
 /* ================= WORK PLAN TABLE ================= */
 .table-card {
     background: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    border: 2px solid #cbd5e1;
     border-radius: 18px;
     padding: 0;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    box-shadow: 0 8px 25px -4px rgba(15, 23, 42, 0.08);
 }
 
 .table-header-box {
     padding: 20px 24px;
-    border-bottom: 1px solid #E2E8F0;
+    border-bottom: 2px solid #e2e8f0;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 12px;
-    background: #FAFBFD;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .table-header-box h2 {
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 800;
     color: #0F172A;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-family: 'Outfit', sans-serif;
 }
 
 .custom-table {
@@ -229,36 +298,42 @@ $bulan_nama = [
 }
 
 .custom-table th {
-    background: #0F172A;
-    color: #F8FAFC;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #FFFFFF;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 13px 14px;
+    letter-spacing: 0.05em;
+    padding: 15px 16px;
     border: none;
+    border-bottom: 3px solid #3b82f6;
     vertical-align: middle;
     white-space: nowrap;
 }
 
 .custom-table td {
-    padding: 13px 14px;
+    padding: 15px 16px;
     vertical-align: middle;
-    font-size: 13px;
-    color: #334155;
-    border-bottom: 1px solid #F1F5F9;
-}
-
-.custom-table tbody tr {
+    font-size: 13.5px;
+    color: #0f172a;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #ffffff;
     transition: background-color 0.15s ease;
 }
 
-.custom-table tbody tr:hover {
-    background-color: #F8FAFC;
+.custom-table tbody tr:nth-child(even) td {
+    background-color: #fbfcfe;
 }
 
-.custom-table tbody tr.row-done {
-    background-color: rgba(240, 253, 244, 0.45);
+.custom-table tbody tr:hover td {
+    background-color: #eff6ff !important;
+}
+
+.custom-table tbody tr.row-done td {
+    background-color: rgba(220, 252, 231, 0.4) !important;
+}
+.custom-table tbody tr.row-done td:first-child {
+    border-left: 4px solid #10b981;
 }
 
 /* Status Check Switch */
@@ -289,44 +364,44 @@ $bulan_nama = [
 
 /* Method Badges */
 .badge-method {
-    font-size: 11.5px;
-    font-weight: 600;
-    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 12px;
     border-radius: 8px;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     white-space: nowrap;
 }
 
-.badge-method-phone { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
-.badge-method-wa { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
-.badge-method-email { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
-.badge-method-ketemu { background: #F3E8FF; color: #6D28D9; border: 1px solid #DDD6FE; }
-.badge-method-other { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+.badge-method-phone { background: #dbeafe; color: #1e40af; border: 1.5px solid #93c5fd; }
+.badge-method-wa { background: #dcfce7; color: #047857; border: 1.5px solid #86efac; }
+.badge-method-email { background: #fef3c7; color: #92400e; border: 1.5px solid #fcd34d; }
+.badge-method-ketemu { background: #f3e8ff; color: #6b21a8; border: 1.5px solid #d8b4fe; }
+.badge-method-other { background: #f1f5f9; color: #334155; border: 1.5px solid #cbd5e1; }
 
 /* Status Badges */
 .badge-status-done {
-    background: #DCFCE7;
-    color: #15803D;
-    border: 1px solid #86EFAC;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 6px;
+    background: #dcfce7;
+    color: #15803d;
+    border: 1.5px solid #86efac;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 8px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
 }
 
 .badge-status-pending {
-    background: #F1F5F9;
-    color: #64748B;
-    border: 1px solid #CBD5E1;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 6px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1.5px solid #cbd5e1;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 8px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -334,53 +409,61 @@ $bulan_nama = [
 
 /* Action Icons */
 .btn-action-icon {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 13px;
-    border: 1px solid transparent;
-    transition: all 0.2s ease;
+    font-weight: 800;
+    transition: all 0.15s ease;
     text-decoration: none;
-    color: #64748B;
-    background: #F8FAFC;
+    color: #ffffff;
+    background: #f59e0b;
+    border: 1px solid #d97706;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25);
 }
 
 .btn-action-icon:hover {
-    color: #2563EB;
-    background: #EFF6FF;
-    border-color: #BFDBFE;
+    color: #ffffff;
+    background: #d97706;
     transform: translateY(-1px);
 }
 
+.btn-action-icon.btn-delete {
+    color: #ffffff;
+    background: #ef4444;
+    border: 1px solid #dc2626;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+}
+
 .btn-action-icon.btn-delete:hover {
-    color: #EF4444;
-    background: #FEF2F2;
-    border-color: #FECACA;
+    color: #ffffff;
+    background: #dc2626;
+    transform: translateY(-1px);
 }
 
 /* Multi-row Batch Table */
 .batch-table th {
-    background: #F1F5F9;
-    color: #334155;
-    font-size: 11.5px;
-    font-weight: 700;
-    padding: 8px;
-    border: 1px solid #E2E8F0;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 10px;
+    border: 1px solid #334155;
 }
 
 .batch-table td {
-    padding: 6px;
-    border: 1px solid #E2E8F0;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
 }
 
 .batch-table input, .batch-table select, .batch-table textarea {
-    font-size: 12px;
-    border-radius: 6px;
-    border: 1px solid #CBD5E1;
-    padding: 5px 8px;
+    font-size: 13px;
+    border-radius: 8px;
+    border: 1.5px solid #cbd5e1;
+    padding: 6px 10px;
     width: 100%;
 }
 </style>
@@ -389,7 +472,7 @@ $bulan_nama = [
 <div class="workplan-hero">
     <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
         <div>
-            <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:600;">
+            <div class="d-flex align-items-center gap-2 mb-2" style="font-size:12px; color:rgba(147,197,253,0.9); font-weight:700;">
                 <a href="customer_management.php" style="color:inherit; text-decoration:none;">Dashboard</a>
                 <span>›</span>
                 <span>Rencana Kerja Sales</span>
@@ -400,14 +483,14 @@ $bulan_nama = [
             </p>
         </div>
         <div class="d-flex flex-wrap gap-2 mt-3 mt-md-0">
-            <button type="button" class="btn btn-light fw-bold text-primary shadow-sm" id="btn-open-batch-add" style="border-radius: 12px; font-size:13.5px; padding:9px 16px;">
-                <i class="bi bi-table me-1.5"></i> Input Cepat (Multi-Baris)
+            <button type="button" class="btn btn-light fw-bold text-dark shadow-sm" id="btn-open-batch-add" style="border-radius: 12px; font-size:13.5px; padding:10px 18px; border: 2px solid #bfdbfe;">
+                <i class="bi bi-table text-primary me-1.5"></i> Input Cepat (Multi-Baris)
             </button>
-            <button type="button" class="btn btn-primary fw-bold shadow-lg" id="btn-open-add" style="background:#2563EB; border-color:#2563EB; border-radius: 12px; font-size:13.5px; padding:9px 18px;">
+            <button type="button" class="btn btn-primary fw-bold shadow-lg" id="btn-open-add" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); border:2px solid #60a5fa; border-radius: 12px; font-size:13.5px; padding:10px 20px; box-shadow: 0 4px 15px rgba(37,99,235,0.4);">
                 <i class="bi bi-plus-circle-fill me-1.5"></i> Tambah Rencana
             </button>
-            <button type="button" class="btn btn-outline-light fw-bold shadow-sm" id="btn-export-excel" style="border-radius: 12px; font-size:13.5px; padding:9px 16px;">
-                <i class="bi bi-file-earmark-excel-fill text-success me-1.5"></i> Unduh Excel
+            <button type="button" class="btn btn-success fw-bold shadow-sm" id="btn-export-excel" style="background:linear-gradient(135deg, #10b981, #059669); border:2px solid #34d399; border-radius: 12px; font-size:13.5px; padding:10px 18px; box-shadow: 0 4px 15px rgba(16,185,129,0.35); color:#fff;">
+                <i class="bi bi-file-earmark-excel-fill me-1.5"></i> Unduh Excel
             </button>
         </div>
     </div>
@@ -445,7 +528,7 @@ $bulan_nama = [
         <div class="card-label">Sudah Dilakukan</div>
         <div class="d-flex align-items-baseline gap-2">
             <div class="card-value" id="kpi-done">0</div>
-            <span class="badge bg-success-subtle text-success fw-bold" id="kpi-percentage" style="font-size:11px;">0%</span>
+            <span class="badge bg-success text-white fw-bold" id="kpi-percentage" style="font-size:12px; padding: 4px 8px; border-radius: 6px;">0%</span>
         </div>
     </div>
 </div>
@@ -853,19 +936,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     let methodBadge = '';
                     const mLower = (row.metode_fu || '').toLowerCase();
                     if (mLower.includes('phone') || mLower.includes('call') || mLower.includes('telepon')) {
-                        methodBadge = `<span class="badge-method badge-method-phone"><i class="bi bi-telephone-fill"></i> ${row.metode_fu}</span>`;
+                        methodBadge = `<span class="badge-method badge-method-phone"><i class="bi bi-telephone-fill"></i> ${escapeHtml(row.metode_fu)}</span>`;
                     } else if (mLower.includes('wa') || mLower.includes('what') || mLower.includes('text')) {
-                        methodBadge = `<span class="badge-method badge-method-wa"><i class="bi bi-whatsapp"></i> ${row.metode_fu}</span>`;
+                        methodBadge = `<span class="badge-method badge-method-wa"><i class="bi bi-whatsapp"></i> ${escapeHtml(row.metode_fu)}</span>`;
                     } else if (mLower.includes('email') || mLower.includes('mail')) {
-                        methodBadge = `<span class="badge-method badge-method-email"><i class="bi bi-envelope-fill"></i> ${row.metode_fu}</span>`;
+                        methodBadge = `<span class="badge-method badge-method-email"><i class="bi bi-envelope-fill"></i> ${escapeHtml(row.metode_fu)}</span>`;
                     } else if (mLower.includes('ketemu') || mLower.includes('visit') || mLower.includes('kunjungan') || mLower.includes('langsung')) {
-                        methodBadge = `<span class="badge-method badge-method-ketemu"><i class="bi bi-people-fill"></i> ${row.metode_fu}</span>`;
+                        methodBadge = `<span class="badge-method badge-method-ketemu"><i class="bi bi-people-fill"></i> ${escapeHtml(row.metode_fu)}</span>`;
                     } else {
-                        methodBadge = `<span class="badge-method badge-method-other"><i class="bi bi-chat-left-dots-fill"></i> ${row.metode_fu || '-'}</span>`;
+                        methodBadge = `<span class="badge-method badge-method-other"><i class="bi bi-chat-left-dots-fill"></i> ${escapeHtml(row.metode_fu || '-')}</span>`;
                     }
 
                     // Contact Links
-                    let contactDisplay = '-';
+                    let contactDisplay = '<span class="text-muted">-</span>';
                     if (row.kontak_customer) {
                         const cleanPhone = row.kontak_customer.replace(/[^0-9]/g, '');
                         let waNumber = cleanPhone;
@@ -874,20 +957,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         contactDisplay = `
                             <div class="d-flex align-items-center gap-1.5">
-                                <span class="font-monospace fw-semibold" style="font-size:12.5px;">${row.kontak_customer}</span>
-                                <a href="https://wa.me/${waNumber}" target="_blank" class="text-success ms-1" title="Chat via WhatsApp">
-                                    <i class="bi bi-whatsapp"></i>
+                                <span class="font-monospace fw-bold text-dark" style="font-size:12.5px;">${escapeHtml(row.kontak_customer)}</span>
+                                <a href="https://wa.me/${waNumber}" target="_blank" class="btn btn-sm btn-outline-success p-0 px-1 border-0" title="Chat via WhatsApp" style="font-size:14px;">
+                                    <i class="bi bi-whatsapp text-success"></i>
                                 </a>
-                                <a href="tel:${cleanPhone}" class="text-primary ms-1" title="Telepon">
-                                    <i class="bi bi-telephone"></i>
+                                <a href="tel:${cleanPhone}" class="btn btn-sm btn-outline-primary p-0 px-1 border-0" title="Telepon" style="font-size:14px;">
+                                    <i class="bi bi-telephone text-primary"></i>
                                 </a>
                             </div>
                         `;
                     }
 
-                    let emailDisplay = '-';
+                    let emailDisplay = '<span class="text-muted">-</span>';
                     if (row.email_customer) {
-                        emailDisplay = `<a href="mailto:${row.email_customer}" class="text-decoration-none text-dark" style="font-size:12px;">${row.email_customer}</a>`;
+                        emailDisplay = `<a href="mailto:${escapeHtml(row.email_customer)}" class="text-decoration-none text-primary fw-semibold" style="font-size:12px;"><i class="bi bi-envelope me-1"></i>${escapeHtml(row.email_customer)}</a>`;
                     }
 
                     // Checkbox / Verification Status
@@ -902,7 +985,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="status-switch-container" title="${verifierTooltip}">
                                 <input class="form-check-input admin-check toggle-done-check" type="checkbox" data-id="${row.id}" ${isDone ? 'checked' : ''}>
                                 <span class="${isDone ? 'badge-status-done' : 'badge-status-pending'}">
-                                    ${isDone ? '<i class="bi bi-check2"></i> Selesai' : 'Belum'}
+                                    ${isDone ? '<i class="bi bi-check-circle-fill"></i> Selesai' : '<i class="bi bi-clock"></i> Belum'}
                                 </span>
                             </div>
                         `;
@@ -912,7 +995,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="status-switch-container" title="Status verifikasi oleh Admin">
                                 <input class="form-check-input admin-check sales-disabled" type="checkbox" ${isDone ? 'checked' : ''} disabled>
                                 <span class="${isDone ? 'badge-status-done' : 'badge-status-pending'}">
-                                    ${isDone ? '<i class="bi bi-check2"></i> Selesai' : 'Belum'}
+                                    ${isDone ? '<i class="bi bi-check-circle-fill"></i> Selesai' : '<i class="bi bi-clock"></i> Belum'}
                                 </span>
                             </div>
                         `;
@@ -922,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     let actionHtml = '';
                     if (row.can_edit) {
                         actionHtml = `
-                            <div class="d-flex align-items-center justify-content-center gap-1">
+                            <div class="d-flex align-items-center justify-content-center gap-1.5">
                                 <button type="button" class="btn-action-icon btn-edit-plan" data-id="${row.id}" title="Edit Rencana Kerja">
                                     <i class="bi bi-pencil-fill"></i>
                                 </button>
@@ -937,16 +1020,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     html += `
                         <tr class="${rowClass}" id="plan-row-${row.id}">
-                            <td class="text-center fw-semibold text-secondary">${idx + 1}</td>
+                            <td class="text-center"><span style="background: #e2e8f0; color: #0f172a; padding: 4px 8px; border-radius: 6px; font-weight: 800; font-size:12px;">${idx + 1}</span></td>
                             <td class="text-center">${statusHtml}</td>
-                            <td class="fw-semibold text-nowrap"><i class="bi bi-calendar3 text-muted me-1"></i>${row.tgl_formatted}</td>
-                            ${IS_ADMIN ? `<td class="fw-semibold text-primary text-nowrap">${escapeHtml(row.sales_name || '-')}</td>` : ''}
-                            <td class="fw-bold text-dark">${escapeHtml(row.nama_customer)}</td>
-                            <td style="max-width:260px;">${escapeHtml(row.aktivitas || '-')}</td>
+                            <td class="fw-bold text-nowrap" style="color:#0f172a;"><i class="bi bi-calendar-event text-primary me-1.5"></i>${row.tgl_formatted}</td>
+                            ${IS_ADMIN ? `<td class="text-nowrap"><span class="badge" style="background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; font-weight: 800; font-size: 12px; padding: 5px 9px; border-radius: 6px;"><i class="bi bi-person-fill me-1"></i>${escapeHtml(row.sales_name || '-')}</span></td>` : ''}
+                            <td class="fw-bold text-dark" style="font-size: 14px;"><i class="bi bi-shop me-1 text-primary opacity-75"></i>${escapeHtml(row.nama_customer)}</td>
+                            <td style="max-width:260px; font-size:13px; color:#334155;">${escapeHtml(row.aktivitas || '-')}</td>
                             <td>${contactDisplay}</td>
                             <td>${emailDisplay}</td>
                             <td>${methodBadge}</td>
-                            <td style="max-width:220px;" class="text-muted fst-italic">${escapeHtml(row.hasil_fu || '-')}</td>
+                            <td style="max-width:220px; font-size:13px;" class="text-secondary">${escapeHtml(row.hasil_fu || '-')}</td>
                             <td class="text-center">${actionHtml}</td>
                         </tr>
                     `;
