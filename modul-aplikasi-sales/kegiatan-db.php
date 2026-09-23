@@ -34,11 +34,11 @@ if (isset($_GET['reset_filter'])) {
 $rescheduledExclusion = " AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled') AND (ks.reschedule_reason IS NULL OR ks.reschedule_reason = '') AND ks.id NOT IN (SELECT DISTINCT rescheduled_from FROM kegiatan_sales WHERE rescheduled_from IS NOT NULL AND deleted_at IS NULL) AND ks.id NOT IN (SELECT ks1.id FROM kegiatan_sales ks1 JOIN kegiatan_sales ks2 ON ks1.id_customer = ks2.id_customer AND ks1.id != ks2.id AND DATE(ks1.jadwal) <= '$current_date' AND DATE(ks2.jadwal) > DATE(ks1.jadwal) AND ks1.status = 'dijadwalkan' AND ks2.status = 'dijadwalkan' AND ks1.deleted_at IS NULL AND ks2.deleted_at IS NULL)";
 
 $tab_meta = [
-  'hari-ini'    => ['label'=>'Hari Ini',     'condition'=>"DATE(ks.jadwal) = '$current_date'" . $rescheduledExclusion,                                       'icon'=>'today',        'color'=>'#1e293b'],
-  'akan-datang' => ['label'=>'Akan Datang',  'condition'=>"DATE(ks.jadwal) > '$current_date'" . $rescheduledExclusion,                                       'icon'=>'event',        'color'=>'#3b82f6'],
-  'terlewat'    => ['label'=>'Terlewat',     'condition'=>"DATE(ks.jadwal) < '$current_date' AND ks.status != 'selesai'" . $rescheduledExclusion,            'icon'=>'event_busy',   'color'=>'#ef4444'],
-  'selesai'     => ['label'=>'Selesai',      'condition'=>"ks.status = 'selesai'",                                                                           'icon'=>'task_alt',     'color'=>'#10b981'],
-  'waiting'     => ['label'=>'Waiting List', 'condition'=>"ks.status = 'waiting'",                                                                           'icon'=>'hourglass_empty','color'=>'#f59e0b'],
+  'hari-ini'    => ['label'=>'Hari Ini',     'condition'=>"DATE(ks.jadwal) = '$current_date'" . $rescheduledExclusion,                                       'icon'=>'today',          'color'=>'#2563eb', 'bg_gradient'=>'linear-gradient(135deg, #2563eb, #1d4ed8)', 'bg_soft'=>'#eff6ff', 'badge_bg'=>'#dbeafe', 'badge_text'=>'#1e40af'],
+  'akan-datang' => ['label'=>'Akan Datang',  'condition'=>"DATE(ks.jadwal) > '$current_date'" . $rescheduledExclusion,                                       'icon'=>'event',          'color'=>'#0284c7', 'bg_gradient'=>'linear-gradient(135deg, #0ea5e9, #0284c7)', 'bg_soft'=>'#f0f9ff', 'badge_bg'=>'#e0f2fe', 'badge_text'=>'#0369a1'],
+  'terlewat'    => ['label'=>'Terlewat',     'condition'=>"DATE(ks.jadwal) < '$current_date' AND ks.status != 'selesai'" . $rescheduledExclusion,            'icon'=>'warning_amber',  'color'=>'#e11d48', 'bg_gradient'=>'linear-gradient(135deg, #f43f5e, #be123c)', 'bg_soft'=>'#fff1f2', 'badge_bg'=>'#ffe4e6', 'badge_text'=>'#9f1239'],
+  'selesai'     => ['label'=>'Selesai',      'condition'=>"ks.status = 'selesai'",                                                                           'icon'=>'task_alt',       'color'=>'#059669', 'bg_gradient'=>'linear-gradient(135deg, #10b981, #047857)', 'bg_soft'=>'#ecfdf5', 'badge_bg'=>'#d1fae5', 'badge_text'=>'#065f46'],
+  'waiting'     => ['label'=>'Waiting List', 'condition'=>"ks.status = 'waiting'",                                                                           'icon'=>'hourglass_empty','color'=>'#d97706', 'bg_gradient'=>'linear-gradient(135deg, #f59e0b, #b45309)', 'bg_soft'=>'#fffbeb', 'badge_bg'=>'#fef3c7', 'badge_text'=>'#92400e'],
 ];
 
 $counts = [];
@@ -75,16 +75,37 @@ $qSelesaiToday = mysqli_query($conn, "
     WHERE ks.deleted_at IS NULL AND DATE(ks.jadwal) = '$current_date' AND ks.status = 'selesai'
 ");
 $selesaiHariIni = ($qSelesaiToday && ($rSt = mysqli_fetch_assoc($qSelesaiToday))) ? (int)$rSt['total'] : 0;
+$progressPercent = ($totalHariIni > 0) ? min(100, round(($selesaiHariIni / $totalHariIni) * 100)) : 0;
 
 $hour = (int)date('H');
 if ($hour >= 4 && $hour < 11) {
     $greeting = "Selamat Pagi, 👋";
+    $greetingSub = "Semangat beraktivitas & capai target hari ini!";
 } elseif ($hour >= 11 && $hour < 15) {
     $greeting = "Selamat Siang, 👋";
+    $greetingSub = "Pantau jadwal kunjungan & follow up customer.";
 } elseif ($hour >= 15 && $hour < 18) {
     $greeting = "Selamat Sore, 👋";
+    $greetingSub = "Review progres kunjungan & laporan harian.";
 } else {
     $greeting = "Selamat Malam, 👋";
+    $greetingSub = "Istirahat sejenak & siapkan jadwal esok hari.";
+}
+
+// Helper Avatar Gradient
+function getSalesGradient($name) {
+    $gradients = [
+        'linear-gradient(135deg, #3b82f6, #1d4ed8)', // Blue
+        'linear-gradient(135deg, #8b5cf6, #6d28d9)', // Violet
+        'linear-gradient(135deg, #ec4899, #be185d)', // Pink
+        'linear-gradient(135deg, #10b981, #047857)', // Emerald
+        'linear-gradient(135deg, #f59e0b, #b45309)', // Amber
+        'linear-gradient(135deg, #06b6d4, #0e7490)', // Cyan
+        'linear-gradient(135deg, #6366f1, #4338ca)', // Indigo
+        'linear-gradient(135deg, #f97316, #c2410c)'  // Orange
+    ];
+    $idx = abs(crc32($name ?? 'Sales')) % count($gradients);
+    return $gradients[$idx];
 }
 
 // ── 2. Data Trend Kunjungan (7 Hari Terakhir) ──────────────────────────────
@@ -129,54 +150,78 @@ if (empty($salesNames)) {
 }
 ?>
 
-<!-- ── 1. HERO GREETING BANNER (Sesuai Gambar 1) ──────────────────────────── -->
+<!-- ── 1. HERO GREETING BANNER (Ultra Modern & Berwarna) ──────────────────────────── -->
 <div class="col-12 mb-4">
-  <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: #ffffff; border-left: 5px solid #2563eb !important;">
-    <div class="card-body p-3 p-md-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
-      <div>
-        <div class="text-muted fw-semibold" style="font-size: 13px;"><?= $greeting; ?></div>
-        <h3 class="fw-bold mb-1 text-dark" style="font-family:'Outfit',sans-serif; letter-spacing:-0.02em;">
-          <?= htmlspecialchars($nmUser ?? 'Super Admin Baru'); ?>
-        </h3>
-        <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 12.5px;">
-          <span><?= formatTanggal('EEEE, d MMMM yyyy', date('Y-m-d')); ?> • <span id="heroLiveClock"><?= date('H:i:s'); ?></span></span>
-          <span class="badge bg-success text-white rounded-pill px-2 py-0.5 font-monospace" style="font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em;">LIVE</span>
+  <div class="hero-welcome-card">
+    <div class="hero-welcome-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+      
+      <!-- Greeting & User Info -->
+      <div class="d-flex align-items-center gap-3">
+        <div class="hero-avatar-badge d-none d-sm-flex">
+          <span class="material-symbols-outlined" style="font-size: 28px;">account_circle</span>
+        </div>
+        <div>
+          <div class="hero-greeting-pill">
+            <span><?= $greeting; ?></span>
+          </div>
+          <h3 class="hero-user-name">
+            <?= htmlspecialchars($nmUser ?? 'Super Admin'); ?>
+          </h3>
+          <div class="d-flex align-items-center gap-2 flex-wrap text-secondary" style="font-size: 12.5px;">
+            <span class="hero-date-pill">
+              <i class="fa-regular fa-calendar text-primary me-1"></i>
+              <?= formatTanggal('EEEE, d MMMM yyyy', date('Y-m-d')); ?> • <span id="heroLiveClock" class="fw-bold text-dark font-monospace"><?= date('H:i:s'); ?></span>
+            </span>
+            <span class="hero-live-badge">
+              <span class="hero-live-dot"></span>
+              LIVE
+            </span>
+          </div>
         </div>
       </div>
 
-      <div class="d-flex align-items-center gap-3">
+      <!-- Right Controls: Progress & Action -->
+      <div class="d-flex align-items-center gap-3 flex-wrap">
         <!-- Progress Box -->
-        <div class="d-none d-sm-flex align-items-center gap-2.5 px-3 py-2 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0;">
-          <div>
-            <div class="text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 0.04em;">Progress Hari ini •</div>
-            <div class="fw-bold text-dark" style="font-size: 13.5px;"><?= $selesaiHariIni; ?> / <?= $totalHariIni; ?> Selesai</div>
+        <div class="hero-progress-box">
+          <div class="hero-progress-info">
+            <div class="hero-progress-label">Progress Hari Ini •</div>
+            <div class="hero-progress-val">
+              <strong><?= $selesaiHariIni; ?></strong> / <?= $totalHariIni; ?> Selesai
+              <span class="hero-progress-percent">(<?= $progressPercent; ?>%)</span>
+            </div>
           </div>
-          <span class="d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; border-radius: 50%; background: #ecfdf5; color: #10b981;">
-            <i class="fa-solid fa-check" style="font-size: 13px;"></i>
-          </span>
+          <div class="hero-progress-icon-wrapper">
+            <span class="material-symbols-outlined" style="font-size: 18px;">check</span>
+          </div>
         </div>
 
         <!-- Tombol Tambah Kegiatan -->
-        <a href="kegiatan-baru.php" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 px-3.5 py-2.5 fw-bold text-uppercase shadow-sm" style="font-size: 12.5px; background: #2563eb; letter-spacing: 0.03em;">
-          <i class="fa-solid fa-circle-plus"></i>
+        <a href="kegiatan-baru.php" class="hero-btn-add">
+          <span class="material-symbols-outlined" style="font-size: 18px;">add_circle</span>
           <span>Tambah Kegiatan</span>
         </a>
       </div>
+
     </div>
   </div>
 </div>
 
-<!-- ── 2. FILTER BAR (Sesuai Gambar 1) ──────────────────────────────────────── -->
+<!-- ── 2. FILTER BAR (Vibrant Category Badges) ──────────────────────────────────── -->
 <div class="col-12 mb-4">
-  <div class="card border-0 shadow-sm rounded-3" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
-    <div class="card-body p-3">
-      <form method="GET" action="kegiatan.php" class="row g-2 align-items-end">
+  <div class="filter-card-modern">
+    <div class="card-body p-3 p-md-3.5">
+      <form method="GET" action="kegiatan.php" class="row g-2.5 align-items-end">
+        
         <!-- Filter Wilayah -->
         <div class="col-12 col-md-3">
-          <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-            <i class="fa-solid fa-map-location-dot text-primary me-1"></i> Filter Wilayah
+          <label class="filter-label">
+            <span class="filter-icon-pill" style="background:#e0f2fe; color:#0284c7;">
+              <i class="fa-solid fa-map-location-dot"></i>
+            </span>
+            Filter Wilayah
           </label>
-          <select name="filter_wilayah" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
+          <select name="filter_wilayah" class="form-select filter-select">
             <option value="all" <?= ($selectedWilayah === 'all') ? 'selected' : ''; ?>>Semua Wilayah</option>
             <?php
             $qWil = mysqli_query($conn, "SELECT * FROM wilayah WHERE deleted_at IS NULL ORDER BY nama ASC");
@@ -192,10 +237,13 @@ if (empty($salesNames)) {
 
         <!-- Filter Sales -->
         <div class="col-12 col-md-3">
-          <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-            <i class="fa-solid fa-user-tie text-primary me-1"></i> Filter Sales
+          <label class="filter-label">
+            <span class="filter-icon-pill" style="background:#e0e7ff; color:#4f46e5;">
+              <i class="fa-solid fa-user-tie"></i>
+            </span>
+            Filter Sales
           </label>
-          <select name="filter_sales" class="form-select form-select-sm text-dark" style="border-radius: 8px; font-size: 12.5px;">
+          <select name="filter_sales" class="form-select filter-select">
             <option value="all" <?= ($selectedSales === 'all') ? 'selected' : ''; ?>>Semua Sales</option>
             <?php
             $qSal = mysqli_query($conn, "SELECT id, nama_lengkap FROM sales WHERE deleted_at IS NULL ORDER BY nama_lengkap ASC");
@@ -211,18 +259,23 @@ if (empty($salesNames)) {
 
         <!-- Nama Customer -->
         <div class="col-12 col-md-4">
-          <label class="form-label text-uppercase fw-bold text-secondary mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-            <i class="fa-solid fa-store text-primary me-1"></i> Nama Customer
+          <label class="filter-label">
+            <span class="filter-icon-pill" style="background:#d1fae5; color:#059669;">
+              <i class="fa-solid fa-store"></i>
+            </span>
+            Nama Customer
           </label>
-          <input type="text" name="search_customer" class="form-control form-control-sm" placeholder="Ketik nama customer..." value="<?= htmlspecialchars($searchCustomer); ?>" style="border-radius: 8px; font-size: 12.5px;">
+          <div class="input-group">
+            <input type="text" name="search_customer" class="form-control filter-input" placeholder="Ketik nama customer..." value="<?= htmlspecialchars($searchCustomer); ?>">
+          </div>
         </div>
 
-        <!-- Buttons -->
+        <!-- Action Buttons -->
         <div class="col-12 col-md-2 d-flex gap-2">
-          <button type="submit" class="btn btn-primary btn-sm flex-grow-1 fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px; background: #3b82f6;">
+          <button type="submit" class="btn-filter-search">
             <i class="fa-solid fa-magnifying-glass"></i> Cari
           </button>
-          <a href="kegiatan.php?reset_filter=1" class="btn btn-outline-secondary btn-sm fw-bold text-uppercase d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 11.5px;">
+          <a href="kegiatan.php?reset_filter=1" class="btn-filter-reset" title="Reset Semua Filter">
             <i class="fa-solid fa-rotate-right"></i> Reset
           </a>
         </div>
@@ -231,19 +284,22 @@ if (empty($salesNames)) {
   </div>
 </div>
 
-<!-- ── 3. ANALYTICS CHARTS (Sesuai Gambar 1) ─────────────────────────────────── -->
+<!-- ── 3. ANALYTICS CHARTS (Vibrant Gradient Area & Bars) ────────────────────────── -->
 <div class="col-12 mb-4">
   <div class="row g-3">
     <!-- Chart 1: Trend Kunjungan (7 Hari Terakhir) -->
     <div class="col-12 col-lg-7">
-      <div class="card border-0 shadow-sm rounded-3 h-100" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
-        <div class="card-header bg-transparent border-0 pt-3 pb-0 px-3.5 d-flex align-items-center justify-content-between">
-          <div class="text-uppercase fw-bold d-flex align-items-center gap-1.5" style="font-size: 11.5px; letter-spacing: 0.04em; color: #0284c7;">
-            <i class="fa-solid fa-chart-line"></i>
+      <div class="chart-card-premium h-100">
+        <div class="chart-card-header d-flex align-items-center justify-content-between">
+          <div class="chart-title-badge trend-badge">
+            <span class="material-symbols-outlined">trending_up</span>
             <span>Trend Kunjungan (7 Hari Terakhir)</span>
           </div>
+          <span class="badge bg-light text-primary fw-bold" style="font-size: 11px; border: 1px solid #bfdbfe;">
+            7 Hari
+          </span>
         </div>
-        <div class="card-body px-2 pb-2 pt-0">
+        <div class="card-body px-2 pb-2 pt-1">
           <div id="trendKunjunganChart" style="min-height: 220px;"></div>
         </div>
       </div>
@@ -251,14 +307,17 @@ if (empty($salesNames)) {
 
     <!-- Chart 2: Performa Kunjungan Sales -->
     <div class="col-12 col-lg-5">
-      <div class="card border-0 shadow-sm rounded-3 h-100" style="background: #ffffff; border: 1px solid #e2e8f0 !important;">
-        <div class="card-header bg-transparent border-0 pt-3 pb-0 px-3.5 d-flex align-items-center justify-content-between">
-          <div class="text-uppercase fw-bold d-flex align-items-center gap-1.5" style="font-size: 11.5px; letter-spacing: 0.04em; color: #10b981;">
-            <i class="fa-solid fa-award text-success"></i>
+      <div class="chart-card-premium h-100">
+        <div class="chart-card-header d-flex align-items-center justify-content-between">
+          <div class="chart-title-badge performa-badge">
+            <span class="material-symbols-outlined">leaderboard</span>
             <span>Performa Kunjungan Sales</span>
           </div>
+          <span class="badge bg-light text-purple fw-bold" style="font-size: 11px; border: 1px solid #e9d5ff; color: #9333ea;">
+            Top Sales
+          </span>
         </div>
-        <div class="card-body px-2 pb-2 pt-0">
+        <div class="card-body px-2 pb-2 pt-1">
           <div id="performaSalesChart" style="min-height: 220px;"></div>
         </div>
       </div>
@@ -266,106 +325,104 @@ if (empty($salesNames)) {
   </div>
 </div>
 
-<!-- ── 4. SUMMARY STAT CARDS (Sama dengan Web Teknisi) ─────────────────────────── -->
+<!-- ── 4. SUMMARY STAT CARDS (Ultra Colorful & Interactive) ──────────────────────── -->
 <div class="col-12 mb-4">
   <div class="row g-3">
+    
     <!-- Card 1: Hari Ini -->
     <div class="col-6 col-md-3">
-      <div class="stat-card-premium" style="border-left: 4px solid #64748b;" onclick="document.getElementById('tab-hari-ini').click()">
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <p class="stat-label-premium">Hari Ini</p>
-              <h3 class="stat-count-premium"><?php echo $counts['hari-ini']; ?></h3>
-            </div>
-            <div class="stat-icon-premium" style="background-color: #f1f5f9; color: #475569;">
-              <span class="material-symbols-outlined" style="color: #475569;">event_available</span>
-            </div>
+      <div class="stat-card-vibrant stat-theme-blue" onclick="document.getElementById('tab-hari-ini').click()">
+        <div class="stat-card-top d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-theme-label">Hari Ini</div>
+            <h3 class="stat-theme-count"><?php echo $counts['hari-ini']; ?></h3>
+          </div>
+          <div class="stat-theme-icon">
+            <span class="material-symbols-outlined">today</span>
           </div>
         </div>
-        <div class="stat-footer-premium">
-          <p><?php echo date('d F Y'); ?></p>
+        <div class="stat-theme-footer">
+          <span class="stat-theme-dot"></span>
+          <span><?php echo formatTanggal('d MMMM yyyy', date('Y-m-d')); ?></span>
         </div>
       </div>
     </div>
 
     <!-- Card 2: Akan Datang -->
     <div class="col-6 col-md-3">
-      <div class="stat-card-premium" style="border-left: 4px solid #3b82f6;" onclick="document.getElementById('tab-akan-datang').click()">
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <p class="stat-label-premium">Akan Datang</p>
-              <h3 class="stat-count-premium"><?php echo $counts['akan-datang']; ?></h3>
-            </div>
-            <div class="stat-icon-premium" style="background-color: #eff6ff; color: #2563eb;">
-              <span class="material-symbols-outlined" style="color: #2563eb;">event</span>
-            </div>
+      <div class="stat-card-vibrant stat-theme-cyan" onclick="document.getElementById('tab-akan-datang').click()">
+        <div class="stat-card-top d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-theme-label">Akan Datang</div>
+            <h3 class="stat-theme-count"><?php echo $counts['akan-datang']; ?></h3>
+          </div>
+          <div class="stat-theme-icon">
+            <span class="material-symbols-outlined">event</span>
           </div>
         </div>
-        <div class="stat-footer-premium">
-          <p>Jadwal Mendatang</p>
+        <div class="stat-theme-footer">
+          <span class="stat-theme-dot"></span>
+          <span>Jadwal Mendatang</span>
         </div>
       </div>
     </div>
 
     <!-- Card 3: Terlewat -->
     <div class="col-6 col-md-3">
-      <div class="stat-card-premium" style="border-left: 4px solid #f43f5e;" onclick="document.getElementById('tab-terlewat').click()">
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <p class="stat-label-premium">Terlewat</p>
-              <h3 class="stat-count-premium"><?php echo $counts['terlewat']; ?></h3>
-            </div>
-            <div class="stat-icon-premium" style="background-color: #fff1f2; color: #e11d48;">
-              <span class="material-symbols-outlined" style="color: #e11d48;">warning_amber</span>
-            </div>
+      <div class="stat-card-vibrant stat-theme-rose" onclick="document.getElementById('tab-terlewat').click()">
+        <div class="stat-card-top d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-theme-label">Terlewat</div>
+            <h3 class="stat-theme-count"><?php echo $counts['terlewat']; ?></h3>
+          </div>
+          <div class="stat-theme-icon">
+            <span class="material-symbols-outlined">warning_amber</span>
           </div>
         </div>
-        <div class="stat-footer-premium">
-          <p>Perlu Tindak Lanjut</p>
+        <div class="stat-theme-footer">
+          <span class="stat-theme-dot"></span>
+          <span>Perlu Tindak Lanjut</span>
         </div>
       </div>
     </div>
 
     <!-- Card 4: Selesai -->
     <div class="col-6 col-md-3">
-      <div class="stat-card-premium" style="border-left: 4px solid #10b981;" onclick="document.getElementById('tab-selesai').click()">
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <p class="stat-label-premium">Selesai</p>
-              <h3 class="stat-count-premium"><?php echo $counts['selesai']; ?></h3>
-            </div>
-            <div class="stat-icon-premium" style="background-color: #ecfdf5; color: #059669;">
-              <span class="material-symbols-outlined" style="color: #059669;">check_circle</span>
-            </div>
+      <div class="stat-card-vibrant stat-theme-emerald" onclick="document.getElementById('tab-selesai').click()">
+        <div class="stat-card-top d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-theme-label">Selesai</div>
+            <h3 class="stat-theme-count"><?php echo $counts['selesai']; ?></h3>
+          </div>
+          <div class="stat-theme-icon">
+            <span class="material-symbols-outlined">task_alt</span>
           </div>
         </div>
-        <div class="stat-footer-premium">
-          <p>Kunjungan Selesai</p>
+        <div class="stat-theme-footer">
+          <span class="stat-theme-dot"></span>
+          <span>Kunjungan Selesai</span>
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- ── TAB NAVIGATION ─────────────────────────────────────────────────────── -->
+<!-- ── 5. TAB NAVIGATION (Vibrant Segments) ─────────────────────────────────────── -->
 <div class="col-12 mb-0">
   <div class="tab-pills-wrapper">
     <ul class="nav tab-pills" id="kegiatanTab" role="tablist">
       <?php $first = true; foreach ($tab_meta as $k => $m): ?>
       <li class="nav-item" role="presentation">
-        <button class="tab-pill <?php echo $first ? 'active' : ''; ?>"
+        <button class="tab-pill tab-pill-<?= $k; ?> <?php echo $first ? 'active' : ''; ?>"
                 id="tab-<?php echo $k; ?>"
                 data-bs-toggle="tab"
                 data-bs-target="#pane-<?php echo $k; ?>"
                 type="button" role="tab"
-                style="--accent:<?php echo $m['color']; ?>">
+                style="--accent:<?php echo $m['color']; ?>; --soft:<?php echo $m['bg_soft']; ?>; --badge-bg:<?php echo $m['badge_bg']; ?>; --badge-txt:<?php echo $m['badge_text']; ?>;">
           <span class="material-symbols-outlined tab-icon"><?php echo $m['icon']; ?></span>
-          <?php echo $m['label']; ?>
-          <span class="tab-badge" style="background:<?php echo $m['color']; ?>"><?php echo $counts[$k]; ?></span>
+          <span class="tab-label"><?php echo $m['label']; ?></span>
+          <span class="tab-badge" style="background:<?php echo $m['color']; ?>; color:#fff;"><?php echo $counts[$k]; ?></span>
         </button>
       </li>
       <?php $first = false; endforeach; ?>
@@ -373,7 +430,7 @@ if (empty($salesNames)) {
   </div>
 </div>
 
-<!-- ── TAB CONTENT ────────────────────────────────────────────────────────── -->
+<!-- ── 6. TAB CONTENT (List Kunjungan) ─────────────────────────────────────────── -->
 <div class="col-12">
   <div class="tab-content" id="kegiatanTabContent">
     <?php $first = true; foreach ($tab_meta as $k => $m):
@@ -407,14 +464,18 @@ if (empty($salesNames)) {
     <div class="tab-pane fade <?php echo $first ? 'show active' : ''; ?>"
          id="pane-<?php echo $k; ?>" role="tabpanel">
 
-      <!-- Section Header (Sama dengan Web Teknisi) -->
-      <div class="section-header-premium">
-        <h6>
-          <span class="material-symbols-outlined" style="font-size: 18px; color: #fff; vertical-align: middle; margin-right: 6px;"><?php echo $m['icon']; ?></span>
-          Kegiatan <?php echo $m['label']; ?>
-        </h6>
+      <!-- Section Header (Rich Dark Slate Banner with Gradient Glow) -->
+      <div class="section-header-modern">
         <div class="d-flex align-items-center gap-2">
-          <span class="badge bg-light text-dark font-weight-bold" style="font-size: 11px;"><?php echo $counts[$k]; ?> Kunjungan</span>
+          <span class="section-header-icon-pill" style="background: <?php echo $m['color']; ?>22; color: <?php echo $m['color']; ?>;">
+            <span class="material-symbols-outlined" style="font-size: 18px;"><?php echo $m['icon']; ?></span>
+          </span>
+          <h6>Kegiatan <?php echo $m['label']; ?></h6>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge rounded-pill px-3 py-1.5 font-monospace fw-bold" style="background: #334155; color: #f8fafc; font-size: 11.5px; border: 1px solid #475569;">
+            <?php echo $counts[$k]; ?> Kunjungan
+          </span>
         </div>
       </div>
 
@@ -424,7 +485,7 @@ if (empty($salesNames)) {
           <!-- Search Customer -->
           <div class="inline-search-wrapper">
             <span class="material-symbols-outlined inline-search-icon">search</span>
-            <input type="text" class="inline-search-input" placeholder="Cari nama customer..." data-tab="<?php echo $k; ?>" oninput="applyInlineFilters('<?php echo $k; ?>')">
+            <input type="text" class="inline-search-input" placeholder="Cari customer di tab ini..." data-tab="<?php echo $k; ?>" oninput="applyInlineFilters('<?php echo $k; ?>')">
             <button type="button" class="inline-search-clear" data-clear="name" data-tab="<?php echo $k; ?>" onclick="clearField(this, 'name')" style="display:none;">
               <span class="material-symbols-outlined" style="font-size:16px;">close</span>
             </button>
@@ -439,21 +500,22 @@ if (empty($salesNames)) {
             </button>
           </div>
           <?php endif; ?>
-          <!-- Result Count -->
+          <!-- Result Count Badge -->
           <span class="inline-search-count" data-tab-count="<?php echo $k; ?>"></span>
         </div>
       </div>
 
+      <!-- Container List Rows -->
       <div class="keg-list-container">
         <?php if (mysqli_num_rows($result) > 0): ?>
 
-          <!-- Desktop header -->
+          <!-- Desktop Table Header -->
           <div class="keg-header d-none d-md-grid">
-            <div>Jadwal</div>
-            <div>Customer</div>
-            <div>Sales &amp; Status</div>
-            <div>Alamat</div>
-            <div class="text-center">Aksi</div>
+            <div><i class="fa-regular fa-clock me-1 text-primary"></i> Jadwal</div>
+            <div><i class="fa-solid fa-store me-1 text-success"></i> Customer</div>
+            <div><i class="fa-solid fa-user-check me-1 text-purple" style="color:#8b5cf6;"></i> Sales &amp; Status</div>
+            <div><i class="fa-solid fa-location-dot me-1 text-danger"></i> Alamat</div>
+            <div class="text-center"><i class="fa-solid fa-sliders me-1 text-secondary"></i> Aksi</div>
           </div>
 
           <?php while ($row = mysqli_fetch_assoc($result)):
@@ -462,7 +524,7 @@ if (empty($salesNames)) {
             $telp       = $row['cust_nomor'] ?? '';
             if ($telp && substr($telp, 0, 1) === '0') $telp = '62' . substr($telp, 1);
 
-            // Ambil sales
+            // Ambil team & pelaksanaan sales
             $salesList = [];
             $sqlSales  = "SELECT s.nama AS nama_sales, s.foto AS foto_sales, ps.status AS status_pelaksanaan, ps.ci_at, ps.co_at, ps.lat_ci, ps.lon_ci, ps.lat_co, ps.lon_co, ps.tipe_prospek, ps.no_invoice
                           FROM team_kegiatan_sales tks
@@ -497,16 +559,17 @@ if (empty($salesNames)) {
           ?>
 
           <div class="keg-row" style="--row-accent:<?php echo $rowAccent; ?>" data-customer="<?php echo strtolower(htmlspecialchars($row['nama_customer'] ?? '')); ?>" data-date="<?php echo date('Y-m-d', strtotime($row['jadwal'])); ?>">
-            <!-- Jadwal -->
+            
+            <!-- 1. Jadwal -->
             <div class="keg-cell">
               <span class="cell-label d-md-none">Jadwal</span>
               <div class="jadwal-badge">
                 <span class="material-symbols-outlined" style="font-size:16px;color:<?php echo $borderColor;?>">schedule</span>
-                <?php echo $jadwal; ?> WIB
+                <span><?php echo $jadwal; ?> WIB</span>
               </div>
             </div>
 
-            <!-- Customer -->
+            <!-- 2. Customer -->
             <div class="keg-cell">
               <span class="cell-label d-md-none">Customer</span>
               <div class="customer-name">
@@ -515,66 +578,83 @@ if (empty($salesNames)) {
                 </a>
               </div>
               <?php if ($telp): ?>
-              <a href="https://api.whatsapp.com/send?phone=<?php echo $telp;?>" target="_blank" class="wa-link">
-                <i class="fab fa-whatsapp"></i> <?php echo $row['cust_nomor']; ?>
+              <a href="https://api.whatsapp.com/send?phone=<?php echo $telp;?>" target="_blank" class="wa-badge-pill">
+                <i class="fab fa-whatsapp" style="font-size: 13px;"></i>
+                <span><?php echo $row['cust_nomor']; ?></span>
               </a>
               <?php endif; ?>
               <?php if ($kegStatus === 'dibatalkan' && !empty($row['reschedule_reason'])): ?>
-                <div style="font-size:10px; color:#ef4444; font-weight:600; margin-top:4px;">
+                <div class="reschedule-callout">
                   🔁 Dijadwalkan Ulang: "<?php echo htmlspecialchars($row['reschedule_reason']); ?>"
                 </div>
               <?php endif; ?>
             </div>
 
-            <!-- Sales -->
+            <!-- 3. Sales & Status -->
             <div class="keg-cell">
-              <span class="cell-label d-md-none">Sales</span>
+              <span class="cell-label d-md-none">Sales &amp; Status</span>
               <?php if (count($salesList) > 0): ?>
                 <?php foreach ($salesList as $sl): ?>
                 <div class="sales-item d-flex align-items-center gap-2 mb-2">
                   <?php if (!empty($sl['foto'])): ?>
-                    <img src="https://api-teknisi.id-giti.com/storage/profile/<?php echo htmlspecialchars($sl['foto']); ?>" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1.5px solid <?php echo $borderColor; ?>;">
+                    <img src="https://api-teknisi.id-giti.com/storage/profile/<?php echo htmlspecialchars($sl['foto']); ?>" class="sales-avatar-img" style="border: 2px solid <?php echo $borderColor; ?>;">
                   <?php else: ?>
-                    <div class="avatar-initials" style="background-color: <?php echo $borderColor; ?>;">
+                    <div class="avatar-initials-gradient" style="background: <?php echo getSalesGradient($sl['nama']); ?>;">
                       <?php 
-                        $words = explode(' ', $sl['nama']);
+                        $words = explode(' ', trim($sl['nama'] ?? 'Sales'));
                         echo strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : ''));
                       ?>
                     </div>
                   <?php endif; ?>
-                  <div class="d-flex flex-column">
-                    <span class="sales-name">
-                      <?php echo htmlspecialchars($sl['nama']); ?>
+                  
+                  <div class="d-flex flex-column" style="min-width: 0;">
+                    <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                      <span class="sales-name-text">
+                        <?php echo htmlspecialchars($sl['nama'] ?? 'Sales'); ?>
+                      </span>
+                      
+                      <!-- Prospek Pill -->
                       <?php if (!empty($sl['tipe_prospek']) && $sl['tipe_prospek'] !== 'Biasa'): 
-                        $pColor = match($sl['tipe_prospek']) { 'Peluang'=>'#10b981', 'Menengah'=>'#f59e0b', 'Rumit'=>'#ef4444', default=>'#64748b' };
+                        $pColor = match($sl['tipe_prospek']) { 'Peluang'=>'#059669', 'Menengah'=>'#d97706', 'Rumit'=>'#dc2626', default=>'#475569' };
                         $pBg = match($sl['tipe_prospek']) { 'Peluang'=>'#d1fae5', 'Menengah'=>'#fef3c7', 'Rumit'=>'#fee2e2', default=>'#f1f5f9' };
                       ?>
-                        <span style="font-size:8px; font-weight:bold; color:<?php echo $pColor; ?>; background:<?php echo $pBg; ?>; padding: 1px 5px; border-radius: 8px; margin-left: 4px; display:inline-block; vertical-align:middle;"><?php echo $sl['tipe_prospek']; ?></span>
+                        <span class="prospek-badge" style="color:<?php echo $pColor; ?>; background:<?php echo $pBg; ?>; border: 1px solid <?php echo $pColor; ?>33;">
+                          <i class="fa-solid fa-sparkles me-0.5"></i> <?php echo $sl['tipe_prospek']; ?>
+                        </span>
                       <?php endif; ?>
-                    </span>
-                    <div class="d-flex align-items-center gap-1 flex-wrap mt-1">
-                      <span class="sales-status-badge <?php echo $sl['cls']; ?>" style="<?php echo ($sl['cls'] === 'status-cancelled') ? 'background:#fee2e2;color:#ef4444;border-color:#fca5a5;' : ''; ?>"><?php echo $sl['lbl']; ?></span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-1.5 flex-wrap mt-1">
+                      <!-- Status Pill -->
+                      <span class="sales-status-badge <?php echo $sl['cls']; ?>">
+                        <?php if ($sl['cls'] === 'status-running'): ?>
+                          <span class="pulse-dot-running"></span>
+                        <?php elseif ($sl['cls'] === 'status-done'): ?>
+                          <i class="fa-solid fa-check me-0.5"></i>
+                        <?php endif; ?>
+                        <?php echo $sl['lbl']; ?>
+                      </span>
                       
-                      <!-- Always Show Clock In -->
-                      <span class="badge bg-light <?php echo !empty($sl['ci_time']) ? 'text-success' : 'text-muted'; ?> font-weight-bold" style="font-size: 9px; padding: 2px 6px; border: 1px solid <?php echo !empty($sl['ci_time']) ? '#d1fae5' : '#e2e8f0'; ?>; border-radius: 4px; font-family: monospace; text-transform: uppercase; display: inline-flex; align-items: center; gap: 2px;" title="Jam Clock In">
-                        📥 IN: <?php echo !empty($sl['ci_time']) ? $sl['ci_time'] : '--:--'; ?>
+                      <!-- Clock In Badge -->
+                      <span class="clock-badge <?= !empty($sl['ci_time']) ? 'clock-in-active' : 'clock-empty'; ?>" title="Jam Clock In">
+                        📥 IN: <?= !empty($sl['ci_time']) ? $sl['ci_time'] : '--:--'; ?>
                         <?php if (!empty($sl['lat_ci']) && !empty($sl['lon_ci'])): ?>
-                          <a href="https://www.google.com/maps?q=<?php echo $sl['lat_ci']; ?>,<?php echo $sl['lon_ci']; ?>" target="_blank" style="text-decoration: none; font-size:10px; line-height:1;" title="Lokasi Clock In">📍</a>
+                          <a href="https://www.google.com/maps?q=<?= $sl['lat_ci']; ?>,<?= $sl['lon_ci']; ?>" target="_blank" class="clock-map-link" title="Buka Lokasi Clock In di Maps">📍</a>
                         <?php endif; ?>
                       </span>
                       
-                      <!-- Always Show Clock Out -->
-                      <span class="badge bg-light <?php echo !empty($sl['co_time']) ? 'text-danger' : 'text-muted'; ?> font-weight-bold" style="font-size: 9px; padding: 2px 6px; border: 1px solid <?php echo !empty($sl['co_time']) ? '#fee2e2' : '#e2e8f0'; ?>; border-radius: 4px; font-family: monospace; text-transform: uppercase; display: inline-flex; align-items: center; gap: 2px;" title="Jam Clock Out">
-                        📤 OUT: <?php echo !empty($sl['co_time']) ? $sl['co_time'] : '--:--'; ?>
+                      <!-- Clock Out Badge -->
+                      <span class="clock-badge <?= !empty($sl['co_time']) ? 'clock-out-active' : 'clock-empty'; ?>" title="Jam Clock Out">
+                        📤 OUT: <?= !empty($sl['co_time']) ? $sl['co_time'] : '--:--'; ?>
                         <?php if (!empty($sl['lat_co']) && !empty($sl['lon_co'])): ?>
-                          <a href="https://www.google.com/maps?q=<?php echo $sl['lat_co']; ?>,<?php echo $sl['lon_co']; ?>" target="_blank" style="text-decoration: none; font-size:10px; line-height:1;" title="Lokasi Clock Out">📍</a>
+                          <a href="https://www.google.com/maps?q=<?= $sl['lat_co']; ?>,<?= $sl['lon_co']; ?>" target="_blank" class="clock-map-link" title="Buka Lokasi Clock Out di Maps">📍</a>
                         <?php endif; ?>
                       </span>
 
-                      <!-- Invoice tag if present -->
+                      <!-- Invoice Tag -->
                       <?php if (!empty($sl['no_invoice'])): ?>
-                        <span class="badge bg-light text-success font-weight-bold" style="font-size: 9px; padding: 2px 6px; border: 1px solid #10b98140; border-radius: 4px; font-family: monospace; display: inline-flex; align-items: center; gap: 2px;" title="Nomor Invoice Penjualan">
-                          📄 INV: <?php echo htmlspecialchars($sl['no_invoice']); ?>
+                        <span class="invoice-badge-pill" title="Nomor Invoice Penjualan">
+                          <i class="fa-solid fa-file-invoice-dollar me-1"></i> <?= htmlspecialchars($sl['no_invoice']); ?>
                         </span>
                       <?php endif; ?>
                     </div>
@@ -582,46 +662,51 @@ if (empty($salesNames)) {
                 </div>
                 <?php endforeach; ?>
               <?php else: ?>
-                <span class="text-muted" style="font-size:12px">Belum ada sales</span>
+                <span class="text-muted" style="font-size:12px">Belum ada tim sales</span>
               <?php endif; ?>
             </div>
 
-            <!-- Alamat -->
+            <!-- 4. Alamat -->
             <div class="keg-cell">
               <span class="cell-label d-md-none">Alamat</span>
               <div class="alamat-text">
-                <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">location_on</span>
-                <?php echo htmlspecialchars($row['alamat'] ?? '-'); ?>
+                <span class="material-symbols-outlined location-pin-icon">location_on</span>
+                <span><?php echo htmlspecialchars($row['alamat'] ?? '-'); ?></span>
               </div>
             </div>
 
-            <!-- Aksi -->
+            <!-- 5. Aksi -->
             <div class="keg-cell keg-actions">
               <?php if ($kegStatus === 'waiting'): ?>
-              <button type="button" class="btn-action" title="Setujui Reschedule" style="background:#e8f5e9; color:#2e7d32; border:1.5px solid #a5d6a7; cursor:pointer;" onclick="confirmApprove(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['nama_customer'] ?? '')); ?>')">
+              <button type="button" class="btn-action btn-approve" title="Setujui Reschedule" onclick="confirmApprove(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['nama_customer'] ?? '')); ?>')">
                 <span class="material-symbols-outlined">check_circle</span>
               </button>
               <?php endif; ?>
-              <a href="detail_kegiatan.php?id=<?php echo $row['id']; ?>" class="btn-action btn-view" title="Lihat Detail">
+              
+              <a href="detail_kegiatan.php?id=<?php echo $row['id']; ?>" class="btn-action btn-view" title="Lihat Detail Kunjungan">
                 <span class="material-symbols-outlined">visibility</span>
               </a>
+
               <?php if ($kegStatus !== 'selesai'): ?>
-              <button type="button" class="btn-action" title="Jadwalkan Ulang" style="background:#eff6ff; color:#2563eb; border:1.5px solid #bfdbfe; cursor:pointer;" onclick="openRescheduleModal(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['nama_customer'] ?? '')); ?>', '<?php echo date('Y-m-d\TH:i', strtotime($row['jadwal'])); ?>')">
+              <button type="button" class="btn-action btn-resched" title="Jadwalkan Ulang" onclick="openRescheduleModal(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['nama_customer'] ?? '')); ?>', '<?php echo date('Y-m-d\TH:i', strtotime($row['jadwal'])); ?>')">
                 <span class="material-symbols-outlined">event_repeat</span>
               </button>
               <?php endif; ?>
+
               <a href="edit_kegiatan.php?id=<?php echo $row['id']; ?>" class="btn-action btn-edit" title="Edit Jadwal">
                 <span class="material-symbols-outlined">edit</span>
               </a>
-              <button type="button" class="btn-action btn-delete" title="Hapus" onclick="confirmDelete(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['nama_customer'] ?? '')); ?>')">
+
+              <button type="button" class="btn-action btn-delete" title="Hapus Kegiatan" onclick="confirmDelete(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['nama_customer'] ?? '')); ?>')">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             </div>
-          </div>
 
+          </div>
           <?php endwhile; ?>
 
         <?php else: ?>
+          <!-- Empty State Vibrant -->
           <div class="empty-state-premium" style="--accent: <?php echo $borderColor; ?>;">
             <div class="empty-icon-wrapper">
               <span class="material-symbols-outlined empty-icon-pulsing"><?php echo $m['icon']; ?></span>
@@ -637,80 +722,361 @@ if (empty($salesNames)) {
   </div>
 </div>
 
-<!-- ── STYLES ─────────────────────────────────────────────────────────────── -->
+<!-- ── STYLES (Ultra Modern, Colorful & Responsive) ────────────────────────── -->
 <style>
-/* ── Premium Stat Cards (Sama dengan Web Teknisi) ── */
-.stat-card-premium {
+/* ── 1. Hero Greeting Banner ── */
+.hero-welcome-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.04);
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 5px solid #2563eb !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -2px rgba(37, 99, 235, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  padding: 20px 24px;
   position: relative;
-  background: #ffffff !important;
+  overflow: hidden;
 }
-.stat-card-premium:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(148, 163, 184, 0.1) !important;
+.hero-welcome-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37,99,235,0.06) 0%, rgba(255,255,255,0) 70%);
+  pointer-events: none;
 }
-.stat-label-premium {
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748b !important;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin: 0 0 6px 0;
-}
-.stat-count-premium {
-  font-size: 30px;
-  font-weight: 800;
-  color: #0f172a !important;
-  margin: 0;
-  line-height: 1;
-}
-.stat-icon-premium {
-  width: 42px; height: 42px;
-  border-radius: 10px;
+.hero-avatar-badge {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
   display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  flex-shrink: 0;
+}
+.hero-greeting-pill {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-bottom: 2px;
+}
+.hero-user-name {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.02em;
+}
+.hero-date-pill {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #475569;
+}
+.hero-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  padding: 2.5px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  font-family: monospace;
+}
+.hero-live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulseGreen 1.8s infinite;
+}
+@keyframes pulseGreen {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.hero-progress-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.hero-progress-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+.hero-progress-val {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.hero-progress-percent {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #10b981;
+}
+.hero-progress-icon-wrapper {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+.hero-btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff !important;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 10px 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  text-decoration: none;
+  transition: all 0.22s ease;
+}
+.hero-btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+  color: #ffffff !important;
+}
+
+/* ── 2. Filter Bar Modern ── */
+.filter-card-modern {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04);
+}
+.filter-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.filter-icon-pill {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+.filter-select, .filter-input {
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1e293b;
+  padding: 7px 12px;
+  transition: all 0.2s;
+  background-color: #f8fafc;
+}
+.filter-select:focus, .filter-input:focus {
+  background-color: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  outline: none;
+}
+.btn-filter-search {
+  flex-grow: 1;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s;
+  height: 38px;
+}
+.btn-filter-search:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(37, 99, 235, 0.35);
+  color: #fff;
+}
+.btn-filter-reset {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: all 0.2s;
+  height: 38px;
+}
+.btn-filter-reset:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+/* ── 3. Analytics Charts Cards ── */
+.chart-card-premium {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+.chart-card-header {
+  padding: 14px 18px 6px;
+}
+.chart-title-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.chart-title-badge .material-symbols-outlined { font-size: 18px; }
+.trend-badge { color: #0284c7; }
+.performa-badge { color: #9333ea; }
+
+/* ── 4. Vibrant Stat Cards ── */
+.stat-card-vibrant {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.stat-card-vibrant:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.08);
+}
+.stat-card-top {
+  padding: 16px 18px;
+}
+.stat-theme-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.stat-theme-count {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  margin: 0;
+}
+.stat-theme-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
   transition: transform 0.25s;
 }
-.stat-card-premium:hover .stat-icon-premium {
-  transform: scale(1.1) rotate(5deg);
+.stat-card-vibrant:hover .stat-theme-icon {
+  transform: scale(1.1) rotate(6deg);
 }
-.stat-icon-premium .material-symbols-outlined {
-  font-size: 22px;
-}
-.stat-footer-premium {
-  padding: 8px 16px;
-  background: #f8fafc;
-  border-top: 1px solid #f1f5f9;
-}
-.stat-footer-premium p {
+.stat-theme-icon .material-symbols-outlined { font-size: 22px; }
+.stat-theme-footer {
+  padding: 7px 18px;
   font-size: 11px;
-  color: #64748b !important;
-  margin: 0;
-  font-weight: 600;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-top: 1px solid rgba(0,0,0,0.04);
+}
+.stat-theme-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
 }
 
-/* ── Section Header Premium (Sama dengan Web Teknisi) ── */
-.section-header-premium {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 20px; background: #1e293b; border-radius: 10px 10px 0 0;
-  transition: background 0.2s;
-  margin-top: 15px;
+/* Themes per Card */
+.stat-theme-blue {
+  border-left: 4.5px solid #2563eb !important;
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
 }
-.section-header-premium h6 { 
-  margin: 0; font-size: 13px; font-weight: 700; color: #fff; 
-  letter-spacing: 0.04em; text-transform: uppercase;
-  display: flex; align-items: center;
-}
+.stat-theme-blue .stat-theme-label { color: #2563eb; }
+.stat-theme-blue .stat-theme-count { color: #1e3a8a; }
+.stat-theme-blue .stat-theme-icon { background: linear-gradient(135deg, #3b82f6, #1d4ed8); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+.stat-theme-blue .stat-theme-footer { background: #f0f7ff; color: #1e40af; }
+.stat-theme-blue .stat-theme-dot { background: #2563eb; }
 
-/* ── Tab Pills ── */
+.stat-theme-cyan {
+  border-left: 4.5px solid #0284c7 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+}
+.stat-theme-cyan .stat-theme-label { color: #0284c7; }
+.stat-theme-cyan .stat-theme-count { color: #075985; }
+.stat-theme-cyan .stat-theme-icon { background: linear-gradient(135deg, #0ea5e9, #0284c7); box-shadow: 0 4px 12px rgba(2,132,199,0.3); }
+.stat-theme-cyan .stat-theme-footer { background: #f0f9ff; color: #0369a1; }
+.stat-theme-cyan .stat-theme-dot { background: #0ea5e9; }
+
+.stat-theme-rose {
+  border-left: 4.5px solid #e11d48 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #fff1f2 100%);
+}
+.stat-theme-rose .stat-theme-label { color: #e11d48; }
+.stat-theme-rose .stat-theme-count { color: #9f1239; }
+.stat-theme-rose .stat-theme-icon { background: linear-gradient(135deg, #f43f5e, #be123c); box-shadow: 0 4px 12px rgba(225,29,72,0.3); }
+.stat-theme-rose .stat-theme-footer { background: #fff1f2; color: #be123c; }
+.stat-theme-rose .stat-theme-dot { background: #f43f5e; }
+
+.stat-theme-emerald {
+  border-left: 4.5px solid #059669 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%);
+}
+.stat-theme-emerald .stat-theme-label { color: #059669; }
+.stat-theme-emerald .stat-theme-count { color: #065f46; }
+.stat-theme-emerald .stat-theme-icon { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 4px 12px rgba(5,150,105,0.3); }
+.stat-theme-emerald .stat-theme-footer { background: #ecfdf5; color: #047857; }
+.stat-theme-emerald .stat-theme-dot { background: #10b981; }
+
+/* ── 5. Tab Navigation Bar ── */
 .tab-pills-wrapper {
   background: #f8fafc;
   border-radius: 16px 16px 0 0;
-  padding: 12px 14px 0;
+  padding: 10px 14px 0;
   border: 1px solid #e2e8f0;
   border-bottom: none;
   overflow-x: auto;
@@ -720,15 +1086,15 @@ if (empty($salesNames)) {
 .tab-pills-wrapper::-webkit-scrollbar { display: none; }
 .tab-pills { gap: 6px; flex-wrap: nowrap; border-bottom: none; }
 .tab-pill {
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 7px;
   padding: 10px 18px;
   border-radius: 12px 12px 0 0;
   border: none;
   background: transparent;
   color: #64748b;
-  font-size: 13.5px; font-weight: 600;
+  font-size: 13px; font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   white-space: nowrap;
   flex-shrink: 0;
@@ -736,203 +1102,399 @@ if (empty($salesNames)) {
 }
 .tab-pill:hover { background: rgba(0,0,0,0.03); color: #1e293b; }
 .tab-pill.active {
-  background: #fff;
-  color: var(--accent);
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
+  background: #ffffff;
+  color: var(--accent) !important;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.05);
+}
+.tab-pill.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 14px; right: 14px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 3px 3px 0 0;
 }
 .tab-icon { font-size: 18px; }
 .tab-badge {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 22px; height: 22px; padding: 0 8px;
   border-radius: 20px;
-  color: #fff;
-  font-size: 11px; font-weight: 700;
-  margin-left: 4px;
+  font-size: 11px; font-weight: 800;
+  margin-left: 2px;
 }
 
-/* ── Kegiatan List Pane ── */
+/* ── 6. Section Header Modern ── */
+.section-header-modern {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  margin-top: 15px;
+}
+.section-header-modern h6 { 
+  margin: 0; font-size: 13px; font-weight: 800; color: #ffffff; 
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.section-header-icon-pill {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── 7. Kegiatan List & Rows ── */
 .tab-pane { 
   background: transparent !important; 
   box-shadow: none !important; 
-  border: none !important;
+  border: none !important; 
 }
 .keg-list-container {
-  background: #fff;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
   border-top: none;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 14px 14px;
   padding: 20px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
-
 .keg-header {
   display: grid;
-  grid-template-columns: 140px 1.2fr 1.2fr 1.5fr 110px;
+  grid-template-columns: 145px 1.25fr 1.35fr 1.4fr 115px;
   gap: 16px;
-  padding: 12px 16px;
+  padding: 12px 18px;
   background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
-  font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px;
-  margin-bottom: 10px;
+  border-radius: 8px;
+  font-size: 11.5px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 12px;
 }
 .keg-row {
   display: grid;
-  grid-template-columns: 140px 1.2fr 1.2fr 1.5fr 110px;
+  grid-template-columns: 145px 1.25fr 1.35fr 1.4fr 115px;
   gap: 16px;
-  padding: 18px 20px;
-  background: #fff;
-  border-radius: 12px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 14px;
   margin-bottom: 12px;
   border: 1px solid #e2e8f0;
   border-left: 5px solid var(--row-accent, #3b82f6);
-  transition: all 0.22s ease;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   align-items: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.03);
 }
 .keg-row:hover { 
-  background: #fff; 
+  background: #ffffff; 
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 24px -2px rgba(0, 0, 0, 0.08);
   border-color: var(--row-accent);
 }
 .keg-cell { padding: 0; }
-.cell-label { display: block; font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+.cell-label { display: block; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
 
 .jadwal-badge { 
   display: inline-flex; 
   align-items: center; 
   gap: 6px; 
-  font-size: 13px; 
-  color: #334155; 
-  font-weight: 600; 
+  font-size: 12.5px; 
+  color: #1e293b; 
+  font-weight: 700; 
   background: #f8fafc;
   padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
 }
-.customer-name { font-size: 14px; font-weight: 700; color: #1e293b; }
-.cust-link { color: #1e293b; text-decoration: none; transition: color 0.15s; }
-.cust-link:hover { color: #3b82f6; }
-.wa-link { font-size: 12px; color: #10b981; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; font-weight: 500; }
-.wa-link:hover { text-decoration: underline; }
+.customer-name { font-size: 14px; font-weight: 800; color: #0f172a; line-height: 1.3; }
+.cust-link { color: #0f172a; text-decoration: none; transition: color 0.15s; }
+.cust-link:hover { color: #2563eb; text-decoration: underline; }
 
-/* Sales item style */
-.avatar-initials {
-  width: 32px; height: 32px;
+.wa-badge-pill {
+  font-size: 11.5px;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-weight: 700;
+  transition: all 0.15s;
+}
+.wa-badge-pill:hover {
+  background: #059669;
+  color: #ffffff;
+}
+.reschedule-callout {
+  font-size: 10.5px;
+  color: #e11d48;
+  font-weight: 700;
+  margin-top: 5px;
+  background: #fff1f2;
+  border: 1px solid #ffe4e6;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* Sales & Status Elements */
+.sales-avatar-img {
+  width: 34px; height: 34px;
   border-radius: 50%;
-  color: #fff;
-  font-size: 11px; font-weight: 700;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.avatar-initials-gradient {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 12px; font-weight: 800;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
-.sales-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+.sales-name-text { font-size: 13px; font-weight: 700; color: #0f172a; }
+.prospek-badge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1.5px 6px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  text-transform: uppercase;
+}
 .sales-status-badge { 
   font-size: 10px; 
-  font-weight: 700; 
-  padding: 2px 8px; 
+  font-weight: 800; 
+  padding: 2.5px 8px; 
   border-radius: 12px; 
   white-space: nowrap; 
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
-.sales-status-badge.status-scheduled { background: #f1f5f9; color: #64748b; }
-.sales-status-badge.status-running { background: #dbeafe; color: #2563eb; }
-.sales-status-badge.status-done { background: #d1fae5; color: #059669; }
+.sales-status-badge.status-scheduled { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+.sales-status-badge.status-running { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+.sales-status-badge.status-done { background: #d1fae5; color: #059669; border: 1px solid #a7f3d0; }
+.sales-status-badge.status-cancelled { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
 
-.alamat-text { font-size: 13px; color: #475569; line-height: 1.5; font-weight: 400; }
+.pulse-dot-running {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #0284c7;
+  animation: pulseGreen 1.5s infinite;
+}
 
-.keg-actions { display: flex; gap: 8px; align-items: center; justify-content: center; }
+.clock-badge {
+  font-size: 9px;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 2px 7px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  text-transform: uppercase;
+}
+.clock-in-active {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+.clock-out-active {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+.clock-empty {
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+}
+.clock-map-link {
+  text-decoration: none;
+  font-size: 10px;
+  transition: transform 0.15s;
+}
+.clock-map-link:hover {
+  transform: scale(1.3);
+}
+
+.invoice-badge-pill {
+  font-size: 9.5px;
+  font-weight: 800;
+  font-family: monospace;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  padding: 2px 7px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.alamat-text {
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.5;
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+.location-pin-icon {
+  font-size: 16px;
+  color: #e11d48;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Action Buttons */
+.keg-actions { display: flex; gap: 6px; align-items: center; justify-content: center; }
 .btn-action {
   width: 36px; height: 36px; border-radius: 10px;
   display: inline-flex; align-items: center; justify-content: center;
-  text-decoration: none; transition: all 0.2s;
-  border: 1px solid transparent;
+  text-decoration: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1.5px solid transparent;
+  cursor: pointer;
 }
-.btn-action:hover { transform: scale(1.08); }
+.btn-action:hover { transform: translateY(-2px) scale(1.06); }
 .btn-action .material-symbols-outlined { font-size: 18px; }
-.btn-view { background: #eff6ff; color: #2563eb; border-color: #dbeafe; }
-.btn-view:hover { background: #2563eb; color: #fff; }
-.btn-edit { background: #ecfdf5; color: #059669; border-color: #d1fae5; }
-.btn-edit:hover { background: #059669; color: #fff; }
-.btn-delete { background: #fef2f2; color: #dc2626; border-color: #fecaca; cursor: pointer; }
-.btn-delete:hover { background: #dc2626; color: #fff; }
 
-/* ── Delete Confirmation Modal ── */
-.modal-overlay-delete {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(4px);
-  z-index: 9999;
-  justify-content: center; align-items: center;
+.btn-view { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.btn-view:hover { background: #2563eb; color: #ffffff; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+
+.btn-resched { background: #e0e7ff; color: #4f46e5; border-color: #c7d2fe; }
+.btn-resched:hover { background: #4f46e5; color: #ffffff; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+
+.btn-edit { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+.btn-edit:hover { background: #059669; color: #ffffff; box-shadow: 0 4px 12px rgba(5,150,105,0.3); }
+
+.btn-delete { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.btn-delete:hover { background: #dc2626; color: #ffffff; box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
+
+.btn-approve { background: #ecfdf5; color: #16a34a; border-color: #86efac; }
+.btn-approve:hover { background: #16a34a; color: #ffffff; box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
+
+/* ── 8. Inline Filter Bar ── */
+.inline-search-bar {
+  padding: 12px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
 }
-.modal-overlay-delete.active { display: flex; }
-.modal-card-delete {
-  background: #fff;
-  border-radius: 20px;
-  padding: 36px;
-  width: 90%; max-width: 420px;
-  text-align: center;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
-  animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+.inline-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
-@keyframes modalSlideIn {
-  from { opacity: 0; transform: scale(0.85) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+.inline-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 200px;
+  max-width: 340px;
 }
-.modal-icon-delete {
-  width: 64px; height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #fef2f2, #fecaca);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px;
+.inline-date-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 160px;
+  max-width: 200px;
 }
-.modal-icon-delete span { font-size: 30px; color: #dc2626; }
-.modal-title-delete { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
-.modal-desc-delete { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 28px; }
-.modal-desc-delete strong { color: #dc2626; }
-.modal-actions-delete { display: flex; gap: 12px; justify-content: center; }
-.modal-btn-cancel {
-  padding: 12px 28px; border-radius: 12px;
-  background: #f1f5f9; color: #475569;
+.inline-search-icon, .inline-date-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 18px;
+  color: #94a3b8;
+  pointer-events: none;
+  transition: color 0.2s;
+  z-index: 1;
+}
+.inline-search-input, .inline-date-input {
+  width: 100%;
+  padding: 8px 36px 8px 38px;
   border: 1.5px solid #e2e8f0;
-  font-weight: 600; font-size: 14px;
-  cursor: pointer; transition: all 0.2s;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1e293b;
+  background: #ffffff;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
 }
-.modal-btn-cancel:hover { background: #e2e8f0; }
-.modal-btn-confirm-delete {
-  padding: 12px 28px; border-radius: 12px;
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
-  color: #fff; border: none;
-  font-weight: 700; font-size: 14px;
-  cursor: pointer; transition: all 0.2s;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+.inline-search-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
 }
-.modal-btn-confirm-delete:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(220,38,38,0.4); }
+.inline-search-input:focus, .inline-date-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+.inline-search-count {
+  font-size: 11px;
+  font-weight: 800;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 4px 10px;
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.inline-search-count.visible { opacity: 1; }
+.inline-search-clear {
+  position: absolute;
+  right: 6px;
+  width: 24px; height: 24px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.15s;
+  padding: 0;
+  z-index: 1;
+}
+.inline-search-clear:hover { background: #e2e8f0; color: #0f172a; }
 
-/* ── Premium Empty State ── */
+.keg-row.filtered-hidden { display: none !important; }
+.keg-row.filtered-highlight { animation: rowHighlight 0.4s ease; }
+@keyframes rowHighlight {
+  0% { background: rgba(59, 130, 246, 0.08); }
+  100% { background: #ffffff; }
+}
+
+/* ── 9. Empty State ── */
 .empty-state-premium { 
   text-align: center; 
-  padding: 60px 40px; 
-  background: #fff; 
+  padding: 50px 30px; 
+  background: #ffffff; 
   border-radius: 16px; 
   border: 2px dashed #e2e8f0;
-  max-width: 480px;
+  max-width: 440px;
   margin: 30px auto;
 }
 .empty-icon-wrapper {
-  width: 80px; height: 80px;
+  width: 72px; height: 72px;
   margin: 0 auto;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
 }
 .empty-icon-pulsing {
-  font-size: 38px;
+  font-size: 34px;
   color: var(--accent);
   animation: pulse 2s infinite ease-in-out;
 }
-.empty-title { font-size: 16px; font-weight: 700; color: #334155; }
+.empty-title { font-size: 16px; font-weight: 800; color: #1e293b; }
 .empty-sub { font-size: 13px; color: #64748b; margin-top: 6px; }
 
 @keyframes pulse {
@@ -941,131 +1503,89 @@ if (empty($salesNames)) {
   100% { transform: scale(1); opacity: 0.8; }
 }
 
-/* ── Mobile Responsive ── */
+/* ── 10. Responsive Breakpoints ── */
+@media (max-width: 991px) {
+  .hero-welcome-body {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
 @media (max-width: 767px) {
   .keg-header { display: none; }
   .keg-row {
     display: flex; flex-direction: column; gap: 12px;
     border-left-width: 5px;
-    padding: 16px 16px;
+    padding: 16px;
     border-radius: 14px;
     align-items: stretch;
   }
-  .keg-cell { padding: 0; }
   .keg-actions { 
     justify-content: flex-start; 
     margin-top: 8px; 
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 10px !important;
+    gap: 8px !important;
   }
   .btn-action {
-    min-width: 40px !important;
-    min-height: 40px !important;
-    border-radius: 10px !important;
-    touch-action: manipulation !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
   }
-  .btn-action .material-symbols-outlined {
-    font-size: 20px !important;
-  }
-  .stat-count-premium { font-size: 24px; }
-  .empty-state-premium { padding: 30px 16px; margin: 15px auto; }
+  .stat-theme-count { font-size: 24px; }
   .inline-filter-row {
-    flex-direction: column !important;
-    gap: 8px !important;
-    align-items: stretch !important;
+    flex-direction: column;
+    align-items: stretch;
   }
   .inline-search-wrapper, .inline-date-wrapper {
-    width: 100% !important;
-    min-width: 100% !important;
+    max-width: 100%;
+    width: 100%;
   }
 }
 
-/* ── Approve Confirmation Modal ── */
-.modal-overlay-approve {
+/* ── Modals Style ── */
+.modal-overlay-custom {
   display: none;
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(4px);
   z-index: 9999;
   justify-content: center; align-items: center;
 }
-.modal-overlay-approve.active { display: flex; }
-.modal-card-approve {
-  background: #fff;
+.modal-overlay-custom.active { display: flex; }
+.modal-card-custom {
+  background: #ffffff;
   border-radius: 20px;
-  padding: 36px;
+  padding: 32px;
   width: 90%; max-width: 420px;
   text-align: center;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.2);
   animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.modal-icon-approve {
-  width: 64px; height: 64px;
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-icon-custom {
+  width: 60px; height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 16px;
 }
-.modal-icon-approve span { font-size: 30px; color: #2e7d32; }
-.modal-title-approve { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
-.modal-desc-approve { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 28px; }
-.modal-desc-approve strong { color: #2e7d32; }
-.modal-btn-confirm-approve {
-  padding: 12px 28px; border-radius: 12px;
-  background: linear-gradient(135deg, #2e7d32, #1b5e20);
-  color: #fff; border: none;
-  font-weight: 700; font-size: 14px;
+.modal-icon-custom span { font-size: 30px; }
+.modal-title-custom { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+.modal-desc-custom { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+.modal-actions-custom { display: flex; gap: 10px; justify-content: center; }
+.modal-btn-cancel {
+  padding: 10px 22px; border-radius: 10px;
+  background: #f1f5f9; color: #475569;
+  border: 1.5px solid #e2e8f0;
+  font-weight: 700; font-size: 13px;
   cursor: pointer; transition: all 0.2s;
-  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.3);
 }
-.modal-btn-confirm-approve:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(46,125,50,0.4); }
-</style>
+.modal-btn-cancel:hover { background: #e2e8f0; }
 
-<!-- ═══ Approve Confirmation Modal ═══ -->
-<div class="modal-overlay-approve" id="approveModal">
-  <div class="modal-card-approve">
-    <div class="modal-icon-approve">
-      <span class="material-symbols-outlined">check_circle</span>
-    </div>
-    <div class="modal-title-approve">Setujui Reschedule?</div>
-    <div class="modal-desc-approve">
-      Jadwal reschedule untuk kunjungan ke <strong id="approveCustomerName"></strong> akan disetujui dan diaktifkan.
-    </div>
-    <div class="modal-actions-delete">
-      <button class="modal-btn-cancel" onclick="closeApproveModal()">Batal</button>
-      <button class="modal-btn-confirm-approve" id="btnConfirmApprove" onclick="executeApprove()">
-        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;margin-right:4px;">check</span>
-        Ya, Setujui
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ Delete Confirmation Modal ═══ -->
-<div class="modal-overlay-delete" id="deleteModal">
-  <div class="modal-card-delete">
-    <div class="modal-icon-delete">
-      <span class="material-symbols-outlined">delete_forever</span>
-    </div>
-    <div class="modal-title-delete">Hapus Kegiatan?</div>
-    <div class="modal-desc-delete">
-      Kegiatan kunjungan ke <strong id="deleteCustomerName"></strong> akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.
-    </div>
-    <div class="modal-actions-delete">
-      <button class="modal-btn-cancel" onclick="closeDeleteModal()">Batal</button>
-      <button class="modal-btn-confirm-delete" id="btnConfirmDelete" onclick="executeDelete()">
-        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;margin-right:4px;">delete</span>
-        Ya, Hapus
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ Admin Reschedule Modal ═══ -->
-<style>
+/* Reschedule Modal Specific */
 .modal-overlay-resched {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  position: fixed; inset: 0;
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(4px);
   display: none; align-items: center; justify-content: center;
@@ -1073,73 +1593,59 @@ if (empty($salesNames)) {
 }
 .modal-overlay-resched.active { display: flex; }
 .modal-card-resched {
-  background: #fff;
+  background: #ffffff;
   border-radius: 20px;
   width: 90%; max-width: 460px;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.2);
   animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   overflow: hidden;
 }
 .resched-header {
   background: linear-gradient(135deg, #1e3a5f, #2563eb);
-  padding: 24px 28px;
-  color: #fff;
-  position: relative;
-  overflow: hidden;
-}
-.resched-header::before {
-  content: '';
-  position: absolute;
-  top: -30px; right: -10px;
-  width: 100px; height: 100px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.06);
+  padding: 22px 26px;
+  color: #ffffff;
 }
 .resched-header h4 {
   font-size: 17px; font-weight: 800; margin: 0 0 4px;
   display: flex; align-items: center; gap: 8px;
 }
 .resched-header p {
-  font-size: 12px; color: rgba(255,255,255,0.7); margin: 0;
+  font-size: 12px; color: rgba(255,255,255,0.75); margin: 0;
 }
-.resched-body {
-  padding: 24px 28px;
+.resched-customer-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.18);
+  padding: 3px 12px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 700;
+  margin-top: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
 }
+.resched-body { padding: 22px 26px; }
 .resched-label {
-  font-size: 11px; font-weight: 700; color: #475569;
+  font-size: 11px; font-weight: 800; color: #475569;
   text-transform: uppercase; letter-spacing: 0.05em;
   margin-bottom: 6px; display: flex; align-items: center; gap: 4px;
 }
 .resched-input {
   width: 100%; padding: 10px 14px;
   border: 1.5px solid #e2e8f0; border-radius: 10px;
-  font-size: 13px; font-weight: 500; color: #1e293b;
+  font-size: 13px; font-weight: 600; color: #1e293b;
   background: #f8fafc; outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s;
   font-family: inherit;
 }
 .resched-input:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  background: #ffffff;
 }
-textarea.resched-input {
-  resize: vertical; min-height: 70px;
-}
+textarea.resched-input { resize: vertical; min-height: 70px; }
 .resched-footer {
-  padding: 0 28px 24px;
+  padding: 0 26px 22px;
   display: flex; gap: 10px; justify-content: flex-end;
 }
-.resched-btn-cancel {
-  padding: 10px 20px; border-radius: 10px;
-  background: #f1f5f9; color: #475569;
-  border: 1.5px solid #e2e8f0;
-  font-weight: 700; font-size: 13px;
-  cursor: pointer; transition: all 0.2s;
-}
-.resched-btn-cancel:hover { background: #e2e8f0; }
 .resched-btn-submit {
-  padding: 10px 24px; border-radius: 10px;
+  padding: 10px 22px; border-radius: 10px;
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff; border: none;
   font-weight: 700; font-size: 13px;
@@ -1148,17 +1654,49 @@ textarea.resched-input {
   display: flex; align-items: center; gap: 6px;
 }
 .resched-btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
-.resched-btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-.resched-customer-badge {
-  display: inline-block;
-  background: rgba(255,255,255,0.15);
-  padding: 3px 12px; border-radius: 20px;
-  font-size: 11px; font-weight: 700;
-  margin-top: 6px;
-  border: 1px solid rgba(255,255,255,0.1);
-}
 </style>
 
+<!-- ═══ Approve Confirmation Modal ═══ -->
+<div class="modal-overlay-custom" id="approveModal">
+  <div class="modal-card-custom">
+    <div class="modal-icon-custom" style="background: #ecfdf5; color: #059669;">
+      <span class="material-symbols-outlined">check_circle</span>
+    </div>
+    <div class="modal-title-custom">Setujui Reschedule?</div>
+    <div class="modal-desc-custom">
+      Jadwal reschedule untuk kunjungan ke <strong id="approveCustomerName" class="text-dark"></strong> akan disetujui dan diaktifkan.
+    </div>
+    <div class="modal-actions-custom">
+      <button class="modal-btn-cancel" onclick="closeApproveModal()">Batal</button>
+      <button class="btn btn-success fw-bold rounded-3 px-4 py-2" id="btnConfirmApprove" onclick="executeApprove()" style="font-size: 13px;">
+        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;margin-right:4px;">check</span>
+        Ya, Setujui
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Delete Confirmation Modal ═══ -->
+<div class="modal-overlay-custom" id="deleteModal">
+  <div class="modal-card-custom">
+    <div class="modal-icon-custom" style="background: #fef2f2; color: #dc2626;">
+      <span class="material-symbols-outlined">delete_forever</span>
+    </div>
+    <div class="modal-title-custom">Hapus Kegiatan?</div>
+    <div class="modal-desc-custom">
+      Kegiatan kunjungan ke <strong id="deleteCustomerName" class="text-danger"></strong> akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.
+    </div>
+    <div class="modal-actions-custom">
+      <button class="modal-btn-cancel" onclick="closeDeleteModal()">Batal</button>
+      <button class="btn btn-danger fw-bold rounded-3 px-4 py-2" id="btnConfirmDelete" onclick="executeDelete()" style="font-size: 13px;">
+        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;margin-right:4px;">delete</span>
+        Ya, Hapus
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Admin Reschedule Modal ═══ -->
 <div class="modal-overlay-resched" id="reschedModal">
   <div class="modal-card-resched">
     <div class="resched-header">
@@ -1172,21 +1710,21 @@ textarea.resched-input {
     <div class="resched-body">
       <div style="margin-bottom: 16px;">
         <div class="resched-label">
-          <span class="material-symbols-outlined" style="font-size:14px; color:#3b82f6;">calendar_month</span>
-          Tanggal & Waktu Baru <span style="color:#ef4444;">*</span>
+          <span class="material-symbols-outlined" style="font-size:15px; color:#2563eb;">calendar_month</span>
+          Tanggal &amp; Waktu Baru <span style="color:#ef4444;">*</span>
         </div>
         <input type="datetime-local" class="resched-input" id="reschedNewDate" required>
       </div>
       <div>
         <div class="resched-label">
-          <span class="material-symbols-outlined" style="font-size:14px; color:#3b82f6;">edit_note</span>
+          <span class="material-symbols-outlined" style="font-size:15px; color:#2563eb;">edit_note</span>
           Alasan Reschedule (Opsional)
         </div>
-        <textarea class="resched-input" id="reschedReason" placeholder="Contoh: Customer minta ganti hari, lokasi belum siap, dll."></textarea>
+        <textarea class="resched-input" id="reschedReason" placeholder="Contoh: Toko tutup, lokasi belum siap, atau request customer..."></textarea>
       </div>
     </div>
     <div class="resched-footer">
-      <button class="resched-btn-cancel" onclick="closeReschedModal()">Batal</button>
+      <button class="modal-btn-cancel" onclick="closeReschedModal()">Batal</button>
       <button class="resched-btn-submit" id="btnExecResched" onclick="executeReschedule()">
         <span class="material-symbols-outlined" style="font-size:16px;">event_repeat</span>
         Jadwalkan Ulang
@@ -1195,6 +1733,7 @@ textarea.resched-input {
   </div>
 </div>
 
+<!-- ── JAVASCRIPT & CHARTS ────────────────────────────────────────────────── -->
 <script>
 let deleteId = null;
 
@@ -1209,7 +1748,6 @@ function closeDeleteModal() {
   deleteId = null;
 }
 
-// Close modal on overlay click
 document.getElementById('deleteModal').addEventListener('click', function(e) {
   if (e.target === this) closeDeleteModal();
 });
@@ -1257,7 +1795,6 @@ function closeApproveModal() {
   approveId = null;
 }
 
-// Close modal on overlay click
 document.getElementById('approveModal').addEventListener('click', function(e) {
   if (e.target === this) closeApproveModal();
 });
@@ -1271,15 +1808,12 @@ function executeApprove() {
 
   window.location.href = 'approve_kegiatan.php?id=' + approveId;
 }
-</script>
 
-<!-- ═══ Admin Reschedule Script ═══ -->
-<script>
 let reschedId = null;
 
 function openRescheduleModal(id, customerName, currentDate) {
   reschedId = id;
-  document.getElementById('reschedCustomerBadge').textContent = '\ud83d\udccd ' + (customerName || 'Customer');
+  document.getElementById('reschedCustomerBadge').textContent = '📍 ' + (customerName || 'Customer');
   const dt = new Date(currentDate);
   dt.setDate(dt.getDate() + 1);
   const y = dt.getFullYear();
@@ -1337,140 +1871,8 @@ function executeReschedule() {
     btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">event_repeat</span> Jadwalkan Ulang';
   });
 }
-</script>
 
-<!-- ── Inline Filter Styles ── -->
-<style>
-.inline-search-bar {
-  padding: 12px 20px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
-}
-.inline-filter-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.inline-search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 200px;
-  max-width: 340px;
-}
-.inline-date-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-width: 160px;
-  max-width: 200px;
-}
-.inline-search-icon, .inline-date-icon {
-  position: absolute;
-  left: 12px;
-  font-size: 18px;
-  color: #94a3b8;
-  pointer-events: none;
-  transition: color 0.2s;
-  z-index: 1;
-}
-.inline-search-input, .inline-date-input {
-  width: 100%;
-  padding: 9px 36px 9px 40px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #1e293b;
-  background: #fff;
-  outline: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: inherit;
-}
-.inline-search-input::placeholder {
-  color: #94a3b8;
-  font-weight: 400;
-}
-.inline-search-input:focus, .inline-date-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-.inline-search-input:focus ~ .inline-search-icon,
-.inline-search-input:not(:placeholder-shown) ~ .inline-search-icon {
-  color: #3b82f6;
-}
-.inline-date-input:focus ~ .inline-date-icon {
-  color: #3b82f6;
-}
-.inline-date-input::-webkit-calendar-picker-indicator {
-  opacity: 0;
-  position: absolute;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-}
-.inline-search-count {
-  font-size: 10px;
-  font-weight: 700;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 3px 10px;
-  border-radius: 6px;
-  opacity: 0;
-  transition: opacity 0.2s;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.inline-search-count.visible {
-  opacity: 1;
-}
-.inline-search-clear {
-  position: absolute;
-  right: 6px;
-  width: 24px;
-  height: 24px;
-  border: none;
-  background: #f1f5f9;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  transition: all 0.15s;
-  padding: 0;
-  z-index: 1;
-}
-.inline-search-clear:hover {
-  background: #e2e8f0;
-  color: #1e293b;
-}
-.keg-row.filtered-hidden {
-  display: none !important;
-}
-.keg-row.filtered-highlight {
-  animation: rowHighlight 0.4s ease;
-}
-@keyframes rowHighlight {
-  0% { background: rgba(59, 130, 246, 0.08); }
-  100% { background: transparent; }
-}
-@media (max-width: 767px) {
-  .inline-filter-row {
-    flex-direction: column;
-  }
-  .inline-search-wrapper, .inline-date-wrapper {
-    max-width: 100%;
-    width: 100%;
-  }
-}
-</style>
-
-<!-- ── Inline Filter Script ── -->
-<script>
+// Inline Filter Logic
 function applyInlineFilters(tabKey) {
   const pane = document.getElementById('pane-' + tabKey);
   if (!pane) return;
@@ -1536,7 +1938,7 @@ function clearField(btn, fieldType) {
   applyInlineFilters(tabKey);
 }
 
-// ── ApexCharts Rendering (Sesuai Gambar 1) ──────────────────────────────────
+// ── ApexCharts Initialization ──
 document.addEventListener('DOMContentLoaded', function() {
   // 1. Trend Kunjungan (7 Hari Terakhir)
   const trendOptions = {
@@ -1551,7 +1953,7 @@ document.addEventListener('DOMContentLoaded', function() {
       zoom: { enabled: false },
       fontFamily: 'Plus Jakarta Sans, sans-serif'
     },
-    colors: ['#00c0ef'],
+    colors: ['#0284c7'],
     dataLabels: { enabled: false },
     stroke: {
       curve: 'smooth',
@@ -1568,18 +1970,18 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     markers: {
       size: 5,
-      colors: ['#00c0ef'],
+      colors: ['#0284c7'],
       strokeColors: '#ffffff',
-      strokeWidth: 2,
+      strokeWidth: 2.5,
       hover: { size: 7 }
     },
     xaxis: {
       categories: <?= json_encode($dates7); ?>,
       labels: {
         style: {
-          colors: '#94a3b8',
+          colors: '#64748b',
           fontSize: '11px',
-          fontWeight: 600
+          fontWeight: 700
         }
       },
       axisBorder: { show: false },
@@ -1588,9 +1990,9 @@ document.addEventListener('DOMContentLoaded', function() {
     yaxis: {
       labels: {
         style: {
-          colors: '#94a3b8',
+          colors: '#64748b',
           fontSize: '11px',
-          fontWeight: 600
+          fontWeight: 700
         }
       }
     },
@@ -1600,6 +2002,7 @@ document.addEventListener('DOMContentLoaded', function() {
       padding: { top: 0, right: 10, bottom: 0, left: 10 }
     },
     tooltip: {
+      theme: 'light',
       y: {
         formatter: function (val) {
           return val + " Kunjungan";
@@ -1628,8 +2031,8 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     plotOptions: {
       bar: {
-        borderRadius: 6,
-        columnWidth: '22%',
+        borderRadius: 8,
+        columnWidth: '24%',
         distributed: false
       }
     },
@@ -1652,9 +2055,9 @@ document.addEventListener('DOMContentLoaded', function() {
       categories: <?= json_encode($salesNames); ?>,
       labels: {
         style: {
-          colors: '#94a3b8',
+          colors: '#64748b',
           fontSize: '11px',
-          fontWeight: 600
+          fontWeight: 700
         }
       },
       axisBorder: { show: false },
@@ -1663,9 +2066,9 @@ document.addEventListener('DOMContentLoaded', function() {
     yaxis: {
       labels: {
         style: {
-          colors: '#94a3b8',
+          colors: '#64748b',
           fontSize: '11px',
-          fontWeight: 600
+          fontWeight: 700
         }
       }
     },
@@ -1675,6 +2078,7 @@ document.addEventListener('DOMContentLoaded', function() {
       padding: { top: 0, right: 10, bottom: 0, left: 10 }
     },
     tooltip: {
+      theme: 'light',
       y: {
         formatter: function (val) {
           return val + " Kunjungan Selesai";
@@ -1703,4 +2107,3 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(updateHeroClock, 1000);
 });
 </script>
-
