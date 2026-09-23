@@ -44,15 +44,15 @@ $userInitials = strtoupper(substr($userName, 0, 2));
         </a>
 
         <!-- ═════════════════════════════════════════════════════════ -->
-        <!-- SEKSI KHUSUS: APLIKASI SALES (MOBILE)                     -->
+        <!-- SEKSI KHUSUS: DASHBOARD SALES CANVAS                      -->
         <!-- ═════════════════════════════════════════════════════════ -->
         <div class="nav-section-label" style="margin-top: 10px; color: #38BDF8;">
-            <i class="bi bi-phone me-1"></i> Aplikasi Sales (Mobile)
+            <i class="bi bi-phone me-1"></i> Aplikasi Sales Canvas (Mobile)
         </div>
 
         <a href="kegiatan.php" class="sidebar-link <?php echo in_array($currFile, ['kegiatan.php', 'kegiatan-selesai.php', 'kegiatan-db.php', 'kegiatan-baru.php', 'detail_kegiatan.php']) ? 'active' : ''; ?>">
-            <i class="bi bi-calendar-range-fill text-primary"></i>
-            <span>Jadwal Kunjungan App</span>
+            <i class="bi bi-grid-1x2-fill text-primary"></i>
+            <span>Dashboard Sales Canvas</span>
         </a>
 
         <a href="laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currFile, ['laporan-kegiatan.php', 'laporan-cust.php', 'laporan-db-kegiatan.php']) ? 'active' : ''; ?>">

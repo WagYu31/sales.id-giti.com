@@ -6,7 +6,7 @@ include_once __DIR__ . "/conn.php";
 include_once __DIR__ . "/session.php";
 include_once __DIR__ . "/get-user-data.php";
 
-$pageNow = "Jadwal Kunjungan";
+$pageNow = "Dashboard Sales Canvas";
 $currentPage = "Today";
 ?>
 <!DOCTYPE html>
@@ -14,7 +14,7 @@ $currentPage = "Today";
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Jadwal Kunjungan Sales App — Loewix Sales</title>
+  <title>Dashboard Sales Canvas — Loewix Sales</title>
   <?php include __DIR__ . "/head.php"; ?>
   <style>
     ul#data-tek li:nth-child(odd) { background-color: white; }
@@ -67,8 +67,8 @@ $currentPage = "Today";
       <!-- Quick Action: Buat Jadwal Baru -->
       <div class="d-flex align-items-center justify-content-between mb-3">
         <div>
-          <h4 class="fw-bold mb-1" style="font-family:'Outfit',sans-serif;">Jadwal Kunjungan Sales (Mobile App)</h4>
-          <p class="text-muted small mb-0">Kelola dan pantau seluruh jadwal penugasan sales ke toko & dealer mitra.</p>
+          <h4 class="fw-bold mb-1" style="font-family:'Outfit',sans-serif;">Dashboard Sales Canvas</h4>
+          <p class="text-muted small mb-0">Kelola dan pantau seluruh jadwal penugasan sales canvasser ke toko & dealer mitra.</p>
         </div>
         <a href="kegiatan-baru.php" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2 fw-semibold shadow-sm">
           <i class="bi bi-plus-circle-fill"></i>

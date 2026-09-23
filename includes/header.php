@@ -512,10 +512,10 @@ table tr td { font-size: 0.85em; }
 
             <!-- APLIKASI SALES (MOBILE) FOR ADMINSALES -->
             <div class="nav-section-label" style="margin-top:8px; color:#38BDF8;">
-                <i class="bi bi-phone me-1"></i> Aplikasi Sales (Mobile)
+                <i class="bi bi-phone me-1"></i> Aplikasi Sales Canvas (Mobile)
             </div>
             <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php','kegiatan-baru.php'])?'active':''; ?>">
-                <i class="bi bi-calendar-range-fill text-primary"></i> Jadwal Kunjungan App
+                <i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Sales Canvas
             </a>
             <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>">
                 <i class="bi bi-geo-alt-fill text-info"></i> Laporan Visit (GPS)
@@ -551,14 +551,14 @@ table tr td { font-size: 0.85em; }
             <?php endif; ?>
 
             <!-- ═════════════════════════════════════════════════════════ -->
-            <!-- SEKSI KHUSUS: APLIKASI SALES (MOBILE)                     -->
+            <!-- SEKSI KHUSUS: DASHBOARD SALES CANVAS                      -->
             <!-- ═════════════════════════════════════════════════════════ -->
             <div class="nav-section-label" style="margin-top:8px; color:#38BDF8;">
-                <i class="bi bi-phone me-1"></i> Aplikasi Sales (Mobile)
+                <i class="bi bi-phone me-1"></i> Aplikasi Sales Canvas (Mobile)
             </div>
 
             <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php','kegiatan-baru.php'])?'active':''; ?>">
-                <i class="bi bi-calendar-range-fill text-primary"></i> Jadwal Kunjungan App
+                <i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Sales Canvas
             </a>
             <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>">
                 <i class="bi bi-geo-alt-fill text-info"></i> Laporan Visit (GPS)
