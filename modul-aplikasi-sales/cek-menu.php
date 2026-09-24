@@ -112,6 +112,13 @@ $roleBadgeBg = match($userRole) {
             <span class="nav-link-text">TIP TOK (Konsinyasi)</span>
         </a>
 
+        <a href="tiptok-invoice.php" class="sidebar-link <?php echo ($currFile === 'tiptok-invoice.php') ? 'active' : ''; ?>">
+            <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
+                <i class="bi bi-receipt-cutoff"></i>
+            </span>
+            <span class="nav-link-text">No. Invoice TIP TOK</span>
+        </a>
+
         <a href="customer.php" class="sidebar-link <?php echo in_array($currFile, ['customer.php', 'customer-detail.php', 'tambah-customer.php', 'edit-customer.php']) ? 'active' : ''; ?>">
             <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
                 <i class="bi bi-shop-window"></i>

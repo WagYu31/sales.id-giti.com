@@ -433,8 +433,29 @@ $loewixPriceList = $tiptokMaster6;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
         }
+        .btn-hero-invoice {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
+            border: 2px solid #38bdf8;
+            border-radius: 12px;
+            padding: 11px 22px;
+            font-size: 14.5px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-hero-invoice:hover {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+        }
 
-        /* ── Bento Metrics Grid (Vibrant Theme) ── */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -1211,6 +1232,10 @@ $loewixPriceList = $tiptokMaster6;
                         </p>
                     </div>
                     <div class="d-flex align-items-center gap-2.5 flex-wrap">
+                        <a href="tiptok-invoice.php" class="btn-hero-invoice">
+                            <i class="fa-solid fa-receipt" style="font-size: 17px;"></i>
+                            <span>No. Invoice TIP TOK</span>
+                        </a>
                         <button class="btn-hero-claim" onclick="openTabKlaimInsentif()">
                             <i class="fa-solid fa-hand-holding-dollar text-warning-light" style="font-size: 18px;"></i>
                             <span>Klaim Insentif</span>
@@ -1909,61 +1934,75 @@ $loewixPriceList = $tiptokMaster6;
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalLaporKunjungan" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div>
-                        <h5 class="modal-title font-weight-bold text-dark mb-0">Laporan Kunjungan & Cek Sisa Stok</h5>
-                        <div class="text-secondary text-sm font-weight-bold">Input kondisi sisa fisik barang di toko. Wajib No. Invoice jika ada yang laku!</div>
+            <div class="modal-content" style="border-radius: 18px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; border-radius: 18px 18px 0 0;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(37, 99, 235, 0.2); border: 1.5px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 20px;">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="modal-title font-weight-bold text-white mb-0">Laporan Kunjungan & Cek Sisa Stok</h5>
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11px; padding: 4px 8px; border-radius: 6px;">Audit Fisik</span>
+                            </div>
+                            <div class="text-xs mt-0.5" style="color: #94a3b8;">Input kondisi sisa fisik barang di toko saat audit kunjungan</div>
+                        </div>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 
                 <form id="formLaporKunjungan" onsubmit="submitLaporKunjungan(event)" enctype="multipart/form-data">
                     <input type="hidden" name="id_penitipan" id="kunjunganIdPenitipan">
-                    <div class="modal-body p-4">
-                        <div class="p-3 mb-3 rounded-3 bg-light border" style="border: 2px solid #cbd5e1 !important;">
+                    <div class="modal-body p-4 bg-light">
+                        <div class="p-3.5 mb-3 rounded-3 bg-white border" style="border: 1.5px solid #cbd5e1 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="font-weight-bold text-dark text-base" id="kunjunganNamaToko">-</span>
-                                <span class="font-monospace text-sm font-weight-bold text-primary" id="kunjunganKodeTitip">-</span>
+                                <span class="font-weight-bold text-dark fs-6" id="kunjunganNamaToko">-</span>
+                                <span class="font-monospace text-xs font-weight-bold text-primary badge bg-primary-subtle px-2 py-1" id="kunjunganKodeTitip">-</span>
                             </div>
-                            <div class="text-sm text-secondary font-weight-bold mt-1" id="kunjunganAlamatToko">-</div>
+                            <div class="text-xs text-secondary font-weight-bold mt-1" id="kunjunganAlamatToko">-</div>
                         </div>
 
-                        <div class="row g-3 mb-3">
+                        <div class="row g-3 mb-3 bg-white p-3.5 rounded-3 border" style="border: 1.5px solid #cbd5e1 !important;">
                             <div class="col-md-6">
-                                <label class="form-label-taste">Tanggal Kunjungan <span class="text-danger">*</span></label>
-                                <input type="date" name="tgl_kunjungan" class="form-control-taste w-100" value="<?php echo date('Y-m-d'); ?>" required>
+                                <label class="form-label-taste"><i class="fa-regular fa-calendar text-primary me-1.5"></i> Tanggal Kunjungan <span class="text-danger">*</span></label>
+                                <input type="date" name="tgl_kunjungan" class="form-control-taste w-100 font-weight-bold" value="<?php echo date('Y-m-d'); ?>" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label-taste">Foto Bukti Display / Stok (Opsional)</label>
+                                <label class="form-label-taste"><i class="fa-solid fa-camera text-primary me-1.5"></i> Foto Bukti Display / Stok (Opsional)</label>
                                 <input type="file" name="foto_kunjungan" class="form-control-taste w-100" accept="image/*">
                             </div>
                         </div>
 
-                        <div class="form-label-taste mt-3 mb-2">Audit Fisik Stok Sisa & Penjualan</div>
-                        <div class="table-responsive border rounded-3 mb-3" style="border: 2px solid #cbd5e1 !important;">
+                        <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
+                            <label class="form-label-taste mb-0"><i class="fa-solid fa-list-check text-primary me-1.5"></i> AUDIT FISIK STOK SISA & PENJUALAN</label>
+                            <span class="text-xs text-muted font-weight-bold">Update sisa fisik di toko</span>
+                        </div>
+                        <div class="table-responsive border rounded-3 mb-3 bg-white" style="border: 1.5px solid #cbd5e1 !important; overflow: hidden;">
                             <table class="table taste-table mb-0">
                                 <thead>
-                                    <tr>
-                                        <th style="width: 32%;">NAMA BARANG</th>
-                                        <th style="width: 15%; text-align: center;">STOK LALU</th>
-                                        <th style="width: 18%;">SISA FISIK <span class="text-danger">*</span></th>
-                                        <th style="width: 12%; text-align: center;">TERJUAL</th>
-                                        <th style="width: 23%;">NO. INVOICE <span class="text-danger">*</span></th>
+                                    <tr style="background: #f8fafc;">
+                                        <th style="width: 36%;">NAMA BARANG</th>
+                                        <th style="width: 16%; text-align: center;">STOK LALU</th>
+                                        <th style="width: 24%; text-align: center;">SISA FISIK AKTUAL <span class="text-danger">*</span></th>
+                                        <th style="width: 24%; text-align: right;">TERJUAL &amp; ESTIMASI</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kunjunganItemsBody"></tbody>
                             </table>
                         </div>
 
-                        <div class="p-3 rounded-3 bg-light border text-sm font-weight-bold text-secondary mb-3 d-flex align-items-center gap-2" style="border: 1.5px solid #cbd5e1 !important;">
-                            <i class="fa-solid fa-circle-info text-primary" style="font-size: 16px;"></i>
-                            <span>Jika ada barang terjual (Sisa < Stok Lalu), kolom <strong>Nomor Invoice</strong> wajib diisi untuk verifikasi klaim insentif.</span>
+                        <div class="p-3 rounded-3 bg-white border text-xs font-weight-bold text-secondary mb-3 d-flex align-items-center gap-2.5" style="border: 1.5px solid #cbd5e1 !important;">
+                            <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(37,99,235,0.1); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                            </div>
+                            <div>
+                                Barang terjual akan otomatis tercatat ke sistem. Nomor Faktur/Invoice dikelola secara terpusat di menu khusus <strong><a href="tiptok-invoice.php" class="text-primary text-decoration-underline">No. Invoice TIP TOK</a></strong>.
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="form-label-taste">Catatan Kunjungan</label>
-                            <textarea name="catatan_kunjungan" class="form-control-taste w-100" rows="2" placeholder="Catatan hasil audit toko..."></textarea>
+                        <div class="bg-white p-3.5 rounded-3 border" style="border: 1.5px solid #cbd5e1 !important;">
+                            <label class="form-label-taste"><i class="fa-regular fa-note-sticky text-secondary me-1.5"></i> Catatan Hasil Audit Kunjungan</label>
+                            <textarea name="catatan_kunjungan" class="form-control-taste w-100" rows="2" placeholder="Tuliskan catatan kondisi display toko / feedback dealer..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer p-3 bg-light border-top">
@@ -3265,46 +3304,41 @@ $loewixPriceList = $tiptokMaster6;
                         }
                         res.data.items.forEach((it, idx) => {
                             const sisaCur = parseInt(it.qty_sisa) || 0;
+                            const insUnit = parseFloat(it.insentif_per_unit) || 0;
                             tbody.innerHTML += `
                                 <tr>
                                     <td>
                                         <input type="hidden" name="items[${idx}][id_item]" value="${it.id}">
-                                        <div class="font-weight-bold" style="font-size: 14.5px; color: #020617;">${escapeHtml(it.nama_barang)}</div>
-                                        <div style="font-size: 13px; font-weight: 700; color: #047857;">Insentif: Rp ${new Intl.NumberFormat('id-ID').format(it.insentif_per_unit)}/unit</div>
+                                        <input type="hidden" id="insentifUnit_${idx}" value="${insUnit}">
+                                        <div class="font-weight-bold" style="font-size: 14px; color: #020617;">${escapeHtml(it.nama_barang)}</div>
+                                        <div style="font-size: 12px; font-weight: 700; color: #059669;"><i class="fa-solid fa-coins me-1"></i> Rp ${new Intl.NumberFormat('id-ID').format(insUnit)}/unit</div>
                                     </td>
                                     <td class="text-center font-weight-bold text-dark">
-                                        <span class="taste-badge badge-neutral" style="font-size: 14px;">${sisaCur}</span>
+                                        <span class="taste-badge badge-neutral" style="font-size: 13px;">${sisaCur} unit</span>
                                     </td>
                                     <td>
                                         <input type="number" name="items[${idx}][stok_sisa]" 
                                                id="stokSisa_${idx}" 
                                                min="0" max="${sisaCur}" 
-                                               class="form-control-taste w-100 text-center" 
-                                               style="font-size: 15px; font-weight: 800;"
+                                               class="form-control-taste w-100 text-center font-weight-bold text-dark" 
+                                               style="font-size: 15px; border-radius: 10px;"
                                                value="${sisaCur}" 
                                                required 
                                                oninput="hitungTerjualRow(${idx}, ${sisaCur})">
                                     </td>
-                                    <td class="text-center font-weight-bold" id="terjualDisplay_${idx}">
-                                        <span class="taste-badge badge-neutral" style="font-size: 13px;">0</span>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="items[${idx}][no_inv]" 
-                                               id="noInv_${idx}" 
-                                               class="form-control-taste w-100 font-monospace" 
-                                               style="font-size: 13.5px; font-weight: 700;"
-                                               placeholder="No. Invoice">
+                                    <td class="text-end font-weight-bold" id="terjualDisplay_${idx}">
+                                        <span class="taste-badge badge-neutral" style="font-size: 12px;">Stok Utuh</span>
                                     </td>
                                 </tr>
                             `;
                         });
                     } else {
-                        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-3 text-danger font-weight-bold">${(res && res.message) ? res.message : 'Gagal memuat data.'}</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-3 text-danger font-weight-bold">${(res && res.message) ? res.message : 'Gagal memuat data.'}</td></tr>`;
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat data barang.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3 text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat data barang.</td></tr>';
                 });
         }
 
@@ -3312,20 +3346,20 @@ $loewixPriceList = $tiptokMaster6;
             const valInput = document.getElementById(`stokSisa_${idx}`).value;
             const sisa = parseInt(valInput) || 0;
             const terjual = Math.max(0, stokPrev - sisa);
+            const insUnit = parseFloat(document.getElementById(`insentifUnit_${idx}`)?.value) || 0;
             const disp = document.getElementById(`terjualDisplay_${idx}`);
-            const inv = document.getElementById(`noInv_${idx}`);
 
-            if (disp && inv) {
+            if (disp) {
                 if (terjual > 0) {
-                    disp.innerHTML = `<span class="taste-badge badge-danger-tag" style="font-size: 13px;">${terjual} Laku</span>`;
-                    inv.setAttribute('required', 'required');
-                    inv.style.borderColor = '#ef4444';
-                    inv.style.boxShadow = '0 0 0 2px rgba(239, 68, 68, 0.2)';
+                    const estSubtotal = terjual * insUnit;
+                    disp.innerHTML = `
+                        <div class="d-flex flex-column align-items-end">
+                            <span class="taste-badge badge-danger-tag mb-1" style="font-size: 12px;">+ ${terjual} Laku</span>
+                            <span class="text-xs fw-bold text-success">+ Rp ${new Intl.NumberFormat('id-ID').format(estSubtotal)}</span>
+                        </div>
+                    `;
                 } else {
-                    disp.innerHTML = `<span class="taste-badge badge-neutral" style="font-size: 13px;">0</span>`;
-                    inv.removeAttribute('required');
-                    inv.style.borderColor = '';
-                    inv.style.boxShadow = '';
+                    disp.innerHTML = `<span class="taste-badge badge-neutral" style="font-size: 12px;">Stok Utuh</span>`;
                 }
             }
         }
