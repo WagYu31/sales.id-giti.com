@@ -214,40 +214,67 @@ if ($action === 'search_dealer') {
 // -------------------------------------------------------------
 if ($action === 'get_product_prices') {
     $products = [];
-    $chkPP = mysqli_query($conn, "SHOW TABLES LIKE 'product_prices'");
-    if ($chkPP && mysqli_num_rows($chkPP) > 0) {
-        $q = trim($_GET['q'] ?? '');
-        if (!empty($q)) {
-            $stmt = $conn->prepare("SELECT id, category, type, description, msrp FROM product_prices WHERE category LIKE ? OR type LIKE ? OR description LIKE ? ORDER BY category ASC, type ASC");
-            $like = "%$q%";
-            $stmt->bind_param("sss", $like, $like, $like);
-            $stmt->execute();
-            $res = $stmt->get_result();
-            while ($row = $res->fetch_assoc()) {
-                $products[] = [
-                    'id' => (int)$row['id'],
-                    'category' => $row['category'] ?? '',
-                    'type' => $row['type'] ?? '',
-                    'description' => $row['description'] ?? '',
-                    'msrp' => (float)($row['msrp'] ?? 0)
-                ];
-            }
-            $stmt->close();
-        } else {
-            $res = mysqli_query($conn, "SELECT id, category, type, description, msrp FROM product_prices ORDER BY category ASC, type ASC");
-            if ($res) {
-                while ($row = mysqli_fetch_assoc($res)) {
-                    $products[] = [
-                        'id' => (int)$row['id'],
-                        'category' => $row['category'] ?? '',
-                        'type' => $row['type'] ?? '',
-                        'description' => $row['description'] ?? '',
-                        'msrp' => (float)($row['msrp'] ?? 0)
-                    ];
+    $fetchFromDb = function($db, $q) {
+        $list = [];
+        if (!$db || $db->connect_error) return $list;
+        $chk = @$db->query("SHOW TABLES LIKE 'product_prices'");
+        if ($chk && $chk->num_rows > 0) {
+            if (!empty($q)) {
+                $stmt = @$db->prepare("SELECT id, category, type, description, msrp FROM product_prices WHERE category LIKE ? OR type LIKE ? OR description LIKE ? ORDER BY category ASC, type ASC");
+                if ($stmt) {
+                    $like = "%$q%";
+                    $stmt->bind_param("sss", $like, $like, $like);
+                    $stmt->execute();
+                    $res = $stmt->get_result();
+                    while ($row = $res->fetch_assoc()) {
+                        $list[] = [
+                            'id' => (int)$row['id'],
+                            'category' => $row['category'] ?? '',
+                            'type' => $row['type'] ?? '',
+                            'description' => $row['description'] ?? '',
+                            'msrp' => (float)($row['msrp'] ?? 0)
+                        ];
+                    }
+                    $stmt->close();
+                }
+            } else {
+                $res = @$db->query("SELECT id, category, type, description, msrp FROM product_prices ORDER BY category ASC, type ASC");
+                if ($res && $res->num_rows > 0) {
+                    while ($row = $res->fetch_assoc()) {
+                        $list[] = [
+                            'id' => (int)$row['id'],
+                            'category' => $row['category'] ?? '',
+                            'type' => $row['type'] ?? '',
+                            'description' => $row['description'] ?? '',
+                            'msrp' => (float)($row['msrp'] ?? 0)
+                        ];
+                    }
                 }
             }
         }
+        return $list;
+    };
+
+    $q = trim($_GET['q'] ?? '');
+    // 1. Try $conn
+    $products = $fetchFromDb($conn, $q);
+
+    // 2. If empty, try altConn
+    if (empty($products)) {
+        $host = 'localhost';
+        $altConn = @new mysqli($host, 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales');
+        if ($altConn->connect_error) {
+            $altConn = @new mysqli($host, 'root', '', 'sales_id_giti');
+            if ($altConn->connect_error) {
+                $altConn = @new mysqli($host, 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti');
+            }
+        }
+        if (!$altConn->connect_error) {
+            $products = $fetchFromDb($altConn, $q);
+            @$altConn->close();
+        }
     }
+
     echo json_encode(['status' => 'success', 'data' => $products]);
     exit;
 }
