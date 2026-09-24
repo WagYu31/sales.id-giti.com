@@ -2339,10 +2339,44 @@ $loewixPriceList = $tiptokMaster6;
         // =========================================================================
         // HELPER FUNGSI TARIK DATA 6 PRODUK RESMI TIP TOK LOEWIX
         // =========================================================================
+        function findLoewixProduct(identifier) {
+            if (!identifier || !loewixProducts || loewixProducts.length === 0) return null;
+            const raw = String(identifier).trim();
+            if (!raw) return null;
+
+            // 1. Exact match by type, model, description, or id
+            let found = loewixProducts.find(p => 
+                p.type === raw || 
+                p.model === raw || 
+                p.description === raw || 
+                String(p.id) === raw
+            );
+            if (found) return found;
+
+            // 2. Normalized match (remove special chars, spaces, case-insensitive)
+            const clean = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const cRaw = clean(raw);
+            if (!cRaw) return null;
+
+            found = loewixProducts.find(p => {
+                const cType = clean(p.type);
+                const cModel = clean(p.model);
+                const cDesc = clean(p.description);
+                return cType === cRaw ||
+                       cModel === cRaw ||
+                       cType.includes(cRaw) ||
+                       cRaw.includes(cModel) ||
+                       cModel.includes(cRaw) ||
+                       cDesc.includes(cRaw);
+            });
+            return found || null;
+        }
+
         function renderPriceListOptions(selectedVal = '') {
             if (!loewixProducts || loewixProducts.length === 0) {
                 return '<option value="" disabled>Belum ada produk TIP TOK</option>';
             }
+            const targetProd = findLoewixProduct(selectedVal);
             const groups = {
                 '2MP AHD INDOOR / OUTDOOR': [],
                 '4MP IPCAM INDOOR / OUTDOOR': []
@@ -2360,7 +2394,7 @@ $loewixPriceList = $tiptokMaster6;
                 if (groups[cat].length === 0) continue;
                 html += `<optgroup label="📹 ${escapeHtml(cat)}">`;
                 groups[cat].forEach(p => {
-                    const isSel = (p.type === selectedVal || p.model === selectedVal) ? 'selected' : '';
+                    const isSel = (targetProd && (p.id === targetProd.id || p.type === targetProd.type)) ? 'selected' : '';
                     const priceStr = p.msrp > 0 ? ` (MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)})` : '';
                     const insentifStr = p.insentif > 0 ? ` • Insentif: Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)}/Unit` : '';
                     html += `<option value="${escapeHtml(p.type)}" ${isSel}>${escapeHtml(p.type)}${insentifStr}${priceStr}</option>`;
@@ -2371,8 +2405,8 @@ $loewixPriceList = $tiptokMaster6;
         }
 
         function onSelectRowProduct(selectEl, rowIndex, prefix = '') {
-            const selectedType = selectEl.value;
-            const p = loewixProducts.find(item => item.type === selectedType || item.model === selectedType);
+            const selectedVal = selectEl.value;
+            const p = findLoewixProduct(selectedVal);
             const inputNama = document.getElementById(`inputNama_${prefix}${rowIndex}`);
             const inputTipe = document.getElementById(`inputTipe_${prefix}${rowIndex}`);
             const inputInsentif = document.getElementById(`inputInsentif_${prefix}${rowIndex}`);
@@ -2834,8 +2868,9 @@ $loewixPriceList = $tiptokMaster6;
             `;
             container.insertAdjacentHTML('beforeend', rowHtml);
             const selEl = document.getElementById(`selectProduct_${itemRowIndex}`);
-            if (pNama && selEl) {
-                selEl.value = pNama;
+            const matched = findLoewixProduct(pNama);
+            if (matched && selEl) {
+                selEl.value = matched.type;
                 onSelectRowProduct(selEl, itemRowIndex, '');
             } else {
                 recalcRowSubtotal(itemRowIndex, '');
@@ -2949,13 +2984,16 @@ $loewixPriceList = $tiptokMaster6;
                                         <i class="fa-solid fa-trash-can me-1"></i> Hapus
                                      </button>`;
 
-                                const pInsentif = it.insentif_per_unit || (it.nama_barang.includes('4MP') ? 30000 : 15000);
+                                const matchedProd = findLoewixProduct(it.nama_barang);
+                                const prodName = matchedProd ? matchedProd.type : (it.nama_barang || '');
+                                const prodCat = matchedProd ? matchedProd.category : (it.tipe_barang || '');
+                                const pInsentif = (matchedProd ? matchedProd.insentif : it.insentif_per_unit) || (prodName.includes('4MP') ? 30000 : 15000);
 
                                 const rowHtml = `
                                     <div class="item-card-row" id="editItemRow_${editItemRowIndex}">
                                         <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="${it.id}">
-                                        <input type="hidden" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" value="${escapeHtml(it.nama_barang)}">
-                                        <input type="hidden" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" value="${escapeHtml(it.tipe_barang || '')}">
+                                        <input type="hidden" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" value="${escapeHtml(prodName)}">
+                                        <input type="hidden" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" value="${escapeHtml(prodCat)}">
 
                                         <!-- Row Top Header -->
                                         <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
@@ -2963,8 +3001,8 @@ $loewixPriceList = $tiptokMaster6;
                                                 <span class="badge bg-dark text-white px-2.5 py-1" style="font-size: 11.5px; border-radius: 8px; font-weight: 800;">
                                                     <i class="fa-solid fa-box me-1 text-primary"></i> Item #${editItemRowIndex}
                                                 </span>
-                                                <span class="taste-badge badge-dealer-tag ${it.tipe_barang ? '' : 'd-none'}" id="itemCatBadge_edit_${editItemRowIndex}">
-                                                    ${escapeHtml(it.tipe_barang || '')}
+                                                <span class="taste-badge badge-dealer-tag ${prodCat ? '' : 'd-none'}" id="itemCatBadge_edit_${editItemRowIndex}">
+                                                    ${escapeHtml(prodCat)}
                                                 </span>
                                             </div>
                                             ${deleteBtn}
@@ -2980,18 +3018,18 @@ $loewixPriceList = $tiptokMaster6;
                                             </label>
                                             <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-premium w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" ${isSold ? 'disabled' : ''}>
                                                 <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
-                                                ${renderPriceListOptions(it.nama_barang)}
+                                                ${renderPriceListOptions(prodName)}
                                             </select>
                                         </div>
 
                                         <!-- Live Product Spec Meta Box -->
-                                        <div id="productMeta_edit_${editItemRowIndex}" class="product-meta-card mb-3">
+                                        <div id="productMeta_edit_${editItemRowIndex}" class="product-meta-card ${prodName ? '' : 'd-none'} mb-3">
                                             <div class="d-flex align-items-center gap-2">
                                                 <div style="width: 34px; height: 34px; border-radius: 8px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 14px;">
                                                     <i class="fa-solid fa-video"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="fw-bold text-dark" style="font-size: 13px;" id="metaTitle_edit_${editItemRowIndex}">${escapeHtml(it.nama_barang)}</div>
+                                                    <div class="fw-bold text-dark" style="font-size: 13px;" id="metaTitle_edit_${editItemRowIndex}">${escapeHtml(prodName)}</div>
                                                     <div class="text-xs text-muted" id="metaMsrp_edit_${editItemRowIndex}">Produk Resmi TIP TOK</div>
                                                 </div>
                                             </div>
@@ -3031,10 +3069,10 @@ $loewixPriceList = $tiptokMaster6;
                                 `;
                                 container.insertAdjacentHTML('beforeend', rowHtml);
                                 const selEl = document.getElementById(`selectProduct_edit_${editItemRowIndex}`);
-                                if (selEl && it.nama_barang) {
-                                    selEl.value = it.nama_barang;
-                                    onSelectRowProduct(selEl, editItemRowIndex, 'edit_');
+                                if (selEl && prodName) {
+                                    selEl.value = prodName;
                                 }
+                                recalcRowSubtotal(editItemRowIndex, 'edit_');
                             });
                             updateModalSummary('edit_');
                         }
@@ -3163,8 +3201,9 @@ $loewixPriceList = $tiptokMaster6;
             `;
             container.insertAdjacentHTML('beforeend', rowHtml);
             const selEl = document.getElementById(`selectProduct_edit_${editItemRowIndex}`);
-            if (pNama && selEl) {
-                selEl.value = pNama;
+            const matched = findLoewixProduct(pNama);
+            if (matched && selEl) {
+                selEl.value = matched.type;
                 onSelectRowProduct(selEl, editItemRowIndex, 'edit_');
             } else {
                 recalcRowSubtotal(editItemRowIndex, 'edit_');
