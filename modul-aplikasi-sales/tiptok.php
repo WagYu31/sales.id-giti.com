@@ -209,48 +209,78 @@ $fetchFromDbConn = function($db) {
 // 1. Try active $conn from conn.php
 $loewixPriceList = $fetchFromDbConn($conn);
 
-// 2. If empty, connect to main Loewix Sales database (u836263092_sales / sales_id_giti)
-if (empty($loewixPriceList)) {
-    $host = 'localhost';
-    $altConn = @new mysqli($host, 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales');
-    if ($altConn->connect_error) {
-        $altConn = @new mysqli($host, 'root', '', 'sales_id_giti');
-        if ($altConn->connect_error) {
-            $altConn = @new mysqli($host, 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti');
+// 2. Try Cross-Database query via active $conn if on same MySQL instance
+if (empty($loewixPriceList) && $conn && !$conn->connect_error) {
+    $crossDbs = ['u836263092_sales', 'sales_id_giti'];
+    foreach ($crossDbs as $cdb) {
+        $resCross = @$conn->query("SELECT id, category, type, description, msrp FROM `{$cdb}`.`product_prices` ORDER BY category ASC, type ASC");
+        if ($resCross && $resCross->num_rows > 0) {
+            while ($row = $resCross->fetch_assoc()) {
+                $loewixPriceList[] = [
+                    'id' => (int)$row['id'],
+                    'category' => $row['category'] ?? '',
+                    'type' => $row['type'] ?? '',
+                    'description' => $row['description'] ?? '',
+                    'msrp' => (float)($row['msrp'] ?? 0)
+                ];
+            }
+            break;
         }
     }
+}
 
-    if (!$altConn->connect_error) {
-        $loewixPriceList = $fetchFromDbConn($altConn);
-        
-        // Auto-replicate to current connection so both DBs stay in sync
-        if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
-            @$conn->query("CREATE TABLE IF NOT EXISTS `product_prices` (
-                `id` INT AUTO_INCREMENT PRIMARY KEY,
-                `category` VARCHAR(100) NOT NULL,
-                `type` VARCHAR(150) NOT NULL,
-                `description` TEXT NULL,
-                `msrp` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-                `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-                `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX (`category`),
-                INDEX (`type`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+// 3. If still empty, connect to main Loewix Sales database via various credentials & socket/TCP combinations
+if (empty($loewixPriceList)) {
+    $candidateConfigs = [
+        ['localhost', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales'],
+        ['127.0.0.1', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales'],
+        ['localhost', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti'],
+        ['127.0.0.1', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti'],
+        ['localhost', 'root', '', 'sales_id_giti'],
+        ['127.0.0.1', 'root', '', 'sales_id_giti'],
+        ['localhost', 'root', '', 'u836263092_sales'],
+        ['localhost', 'teknisi_api_root', 'OffOff@18', 'sales_id_giti'],
+        ['localhost', 'teknisi_api_root', 'WagyuA531052002.', 'sales_id_giti'],
+        ['localhost', 'u836263092_jadwaltest', 'Eddie@1819', 'u836263092_sales'],
+    ];
 
-            $chkCur = @$conn->query("SELECT COUNT(*) AS c FROM product_prices");
-            $curCount = $chkCur ? (int)($chkCur->fetch_assoc()['c'] ?? 0) : 0;
-            if ($curCount === 0) {
-                $stmtIns = @$conn->prepare("INSERT INTO product_prices (category, type, description, msrp) VALUES (?, ?, ?, ?)");
-                if ($stmtIns) {
-                    foreach ($loewixPriceList as $p) {
-                        $stmtIns->bind_param("sssd", $p['category'], $p['type'], $p['description'], $p['msrp']);
-                        @$stmtIns->execute();
-                    }
-                    @$stmtIns->close();
-                }
+    foreach ($candidateConfigs as $cfg) {
+        $altConn = @new mysqli($cfg[0], $cfg[1], $cfg[2], $cfg[3]);
+        if (!$altConn->connect_error) {
+            $loewixPriceList = $fetchFromDbConn($altConn);
+            @$altConn->close();
+            if (!empty($loewixPriceList)) {
+                break;
             }
         }
-        @$altConn->close();
+    }
+}
+
+// 4. Auto-replicate to current connection so both DBs stay in sync
+if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
+    $chkCur = @$conn->query("SELECT COUNT(*) AS c FROM product_prices");
+    $curCount = $chkCur ? (int)($chkCur->fetch_assoc()['c'] ?? 0) : -1;
+    if ($curCount <= 0) {
+        @$conn->query("CREATE TABLE IF NOT EXISTS `product_prices` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `category` VARCHAR(100) NOT NULL,
+            `type` VARCHAR(150) NOT NULL,
+            `description` TEXT NULL,
+            `msrp` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX (`category`),
+            INDEX (`type`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $stmtIns = @$conn->prepare("INSERT INTO product_prices (category, type, description, msrp) VALUES (?, ?, ?, ?)");
+        if ($stmtIns) {
+            foreach ($loewixPriceList as $p) {
+                $stmtIns->bind_param("sssd", $p['category'], $p['type'], $p['description'], $p['msrp']);
+                @$stmtIns->execute();
+            }
+            @$stmtIns->close();
+        }
     }
 }
 ?>

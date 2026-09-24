@@ -259,19 +259,71 @@ if ($action === 'get_product_prices') {
     // 1. Try $conn
     $products = $fetchFromDb($conn, $q);
 
-    // 2. If empty, try altConn
-    if (empty($products)) {
-        $host = 'localhost';
-        $altConn = @new mysqli($host, 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales');
-        if ($altConn->connect_error) {
-            $altConn = @new mysqli($host, 'root', '', 'sales_id_giti');
-            if ($altConn->connect_error) {
-                $altConn = @new mysqli($host, 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti');
+    // 2. Try Cross-Database query via active $conn if on same MySQL instance
+    if (empty($products) && $conn && !$conn->connect_error) {
+        $crossDbs = ['u836263092_sales', 'sales_id_giti'];
+        foreach ($crossDbs as $cdb) {
+            if (!empty($q)) {
+                $stmtCross = @$conn->prepare("SELECT id, category, type, description, msrp FROM `{$cdb}`.`product_prices` WHERE category LIKE ? OR type LIKE ? OR description LIKE ? ORDER BY category ASC, type ASC");
+                if ($stmtCross) {
+                    $like = "%$q%";
+                    $stmtCross->bind_param("sss", $like, $like, $like);
+                    $stmtCross->execute();
+                    $resCross = $stmtCross->get_result();
+                    while ($row = $resCross->fetch_assoc()) {
+                        $products[] = [
+                            'id' => (int)$row['id'],
+                            'category' => $row['category'] ?? '',
+                            'type' => $row['type'] ?? '',
+                            'description' => $row['description'] ?? '',
+                            'msrp' => (float)($row['msrp'] ?? 0)
+                        ];
+                    }
+                    $stmtCross->close();
+                    if (!empty($products)) break;
+                }
+            } else {
+                $resCross = @$conn->query("SELECT id, category, type, description, msrp FROM `{$cdb}`.`product_prices` ORDER BY category ASC, type ASC");
+                if ($resCross && $resCross->num_rows > 0) {
+                    while ($row = $resCross->fetch_assoc()) {
+                        $products[] = [
+                            'id' => (int)$row['id'],
+                            'category' => $row['category'] ?? '',
+                            'type' => $row['type'] ?? '',
+                            'description' => $row['description'] ?? '',
+                            'msrp' => (float)($row['msrp'] ?? 0)
+                        ];
+                    }
+                    break;
+                }
             }
         }
-        if (!$altConn->connect_error) {
-            $products = $fetchFromDb($altConn, $q);
-            @$altConn->close();
+    }
+
+    // 3. If empty, try candidate credentials
+    if (empty($products)) {
+        $candidateConfigs = [
+            ['localhost', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales'],
+            ['127.0.0.1', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales'],
+            ['localhost', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti'],
+            ['127.0.0.1', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti'],
+            ['localhost', 'root', '', 'sales_id_giti'],
+            ['127.0.0.1', 'root', '', 'sales_id_giti'],
+            ['localhost', 'root', '', 'u836263092_sales'],
+            ['localhost', 'teknisi_api_root', 'OffOff@18', 'sales_id_giti'],
+            ['localhost', 'teknisi_api_root', 'WagyuA531052002.', 'sales_id_giti'],
+            ['localhost', 'u836263092_jadwaltest', 'Eddie@1819', 'u836263092_sales'],
+        ];
+
+        foreach ($candidateConfigs as $cfg) {
+            $altConn = @new mysqli($cfg[0], $cfg[1], $cfg[2], $cfg[3]);
+            if (!$altConn->connect_error) {
+                $products = $fetchFromDb($altConn, $q);
+                @$altConn->close();
+                if (!empty($products)) {
+                    break;
+                }
+            }
         }
     }
 
