@@ -1271,10 +1271,53 @@ if ($action === 'get_tiptok_invoices') {
         WHERE k.qty_terjual_kunjungan > 0 $whereStatSales");
     $stats = $qStat ? $qStat->fetch_assoc() : [];
 
+    // Leaderboard & Sales Recap calculation (ranked by Invoiced Unit -> Total Terjual -> Insentif)
+    $qSalesLeaderboard = $conn->query("SELECT 
+        COALESCE(NULLIF(p.id_sales, 0), k.id_sales, 0) AS id_sales,
+        COALESCE(NULLIF(p.nama_sales, ''), k.nama_sales, 'Sales') AS nama_sales,
+        COUNT(DISTINCT p.id_customer) AS total_toko,
+        COUNT(DISTINCT k.id_penitipan) AS total_penitipan,
+        SUM(k.qty_terjual_kunjungan) AS total_terjual,
+        SUM(CASE WHEN k.no_inv IS NOT NULL AND TRIM(k.no_inv) != '' THEN k.qty_terjual_kunjungan ELSE 0 END) AS invoiced_unit,
+        SUM(CASE WHEN k.no_inv IS NULL OR TRIM(k.no_inv) = '' THEN k.qty_terjual_kunjungan ELSE 0 END) AS pending_unit,
+        COUNT(DISTINCT CASE WHEN k.no_inv IS NOT NULL AND TRIM(k.no_inv) != '' THEN k.no_inv ELSE NULL END) AS count_invoices,
+        COUNT(CASE WHEN k.no_inv IS NULL OR TRIM(k.no_inv) = '' THEN 1 ELSE NULL END) AS count_pending_trx,
+        SUM(k.insentif_didapat) AS total_insentif
+        FROM tiptok_kunjungan k
+        JOIN tiptok_penitipan p ON k.id_penitipan = p.id
+        WHERE k.qty_terjual_kunjungan > 0
+        GROUP BY COALESCE(NULLIF(p.id_sales, 0), k.id_sales, 0), COALESCE(NULLIF(p.nama_sales, ''), k.nama_sales, 'Sales')
+        ORDER BY invoiced_unit DESC, total_terjual DESC, total_insentif DESC");
+
+    $leaderboard = [];
+    $rank = 1;
+    if ($qSalesLeaderboard) {
+        while ($sRow = $qSalesLeaderboard->fetch_assoc()) {
+            $invUnit = intval($sRow['invoiced_unit'] ?? 0);
+            $totTerjual = intval($sRow['total_terjual'] ?? 0);
+            $pctClaim = min(100, round(($invUnit / 50) * 100));
+            $sRow['rank'] = $rank++;
+            $sRow['id_sales'] = intval($sRow['id_sales']);
+            $sRow['total_toko'] = intval($sRow['total_toko']);
+            $sRow['total_penitipan'] = intval($sRow['total_penitipan']);
+            $sRow['total_terjual'] = $totTerjual;
+            $sRow['invoiced_unit'] = $invUnit;
+            $sRow['pending_unit'] = intval($sRow['pending_unit'] ?? 0);
+            $sRow['count_invoices'] = intval($sRow['count_invoices'] ?? 0);
+            $sRow['count_pending_trx'] = intval($sRow['count_pending_trx'] ?? 0);
+            $sRow['total_insentif'] = floatval($sRow['total_insentif'] ?? 0);
+            $sRow['claim_progress'] = $pctClaim;
+            $sRow['claim_target'] = 50;
+            $sRow['units_needed'] = max(0, 50 - $invUnit);
+            $leaderboard[] = $sRow;
+        }
+    }
+
     echo json_encode([
         'status' => 'success',
         'data' => [
             'items' => $items,
+            'leaderboard' => $leaderboard,
             'filtered_stats' => [
                 'total_unit' => $totalUnitTerjual,
                 'total_pending' => $totalPendingInvoice,
