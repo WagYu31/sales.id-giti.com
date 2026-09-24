@@ -664,10 +664,10 @@ if ($qDealersPreload) {
     <!-- ========================================================================= -->
     <div class="modal fade" id="modalSingleInvoice" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 18px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
-                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; border-radius: 18px 18px 0 0;">
+            <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 25px 50px -12px rgba(15,23,42,0.35); overflow: hidden;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 20px 24px;">
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(14, 165, 233, 0.2); border: 1.5px solid rgba(56, 189, 248, 0.4); display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 18px;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); border: 1.5px solid rgba(56, 189, 248, 0.35); display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 19px;">
                             <i class="fa-solid fa-file-invoice"></i>
                         </div>
                         <div>
@@ -680,37 +680,47 @@ if ($qDealersPreload) {
                 
                 <form id="formSingleInvoice" onsubmit="submitSingleInvoice(event)">
                     <input type="hidden" name="id_kunjungan" id="singleIdKunjungan">
-                    <div class="modal-body p-4 bg-light">
+                    <div class="modal-body p-4 bg-white">
                         
-                        <!-- Info Card Ringkasan -->
-                        <div class="p-3.5 mb-3 rounded-3 bg-white border" style="border: 1.5px solid #cbd5e1 !important;">
+                        <!-- Info Card Ringkasan Transaksi -->
+                        <div class="p-3 mb-4 rounded-3" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="font-weight-bold text-dark fs-6" id="singlePrevNamaToko">-</span>
-                                <span class="badge bg-primary text-white" id="singlePrevQty">0 Unit</span>
+                                <span class="badge text-white px-2.5 py-1" style="background: #0f172a; border-radius: 20px; font-size: 11px; font-weight: 800;" id="singlePrevQty">0 Unit</span>
                             </div>
                             <div class="text-xs text-secondary font-weight-bold" id="singlePrevNamaBarang">-</div>
-                            <div class="text-xs text-success font-weight-bold mt-1" id="singlePrevInsentif">Insentif: Rp 0</div>
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded-2 mt-2" style="background: #ecfdf5; border: 1px solid #a7f3d0;">
+                                <span class="text-xs text-success font-weight-bold"><i class="fa-solid fa-coins me-1"></i> Subtotal Reward Insentif:</span>
+                                <span class="text-xs font-weight-bold text-success fs-6" id="singlePrevInsentif">Rp 0</span>
+                            </div>
                         </div>
 
-                        <div class="bg-white p-3.5 rounded-3 border mb-3" style="border: 1.5px solid #cbd5e1 !important;">
-                            <label class="form-label-taste"><i class="fa-solid fa-receipt text-primary me-1.5"></i> NOMOR INVOICE / FAKTUR <span class="text-danger">*</span></label>
-                            <input type="text" name="no_inv" id="singleInputNoInv" class="form-control-taste w-100 font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" required>
-                            <div class="text-xs text-muted mt-1">Masukkan nomor faktur resmi yang diterbitkan untuk toko ini.</div>
+                        <!-- Form Input Groups (Clean & Modern) -->
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
+                                <i class="fa-solid fa-receipt text-primary"></i> NOMOR INVOICE / FAKTUR <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="no_inv" id="singleInputNoInv" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" required>
+                            <div class="form-text text-xs text-muted mt-1">Masukkan nomor faktur resmi yang diterbitkan untuk toko ini.</div>
                         </div>
 
-                        <div class="bg-white p-3.5 rounded-3 border mb-3" style="border: 1.5px solid #cbd5e1 !important;">
-                            <label class="form-label-taste"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL INVOICE / FAKTUR <span class="text-danger">*</span></label>
-                            <input type="date" name="tgl_invoice" id="singleInputTglInv" class="form-control-taste w-100 font-weight-bold" value="<?php echo date('Y-m-d'); ?>" required>
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
+                                <i class="fa-regular fa-calendar-days text-primary"></i> TANGGAL INVOICE / FAKTUR <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" name="tgl_invoice" id="singleInputTglInv" class="form-control font-weight-bold" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" value="<?php echo date('Y-m-d'); ?>" required>
                         </div>
 
-                        <div class="bg-white p-3.5 rounded-3 border" style="border: 1.5px solid #cbd5e1 !important;">
-                            <label class="form-label-taste"><i class="fa-regular fa-note-sticky text-secondary me-1.5"></i> Catatan Invoice (Opsional)</label>
-                            <textarea name="catatan_invoice" id="singleInputCatatan" class="form-control-taste w-100" rows="2" placeholder="Catatan nomor faktur / referensi..."></textarea>
+                        <div class="mb-1">
+                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
+                                <i class="fa-regular fa-note-sticky text-secondary"></i> CATATAN INVOICE (OPSIONAL)
+                            </label>
+                            <textarea name="catatan_invoice" id="singleInputCatatan" class="form-control" rows="2" placeholder="Catatan nomor faktur / referensi..." style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer p-3 bg-white border-top">
-                        <button type="button" class="btn-brand-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" id="btnSaveSingleInvoice" class="btn-brand-primary">
+                    <div class="modal-footer p-3 bg-white border-top d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-light px-4 font-weight-bold" style="border-radius: 10px; border: 1.5px solid #e2e8f0; color: #475569;" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" id="btnSaveSingleInvoice" class="btn btn-dark px-4 font-weight-bold" style="border-radius: 10px; background: #0f172a; color: white;">
                             <i class="fa-solid fa-check me-1"></i> Simpan Invoice
                         </button>
                     </div>
@@ -724,10 +734,10 @@ if ($qDealersPreload) {
     <!-- ========================================================================= -->
     <div class="modal fade" id="modalBatchInvoice" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 18px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
-                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; border-radius: 18px 18px 0 0;">
+            <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 25px 50px -12px rgba(15,23,42,0.35); overflow: hidden;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 20px 24px;">
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); border: 1.5px solid rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 18px;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); border: 1.5px solid rgba(16, 185, 129, 0.35); display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 19px;">
                             <i class="fa-solid fa-layer-group"></i>
                         </div>
                         <div>
@@ -739,29 +749,33 @@ if ($qDealersPreload) {
                 </div>
                 
                 <form id="formBatchInvoice" onsubmit="submitBatchInvoice(event)">
-                    <div class="modal-body p-4 bg-light">
-                        <div class="p-3.5 mb-3 rounded-3 bg-white border" style="border: 1.5px solid #cbd5e1 !important;">
+                    <div class="modal-body p-4 bg-white">
+                        <div class="p-3 mb-4 rounded-3" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold text-dark fs-6" id="batchModalSelectedCount">0 Transaksi Terpilih</span>
-                                <span class="badge bg-success" id="batchModalTotalUnit">0 Unit</span>
+                                <span class="badge text-white px-2.5 py-1" style="background: #059669; border-radius: 20px; font-size: 11px; font-weight: 800;" id="batchModalTotalUnit">0 Unit</span>
                             </div>
-                            <div class="text-xs text-muted mt-1" id="batchModalDealerSummary">-</div>
+                            <div class="text-xs text-muted mt-1.5" id="batchModalDealerSummary">-</div>
                         </div>
 
-                        <div class="bg-white p-3.5 rounded-3 border mb-3" style="border: 1.5px solid #cbd5e1 !important;">
-                            <label class="form-label-taste"><i class="fa-solid fa-receipt text-primary me-1.5"></i> NOMOR INVOICE KOLEKTIF <span class="text-danger">*</span></label>
-                            <input type="text" name="no_inv" id="batchInputNoInv" class="form-control-taste w-100 font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" required>
-                            <div class="text-xs text-muted mt-1">Nomor ini akan disimpan ke semua item yang Anda centang.</div>
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
+                                <i class="fa-solid fa-receipt text-primary"></i> NOMOR INVOICE KOLEKTIF <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="no_inv" id="batchInputNoInv" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" required>
+                            <div class="form-text text-xs text-muted mt-1">Nomor ini akan disimpan ke semua item yang Anda centang.</div>
                         </div>
 
-                        <div class="bg-white p-3.5 rounded-3 border" style="border: 1.5px solid #cbd5e1 !important;">
-                            <label class="form-label-taste"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL INVOICE / FAKTUR <span class="text-danger">*</span></label>
-                            <input type="date" name="tgl_invoice" id="batchInputTglInv" class="form-control-taste w-100 font-weight-bold" value="<?php echo date('Y-m-d'); ?>" required>
+                        <div class="mb-1">
+                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
+                                <i class="fa-regular fa-calendar-days text-primary"></i> TANGGAL INVOICE / FAKTUR <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" name="tgl_invoice" id="batchInputTglInv" class="form-control font-weight-bold" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" value="<?php echo date('Y-m-d'); ?>" required>
                         </div>
                     </div>
-                    <div class="modal-footer p-3 bg-white border-top">
-                        <button type="button" class="btn-brand-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" id="btnSaveBatchInvoice" class="btn-brand-primary">
+                    <div class="modal-footer p-3 bg-white border-top d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-light px-4 font-weight-bold" style="border-radius: 10px; border: 1.5px solid #e2e8f0; color: #475569;" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" id="btnSaveBatchInvoice" class="btn btn-dark px-4 font-weight-bold" style="border-radius: 10px; background: #0f172a; color: white;">
                             <i class="fa-solid fa-check me-1"></i> Terapkan ke Semua Item
                         </button>
                     </div>
