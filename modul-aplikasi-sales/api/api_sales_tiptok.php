@@ -1,4 +1,6 @@
 <?php
+ini_set("display_errors", 0);
+error_reporting(0);
 /**
  * API Sales TIP TOK (Titip Barang di Toko / Konsinyasi)
  * Melayani aplikasi mobile Flutter Loewix Sales
@@ -419,7 +421,7 @@ if ($action === 'audit_kunjungan') {
         exit;
     }
 
-    // Validasi No Invoice jika ada unit terjual
+    // Validasi stok
     foreach ($items as $it) {
         $idItem = intval($it['id_item'] ?? 0);
         $stokSisa = intval($it['stok_sisa'] ?? ($it['qty_sisa'] ?? 0));
@@ -434,11 +436,6 @@ if ($action === 'audit_kunjungan') {
             }
             if ($stokSisa > $stokPrev) {
                 echo json_encode(['status' => 'error', 'message' => 'Stok sisa (' . $stokSisa . ') tidak boleh lebih besar dari stok sebelumnya (' . $stokPrev . ')!']);
-                exit;
-            }
-            $terjual = $stokPrev - $stokSisa;
-            if ($terjual > 0 && empty($noInv)) {
-                echo json_encode(['status' => 'error', 'message' => 'Terdapat ' . $terjual . ' unit "' . $cur['nama_barang'] . '" terjual. Nomor Invoice (No. INV) WAJIB DIISI!']);
                 exit;
             }
         }
@@ -457,14 +454,17 @@ if ($action === 'audit_kunjungan') {
 
     foreach ($items as $it) {
         $idItem = intval($it['id_item'] ?? 0);
-        $stokSisa = intval($it['stok_sisa'] ?? 0);
+        $stokSisa = intval($it['stok_sisa'] ?? ($it['qty_sisa'] ?? 0));
         $noInv = trim($it['no_inv'] ?? '');
-        $tglInvoice = !empty($it['tgl_invoice']) ? trim($it['tgl_invoice']) : ($terjual > 0 ? $tglKunjungan : null);
+        $tglInvoice = !empty($it['tgl_invoice']) ? trim($it['tgl_invoice']) : null;
 
         $qCur = $conn->query("SELECT * FROM tiptok_items WHERE id = $idItem AND id_penitipan = $idPenitipan");
         if ($qCur && $cur = $qCur->fetch_assoc()) {
             $stokPrev = intval($cur['qty_sisa']);
             $terjual = max(0, $stokPrev - $stokSisa);
+            if ($terjual > 0 && empty($tglInvoice)) {
+                $tglInvoice = $tglKunjungan;
+            }
             $insentifUnit = floatval($cur['insentif_per_unit']);
             $insentifKunjungan = $terjual * $insentifUnit;
 
@@ -472,8 +472,10 @@ if ($action === 'audit_kunjungan') {
             $kodeKunjungan = $prefixVis . str_pad($lastVisNum, 3, '0', STR_PAD_LEFT);
 
             $stmtLog = $conn->prepare("INSERT INTO tiptok_kunjungan (kode_kunjungan, id_penitipan, id_item, id_sales, nama_sales, tgl_kunjungan, stok_sebelumnya, stok_sisa, qty_terjual_kunjungan, no_inv, tgl_invoice, insentif_didapat, catatan_kunjungan, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-            $stmtLog->bind_param("siiissiiisdds", $kodeKunjungan, $idPenitipan, $idItem, $idSales, $namaSales, $tglKunjungan, $stokPrev, $stokSisa, $terjual, $noInv, $tglInvoice, $insentifKunjungan, $catatanKunjungan);
-            $stmtLog->execute();
+            if ($stmtLog) {
+                $stmtLog->bind_param("siiissiiissds", $kodeKunjungan, $idPenitipan, $idItem, $idSales, $namaSales, $tglKunjungan, $stokPrev, $stokSisa, $terjual, $noInv, $tglInvoice, $insentifKunjungan, $catatanKunjungan);
+                $stmtLog->execute();
+            }
 
             // Update Master Item
             $newTerjualTotal = intval($cur['qty_terjual']) + $terjual;
@@ -481,8 +483,10 @@ if ($action === 'audit_kunjungan') {
             $newItemStatus = ($stokSisa == 0) ? 'habis_terjual' : 'titip';
 
             $stmtUpItem = $conn->prepare("UPDATE tiptok_items SET qty_sisa = ?, qty_terjual = ?, total_insentif = ?, status_item = ?, updated_at = NOW() WHERE id = ?");
-            $stmtUpItem->bind_param("iidsi", $stokSisa, $newTerjualTotal, $newInsentifTotal, $newItemStatus, $idItem);
-            $stmtUpItem->execute();
+            if ($stmtUpItem) {
+                $stmtUpItem->bind_param("iidsi", $stokSisa, $newTerjualTotal, $newInsentifTotal, $newItemStatus, $idItem);
+                $stmtUpItem->execute();
+            }
 
             $totalInsentifDidapat += $insentifKunjungan;
             $totalTerjualKunjungan += $terjual;
