@@ -943,6 +943,119 @@ $loewixPriceList = $tiptokMaster6;
             box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.2);
         }
 
+        /* Dedicated Rock-Solid Controls for TIP TOK Row */
+        .taste-qty-stepper {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: stretch !important;
+            width: 100% !important;
+            height: 44px !important;
+            border: 2px solid #cbd5e1 !important;
+            border-radius: 12px !important;
+            background: #ffffff !important;
+            overflow: hidden !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03) !important;
+            transition: all 0.2s ease !important;
+        }
+        .taste-qty-stepper:focus-within {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+        }
+        .taste-qty-stepper .stepper-btn {
+            width: 44px !important;
+            min-width: 44px !important;
+            height: 100% !important;
+            border: none !important;
+            background: #f1f5f9 !important;
+            color: #334155 !important;
+            font-size: 18px !important;
+            font-weight: 900 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            user-select: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            transition: background 0.15s, color 0.15s !important;
+        }
+        .taste-qty-stepper .stepper-btn:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+        .taste-qty-stepper .stepper-btn:active {
+            background: #cbd5e1 !important;
+        }
+        .taste-qty-stepper input.stepper-input {
+            flex: 1 1 auto !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            height: 100% !important;
+            border: none !important;
+            text-align: center !important;
+            font-size: 16px !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+            background: #ffffff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .taste-addon-input {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: stretch !important;
+            width: 100% !important;
+            height: 44px !important;
+            border: 2px solid #cbd5e1 !important;
+            border-radius: 12px !important;
+            background: #f8fafc !important;
+            overflow: hidden !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03) !important;
+        }
+        .taste-addon-input .addon-label {
+            padding: 0 14px !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: #e2e8f0 !important;
+            color: #475569 !important;
+            font-size: 13px !important;
+            font-weight: 900 !important;
+            border-right: 1.5px solid #cbd5e1 !important;
+            user-select: none !important;
+        }
+        .taste-addon-input input.addon-input-field {
+            flex: 1 1 auto !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            height: 100% !important;
+            border: none !important;
+            text-align: right !important;
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            color: #059669 !important;
+            background: transparent !important;
+            padding: 0 14px !important;
+            margin: 0 !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .taste-subtotal-card {
+            height: 44px !important;
+            border-radius: 12px !important;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.12) 100%) !important;
+            border: 1.5px solid rgba(16, 185, 129, 0.35) !important;
+            padding: 0 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+        }
+
         /* Detail Modal Stat Cards */
         .detail-stat-card {
             border-radius: 14px;
@@ -2251,6 +2364,7 @@ $loewixPriceList = $tiptokMaster6;
             } else {
                 if (inputNama) inputNama.value = '';
                 if (inputTipe) inputTipe.value = '';
+                if (inputInsentif) inputInsentif.value = '';
                 if (badgeEl) badgeEl.classList.add('d-none');
                 if (metaBox) metaBox.classList.add('d-none');
             }
@@ -2269,11 +2383,13 @@ $loewixPriceList = $tiptokMaster6;
         function recalcRowSubtotal(rowIndex, prefix = '') {
             const qtyInp = document.getElementById(`inputQty_${prefix}${rowIndex}`);
             const insentifInp = document.getElementById(`inputInsentif_${prefix}${rowIndex}`);
+            const namaInp = document.getElementById(`inputNama_${prefix}${rowIndex}`);
             const subtotalEl = document.getElementById(`subtotalInsentif_${prefix}${rowIndex}`);
             
+            const isSelected = namaInp && namaInp.value.trim() !== '';
             const qty = parseInt(qtyInp?.value) || 0;
             const insentif = parseFloat(insentifInp?.value) || 0;
-            const subtotal = qty * insentif;
+            const subtotal = isSelected ? (qty * insentif) : 0;
 
             if (subtotalEl) {
                 subtotalEl.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(subtotal)}`;
@@ -2287,17 +2403,21 @@ $loewixPriceList = $tiptokMaster6;
             const container = document.getElementById(containerId);
             if (!container) return;
 
-            const qtyInputs = container.querySelectorAll(`input[id^="inputQty_${prefix}"]`);
-            const insentifInputs = container.querySelectorAll(`input[id^="inputInsentif_${prefix}"]`);
-            
+            const itemRows = container.querySelectorAll('.item-card-row');
             let totalQty = 0;
             let totalInsentif = 0;
             let modelCount = 0;
 
-            qtyInputs.forEach((qInp, i) => {
-                const q = parseInt(qInp.value) || 0;
-                const ins = parseFloat(insentifInputs[i]?.value) || 0;
-                if (q > 0) {
+            itemRows.forEach(row => {
+                const qInp = row.querySelector(`input[id^="inputQty_${prefix}"]`);
+                const insInp = row.querySelector(`input[id^="inputInsentif_${prefix}"]`);
+                const nameInp = row.querySelector(`input[id^="inputNama_${prefix}"]`);
+
+                const isSelected = nameInp && nameInp.value.trim() !== '';
+                const q = parseInt(qInp?.value) || 0;
+                const ins = parseFloat(insInp?.value) || 0;
+
+                if (isSelected && q > 0) {
                     totalQty += q;
                     totalInsentif += (q * ins);
                     modelCount++;
@@ -2585,11 +2705,12 @@ $loewixPriceList = $tiptokMaster6;
 
             const pNama = prefill ? (prefill.type || prefill.nama_barang || '') : '';
             const pTipe = prefill ? (prefill.category || prefill.tipe_barang || '') : '';
-            let pInsentif = '15000';
+            let pInsentif = '';
             if (prefill) {
                 if (prefill.insentif) pInsentif = prefill.insentif;
                 else if (prefill.insentif_per_unit) pInsentif = prefill.insentif_per_unit;
                 else if (pNama.includes('4MP')) pInsentif = '30000';
+                else if (pNama.includes('2MP')) pInsentif = '15000';
             }
             const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : 1;
 
@@ -2615,8 +2736,8 @@ $loewixPriceList = $tiptokMaster6;
 
                     <!-- Single Clean Product Selector -->
                     <div class="mb-3">
-                        <label class="form-label-taste mb-1 d-flex justify-content-between">
-                            <span>PILIH 1 DARI 6 KAMERA RESMI TIP TOK <span class="text-danger">*</span></span>
+                        <label class="form-label-taste mb-1 d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-video text-primary me-1"></i> PILIH 1 DARI 6 KAMERA RESMI TIP TOK <span class="text-danger">*</span></span>
                             <span class="text-primary text-xs" style="cursor: pointer; font-weight: 700;" onclick="openKatalogPriceListModal('tambah')">
                                 <i class="fa-solid fa-eye me-1"></i> Lihat Katalog Visual
                             </span>
@@ -2645,27 +2766,27 @@ $loewixPriceList = $tiptokMaster6;
                         </div>
                     </div>
 
-                    <!-- Qty, Insentif, & Subtotal -->
-                    <div class="row g-2 align-items-center">
+                    <!-- Qty, Insentif, & Subtotal in Bulletproof Custom Controls -->
+                    <div class="row g-2 align-items-end">
                         <div class="col-md-4 col-sm-6">
-                            <label class="form-label-taste mb-1">JUMLAH TITIP <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <button type="button" class="btn btn-outline-secondary px-3 py-2" style="border: 2px solid #cbd5e1; border-right:none; border-radius: 12px 0 0 12px; font-weight: 800;" onclick="stepQty(${itemRowIndex}, -1, '')">-</button>
-                                <input type="number" name="items[${itemRowIndex}][qty_titip]" id="inputQty_${itemRowIndex}" min="1" class="form-control-taste text-center font-weight-bold text-dark fs-6" style="border-radius: 0; border-left: none; border-right: none;" placeholder="0" value="${pQty}" required oninput="recalcRowSubtotal(${itemRowIndex}, '')">
-                                <button type="button" class="btn btn-outline-secondary px-3 py-2" style="border: 2px solid #cbd5e1; border-left:none; border-radius: 0 12px 12px 0; font-weight: 800;" onclick="stepQty(${itemRowIndex}, 1, '')">+</button>
+                            <label class="form-label-taste mb-1.5"><i class="fa-solid fa-boxes-stacked text-primary me-1"></i> JUMLAH TITIP <span class="text-danger">*</span></label>
+                            <div class="taste-qty-stepper">
+                                <button type="button" class="stepper-btn" onclick="stepQty(${itemRowIndex}, -1, '')" title="Kurangi">−</button>
+                                <input type="number" name="items[${itemRowIndex}][qty_titip]" id="inputQty_${itemRowIndex}" min="1" class="stepper-input" value="${pQty}" required oninput="recalcRowSubtotal(${itemRowIndex}, '')">
+                                <button type="button" class="stepper-btn" onclick="stepQty(${itemRowIndex}, 1, '')" title="Tambah">+</button>
                             </div>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <label class="form-label-taste mb-1">TARIF INSENTIF / UNIT</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-secondary font-weight-bold" style="border: 2px solid #cbd5e1; border-right:none; border-radius: 12px 0 0 12px; font-size: 13px;">Rp</span>
-                                <input type="number" name="items[${itemRowIndex}][insentif_per_unit]" id="inputInsentif_${itemRowIndex}" min="0" step="500" class="form-control-taste text-end font-weight-bold text-success fs-6 bg-light" style="border-radius: 0 12px 12px 0; border-left: none;" value="${pInsentif}" readonly>
+                            <label class="form-label-taste mb-1.5"><i class="fa-solid fa-tag text-success me-1"></i> TARIF INSENTIF</label>
+                            <div class="taste-addon-input">
+                                <span class="addon-label">Rp</span>
+                                <input type="number" name="items[${itemRowIndex}][insentif_per_unit]" id="inputInsentif_${itemRowIndex}" min="0" step="500" class="addon-input-field" value="${pInsentif}" placeholder="0" readonly>
                             </div>
                         </div>
                         <div class="col-md-4 col-sm-12">
-                            <label class="form-label-taste mb-1 text-end d-block">SUBTOTAL INSENTIF</label>
-                            <div class="p-2 rounded-3 text-end" style="background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.3);">
-                                <span class="text-xs text-secondary d-block font-weight-bold" style="line-height: 1.1;">Estimasi Komisi:</span>
+                            <label class="form-label-taste mb-1.5 text-end d-block"><i class="fa-solid fa-coins text-warning me-1"></i> SUBTOTAL REWARD</label>
+                            <div class="taste-subtotal-card">
+                                <span class="text-xs text-muted font-weight-bold">Komisi:</span>
                                 <span class="fw-bold text-success fs-6" id="subtotalInsentif_${itemRowIndex}">Rp 0</span>
                             </div>
                         </div>
@@ -2812,8 +2933,8 @@ $loewixPriceList = $tiptokMaster6;
 
                                         <!-- Single Clean Product Selector -->
                                         <div class="mb-3">
-                                            <label class="form-label-taste mb-1 d-flex justify-content-between">
-                                                <span>PILIH 1 DARI 6 KAMERA RESMI TIP TOK <span class="text-danger">*</span></span>
+                                            <label class="form-label-taste mb-1 d-flex justify-content-between align-items-center">
+                                                <span><i class="fa-solid fa-video text-primary me-1"></i> PILIH 1 DARI 6 KAMERA RESMI TIP TOK <span class="text-danger">*</span></span>
                                                 <span class="text-primary text-xs" style="cursor: pointer; font-weight: 700;" onclick="openKatalogPriceListModal('edit')">
                                                     <i class="fa-solid fa-eye me-1"></i> Lihat Katalog Visual
                                                 </span>
@@ -2842,27 +2963,27 @@ $loewixPriceList = $tiptokMaster6;
                                             </div>
                                         </div>
 
-                                        <!-- Qty, Insentif, & Subtotal -->
-                                        <div class="row g-2 align-items-center">
+                                        <!-- Qty, Insentif, & Subtotal in Bulletproof Custom Controls -->
+                                        <div class="row g-2 align-items-end">
                                             <div class="col-md-4 col-sm-6">
-                                                <label class="form-label-taste mb-1">JUMLAH TITIP <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <button type="button" class="btn btn-outline-secondary px-3 py-2" style="border: 2px solid #cbd5e1; border-right:none; border-radius: 12px 0 0 12px; font-weight: 800;" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')">-</button>
-                                                    <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, parseInt(it.qty_terjual) || 1)}" class="form-control-taste text-center font-weight-bold text-dark fs-6" style="border-radius: 0; border-left: none; border-right: none;" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
-                                                    <button type="button" class="btn btn-outline-secondary px-3 py-2" style="border: 2px solid #cbd5e1; border-left:none; border-radius: 0 12px 12px 0; font-weight: 800;" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')">+</button>
+                                                <label class="form-label-taste mb-1.5"><i class="fa-solid fa-boxes-stacked text-primary me-1"></i> JUMLAH TITIP <span class="text-danger">*</span></label>
+                                                <div class="taste-qty-stepper">
+                                                    <button type="button" class="stepper-btn" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
+                                                    <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, parseInt(it.qty_terjual) || 1)}" class="stepper-input" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
+                                                    <button type="button" class="stepper-btn" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 col-sm-6">
-                                                <label class="form-label-taste mb-1">TARIF INSENTIF / UNIT</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text bg-light text-secondary font-weight-bold" style="border: 2px solid #cbd5e1; border-right:none; border-radius: 12px 0 0 12px; font-size: 13px;">Rp</span>
-                                                    <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" min="0" step="500" class="form-control-taste text-end font-weight-bold text-success fs-6 bg-light" style="border-radius: 0 12px 12px 0; border-left: none;" value="${pInsentif}" readonly>
+                                                <label class="form-label-taste mb-1.5"><i class="fa-solid fa-tag text-success me-1"></i> TARIF INSENTIF</label>
+                                                <div class="taste-addon-input">
+                                                    <span class="addon-label">Rp</span>
+                                                    <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" min="0" step="500" class="addon-input-field" value="${pInsentif}" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 col-sm-12">
-                                                <label class="form-label-taste mb-1 text-end d-block">SUBTOTAL INSENTIF</label>
-                                                <div class="p-2 rounded-3 text-end" style="background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.3);">
-                                                    <span class="text-xs text-secondary d-block font-weight-bold" style="line-height: 1.1;">Estimasi Komisi:</span>
+                                                <label class="form-label-taste mb-1.5 text-end d-block"><i class="fa-solid fa-coins text-warning me-1"></i> SUBTOTAL REWARD</label>
+                                                <div class="taste-subtotal-card">
+                                                    <span class="text-xs text-muted font-weight-bold">Komisi:</span>
                                                     <span class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}">Rp 0</span>
                                                 </div>
                                             </div>
@@ -2912,11 +3033,12 @@ $loewixPriceList = $tiptokMaster6;
 
             const pNama = prefill ? (prefill.type || prefill.nama_barang || '') : '';
             const pTipe = prefill ? (prefill.category || prefill.tipe_barang || '') : '';
-            let pInsentif = '15000';
+            let pInsentif = '';
             if (prefill) {
                 if (prefill.insentif) pInsentif = prefill.insentif;
                 else if (prefill.insentif_per_unit) pInsentif = prefill.insentif_per_unit;
                 else if (pNama.includes('4MP')) pInsentif = '30000';
+                else if (pNama.includes('2MP')) pInsentif = '15000';
             }
             const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : 1;
 
@@ -2943,8 +3065,8 @@ $loewixPriceList = $tiptokMaster6;
 
                     <!-- Single Clean Product Selector -->
                     <div class="mb-3">
-                        <label class="form-label-taste mb-1 d-flex justify-content-between">
-                            <span>PILIH 1 DARI 6 KAMERA RESMI TIP TOK <span class="text-danger">*</span></span>
+                        <label class="form-label-taste mb-1 d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-video text-primary me-1"></i> PILIH 1 DARI 6 KAMERA RESMI TIP TOK <span class="text-danger">*</span></span>
                             <span class="text-primary text-xs" style="cursor: pointer; font-weight: 700;" onclick="openKatalogPriceListModal('edit')">
                                 <i class="fa-solid fa-eye me-1"></i> Lihat Katalog Visual
                             </span>
@@ -2973,27 +3095,27 @@ $loewixPriceList = $tiptokMaster6;
                         </div>
                     </div>
 
-                    <!-- Qty, Insentif, & Subtotal -->
-                    <div class="row g-2 align-items-center">
+                    <!-- Qty, Insentif, & Subtotal in Bulletproof Custom Controls -->
+                    <div class="row g-2 align-items-end">
                         <div class="col-md-4 col-sm-6">
-                            <label class="form-label-taste mb-1">JUMLAH TITIP <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <button type="button" class="btn btn-outline-secondary px-3 py-2" style="border: 2px solid #cbd5e1; border-right:none; border-radius: 12px 0 0 12px; font-weight: 800;" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')">-</button>
-                                <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="1" class="form-control-taste text-center font-weight-bold text-dark fs-6" style="border-radius: 0; border-left: none; border-right: none;" placeholder="0" value="${pQty}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
-                                <button type="button" class="btn btn-outline-secondary px-3 py-2" style="border: 2px solid #cbd5e1; border-left:none; border-radius: 0 12px 12px 0; font-weight: 800;" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')">+</button>
+                            <label class="form-label-taste mb-1.5"><i class="fa-solid fa-boxes-stacked text-primary me-1"></i> JUMLAH TITIP <span class="text-danger">*</span></label>
+                            <div class="taste-qty-stepper">
+                                <button type="button" class="stepper-btn" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
+                                <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="1" class="stepper-input" placeholder="0" value="${pQty}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
+                                <button type="button" class="stepper-btn" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
                             </div>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <label class="form-label-taste mb-1">TARIF INSENTIF / UNIT</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-secondary font-weight-bold" style="border: 2px solid #cbd5e1; border-right:none; border-radius: 12px 0 0 12px; font-size: 13px;">Rp</span>
-                                <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" min="0" step="500" class="form-control-taste text-end font-weight-bold text-success fs-6 bg-light" style="border-radius: 0 12px 12px 0; border-left: none;" value="${pInsentif}" readonly>
+                            <label class="form-label-taste mb-1.5"><i class="fa-solid fa-tag text-success me-1"></i> TARIF INSENTIF</label>
+                            <div class="taste-addon-input">
+                                <span class="addon-label">Rp</span>
+                                <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" min="0" step="500" class="addon-input-field" value="${pInsentif}" placeholder="0" readonly>
                             </div>
                         </div>
                         <div class="col-md-4 col-sm-12">
-                            <label class="form-label-taste mb-1 text-end d-block">SUBTOTAL INSENTIF</label>
-                            <div class="p-2 rounded-3 text-end" style="background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.3);">
-                                <span class="text-xs text-secondary d-block font-weight-bold" style="line-height: 1.1;">Estimasi Komisi:</span>
+                            <label class="form-label-taste mb-1.5 text-end d-block"><i class="fa-solid fa-coins text-warning me-1"></i> SUBTOTAL REWARD</label>
+                            <div class="taste-subtotal-card">
+                                <span class="text-xs text-muted font-weight-bold">Komisi:</span>
                                 <span class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}">Rp 0</span>
                             </div>
                         </div>
