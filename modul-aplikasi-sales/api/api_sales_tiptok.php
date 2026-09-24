@@ -375,9 +375,9 @@ if ($action === 'create_penitipan') {
 
     foreach ($items as $it) {
         $namaBarang = trim($it['nama_barang'] ?? '');
-        $tipeBarang = trim($it['tipe_barang'] ?? '');
-        $qtyTitip = intval($it['qty_titip'] ?? 0);
-        $insentifUnit = floatval($it['insentif_per_unit'] ?? 0);
+        $tipeBarang = trim($it['tipe_barang'] ?? ($it['type_barang'] ?? ($it['type'] ?? '')));
+        $qtyTitip = intval($it['qty_titip'] ?? ($it['qty'] ?? 0));
+        $insentifUnit = floatval($it['insentif_per_unit'] ?? ($it['insentif'] ?? 0));
 
         if (!empty($namaBarang) && $qtyTitip > 0) {
             $qtySisa = $qtyTitip;
@@ -422,7 +422,7 @@ if ($action === 'audit_kunjungan') {
     // Validasi No Invoice jika ada unit terjual
     foreach ($items as $it) {
         $idItem = intval($it['id_item'] ?? 0);
-        $stokSisa = intval($it['stok_sisa'] ?? 0);
+        $stokSisa = intval($it['stok_sisa'] ?? ($it['qty_sisa'] ?? 0));
         $noInv = trim($it['no_inv'] ?? '');
 
         $qCur = $conn->query("SELECT * FROM tiptok_items WHERE id = $idItem AND id_penitipan = $idPenitipan");
