@@ -2604,6 +2604,7 @@ $loewixPriceList = $tiptokMaster6;
     <!-- JavaScript & Logic -->
     <script>
         let dealersList = [];
+        let salesListCache = <?php echo json_encode($salesOptionList, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?> || [];
         let currentLoadedPenitipan = null;
         let currentClaimId = 0;
         let editItemRowIndex = 0;
@@ -2917,9 +2918,6 @@ $loewixPriceList = $tiptokMaster6;
                 $(document.getElementById(modalId)).modal('hide');
             }
         }
-
-        let salesListCache = <?php echo json_encode($salesOptionList); ?> || [];
-        let dealersList = <?php echo json_encode($dealerOptionList); ?> || [];
 
         document.addEventListener('DOMContentLoaded', function() {
             updateBadgeCounts();
