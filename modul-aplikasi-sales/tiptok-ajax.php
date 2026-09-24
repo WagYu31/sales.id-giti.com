@@ -220,7 +220,8 @@ if ($action === 'get_product_prices') {
             'type' => '2MP AHD INDOOR LX-4F320-CE',
             'model' => 'LX-4F320-CE',
             'description' => 'Kamera CCTV Loewix 2MP AHD Indoor CatEyes (LX-4F320-CE)',
-            'msrp' => 145000
+            'msrp' => 145000,
+            'insentif' => 15000
         ],
         [
             'id' => 2,
@@ -228,7 +229,8 @@ if ($action === 'get_product_prices') {
             'type' => '2MP AHD OUTDOOR LX-50F320-CM',
             'model' => 'LX-50F320-CM',
             'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor ColorMax (LX-50F320-CM)',
-            'msrp' => 170000
+            'msrp' => 170000,
+            'insentif' => 15000
         ],
         [
             'id' => 3,
@@ -236,7 +238,8 @@ if ($action === 'get_product_prices') {
             'type' => '2MP AHD INDOOR LX-4F320-CM',
             'model' => 'LX-4F320-CM',
             'description' => 'Kamera CCTV Loewix 2MP AHD Indoor ColorMax (LX-4F320-CM)',
-            'msrp' => 145000
+            'msrp' => 145000,
+            'insentif' => 15000
         ],
         [
             'id' => 4,
@@ -244,7 +247,8 @@ if ($action === 'get_product_prices') {
             'type' => '2MP AHD OUTDOOR LX-50F320-CE',
             'model' => 'LX-50F320-CE',
             'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor CatEyes (LX-50F320-CE)',
-            'msrp' => 170000
+            'msrp' => 170000,
+            'insentif' => 15000
         ],
         [
             'id' => 5,
@@ -252,7 +256,8 @@ if ($action === 'get_product_prices') {
             'type' => '4MP IPCAM INDOOR LX-IPF40CMT02',
             'model' => 'LX-IPF40CMT02',
             'description' => 'Kamera CCTV Loewix 4MP IP Camera Indoor (LX-IPF40CMT02)',
-            'msrp' => 350000
+            'msrp' => 350000,
+            'insentif' => 30000
         ],
         [
             'id' => 6,
@@ -260,7 +265,8 @@ if ($action === 'get_product_prices') {
             'type' => '4MP IPCAM OUTDOOR LX-IPF40CMT17',
             'model' => 'LX-IPF40CMT17',
             'description' => 'Kamera CCTV Loewix 4MP IP Camera Outdoor (LX-IPF40CMT17)',
-            'msrp' => 380000
+            'msrp' => 380000,
+            'insentif' => 30000
         ]
     ];
 

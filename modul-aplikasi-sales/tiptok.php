@@ -191,7 +191,8 @@ $tiptokMaster6 = [
         'type' => '2MP AHD INDOOR LX-4F320-CE',
         'model' => 'LX-4F320-CE',
         'description' => 'Kamera CCTV Loewix 2MP AHD Indoor CatEyes (LX-4F320-CE)',
-        'msrp' => 145000
+        'msrp' => 145000,
+        'insentif' => 15000
     ],
     [
         'id' => 2,
@@ -199,7 +200,8 @@ $tiptokMaster6 = [
         'type' => '2MP AHD OUTDOOR LX-50F320-CM',
         'model' => 'LX-50F320-CM',
         'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor ColorMax (LX-50F320-CM)',
-        'msrp' => 170000
+        'msrp' => 170000,
+        'insentif' => 15000
     ],
     [
         'id' => 3,
@@ -207,7 +209,8 @@ $tiptokMaster6 = [
         'type' => '2MP AHD INDOOR LX-4F320-CM',
         'model' => 'LX-4F320-CM',
         'description' => 'Kamera CCTV Loewix 2MP AHD Indoor ColorMax (LX-4F320-CM)',
-        'msrp' => 145000
+        'msrp' => 145000,
+        'insentif' => 15000
     ],
     [
         'id' => 4,
@@ -215,7 +218,8 @@ $tiptokMaster6 = [
         'type' => '2MP AHD OUTDOOR LX-50F320-CE',
         'model' => 'LX-50F320-CE',
         'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor CatEyes (LX-50F320-CE)',
-        'msrp' => 170000
+        'msrp' => 170000,
+        'insentif' => 15000
     ],
     [
         'id' => 5,
@@ -223,7 +227,8 @@ $tiptokMaster6 = [
         'type' => '4MP IPCAM INDOOR LX-IPF40CMT02',
         'model' => 'LX-IPF40CMT02',
         'description' => 'Kamera CCTV Loewix 4MP IP Camera Indoor (LX-IPF40CMT02)',
-        'msrp' => 350000
+        'msrp' => 350000,
+        'insentif' => 30000
     ],
     [
         'id' => 6,
@@ -231,7 +236,8 @@ $tiptokMaster6 = [
         'type' => '4MP IPCAM OUTDOOR LX-IPF40CMT17',
         'model' => 'LX-IPF40CMT17',
         'description' => 'Kamera CCTV Loewix 4MP IP Camera Outdoor (LX-IPF40CMT17)',
-        'msrp' => 380000
+        'msrp' => 380000,
+        'insentif' => 30000
     ]
 ];
 
@@ -1649,10 +1655,11 @@ $loewixPriceList = $tiptokMaster6;
                         <table class="table table-hover align-middle mb-0">
                             <thead style="background: #0f172a; color: #fff; position: sticky; top: 0; z-index: 2;">
                                 <tr>
-                                    <th style="width: 22%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">KATEGORI</th>
-                                    <th style="width: 44%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">NAMA PRODUK & MODEL</th>
-                                    <th style="width: 18%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: right;">MSRP RESMI</th>
-                                    <th style="width: 16%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: center;">AKSI</th>
+                                    <th style="width: 20%; padding: 12px 14px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">KATEGORI</th>
+                                    <th style="width: 36%; padding: 12px 14px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">NAMA PRODUK & MODEL</th>
+                                    <th style="width: 18%; padding: 12px 14px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: center;">INSENTIF / UNIT</th>
+                                    <th style="width: 14%; padding: 12px 14px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: right;">MSRP RESMI</th>
+                                    <th style="width: 12%; padding: 12px 14px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: center;">AKSI</th>
                                 </tr>
                             </thead>
                             <tbody id="katalogProductsBody">
@@ -1672,7 +1679,7 @@ $loewixPriceList = $tiptokMaster6;
     <!-- Datalist Autocomplete 6 Produk TIP TOK Loewix -->
     <datalist id="loewixPriceListDatalist">
         <?php foreach ($loewixPriceList as $p): ?>
-            <option value="<?= htmlspecialchars($p['type']) ?>"><?= htmlspecialchars($p['category']) ?> <?= $p['msrp'] > 0 ? ' - Rp ' . number_format($p['msrp'], 0, ',', '.') : '' ?></option>
+            <option value="<?= htmlspecialchars($p['type']) ?>"><?= htmlspecialchars($p['category']) ?> [Insentif: Rp <?= number_format($p['insentif'] ?? 15000, 0, ',', '.') ?>/Unit]<?= $p['msrp'] > 0 ? ' - Rp ' . number_format($p['msrp'], 0, ',', '.') : '' ?></option>
         <?php endforeach; ?>
     </datalist>
 
@@ -2088,8 +2095,9 @@ $loewixPriceList = $tiptokMaster6;
                 html += `<optgroup label="📂 ${escapeHtml(cat)}">`;
                 groups[cat].forEach(p => {
                     const isSel = (p.type === selectedVal || p.model === selectedVal) ? 'selected' : '';
-                    const priceStr = p.msrp > 0 ? ` (MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)})` : '';
-                    html += `<option value="${escapeHtml(p.type)}" ${isSel}>${escapeHtml(p.type)}${priceStr}</option>`;
+                    const priceStr = p.msrp > 0 ? ` • MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : '';
+                    const insentifStr = p.insentif > 0 ? ` [Insentif: Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)}/Unit]` : '';
+                    html += `<option value="${escapeHtml(p.type)}" ${isSel}>${escapeHtml(p.type)}${insentifStr}${priceStr}</option>`;
                 });
                 html += `</optgroup>`;
             }
@@ -2101,15 +2109,18 @@ $loewixPriceList = $tiptokMaster6;
             const p = loewixProducts.find(item => item.type === selectedType || item.model === selectedType);
             const inputNama = document.getElementById(`inputNama_${prefix}${rowIndex}`);
             const inputTipe = document.getElementById(`inputTipe_${prefix}${rowIndex}`);
+            const inputInsentif = document.getElementById(`inputInsentif_${prefix}${rowIndex}`);
             const infoEl = document.getElementById(`productInfo_${prefix}${rowIndex}`);
             const badgeEl = document.getElementById(`itemCatBadge_${prefix}${rowIndex}`);
 
             if (p) {
                 if (inputNama) inputNama.value = p.type;
                 if (inputTipe) inputTipe.value = p.category;
+                if (inputInsentif && p.insentif) inputInsentif.value = p.insentif;
                 if (infoEl) {
                     const msrpStr = p.msrp > 0 ? ` • MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : '';
-                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> Produk Resmi TIP TOK: ${escapeHtml(p.category)}${msrpStr}</span>`;
+                    const insentifStr = p.insentif > 0 ? ` • <span class="text-success font-weight-bold">Insentif: Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)}/Unit</span>` : '';
+                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> Produk Resmi TIP TOK: ${escapeHtml(p.category)}${insentifStr}${msrpStr}</span>`;
                 }
                 if (badgeEl) {
                     badgeEl.textContent = p.category;
@@ -2123,6 +2134,7 @@ $loewixPriceList = $tiptokMaster6;
         function onNamaBarangInput(rowIndex, prefix = '') {
             const inputNama = document.getElementById(`inputNama_${prefix}${rowIndex}`);
             const inputTipe = document.getElementById(`inputTipe_${prefix}${rowIndex}`);
+            const inputInsentif = document.getElementById(`inputInsentif_${prefix}${rowIndex}`);
             const selectEl = document.getElementById(`selectProduct_${prefix}${rowIndex}`);
             const infoEl = document.getElementById(`productInfo_${prefix}${rowIndex}`);
             const badgeEl = document.getElementById(`itemCatBadge_${prefix}${rowIndex}`);
@@ -2149,10 +2161,14 @@ $loewixPriceList = $tiptokMaster6;
                     inputTipe.value = p.category;
                     inputTipe.dataset.autoFilled = '1';
                 }
+                if (inputInsentif && p.insentif) {
+                    inputInsentif.value = p.insentif;
+                }
                 if (selectEl) selectEl.value = p.type;
                 if (infoEl) {
                     const msrpStr = p.msrp > 0 ? ` • MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : '';
-                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> Produk Resmi TIP TOK: ${escapeHtml(p.category)}${msrpStr}</span>`;
+                    const insentifStr = p.insentif > 0 ? ` • <span class="text-success font-weight-bold">Insentif: Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)}/Unit</span>` : '';
+                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> Produk Resmi TIP TOK: ${escapeHtml(p.category)}${insentifStr}${msrpStr}</span>`;
                 }
                 if (badgeEl) {
                     badgeEl.textContent = p.category;
@@ -2197,7 +2213,7 @@ $loewixPriceList = $tiptokMaster6;
                 const matchSearch = (!query || 
                     (p.type || '').toLowerCase().includes(query) || 
                     (p.category || '').toLowerCase().includes(query) || 
-                    (p.description || '').toLowerCase().includes(query) ||
+                    (p.description || '').toLowerCase().includes(query) || 
                     (p.model || '').toLowerCase().includes(query)
                 );
                 return matchCat && matchSearch;
@@ -2208,7 +2224,7 @@ $loewixPriceList = $tiptokMaster6;
             }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted font-weight-bold">Tidak ada produk yang cocok dengan pencarian.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted font-weight-bold">Tidak ada produk yang cocok dengan pencarian.</td></tr>';
                 return;
             }
 
@@ -2216,6 +2232,8 @@ $loewixPriceList = $tiptokMaster6;
             filtered.forEach(p => {
                 const msrpStr = p.msrp > 0 ? `Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : '-';
                 const descStr = p.description ? `<div class="text-xs text-muted mt-0.5" style="line-height:1.3;">${escapeHtml(p.description)}</div>` : '';
+                const insentifBadge = p.insentif > 0 ? 
+                    `<span class="taste-badge badge-success-tag" style="font-size: 11.5px; font-weight: 800;">Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)}/Unit</span>` : '-';
                 html += `
                     <tr>
                         <td>
@@ -2226,6 +2244,9 @@ $loewixPriceList = $tiptokMaster6;
                         <td>
                             <strong class="text-dark" style="font-size: 13.5px;">${escapeHtml(p.type)}</strong>
                             ${descStr}
+                        </td>
+                        <td class="text-center">
+                            ${insentifBadge}
                         </td>
                         <td class="text-end font-weight-bold text-dark" style="font-size: 13.5px; font-family: monospace;">
                             ${msrpStr}
@@ -2434,7 +2455,12 @@ $loewixPriceList = $tiptokMaster6;
 
             const pNama = prefill ? (prefill.type || prefill.nama_barang || '') : '';
             const pTipe = prefill ? (prefill.category || prefill.tipe_barang || '') : '';
-            const pInsentif = (prefill && prefill.insentif_per_unit) ? prefill.insentif_per_unit : '15000';
+            let pInsentif = '15000';
+            if (prefill) {
+                if (prefill.insentif) pInsentif = prefill.insentif;
+                else if (prefill.insentif_per_unit) pInsentif = prefill.insentif_per_unit;
+                else if (pNama.includes('4MP')) pInsentif = '30000';
+            }
             const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : '';
 
             const rowHtml = `
@@ -2478,7 +2504,7 @@ $loewixPriceList = $tiptokMaster6;
                         </div>
                         <div class="col-md-3">
                             <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
-                            <input type="number" name="items[${itemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end font-weight-bold text-success" placeholder="15000" value="${pInsentif}" required>
+                            <input type="number" name="items[${itemRowIndex}][insentif_per_unit]" id="inputInsentif_${itemRowIndex}" min="0" step="500" class="form-control-taste w-100 text-end font-weight-bold text-success" placeholder="15000" value="${pInsentif}" required>
                         </div>
                     </div>
                 </div>
@@ -2635,7 +2661,7 @@ $loewixPriceList = $tiptokMaster6;
                                             </div>
                                             <div class="col-md-3">
                                                 <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
-                                                <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end font-weight-bold text-success" value="${it.insentif_per_unit}" required>
+                                                <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" min="0" step="500" class="form-control-taste w-100 text-end font-weight-bold text-success" value="${it.insentif_per_unit}" required>
                                             </div>
                                         </div>
                                     </div>
@@ -2678,7 +2704,12 @@ $loewixPriceList = $tiptokMaster6;
 
             const pNama = prefill ? (prefill.type || prefill.nama_barang || '') : '';
             const pTipe = prefill ? (prefill.category || prefill.tipe_barang || '') : '';
-            const pInsentif = (prefill && prefill.insentif_per_unit) ? prefill.insentif_per_unit : '15000';
+            let pInsentif = '15000';
+            if (prefill) {
+                if (prefill.insentif) pInsentif = prefill.insentif;
+                else if (prefill.insentif_per_unit) pInsentif = prefill.insentif_per_unit;
+                else if (pNama.includes('4MP')) pInsentif = '30000';
+            }
             const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : '';
 
             const rowHtml = `
@@ -2723,7 +2754,7 @@ $loewixPriceList = $tiptokMaster6;
                         </div>
                         <div class="col-md-3">
                             <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
-                            <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end font-weight-bold text-success" placeholder="15000" value="${pInsentif}" required>
+                            <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" min="0" step="500" class="form-control-taste w-100 text-end font-weight-bold text-success" placeholder="15000" value="${pInsentif}" required>
                         </div>
                     </div>
                 </div>
