@@ -180,6 +180,24 @@ $sqlPenitipan = "SELECT p.*, $custSelect,
                  GROUP BY p.id 
                  ORDER BY p.id DESC";
 $resPenitipan = $conn->query($sqlPenitipan);
+
+// Fetch Price List Loewix Products for Autocomplete, Dropdowns & Catalog
+$loewixPriceList = [];
+$chkPP = $conn->query("SHOW TABLES LIKE 'product_prices'");
+if ($chkPP && $chkPP->num_rows > 0) {
+    $resPP = $conn->query("SELECT id, category, type, description, msrp FROM product_prices ORDER BY category ASC, type ASC");
+    if ($resPP) {
+        while ($pRow = $resPP->fetch_assoc()) {
+            $loewixPriceList[] = [
+                'id' => (int)$pRow['id'],
+                'category' => $pRow['category'] ?? '',
+                'type' => $pRow['type'] ?? '',
+                'description' => $pRow['description'] ?? '',
+                'msrp' => (float)($pRow['msrp'] ?? 0)
+            ];
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -1394,11 +1412,19 @@ $resPenitipan = $conn->query($sqlPenitipan);
                             <div class="text-sm text-success font-weight-bold mt-1" id="prevTelpToko">-</div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
-                            <label class="form-label-taste mb-0">Daftar Barang Dititipkan <span class="text-danger">*</span></label>
-                            <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="tambahBarisBarang()">
-                                <i class="fa-solid fa-plus me-1"></i> Tambah Baris
-                            </button>
+                        <div class="d-flex justify-content-between align-items-center mb-2 mt-4 flex-wrap gap-2">
+                            <div>
+                                <label class="form-label-taste mb-0">Daftar Barang Dititipkan <span class="text-danger">*</span></label>
+                                <div class="text-xs text-secondary font-weight-bold">Tarik / pilih barang dari Katalog Price List Loewix atau ketik manual</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-3 py-1 mb-0" style="border-radius: 8px; font-size: 12px;" onclick="openKatalogPriceListModal('tambah')">
+                                    <i class="fa-solid fa-tags me-1"></i> Buka Katalog Price List
+                                </button>
+                                <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="tambahBarisBarang()">
+                                    <i class="fa-solid fa-plus me-1"></i> Tambah Baris
+                                </button>
+                            </div>
                         </div>
 
                         <div id="containerItemRows"></div>
@@ -1466,11 +1492,19 @@ $resPenitipan = $conn->query($sqlPenitipan);
                             <div class="text-sm text-success font-weight-bold mt-1" id="editPrevTelpToko">-</div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
-                            <label class="form-label-taste mb-0">Daftar Barang Dititipkan <span class="text-danger">*</span></label>
-                            <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="tambahBarisBarangEdit()">
-                                <i class="fa-solid fa-plus me-1"></i> Tambah Baris
-                            </button>
+                        <div class="d-flex justify-content-between align-items-center mb-2 mt-4 flex-wrap gap-2">
+                            <div>
+                                <label class="form-label-taste mb-0">Daftar Barang Dititipkan <span class="text-danger">*</span></label>
+                                <div class="text-xs text-secondary font-weight-bold">Tarik / pilih barang dari Katalog Price List Loewix atau ketik manual</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-3 py-1 mb-0" style="border-radius: 8px; font-size: 12px;" onclick="openKatalogPriceListModal('edit')">
+                                    <i class="fa-solid fa-tags me-1"></i> Buka Katalog Price List
+                                </button>
+                                <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="tambahBarisBarangEdit()">
+                                    <i class="fa-solid fa-plus me-1"></i> Tambah Baris
+                                </button>
+                            </div>
                         </div>
 
                         <div id="editContainerItemRows"></div>
@@ -1490,6 +1524,79 @@ $resPenitipan = $conn->query($sqlPenitipan);
             </div>
         </div>
     </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL KATALOG PRICE LIST LOEWIX (PILIH PRODUK LANGSUNG)                  -->
+    <!-- ========================================================================= -->
+    <div class="modal fade modal-taste" id="modalKatalogPriceList" tabindex="-1" aria-hidden="true" style="z-index: 1065;">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; padding: 20px 28px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2);">
+                            <i class="fa-solid fa-tags text-warning" style="font-size: 20px;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title font-weight-bold text-white mb-0" style="font-size: 18px;">Katalog Price List Produk Loewix 🏷️</h5>
+                            <span class="text-xs text-white-50 font-weight-bold">Tarik langsung data nama barang & kategori ke form penitipan TIP TOK</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    <!-- Search & Category Filters -->
+                    <div class="row g-2 mb-3 align-items-center">
+                        <div class="col-md-7">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0" style="border: 1.5px solid #cbd5e1; border-right: none; border-radius: 10px 0 0 10px;"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                                <input type="text" id="katalogSearchInput" class="form-control bg-white border-start-0 ps-0" style="border: 1.5px solid #cbd5e1; border-left: none; border-radius: 0 10px 10px 0; font-size: 13.5px; font-weight: 600;" placeholder="Cari tipe barang, kategori, spesifikasi..." oninput="filterKatalogProducts()">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <select id="katalogCategorySelect" class="form-select bg-white" style="border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 13px; font-weight: 700;" onchange="filterKatalogProducts()">
+                                <option value="all">Semua Kategori (Semua Produk)</option>
+                                <?php 
+                                    $kats = array_unique(array_filter(array_column($loewixPriceList, 'category')));
+                                    sort($kats);
+                                    foreach ($kats as $cat): 
+                                ?>
+                                    <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Products Table -->
+                    <div class="table-responsive bg-white rounded-3 border" style="max-height: 480px; overflow-y: auto; border: 1.5px solid #cbd5e1 !important;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead style="background: #0f172a; color: #fff; position: sticky; top: 0; z-index: 2;">
+                                <tr>
+                                    <th style="width: 18%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">KATEGORI</th>
+                                    <th style="width: 44%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">TIPE & DESKRIPSI</th>
+                                    <th style="width: 20%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: right;">MSRP (HARGA USER)</th>
+                                    <th style="width: 18%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: center;">AKSI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="katalogProductsBody">
+                                <!-- Loaded dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer p-3 bg-white border-top justify-content-between">
+                    <span class="text-xs text-secondary font-weight-bold" id="katalogCountInfo">Menampilkan <?= count($loewixPriceList) ?> Produk Price List</span>
+                    <button type="button" class="btn btn-secondary px-4 font-weight-bold" data-bs-dismiss="modal">Tutup Katalog</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datalist Autocomplete Produk Loewix -->
+    <datalist id="loewixPriceListDatalist">
+        <?php foreach ($loewixPriceList as $p): ?>
+            <option value="<?= htmlspecialchars($p['type']) ?>"><?= htmlspecialchars($p['category']) ?> <?= $p['msrp'] > 0 ? ' - Rp ' . number_format($p['msrp'], 0, ',', '.') : '' ?></option>
+        <?php endforeach; ?>
+    </datalist>
 
     <!-- ========================================================================= -->
     <!-- MODAL 2: LAPORAN KUNJUNGAN & CEK STOK SISA                                -->
@@ -1880,6 +1987,205 @@ $resPenitipan = $conn->query($sqlPenitipan);
         let currentClaimId = 0;
         let editItemRowIndex = 0;
 
+        // Loewix Products from Price List (product_prices)
+        const loewixProducts = <?php echo json_encode($loewixPriceList, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        let katalogTargetModal = 'tambah'; // 'tambah' or 'edit'
+
+        // =========================================================================
+        // HELPER FUNGSI TARIK DATA PRICE LIST LOEWIX KE NAMA BARANG
+        // =========================================================================
+        function renderPriceListOptions(selectedVal = '') {
+            if (!loewixProducts || loewixProducts.length === 0) {
+                return '<option value="" disabled>Belum ada produk di database Price List</option>';
+            }
+            const groups = {};
+            loewixProducts.forEach(p => {
+                const cat = p.category || 'PRODUK LAINNYA';
+                if (!groups[cat]) groups[cat] = [];
+                groups[cat].push(p);
+            });
+
+            let html = '';
+            for (const cat in groups) {
+                html += `<optgroup label="📂 ${escapeHtml(cat)}">`;
+                groups[cat].forEach(p => {
+                    const isSel = (p.type === selectedVal) ? 'selected' : '';
+                    const priceStr = p.msrp > 0 ? ` (Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)})` : '';
+                    html += `<option value="${escapeHtml(p.type)}" ${isSel}>${escapeHtml(p.type)}${priceStr}</option>`;
+                });
+                html += `</optgroup>`;
+            }
+            return html;
+        }
+
+        function onSelectPriceListProduct(selectEl, rowIndex, prefix = '') {
+            const selectedType = selectEl.value;
+            const p = loewixProducts.find(item => item.type === selectedType);
+            const inputNama = document.getElementById(`inputNama_${prefix}${rowIndex}`);
+            const inputTipe = document.getElementById(`inputTipe_${prefix}${rowIndex}`);
+            const infoEl = document.getElementById(`productInfo_${prefix}${rowIndex}`);
+            const badgeEl = document.getElementById(`itemCatBadge_${prefix}${rowIndex}`);
+
+            if (p) {
+                if (inputNama) inputNama.value = p.type;
+                if (inputTipe) inputTipe.value = p.category;
+                if (infoEl) {
+                    const msrpStr = p.msrp > 0 ? ` • MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : '';
+                    const descSnippet = p.description ? ` • <span class="text-secondary">${escapeHtml(p.description.substring(0, 45))}</span>` : '';
+                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> ${escapeHtml(p.category)}${msrpStr}</span>${descSnippet}`;
+                }
+                if (badgeEl) {
+                    badgeEl.textContent = p.category;
+                    badgeEl.classList.remove('d-none');
+                }
+            } else if (!selectedType) {
+                if (infoEl) infoEl.innerHTML = '';
+            }
+        }
+
+        function onNamaBarangInput(rowIndex, prefix = '') {
+            const inputNama = document.getElementById(`inputNama_${prefix}${rowIndex}`);
+            const inputTipe = document.getElementById(`inputTipe_${prefix}${rowIndex}`);
+            const selectEl = document.getElementById(`selectProduct_${prefix}${rowIndex}`);
+            const infoEl = document.getElementById(`productInfo_${prefix}${rowIndex}`);
+            const badgeEl = document.getElementById(`itemCatBadge_${prefix}${rowIndex}`);
+
+            if (!inputNama) return;
+            const val = inputNama.value.trim();
+            if (!val) {
+                if (infoEl) infoEl.innerHTML = '';
+                if (badgeEl) badgeEl.classList.add('d-none');
+                if (selectEl) selectEl.value = '';
+                return;
+            }
+
+            // Cari kecocokan exact / case-insensitive di loewixProducts
+            const p = loewixProducts.find(item => 
+                item.type.toLowerCase() === val.toLowerCase() || 
+                (item.category + ' ' + item.type).toLowerCase() === val.toLowerCase()
+            );
+
+            if (p) {
+                if (inputTipe && (!inputTipe.value || inputTipe.value === 'CCTV / NVR' || inputTipe.dataset.autoFilled === '1')) {
+                    inputTipe.value = p.category;
+                    inputTipe.dataset.autoFilled = '1';
+                }
+                if (selectEl) selectEl.value = p.type;
+                if (infoEl) {
+                    const msrpStr = p.msrp > 0 ? ` • MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : '';
+                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> Terdaftar di Price List: ${escapeHtml(p.category)}${msrpStr}</span>`;
+                }
+                if (badgeEl) {
+                    badgeEl.textContent = p.category;
+                    badgeEl.classList.remove('d-none');
+                }
+            } else {
+                if (selectEl) selectEl.value = '';
+                if (infoEl) {
+                    infoEl.innerHTML = `<span class="text-muted font-weight-bold"><i class="fa-solid fa-pen"></i> Item Kustom / Manual</span>`;
+                }
+                if (badgeEl) badgeEl.classList.add('d-none');
+            }
+        }
+
+        // =========================================================================
+        // MODAL KATALOG PRICE LIST BROWSER
+        // =========================================================================
+        function openKatalogPriceListModal(target = 'tambah') {
+            katalogTargetModal = target;
+            const searchInp = document.getElementById('katalogSearchInput');
+            if (searchInp) searchInp.value = '';
+            const catSel = document.getElementById('katalogCategorySelect');
+            if (catSel) catSel.value = 'all';
+            renderKatalogProducts('', 'all');
+            showModalSafe('modalKatalogPriceList');
+        }
+
+        function filterKatalogProducts() {
+            const search = (document.getElementById('katalogSearchInput')?.value || '').toLowerCase().trim();
+            const cat = document.getElementById('katalogCategorySelect')?.value || 'all';
+            renderKatalogProducts(search, cat);
+        }
+
+        function renderKatalogProducts(filterSearch = '', filterCat = 'all') {
+            const tbody = document.getElementById('katalogProductsBody');
+            const countInfo = document.getElementById('katalogCountInfo');
+            if (!tbody) return;
+
+            let filtered = loewixProducts.filter(p => {
+                const matchCat = (filterCat === 'all' || p.category === filterCat);
+                const query = filterSearch.toLowerCase();
+                const matchSearch = (!query || 
+                    (p.type || '').toLowerCase().includes(query) || 
+                    (p.category || '').toLowerCase().includes(query) || 
+                    (p.description || '').toLowerCase().includes(query)
+                );
+                return matchCat && matchSearch;
+            });
+
+            if (countInfo) {
+                countInfo.textContent = `Menampilkan ${filtered.length} dari total ${loewixProducts.length} Produk Price List`;
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted font-weight-bold">Tidak ada produk yang cocok dengan pencarian.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(p => {
+                const msrpStr = p.msrp > 0 ? `Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : '-';
+                const descStr = p.description ? `<div class="text-xs text-muted mt-0.5" style="line-height:1.3;">${escapeHtml(p.description)}</div>` : '';
+                html += `
+                    <tr>
+                        <td>
+                            <span class="taste-badge badge-dealer-tag" style="font-size: 11px;">
+                                ${escapeHtml(p.category)}
+                            </span>
+                        </td>
+                        <td>
+                            <strong class="text-dark" style="font-size: 13.5px;">${escapeHtml(p.type)}</strong>
+                            ${descStr}
+                        </td>
+                        <td class="text-end font-weight-bold text-dark" style="font-size: 13.5px; font-family: monospace;">
+                            ${msrpStr}
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-primary font-weight-bold px-3 py-1 mb-0" style="border-radius: 8px; font-size: 12px;" onclick="pilihProdukDariKatalog(${p.id})">
+                                <i class="fa-solid fa-plus me-1"></i> Pilih Barang
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function pilihProdukDariKatalog(prodId) {
+            const p = loewixProducts.find(item => item.id == prodId);
+            if (!p) return;
+
+            hideModalSafe('modalKatalogPriceList');
+
+            if (katalogTargetModal === 'edit') {
+                tambahBarisBarangEdit(p);
+            } else {
+                tambahBarisBarang(p);
+            }
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
+            Toast.fire({
+                icon: 'success',
+                title: `Ditambahkan: ${p.type}`
+            });
+        }
+
         function escapeHtml(text) {
             if (!text && text !== 0) return '';
             return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -2041,39 +2347,66 @@ $resPenitipan = $conn->query($sqlPenitipan);
         }
 
         let itemRowIndex = 0;
-        function tambahBarisBarang() {
+        function tambahBarisBarang(prefill = null) {
             itemRowIndex++;
             const container = document.getElementById('containerItemRows');
             if (!container) return;
+
+            const pNama = prefill ? (prefill.type || prefill.nama_barang || '') : '';
+            const pTipe = prefill ? (prefill.category || prefill.tipe_barang || '') : '';
+            const pInsentif = (prefill && prefill.insentif_per_unit) ? prefill.insentif_per_unit : '15000';
+            const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : '';
+
             const rowHtml = `
                 <div class="item-card-row" id="itemRow_${itemRowIndex}">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="taste-badge badge-neutral" style="font-size: 13px;">Item #${itemRowIndex}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="taste-badge badge-neutral" style="font-size: 13px;">Item #${itemRowIndex}</span>
+                            <span class="taste-badge badge-dealer-tag ${pTipe ? '' : 'd-none'}" id="itemCatBadge_${itemRowIndex}">${escapeHtml(pTipe)}</span>
+                        </div>
                         <button type="button" class="btn btn-sm btn-link text-danger p-0 mb-0 font-weight-bold" onclick="hapusBarisBarang(${itemRowIndex})">
                             <i class="fa-solid fa-trash-can me-1"></i> Hapus
                         </button>
                     </div>
+
+                    <!-- Quick Tarik dari Price List Loewix -->
+                    <div class="mb-2 p-2 rounded-2" style="background: rgba(37, 99, 235, 0.05); border: 1.5px dashed rgba(37, 99, 235, 0.35);">
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="font-size: 11px; font-weight: 800; color: #2563eb; white-space: nowrap;">
+                                <i class="fa-solid fa-tags"></i> TARIK PRICE LIST:
+                            </span>
+                            <select id="selectProduct_${itemRowIndex}" class="form-select form-select-sm bg-white" style="font-size: 12px; font-weight: 700; border-radius: 8px; border: 1.5px solid #cbd5e1;" onchange="onSelectPriceListProduct(this, ${itemRowIndex}, '')">
+                                <option value="">-- Cari & Pilih Produk Loewix (${loewixProducts.length} Produk) --</option>
+                                ${renderPriceListOptions(pNama)}
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="row g-2">
                         <div class="col-md-5">
                             <label class="form-label-taste mb-1">NAMA BARANG <span class="text-danger">*</span></label>
-                            <input type="text" name="items[${itemRowIndex}][nama_barang]" class="form-control-taste w-100" placeholder="CCTV Loewix 2MP Outdoor" required>
+                            <input type="text" name="items[${itemRowIndex}][nama_barang]" id="inputNama_${itemRowIndex}" list="loewixPriceListDatalist" class="form-control-taste w-100" placeholder="Ketik atau pilih tipe produk..." value="${escapeHtml(pNama)}" required oninput="onNamaBarangInput(${itemRowIndex}, '')">
+                            <div id="productInfo_${itemRowIndex}" class="small mt-1 font-weight-bold" style="font-size: 11px; min-height: 16px;"></div>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label-taste mb-1">TIPE / KATEGORI</label>
-                            <input type="text" name="items[${itemRowIndex}][tipe_barang]" class="form-control-taste w-100" placeholder="CCTV / NVR">
+                            <input type="text" name="items[${itemRowIndex}][tipe_barang]" id="inputTipe_${itemRowIndex}" class="form-control-taste w-100" placeholder="CCTV / NVR" value="${escapeHtml(pTipe)}">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label-taste mb-1">QTY TITIP <span class="text-danger">*</span></label>
-                            <input type="number" name="items[${itemRowIndex}][qty_titip]" min="1" class="form-control-taste w-100 text-center" placeholder="Jml" required>
+                            <input type="number" name="items[${itemRowIndex}][qty_titip]" min="1" class="form-control-taste w-100 text-center font-weight-bold" placeholder="Jml" value="${pQty}" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
-                            <input type="number" name="items[${itemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end" placeholder="15000" required>
+                            <input type="number" name="items[${itemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end font-weight-bold text-success" placeholder="15000" value="${pInsentif}" required>
                         </div>
                     </div>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', rowHtml);
+            if (pNama) {
+                onNamaBarangInput(itemRowIndex, '');
+            }
         }
 
         function hapusBarisBarang(idx) {
@@ -2186,30 +2519,49 @@ $resPenitipan = $conn->query($sqlPenitipan);
                                     <div class="item-card-row" id="editItemRow_${editItemRowIndex}">
                                         <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="${it.id}">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="taste-badge badge-neutral" style="font-size: 13px;">Item #${editItemRowIndex}</span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="taste-badge badge-neutral" style="font-size: 13px;">Item #${editItemRowIndex}</span>
+                                                <span class="taste-badge badge-dealer-tag ${it.tipe_barang ? '' : 'd-none'}" id="itemCatBadge_edit_${editItemRowIndex}">${escapeHtml(it.tipe_barang || '')}</span>
+                                            </div>
                                             ${deleteBtn}
                                         </div>
+
+                                        <!-- Quick Tarik dari Price List Loewix -->
+                                        <div class="mb-2 p-2 rounded-2" style="background: rgba(37, 99, 235, 0.05); border: 1.5px dashed rgba(37, 99, 235, 0.35);">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span style="font-size: 11px; font-weight: 800; color: #2563eb; white-space: nowrap;">
+                                                    <i class="fa-solid fa-tags"></i> TARIK PRICE LIST:
+                                                </span>
+                                                <select id="selectProduct_edit_${editItemRowIndex}" class="form-select form-select-sm bg-white" style="font-size: 12px; font-weight: 700; border-radius: 8px; border: 1.5px solid #cbd5e1;" onchange="onSelectPriceListProduct(this, ${editItemRowIndex}, 'edit_')">
+                                                    <option value="">-- Ganti dari Price List Loewix --</option>
+                                                    ${renderPriceListOptions(it.nama_barang)}
+                                                </select>
+                                            </div>
+                                        </div>
+
                                         <div class="row g-2">
                                             <div class="col-md-5">
                                                 <label class="form-label-taste mb-1">NAMA BARANG <span class="text-danger">*</span></label>
-                                                <input type="text" name="items[${editItemRowIndex}][nama_barang]" class="form-control-taste w-100" value="${escapeHtml(it.nama_barang)}" required>
+                                                <input type="text" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" list="loewixPriceListDatalist" class="form-control-taste w-100" value="${escapeHtml(it.nama_barang)}" required oninput="onNamaBarangInput(${editItemRowIndex}, 'edit_')">
+                                                <div id="productInfo_edit_${editItemRowIndex}" class="small mt-1 font-weight-bold" style="font-size: 11px; min-height: 16px;"></div>
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label-taste mb-1">TIPE / KATEGORI</label>
-                                                <input type="text" name="items[${editItemRowIndex}][tipe_barang]" class="form-control-taste w-100" value="${escapeHtml(it.tipe_barang || '')}">
+                                                <input type="text" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" class="form-control-taste w-100" value="${escapeHtml(it.tipe_barang || '')}">
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label-taste mb-1">QTY TITIP <span class="text-danger">*</span></label>
-                                                <input type="number" name="items[${editItemRowIndex}][qty_titip]" min="${Math.max(1, parseInt(it.qty_terjual) || 1)}" class="form-control-taste w-100 text-center" value="${it.qty_titip}" required>
+                                                <input type="number" name="items[${editItemRowIndex}][qty_titip]" min="${Math.max(1, parseInt(it.qty_terjual) || 1)}" class="form-control-taste w-100 text-center font-weight-bold" value="${it.qty_titip}" required>
                                             </div>
                                             <div class="col-md-3">
                                                 <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
-                                                <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end" value="${it.insentif_per_unit}" required>
+                                                <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end font-weight-bold text-success" value="${it.insentif_per_unit}" required>
                                             </div>
                                         </div>
                                     </div>
                                 `;
                                 container.insertAdjacentHTML('beforeend', rowHtml);
+                                onNamaBarangInput(editItemRowIndex, 'edit_');
                             });
                         }
                     } else {
@@ -2239,40 +2591,67 @@ $resPenitipan = $conn->query($sqlPenitipan);
             }
         }
 
-        function tambahBarisBarangEdit() {
+        function tambahBarisBarangEdit(prefill = null) {
             editItemRowIndex++;
             const container = document.getElementById('editContainerItemRows');
             if (!container) return;
+
+            const pNama = prefill ? (prefill.type || prefill.nama_barang || '') : '';
+            const pTipe = prefill ? (prefill.category || prefill.tipe_barang || '') : '';
+            const pInsentif = (prefill && prefill.insentif_per_unit) ? prefill.insentif_per_unit : '15000';
+            const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : '';
+
             const rowHtml = `
                 <div class="item-card-row" id="editItemRow_${editItemRowIndex}">
                     <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="0">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="taste-badge badge-neutral" style="font-size: 13px;">Item Baru #${editItemRowIndex}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="taste-badge badge-neutral" style="font-size: 13px;">Item Baru #${editItemRowIndex}</span>
+                            <span class="taste-badge badge-dealer-tag ${pTipe ? '' : 'd-none'}" id="itemCatBadge_edit_${editItemRowIndex}">${escapeHtml(pTipe)}</span>
+                        </div>
                         <button type="button" class="btn btn-sm btn-link text-danger p-0 mb-0 font-weight-bold" onclick="hapusBarisBarangEdit(${editItemRowIndex})">
                             <i class="fa-solid fa-trash-can me-1"></i> Hapus
                         </button>
                     </div>
+
+                    <!-- Quick Tarik dari Price List Loewix -->
+                    <div class="mb-2 p-2 rounded-2" style="background: rgba(37, 99, 235, 0.05); border: 1.5px dashed rgba(37, 99, 235, 0.35);">
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="font-size: 11px; font-weight: 800; color: #2563eb; white-space: nowrap;">
+                                <i class="fa-solid fa-tags"></i> TARIK PRICE LIST:
+                            </span>
+                            <select id="selectProduct_edit_${editItemRowIndex}" class="form-select form-select-sm bg-white" style="font-size: 12px; font-weight: 700; border-radius: 8px; border: 1.5px solid #cbd5e1;" onchange="onSelectPriceListProduct(this, ${editItemRowIndex}, 'edit_')">
+                                <option value="">-- Cari & Pilih Produk Loewix (${loewixProducts.length} Produk) --</option>
+                                ${renderPriceListOptions(pNama)}
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="row g-2">
                         <div class="col-md-5">
                             <label class="form-label-taste mb-1">NAMA BARANG <span class="text-danger">*</span></label>
-                            <input type="text" name="items[${editItemRowIndex}][nama_barang]" class="form-control-taste w-100" placeholder="Nama Barang" required>
+                            <input type="text" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" list="loewixPriceListDatalist" class="form-control-taste w-100" placeholder="Ketik atau pilih tipe produk..." value="${escapeHtml(pNama)}" required oninput="onNamaBarangInput(${editItemRowIndex}, 'edit_')">
+                            <div id="productInfo_edit_${editItemRowIndex}" class="small mt-1 font-weight-bold" style="font-size: 11px; min-height: 16px;"></div>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label-taste mb-1">TIPE / KATEGORI</label>
-                            <input type="text" name="items[${editItemRowIndex}][tipe_barang]" class="form-control-taste w-100" placeholder="CCTV / NVR">
+                            <input type="text" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" class="form-control-taste w-100" placeholder="CCTV / NVR" value="${escapeHtml(pTipe)}">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label-taste mb-1">QTY TITIP <span class="text-danger">*</span></label>
-                            <input type="number" name="items[${editItemRowIndex}][qty_titip]" min="1" class="form-control-taste w-100 text-center" placeholder="Jml" required>
+                            <input type="number" name="items[${editItemRowIndex}][qty_titip]" min="1" class="form-control-taste w-100 text-center font-weight-bold" placeholder="Jml" value="${pQty}" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label-taste mb-1">INSENTIF / UNIT (RP) <span class="text-danger">*</span></label>
-                            <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end" placeholder="15000" required>
+                            <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" min="0" step="500" class="form-control-taste w-100 text-end font-weight-bold text-success" placeholder="15000" value="${pInsentif}" required>
                         </div>
                     </div>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', rowHtml);
+            if (pNama) {
+                onNamaBarangInput(editItemRowIndex, 'edit_');
+            }
         }
 
         function hapusBarisBarangEdit(idx) {

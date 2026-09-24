@@ -210,6 +210,49 @@ if ($action === 'search_dealer') {
 }
 
 // -------------------------------------------------------------
+// 1.1 CARI / AMBIL DAFTAR PRODUK DARI PRICE LIST LOEWIX
+// -------------------------------------------------------------
+if ($action === 'get_product_prices') {
+    $products = [];
+    $chkPP = mysqli_query($conn, "SHOW TABLES LIKE 'product_prices'");
+    if ($chkPP && mysqli_num_rows($chkPP) > 0) {
+        $q = trim($_GET['q'] ?? '');
+        if (!empty($q)) {
+            $stmt = $conn->prepare("SELECT id, category, type, description, msrp FROM product_prices WHERE category LIKE ? OR type LIKE ? OR description LIKE ? ORDER BY category ASC, type ASC");
+            $like = "%$q%";
+            $stmt->bind_param("sss", $like, $like, $like);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            while ($row = $res->fetch_assoc()) {
+                $products[] = [
+                    'id' => (int)$row['id'],
+                    'category' => $row['category'] ?? '',
+                    'type' => $row['type'] ?? '',
+                    'description' => $row['description'] ?? '',
+                    'msrp' => (float)($row['msrp'] ?? 0)
+                ];
+            }
+            $stmt->close();
+        } else {
+            $res = mysqli_query($conn, "SELECT id, category, type, description, msrp FROM product_prices ORDER BY category ASC, type ASC");
+            if ($res) {
+                while ($row = mysqli_fetch_assoc($res)) {
+                    $products[] = [
+                        'id' => (int)$row['id'],
+                        'category' => $row['category'] ?? '',
+                        'type' => $row['type'] ?? '',
+                        'description' => $row['description'] ?? '',
+                        'msrp' => (float)($row['msrp'] ?? 0)
+                    ];
+                }
+            }
+        }
+    }
+    echo json_encode(['status' => 'success', 'data' => $products]);
+    exit;
+}
+
+// -------------------------------------------------------------
 // 2. SIMPAN PENITIPAN BARU (MASTER + MULTI ITEM)
 // -------------------------------------------------------------
 if ($action === 'simpan_penitipan') {
