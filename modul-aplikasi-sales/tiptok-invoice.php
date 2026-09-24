@@ -41,20 +41,10 @@ $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
-    <title>Halaman Khusus No. Invoice TIP TOK - Loewix Sales</title>
-
-    <!-- Google Fonts & FontAwesome -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>No. Invoice TIP TOK | Loewix Sales</title>
+    <?php include "head.php"; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
-    <!-- Argon / Soft UI Theme CSS -->
-    <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
         :root {
@@ -69,9 +59,10 @@ $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
         }
 
         body {
-            font-family: var(--font-main);
-            background-color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             color: #0f172a;
+            min-height: 100vh;
         }
 
         /* Hero Banner */
@@ -602,6 +593,8 @@ $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
             </div>
 
         </div>
+
+        <?php include "footer.php"; ?>
     </main>
 
     <!-- ========================================================================= -->
