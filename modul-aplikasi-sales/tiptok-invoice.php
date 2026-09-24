@@ -18,7 +18,7 @@ if ($chkSC && $chkSC->num_rows > 0) {
 }
 
 // Initial counts for PHP preload
-$whereSales = ($role === 'Sales') ? " AND k.id_sales = '$idSesi' " : "";
+$whereSales = ($role === 'Sales') ? " AND (p.id_sales = '$idSesi' OR k.id_sales = '$idSesi') " : "";
 $qInitStats = $conn->query("SELECT 
     COUNT(k.id) AS total_trx,
     SUM(k.qty_terjual_kunjungan) AS total_unit,
@@ -27,6 +27,7 @@ $qInitStats = $conn->query("SELECT
     SUM(CASE WHEN k.no_inv IS NOT NULL AND TRIM(k.no_inv) != '' THEN k.qty_terjual_kunjungan ELSE 0 END) AS invoiced_unit,
     SUM(k.insentif_didapat) AS total_insentif
     FROM tiptok_kunjungan k 
+    JOIN tiptok_penitipan p ON k.id_penitipan = p.id
     WHERE k.qty_terjual_kunjungan > 0 $whereSales");
 $initStat = $qInitStats ? $qInitStats->fetch_assoc() : [];
 $statTotalUnit = intval($initStat['total_unit'] ?? 0);

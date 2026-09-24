@@ -684,13 +684,15 @@ if ($action === 'get_claim_summary') {
     // Ambil data kunjungan yang menghasilkan penjualan dan belum masuk ke claim
     $whereSales = "";
     if ($jabatanUser === 'Sales') {
-        $whereSales = " AND k.id_sales = '$idUser' ";
+        $whereSales = " AND (p.id_sales = '$idUser' OR k.id_sales = '$idUser') ";
     }
 
     $custJoin = $hasSalesCustomer ? "JOIN sales_customer c ON p.id_customer = c.id" : "JOIN customers c ON p.id_customer = c.id";
     $custField = $hasSalesCustomer ? "c.nama" : "c.nama_toko";
 
-    $sql = "SELECT k.id AS id_kunjungan, k.id_penitipan, k.id_item, k.kode_kunjungan, k.nama_sales, k.tgl_kunjungan, 
+    $sql = "SELECT k.id AS id_kunjungan, k.id_penitipan, k.id_item, k.kode_kunjungan, 
+                   COALESCE(NULLIF(p.nama_sales, ''), k.nama_sales) AS nama_sales, 
+                   k.tgl_kunjungan, 
                    k.qty_terjual_kunjungan, k.no_inv, k.tgl_invoice, k.insentif_didapat, 
                    i.nama_barang, i.tipe_barang, i.insentif_per_unit, 
                    p.kode_titip, $custField AS nama_toko 
@@ -1141,12 +1143,19 @@ if ($action === 'get_tiptok_invoices') {
     $tgl_mulai = trim($_GET['tgl_mulai'] ?? '');
     $tgl_akhir = trim($_GET['tgl_akhir'] ?? '');
 
+    // Auto-sync kunjungan sales dengan sales penitipan jika ada perbedaan
+    @$conn->query("UPDATE tiptok_kunjungan k 
+                   JOIN tiptok_penitipan p ON k.id_penitipan = p.id 
+                   SET k.id_sales = p.id_sales, k.nama_sales = p.nama_sales 
+                   WHERE p.nama_sales IS NOT NULL AND p.nama_sales != '' 
+                     AND (k.nama_sales != p.nama_sales OR k.id_sales != p.id_sales OR k.id_sales IS NULL OR k.id_sales = 0)");
+
     $where = ["k.qty_terjual_kunjungan > 0"];
 
     if ($jabatanUser === 'Sales') {
-        $where[] = "k.id_sales = '$idUser'";
+        $where[] = "(p.id_sales = '$idUser' OR k.id_sales = '$idUser')";
     } elseif ($id_sales_filter > 0) {
-        $where[] = "k.id_sales = '$id_sales_filter'";
+        $where[] = "(p.id_sales = '$id_sales_filter' OR k.id_sales = '$id_sales_filter')";
     }
 
     if ($statusInv === 'pending') {
@@ -1175,12 +1184,14 @@ if ($action === 'get_tiptok_invoices') {
 
     if (!empty($search)) {
         $safeSearch = $conn->real_escape_string($search);
-        $where[] = "($custField LIKE '%$safeSearch%' OR p.kode_titip LIKE '%$safeSearch%' OR k.kode_kunjungan LIKE '%$safeSearch%' OR i.nama_barang LIKE '%$safeSearch%' OR k.no_inv LIKE '%$safeSearch%' OR k.nama_sales LIKE '%$safeSearch%')";
+        $where[] = "($custField LIKE '%$safeSearch%' OR p.kode_titip LIKE '%$safeSearch%' OR k.kode_kunjungan LIKE '%$safeSearch%' OR i.nama_barang LIKE '%$safeSearch%' OR k.no_inv LIKE '%$safeSearch%' OR p.nama_sales LIKE '%$safeSearch%' OR k.nama_sales LIKE '%$safeSearch%')";
     }
 
     $whereClause = implode(" AND ", $where);
 
-    $sql = "SELECT k.id AS id_kunjungan, k.id_penitipan, k.id_item, k.id_sales, k.nama_sales, 
+    $sql = "SELECT k.id AS id_kunjungan, k.id_penitipan, k.id_item, 
+                   COALESCE(NULLIF(p.id_sales, 0), k.id_sales) AS id_sales, 
+                   COALESCE(NULLIF(p.nama_sales, ''), k.nama_sales) AS nama_sales, 
                    k.kode_kunjungan, k.tgl_kunjungan, k.stok_sebelumnya, k.stok_sisa, 
                    k.qty_terjual_kunjungan, k.no_inv, k.tgl_invoice, k.insentif_didapat, 
                    k.catatan_kunjungan, k.foto_kunjungan, k.id_claim, k.created_at,
