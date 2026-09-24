@@ -721,6 +721,7 @@ $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
         document.addEventListener('DOMContentLoaded', () => {
             loadInvoicesData();
             loadDealerFilterOptions();
+            loadSalesFilterOptions();
         });
 
         function showModalSafe(id) {
@@ -776,6 +777,24 @@ $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
                             sel.innerHTML = '<option value="0">-- Semua Toko Dealer --</option>';
                             res.data.forEach(d => {
                                 sel.innerHTML += `<option value="${d.id}">${escapeHtml(d.nama)} - ${escapeHtml(d.kota || '')}</option>`;
+                            });
+                        }
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+
+        function loadSalesFilterOptions() {
+            fetch('tiptok-ajax.php?action=get_sales_list')
+                .then(r => r.json())
+                .then(res => {
+                    if (res && res.status === 'success' && Array.isArray(res.data)) {
+                        const sel = document.getElementById('filterSalesSelect');
+                        if (sel) {
+                            sel.innerHTML = '<option value="0">-- Semua Sales PIC --</option>';
+                            res.data.forEach(s => {
+                                const jabText = s.jabatan ? ` (${s.jabatan})` : '';
+                                sel.innerHTML += `<option value="${s.id}">${escapeHtml(s.nama)}${escapeHtml(jabText)}</option>`;
                             });
                         }
                     }
@@ -925,7 +944,11 @@ $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
                         <td>
                             <div class="font-weight-bold text-dark" style="font-size: 13px;"><i class="fa-regular fa-calendar-check text-primary me-1"></i> ${escapeHtml(it.tgl_kunjungan)}</div>
                             <div class="font-monospace text-xs text-secondary font-weight-bold mt-0.5">${escapeHtml(it.kode_kunjungan)}</div>
-                            <div class="text-xs text-muted mt-0.5"><i class="fa-solid fa-user-tie me-1"></i> ${escapeHtml(it.nama_sales || 'Sales')}</div>
+                            <div class="mt-1">
+                                <span class="badge" style="background: rgba(37,99,235,0.1); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.25); font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 700;">
+                                    <i class="fa-solid fa-user-tie me-1"></i> ${escapeHtml(it.nama_sales || 'Sales')}
+                                </span>
+                            </div>
                         </td>
                         <td>
                             ${statusPill}

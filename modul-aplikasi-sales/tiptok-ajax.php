@@ -317,6 +317,33 @@ if ($action === 'get_product_prices') {
 }
 
 // -------------------------------------------------------------
+// 1.5. GET DAFTAR SALES PIC (UNTUK DROPDOWN & FILTER SALES)
+// -------------------------------------------------------------
+if ($action === 'get_sales_list' || $action === 'search_sales') {
+    $colNama = "nama_lengkap";
+    $chkCol = @$conn->query("SHOW COLUMNS FROM sales LIKE 'nama_lengkap'");
+    if (!$chkCol || $chkCol->num_rows == 0) {
+        $colNama = "nama";
+    }
+
+    $sql = "SELECT id, $colNama AS nama, role AS jabatan, email FROM sales WHERE deleted_at IS NULL ORDER BY (role = 'sales') DESC, $colNama ASC";
+    $res = $conn->query($sql);
+    $salesList = [];
+    if ($res) {
+        while ($r = $res->fetch_assoc()) {
+            $salesList[] = [
+                'id' => intval($r['id']),
+                'nama' => $r['nama'] ?? 'Sales',
+                'jabatan' => $r['jabatan'] ?? 'Sales',
+                'email' => $r['email'] ?? ''
+            ];
+        }
+    }
+    echo json_encode(['status' => 'success', 'data' => $salesList]);
+    exit;
+}
+
+// -------------------------------------------------------------
 // 2. SIMPAN PENITIPAN BARU (MASTER + MULTI ITEM)
 // -------------------------------------------------------------
 if ($action === 'simpan_penitipan') {
@@ -324,6 +351,22 @@ if ($action === 'simpan_penitipan') {
     $tgl_titip = trim($_POST['tgl_titip'] ?? date('Y-m-d'));
     $catatan = trim($_POST['catatan'] ?? '');
     $items = $_POST['items'] ?? [];
+    $id_sales_input = intval($_POST['id_sales'] ?? 0);
+
+    $target_id_sales = $idUser;
+    $target_nama_sales = $namaUser;
+
+    if ($id_sales_input > 0 && $jabatanUser !== 'Sales') {
+        $target_id_sales = $id_sales_input;
+        $chkS = $conn->query("SELECT nama_lengkap FROM sales WHERE id = '$target_id_sales' LIMIT 1");
+        if (!$chkS || $chkS->num_rows == 0) {
+            $chkS = $conn->query("SELECT nama FROM sales WHERE id = '$target_id_sales' LIMIT 1");
+        }
+        if ($chkS && $chkS->num_rows > 0) {
+            $rowS = $chkS->fetch_assoc();
+            $target_nama_sales = $rowS['nama_lengkap'] ?? ($rowS['nama'] ?? $namaUser);
+        }
+    }
 
     if ($id_customer <= 0) {
         echo json_encode(['status' => 'error', 'message' => 'Silakan pilih toko/dealer tujuan.']);
@@ -349,7 +392,7 @@ if ($action === 'simpan_penitipan') {
 
     // Insert master penitipan
     $stmtMaster = $conn->prepare("INSERT INTO tiptok_penitipan (kode_titip, id_customer, id_sales, nama_sales, tgl_titip, status, catatan, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'aktif', ?, NOW(), NOW())");
-    $stmtMaster->bind_param("siisss", $kode_titip, $id_customer, $idUser, $namaUser, $tgl_titip, $catatan);
+    $stmtMaster->bind_param("siisss", $kode_titip, $id_customer, $target_id_sales, $target_nama_sales, $tgl_titip, $catatan);
     
     if (!$stmtMaster->execute()) {
         echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan data master: ' . $stmtMaster->error]);
@@ -566,6 +609,18 @@ if ($action === 'simpan_kunjungan') {
         $nextVisNum = $lastSeq + 1;
     }
 
+    // Ambil data sales dari master penitipan jika input dilakukan oleh level admin
+    $qMasterPen = $conn->query("SELECT id_sales, nama_sales FROM tiptok_penitipan WHERE id = $id_penitipan LIMIT 1");
+    $mPen = $qMasterPen ? $qMasterPen->fetch_assoc() : null;
+
+    $kunjungan_id_sales = $idUser;
+    $kunjungan_nama_sales = $namaUser;
+
+    if ($jabatanUser !== 'Sales' && !empty($mPen['nama_sales'])) {
+        $kunjungan_id_sales = intval($mPen['id_sales']) > 0 ? intval($mPen['id_sales']) : $idUser;
+        $kunjungan_nama_sales = $mPen['nama_sales'];
+    }
+
     // Eksekusi update dan insert log
     foreach ($items as $item) {
         $id_item = intval($item['id_item'] ?? 0);
@@ -584,7 +639,7 @@ if ($action === 'simpan_kunjungan') {
 
         // Insert log kunjungan
         $stmtLog = $conn->prepare("INSERT INTO tiptok_kunjungan (kode_kunjungan, id_penitipan, id_item, id_sales, nama_sales, tgl_kunjungan, stok_sebelumnya, stok_sisa, qty_terjual_kunjungan, no_inv, tgl_invoice, insentif_didapat, catatan_kunjungan, foto_kunjungan, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmtLog->bind_param("siiissiiissdss", $kode_kunjungan, $id_penitipan, $id_item, $idUser, $namaUser, $tgl_kunjungan, $stok_sebelumnya, $stok_sisa_baru, $terjual, $no_inv, $tgl_invoice, $insentif_didapat, $catatan_kunjungan, $foto_filename);
+        $stmtLog->bind_param("siiissiiissdss", $kode_kunjungan, $id_penitipan, $id_item, $kunjungan_id_sales, $kunjungan_nama_sales, $tgl_kunjungan, $stok_sebelumnya, $stok_sisa_baru, $terjual, $no_inv, $tgl_invoice, $insentif_didapat, $catatan_kunjungan, $foto_filename);
         $stmtLog->execute();
         $stmtLog->close();
 
@@ -935,11 +990,31 @@ if ($action === 'update_penitipan') {
 
     $conn->begin_transaction();
     try {
+        $target_id_sales = intval($_POST['id_sales'] ?? ($master['id_sales'] ?? $idUser));
+        $target_nama_sales = $master['nama_sales'] ?? $namaUser;
+
+        if ($target_id_sales > 0 && $jabatanUser !== 'Sales') {
+            $chkS = $conn->query("SELECT nama_lengkap FROM sales WHERE id = '$target_id_sales' LIMIT 1");
+            if (!$chkS || $chkS->num_rows == 0) {
+                $chkS = $conn->query("SELECT nama FROM sales WHERE id = '$target_id_sales' LIMIT 1");
+            }
+            if ($chkS && $chkS->num_rows > 0) {
+                $rowS = $chkS->fetch_assoc();
+                $target_nama_sales = $rowS['nama_lengkap'] ?? ($rowS['nama'] ?? $target_nama_sales);
+            }
+        }
+
         // Update master
-        $stmtUp = $conn->prepare("UPDATE tiptok_penitipan SET id_customer = ?, tgl_titip = ?, catatan = ?, status = ?, updated_at = NOW() WHERE id = ?");
-        $stmtUp->bind_param("isssi", $id_customer, $tgl_titip, $catatan, $status, $id_penitipan);
+        $stmtUp = $conn->prepare("UPDATE tiptok_penitipan SET id_customer = ?, id_sales = ?, nama_sales = ?, tgl_titip = ?, catatan = ?, status = ?, updated_at = NOW() WHERE id = ?");
+        $stmtUp->bind_param("iissssi", $id_customer, $target_id_sales, $target_nama_sales, $tgl_titip, $catatan, $status, $id_penitipan);
         $stmtUp->execute();
         $stmtUp->close();
+
+        // Sync sales to related kunjungan logs if updated
+        if ($target_id_sales > 0) {
+            $safeSalesName = $conn->real_escape_string($target_nama_sales);
+            $conn->query("UPDATE tiptok_kunjungan SET id_sales = '$target_id_sales', nama_sales = '$safeSalesName' WHERE id_penitipan = $id_penitipan");
+        }
 
         // Ambil existing items di database
         $qExist = $conn->query("SELECT * FROM tiptok_items WHERE id_penitipan = $id_penitipan");

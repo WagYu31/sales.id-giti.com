@@ -1800,13 +1800,21 @@ $loewixPriceList = $tiptokMaster6;
                         <!-- Toko & Tanggal Card -->
                         <div class="bg-white p-3.5 rounded-3 mb-3 border" style="border: 1.5px solid #e2e8f0 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                             <div class="row g-3">
-                                <div class="col-md-8">
-                                    <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN (MITRA TIP TOK) <span class="text-danger">*</span></label>
+                                <div class="col-md-<?php echo ($role !== 'Sales') ? '5' : '8'; ?>">
+                                    <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
                                     <select name="id_customer" id="selectDealer" class="form-control-taste w-100" required onchange="onDealerSelected()">
                                         <option value="">-- Cari / Pilih Toko Mitra TIP TOK --</option>
                                     </select>
                                 </div>
+                                <?php if ($role !== 'Sales') : ?>
                                 <div class="col-md-4">
+                                    <label class="form-label-taste"><i class="fa-solid fa-user-tie text-primary me-1.5"></i> SALES PIC <span class="text-danger">*</span></label>
+                                    <select name="id_sales" id="selectSalesTambah" class="form-control-taste w-100" required>
+                                        <option value="">-- Pilih Sales PIC --</option>
+                                    </select>
+                                </div>
+                                <?php endif; ?>
+                                <div class="col-md-<?php echo ($role !== 'Sales') ? '3' : '4'; ?>">
                                     <label class="form-label-taste"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL TITIP <span class="text-danger">*</span></label>
                                     <input type="date" name="tgl_titip" class="form-control-taste w-100 font-weight-bold" value="<?php echo date('Y-m-d'); ?>" required>
                                 </div>
@@ -1900,17 +1908,25 @@ $loewixPriceList = $tiptokMaster6;
                     <div class="modal-body p-4 bg-light">
                         <div class="bg-white p-3.5 rounded-3 mb-3 border" style="border: 1.5px solid #e2e8f0 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                             <div class="row g-3">
-                                <div class="col-md-5">
+                                <div class="col-md-<?php echo ($role !== 'Sales') ? '4' : '5'; ?>">
                                     <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
                                     <select name="id_customer" id="editSelectDealer" class="form-control-taste w-100" required onchange="onEditDealerSelected()">
                                         <option value="">-- Pilih Toko Mitra TIP TOK --</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <?php if ($role !== 'Sales') : ?>
+                                <div class="col-md-3">
+                                    <label class="form-label-taste"><i class="fa-solid fa-user-tie text-primary me-1.5"></i> SALES PIC <span class="text-danger">*</span></label>
+                                    <select name="id_sales" id="editSelectSales" class="form-control-taste w-100" required>
+                                        <option value="">-- Pilih Sales PIC --</option>
+                                    </select>
+                                </div>
+                                <?php endif; ?>
+                                <div class="col-md-<?php echo ($role !== 'Sales') ? '3' : '4'; ?>">
                                     <label class="form-label-taste"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL TITIP <span class="text-danger">*</span></label>
                                     <input type="date" name="tgl_titip" id="editTglTitip" class="form-control-taste w-100 font-weight-bold" required>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-<?php echo ($role !== 'Sales') ? '2' : '3'; ?>">
                                     <label class="form-label-taste"><i class="fa-solid fa-signal text-primary me-1.5"></i> STATUS <span class="text-danger">*</span></label>
                                     <select name="status" id="editStatusPenitipan" class="form-control-taste w-100 font-weight-bold" required>
                                         <option value="aktif">Aktif</option>
@@ -2826,11 +2842,33 @@ $loewixPriceList = $tiptokMaster6;
             }
         }
 
+        let salesListCache = [];
+
         document.addEventListener('DOMContentLoaded', function() {
             updateBadgeCounts();
             loadDealers();
+            loadSalesOptions();
             tambahBarisBarang();
         });
+
+        function loadSalesOptions() {
+            fetch('tiptok-ajax.php?action=get_sales_list')
+                .then(r => r.json())
+                .then(res => {
+                    if (res && res.status === 'success' && Array.isArray(res.data)) {
+                        salesListCache = res.data;
+                        const selTambah = document.getElementById('selectSalesTambah');
+                        if (selTambah) {
+                            selTambah.innerHTML = '<option value="">-- Pilih Sales PIC --</option>';
+                            salesListCache.forEach(s => {
+                                const jabText = s.jabatan ? ` (${s.jabatan})` : '';
+                                selTambah.innerHTML += `<option value="${s.id}">${escapeHtml(s.nama)}${escapeHtml(jabText)}</option>`;
+                            });
+                        }
+                    }
+                })
+                .catch(err => console.error('Error loading sales list:', err));
+        }
 
         function updateBadgeCounts() {
             const bAll = document.getElementById('badgeCountAll');
@@ -3152,6 +3190,17 @@ $loewixPriceList = $tiptokMaster6;
                             });
                         }
                         onEditDealerSelected();
+
+                        // Dropdown sales PIC
+                        const selSales = document.getElementById('editSelectSales');
+                        if (selSales && Array.isArray(salesListCache)) {
+                            selSales.innerHTML = '<option value="">-- Pilih Sales PIC --</option>';
+                            salesListCache.forEach(s => {
+                                const selected = (s.id == m.id_sales) ? 'selected' : '';
+                                const jabText = s.jabatan ? ` (${s.jabatan})` : '';
+                                selSales.innerHTML += `<option value="${s.id}" ${selected}>${escapeHtml(s.nama)}${escapeHtml(jabText)}</option>`;
+                            });
+                        }
 
                         // Render items
                         container.innerHTML = '';
