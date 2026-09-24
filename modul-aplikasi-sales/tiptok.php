@@ -181,6 +181,56 @@ $sqlPenitipan = "SELECT p.*, $custSelect,
                  ORDER BY p.id DESC";
 $resPenitipan = $conn->query($sqlPenitipan);
 
+// Ambil daftar sales aktif untuk dropdown & filter PIC (Preload)
+$colNamaSales = "nama_lengkap";
+$chkColSales = @$conn->query("SHOW COLUMNS FROM sales LIKE 'nama_lengkap'");
+if (!$chkColSales || $chkColSales->num_rows == 0) {
+    $colNamaSales = "nama";
+}
+$qSalesList = $conn->query("SELECT id, $colNamaSales AS nama_sales, role FROM sales WHERE deleted_at IS NULL ORDER BY (role = 'sales') DESC, $colNamaSales ASC");
+$salesOptionList = [];
+if ($qSalesList) {
+    while ($sRow = $qSalesList->fetch_assoc()) {
+        $salesOptionList[] = [
+            'id' => intval($sRow['id']),
+            'nama' => $sRow['nama_sales'] ?? 'Sales',
+            'jabatan' => $sRow['role'] ?? 'Sales'
+        ];
+    }
+}
+
+// Preload Dealers for TIP TOK
+$dealerOptionList = [];
+if ($hasSalesCustomer) {
+    $qDealersPreload = $conn->query("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
+                                     FROM sales_customer 
+                                     WHERE deleted_at IS NULL 
+                                     ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 500");
+} else {
+    $qDealersPreload = $conn->query("SELECT c.id, c.id AS kode_customer, c.nama_toko AS nama, c.kategori, 
+                                            (SELECT tlp_pic FROM customer_pics WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS telp_pribadi,
+                                            (SELECT alamat FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat,
+                                            (SELECT kota FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS kota,
+                                            (SELECT link_google_map FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_lokasi
+                                     FROM customers c 
+                                     WHERE c.deleted_at IS NULL 
+                                     ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 500");
+}
+if ($qDealersPreload) {
+    while ($dRow = $qDealersPreload->fetch_assoc()) {
+        $dealerOptionList[] = [
+            'id' => intval($dRow['id']),
+            'kode_customer' => $dRow['kode_customer'] ?? '',
+            'nama' => $dRow['nama'] ?? '',
+            'kategori' => $dRow['kategori'] ?? 'Dealer',
+            'telp_pribadi' => $dRow['telp_pribadi'] ?? '',
+            'alamat' => $dRow['alamat'] ?? '',
+            'kota' => $dRow['kota'] ?? '',
+            'alamat_lokasi' => $dRow['alamat_lokasi'] ?? ''
+        ];
+    }
+}
+
 // =========================================================================
 // 6 PRODUK RESMI PROGRAM TIP TOK (KONSINYASI LOEWIX)
 // =========================================================================
@@ -1804,6 +1854,16 @@ $loewixPriceList = $tiptokMaster6;
                                     <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
                                     <select name="id_customer" id="selectDealer" class="form-control-taste w-100" required onchange="onDealerSelected()">
                                         <option value="">-- Cari / Pilih Toko Mitra TIP TOK --</option>
+                                        <?php if (empty($dealerOptionList)) : ?>
+                                            <option value="" disabled>⚠️ Belum ada toko bertanda TIP TOK. Tandai toko di menu Customer terlebih dahulu.</option>
+                                        <?php else: ?>
+                                            <?php foreach ($dealerOptionList as $d) : 
+                                                $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
+                                                $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
+                                            ?>
+                                                <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($katBadge . $d['nama'] . $kotaText); ?></option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                                 <?php if ($role !== 'Sales') : ?>
@@ -1811,6 +1871,11 @@ $loewixPriceList = $tiptokMaster6;
                                     <label class="form-label-taste"><i class="fa-solid fa-user-tie text-primary me-1.5"></i> SALES PIC <span class="text-danger">*</span></label>
                                     <select name="id_sales" id="selectSalesTambah" class="form-control-taste w-100" required>
                                         <option value="">-- Pilih Sales PIC --</option>
+                                        <?php foreach ($salesOptionList as $s) : ?>
+                                            <option value="<?php echo $s['id']; ?>" <?php echo ($s['id'] == $idSesi) ? 'selected' : ''; ?>>
+                                                <?php echo htmlspecialchars($s['nama']); ?><?php echo !empty($s['jabatan']) ? ' (' . htmlspecialchars($s['jabatan']) . ')' : ''; ?>
+                                            </option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <?php endif; ?>
@@ -1912,6 +1977,12 @@ $loewixPriceList = $tiptokMaster6;
                                     <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
                                     <select name="id_customer" id="editSelectDealer" class="form-control-taste w-100" required onchange="onEditDealerSelected()">
                                         <option value="">-- Pilih Toko Mitra TIP TOK --</option>
+                                        <?php foreach ($dealerOptionList as $d) : 
+                                            $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
+                                            $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
+                                        ?>
+                                            <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($katBadge . $d['nama'] . $kotaText); ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <?php if ($role !== 'Sales') : ?>
@@ -1919,6 +1990,11 @@ $loewixPriceList = $tiptokMaster6;
                                     <label class="form-label-taste"><i class="fa-solid fa-user-tie text-primary me-1.5"></i> SALES PIC <span class="text-danger">*</span></label>
                                     <select name="id_sales" id="editSelectSales" class="form-control-taste w-100" required>
                                         <option value="">-- Pilih Sales PIC --</option>
+                                        <?php foreach ($salesOptionList as $s) : ?>
+                                            <option value="<?php echo $s['id']; ?>">
+                                                <?php echo htmlspecialchars($s['nama']); ?><?php echo !empty($s['jabatan']) ? ' (' . htmlspecialchars($s['jabatan']) . ')' : ''; ?>
+                                            </option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <?php endif; ?>
@@ -2842,7 +2918,8 @@ $loewixPriceList = $tiptokMaster6;
             }
         }
 
-        let salesListCache = [];
+        let salesListCache = <?php echo json_encode($salesOptionList); ?> || [];
+        let dealersList = <?php echo json_encode($dealerOptionList); ?> || [];
 
         document.addEventListener('DOMContentLoaded', function() {
             updateBadgeCounts();
@@ -2851,20 +2928,29 @@ $loewixPriceList = $tiptokMaster6;
             tambahBarisBarang();
         });
 
+        function populateSalesSelects() {
+            if (!Array.isArray(salesListCache) || salesListCache.length === 0) return;
+            const selTambah = document.getElementById('selectSalesTambah');
+            if (selTambah) {
+                const curVal = selTambah.value;
+                let html = '<option value="">-- Pilih Sales PIC --</option>';
+                salesListCache.forEach(s => {
+                    const jabText = s.jabatan ? ` (${s.jabatan})` : '';
+                    const isSel = (s.id == curVal) ? 'selected' : '';
+                    html += `<option value="${s.id}" ${isSel}>${escapeHtml(s.nama)}${escapeHtml(jabText)}</option>`;
+                });
+                selTambah.innerHTML = html;
+            }
+        }
+
         function loadSalesOptions() {
+            populateSalesSelects();
             fetch('tiptok-ajax.php?action=get_sales_list')
                 .then(r => r.json())
                 .then(res => {
-                    if (res && res.status === 'success' && Array.isArray(res.data)) {
+                    if (res && res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
                         salesListCache = res.data;
-                        const selTambah = document.getElementById('selectSalesTambah');
-                        if (selTambah) {
-                            selTambah.innerHTML = '<option value="">-- Pilih Sales PIC --</option>';
-                            salesListCache.forEach(s => {
-                                const jabText = s.jabatan ? ` (${s.jabatan})` : '';
-                                selTambah.innerHTML += `<option value="${s.id}">${escapeHtml(s.nama)}${escapeHtml(jabText)}</option>`;
-                            });
-                        }
+                        populateSalesSelects();
                     }
                 })
                 .catch(err => console.error('Error loading sales list:', err));
@@ -3108,6 +3194,7 @@ $loewixPriceList = $tiptokMaster6;
         function openModalTambahPenitipan() {
             const form = document.getElementById('formTambahPenitipan');
             if (form) form.reset();
+            populateSalesSelects();
             const prev = document.getElementById('dealerPreview');
             if (prev) prev.classList.add('d-none');
             const container = document.getElementById('containerItemRows');

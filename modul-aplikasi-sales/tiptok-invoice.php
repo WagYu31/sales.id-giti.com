@@ -35,6 +35,56 @@ $statPendingUnit = intval($initStat['pending_unit'] ?? 0);
 $statPendingTrx = intval($initStat['pending_trx'] ?? 0);
 $statInvoicedUnit = intval($initStat['invoiced_unit'] ?? 0);
 $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
+
+// Preload Sales PIC list
+$colNamaSales = "nama_lengkap";
+$chkColSales = @$conn->query("SHOW COLUMNS FROM sales LIKE 'nama_lengkap'");
+if (!$chkColSales || $chkColSales->num_rows == 0) {
+    $colNamaSales = "nama";
+}
+$qSalesList = $conn->query("SELECT id, $colNamaSales AS nama_sales, role FROM sales WHERE deleted_at IS NULL ORDER BY (role = 'sales') DESC, $colNamaSales ASC");
+$salesOptionList = [];
+if ($qSalesList) {
+    while ($sRow = $qSalesList->fetch_assoc()) {
+        $salesOptionList[] = [
+            'id' => intval($sRow['id']),
+            'nama' => $sRow['nama_sales'] ?? 'Sales',
+            'jabatan' => $sRow['role'] ?? 'Sales'
+        ];
+    }
+}
+
+// Preload Dealers list
+$dealerOptionList = [];
+if ($hasSalesCustomer) {
+    $qDealersPreload = $conn->query("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
+                                     FROM sales_customer 
+                                     WHERE deleted_at IS NULL 
+                                     ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 500");
+} else {
+    $qDealersPreload = $conn->query("SELECT c.id, c.id AS kode_customer, c.nama_toko AS nama, c.kategori, 
+                                            (SELECT tlp_pic FROM customer_pics WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS telp_pribadi,
+                                            (SELECT alamat FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat,
+                                            (SELECT kota FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS kota,
+                                            (SELECT link_google_map FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_lokasi
+                                     FROM customers c 
+                                     WHERE c.deleted_at IS NULL 
+                                     ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 500");
+}
+if ($qDealersPreload) {
+    while ($dRow = $qDealersPreload->fetch_assoc()) {
+        $dealerOptionList[] = [
+            'id' => intval($dRow['id']),
+            'kode_customer' => $dRow['kode_customer'] ?? '',
+            'nama' => $dRow['nama'] ?? '',
+            'kategori' => $dRow['kategori'] ?? 'Dealer',
+            'telp_pribadi' => $dRow['telp_pribadi'] ?? '',
+            'alamat' => $dRow['alamat'] ?? '',
+            'kota' => $dRow['kota'] ?? '',
+            'alamat_lokasi' => $dRow['alamat_lokasi'] ?? ''
+        ];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -523,13 +573,24 @@ $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
                         <label class="form-label-taste mb-1">Filter Toko / Dealer Mitra</label>
                         <select id="filterDealerSelect" class="form-control-taste w-100" onchange="loadInvoicesData()">
                             <option value="0">-- Semua Toko Dealer --</option>
+                            <?php foreach ($dealerOptionList as $d) : 
+                                $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
+                                $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
+                            ?>
+                                <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($katBadge . $d['nama'] . $kotaText); ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <?php if ($role !== 'Sales') : ?>
                         <div class="col-md-3">
                             <label class="form-label-taste mb-1">Filter Sales PIC</label>
                             <select id="filterSalesSelect" class="form-control-taste w-100" onchange="loadInvoicesData()">
-                                <option value="0">-- Semua Sales --</option>
+                                <option value="0">-- Semua Sales PIC --</option>
+                                <?php foreach ($salesOptionList as $s) : ?>
+                                    <option value="<?php echo $s['id']; ?>">
+                                        <?php echo htmlspecialchars($s['nama']); ?><?php echo !empty($s['jabatan']) ? ' (' . htmlspecialchars($s['jabatan']) . ')' : ''; ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                     <?php endif; ?>
@@ -772,13 +833,16 @@ $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
             fetch('tiptok-ajax.php?action=search_dealer')
                 .then(r => r.json())
                 .then(res => {
-                    if (res && res.status === 'success' && Array.isArray(res.data)) {
+                    if (res && res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
                         const sel = document.getElementById('filterDealerSelect');
                         if (sel) {
-                            sel.innerHTML = '<option value="0">-- Semua Toko Dealer --</option>';
+                            const curVal = sel.value;
+                            let html = '<option value="0">-- Semua Toko Dealer --</option>';
                             res.data.forEach(d => {
-                                sel.innerHTML += `<option value="${d.id}">${escapeHtml(d.nama)} - ${escapeHtml(d.kota || '')}</option>`;
+                                const isSel = (d.id == curVal) ? 'selected' : '';
+                                html += `<option value="${d.id}" ${isSel}>${escapeHtml(d.nama)} - ${escapeHtml(d.kota || '')}</option>`;
                             });
+                            sel.innerHTML = html;
                         }
                     }
                 })
@@ -789,14 +853,17 @@ $statTotalInsentif = floatval($initStat['total_insentif'] ?? 0);
             fetch('tiptok-ajax.php?action=get_sales_list')
                 .then(r => r.json())
                 .then(res => {
-                    if (res && res.status === 'success' && Array.isArray(res.data)) {
+                    if (res && res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
                         const sel = document.getElementById('filterSalesSelect');
                         if (sel) {
-                            sel.innerHTML = '<option value="0">-- Semua Sales PIC --</option>';
+                            const curVal = sel.value;
+                            let html = '<option value="0">-- Semua Sales PIC --</option>';
                             res.data.forEach(s => {
                                 const jabText = s.jabatan ? ` (${s.jabatan})` : '';
-                                sel.innerHTML += `<option value="${s.id}">${escapeHtml(s.nama)}${escapeHtml(jabText)}</option>`;
+                                const isSel = (s.id == curVal) ? 'selected' : '';
+                                html += `<option value="${s.id}" ${isSel}>${escapeHtml(s.nama)}${escapeHtml(jabText)}</option>`;
                             });
+                            sel.innerHTML = html;
                         }
                     }
                 })
