@@ -181,8 +181,59 @@ $sqlPenitipan = "SELECT p.*, $custSelect,
                  ORDER BY p.id DESC";
 $resPenitipan = $conn->query($sqlPenitipan);
 
-// Fetch Price List Loewix Products for Autocomplete, Dropdowns & Catalog
-$loewixPriceList = [];
+// =========================================================================
+// 6 PRODUK RESMI PROGRAM TIP TOK (KONSINYASI LOEWIX)
+// =========================================================================
+$tiptokMaster6 = [
+    [
+        'id' => 1,
+        'category' => '2MP AHD INDOOR',
+        'type' => '2MP AHD INDOOR LX-4F320-CE',
+        'model' => 'LX-4F320-CE',
+        'description' => 'Kamera CCTV Loewix 2MP AHD Indoor CatEyes (LX-4F320-CE)',
+        'msrp' => 145000
+    ],
+    [
+        'id' => 2,
+        'category' => '2MP AHD OUTDOOR',
+        'type' => '2MP AHD OUTDOOR LX-50F320-CM',
+        'model' => 'LX-50F320-CM',
+        'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor ColorMax (LX-50F320-CM)',
+        'msrp' => 170000
+    ],
+    [
+        'id' => 3,
+        'category' => '2MP AHD INDOOR',
+        'type' => '2MP AHD INDOOR LX-4F320-CM',
+        'model' => 'LX-4F320-CM',
+        'description' => 'Kamera CCTV Loewix 2MP AHD Indoor ColorMax (LX-4F320-CM)',
+        'msrp' => 145000
+    ],
+    [
+        'id' => 4,
+        'category' => '2MP AHD OUTDOOR',
+        'type' => '2MP AHD OUTDOOR LX-50F320-CE',
+        'model' => 'LX-50F320-CE',
+        'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor CatEyes (LX-50F320-CE)',
+        'msrp' => 170000
+    ],
+    [
+        'id' => 5,
+        'category' => '4MP IPCAM INDOOR',
+        'type' => '4MP IPCAM INDOOR LX-IPF40CMT02',
+        'model' => 'LX-IPF40CMT02',
+        'description' => 'Kamera CCTV Loewix 4MP IP Camera Indoor (LX-IPF40CMT02)',
+        'msrp' => 350000
+    ],
+    [
+        'id' => 6,
+        'category' => '4MP IPCAM OUTDOOR',
+        'type' => '4MP IPCAM OUTDOOR LX-IPF40CMT17',
+        'model' => 'LX-IPF40CMT17',
+        'description' => 'Kamera CCTV Loewix 4MP IP Camera Outdoor (LX-IPF40CMT17)',
+        'msrp' => 380000
+    ]
+];
 
 // Helper to query connection
 $fetchFromDbConn = function($db) {
@@ -206,83 +257,25 @@ $fetchFromDbConn = function($db) {
     return $list;
 };
 
-// 1. Try active $conn from conn.php
-$loewixPriceList = $fetchFromDbConn($conn);
-
-// 2. Try Cross-Database query via active $conn if on same MySQL instance
-if (empty($loewixPriceList) && $conn && !$conn->connect_error) {
-    $crossDbs = ['u836263092_sales', 'sales_id_giti'];
-    foreach ($crossDbs as $cdb) {
-        $resCross = @$conn->query("SELECT id, category, type, description, msrp FROM `{$cdb}`.`product_prices` ORDER BY category ASC, type ASC");
-        if ($resCross && $resCross->num_rows > 0) {
-            while ($row = $resCross->fetch_assoc()) {
-                $loewixPriceList[] = [
-                    'id' => (int)$row['id'],
-                    'category' => $row['category'] ?? '',
-                    'type' => $row['type'] ?? '',
-                    'description' => $row['description'] ?? '',
-                    'msrp' => (float)($row['msrp'] ?? 0)
-                ];
-            }
-            break;
-        }
-    }
-}
-
-// 3. If still empty, connect to main Loewix Sales database via various credentials & socket/TCP combinations
-if (empty($loewixPriceList)) {
-    $candidateConfigs = [
-        ['localhost', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales'],
-        ['127.0.0.1', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales'],
-        ['localhost', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti'],
-        ['127.0.0.1', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti'],
-        ['localhost', 'root', '', 'sales_id_giti'],
-        ['127.0.0.1', 'root', '', 'sales_id_giti'],
-        ['localhost', 'root', '', 'u836263092_sales'],
-        ['localhost', 'teknisi_api_root', 'OffOff@18', 'sales_id_giti'],
-        ['localhost', 'teknisi_api_root', 'WagyuA531052002.', 'sales_id_giti'],
-        ['localhost', 'u836263092_jadwaltest', 'Eddie@1819', 'u836263092_sales'],
-    ];
-
-    foreach ($candidateConfigs as $cfg) {
-        $altConn = @new mysqli($cfg[0], $cfg[1], $cfg[2], $cfg[3]);
-        if (!$altConn->connect_error) {
-            $loewixPriceList = $fetchFromDbConn($altConn);
-            @$altConn->close();
-            if (!empty($loewixPriceList)) {
+// Cek harga terkini di database jika ada untuk sinkronisasi harga
+$dbPrices = $fetchFromDbConn($conn);
+if (!empty($dbPrices)) {
+    foreach ($tiptokMaster6 as &$p) {
+        $cleanModel = str_replace('-', '', $p['model']);
+        foreach ($dbPrices as $dbP) {
+            $dbTypeClean = str_replace('-', '', $dbP['type']);
+            if (stripos($dbTypeClean, $cleanModel) !== false || stripos($dbP['type'], $p['model']) !== false) {
+                if ($dbP['msrp'] > 0) $p['msrp'] = (float)$dbP['msrp'];
+                if (!empty($dbP['description'])) $p['description'] = $dbP['description'];
                 break;
             }
         }
     }
+    unset($p);
 }
 
-// 4. Auto-replicate to current connection so both DBs stay in sync
-if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
-    $chkCur = @$conn->query("SELECT COUNT(*) AS c FROM product_prices");
-    $curCount = $chkCur ? (int)($chkCur->fetch_assoc()['c'] ?? 0) : -1;
-    if ($curCount <= 0) {
-        @$conn->query("CREATE TABLE IF NOT EXISTS `product_prices` (
-            `id` INT AUTO_INCREMENT PRIMARY KEY,
-            `category` VARCHAR(100) NOT NULL,
-            `type` VARCHAR(150) NOT NULL,
-            `description` TEXT NULL,
-            `msrp` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-            `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            INDEX (`category`),
-            INDEX (`type`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-        $stmtIns = @$conn->prepare("INSERT INTO product_prices (category, type, description, msrp) VALUES (?, ?, ?, ?)");
-        if ($stmtIns) {
-            foreach ($loewixPriceList as $p) {
-                $stmtIns->bind_param("sssd", $p['category'], $p['type'], $p['description'], $p['msrp']);
-                @$stmtIns->execute();
-            }
-            @$stmtIns->close();
-        }
-    }
-}
+// Khusus TIP TOK: Hanya 6 Produk Resmi Ini yang Ditampilkan
+$loewixPriceList = $tiptokMaster6;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -1499,12 +1492,12 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
 
                         <div class="d-flex justify-content-between align-items-center mb-2 mt-4 flex-wrap gap-2">
                             <div>
-                                <label class="form-label-taste mb-0">Daftar Barang Dititipkan <span class="text-danger">*</span></label>
-                                <div class="text-xs text-secondary font-weight-bold">Tarik / pilih barang dari Katalog Price List Loewix atau ketik manual</div>
+                                <label class="form-label-taste mb-0">Daftar Barang Dititipkan (6 Produk Resmi TIP TOK) <span class="text-danger">*</span></label>
+                                <div class="text-xs text-secondary font-weight-bold">Pilih salah satu dari 6 model kamera resmi program TIP TOK</div>
                             </div>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-3 py-1 mb-0" style="border-radius: 8px; font-size: 12px;" onclick="openKatalogPriceListModal('tambah')">
-                                    <i class="fa-solid fa-tags me-1"></i> Buka Katalog Price List
+                                    <i class="fa-solid fa-tags me-1"></i> Buka Katalog 6 Produk TIP TOK
                                 </button>
                                 <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="tambahBarisBarang()">
                                     <i class="fa-solid fa-plus me-1"></i> Tambah Baris
@@ -1579,12 +1572,12 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
 
                         <div class="d-flex justify-content-between align-items-center mb-2 mt-4 flex-wrap gap-2">
                             <div>
-                                <label class="form-label-taste mb-0">Daftar Barang Dititipkan <span class="text-danger">*</span></label>
-                                <div class="text-xs text-secondary font-weight-bold">Tarik / pilih barang dari Katalog Price List Loewix atau ketik manual</div>
+                                <label class="form-label-taste mb-0">Daftar Barang Dititipkan (6 Produk Resmi TIP TOK) <span class="text-danger">*</span></label>
+                                <div class="text-xs text-secondary font-weight-bold">Pilih salah satu dari 6 model kamera resmi program TIP TOK</div>
                             </div>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-3 py-1 mb-0" style="border-radius: 8px; font-size: 12px;" onclick="openKatalogPriceListModal('edit')">
-                                    <i class="fa-solid fa-tags me-1"></i> Buka Katalog Price List
+                                    <i class="fa-solid fa-tags me-1"></i> Buka Katalog 6 Produk TIP TOK
                                 </button>
                                 <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="tambahBarisBarangEdit()">
                                     <i class="fa-solid fa-plus me-1"></i> Tambah Baris
@@ -1611,7 +1604,7 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL KATALOG PRICE LIST LOEWIX (PILIH PRODUK LANGSUNG)                  -->
+    <!-- MODAL KATALOG 6 PRODUK RESMI TIP TOK LOEWIX (PILIH PRODUK LANGSUNG)      -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalKatalogPriceList" tabindex="-1" aria-hidden="true" style="z-index: 1065;">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -1622,8 +1615,8 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                             <i class="fa-solid fa-tags text-warning" style="font-size: 20px;"></i>
                         </div>
                         <div>
-                            <h5 class="modal-title font-weight-bold text-white mb-0" style="font-size: 18px;">Katalog Price List Produk Loewix 🏷️</h5>
-                            <span class="text-xs text-white-50 font-weight-bold">Tarik langsung data nama barang & kategori ke form penitipan TIP TOK</span>
+                            <h5 class="modal-title font-weight-bold text-white mb-0" style="font-size: 18px;">Katalog 6 Produk Resmi TIP TOK Loewix 🏷️</h5>
+                            <span class="text-xs text-white-50 font-weight-bold">Hanya 6 model kamera resmi di bawah ini yang dapat dititipkan pada program TIP TOK</span>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1639,7 +1632,7 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                         </div>
                         <div class="col-md-5">
                             <select id="katalogCategorySelect" class="form-select bg-white" style="border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 13px; font-weight: 700;" onchange="filterKatalogProducts()">
-                                <option value="all">Semua Kategori (Semua Produk)</option>
+                                <option value="all">Semua Kategori (6 Produk TIP TOK)</option>
                                 <?php 
                                     $kats = array_unique(array_filter(array_column($loewixPriceList, 'category')));
                                     sort($kats);
@@ -1656,10 +1649,10 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                         <table class="table table-hover align-middle mb-0">
                             <thead style="background: #0f172a; color: #fff; position: sticky; top: 0; z-index: 2;">
                                 <tr>
-                                    <th style="width: 18%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">KATEGORI</th>
-                                    <th style="width: 44%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">TIPE & DESKRIPSI</th>
-                                    <th style="width: 20%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: right;">MSRP (HARGA USER)</th>
-                                    <th style="width: 18%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: center;">AKSI</th>
+                                    <th style="width: 22%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">KATEGORI</th>
+                                    <th style="width: 44%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;">NAMA PRODUK & MODEL</th>
+                                    <th style="width: 18%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: right;">MSRP RESMI</th>
+                                    <th style="width: 16%; padding: 12px 16px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; text-align: center;">AKSI</th>
                                 </tr>
                             </thead>
                             <tbody id="katalogProductsBody">
@@ -1669,14 +1662,14 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                     </div>
                 </div>
                 <div class="modal-footer p-3 bg-white border-top justify-content-between">
-                    <span class="text-xs text-secondary font-weight-bold" id="katalogCountInfo">Menampilkan <?= count($loewixPriceList) ?> Produk Price List</span>
+                    <span class="text-xs text-secondary font-weight-bold" id="katalogCountInfo">Menampilkan <?= count($loewixPriceList) ?> Produk Resmi TIP TOK</span>
                     <button type="button" class="btn btn-secondary px-4 font-weight-bold" data-bs-dismiss="modal">Tutup Katalog</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Datalist Autocomplete Produk Loewix -->
+    <!-- Datalist Autocomplete 6 Produk TIP TOK Loewix -->
     <datalist id="loewixPriceListDatalist">
         <?php foreach ($loewixPriceList as $p): ?>
             <option value="<?= htmlspecialchars($p['type']) ?>"><?= htmlspecialchars($p['category']) ?> <?= $p['msrp'] > 0 ? ' - Rp ' . number_format($p['msrp'], 0, ',', '.') : '' ?></option>
@@ -2077,15 +2070,15 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
         let katalogTargetModal = 'tambah'; // 'tambah' or 'edit'
 
         // =========================================================================
-        // HELPER FUNGSI TARIK DATA PRICE LIST LOEWIX KE NAMA BARANG
+        // HELPER FUNGSI TARIK DATA 6 PRODUK RESMI TIP TOK LOEWIX
         // =========================================================================
         function renderPriceListOptions(selectedVal = '') {
             if (!loewixProducts || loewixProducts.length === 0) {
-                return '<option value="" disabled>Belum ada produk di database Price List</option>';
+                return '<option value="" disabled>Belum ada produk TIP TOK</option>';
             }
             const groups = {};
             loewixProducts.forEach(p => {
-                const cat = p.category || 'PRODUK LAINNYA';
+                const cat = p.category || 'PRODUK TIP TOK';
                 if (!groups[cat]) groups[cat] = [];
                 groups[cat].push(p);
             });
@@ -2094,8 +2087,8 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
             for (const cat in groups) {
                 html += `<optgroup label="📂 ${escapeHtml(cat)}">`;
                 groups[cat].forEach(p => {
-                    const isSel = (p.type === selectedVal) ? 'selected' : '';
-                    const priceStr = p.msrp > 0 ? ` (Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)})` : '';
+                    const isSel = (p.type === selectedVal || p.model === selectedVal) ? 'selected' : '';
+                    const priceStr = p.msrp > 0 ? ` (MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)})` : '';
                     html += `<option value="${escapeHtml(p.type)}" ${isSel}>${escapeHtml(p.type)}${priceStr}</option>`;
                 });
                 html += `</optgroup>`;
@@ -2105,7 +2098,7 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
 
         function onSelectPriceListProduct(selectEl, rowIndex, prefix = '') {
             const selectedType = selectEl.value;
-            const p = loewixProducts.find(item => item.type === selectedType);
+            const p = loewixProducts.find(item => item.type === selectedType || item.model === selectedType);
             const inputNama = document.getElementById(`inputNama_${prefix}${rowIndex}`);
             const inputTipe = document.getElementById(`inputTipe_${prefix}${rowIndex}`);
             const infoEl = document.getElementById(`productInfo_${prefix}${rowIndex}`);
@@ -2116,8 +2109,7 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                 if (inputTipe) inputTipe.value = p.category;
                 if (infoEl) {
                     const msrpStr = p.msrp > 0 ? ` • MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : '';
-                    const descSnippet = p.description ? ` • <span class="text-secondary">${escapeHtml(p.description.substring(0, 45))}</span>` : '';
-                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> ${escapeHtml(p.category)}${msrpStr}</span>${descSnippet}`;
+                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> Produk Resmi TIP TOK: ${escapeHtml(p.category)}${msrpStr}</span>`;
                 }
                 if (badgeEl) {
                     badgeEl.textContent = p.category;
@@ -2144,11 +2136,13 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                 return;
             }
 
-            // Cari kecocokan exact / case-insensitive di loewixProducts
-            const p = loewixProducts.find(item => 
-                item.type.toLowerCase() === val.toLowerCase() || 
-                (item.category + ' ' + item.type).toLowerCase() === val.toLowerCase()
-            );
+            // Cari kecocokan exact / case-insensitive di loewixProducts (6 Produk TIP TOK)
+            const cleanVal = val.toLowerCase().replace(/[\s\-_]/g, '');
+            const p = loewixProducts.find(item => {
+                const cleanType = (item.type || '').toLowerCase().replace(/[\s\-_]/g, '');
+                const cleanModel = (item.model || '').toLowerCase().replace(/[\s\-_]/g, '');
+                return cleanType.includes(cleanVal) || cleanVal.includes(cleanModel);
+            });
 
             if (p) {
                 if (inputTipe && (!inputTipe.value || inputTipe.value === 'CCTV / NVR' || inputTipe.dataset.autoFilled === '1')) {
@@ -2158,7 +2152,7 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                 if (selectEl) selectEl.value = p.type;
                 if (infoEl) {
                     const msrpStr = p.msrp > 0 ? ` • MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : '';
-                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> Terdaftar di Price List: ${escapeHtml(p.category)}${msrpStr}</span>`;
+                    infoEl.innerHTML = `<span class="text-primary font-weight-bold"><i class="fa-solid fa-circle-check"></i> Produk Resmi TIP TOK: ${escapeHtml(p.category)}${msrpStr}</span>`;
                 }
                 if (badgeEl) {
                     badgeEl.textContent = p.category;
@@ -2167,14 +2161,14 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
             } else {
                 if (selectEl) selectEl.value = '';
                 if (infoEl) {
-                    infoEl.innerHTML = `<span class="text-muted font-weight-bold"><i class="fa-solid fa-pen"></i> Item Kustom / Manual</span>`;
+                    infoEl.innerHTML = `<span class="text-muted font-weight-bold"><i class="fa-solid fa-pen"></i> Item Kustom</span>`;
                 }
                 if (badgeEl) badgeEl.classList.add('d-none');
             }
         }
 
         // =========================================================================
-        // MODAL KATALOG PRICE LIST BROWSER
+        // MODAL KATALOG 6 PRODUK RESMI TIP TOK BROWSER
         // =========================================================================
         function openKatalogPriceListModal(target = 'tambah') {
             katalogTargetModal = target;
@@ -2203,13 +2197,14 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                 const matchSearch = (!query || 
                     (p.type || '').toLowerCase().includes(query) || 
                     (p.category || '').toLowerCase().includes(query) || 
-                    (p.description || '').toLowerCase().includes(query)
+                    (p.description || '').toLowerCase().includes(query) ||
+                    (p.model || '').toLowerCase().includes(query)
                 );
                 return matchCat && matchSearch;
             });
 
             if (countInfo) {
-                countInfo.textContent = `Menampilkan ${filtered.length} dari total ${loewixProducts.length} Produk Price List`;
+                countInfo.textContent = `Menampilkan ${filtered.length} dari total ${loewixProducts.length} Produk Resmi TIP TOK`;
             }
 
             if (filtered.length === 0) {
@@ -2267,7 +2262,7 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
             });
             Toast.fire({
                 icon: 'success',
-                title: `Ditambahkan: ${p.type}`
+                title: `Produk "${p.type}" berhasil dipilih!`
             });
         }
 
@@ -2454,14 +2449,14 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                         </button>
                     </div>
 
-                    <!-- Quick Tarik dari Price List Loewix -->
+                    <!-- Quick Tarik 6 Produk TIP TOK Loewix -->
                     <div class="mb-2 p-2 rounded-2" style="background: rgba(37, 99, 235, 0.05); border: 1.5px dashed rgba(37, 99, 235, 0.35);">
                         <div class="d-flex align-items-center gap-2">
                             <span style="font-size: 11px; font-weight: 800; color: #2563eb; white-space: nowrap;">
-                                <i class="fa-solid fa-tags"></i> TARIK PRICE LIST:
+                                <i class="fa-solid fa-tags"></i> PILIH 6 PRODUK TIP TOK:
                             </span>
                             <select id="selectProduct_${itemRowIndex}" class="form-select form-select-sm bg-white" style="font-size: 12px; font-weight: 700; border-radius: 8px; border: 1.5px solid #cbd5e1;" onchange="onSelectPriceListProduct(this, ${itemRowIndex}, '')">
-                                <option value="">-- Cari & Pilih Produk Loewix (${loewixProducts.length} Produk) --</option>
+                                <option value="">-- Pilih 1 dari 6 Produk TIP TOK --</option>
                                 ${renderPriceListOptions(pNama)}
                             </select>
                         </div>
@@ -2470,7 +2465,7 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                     <div class="row g-2">
                         <div class="col-md-5">
                             <label class="form-label-taste mb-1">NAMA BARANG <span class="text-danger">*</span></label>
-                            <input type="text" name="items[${itemRowIndex}][nama_barang]" id="inputNama_${itemRowIndex}" list="loewixPriceListDatalist" class="form-control-taste w-100" placeholder="Ketik atau pilih tipe produk..." value="${escapeHtml(pNama)}" required oninput="onNamaBarangInput(${itemRowIndex}, '')">
+                            <input type="text" name="items[${itemRowIndex}][nama_barang]" id="inputNama_${itemRowIndex}" list="loewixPriceListDatalist" class="form-control-taste w-100" placeholder="Pilih 1 dari 6 produk TIP TOK..." value="${escapeHtml(pNama)}" required oninput="onNamaBarangInput(${itemRowIndex}, '')">
                             <div id="productInfo_${itemRowIndex}" class="small mt-1 font-weight-bold" style="font-size: 11px; min-height: 16px;"></div>
                         </div>
                         <div class="col-md-2">
@@ -2611,14 +2606,14 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                                             ${deleteBtn}
                                         </div>
 
-                                        <!-- Quick Tarik dari Price List Loewix -->
+                                        <!-- Quick Tarik 6 Produk TIP TOK Loewix -->
                                         <div class="mb-2 p-2 rounded-2" style="background: rgba(37, 99, 235, 0.05); border: 1.5px dashed rgba(37, 99, 235, 0.35);">
                                             <div class="d-flex align-items-center gap-2">
                                                 <span style="font-size: 11px; font-weight: 800; color: #2563eb; white-space: nowrap;">
-                                                    <i class="fa-solid fa-tags"></i> TARIK PRICE LIST:
+                                                    <i class="fa-solid fa-tags"></i> PILIH 6 PRODUK TIP TOK:
                                                 </span>
                                                 <select id="selectProduct_edit_${editItemRowIndex}" class="form-select form-select-sm bg-white" style="font-size: 12px; font-weight: 700; border-radius: 8px; border: 1.5px solid #cbd5e1;" onchange="onSelectPriceListProduct(this, ${editItemRowIndex}, 'edit_')">
-                                                    <option value="">-- Ganti dari Price List Loewix --</option>
+                                                    <option value="">-- Pilih 1 dari 6 Produk TIP TOK --</option>
                                                     ${renderPriceListOptions(it.nama_barang)}
                                                 </select>
                                             </div>
@@ -2699,14 +2694,14 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                         </button>
                     </div>
 
-                    <!-- Quick Tarik dari Price List Loewix -->
+                    <!-- Quick Tarik 6 Produk TIP TOK Loewix -->
                     <div class="mb-2 p-2 rounded-2" style="background: rgba(37, 99, 235, 0.05); border: 1.5px dashed rgba(37, 99, 235, 0.35);">
                         <div class="d-flex align-items-center gap-2">
                             <span style="font-size: 11px; font-weight: 800; color: #2563eb; white-space: nowrap;">
-                                <i class="fa-solid fa-tags"></i> TARIK PRICE LIST:
+                                <i class="fa-solid fa-tags"></i> PILIH 6 PRODUK TIP TOK:
                             </span>
                             <select id="selectProduct_edit_${editItemRowIndex}" class="form-select form-select-sm bg-white" style="font-size: 12px; font-weight: 700; border-radius: 8px; border: 1.5px solid #cbd5e1;" onchange="onSelectPriceListProduct(this, ${editItemRowIndex}, 'edit_')">
-                                <option value="">-- Cari & Pilih Produk Loewix (${loewixProducts.length} Produk) --</option>
+                                <option value="">-- Pilih 1 dari 6 Produk TIP TOK --</option>
                                 ${renderPriceListOptions(pNama)}
                             </select>
                         </div>
@@ -2715,7 +2710,7 @@ if (!empty($loewixPriceList) && $conn && !$conn->connect_error) {
                     <div class="row g-2">
                         <div class="col-md-5">
                             <label class="form-label-taste mb-1">NAMA BARANG <span class="text-danger">*</span></label>
-                            <input type="text" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" list="loewixPriceListDatalist" class="form-control-taste w-100" placeholder="Ketik atau pilih tipe produk..." value="${escapeHtml(pNama)}" required oninput="onNamaBarangInput(${editItemRowIndex}, 'edit_')">
+                            <input type="text" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" list="loewixPriceListDatalist" class="form-control-taste w-100" placeholder="Pilih 1 dari 6 produk TIP TOK..." value="${escapeHtml(pNama)}" required oninput="onNamaBarangInput(${editItemRowIndex}, 'edit_')">
                             <div id="productInfo_edit_${editItemRowIndex}" class="small mt-1 font-weight-bold" style="font-size: 11px; min-height: 16px;"></div>
                         </div>
                         <div class="col-md-2">

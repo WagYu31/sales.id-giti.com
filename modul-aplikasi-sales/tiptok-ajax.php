@@ -210,124 +210,103 @@ if ($action === 'search_dealer') {
 }
 
 // -------------------------------------------------------------
-// 1.1 CARI / AMBIL DAFTAR PRODUK DARI PRICE LIST LOEWIX
+// 1.1 CARI / AMBIL DAFTAR 6 PRODUK RESMI TIP TOK LOEWIX
 // -------------------------------------------------------------
 if ($action === 'get_product_prices') {
-    $products = [];
-    $fetchFromDb = function($db, $q) {
-        $list = [];
-        if (!$db || $db->connect_error) return $list;
-        $chk = @$db->query("SHOW TABLES LIKE 'product_prices'");
-        if ($chk && $chk->num_rows > 0) {
-            if (!empty($q)) {
-                $stmt = @$db->prepare("SELECT id, category, type, description, msrp FROM product_prices WHERE category LIKE ? OR type LIKE ? OR description LIKE ? ORDER BY category ASC, type ASC");
-                if ($stmt) {
-                    $like = "%$q%";
-                    $stmt->bind_param("sss", $like, $like, $like);
-                    $stmt->execute();
-                    $res = $stmt->get_result();
-                    while ($row = $res->fetch_assoc()) {
-                        $list[] = [
-                            'id' => (int)$row['id'],
-                            'category' => $row['category'] ?? '',
-                            'type' => $row['type'] ?? '',
-                            'description' => $row['description'] ?? '',
-                            'msrp' => (float)($row['msrp'] ?? 0)
-                        ];
-                    }
-                    $stmt->close();
-                }
-            } else {
-                $res = @$db->query("SELECT id, category, type, description, msrp FROM product_prices ORDER BY category ASC, type ASC");
-                if ($res && $res->num_rows > 0) {
-                    while ($row = $res->fetch_assoc()) {
-                        $list[] = [
-                            'id' => (int)$row['id'],
-                            'category' => $row['category'] ?? '',
-                            'type' => $row['type'] ?? '',
-                            'description' => $row['description'] ?? '',
-                            'msrp' => (float)($row['msrp'] ?? 0)
-                        ];
+    $masterProducts = [
+        [
+            'id' => 1,
+            'category' => '2MP AHD INDOOR',
+            'type' => '2MP AHD INDOOR LX-4F320-CE',
+            'model' => 'LX-4F320-CE',
+            'description' => 'Kamera CCTV Loewix 2MP AHD Indoor CatEyes (LX-4F320-CE)',
+            'msrp' => 145000
+        ],
+        [
+            'id' => 2,
+            'category' => '2MP AHD OUTDOOR',
+            'type' => '2MP AHD OUTDOOR LX-50F320-CM',
+            'model' => 'LX-50F320-CM',
+            'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor ColorMax (LX-50F320-CM)',
+            'msrp' => 170000
+        ],
+        [
+            'id' => 3,
+            'category' => '2MP AHD INDOOR',
+            'type' => '2MP AHD INDOOR LX-4F320-CM',
+            'model' => 'LX-4F320-CM',
+            'description' => 'Kamera CCTV Loewix 2MP AHD Indoor ColorMax (LX-4F320-CM)',
+            'msrp' => 145000
+        ],
+        [
+            'id' => 4,
+            'category' => '2MP AHD OUTDOOR',
+            'type' => '2MP AHD OUTDOOR LX-50F320-CE',
+            'model' => 'LX-50F320-CE',
+            'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor CatEyes (LX-50F320-CE)',
+            'msrp' => 170000
+        ],
+        [
+            'id' => 5,
+            'category' => '4MP IPCAM INDOOR',
+            'type' => '4MP IPCAM INDOOR LX-IPF40CMT02',
+            'model' => 'LX-IPF40CMT02',
+            'description' => 'Kamera CCTV Loewix 4MP IP Camera Indoor (LX-IPF40CMT02)',
+            'msrp' => 350000
+        ],
+        [
+            'id' => 6,
+            'category' => '4MP IPCAM OUTDOOR',
+            'type' => '4MP IPCAM OUTDOOR LX-IPF40CMT17',
+            'model' => 'LX-IPF40CMT17',
+            'description' => 'Kamera CCTV Loewix 4MP IP Camera Outdoor (LX-IPF40CMT17)',
+            'msrp' => 380000
+        ]
+    ];
+
+    // Cek harga terkini di database jika ada
+    $chk = @$conn->query("SHOW TABLES LIKE 'product_prices'");
+    if ($chk && $chk->num_rows > 0) {
+        $res = @$conn->query("SELECT category, type, description, msrp FROM product_prices");
+        if ($res && $res->num_rows > 0) {
+            $dbPrices = [];
+            while ($row = $res->fetch_assoc()) {
+                $dbPrices[] = $row;
+            }
+            foreach ($masterProducts as &$p) {
+                $cleanModel = str_replace('-', '', $p['model']);
+                foreach ($dbPrices as $dbP) {
+                    $dbTypeClean = str_replace('-', '', $dbP['type']);
+                    if (stripos($dbTypeClean, $cleanModel) !== false || stripos($dbP['type'], $p['model']) !== false) {
+                        if ((float)$dbP['msrp'] > 0) $p['msrp'] = (float)$dbP['msrp'];
+                        if (!empty($dbP['description'])) $p['description'] = $dbP['description'];
+                        break;
                     }
                 }
             }
+            unset($p);
         }
-        return $list;
-    };
+    }
 
     $q = trim($_GET['q'] ?? '');
-    // 1. Try $conn
-    $products = $fetchFromDb($conn, $q);
-
-    // 2. Try Cross-Database query via active $conn if on same MySQL instance
-    if (empty($products) && $conn && !$conn->connect_error) {
-        $crossDbs = ['u836263092_sales', 'sales_id_giti'];
-        foreach ($crossDbs as $cdb) {
-            if (!empty($q)) {
-                $stmtCross = @$conn->prepare("SELECT id, category, type, description, msrp FROM `{$cdb}`.`product_prices` WHERE category LIKE ? OR type LIKE ? OR description LIKE ? ORDER BY category ASC, type ASC");
-                if ($stmtCross) {
-                    $like = "%$q%";
-                    $stmtCross->bind_param("sss", $like, $like, $like);
-                    $stmtCross->execute();
-                    $resCross = $stmtCross->get_result();
-                    while ($row = $resCross->fetch_assoc()) {
-                        $products[] = [
-                            'id' => (int)$row['id'],
-                            'category' => $row['category'] ?? '',
-                            'type' => $row['type'] ?? '',
-                            'description' => $row['description'] ?? '',
-                            'msrp' => (float)($row['msrp'] ?? 0)
-                        ];
-                    }
-                    $stmtCross->close();
-                    if (!empty($products)) break;
-                }
-            } else {
-                $resCross = @$conn->query("SELECT id, category, type, description, msrp FROM `{$cdb}`.`product_prices` ORDER BY category ASC, type ASC");
-                if ($resCross && $resCross->num_rows > 0) {
-                    while ($row = $resCross->fetch_assoc()) {
-                        $products[] = [
-                            'id' => (int)$row['id'],
-                            'category' => $row['category'] ?? '',
-                            'type' => $row['type'] ?? '',
-                            'description' => $row['description'] ?? '',
-                            'msrp' => (float)($row['msrp'] ?? 0)
-                        ];
-                    }
-                    break;
-                }
+    if (!empty($q)) {
+        $filtered = [];
+        $qLower = strtolower($q);
+        $cleanQ = str_replace(['-', ' ', '_'], '', $qLower);
+        foreach ($masterProducts as $p) {
+            $cleanType = str_replace(['-', ' ', '_'], '', strtolower($p['type']));
+            $cleanModel = str_replace(['-', ' ', '_'], '', strtolower($p['model']));
+            if (strpos($cleanType, $cleanQ) !== false ||
+                strpos(strtolower($p['category']), $qLower) !== false ||
+                strpos(strtolower($p['description']), $qLower) !== false ||
+                strpos($cleanModel, $cleanQ) !== false) {
+                $filtered[] = $p;
             }
         }
+        echo json_encode(['status' => 'success', 'data' => $filtered]);
+    } else {
+        echo json_encode(['status' => 'success', 'data' => $masterProducts]);
     }
-
-    // 3. If empty, try candidate credentials
-    if (empty($products)) {
-        $candidateConfigs = [
-            ['localhost', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales'],
-            ['127.0.0.1', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'u836263092_sales'],
-            ['localhost', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti'],
-            ['127.0.0.1', 'u836263092_sales', 'bkmRa2a5bDfwZLYX', 'sales_id_giti'],
-            ['localhost', 'root', '', 'sales_id_giti'],
-            ['127.0.0.1', 'root', '', 'sales_id_giti'],
-            ['localhost', 'root', '', 'u836263092_sales'],
-            ['localhost', 'teknisi_api_root', 'OffOff@18', 'sales_id_giti'],
-            ['localhost', 'teknisi_api_root', 'WagyuA531052002.', 'sales_id_giti'],
-            ['localhost', 'u836263092_jadwaltest', 'Eddie@1819', 'u836263092_sales'],
-        ];
-
-        foreach ($candidateConfigs as $cfg) {
-            $altConn = @new mysqli($cfg[0], $cfg[1], $cfg[2], $cfg[3]);
-            if (!$altConn->connect_error) {
-                $products = $fetchFromDb($altConn, $q);
-                @$altConn->close();
-                if (!empty($products)) {
-                    break;
-                }
-            }
-        }
-    }
-
-    echo json_encode(['status' => 'success', 'data' => $products]);
     exit;
 }
 
