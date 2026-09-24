@@ -453,227 +453,212 @@ if ($qDealersPreload) {
         }
 
         /* ------------------------------------------------------------- */
-        /* 3D TACTILE LEADERBOARD WIDGET (taste-skill aligned)           */
+        /* CLEAN MODERN SALES PILL CHIPS (taste-skill aligned)           */
         /* ------------------------------------------------------------- */
-        .leaderboard-section {
-            margin-bottom: 24px;
-        }
-        .leaderboard-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .leaderboard-title {
-            font-family: var(--font-heading);
-            font-size: 19px;
-            font-weight: 800;
-            color: #0f172a;
+        .sales-chips-bar {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 2px;
-            letter-spacing: -0.01em;
+            overflow-x: auto;
+            padding: 4px 2px 14px 2px;
+            margin-bottom: 12px;
+            scrollbar-width: thin;
         }
-        .leaderboard-subtitle {
-            font-size: 12.5px;
-            color: #64748b;
-            font-weight: 600;
-        }
-
-        /* 3D Tactile Sales Card */
-        .sales-card-3d {
-            position: relative;
-            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 18px;
-            padding: 18px 20px;
+        .sales-chip-btn {
+            background: #ffffff;
             border: 1.5px solid #e2e8f0;
-            box-shadow: 
-                0 10px 20px -5px rgba(15, 23, 42, 0.08),
-                0 4px 6px -2px rgba(15, 23, 42, 0.03),
-                inset 0 1px 0 rgba(255, 255, 255, 0.95),
-                inset 0 -3px 0 rgba(226, 232, 240, 0.7);
+            border-radius: 30px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            overflow: hidden;
-        }
-        .sales-card-3d::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: transparent;
-            transition: all 0.2s ease;
-        }
-        .sales-card-3d:hover {
-            transform: translateY(-5px) scale(1.015);
-            box-shadow: 
-                0 20px 30px -8px rgba(15, 23, 42, 0.16),
-                0 8px 12px -4px rgba(15, 23, 42, 0.06),
-                inset 0 1px 0 rgba(255, 255, 255, 1);
-            border-color: #cbd5e1;
-        }
-        .sales-card-3d:active {
-            transform: translateY(-1px) scale(0.995);
-            box-shadow: 0 6px 12px -3px rgba(15, 23, 42, 0.1);
-        }
-
-        /* Rank 1 (Gold 3D) */
-        .sales-card-3d.rank-1 {
-            background: linear-gradient(145deg, #ffffff 0%, #fffbeb 50%, #fef3c7 100%);
-            border-color: #fde68a;
-            box-shadow: 
-                0 14px 26px -6px rgba(217, 119, 6, 0.2),
-                0 4px 6px -2px rgba(217, 119, 6, 0.06),
-                inset 0 1px 0 rgba(255, 255, 255, 1),
-                inset 0 -3px 0 #fcd34d;
-        }
-        .sales-card-3d.rank-1::before {
-            background: linear-gradient(90deg, #f59e0b, #d97706);
-        }
-
-        /* Rank 2 (Silver 3D) */
-        .sales-card-3d.rank-2 {
-            background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
-            border-color: #cbd5e1;
-            box-shadow: 
-                0 12px 24px -6px rgba(100, 116, 139, 0.16),
-                0 4px 6px -2px rgba(100, 116, 139, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 1),
-                inset 0 -3px 0 #94a3b8;
-        }
-        .sales-card-3d.rank-2::before {
-            background: linear-gradient(90deg, #94a3b8, #64748b);
-        }
-
-        /* Rank 3 (Bronze 3D) */
-        .sales-card-3d.rank-3 {
-            background: linear-gradient(145deg, #ffffff 0%, #fff7ed 50%, #ffedd5 100%);
-            border-color: #fed7aa;
-            box-shadow: 
-                0 12px 24px -6px rgba(194, 65, 12, 0.15),
-                0 4px 6px -2px rgba(194, 65, 12, 0.04),
-                inset 0 1px 0 rgba(255, 255, 255, 1),
-                inset 0 -3px 0 #fdba74;
-        }
-        .sales-card-3d.rank-3::before {
-            background: linear-gradient(90deg, #fb923c, #c2410c);
-        }
-
-        /* Active Selected State for 3D Card */
-        .sales-card-3d.is-active-filter {
-            border-color: #0284c7 !important;
-            box-shadow: 
-                0 0 0 3.5px rgba(2, 132, 199, 0.35),
-                0 16px 30px -6px rgba(2, 132, 199, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 1) !important;
-            background: linear-gradient(145deg, #f0f9ff 0%, #e0f2fe 100%) !important;
-        }
-
-        /* 3D Medal Emblem */
-        .medal-badge-3d {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 900;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            gap: 7px;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
         }
-        .medal-gold {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        .sales-chip-btn:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            transform: translateY(-1px);
+        }
+        .sales-chip-btn.active {
+            background: #0f172a;
             color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            border-color: #0f172a;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
         }
-        .medal-silver {
-            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
-            color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-        .medal-bronze {
-            background: linear-gradient(135deg, #fb923c 0%, #c2410c 100%);
-            color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-        .medal-default {
-            background: #e2e8f0;
+        .sales-chip-btn .chip-count {
+            background: #f1f5f9;
             color: #475569;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        .sales-chip-btn.active .chip-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
         }
 
-        /* 3D Sales Avatar */
-        .sales-avatar-3d {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
-            color: #38bdf8;
+        /* ------------------------------------------------------------- */
+        /* ELEGANT 3D SALES PODIUM (LEADERBOARD VIEW)                    */
+        /* ------------------------------------------------------------- */
+        .podium-container {
+            max-width: 1000px;
+            margin: 0 auto 30px auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .podium-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px 20px;
+            border: 1.5px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+            text-align: center;
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+            max-width: 320px;
+            transition: all 0.25s ease;
+        }
+        .podium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.15);
+        }
+        .podium-card.rank-1 {
+            order: 2;
+            padding-top: 32px;
+            padding-bottom: 30px;
+            border-color: #fde68a;
+            background: linear-gradient(180deg, #fffbeb 0%, #ffffff 40%);
+            box-shadow: 0 15px 35px -8px rgba(217, 119, 6, 0.2);
+            transform: scale(1.04);
+            z-index: 2;
+        }
+        .podium-card.rank-1:hover {
+            transform: scale(1.04) translateY(-4px);
+        }
+        .podium-card.rank-2 {
+            order: 1;
+            border-color: #e2e8f0;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 40%);
+        }
+        .podium-card.rank-3 {
+            order: 3;
+            border-color: #ffedd5;
+            background: linear-gradient(180deg, #fff7ed 0%, #ffffff 40%);
+        }
+
+        .podium-avatar {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            margin: 0 auto 12px auto;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: var(--font-heading);
+            font-size: 20px;
             font-weight: 800;
-            font-size: 15px;
-            border: 2px solid #ffffff;
-            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+            border: 3px solid #ffffff;
+        }
+        .podium-card.rank-1 .podium-avatar {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            width: 68px;
+            height: 68px;
+            font-size: 24px;
+        }
+        .podium-card.rank-2 .podium-avatar {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            color: #ffffff;
+        }
+        .podium-card.rank-3 .podium-avatar {
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+            color: #ffffff;
         }
 
-        /* 3D Claim Meter */
-        .progress-meter-3d {
-            background: #e2e8f0;
-            border-radius: 8px;
-            height: 8px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        .podium-rank-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
         }
-        .progress-meter-bar-3d {
-            height: 100%;
-            border-radius: 8px;
-            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 1px 3px rgba(16, 185, 129, 0.4);
+        .podium-card.rank-1 .podium-rank-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+        }
+        .podium-card.rank-2 .podium-rank-badge {
+            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+            color: #ffffff;
+        }
+        .podium-card.rank-3 .podium-rank-badge {
+            background: linear-gradient(135deg, #fb923c 0%, #c2410c 100%);
+            color: #ffffff;
         }
 
-        /* View Switcher */
-        .view-switch-group {
+        /* Top Page Navigation View Switcher */
+        .page-view-nav {
             display: inline-flex;
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
             padding: 4px;
             border-radius: 12px;
             gap: 4px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .view-switch-btn {
+        .page-view-nav-btn {
             border: none;
             background: transparent;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 8px 18px;
+            border-radius: 9px;
             font-size: 13px;
             font-weight: 800;
-            color: #64748b;
+            color: #cbd5e1;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }
-        .view-switch-btn:hover {
-            color: #0f172a;
+        .page-view-nav-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
         }
-        .view-switch-btn.active {
+        .page-view-nav-btn.active {
             background: #ffffff;
             color: #0f172a;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Progress Bar */
+        .podium-progress {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 7px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .podium-progress-bar {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s ease;
         }
     </style>
 </head>
@@ -706,253 +691,263 @@ if ($qDealersPreload) {
                             Kelola pencatatan nomor faktur/invoice untuk seluruh barang konsinyasi yang telah terjual pada audit toko mitra.
                         </p>
                     </div>
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <a href="tiptok.php" class="btn btn-outline-light mb-0 font-weight-bold" style="border-radius: 10px; padding: 9px 16px; font-size: 13px;">
-                            <i class="fa-solid fa-box-archive me-1.5"></i> Tabel Penitipan Stok
-                        </a>
-                        <button type="button" class="btn btn-primary mb-0 font-weight-bold" style="border-radius: 10px; padding: 9px 16px; font-size: 13px;" onclick="loadInvoicesData()">
-                            <i class="fa-solid fa-rotate me-1.5"></i> Refresh Data
-                        </button>
+                    
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <div class="page-view-nav">
+                            <button type="button" class="page-view-nav-btn active" id="btnNavInvoices" onclick="switchMainView('invoices')">
+                                <i class="fa-solid fa-file-invoice"></i> Daftar Faktur
+                            </button>
+                            <button type="button" class="page-view-nav-btn" id="btnNavLeaderboard" onclick="switchMainView('leaderboard')">
+                                <i class="fa-solid fa-trophy text-warning"></i> Leaderboard Sales
+                            </button>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="tiptok.php" class="btn btn-outline-light mb-0 font-weight-bold" style="border-radius: 10px; padding: 9px 16px; font-size: 13px;">
+                                <i class="fa-solid fa-box-archive me-1.5"></i> Penitipan Stok
+                            </a>
+                            <button type="button" class="btn btn-primary mb-0 font-weight-bold" style="border-radius: 10px; padding: 9px 16px; font-size: 13px;" onclick="loadInvoicesData()">
+                                <i class="fa-solid fa-rotate me-1.5"></i> Refresh
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. LIVE METRIC BENTO CARDS -->
-            <div class="row g-3 mb-4">
-                <div class="col-xl-3 col-sm-6">
-                    <div class="metric-card-inv theme-blue">
-                        <div>
-                            <div class="metric-icon-box"><i class="fa-solid fa-boxes-packing"></i></div>
-                            <div class="metric-value" id="statTotalUnit"><?php echo number_format($statTotalUnit); ?> Unit</div>
-                            <div class="metric-label">Total Unit Terjual</div>
-                        </div>
-                        <div class="text-xs text-muted font-weight-bold mt-2">Dari seluruh audit kunjungan</div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-sm-6">
-                    <div class="metric-card-inv theme-amber">
-                        <div>
-                            <div class="metric-icon-box"><i class="fa-solid fa-file-circle-exclamation"></i></div>
-                            <div class="metric-value" id="statPendingUnit"><?php echo number_format($statPendingUnit); ?> Unit</div>
-                            <div class="metric-label">Belum Ada No. Invoice</div>
-                        </div>
-                        <div class="text-xs font-weight-bold mt-2" style="color: #b45309;" id="statPendingTrxText"><?php echo $statPendingTrx; ?> transaksi menunggu invoice</div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-sm-6">
-                    <div class="metric-card-inv theme-emerald">
-                        <div>
-                            <div class="metric-icon-box"><i class="fa-solid fa-file-circle-check"></i></div>
-                            <div class="metric-value" id="statInvoicedUnit"><?php echo number_format($statInvoicedUnit); ?> Unit</div>
-                            <div class="metric-label">Sudah Ber-Invoice</div>
-                        </div>
-                        <div class="text-xs text-success font-weight-bold mt-2">Faktur tercatat &amp; siap klaim</div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-sm-6">
-                    <div class="metric-card-inv theme-purple">
-                        <div>
-                            <div class="metric-icon-box"><i class="fa-solid fa-coins"></i></div>
-                            <div class="metric-value" id="statTotalInsentif">Rp <?php echo number_format($statTotalInsentif, 0, ',', '.'); ?></div>
-                            <div class="metric-label">Total Reward Terjual</div>
-                        </div>
-                        <div class="text-xs text-muted font-weight-bold mt-2">Estimasi insentif unit laku</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2.5 3D TACTILE LEADERBOARD WIDGET -->
-            <div class="leaderboard-section" id="leaderboardSection">
-                <div class="leaderboard-header">
-                    <div>
-                        <div class="leaderboard-title">
-                            <i class="fa-solid fa-trophy text-warning"></i> Top Sales Performer TIP TOK
-                        </div>
-                        <div class="leaderboard-subtitle">
-                            Peringkat sales berdasarkan unit faktur penjualan &amp; progress insentif. Klik card untuk filter cepat.
-                        </div>
-                    </div>
-                    <div id="activeSalesFilterBadge" class="d-none align-items-center gap-2">
-                        <span class="badge" style="background: rgba(2, 132, 199, 0.15); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.35); font-size: 12px; padding: 6px 12px; border-radius: 20px; font-weight: 800;">
-                            <i class="fa-solid fa-filter me-1"></i> Filter Aktif: <span id="activeSalesNameLabel">-</span>
-                        </span>
-                        <button type="button" class="btn btn-sm btn-outline-danger mb-0 py-1 px-2.5 font-weight-bold" style="border-radius: 8px; font-size: 11.5px;" onclick="resetSalesFilter()">
-                            <i class="fa-solid fa-xmark me-1"></i> Reset Filter
-                        </button>
-                    </div>
-                </div>
-                <div class="row g-3" id="leaderboardCardsRow">
-                    <div class="col-12 text-center py-3">
-                        <div class="spinner-border spinner-border-sm text-primary mb-1"></div>
-                        <div class="text-xs text-muted font-weight-bold">Memuat leaderboard performa sales...</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. FILTER & SEARCH CONTROLS -->
-            <div class="filter-panel-card">
-                <div class="row g-3 align-items-center justify-content-between">
-                    <div class="col-xl-6 col-lg-7 col-md-12">
-                        <div class="d-flex align-items-center gap-2 flex-wrap">
-                            <div class="view-switch-group">
-                                <button type="button" class="view-switch-btn active" id="btnViewList" onclick="switchTableView('list')">
-                                    <i class="fa-solid fa-list-check"></i> List Transaksi
-                                </button>
-                                <button type="button" class="view-switch-btn" id="btnViewRecap" onclick="switchTableView('recap')">
-                                    <i class="fa-solid fa-trophy"></i> Rekap Performa Sales
-                                </button>
+            <!-- ========================================================================= -->
+            <!-- VIEW 1: DAFTAR FAKTUR & TRANSAKSI (DEFAULT)                              -->
+            <!-- ========================================================================= -->
+            <div id="mainViewInvoices">
+                <!-- 2. LIVE METRIC BENTO CARDS -->
+                <div class="row g-3 mb-3">
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card-inv theme-blue">
+                            <div>
+                                <div class="metric-icon-box"><i class="fa-solid fa-boxes-packing"></i></div>
+                                <div class="metric-value" id="statTotalUnit"><?php echo number_format($statTotalUnit); ?> Unit</div>
+                                <div class="metric-label">Total Unit Terjual</div>
                             </div>
+                            <div class="text-xs text-muted font-weight-bold mt-2">Dari seluruh audit kunjungan</div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card-inv theme-amber">
+                            <div>
+                                <div class="metric-icon-box"><i class="fa-solid fa-file-circle-exclamation"></i></div>
+                                <div class="metric-value" id="statPendingUnit"><?php echo number_format($statPendingUnit); ?> Unit</div>
+                                <div class="metric-label">Belum Ada No. Invoice</div>
+                            </div>
+                            <div class="text-xs font-weight-bold mt-2" style="color: #b45309;" id="statPendingTrxText"><?php echo $statPendingTrx; ?> transaksi menunggu invoice</div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card-inv theme-emerald">
+                            <div>
+                                <div class="metric-icon-box"><i class="fa-solid fa-file-circle-check"></i></div>
+                                <div class="metric-value" id="statInvoicedUnit"><?php echo number_format($statInvoicedUnit); ?> Unit</div>
+                                <div class="metric-label">Sudah Ber-Invoice</div>
+                            </div>
+                            <div class="text-xs text-success font-weight-bold mt-2">Faktur tercatat &amp; siap klaim</div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="metric-card-inv theme-purple">
+                            <div>
+                                <div class="metric-icon-box"><i class="fa-solid fa-coins"></i></div>
+                                <div class="metric-value" id="statTotalInsentif">Rp <?php echo number_format($statTotalInsentif, 0, ',', '.'); ?></div>
+                                <div class="metric-label">Total Reward Terjual</div>
+                            </div>
+                            <div class="text-xs text-muted font-weight-bold mt-2">Estimasi insentif unit laku</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.5 HORIZONTAL QUICK SALES FILTER CHIPS -->
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="text-xs font-weight-bold text-muted text-uppercase letter-spacing-1">
+                        <i class="fa-solid fa-user-check me-1"></i> Filter Berdasarkan Sales PIC:
+                    </span>
+                    <span class="text-xs text-muted" id="salesChipsCountText">Pilih sales untuk memfilter</span>
+                </div>
+                <div class="sales-chips-bar" id="salesChipsBar">
+                    <button type="button" class="sales-chip-btn active" onclick="selectSalesFilter(0, '')">
+                        <i class="fa-solid fa-users"></i> Semua Sales
+                        <span class="chip-count" id="chipTotalUnitCount">0 Unit</span>
+                    </button>
+                </div>
+
+                <!-- 3. FILTER & SEARCH CONTROLS -->
+                <div class="filter-panel-card">
+                    <div class="row g-3 align-items-center justify-content-between">
+                        <div class="col-lg-6 col-md-12">
                             <div class="segment-filter-group" id="statusFilterGroup">
                                 <button type="button" class="segment-btn active" id="btnFilterAll" onclick="setFilterStatus('all', this)">
-                                    <i class="fa-solid fa-list"></i> Semua
+                                    <i class="fa-solid fa-list"></i> Semua Penjualan
                                 </button>
                                 <button type="button" class="segment-btn" id="btnFilterPending" onclick="setFilterStatus('pending', this)">
                                     <i class="fa-solid fa-triangle-exclamation text-warning"></i> Belum Invoice 
                                     <span class="badge bg-warning text-dark px-1.5 py-0.5" id="badgePendingCount" style="font-size: 10.5px;"><?php echo $statPendingTrx; ?></span>
                                 </button>
                                 <button type="button" class="segment-btn" id="btnFilterInvoiced" onclick="setFilterStatus('invoiced', this)">
-                                    <i class="fa-solid fa-circle-check text-success"></i> Ber-Invoice
+                                    <i class="fa-solid fa-circle-check text-success"></i> Sudah Ber-Invoice
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <div class="d-flex gap-2 justify-content-lg-end flex-wrap align-items-center">
+                                <div class="search-input-box flex-grow-1" style="max-width: 320px;">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Cari toko, barang, invoice..." oninput="handleSearchInput()">
+                                </div>
+                                <button type="button" class="btn btn-outline-secondary mb-0 px-3 font-weight-bold" style="border-radius: 12px; height: 42px;" onclick="toggleAdvancedFilters()">
+                                    <i class="fa-solid fa-filter me-1"></i> Filter Lanjutan
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-6 col-lg-5 col-md-12">
-                        <div class="d-flex gap-2 justify-content-lg-end flex-wrap align-items-center">
-                            <div class="quick-sales-box flex-grow-1" style="max-width: 240px;">
-                                <select id="quickSalesSelect" class="form-control-taste w-100" style="height: 42px; font-size: 13px;" onchange="handleQuickSalesChange(this.value)">
-                                    <option value="0">👤 Semua Sales PIC</option>
-                                </select>
-                            </div>
-                            <div class="search-input-box flex-grow-1" style="max-width: 260px;">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                <input type="text" id="searchInput" class="form-control" placeholder="Cari toko, barang, inv..." oninput="handleSearchInput()">
-                            </div>
-                            <button type="button" class="btn btn-outline-secondary mb-0 px-3 font-weight-bold" style="border-radius: 12px; height: 42px;" onclick="toggleAdvancedFilters()">
-                                <i class="fa-solid fa-filter me-1"></i> Filter
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Collapsible Advanced Filters -->
-                <div id="advancedFilterRow" class="row g-3 mt-2 pt-3 border-top d-none">
-                    <div class="col-md-4">
-                        <label class="form-label-taste mb-1">Filter Toko / Dealer Mitra</label>
-                        <select id="filterDealerSelect" class="form-control-taste w-100" onchange="loadInvoicesData()">
-                            <option value="0">-- Semua Toko Dealer --</option>
-                            <?php foreach ($dealerOptionList as $d) : 
-                                $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
-                                $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
-                            ?>
-                                <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($katBadge . $d['nama'] . $kotaText); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <?php if ($role !== 'Sales') : ?>
-                        <div class="col-md-3">
-                            <label class="form-label-taste mb-1">Filter Sales PIC (Detail)</label>
-                            <select id="filterSalesSelect" class="form-control-taste w-100" onchange="loadInvoicesData()">
-                                <option value="0">-- Semua Sales PIC --</option>
-                                <?php foreach ($salesOptionList as $s) : ?>
-                                    <option value="<?php echo $s['id']; ?>">
-                                        <?php echo htmlspecialchars($s['nama']); ?><?php echo !empty($s['jabatan']) ? ' (' . htmlspecialchars($s['jabatan']) . ')' : ''; ?>
-                                    </option>
+                    <!-- Collapsible Advanced Filters -->
+                    <div id="advancedFilterRow" class="row g-3 mt-2 pt-3 border-top d-none">
+                        <div class="col-md-4">
+                            <label class="form-label-taste mb-1">Filter Toko / Dealer Mitra</label>
+                            <select id="filterDealerSelect" class="form-control-taste w-100" onchange="loadInvoicesData()">
+                                <option value="0">-- Semua Toko Dealer --</option>
+                                <?php foreach ($dealerOptionList as $d) : 
+                                    $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
+                                    $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
+                                ?>
+                                    <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($katBadge . $d['nama'] . $kotaText); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                    <?php endif; ?>
-                    <div class="col-md-<?php echo ($role === 'Sales') ? '4' : '3'; ?>">
-                        <label class="form-label-taste mb-1">Tanggal Mulai Audit</label>
-                        <input type="date" id="filterTglMulai" class="form-control-taste w-100" onchange="loadInvoicesData()">
+                        <?php if ($role !== 'Sales') : ?>
+                            <div class="col-md-3">
+                                <label class="form-label-taste mb-1">Filter Sales PIC</label>
+                                <select id="filterSalesSelect" class="form-control-taste w-100" onchange="handleDropdownSalesChange(this.value)">
+                                    <option value="0">-- Semua Sales PIC --</option>
+                                    <?php foreach ($salesOptionList as $s) : ?>
+                                        <option value="<?php echo $s['id']; ?>">
+                                            <?php echo htmlspecialchars($s['nama']); ?><?php echo !empty($s['jabatan']) ? ' (' . htmlspecialchars($s['jabatan']) . ')' : ''; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        <?php endif; ?>
+                        <div class="col-md-<?php echo ($role === 'Sales') ? '4' : '3'; ?>">
+                            <label class="form-label-taste mb-1">Tanggal Mulai Audit</label>
+                            <input type="date" id="filterTglMulai" class="form-control-taste w-100" onchange="loadInvoicesData()">
+                        </div>
+                        <div class="col-md-<?php echo ($role === 'Sales') ? '4' : '2'; ?>">
+                            <label class="form-label-taste mb-1">Tanggal Akhir Audit</label>
+                            <input type="date" id="filterTglAkhir" class="form-control-taste w-100" onchange="loadInvoicesData()">
+                        </div>
                     </div>
-                    <div class="col-md-<?php echo ($role === 'Sales') ? '4' : '2'; ?>">
-                        <label class="form-label-taste mb-1">Tanggal Akhir Audit</label>
-                        <input type="date" id="filterTglAkhir" class="form-control-taste w-100" onchange="loadInvoicesData()">
+                </div>
+
+                <!-- 4. BATCH ACTION BAR (Shown when checkboxes are checked) -->
+                <div id="batchActionBar" class="batch-action-bar d-none">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.2); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                            <i class="fa-solid fa-check-double"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold fs-6" id="batchSelectedText">0 Item Terpilih</div>
+                            <div class="text-xs text-muted" id="batchSubtotalInfo">Total: 0 Unit | Estimasi Reward: Rp 0</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-light mb-0 font-weight-bold" onclick="unselectAllCheckboxes()">
+                            Batal
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success mb-0 font-weight-bold px-3" onclick="openBatchInvoiceModal()">
+                            <i class="fa-solid fa-file-pen me-1.5"></i> Input No. Invoice Kolektif
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5. INVOICE DATA TABLE -->
+                <div class="data-card-inv">
+                    <div class="table-responsive">
+                        <table class="table table-invoice" id="tableInvoices">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center;">
+                                        <input type="checkbox" id="checkAllItems" class="form-check-input" style="cursor: pointer;" onchange="toggleCheckAll(this)">
+                                    </th>
+                                    <th style="width: 26%;">TOKO / DEALER MITRA</th>
+                                    <th style="width: 24%;">PRODUK &amp; TERJUAL</th>
+                                    <th style="width: 14%; text-align: right;">REWARD INSENTIF</th>
+                                    <th style="width: 16%;">TGL &amp; KODE AUDIT</th>
+                                    <th style="width: 20%;">STATUS &amp; NO. INVOICE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoicesTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="spinner-border spinner-border-sm text-dark mb-2"></div>
+                                        <div class="text-xs text-muted font-weight-bold">Memuat daftar invoice TIP TOK...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- 4. BATCH ACTION BAR (Shown when checkboxes are checked) -->
-            <div id="batchActionBar" class="batch-action-bar d-none">
-                <div class="d-flex align-items-center gap-3">
-                    <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.2); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 16px;">
-                        <i class="fa-solid fa-check-double"></i>
-                    </div>
-                    <div>
-                        <div class="fw-bold fs-6" id="batchSelectedText">0 Item Terpilih</div>
-                        <div class="text-xs text-muted" id="batchSubtotalInfo">Total: 0 Unit | Estimasi Reward: Rp 0</div>
-                    </div>
+            <!-- ========================================================================= -->
+            <!-- VIEW 2: LEADERBOARD & PERFORMA SALES (DEDICATED VIEW)                    -->
+            <!-- ========================================================================= -->
+            <div id="mainViewLeaderboard" class="d-none">
+                <!-- Podium Top Performers -->
+                <div class="text-center mb-4">
+                    <h4 class="font-weight-bold text-dark mb-1" style="font-family: var(--font-heading);">
+                        🏆 Leaderboard &amp; Performa Sales TIP TOK
+                    </h4>
+                    <p class="text-sm text-muted mb-0">
+                        Peringkat performa sales berdasarkan unit faktur terbit, omset konsinyasi, dan target klaim insentif.
+                    </p>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-light mb-0 font-weight-bold" onclick="unselectAllCheckboxes()">
-                        Batal
-                    </button>
-                    <button type="button" class="btn btn-sm btn-success mb-0 font-weight-bold px-3" onclick="openBatchInvoiceModal()">
-                        <i class="fa-solid fa-file-pen me-1.5"></i> Input No. Invoice Kolektif
-                    </button>
-                </div>
-            </div>
 
-            <!-- 5. INVOICE DATA TABLE (VIEW 1: LIST TRANSAKSI) -->
-            <div class="data-card-inv" id="containerViewList">
-                <div class="table-responsive">
-                    <table class="table table-invoice" id="tableInvoices">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px; text-align: center;">
-                                    <input type="checkbox" id="checkAllItems" class="form-check-input" style="cursor: pointer;" onchange="toggleCheckAll(this)">
-                                </th>
-                                <th style="width: 26%;">TOKO / DEALER MITRA</th>
-                                <th style="width: 24%;">PRODUK &amp; TERJUAL</th>
-                                <th style="width: 14%; text-align: right;">REWARD INSENTIF</th>
-                                <th style="width: 16%;">TGL &amp; KODE AUDIT</th>
-                                <th style="width: 20%;">STATUS &amp; NO. INVOICE</th>
-                            </tr>
-                        </thead>
-                        <tbody id="invoicesTableBody">
-                            <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <div class="spinner-border spinner-border-sm text-dark mb-2"></div>
-                                    <div class="text-xs text-muted font-weight-bold">Memuat daftar invoice TIP TOK...</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 6. SALES PERFORMANCE RECAP TABLE (VIEW 2: REKAP SALES) -->
-            <div class="data-card-inv d-none" id="containerViewRecap">
-                <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light flex-wrap gap-2">
-                    <div>
-                        <h6 class="font-weight-bold text-dark mb-0"><i class="fa-solid fa-ranking-star text-warning me-1.5"></i> Rekapitulasi Performa &amp; Faktur Seluruh Sales</h6>
-                        <span class="text-xs text-muted font-weight-bold">Diurutkan berdasarkan unit ber-invoice &amp; total terjual</span>
+                <!-- 3D Podium Container -->
+                <div class="podium-container" id="podiumCardsContainer">
+                    <div class="text-center py-4 w-100">
+                        <div class="spinner-border spinner-border-sm text-primary mb-2"></div>
+                        <div class="text-xs text-muted font-weight-bold">Menyiapkan podium sales...</div>
                     </div>
-                    <span class="badge text-white px-3 py-1.5" style="background: #0f172a; border-radius: 20px; font-size: 11.5px; font-weight: 800;">
-                        Target Klaim: Min. 50 Unit
-                    </span>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-invoice" id="tableSalesRecap">
-                        <thead>
-                            <tr>
-                                <th style="width: 10%; text-align: center;">PERINGKAT</th>
-                                <th style="width: 24%;">PROFIL SALES</th>
-                                <th style="width: 12%; text-align: center;">TOKO MITRA</th>
-                                <th style="width: 22%;">TERJUAL &amp; TARGET KLAIM</th>
-                                <th style="width: 16%;">STATUS FAKTUR</th>
-                                <th style="width: 16%; text-align: right;">TOTAL INSENTIF</th>
-                            </tr>
-                        </thead>
-                        <tbody id="salesRecapTableBody">
-                            <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <div class="spinner-border spinner-border-sm text-dark mb-2"></div>
-                                    <div class="text-xs text-muted font-weight-bold">Memuat data performa sales...</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                <!-- Comprehensive Sales Table -->
+                <div class="data-card-inv mt-4">
+                    <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light flex-wrap gap-2">
+                        <div>
+                            <h6 class="font-weight-bold text-dark mb-0"><i class="fa-solid fa-list-ol text-primary me-1.5"></i> Tabel Peringkat Lengkap Seluruh Sales</h6>
+                            <span class="text-xs text-muted font-weight-bold">Diurutkan otomatis: Unit Ber-Invoice &gt; Total Terjual &gt; Total Insentif</span>
+                        </div>
+                        <span class="badge text-white px-3 py-1.5" style="background: #0f172a; border-radius: 20px; font-size: 11.5px; font-weight: 800;">
+                            Target Klaim: Min. 50 Unit
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-invoice" id="tableSalesRecap">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%; text-align: center;">PERINGKAT</th>
+                                    <th style="width: 24%;">PROFIL SALES</th>
+                                    <th style="width: 12%; text-align: center;">TOKO MITRA</th>
+                                    <th style="width: 22%;">TERJUAL &amp; TARGET KLAIM</th>
+                                    <th style="width: 16%;">STATUS FAKTUR</th>
+                                    <th style="width: 16%; text-align: right;">TOTAL INSENTIF</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesRecapTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="spinner-border spinner-border-sm text-dark mb-2"></div>
+                                        <div class="text-xs text-muted font-weight-bold">Memuat data performa sales...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -1093,10 +1088,11 @@ if ($qDealersPreload) {
     <script>
         let invoicesData = [];
         let leaderboardData = [];
+        let globalStatsData = null;
         let currentStatusFilter = 'all';
         let currentSalesFilter = 0;
         let currentSalesName = '';
-        let currentTableView = 'list'; // 'list' | 'recap'
+        let currentMainView = 'invoices'; // 'invoices' | 'leaderboard'
         let selectedTrxIds = new Set();
         let searchTimeout = null;
 
@@ -1128,6 +1124,29 @@ if ($qDealersPreload) {
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+        }
+
+        // =========================================================================
+        // VIEW NAVIGATION (DAFTAR FAKTUR vs LEADERBOARD SALES)
+        // =========================================================================
+        function switchMainView(view) {
+            currentMainView = view;
+            const viewInvoices = document.getElementById('mainViewInvoices');
+            const viewLeaderboard = document.getElementById('mainViewLeaderboard');
+            const btnInvoices = document.getElementById('btnNavInvoices');
+            const btnLeaderboard = document.getElementById('btnNavLeaderboard');
+
+            if (view === 'leaderboard') {
+                if (viewInvoices) viewInvoices.classList.add('d-none');
+                if (viewLeaderboard) viewLeaderboard.classList.remove('d-none');
+                if (btnInvoices) btnInvoices.classList.remove('active');
+                if (btnLeaderboard) btnLeaderboard.classList.add('active');
+            } else {
+                if (viewInvoices) viewInvoices.classList.remove('d-none');
+                if (viewLeaderboard) viewLeaderboard.classList.add('d-none');
+                if (btnInvoices) btnInvoices.classList.add('active');
+                if (btnLeaderboard) btnLeaderboard.classList.remove('active');
+            }
         }
 
         function toggleAdvancedFilters() {
@@ -1192,7 +1211,9 @@ if ($qDealersPreload) {
 
         function loadInvoicesData() {
             const tbody = document.getElementById('invoicesTableBody');
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5"><div class="spinner-border spinner-border-sm text-dark mb-2"></div><div class="text-xs text-muted font-weight-bold">Memuat data invoice...</div></td></tr>`;
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5"><div class="spinner-border spinner-border-sm text-dark mb-2"></div><div class="text-xs text-muted font-weight-bold">Memuat data invoice...</div></td></tr>`;
+            }
             
             const search = document.getElementById('searchInput')?.value.trim() || '';
             const dealer = document.getElementById('filterDealerSelect')?.value || '0';
@@ -1216,126 +1237,205 @@ if ($qDealersPreload) {
                     if (res && res.status === 'success') {
                         invoicesData = res.data.items || [];
                         leaderboardData = res.data.leaderboard || [];
+                        globalStatsData = res.data.global_stats;
+                        
                         updateMetricCards(res.data.global_stats);
-                        render3DLeaderboard(leaderboardData);
-                        populateQuickSalesDropdown(leaderboardData);
+                        renderSalesChips(leaderboardData, res.data.global_stats);
                         renderInvoicesTable(invoicesData);
+                        renderPodium(leaderboardData);
                         renderSalesRecapTable(leaderboardData);
                     } else {
-                        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger font-weight-bold">${(res && res.message) ? res.message : 'Gagal memuat data.'}</td></tr>`;
+                        if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger font-weight-bold">${(res && res.message) ? res.message : 'Gagal memuat data.'}</td></tr>`;
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat data.</td></tr>`;
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat data.</td></tr>`;
                 });
         }
 
         function updateMetricCards(stats) {
             if (!stats) return;
-            document.getElementById('statTotalUnit').textContent = `${new Intl.NumberFormat('id-ID').format(stats.grand_total_unit || 0)} Unit`;
-            document.getElementById('statPendingUnit').textContent = `${new Intl.NumberFormat('id-ID').format(stats.grand_pending_unit || 0)} Unit`;
-            document.getElementById('statPendingTrxText').textContent = `${stats.grand_pending_trx || 0} transaksi menunggu invoice`;
-            document.getElementById('statInvoicedUnit').textContent = `${new Intl.NumberFormat('id-ID').format(stats.grand_invoiced_unit || 0)} Unit`;
-            document.getElementById('statTotalInsentif').textContent = `Rp ${new Intl.NumberFormat('id-ID').format(stats.grand_total_insentif || 0)}`;
-            
+            const elTotalUnit = document.getElementById('statTotalUnit');
+            const elPendingUnit = document.getElementById('statPendingUnit');
+            const elPendingTrxText = document.getElementById('statPendingTrxText');
+            const elInvoicedUnit = document.getElementById('statInvoicedUnit');
+            const elTotalInsentif = document.getElementById('statTotalInsentif');
             const badgePending = document.getElementById('badgePendingCount');
+
+            if (elTotalUnit) elTotalUnit.textContent = `${new Intl.NumberFormat('id-ID').format(stats.grand_total_unit || 0)} Unit`;
+            if (elPendingUnit) elPendingUnit.textContent = `${new Intl.NumberFormat('id-ID').format(stats.grand_pending_unit || 0)} Unit`;
+            if (elPendingTrxText) elPendingTrxText.textContent = `${stats.grand_pending_trx || 0} transaksi menunggu invoice`;
+            if (elInvoicedUnit) elInvoicedUnit.textContent = `${new Intl.NumberFormat('id-ID').format(stats.grand_invoiced_unit || 0)} Unit`;
+            if (elTotalInsentif) elTotalInsentif.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(stats.grand_total_insentif || 0)}`;
             if (badgePending) badgePending.textContent = stats.grand_pending_trx || 0;
         }
 
-        function render3DLeaderboard(leaderboard) {
-            const container = document.getElementById('leaderboardCardsRow');
+        // =========================================================================
+        // HORIZONTAL SALES CHIP PILLS (QUICK FILTER)
+        // =========================================================================
+        function renderSalesChips(leaderboard, stats) {
+            const container = document.getElementById('salesChipsBar');
+            if (!container) return;
+
+            const totalAllUnit = stats ? (stats.grand_total_unit || 0) : 0;
+            const isAllActive = (currentSalesFilter === 0 && currentSalesName === '');
+
+            let html = `
+                <button type="button" class="sales-chip-btn ${isAllActive ? 'active' : ''}" onclick="selectSalesFilter(0, '')">
+                    <i class="fa-solid fa-users"></i> Semua Sales
+                    <span class="chip-count">${totalAllUnit} Unit</span>
+                </button>
+            `;
+
+            if (leaderboard && leaderboard.length > 0) {
+                leaderboard.forEach(s => {
+                    const isSelected = (currentSalesFilter == s.id_sales && s.id_sales > 0) || (currentSalesName === s.nama_sales && currentSalesName !== '');
+                    const medal = s.rank === 1 ? '🥇 ' : (s.rank === 2 ? '🥈 ' : (s.rank === 3 ? '🥉 ' : ''));
+                    
+                    html += `
+                        <button type="button" class="sales-chip-btn ${isSelected ? 'active' : ''}" onclick="selectSalesFilter(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
+                            <span>${medal}<strong>${escapeHtml(s.nama_sales)}</strong></span>
+                            <span class="chip-count">${s.invoiced_unit} Unit / ${s.count_invoices} INV</span>
+                        </button>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
+
+            const countText = document.getElementById('salesChipsCountText');
+            if (countText) {
+                if (currentSalesName) {
+                    countText.innerHTML = `Filter aktif: <strong class="text-primary">${escapeHtml(currentSalesName)}</strong>`;
+                } else {
+                    countText.textContent = `Menampilkan seluruh ${leaderboard ? leaderboard.length : 0} sales`;
+                }
+            }
+        }
+
+        function selectSalesFilter(idSales, nameSales) {
+            if (currentSalesFilter === idSales && idSales > 0) {
+                // Toggle off
+                currentSalesFilter = 0;
+                currentSalesName = '';
+            } else {
+                currentSalesFilter = idSales;
+                currentSalesName = nameSales || '';
+            }
+
+            const advSel = document.getElementById('filterSalesSelect');
+            if (advSel) advSel.value = currentSalesFilter;
+
+            loadInvoicesData();
+        }
+
+        function handleDropdownSalesChange(val) {
+            const sel = document.getElementById('filterSalesSelect');
+            const opt = sel ? sel.options[sel.selectedIndex] : null;
+            const name = opt ? (opt.text.split('(')[0].trim()) : '';
+            currentSalesFilter = parseInt(val) || 0;
+            currentSalesName = (currentSalesFilter > 0) ? name : '';
+            loadInvoicesData();
+        }
+
+        function filterAndSwitchToInvoices(idSales, nameSales) {
+            switchMainView('invoices');
+            selectSalesFilter(idSales, nameSales);
+        }
+
+        // =========================================================================
+        // 3D PODIUM RENDERING (LEADERBOARD VIEW)
+        // =========================================================================
+        function renderPodium(leaderboard) {
+            const container = document.getElementById('podiumCardsContainer');
             if (!container) return;
 
             if (!leaderboard || leaderboard.length === 0) {
                 container.innerHTML = `
-                    <div class="col-12">
-                        <div class="p-4 text-center rounded-3 bg-white border" style="border: 1.5px dashed #cbd5e1 !important;">
-                            <i class="fa-solid fa-trophy fa-2x text-muted mb-2"></i>
-                            <div class="font-weight-bold text-dark text-sm">Belum Ada Transaksi Terjual</div>
-                            <div class="text-xs text-muted">Leaderboard akan aktif otomatis saat sales melakukan audit unit laku.</div>
-                        </div>
+                    <div class="p-5 text-center bg-white rounded-4 border w-100" style="border: 2px dashed #cbd5e1 !important;">
+                        <i class="fa-solid fa-trophy fa-3x text-muted mb-3 opacity-50"></i>
+                        <h5 class="font-weight-bold text-dark mb-1">Belum Ada Data Penjualan</h5>
+                        <p class="text-sm text-muted mb-0">Podium peringkat sales akan tampil otomatis saat audit unit laku tercatat.</p>
                     </div>
                 `;
                 return;
             }
 
+            const top3 = leaderboard.slice(0, 3);
             let html = '';
-            leaderboard.slice(0, 4).forEach((s, idx) => {
-                const rank = idx + 1;
-                const rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''));
-                const medalClass = rank === 1 ? 'medal-gold' : (rank === 2 ? 'medal-silver' : (rank === 3 ? 'medal-bronze' : 'medal-default'));
-                const medalIcon = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : `#${rank}`));
-                const isActive = (currentSalesFilter == s.id_sales && s.id_sales > 0) || (currentSalesName === s.nama_sales && currentSalesName !== '');
-                
+
+            // Handle 1, 2, or 3+ sales gracefully
+            top3.forEach(s => {
+                const rank = s.rank;
+                const rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : 'rank-3');
+                const rankTitle = rank === 1 ? '🥇 JUARA 1' : (rank === 2 ? '🥈 JUARA 2' : '🥉 JUARA 3');
                 const initials = s.nama_sales ? s.nama_sales.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'SL';
 
                 html += `
-                    <div class="col-xl-3 col-md-6">
-                        <div class="sales-card-3d ${rankClass} ${isActive ? 'is-active-filter' : ''}" onclick="selectSalesFilter(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
-                            <div>
-                                <!-- Top: Rank Medal & Profile -->
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center gap-2.5">
-                                        <div class="sales-avatar-3d">
-                                            ${escapeHtml(initials)}
-                                        </div>
-                                        <div>
-                                            <div class="font-weight-bold text-dark" style="font-size: 14.5px; line-height: 1.2;">
-                                                ${escapeHtml(s.nama_sales)}
-                                            </div>
-                                            <div class="text-xs text-muted font-weight-bold mt-0.5">
-                                                <i class="fa-solid fa-store me-1"></i> ${s.total_toko} Toko Mitra
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="medal-badge-3d ${medalClass}">
-                                        ${medalIcon}
-                                    </div>
-                                </div>
+                    <div class="podium-card ${rankClass}">
+                        <div class="podium-rank-badge">
+                            ${rankTitle}
+                        </div>
+                        <div class="podium-avatar">
+                            ${escapeHtml(initials)}
+                        </div>
+                        <h5 class="font-weight-bold text-dark mb-0" style="font-family: var(--font-heading); font-size: 16px;">
+                            ${escapeHtml(s.nama_sales)}
+                        </h5>
+                        <div class="text-xs text-muted font-weight-bold mt-0.5 mb-3">
+                            <i class="fa-solid fa-store text-primary me-1"></i> ${s.total_toko} Toko Mitra Aktif
+                        </div>
 
-                                <!-- Mid: Invoiced Unit & Total Laku -->
-                                <div class="p-2.5 rounded-3 mb-2.5" style="background: rgba(255,255,255,0.75); border: 1px solid rgba(226,232,240,0.8);">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="text-xs font-weight-bold text-secondary">Faktur / Invoice:</span>
-                                        <span class="badge text-white px-2 py-0.5" style="background: #047857; font-size: 11px; font-weight: 800; border-radius: 6px;">
-                                            <i class="fa-solid fa-file-invoice me-1"></i> ${s.invoiced_unit} Unit (${s.count_invoices} INV)
-                                        </span>
-                                    </div>
-                                    ${s.pending_unit > 0 ? `
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="text-xs font-weight-bold" style="color: #b45309;">Pending Invoice:</span>
-                                            <span class="badge bg-warning text-dark px-2 py-0.5" style="font-size: 10.5px; font-weight: 800; border-radius: 6px;">
-                                                ${s.pending_unit} Unit (${s.count_pending_trx} Trx)
-                                            </span>
-                                        </div>
-                                    ` : ''}
+                        <!-- Highlights Box -->
+                        <div class="p-2.5 rounded-3 mb-3 text-start" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <span class="text-xs font-weight-bold text-secondary">Faktur Terbit:</span>
+                                <span class="badge text-white px-2 py-0.5" style="background: #047857; font-size: 11px; font-weight: 800; border-radius: 6px;">
+                                    <i class="fa-solid fa-file-invoice me-1"></i> ${s.invoiced_unit} Unit (${s.count_invoices} INV)
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-xs font-weight-bold text-secondary">Total Terjual:</span>
+                                <span class="badge bg-light text-dark px-2 py-0.5" style="font-size: 11px; font-weight: 800; border: 1px solid #cbd5e1; border-radius: 6px;">
+                                    ${s.total_terjual} Unit Fisik
+                                </span>
+                            </div>
+                            ${s.pending_unit > 0 ? `
+                                <div class="d-flex justify-content-between align-items-center mt-1.5 pt-1.5 border-top">
+                                    <span class="text-xs font-weight-bold" style="color: #b45309;">Belum Invoice:</span>
+                                    <span class="badge bg-warning text-dark px-2 py-0.5" style="font-size: 10.5px; font-weight: 800; border-radius: 6px;">
+                                        ${s.pending_unit} Unit (${s.count_pending_trx} Trx)
+                                    </span>
                                 </div>
+                            ` : ''}
+                        </div>
 
-                                <!-- Milestone Progress towards 50 Units -->
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-1 text-xs font-weight-bold">
-                                        <span class="text-muted">Target Klaim (Min. 50):</span>
-                                        <span class="text-dark">${s.invoiced_unit} / 50 (${s.claim_progress}%)</span>
-                                    </div>
-                                    <div class="progress-meter-3d">
-                                        <div class="progress-meter-bar-3d" style="width: ${s.claim_progress}%;"></div>
-                                    </div>
+                        <!-- Milestone Progress towards 50 Units -->
+                        <div class="mb-3 text-start">
+                            <div class="d-flex justify-content-between align-items-center text-xs font-weight-bold mb-1">
+                                <span class="text-muted">Target Klaim (Min. 50):</span>
+                                <span class="text-dark">${s.invoiced_unit} / 50 (${s.claim_progress}%)</span>
+                            </div>
+                            <div class="podium-progress">
+                                <div class="podium-progress-bar" style="width: ${s.claim_progress}%;"></div>
+                            </div>
+                            <div class="text-xs text-muted mt-1">
+                                ${s.units_needed > 0 ? `Kurang <strong class="text-danger">${s.units_needed} Unit</strong> lagi` : '<strong class="text-success"><i class="fa-solid fa-circle-check"></i> Siap Klaim!</strong>'}
+                            </div>
+                        </div>
+
+                        <!-- Insentif & CTA -->
+                        <div class="pt-2.5 border-top d-flex align-items-center justify-content-between">
+                            <div class="text-start">
+                                <div class="text-xs text-muted font-weight-bold">Estimasi Reward:</div>
+                                <div style="font-family: var(--font-heading); font-size: 16px; font-weight: 900; color: #047857;">
+                                    Rp ${new Intl.NumberFormat('id-ID').format(s.total_insentif)}
                                 </div>
                             </div>
-
-                            <!-- Bottom: Total Reward Insentif & Filter Hint -->
-                            <div class="pt-2 border-top d-flex align-items-center justify-content-between mt-1">
-                                <div>
-                                    <div class="text-xs text-muted font-weight-bold">Total Insentif</div>
-                                    <div style="font-family: var(--font-heading); font-weight: 800; font-size: 15px; color: #047857;">
-                                        Rp ${new Intl.NumberFormat('id-ID').format(s.total_insentif)}
-                                    </div>
-                                </div>
-                                <div class="text-xs font-weight-bold ${isActive ? 'text-primary' : 'text-muted'}">
-                                    ${isActive ? '<i class="fa-solid fa-check-circle text-primary"></i> Aktif' : '<i class="fa-solid fa-arrow-right"></i> Filter'}
-                                </div>
-                            </div>
+                            <button type="button" class="btn btn-sm btn-dark mb-0 font-weight-bold px-3" style="border-radius: 9px; font-size: 11.5px; background: #0f172a;" onclick="filterAndSwitchToInvoices(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
+                                Faktur <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1344,99 +1444,9 @@ if ($qDealersPreload) {
             container.innerHTML = html;
         }
 
-        function populateQuickSalesDropdown(leaderboard) {
-            const sel = document.getElementById('quickSalesSelect');
-            if (!sel) return;
-
-            let html = '<option value="0">👤 Semua Sales PIC</option>';
-            if (leaderboard && leaderboard.length > 0) {
-                leaderboard.forEach(s => {
-                    const medal = s.rank === 1 ? '🥇 ' : (s.rank === 2 ? '🥈 ' : (s.rank === 3 ? '🥉 ' : ''));
-                    const isSel = (currentSalesFilter == s.id_sales && s.id_sales > 0) ? 'selected' : '';
-                    html += `<option value="${s.id_sales}" data-name="${escapeHtml(s.nama_sales)}" ${isSel}>${medal}${escapeHtml(s.nama_sales)} (${s.invoiced_unit} Unit / ${s.count_invoices} INV)</option>`;
-                });
-            }
-            sel.innerHTML = html;
-        }
-
-        function handleQuickSalesChange(val) {
-            const sel = document.getElementById('quickSalesSelect');
-            const opt = sel.options[sel.selectedIndex];
-            const name = opt ? (opt.getAttribute('data-name') || '') : '';
-            selectSalesFilter(parseInt(val) || 0, name);
-        }
-
-        function selectSalesFilter(idSales, nameSales) {
-            if (currentSalesFilter === idSales && currentSalesFilter > 0) {
-                resetSalesFilter();
-                return;
-            }
-
-            currentSalesFilter = idSales;
-            currentSalesName = nameSales || '';
-
-            const filterBadge = document.getElementById('activeSalesFilterBadge');
-            const nameLabel = document.getElementById('activeSalesNameLabel');
-            if (currentSalesFilter > 0 || currentSalesName !== '') {
-                if (filterBadge) filterBadge.classList.remove('d-none');
-                if (filterBadge) filterBadge.classList.add('d-flex');
-                if (nameLabel) nameLabel.textContent = currentSalesName || `Sales #${currentSalesFilter}`;
-            } else {
-                if (filterBadge) filterBadge.classList.add('d-none');
-                if (filterBadge) filterBadge.classList.remove('d-flex');
-            }
-
-            const quickSel = document.getElementById('quickSalesSelect');
-            if (quickSel) quickSel.value = currentSalesFilter;
-
-            const advSel = document.getElementById('filterSalesSelect');
-            if (advSel) advSel.value = currentSalesFilter;
-
-            loadInvoicesData();
-        }
-
-        function resetSalesFilter() {
-            currentSalesFilter = 0;
-            currentSalesName = '';
-
-            const filterBadge = document.getElementById('activeSalesFilterBadge');
-            if (filterBadge) {
-                filterBadge.classList.add('d-none');
-                filterBadge.classList.remove('d-flex');
-            }
-
-            const quickSel = document.getElementById('quickSalesSelect');
-            if (quickSel) quickSel.value = "0";
-
-            const advSel = document.getElementById('filterSalesSelect');
-            if (advSel) advSel.value = "0";
-
-            loadInvoicesData();
-        }
-
-        function switchTableView(view) {
-            currentTableView = view;
-            const btnList = document.getElementById('btnViewList');
-            const btnRecap = document.getElementById('btnViewRecap');
-            const containerList = document.getElementById('containerViewList');
-            const containerRecap = document.getElementById('containerViewRecap');
-            const statusGroup = document.getElementById('statusFilterGroup');
-
-            if (view === 'recap') {
-                if (btnList) btnList.classList.remove('active');
-                if (btnRecap) btnRecap.classList.add('active');
-                if (containerList) containerList.classList.add('d-none');
-                if (containerRecap) containerRecap.classList.remove('d-none');
-                if (statusGroup) statusGroup.classList.add('d-none');
-            } else {
-                if (btnList) btnList.classList.add('active');
-                if (btnRecap) btnRecap.classList.remove('active');
-                if (containerList) containerList.classList.remove('d-none');
-                if (containerRecap) containerRecap.classList.add('d-none');
-                if (statusGroup) statusGroup.classList.remove('d-none');
-            }
-        }
-
+        // =========================================================================
+        // FULL SALES RECAP TABLE (LEADERBOARD VIEW)
+        // =========================================================================
         function renderSalesRecapTable(leaderboard) {
             const tbody = document.getElementById('salesRecapTableBody');
             if (!tbody) return;
@@ -1445,9 +1455,7 @@ if ($qDealersPreload) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="text-center py-5">
-                            <div class="d-inline-flex p-3 rounded-circle bg-light text-muted mb-2">
-                                <i class="fa-solid fa-trophy fa-2x"></i>
-                            </div>
+                            <i class="fa-solid fa-trophy fa-2x text-muted mb-2"></i>
                             <div class="font-weight-bold text-dark text-base mb-1">Belum Ada Rekap Sales</div>
                             <p class="text-sm text-muted mb-0">Belum ada data transaksi terjual yang tercatat.</p>
                         </td>
@@ -1458,20 +1466,20 @@ if ($qDealersPreload) {
 
             let html = '';
             leaderboard.forEach(s => {
-                const medalClass = s.rank === 1 ? 'medal-gold' : (s.rank === 2 ? 'medal-silver' : (s.rank === 3 ? 'medal-bronze' : 'medal-default'));
                 const medalText = s.rank === 1 ? '🥇 #1' : (s.rank === 2 ? '🥈 #2' : (s.rank === 3 ? '🥉 #3' : `#${s.rank}`));
+                const badgeColor = s.rank === 1 ? 'background: #fef3c7; color: #b45309; border: 1.5px solid #fde68a;' : (s.rank === 2 ? 'background: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1;' : (s.rank === 3 ? 'background: #ffedd5; color: #c2410c; border: 1.5px solid #fed7aa;' : 'background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0;'));
                 const initials = s.nama_sales ? s.nama_sales.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'SL';
 
                 html += `
                     <tr>
                         <td class="text-center">
-                            <span class="medal-badge-3d ${medalClass}">
+                            <span class="badge px-2.5 py-1.5 font-weight-bold" style="${badgeColor} font-size: 12px; border-radius: 10px;">
                                 ${medalText}
                             </span>
                         </td>
                         <td>
                             <div class="d-flex align-items-center gap-2.5">
-                                <div class="sales-avatar-3d" style="width: 36px; height: 36px; font-size: 13px;">
+                                <div style="width: 36px; height: 36px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;">
                                     ${escapeHtml(initials)}
                                 </div>
                                 <div>
@@ -1481,20 +1489,20 @@ if ($qDealersPreload) {
                             </div>
                         </td>
                         <td class="text-center">
-                            <span class="badge bg-light text-dark px-2.5 py-1" style="font-size: 12px; font-weight: 800; border: 1px solid #cbd5e1;">
+                            <span class="badge bg-light text-dark px-2.5 py-1" style="font-size: 12px; font-weight: 800; border: 1px solid #cbd5e1; border-radius: 8px;">
                                 <i class="fa-solid fa-store text-primary me-1"></i> ${s.total_toko} Toko
                             </span>
                         </td>
                         <td>
                             <div class="d-flex justify-content-between align-items-center mb-1 text-xs font-weight-bold">
                                 <span class="text-dark">Laku: <strong>${s.total_terjual} Unit</strong></span>
-                                <span class="text-muted">${s.claim_progress}% Menuju Klaim</span>
+                                <span class="text-muted">${s.claim_progress}% Klaim</span>
                             </div>
-                            <div class="progress-meter-3d mb-1">
-                                <div class="progress-meter-bar-3d" style="width: ${s.claim_progress}%;"></div>
+                            <div class="podium-progress mb-1" style="height: 6px;">
+                                <div class="podium-progress-bar" style="width: ${s.claim_progress}%;"></div>
                             </div>
                             <div class="text-xs text-muted">
-                                ${s.units_needed > 0 ? `Kurang <span class="text-danger font-weight-bold">${s.units_needed} Unit</span> untuk klaim insentif` : '<span class="text-success font-weight-bold"><i class="fa-solid fa-circle-check"></i> Memenuhi Syarat Klaim!</span>'}
+                                ${s.units_needed > 0 ? `Kurang <span class="text-danger font-weight-bold">${s.units_needed} Unit</span> untuk klaim` : '<span class="text-success font-weight-bold"><i class="fa-solid fa-circle-check"></i> Memenuhi Syarat Klaim!</span>'}
                             </div>
                         </td>
                         <td>
@@ -1510,10 +1518,10 @@ if ($qDealersPreload) {
                             </div>
                         </td>
                         <td class="text-end">
-                            <div style="font-family: var(--font-heading); font-size: 16px; font-weight: 800; color: #047857;">
+                            <div style="font-family: var(--font-heading); font-size: 15px; font-weight: 800; color: #047857;">
                                 Rp ${new Intl.NumberFormat('id-ID').format(s.total_insentif)}
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2.5 font-weight-bold mt-1 mb-0" style="border-radius: 8px; font-size: 11.5px;" onclick="selectSalesFilterAndSwitch(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
+                            <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2.5 font-weight-bold mt-1 mb-0" style="border-radius: 8px; font-size: 11px;" onclick="filterAndSwitchToInvoices(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
                                 <i class="fa-solid fa-magnifying-glass me-1"></i> Lihat Faktur
                             </button>
                         </td>
@@ -1524,13 +1532,13 @@ if ($qDealersPreload) {
             tbody.innerHTML = html;
         }
 
-        function selectSalesFilterAndSwitch(idSales, nameSales) {
-            switchTableView('list');
-            selectSalesFilter(idSales, nameSales);
-        }
-
+        // =========================================================================
+        // INVOICES DATA TABLE (INVOICES VIEW)
+        // =========================================================================
         function renderInvoicesTable(items) {
             const tbody = document.getElementById('invoicesTableBody');
+            if (!tbody) return;
+
             selectedTrxIds.clear();
             updateBatchActionBar();
 
@@ -1667,6 +1675,7 @@ if ($qDealersPreload) {
 
         function updateBatchActionBar() {
             const bar = document.getElementById('batchActionBar');
+            if (!bar) return;
             const count = selectedTrxIds.size;
             if (count > 0) {
                 bar.classList.remove('d-none');
@@ -1681,8 +1690,10 @@ if ($qDealersPreload) {
                     }
                 });
 
-                document.getElementById('batchSelectedText').textContent = `${count} Transaksi Penjualan Terpilih`;
-                document.getElementById('batchSubtotalInfo').textContent = `Total Fisik: ${sumUnit} Unit | Total Estimasi Insentif: Rp ${new Intl.NumberFormat('id-ID').format(sumIns)}`;
+                const textEl = document.getElementById('batchSelectedText');
+                const subEl = document.getElementById('batchSubtotalInfo');
+                if (textEl) textEl.textContent = `${count} Transaksi Penjualan Terpilih`;
+                if (subEl) subEl.textContent = `Total Fisik: ${sumUnit} Unit | Total Estimasi Insentif: Rp ${new Intl.NumberFormat('id-ID').format(sumIns)}`;
             } else {
                 bar.classList.add('d-none');
             }
