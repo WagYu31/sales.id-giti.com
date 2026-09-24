@@ -1143,6 +1143,12 @@ if ($action === 'get_tiptok_invoices') {
     $tgl_mulai = trim($_GET['tgl_mulai'] ?? '');
     $tgl_akhir = trim($_GET['tgl_akhir'] ?? '');
 
+    // Self-healing database: sync id_sales pada tiptok_penitipan berdasarkan nama_sales di tabel sales
+    @$conn->query("UPDATE tiptok_penitipan p 
+                   JOIN sales s ON (s.nama_lengkap = p.nama_sales OR s.nama = p.nama_sales OR p.nama_sales LIKE CONCAT('%', s.nama_lengkap, '%')) 
+                   SET p.id_sales = s.id 
+                   WHERE p.nama_sales IS NOT NULL AND p.nama_sales != '' AND (p.id_sales IS NULL OR p.id_sales = 0 OR p.id_sales != s.id)");
+
     // Auto-sync kunjungan sales dengan sales penitipan jika ada perbedaan
     @$conn->query("UPDATE tiptok_kunjungan k 
                    JOIN tiptok_penitipan p ON k.id_penitipan = p.id 
@@ -1151,11 +1157,23 @@ if ($action === 'get_tiptok_invoices') {
                      AND (k.nama_sales != p.nama_sales OR k.id_sales != p.id_sales OR k.id_sales IS NULL OR k.id_sales = 0)");
 
     $where = ["k.qty_terjual_kunjungan > 0"];
+    $salesNameFilter = '';
 
     if ($jabatanUser === 'Sales') {
-        $where[] = "(p.id_sales = '$idUser' OR k.id_sales = '$idUser')";
+        $where[] = "(p.id_sales = '$idUser' OR k.id_sales = '$idUser' OR p.nama_sales = '" . $conn->real_escape_string($namaUser) . "')";
     } elseif ($id_sales_filter > 0) {
-        $where[] = "(p.id_sales = '$id_sales_filter' OR k.id_sales = '$id_sales_filter')";
+        $qS = $conn->query("SELECT nama_lengkap, nama FROM sales WHERE id = '$id_sales_filter' LIMIT 1");
+        if ($qS && $qS->num_rows > 0) {
+            $rowS = $qS->fetch_assoc();
+            $salesNameFilter = !empty($rowS['nama_lengkap']) ? $rowS['nama_lengkap'] : ($rowS['nama'] ?? '');
+        }
+
+        if (!empty($salesNameFilter)) {
+            $safeNameFilter = $conn->real_escape_string($salesNameFilter);
+            $where[] = "(p.id_sales = '$id_sales_filter' OR k.id_sales = '$id_sales_filter' OR p.nama_sales = '$safeNameFilter' OR k.nama_sales = '$safeNameFilter' OR p.nama_sales LIKE '%$safeNameFilter%' OR k.nama_sales LIKE '%$safeNameFilter%')";
+        } else {
+            $where[] = "(p.id_sales = '$id_sales_filter' OR k.id_sales = '$id_sales_filter')";
+        }
     }
 
     if ($statusInv === 'pending') {
@@ -1229,8 +1247,19 @@ if ($action === 'get_tiptok_invoices') {
         }
     }
 
-    // Global stats tanpa filter status
-    $whereStatSales = ($jabatanUser === 'Sales') ? " AND k.id_sales = '$idUser'" : "";
+    // Global stats dengan filter sales jika dipilih
+    $whereStatSales = "";
+    if ($jabatanUser === 'Sales') {
+        $whereStatSales = " AND (p.id_sales = '$idUser' OR k.id_sales = '$idUser' OR p.nama_sales = '" . $conn->real_escape_string($namaUser) . "')";
+    } elseif ($id_sales_filter > 0) {
+        if (!empty($salesNameFilter)) {
+            $safeNameFilter = $conn->real_escape_string($salesNameFilter);
+            $whereStatSales = " AND (p.id_sales = '$id_sales_filter' OR k.id_sales = '$id_sales_filter' OR p.nama_sales = '$safeNameFilter' OR k.nama_sales = '$safeNameFilter' OR p.nama_sales LIKE '%$safeNameFilter%' OR k.nama_sales LIKE '%$safeNameFilter%')";
+        } else {
+            $whereStatSales = " AND (p.id_sales = '$id_sales_filter' OR k.id_sales = '$id_sales_filter')";
+        }
+    }
+
     $qStat = $conn->query("SELECT 
         SUM(k.qty_terjual_kunjungan) AS grand_total_unit,
         SUM(CASE WHEN k.no_inv IS NULL OR TRIM(k.no_inv) = '' THEN k.qty_terjual_kunjungan ELSE 0 END) AS grand_pending_unit,
@@ -1238,6 +1267,7 @@ if ($action === 'get_tiptok_invoices') {
         SUM(CASE WHEN k.no_inv IS NULL OR TRIM(k.no_inv) = '' THEN 1 ELSE 0 END) AS grand_pending_trx,
         SUM(k.insentif_didapat) AS grand_total_insentif
         FROM tiptok_kunjungan k 
+        JOIN tiptok_penitipan p ON k.id_penitipan = p.id
         WHERE k.qty_terjual_kunjungan > 0 $whereStatSales");
     $stats = $qStat ? $qStat->fetch_assoc() : [];
 
