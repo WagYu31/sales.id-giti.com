@@ -772,13 +772,64 @@ $loewixPriceList = $tiptokMaster6;
             white-space: nowrap;
         }
         .table-vibrant td {
-            padding: 16px 18px;
-            vertical-align: middle;
+            padding: 14px 16px !important;
+            vertical-align: top !important;
             border-bottom: 1.5px solid #e2e8f0;
-            font-size: 14.5px;
+            font-size: 13.5px;
             color: #0f172a;
             background-color: #ffffff;
             transition: background-color 0.15s ease;
+        }
+
+        /* Compact Inventory Monitoring Feed for Main Table */
+        .monitoring-box {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 4px 6px;
+            max-height: 155px;
+            overflow-y: auto;
+        }
+        .monitoring-box::-webkit-scrollbar {
+            width: 4px;
+        }
+        .monitoring-box::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .monitoring-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 3px 7px;
+            margin-bottom: 2px;
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+            border-radius: 6px;
+            font-size: 11.5px;
+            transition: background 0.12s ease;
+        }
+        .monitoring-item-row:hover {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+        }
+        .badge-sisa-pill {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .badge-laku-pill {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 800;
         }
         .table-vibrant tr:nth-child(even) td {
             background-color: #fbfcfe;
@@ -1941,13 +1992,13 @@ $loewixPriceList = $tiptokMaster6;
                     <table class="table table-vibrant" id="mainTiptokTable">
                         <thead>
                             <tr>
-                                <th style="width: 4%; text-align: center;">#</th>
-                                <th style="width: 26%;">TOKO / DEALER</th>
-                                <th style="width: 14%;">KODE & TGL</th>
-                                <th style="width: 24%;">BARANG & MONITORING STOK</th>
-                                <th style="width: 14%;">INVOICE & INSENTIF</th>
-                                <th style="width: 8%;">STATUS</th>
-                                <th style="width: 10%; text-align: right;">AKSI</th>
+                                <th style="width: 3.5%; text-align: center;">#</th>
+                                <th style="width: 25%;">TOKO / DEALER</th>
+                                <th style="width: 15%;">KODE &amp; TGL</th>
+                                <th style="width: 28%;">BARANG &amp; MONITORING STOK</th>
+                                <th style="width: 14%;">INVOICE &amp; INSENTIF</th>
+                                <th style="width: 6.5%; text-align: center;">STATUS</th>
+                                <th style="width: 8%; text-align: right;">AKSI</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1987,58 +2038,77 @@ $loewixPriceList = $tiptokMaster6;
                                     if (substr($telpRaw, 0, 1) === '0') $telpRaw = '62' . substr($telpRaw, 1);
                                     ?>
                                     <tr class="tiptok-row" data-category="<?php echo $filterCat; ?>">
-                                        <td class="text-center font-weight-bold" style="font-size: 14px; color: #475569;">
-                                            <span style="background: #e2e8f0; color: #0f172a; padding: 4px 8px; border-radius: 6px; font-weight: 800;"><?php echo $no++; ?></span>
+                                        <td class="text-center font-weight-bold" style="vertical-align: top; padding-top: 14px;">
+                                            <span style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 12px; display: inline-block;"><?php echo $no++; ?></span>
                                         </td>
                                         
-                                        <!-- Toko -->
-                                        <td>
-                                            <div class="d-flex align-items-center gap-2 flex-wrap">
-                                                <span class="font-weight-bold" style="font-size: 16px; color: #0f172a; line-height: 1.3;"><?php echo htmlspecialchars($row['nama_toko'] ?? 'Toko Tidak Ditemukan'); ?></span>
-                                                <span class="taste-badge badge-dealer-tag"><?php echo htmlspecialchars($row['kategori_customer'] ?? 'Dealer'); ?></span>
+                                        <!-- Toko / Dealer -->
+                                        <td style="vertical-align: top; padding-top: 14px;">
+                                            <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                                <span class="font-weight-bold text-dark" style="font-size: 15px; line-height: 1.3;"><?php echo htmlspecialchars($row['nama_toko'] ?? 'Toko Tidak Ditemukan'); ?></span>
+                                                <span class="taste-badge badge-dealer-tag" style="font-size: 10.5px; padding: 2px 7px;"><?php echo htmlspecialchars($row['kategori_customer'] ?? 'Dealer'); ?></span>
                                             </div>
-                                            <div style="font-size: 13.5px; font-weight: 600; color: #334155; margin-top: 4px; line-height: 1.4;">
-                                                <?php echo htmlspecialchars($row['alamat_toko'] ?? '-'); ?><?php echo !empty($row['kota_toko']) ? ', ' . htmlspecialchars($row['kota_toko']) : ''; ?>
+                                            <div class="text-muted" style="font-size: 12.5px; font-weight: 600; margin-top: 4px; line-height: 1.4;">
+                                                <i class="fa-solid fa-location-dot text-secondary me-1" style="font-size: 11px;"></i><?php echo htmlspecialchars($row['alamat_toko'] ?? '-'); ?><?php echo !empty($row['kota_toko']) ? ', ' . htmlspecialchars($row['kota_toko']) : ''; ?>
                                             </div>
                                             <?php if (!empty($telpRaw)) : ?>
-                                                <a href="https://wa.me/<?php echo $telpRaw; ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 800; text-decoration: none; margin-top: 6px;">
-                                                    <i class="fa-brands fa-whatsapp"></i> <?php echo htmlspecialchars($row['telp_toko']); ?>
-                                                </a>
+                                                <div style="margin-top: 6px;">
+                                                    <a href="https://wa.me/<?php echo $telpRaw; ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 3px 9px; border-radius: 6px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                                                        <i class="fa-brands fa-whatsapp"></i> <?php echo htmlspecialchars($row['telp_toko']); ?>
+                                                    </a>
+                                                </div>
                                             <?php endif; ?>
                                         </td>
 
                                         <!-- Kode & Tanggal -->
-                                        <td>
-                                            <div class="font-monospace" style="font-size: 13.5px; font-weight: 800; color: #0f172a; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; border: 1.5px solid #cbd5e1; border-left: 4px solid #2563eb; display: inline-block;">
+                                        <td style="vertical-align: top; padding-top: 14px;">
+                                            <div class="font-monospace" style="font-size: 12.5px; font-weight: 800; color: #0f172a; background: #f8fafc; padding: 3px 8px; border-radius: 6px; border: 1px solid #cbd5e1; border-left: 3px solid #2563eb; display: inline-block; white-space: nowrap;">
                                                 <?php echo htmlspecialchars($row['kode_titip']); ?>
                                             </div>
-                                            <div style="font-size: 13.5px; font-weight: 700; color: #334155; margin-top: 5px;">
+                                            <div class="text-muted" style="font-size: 12.5px; font-weight: 600; margin-top: 5px;">
                                                 <i class="fa-regular fa-calendar me-1 text-primary"></i><?php echo date('d M Y', strtotime($row['tgl_titip'])); ?>
                                             </div>
-                                            <div style="margin-top: 3px;">
-                                                <span class="taste-badge badge-sales-tag" style="font-size: 12px; padding: 2px 8px;">
+                                            <div style="margin-top: 4px;">
+                                                <span class="taste-badge badge-sales-tag" style="font-size: 11.5px; padding: 2px 8px;">
                                                     <i class="fa-solid fa-user-tie me-1"></i><?php echo htmlspecialchars($row['nama_sales'] ?? 'Sales'); ?>
                                                 </span>
                                             </div>
                                         </td>
 
-                                        <!-- Barang & Stok -->
-                                        <td>
-                                            <div class="d-flex flex-column gap-1">
+                                        <!-- Barang & Monitoring Stok (Compact Sleek Inventory Feed) -->
+                                        <td style="vertical-align: top; padding-top: 14px;">
+                                            <div class="d-flex align-items-center justify-content-between mb-1.5 px-0.5">
+                                                <span class="text-xs fw-bold text-dark">
+                                                    <i class="fa-solid fa-boxes-stacked text-primary me-1"></i> <?php echo count($itemList); ?> Model <span class="text-muted">(<?php echo $sumTitip; ?> Unit)</span>
+                                                </span>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="badge-sisa-pill">
+                                                        Sisa: <?php echo $sumSisa; ?>
+                                                    </span>
+                                                    <?php if ($sumTerjual > 0) : ?>
+                                                        <span class="badge-laku-pill">
+                                                            Laku: <?php echo $sumTerjual; ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <div class="monitoring-box">
                                                 <?php foreach ($itemList as $it) : 
                                                     $sisa = intval($it['qty_sisa']);
                                                     $terjual = intval($it['qty_terjual']);
-                                                    $insPerUnit = floatval($it['insentif_per_unit']);
                                                 ?>
-                                                    <div class="taste-item-pill">
-                                                        <span class="font-weight-bold" style="font-size: 14px; color: #0f172a;"><?php echo htmlspecialchars($it['nama_barang']); ?></span>
-                                                        <div class="d-flex align-items-center gap-2 ms-auto">
-                                                            <span style="font-size: 13px; font-weight: 700; color: #475569;">
-                                                                Sisa: <strong style="font-size: 13px; font-weight: 900; background: #10b981; color: #ffffff; padding: 2px 8px; border-radius: 6px; box-shadow: 0 2px 5px rgba(16,185,129,0.3);"><?php echo $sisa; ?></strong>
+                                                    <div class="monitoring-item-row">
+                                                        <span class="fw-bold text-dark text-truncate" style="max-width: 180px;" title="<?php echo htmlspecialchars($it['nama_barang']); ?>">
+                                                            <?php echo htmlspecialchars($it['nama_barang']); ?>
+                                                        </span>
+                                                        <div class="d-flex align-items-center gap-1 flex-shrink-0 ms-1">
+                                                            <span class="badge-sisa-pill" style="font-size: 10px; padding: 0.5px 5px;">
+                                                                <?php echo $sisa; ?>
                                                             </span>
                                                             <?php if ($terjual > 0) : ?>
-                                                                <span style="font-size: 13px; font-weight: 900; background: #ef4444; color: #ffffff; padding: 2px 8px; border-radius: 6px; box-shadow: 0 2px 5px rgba(239,68,68,0.3);">
-                                                                    Laku: <?php echo $terjual; ?>
+                                                                <span class="badge-laku-pill" style="font-size: 10px; padding: 0.5px 5px;">
+                                                                    <?php echo $terjual; ?>
                                                                 </span>
                                                             <?php endif; ?>
                                                         </div>
@@ -2048,54 +2118,57 @@ $loewixPriceList = $tiptokMaster6;
                                         </td>
 
                                         <!-- Invoice & Insentif -->
-                                        <td>
+                                        <td style="vertical-align: top; padding-top: 14px;">
                                             <?php if (!empty($row['last_no_inv'])) : ?>
-                                                <div class="taste-badge badge-invoice-tag mb-1">
+                                                <div class="taste-badge badge-invoice-tag mb-1" style="font-size: 11.5px; padding: 2px 7px;">
                                                     <i class="fa-solid fa-receipt me-1"></i><?php echo htmlspecialchars($row['last_no_inv']); ?>
                                                 </div>
                                             <?php else: ?>
-                                                <div style="font-size: 13px; font-weight: 600; color: #64748b; font-style: italic; margin-bottom: 4px;">Belum ada invoice</div>
+                                                <div class="text-muted" style="font-size: 12px; font-weight: 600; font-style: italic; margin-bottom: 4px;">
+                                                    <i class="fa-regular fa-clock me-1"></i>Belum ada invoice
+                                                </div>
                                             <?php endif; ?>
-                                            <div style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 900; color: #047857; line-height: 1.2;">
+                                            <div style="font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 900; color: #047857; line-height: 1.2;">
                                                 Rp <?php echo number_format($sumInsentif, 0, ',', '.'); ?>
                                             </div>
-                                            <div style="font-size: 13px; font-weight: 700; color: #475569; margin-top: 2px;">
-                                                (Terjual: <strong style="color: #0f172a;"><?php echo $sumTerjual; ?> unit</strong>)
+                                            <div class="text-muted" style="font-size: 12px; font-weight: 700; margin-top: 2px;">
+                                                Terjual: <strong class="text-dark"><?php echo $sumTerjual; ?> unit</strong>
                                             </div>
                                         </td>
 
                                         <!-- Status -->
-                                        <td>
+                                        <td class="text-center" style="vertical-align: top; padding-top: 14px;">
                                             <?php if ($statusPen === 'aktif' && $sumSisa > 0) : ?>
-                                                <span class="taste-badge badge-active-tag"><i class="fa-solid fa-circle-check me-1"></i> Aktif</span>
+                                                <span class="badge-soft-emerald"><i class="fa-solid fa-circle-check"></i> Aktif</span>
                                             <?php elseif ($statusPen === 'selesai' || $sumSisa === 0) : ?>
-                                                <span class="taste-badge badge-neutral"><i class="fa-solid fa-circle-minus me-1"></i> Selesai</span>
+                                                <span class="taste-badge badge-neutral" style="font-size: 11px; padding: 3px 8px;"><i class="fa-solid fa-circle-minus me-1"></i> Selesai</span>
                                             <?php else : ?>
-                                                <span class="taste-badge badge-danger-tag"><i class="fa-solid fa-ban me-1"></i> Ditarik</span>
+                                                <span class="badge-soft-rose"><i class="fa-solid fa-ban"></i> Ditarik</span>
                                             <?php endif; ?>
                                         </td>
 
                                         <!-- Aksi -->
-                                        <td style="text-align: right; white-space: nowrap;">
-                                            <div class="d-inline-flex gap-1.5 align-items-center justify-content-end">
+                                        <td style="text-align: right; white-space: nowrap; vertical-align: top; padding-top: 14px;">
+                                            <div class="d-inline-flex gap-1 align-items-center justify-content-end">
                                                 <?php if ($statusPen === 'aktif' && $sumSisa > 0) : ?>
-                                                    <button type="button" class="btn-table-primary" onclick="openModalLaporKunjungan(<?php echo $idPen; ?>)" title="Lapor Kunjungan &amp; Cek Sisa Fisik">
+                                                    <button type="button" class="btn-table-primary" onclick="openModalLaporKunjungan(<?php echo $idPen; ?>)" title="Lapor Kunjungan &amp; Cek Sisa Fisik" style="height: 30px; font-size: 11.5px; padding: 0 10px;">
                                                         <i class="fa-solid fa-clipboard-check"></i> Cek Sisa
                                                     </button>
                                                 <?php endif; ?>
-                                                <button type="button" class="btn-table-secondary" onclick="openModalDetailTiptok(<?php echo $idPen; ?>)" title="Lihat Riwayat Lengkap">
-                                                    <i class="fa-solid fa-eye"></i>
+                                                <button type="button" class="btn-table-secondary" onclick="openModalDetailTiptok(<?php echo $idPen; ?>)" title="Lihat Riwayat Lengkap" style="width: 30px; height: 30px; padding: 0;">
+                                                    <i class="fa-solid fa-eye" style="font-size: 12px;"></i>
                                                 </button>
-                                                <button type="button" class="btn-table-warning" onclick="openModalEditPenitipan(<?php echo $idPen; ?>)" title="Edit Data Penitipan">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                <button type="button" class="btn-table-warning" onclick="openModalEditPenitipan(<?php echo $idPen; ?>)" title="Edit Data Penitipan" style="width: 30px; height: 30px; padding: 0;">
+                                                    <i class="fa-solid fa-pen-to-square" style="font-size: 12px;"></i>
                                                 </button>
                                                 <button type="button" class="btn-table-danger" 
                                                         data-id="<?php echo $idPen; ?>" 
                                                         data-kode="<?php echo htmlspecialchars($row['kode_titip'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" 
                                                         data-toko="<?php echo htmlspecialchars($row['nama_toko'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" 
                                                         onclick="hapusPenitipanFromBtn(this)" 
-                                                        title="Hapus Penitipan">
-                                                    <i class="fa-solid fa-trash-can"></i>
+                                                        title="Hapus Penitipan"
+                                                        style="width: 30px; height: 30px; padding: 0;">
+                                                    <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
                                                 </button>
                                             </div>
                                         </td>
