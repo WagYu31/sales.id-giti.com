@@ -882,9 +882,6 @@ if ($active_sales_id > 0) {
 }
 </style>
 
-<!-- TOP RUNNING TEXT ANNOUNCEMENT TICKER BANNER -->
-<?php include 'includes/announcement_widget.php'; ?>
-
 <!-- TASTE-SKILL WORKSPACE HEADER -->
 <div class="taste-header">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
