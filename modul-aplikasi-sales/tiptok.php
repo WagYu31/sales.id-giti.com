@@ -1178,6 +1178,112 @@ $loewixPriceList = $tiptokMaster6;
             justify-content: space-between !important;
         }
 
+        /* Ultra Sleek Compact Item Row for TIP TOK */
+        .item-row-compact {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-bottom: 9px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+        .item-row-compact:hover {
+            border-color: #93c5fd;
+            background: #fafcff;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
+        }
+        .product-select-compact {
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            border-radius: 10px !important;
+            border: 1.5px solid #cbd5e1 !important;
+            padding: 8px 12px !important;
+            color: #0f172a !important;
+            background-color: #ffffff !important;
+            transition: all 0.2s ease !important;
+        }
+        .product-select-compact:focus {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+            outline: none !important;
+        }
+        .taste-qty-stepper-compact {
+            display: inline-flex !important;
+            align-items: center !important;
+            background: #f1f5f9 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            border-radius: 9px !important;
+            overflow: hidden !important;
+            height: 36px !important;
+        }
+        .stepper-btn-compact {
+            width: 32px !important;
+            height: 100% !important;
+            background: #ffffff !important;
+            border: none !important;
+            font-weight: 900 !important;
+            font-size: 15px !important;
+            color: #334155 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            user-select: none !important;
+            transition: background 0.15s ease !important;
+        }
+        .stepper-btn-compact:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+        .stepper-input-compact {
+            width: 44px !important;
+            height: 100% !important;
+            border: none !important;
+            text-align: center !important;
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            background: transparent !important;
+            color: #0f172a !important;
+            padding: 0 !important;
+            outline: none !important;
+        }
+        .sticky-items-header {
+            position: sticky;
+            top: -1.5rem;
+            z-index: 10;
+            background: #f8fafc;
+            padding: 10px 4px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+            border-bottom: 1.5px solid #e2e8f0;
+            backdrop-filter: blur(8px);
+        }
+        .btn-add-item-dashed {
+            background: #ffffff;
+            border: 2px dashed #93c5fd;
+            border-radius: 12px;
+            padding: 11px 16px;
+            color: #2563eb;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .btn-add-item-dashed:hover {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+        }
+
         /* Detail Modal Stat Cards */
         .detail-stat-card {
             border-radius: 14px;
@@ -1946,23 +2052,36 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <!-- Header Barang Dititipkan -->
-                        <div class="d-flex justify-content-between align-items-center mb-3 mt-4 flex-wrap gap-2">
-                            <div>
-                                <label class="form-label-taste mb-0 text-dark" style="font-size: 13.5px;"><i class="fa-solid fa-video text-primary me-1.5"></i> DAFTAR BARANG DITITIPKAN (6 PRODUK RESMI) <span class="text-danger">*</span></label>
-                                <div class="text-xs text-secondary font-weight-bold">Pilih salah satu dari 6 model kamera resmi berinsentif</div>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 10px; font-size: 12px;" onclick="openKatalogPriceListModal('tambah')">
-                                    <i class="fa-solid fa-eye me-1.5"></i> Katalog 6 Produk
-                                </button>
-                                <button type="button" class="btn-taste-primary btn-sm py-1.5 px-3" style="font-size: 12px; border-radius: 10px;" onclick="tambahBarisBarang()">
-                                    <i class="fa-solid fa-plus me-1.5"></i> Tambah Barang
-                                </button>
+                        <!-- Header Barang Dititipkan (Sticky) -->
+                        <div class="sticky-items-header">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="form-label-taste mb-0 text-dark" style="font-size: 13.5px;"><i class="fa-solid fa-video text-primary me-1.5"></i> DAFTAR BARANG DITITIPKAN <span class="text-danger">*</span></label>
+                                        <span class="badge bg-dark text-white px-2 py-0.5" id="badgeJumlahBarang" style="font-size: 11px; border-radius: 6px;">0 Item</span>
+                                    </div>
+                                    <div class="text-xs text-secondary font-weight-bold">Pilih model kamera resmi berinsentif (2MP / 4MP)</div>
+                                </div>
+                                <div class="d-flex gap-1.5 flex-wrap">
+                                    <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px;" onclick="openKatalogPriceListModal('tambah')">
+                                        <i class="fa-solid fa-eye me-1"></i> Katalog
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-warning text-dark font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px; background: #fffbeb; border-color: #fde68a;" onclick="pasangSemua6Produk('')" title="Masukkan otomatis seluruh 6 kamera resmi">
+                                        <i class="fa-solid fa-bolt text-warning me-1"></i> + 6 Kamera Sekaligus
+                                    </button>
+                                    <button type="button" class="btn-taste-primary btn-sm py-1.5 px-3 mb-0" style="font-size: 12px; border-radius: 9px;" onclick="tambahBarisBarang()">
+                                        <i class="fa-solid fa-plus me-1"></i> Tambah Barang
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <div id="containerItemRows"></div>
+
+                        <!-- Tombol Tambah Cepat di Bawah Item -->
+                        <button type="button" class="btn-add-item-dashed mt-1 mb-3 w-100" onclick="tambahBarisBarang()">
+                            <i class="fa-solid fa-circle-plus me-1 text-primary"></i> + Tambah Model Kamera Lainnya
+                        </button>
 
                         <!-- Grand Total Summary Bar -->
                         <div class="summary-bar-tiptok my-3" id="tambahSummaryBar">
@@ -2073,22 +2192,36 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-3 mt-4 flex-wrap gap-2">
-                            <div>
-                                <label class="form-label-taste mb-0 text-dark" style="font-size: 13.5px;"><i class="fa-solid fa-video text-primary me-1.5"></i> DAFTAR BARANG DITITIPKAN (6 PRODUK RESMI) <span class="text-danger">*</span></label>
-                                <div class="text-xs text-secondary font-weight-bold">Pilih salah satu dari 6 model kamera resmi berinsentif</div>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 10px; font-size: 12px;" onclick="openKatalogPriceListModal('edit')">
-                                    <i class="fa-solid fa-eye me-1.5"></i> Katalog 6 Produk
-                                </button>
-                                <button type="button" class="btn-taste-primary btn-sm py-1.5 px-3" style="font-size: 12px; border-radius: 10px;" onclick="tambahBarisBarangEdit()">
-                                    <i class="fa-solid fa-plus me-1.5"></i> Tambah Barang
-                                </button>
+                        <!-- Header Barang Dititipkan (Sticky Edit) -->
+                        <div class="sticky-items-header">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="form-label-taste mb-0 text-dark" style="font-size: 13.5px;"><i class="fa-solid fa-video text-primary me-1.5"></i> DAFTAR BARANG DITITIPKAN <span class="text-danger">*</span></label>
+                                        <span class="badge bg-dark text-white px-2 py-0.5" id="editBadgeJumlahBarang" style="font-size: 11px; border-radius: 6px;">0 Item</span>
+                                    </div>
+                                    <div class="text-xs text-secondary font-weight-bold">Perbarui daftar kamera titipan toko</div>
+                                </div>
+                                <div class="d-flex gap-1.5 flex-wrap">
+                                    <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px;" onclick="openKatalogPriceListModal('edit')">
+                                        <i class="fa-solid fa-eye me-1"></i> Katalog
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-warning text-dark font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px; background: #fffbeb; border-color: #fde68a;" onclick="pasangSemua6Produk('edit_')" title="Masukkan otomatis seluruh 6 kamera resmi">
+                                        <i class="fa-solid fa-bolt text-warning me-1"></i> + 6 Kamera Sekaligus
+                                    </button>
+                                    <button type="button" class="btn-taste-primary btn-sm py-1.5 px-3 mb-0" style="font-size: 12px; border-radius: 9px;" onclick="tambahBarisBarangEdit()">
+                                        <i class="fa-solid fa-plus me-1"></i> Tambah Barang
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <div id="editContainerItemRows"></div>
+
+                        <!-- Tombol Tambah Cepat di Bawah Item Edit -->
+                        <button type="button" class="btn-add-item-dashed mt-1 mb-3 w-100" onclick="tambahBarisBarangEdit()">
+                            <i class="fa-solid fa-circle-plus me-1 text-primary"></i> + Tambah Model Kamera Lainnya
+                        </button>
 
                         <!-- Grand Total Summary Bar for Edit -->
                         <div class="summary-bar-tiptok my-3" id="editSummaryBar">
@@ -2739,11 +2872,7 @@ $loewixPriceList = $tiptokMaster6;
             const inputTipe = document.getElementById(`inputTipe_${prefix}${rowIndex}`);
             const inputInsentif = document.getElementById(`inputInsentif_${prefix}${rowIndex}`);
             const inputQty = document.getElementById(`inputQty_${prefix}${rowIndex}`);
-            const badgeEl = document.getElementById(`itemCatBadge_${prefix}${rowIndex}`);
-            const metaBox = document.getElementById(`productMeta_${prefix}${rowIndex}`);
-            const metaTitle = document.getElementById(`metaTitle_${prefix}${rowIndex}`);
-            const metaMsrp = document.getElementById(`metaMsrp_${prefix}${rowIndex}`);
-            const metaInsentif = document.getElementById(`metaInsentifPill_${prefix}${rowIndex}`);
+            const labelIns = document.getElementById(`labelInsentif_${prefix}${rowIndex}`);
 
             if (p) {
                 if (inputNama) inputNama.value = p.type;
@@ -2752,22 +2881,16 @@ $loewixPriceList = $tiptokMaster6;
                 if (inputQty && (!inputQty.value || parseInt(inputQty.value) <= 0)) {
                     inputQty.value = 1;
                 }
-                if (badgeEl) {
-                    badgeEl.textContent = p.category;
-                    badgeEl.classList.remove('d-none');
-                }
-                if (metaBox) {
-                    metaBox.classList.remove('d-none');
-                    if (metaTitle) metaTitle.textContent = `${p.type}`;
-                    if (metaMsrp) metaMsrp.textContent = p.msrp > 0 ? `MSRP Resmi: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)}` : 'Produk Resmi TIP TOK';
-                    if (metaInsentif) metaInsentif.innerHTML = `<i class="fa-solid fa-coins"></i> Insentif: Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)} / Unit`;
+                if (labelIns) {
+                    labelIns.textContent = `Insentif: Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)}/u`;
                 }
             } else {
                 if (inputNama) inputNama.value = '';
                 if (inputTipe) inputTipe.value = '';
                 if (inputInsentif) inputInsentif.value = '';
-                if (badgeEl) badgeEl.classList.add('d-none');
-                if (metaBox) metaBox.classList.add('d-none');
+                if (labelIns) {
+                    labelIns.textContent = 'Insentif: -';
+                }
             }
             recalcRowSubtotal(rowIndex, prefix);
         }
@@ -2825,6 +2948,11 @@ $loewixPriceList = $tiptokMaster6;
                 }
             });
 
+            const countBadge = document.getElementById(isEdit ? 'editBadgeJumlahBarang' : 'badgeJumlahBarang');
+            if (countBadge) {
+                countBadge.textContent = `${itemRows.length} Item`;
+            }
+
             const qtyPreview = document.getElementById(isEdit ? 'editTotalQtyTitipPreview' : 'totalQtyTitipPreview');
             const modelPreview = document.getElementById(isEdit ? 'editTotalModelTitipPreview' : 'totalModelTitipPreview');
             const insentifPreview = document.getElementById(isEdit ? 'editTotalInsentifTitipPreview' : 'totalInsentifTitipPreview');
@@ -2832,6 +2960,39 @@ $loewixPriceList = $tiptokMaster6;
             if (qtyPreview) qtyPreview.textContent = `${totalQty} Unit (${modelCount} Model)`;
             if (modelPreview) modelPreview.textContent = modelCount;
             if (insentifPreview) insentifPreview.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(totalInsentif)}`;
+        }
+
+        function pasangSemua6Produk(prefix = '') {
+            if (!loewixProducts || loewixProducts.length === 0) return;
+            const isEdit = (prefix === 'edit_');
+            const containerId = isEdit ? 'editContainerItemRows' : 'containerItemRows';
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            // If there is only 1 row and it is blank/unselected, clear it
+            const existingRows = container.querySelectorAll('.item-card-row');
+            if (existingRows.length === 1) {
+                const firstSel = container.querySelector('select[id^="selectProduct_"]');
+                if (firstSel && !firstSel.value) {
+                    container.innerHTML = '';
+                }
+            }
+
+            loewixProducts.forEach(p => {
+                let alreadyAdded = false;
+                container.querySelectorAll(`input[id^="inputNama_${prefix}"]`).forEach(inp => {
+                    if (inp.value === p.type) alreadyAdded = true;
+                });
+
+                if (!alreadyAdded) {
+                    if (isEdit) {
+                        tambahBarisBarangEdit({ type: p.type, category: p.category, insentif: p.insentif, qty_titip: 1 });
+                    } else {
+                        tambahBarisBarang({ type: p.type, category: p.category, insentif: p.insentif, qty_titip: 1 });
+                    }
+                }
+            });
+            updateModalSummary(prefix);
         }
 
         // =========================================================================
@@ -3156,80 +3317,57 @@ $loewixPriceList = $tiptokMaster6;
             const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : 1;
 
             const rowHtml = `
-                <div class="item-card-row" id="itemRow_${itemRowIndex}">
+                <div class="item-card-row item-row-compact" id="itemRow_${itemRowIndex}">
                     <input type="hidden" name="items[${itemRowIndex}][nama_barang]" id="inputNama_${itemRowIndex}" value="${escapeHtml(pNama)}">
                     <input type="hidden" name="items[${itemRowIndex}][tipe_barang]" id="inputTipe_${itemRowIndex}" value="${escapeHtml(pTipe)}">
+                    <input type="hidden" name="items[${itemRowIndex}][insentif_per_unit]" id="inputInsentif_${itemRowIndex}" value="${pInsentif}">
 
-                    <!-- Row Top Header -->
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-dark text-white px-2.5 py-1" style="font-size: 11.5px; border-radius: 8px; font-weight: 800;">
-                                <i class="fa-solid fa-box me-1 text-primary"></i> Item #${itemRowIndex}
-                            </span>
-                            <span class="taste-badge badge-dealer-tag ${pTipe ? '' : 'd-none'}" id="itemCatBadge_${itemRowIndex}">
-                                ${escapeHtml(pTipe)}
-                            </span>
+                    <div class="row g-2 align-items-center">
+                        <!-- Index & Product Selector -->
+                        <div class="col-md-5 col-12">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-dark text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
+                                    #${itemRowIndex}
+                                </span>
+                                <div class="flex-grow-1 min-w-0">
+                                    <select id="selectProduct_${itemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${itemRowIndex}, '')">
+                                        <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
+                                        ${renderPriceListOptions(pNama)}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2.5 mb-0 font-weight-bold" style="border-radius: 8px; font-size: 12px;" onclick="hapusBarisBarang(${itemRowIndex})">
-                            <i class="fa-solid fa-trash-can me-1"></i> Hapus
-                        </button>
-                    </div>
 
-                    <!-- Single Clean Product Selector -->
-                    <div class="mb-3">
-                        <label class="form-label-taste mb-1 d-flex justify-content-between align-items-center">
-                            <span><i class="fa-solid fa-video text-primary me-1"></i> PILIH 1 DARI 6 KAMERA RESMI TIP TOK <span class="text-danger">*</span></span>
-                            <span class="text-primary text-xs" style="cursor: pointer; font-weight: 700;" onclick="openKatalogPriceListModal('tambah')">
-                                <i class="fa-solid fa-eye me-1"></i> Lihat Katalog Visual
-                            </span>
-                        </label>
-                        <select id="selectProduct_${itemRowIndex}" class="form-select product-select-premium w-100" onchange="onSelectRowProduct(this, ${itemRowIndex}, '')">
-                            <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
-                            ${renderPriceListOptions(pNama)}
-                        </select>
-                    </div>
+                        <!-- Qty Stepper -->
+                        <div class="col-md-3 col-6">
+                            <div class="d-flex align-items-center justify-content-start justify-content-md-center gap-1.5">
+                                <span class="text-xs text-secondary font-weight-bold d-none d-sm-inline">Qty:</span>
+                                <div class="taste-qty-stepper-compact">
+                                    <button type="button" class="stepper-btn-compact" onclick="stepQty(${itemRowIndex}, -1, '')" title="Kurangi">−</button>
+                                    <input type="number" name="items[${itemRowIndex}][qty_titip]" id="inputQty_${itemRowIndex}" min="1" class="stepper-input-compact" value="${pQty}" required oninput="recalcRowSubtotal(${itemRowIndex}, '')">
+                                    <button type="button" class="stepper-btn-compact" onclick="stepQty(${itemRowIndex}, 1, '')" title="Tambah">+</button>
+                                </div>
+                                <span class="text-xs text-muted font-weight-bold">Unit</span>
+                            </div>
+                        </div>
 
-                    <!-- Live Product Spec Meta Box -->
-                    <div id="productMeta_${itemRowIndex}" class="product-meta-card ${pNama ? '' : 'd-none'} mb-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <div style="width: 34px; height: 34px; border-radius: 8px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 14px;">
-                                <i class="fa-solid fa-video"></i>
-                            </div>
-                            <div>
-                                <div class="fw-bold text-dark" style="font-size: 13px;" id="metaTitle_${itemRowIndex}">-</div>
-                                <div class="text-xs text-muted" id="metaMsrp_${itemRowIndex}">-</div>
+                        <!-- Insentif & Subtotal Badge -->
+                        <div class="col-md-3 col-4 text-end">
+                            <div class="d-inline-flex flex-column align-items-end">
+                                <div class="text-xs font-weight-bold text-muted" style="font-size: 10px;" id="labelInsentif_${itemRowIndex}">
+                                    ${pInsentif ? 'Insentif: Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + '/u' : 'Insentif: -'}
+                                </div>
+                                <div class="fw-bold text-success fs-6" id="subtotalInsentif_${itemRowIndex}" style="line-height: 1.2;">
+                                    Rp 0
+                                </div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="incentive-badge-glow" id="metaInsentifPill_${itemRowIndex}">
-                                <i class="fa-solid fa-coins"></i> Insentif: Rp 15.000 / Unit
-                            </span>
-                        </div>
-                    </div>
 
-                    <!-- Qty, Insentif, & Subtotal in Bulletproof Custom Controls -->
-                    <div class="row g-2 align-items-end">
-                        <div class="col-md-4 col-sm-6">
-                            <label class="form-label-taste mb-1.5"><i class="fa-solid fa-boxes-stacked text-primary me-1"></i> JUMLAH TITIP <span class="text-danger">*</span></label>
-                            <div class="taste-qty-stepper">
-                                <button type="button" class="stepper-btn" onclick="stepQty(${itemRowIndex}, -1, '')" title="Kurangi">−</button>
-                                <input type="number" name="items[${itemRowIndex}][qty_titip]" id="inputQty_${itemRowIndex}" min="1" class="stepper-input" value="${pQty}" required oninput="recalcRowSubtotal(${itemRowIndex}, '')">
-                                <button type="button" class="stepper-btn" onclick="stepQty(${itemRowIndex}, 1, '')" title="Tambah">+</button>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-6">
-                            <label class="form-label-taste mb-1.5"><i class="fa-solid fa-tag text-success me-1"></i> TARIF INSENTIF</label>
-                            <div class="taste-addon-input">
-                                <span class="addon-label">Rp</span>
-                                <input type="number" name="items[${itemRowIndex}][insentif_per_unit]" id="inputInsentif_${itemRowIndex}" min="0" step="500" class="addon-input-field" value="${pInsentif}" placeholder="0" readonly>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-12">
-                            <label class="form-label-taste mb-1.5 text-end d-block"><i class="fa-solid fa-coins text-warning me-1"></i> SUBTOTAL REWARD</label>
-                            <div class="taste-subtotal-card">
-                                <span class="text-xs text-muted font-weight-bold">Komisi:</span>
-                                <span class="fw-bold text-success fs-6" id="subtotalInsentif_${itemRowIndex}">Rp 0</span>
-                            </div>
+                        <!-- Delete Action -->
+                        <div class="col-md-1 col-2 text-end">
+                            <button type="button" class="btn btn-sm btn-outline-danger p-0 d-flex align-items-center justify-content-center ms-auto" style="width: 32px; height: 32px; border-radius: 8px;" onclick="hapusBarisBarang(${itemRowIndex})" title="Hapus Barang Ini">
+                                <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -3370,79 +3508,56 @@ $loewixPriceList = $tiptokMaster6;
                                 const pInsentif = (matchedProd ? matchedProd.insentif : it.insentif_per_unit) || (prodName.includes('4MP') ? 30000 : 15000);
 
                                 const rowHtml = `
-                                    <div class="item-card-row" id="editItemRow_${editItemRowIndex}">
+                                    <div class="item-card-row item-row-compact" id="editItemRow_${editItemRowIndex}">
                                         <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="${it.id}">
                                         <input type="hidden" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" value="${escapeHtml(prodName)}">
                                         <input type="hidden" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" value="${escapeHtml(prodCat)}">
+                                        <input type="hidden" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" value="${pInsentif}">
 
-                                        <!-- Row Top Header -->
-                                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="badge bg-dark text-white px-2.5 py-1" style="font-size: 11.5px; border-radius: 8px; font-weight: 800;">
-                                                    <i class="fa-solid fa-box me-1 text-primary"></i> Item #${editItemRowIndex}
-                                                </span>
-                                                <span class="taste-badge badge-dealer-tag ${prodCat ? '' : 'd-none'}" id="itemCatBadge_edit_${editItemRowIndex}">
-                                                    ${escapeHtml(prodCat)}
-                                                </span>
+                                        <div class="row g-2 align-items-center">
+                                            <!-- Index & Product Selector -->
+                                            <div class="col-md-5 col-12">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="badge bg-dark text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
+                                                        #${editItemRowIndex}
+                                                    </span>
+                                                    <div class="flex-grow-1 min-w-0">
+                                                        <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" ${isSold ? 'disabled' : ''}>
+                                                            <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
+                                                            ${renderPriceListOptions(prodName)}
+                                                        </select>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            ${deleteBtn}
-                                        </div>
 
-                                        <!-- Single Clean Product Selector -->
-                                        <div class="mb-3">
-                                            <label class="form-label-taste mb-1 d-flex justify-content-between align-items-center">
-                                                <span><i class="fa-solid fa-video text-primary me-1"></i> PILIH 1 DARI 6 KAMERA RESMI TIP TOK <span class="text-danger">*</span></span>
-                                                <span class="text-primary text-xs" style="cursor: pointer; font-weight: 700;" onclick="openKatalogPriceListModal('edit')">
-                                                    <i class="fa-solid fa-eye me-1"></i> Lihat Katalog Visual
-                                                </span>
-                                            </label>
-                                            <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-premium w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" ${isSold ? 'disabled' : ''}>
-                                                <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
-                                                ${renderPriceListOptions(prodName)}
-                                            </select>
-                                        </div>
+                                            <!-- Qty Stepper -->
+                                            <div class="col-md-3 col-6">
+                                                <div class="d-flex align-items-center justify-content-start justify-content-md-center gap-1.5">
+                                                    <span class="text-xs text-secondary font-weight-bold d-none d-sm-inline">Qty:</span>
+                                                    <div class="taste-qty-stepper-compact">
+                                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
+                                                        <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, parseInt(it.qty_terjual) || 1)}" class="stepper-input-compact" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
+                                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
+                                                    </div>
+                                                    <span class="text-xs text-muted font-weight-bold">Unit</span>
+                                                </div>
+                                            </div>
 
-                                        <!-- Live Product Spec Meta Box -->
-                                        <div id="productMeta_edit_${editItemRowIndex}" class="product-meta-card ${prodName ? '' : 'd-none'} mb-3">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div style="width: 34px; height: 34px; border-radius: 8px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 14px;">
-                                                    <i class="fa-solid fa-video"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold text-dark" style="font-size: 13px;" id="metaTitle_edit_${editItemRowIndex}">${escapeHtml(prodName)}</div>
-                                                    <div class="text-xs text-muted" id="metaMsrp_edit_${editItemRowIndex}">Produk Resmi TIP TOK</div>
+                                            <!-- Insentif & Subtotal Badge -->
+                                            <div class="col-md-3 col-4 text-end">
+                                                <div class="d-inline-flex flex-column align-items-end">
+                                                    <div class="text-xs font-weight-bold text-muted" style="font-size: 10px;" id="labelInsentif_edit_${editItemRowIndex}">
+                                                        ${pInsentif ? 'Insentif: Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + '/u' : 'Insentif: -'}
+                                                    </div>
+                                                    <div class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}" style="line-height: 1.2;">
+                                                        Rp 0
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="incentive-badge-glow" id="metaInsentifPill_edit_${editItemRowIndex}">
-                                                    <i class="fa-solid fa-coins"></i> Insentif: Rp ${new Intl.NumberFormat('id-ID').format(pInsentif)} / Unit
-                                                </span>
-                                            </div>
-                                        </div>
 
-                                        <!-- Qty, Insentif, & Subtotal in Bulletproof Custom Controls -->
-                                        <div class="row g-2 align-items-end">
-                                            <div class="col-md-4 col-sm-6">
-                                                <label class="form-label-taste mb-1.5"><i class="fa-solid fa-boxes-stacked text-primary me-1"></i> JUMLAH TITIP <span class="text-danger">*</span></label>
-                                                <div class="taste-qty-stepper">
-                                                    <button type="button" class="stepper-btn" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
-                                                    <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, parseInt(it.qty_terjual) || 1)}" class="stepper-input" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
-                                                    <button type="button" class="stepper-btn" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 col-sm-6">
-                                                <label class="form-label-taste mb-1.5"><i class="fa-solid fa-tag text-success me-1"></i> TARIF INSENTIF</label>
-                                                <div class="taste-addon-input">
-                                                    <span class="addon-label">Rp</span>
-                                                    <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" min="0" step="500" class="addon-input-field" value="${pInsentif}" readonly>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 col-sm-12">
-                                                <label class="form-label-taste mb-1.5 text-end d-block"><i class="fa-solid fa-coins text-warning me-1"></i> SUBTOTAL REWARD</label>
-                                                <div class="taste-subtotal-card">
-                                                    <span class="text-xs text-muted font-weight-bold">Komisi:</span>
-                                                    <span class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}">Rp 0</span>
-                                                </div>
+                                            <!-- Delete Action / Sold Lock -->
+                                            <div class="col-md-1 col-2 text-end">
+                                                ${deleteBtn}
                                             </div>
                                         </div>
                                     </div>
@@ -3500,81 +3615,58 @@ $loewixPriceList = $tiptokMaster6;
             const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : 1;
 
             const rowHtml = `
-                <div class="item-card-row" id="editItemRow_${editItemRowIndex}">
+                <div class="item-card-row item-row-compact" id="editItemRow_${editItemRowIndex}">
                     <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="0">
                     <input type="hidden" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" value="${escapeHtml(pNama)}">
                     <input type="hidden" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" value="${escapeHtml(pTipe)}">
+                    <input type="hidden" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" value="${pInsentif}">
 
-                    <!-- Row Top Header -->
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-dark text-white px-2.5 py-1" style="font-size: 11.5px; border-radius: 8px; font-weight: 800;">
-                                <i class="fa-solid fa-box me-1 text-primary"></i> Item Baru #${editItemRowIndex}
-                            </span>
-                            <span class="taste-badge badge-dealer-tag ${pTipe ? '' : 'd-none'}" id="itemCatBadge_edit_${editItemRowIndex}">
-                                ${escapeHtml(pTipe)}
-                            </span>
+                    <div class="row g-2 align-items-center">
+                        <!-- Index & Product Selector -->
+                        <div class="col-md-5 col-12">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
+                                    +${editItemRowIndex}
+                                </span>
+                                <div class="flex-grow-1 min-w-0">
+                                    <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')">
+                                        <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
+                                        ${renderPriceListOptions(pNama)}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2.5 mb-0 font-weight-bold" style="border-radius: 8px; font-size: 12px;" onclick="hapusBarisBarangEdit(${editItemRowIndex})">
-                            <i class="fa-solid fa-trash-can me-1"></i> Hapus
-                        </button>
-                    </div>
 
-                    <!-- Single Clean Product Selector -->
-                    <div class="mb-3">
-                        <label class="form-label-taste mb-1 d-flex justify-content-between align-items-center">
-                            <span><i class="fa-solid fa-video text-primary me-1"></i> PILIH 1 DARI 6 KAMERA RESMI TIP TOK <span class="text-danger">*</span></span>
-                            <span class="text-primary text-xs" style="cursor: pointer; font-weight: 700;" onclick="openKatalogPriceListModal('edit')">
-                                <i class="fa-solid fa-eye me-1"></i> Lihat Katalog Visual
-                            </span>
-                        </label>
-                        <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-premium w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')">
-                            <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
-                            ${renderPriceListOptions(pNama)}
-                        </select>
-                    </div>
+                        <!-- Qty Stepper -->
+                        <div class="col-md-3 col-6">
+                            <div class="d-flex align-items-center justify-content-start justify-content-md-center gap-1.5">
+                                <span class="text-xs text-secondary font-weight-bold d-none d-sm-inline">Qty:</span>
+                                <div class="taste-qty-stepper-compact">
+                                    <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
+                                    <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="1" class="stepper-input-compact" value="${pQty}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
+                                    <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
+                                </div>
+                                <span class="text-xs text-muted font-weight-bold">Unit</span>
+                            </div>
+                        </div>
 
-                    <!-- Live Product Spec Meta Box -->
-                    <div id="productMeta_edit_${editItemRowIndex}" class="product-meta-card ${pNama ? '' : 'd-none'} mb-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <div style="width: 34px; height: 34px; border-radius: 8px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 14px;">
-                                <i class="fa-solid fa-video"></i>
-                            </div>
-                            <div>
-                                <div class="fw-bold text-dark" style="font-size: 13px;" id="metaTitle_edit_${editItemRowIndex}">-</div>
-                                <div class="text-xs text-muted" id="metaMsrp_edit_${editItemRowIndex}">-</div>
+                        <!-- Insentif & Subtotal Badge -->
+                        <div class="col-md-3 col-4 text-end">
+                            <div class="d-inline-flex flex-column align-items-end">
+                                <div class="text-xs font-weight-bold text-muted" style="font-size: 10px;" id="labelInsentif_edit_${editItemRowIndex}">
+                                    ${pInsentif ? 'Insentif: Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + '/u' : 'Insentif: -'}
+                                </div>
+                                <div class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}" style="line-height: 1.2;">
+                                    Rp 0
+                                </div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="incentive-badge-glow" id="metaInsentifPill_edit_${editItemRowIndex}">
-                                <i class="fa-solid fa-coins"></i> Insentif: Rp 15.000 / Unit
-                            </span>
-                        </div>
-                    </div>
 
-                    <!-- Qty, Insentif, & Subtotal in Bulletproof Custom Controls -->
-                    <div class="row g-2 align-items-end">
-                        <div class="col-md-4 col-sm-6">
-                            <label class="form-label-taste mb-1.5"><i class="fa-solid fa-boxes-stacked text-primary me-1"></i> JUMLAH TITIP <span class="text-danger">*</span></label>
-                            <div class="taste-qty-stepper">
-                                <button type="button" class="stepper-btn" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
-                                <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="1" class="stepper-input" placeholder="0" value="${pQty}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
-                                <button type="button" class="stepper-btn" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-6">
-                            <label class="form-label-taste mb-1.5"><i class="fa-solid fa-tag text-success me-1"></i> TARIF INSENTIF</label>
-                            <div class="taste-addon-input">
-                                <span class="addon-label">Rp</span>
-                                <input type="number" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" min="0" step="500" class="addon-input-field" value="${pInsentif}" placeholder="0" readonly>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-12">
-                            <label class="form-label-taste mb-1.5 text-end d-block"><i class="fa-solid fa-coins text-warning me-1"></i> SUBTOTAL REWARD</label>
-                            <div class="taste-subtotal-card">
-                                <span class="text-xs text-muted font-weight-bold">Komisi:</span>
-                                <span class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}">Rp 0</span>
-                            </div>
+                        <!-- Delete Action -->
+                        <div class="col-md-1 col-2 text-end">
+                            <button type="button" class="btn btn-sm btn-outline-danger p-0 d-flex align-items-center justify-content-center ms-auto" style="width: 32px; height: 32px; border-radius: 8px;" onclick="hapusBarisBarangEdit(${editItemRowIndex})" title="Hapus Barang Ini">
+                                <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
