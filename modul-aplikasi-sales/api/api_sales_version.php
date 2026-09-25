@@ -10,21 +10,21 @@ header('Access-Control-Allow-Methods: GET');
 
 $response = [
     'status'         => 'success',
-    'latest_version' => '1.9.3',
-    'min_version'    => '1.9.3',
-    'version'        => '1.9.3',
-    'version_code'   => 193,
+    'latest_version' => '1.9.8',
+    'min_version'    => '1.9.8',
+    'version'        => '1.9.8',
+    'version_code'   => 198,
     'force_update'   => true,
     'download_url'   => 'https://api-teknisi.id-giti.com/downloads/LoewixSales-latest.apk',
-    'changelog'      => 'Versi terbaru (v1.9.3) tersedia! Update tarif insentif resmi TIP TOK: 4MP IP Camera Rp 30.000/unit & 2MP AHD Rp 15.000/unit, perbaikan nama model kamera, dan sinkronisasi server.',
+    'changelog'      => 'Versi terbaru (v1.9.8) tersedia! Update tarif insentif resmi TIP TOK: 4MP IP Camera Rp 30.000/unit & 2MP AHD Rp 15.000/unit, perbaikan nama model kamera, dan sinkronisasi server.',
     'data' => [
-        'latest_version' => '1.9.3',
-        'min_version'    => '1.9.3',
-        'version'        => '1.9.3',
-        'version_code'   => 193,
+        'latest_version' => '1.9.8',
+        'min_version'    => '1.9.8',
+        'version'        => '1.9.8',
+        'version_code'   => 198,
         'force_update'   => true,
         'download_url'   => 'https://api-teknisi.id-giti.com/downloads/LoewixSales-latest.apk',
-        'changelog'      => 'Versi terbaru (v1.9.3) tersedia! Update tarif insentif resmi TIP TOK: 4MP IP Camera Rp 30.000/unit & 2MP AHD Rp 15.000/unit, perbaikan nama model kamera, dan sinkronisasi server.',
+        'changelog'      => 'Versi terbaru (v1.9.8) tersedia! Update tarif insentif resmi TIP TOK: 4MP IP Camera Rp 30.000/unit & 2MP AHD Rp 15.000/unit, perbaikan nama model kamera, dan sinkronisasi server.',
     ]
 ];
 
