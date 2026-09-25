@@ -909,6 +909,9 @@ if ($qDealersPreload) {
                         <button type="button" class="btn btn-sm btn-outline-light mb-0 font-weight-bold" onclick="unselectAllCheckboxes()">
                             Batal
                         </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger mb-0 font-weight-bold px-3" onclick="batalkanPenjualanBatch()">
+                            <i class="fa-solid fa-rotate-left me-1.5"></i> Batalkan Penjualan Terpilih
+                        </button>
                         <button type="button" class="btn btn-sm btn-success mb-0 font-weight-bold px-3" onclick="openBatchInvoiceModal()">
                             <i class="fa-solid fa-file-pen me-1.5"></i> Input No. Invoice Kolektif
                         </button>
@@ -1624,9 +1627,14 @@ if ($qDealersPreload) {
                         <span class="badge-pending-inv">
                             <i class="fa-solid fa-clock"></i> Belum Diinput
                         </span>
-                        <button type="button" class="btn-brand-amber" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
-                            <i class="fa-solid fa-plus"></i> Input Invoice
-                        </button>
+                        <div class="d-flex align-items-center gap-1.5">
+                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2.5 mb-0" style="border-radius: 8px; font-weight: 700; font-size: 11.5px;" title="Batalkan Penjualan & Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
+                                <i class="fa-solid fa-trash-can me-1"></i> Batal Terjual
+                            </button>
+                            <button type="button" class="btn-brand-amber" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
+                                <i class="fa-solid fa-plus"></i> Input Invoice
+                            </button>
+                        </div>
                     </div>
                 ` : `
                     <div class="d-flex align-items-center justify-content-between gap-2">
@@ -1641,7 +1649,10 @@ if ($qDealersPreload) {
                                 <i class="fa-solid fa-pen"></i>
                             </button>
                             ${!isClaimed ? `
-                                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 mb-0" style="border-radius: 6px;" title="Reset No. Invoice" onclick="hapusInvoiceSingle(${it.id_kunjungan}, '${escapeHtml(it.no_inv)}')">
+                                <button type="button" class="btn btn-sm btn-outline-warning py-1 px-2 mb-0" style="border-radius: 6px;" title="Reset No. Invoice (Jadikan Belum Diinput)" onclick="hapusInvoiceSingle(${it.id_kunjungan}, '${escapeHtml(it.no_inv)}')">
+                                    <i class="fa-solid fa-eraser"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 mb-0" style="border-radius: 6px;" title="Batalkan Penjualan & Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             ` : `
@@ -1937,6 +1948,120 @@ if ($qDealersPreload) {
                         .catch(err => {
                             console.error(err);
                             Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
+                        });
+                }
+            });
+        }
+
+        // =========================================================================
+        // BATALKAN PENJUALAN SINGLE (KEMBALIKAN STOK KE TOKO)
+        // =========================================================================
+        function batalkanPenjualanSingle(idKunjungan, kodeKunjungan, qty, namaBarang) {
+            Swal.fire({
+                title: 'Batalkan Penjualan?',
+                html: `Apakah transaksi audit <strong>${escapeHtml(kodeKunjungan || '')}</strong> batal terjual?<br><br>
+                       <div class="p-3 bg-light rounded text-start border" style="font-size: 13px;">
+                           <div class="text-danger fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Dampak Pembatalan:</div>
+                           • Stok <strong>${qty} unit</strong> (${escapeHtml(namaBarang)}) akan <strong>otomatis dikembalikan ke toko mitra</strong>.<br>
+                           • Laporan terjual dan estimasi insentif pada audit ini akan dihapus dari sistem.
+                       </div>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fa-solid fa-rotate-left me-1"></i> Ya, Batalkan Penjualan',
+                cancelButtonText: 'Kembali'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Mengembalikan stok dan membatalkan penjualan...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    const formData = new FormData();
+                    formData.append('action', 'batalkan_penjualan_kunjungan');
+                    formData.append('id_kunjungan', idKunjungan);
+
+                    fetch('tiptok-ajax.php', { method: 'POST', body: formData })
+                        .then(r => r.json())
+                        .then(res => {
+                            if (res && res.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Penjualan Dibatalkan!',
+                                    text: res.message || 'Stok berhasil dikembalikan ke toko.',
+                                    timer: 1600,
+                                    showConfirmButton: false
+                                });
+                                loadInvoicesData();
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Gagal Membatalkan', html: (res && res.message) ? res.message : 'Gagal membatalkan transaksi.' });
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            Swal.fire({ icon: 'error', title: 'Error Jaringan', text: 'Terjadi kesalahan koneksi server.' });
+                        });
+                }
+            });
+        }
+
+        // =========================================================================
+        // BATALKAN PENJUALAN BATCH (KOLEKTIF)
+        // =========================================================================
+        function batalkanPenjualanBatch() {
+            if (selectedTrxIds.size === 0) return;
+            const ids = Array.from(selectedTrxIds);
+
+            Swal.fire({
+                title: 'Batalkan Penjualan Terpilih?',
+                html: `Apakah Anda yakin ingin membatalkan <strong>${ids.length} transaksi</strong> penjualan yang dipilih?<br><br>
+                       <div class="p-3 bg-light rounded text-start border" style="font-size: 13px;">
+                           <div class="text-danger fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Perhatian:</div>
+                           Seluruh unit barang yang batal terjual pada transaksi terpilih akan <strong>otomatis dikembalikan ke stok toko mitra</strong> masing-masing.
+                       </div>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fa-solid fa-rotate-left me-1"></i> Ya, Batalkan Semua',
+                cancelButtonText: 'Kembali'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Mengembalikan stok dan membatalkan penjualan terpilih...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    // Execute serial or parallel deletions
+                    const promises = ids.map(id => {
+                        const fd = new FormData();
+                        fd.append('action', 'batalkan_penjualan_kunjungan');
+                        fd.append('id_kunjungan', id);
+                        return fetch('tiptok-ajax.php', { method: 'POST', body: fd }).then(r => r.json());
+                    });
+
+                    Promise.all(promises)
+                        .then(results => {
+                            const successCount = results.filter(r => r && r.status === 'success').length;
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Selesai!',
+                                text: `${successCount} transaksi penjualan berhasil dibatalkan dan stok telah dipulihkan.`,
+                                timer: 1800,
+                                showConfirmButton: false
+                            });
+                            selectedTrxIds.clear();
+                            loadInvoicesData();
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            Swal.fire({ icon: 'error', title: 'Error', text: 'Sebagian proses gagal dijalankan.' });
+                            loadInvoicesData();
                         });
                 }
             });

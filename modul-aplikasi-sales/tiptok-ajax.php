@@ -1490,6 +1490,63 @@ if ($action === 'hapus_invoice_item') {
     exit;
 }
 
+// -------------------------------------------------------------
+// 21. BATALKAN PENJUALAN AUDIT / RESTORE STOK KE TOKO
+// -------------------------------------------------------------
+if ($action === 'batalkan_penjualan_kunjungan') {
+    $id_kunjungan = intval($_POST['id_kunjungan'] ?? 0);
+    if ($id_kunjungan <= 0) {
+        echo json_encode(['status' => 'error', 'message' => 'ID transaksi kunjungan tidak valid.']);
+        exit;
+    }
+
+    $qKunj = $conn->query("SELECT * FROM tiptok_kunjungan WHERE id = $id_kunjungan LIMIT 1");
+    if (!$qKunj || $qKunj->num_rows === 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Data transaksi kunjungan tidak ditemukan.']);
+        exit;
+    }
+    $kunj = $qKunj->fetch_assoc();
+
+    // Cek apakah transaksi sudah diklaim insentif
+    if (!empty($kunj['id_claim']) && intval($kunj['id_claim']) > 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Transaksi ini tidak dapat dibatalkan karena sudah masuk pengajuan klaim insentif yang terkunci.']);
+        exit;
+    }
+
+    $id_penitipan = intval($kunj['id_penitipan']);
+    $id_item = intval($kunj['id_item']);
+    $qty_batal = intval($kunj['qty_terjual_kunjungan']);
+    $insentif_batal = floatval($kunj['insentif_didapat']);
+    $kode_kunjungan = $kunj['kode_kunjungan'];
+
+    // 1. Pulihkan stok dan insentif di tiptok_items
+    $qItem = $conn->query("SELECT * FROM tiptok_items WHERE id = $id_item LIMIT 1");
+    if ($qItem && $qItem->num_rows > 0) {
+        $curItem = $qItem->fetch_assoc();
+        $restored_sisa = intval($curItem['qty_sisa']) + $qty_batal;
+        $reduced_terjual = max(0, intval($curItem['qty_terjual']) - $qty_batal);
+        $reduced_insentif = max(0.0, floatval($curItem['total_insentif']) - $insentif_batal);
+        $new_status = ($restored_sisa > 0) ? 'titip' : $curItem['status_item'];
+
+        $stmtUpItem = $conn->prepare("UPDATE tiptok_items SET qty_sisa = ?, qty_terjual = ?, total_insentif = ?, status_item = ?, updated_at = NOW() WHERE id = ?");
+        $stmtUpItem->bind_param("iidsi", $restored_sisa, $reduced_terjual, $reduced_insentif, $new_status, $id_item);
+        $stmtUpItem->execute();
+        $stmtUpItem->close();
+    }
+
+    // 2. Pulihkan status master penitipan kembali aktif jika sebelumnya selesai
+    $conn->query("UPDATE tiptok_penitipan SET status = 'aktif', updated_at = NOW() WHERE id = $id_penitipan AND status = 'selesai'");
+
+    // 3. Hapus baris tiptok_kunjungan
+    $conn->query("DELETE FROM tiptok_kunjungan WHERE id = $id_kunjungan");
+
+    echo json_encode([
+        'status' => 'success',
+        'message' => "Penjualan ($kode_kunjungan) berhasil dibatalkan. Stok sebanyak $qty_batal unit otomatis dikembalikan ke toko mitra."
+    ]);
+    exit;
+}
+
 // Default error
 echo json_encode(['status' => 'error', 'message' => 'Aksi tidak dikenali.']);
 exit;
