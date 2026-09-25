@@ -124,6 +124,100 @@ $chkSC = $conn->query("SHOW TABLES LIKE 'sales_customer'");
 $hasSalesCustomer = ($chkSC && $chkSC->num_rows > 0);
 
 // ─────────────────────────────────────────────────────────────
+// 0. GET MASTER PRODUK RESMI TIP TOK (6 PRODUK RESMI BERINSENTIF)
+// ─────────────────────────────────────────────────────────────
+if ($action === 'get_products' || $action === 'get_product_prices' || $action === 'master_products' || $action === 'get_master_products') {
+    $masterProducts = [
+        [
+            'id' => 1,
+            'category' => '2MP AHD INDOOR',
+            'type' => '2MP AHD INDOOR LX-4F320-CE',
+            'model' => 'LX-4F320-CE',
+            'description' => 'Kamera CCTV Loewix 2MP AHD Indoor CatEyes (LX-4F320-CE)',
+            'msrp' => 145000,
+            'insentif' => 15000,
+            'insentif_per_unit' => 15000
+        ],
+        [
+            'id' => 2,
+            'category' => '2MP AHD OUTDOOR',
+            'type' => '2MP AHD OUTDOOR LX-50F320-CM',
+            'model' => 'LX-50F320-CM',
+            'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor ColorMax (LX-50F320-CM)',
+            'msrp' => 170000,
+            'insentif' => 15000,
+            'insentif_per_unit' => 15000
+        ],
+        [
+            'id' => 3,
+            'category' => '2MP AHD INDOOR',
+            'type' => '2MP AHD INDOOR LX-4F320-CM',
+            'model' => 'LX-4F320-CM',
+            'description' => 'Kamera CCTV Loewix 2MP AHD Indoor ColorMax (LX-4F320-CM)',
+            'msrp' => 145000,
+            'insentif' => 15000,
+            'insentif_per_unit' => 15000
+        ],
+        [
+            'id' => 4,
+            'category' => '2MP AHD OUTDOOR',
+            'type' => '2MP AHD OUTDOOR LX-50F320-CE',
+            'model' => 'LX-50F320-CE',
+            'description' => 'Kamera CCTV Loewix 2MP AHD Outdoor CatEyes (LX-50F320-CE)',
+            'msrp' => 170000,
+            'insentif' => 15000,
+            'insentif_per_unit' => 15000
+        ],
+        [
+            'id' => 5,
+            'category' => '4MP IPCAM INDOOR',
+            'type' => '4MP IPCAM INDOOR LX-IPF40CMT02',
+            'model' => 'LX-IPF40CMT02',
+            'description' => 'Kamera CCTV Loewix 4MP IP Camera Indoor (LX-IPF40CMT02)',
+            'msrp' => 350000,
+            'insentif' => 30000,
+            'insentif_per_unit' => 30000
+        ],
+        [
+            'id' => 6,
+            'category' => '4MP IPCAM OUTDOOR',
+            'type' => '4MP IPCAM OUTDOOR LX-IPF40CMT17',
+            'model' => 'LX-IPF40CMT17',
+            'description' => 'Kamera CCTV Loewix 4MP IP Camera Outdoor (LX-IPF40CMT17)',
+            'msrp' => 380000,
+            'insentif' => 30000,
+            'insentif_per_unit' => 30000
+        ]
+    ];
+
+    $chk = @$conn->query("SHOW TABLES LIKE 'product_prices'");
+    if ($chk && $chk->num_rows > 0) {
+        $res = @$conn->query("SELECT category, type, description, msrp FROM product_prices");
+        if ($res && $res->num_rows > 0) {
+            $dbPrices = [];
+            while ($row = $res->fetch_assoc()) {
+                $dbPrices[] = $row;
+            }
+            foreach ($masterProducts as &$p) {
+                $cleanModel = str_replace('-', '', $p['model']);
+                foreach ($dbPrices as $dbP) {
+                    $dbTypeClean = str_replace('-', '', $dbP['type']);
+                    if (stripos($dbTypeClean, $cleanModel) !== false || stripos($dbP['type'], $p['model']) !== false) {
+                        if ((float)$dbP['msrp'] > 0) $p['msrp'] = (float)$dbP['msrp'];
+                        if (!empty($dbP['description'])) $p['description'] = $dbP['description'];
+                        break;
+                    }
+                }
+            }
+            unset($p);
+        }
+    }
+
+    echo json_encode(['status' => 'success', 'data' => $masterProducts]);
+    exit;
+}
+
+// ─────────────────────────────────────────────────────────────
 // 1. GET DASHBOARD & LIST TITIPAN SALES
 // ─────────────────────────────────────────────────────────────
 if ($action === 'get_dashboard') {
@@ -380,6 +474,16 @@ if ($action === 'create_penitipan') {
         $tipeBarang = trim($it['tipe_barang'] ?? ($it['type_barang'] ?? ($it['type'] ?? '')));
         $qtyTitip = intval($it['qty_titip'] ?? ($it['qty'] ?? 0));
         $insentifUnit = floatval($it['insentif_per_unit'] ?? ($it['insentif'] ?? 0));
+
+        // Auto-koreksi insentif resmi TIP TOK (4MP IPCAM = 30.000, 2MP AHD = 15.000)
+        $comboName = strtoupper($namaBarang . ' ' . $tipeBarang);
+        if (strpos($comboName, '4MP') !== false || strpos($comboName, 'IPCAM') !== false || strpos($comboName, 'IPF40') !== false) {
+            if ($insentifUnit < 30000) {
+                $insentifUnit = 30000.00;
+            }
+        } elseif ($insentifUnit <= 0) {
+            $insentifUnit = 15000.00;
+        }
 
         if (!empty($namaBarang) && $qtyTitip > 0) {
             $qtySisa = $qtyTitip;
