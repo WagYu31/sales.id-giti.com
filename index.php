@@ -294,8 +294,8 @@ if ($active_sales_id > 0) {
 .brandkit-hero {
     background: linear-gradient(135deg, #090D16 0%, #0F172A 50%, #1E293B 100%);
     border-radius: 24px;
-    padding: 34px 38px;
-    margin-bottom: 24px;
+    padding: 30px 34px;
+    margin-bottom: 22px;
     color: #FFFFFF;
     position: relative;
     overflow: hidden;
@@ -349,7 +349,7 @@ if ($active_sales_id > 0) {
 }
 .brandkit-hero-title {
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 800;
     color: #FFFFFF;
     letter-spacing: -0.02em;
@@ -357,9 +357,9 @@ if ($active_sales_id > 0) {
     margin-bottom: 6px;
 }
 .brandkit-hero-subtitle {
-    font-size: 14px;
+    font-size: 13.5px;
     color: rgba(226, 232, 240, 0.85);
-    line-height: 1.6;
+    line-height: 1.5;
     max-width: 680px;
     margin: 0;
 }
@@ -367,7 +367,7 @@ if ($active_sales_id > 0) {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
+    padding: 9px 18px;
     border-radius: 50px;
     background: rgba(255, 255, 255, 0.07);
     border: 1.5px solid rgba(255, 255, 255, 0.18);
@@ -375,7 +375,7 @@ if ($active_sales_id > 0) {
     color: #FFFFFF;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 700;
-    font-size: 13.5px;
+    font-size: 13px;
     cursor: pointer;
     transition: all 0.25s ease;
     text-decoration: none;
@@ -387,57 +387,93 @@ if ($active_sales_id > 0) {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
+.btn-add-customer-vip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    color: #FFFFFF !important;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+    text-decoration: none !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.btn-add-customer-vip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.55);
+    color: #FFFFFF !important;
+}
+.btn-icon-badge {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+}
 
 /* Bento KPI Grid */
 .cust-kpi-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
-    margin-bottom: 22px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
 }
-@media (max-width: 1200px) {
-    .cust-kpi-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 768px) {
-    .cust-kpi-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 480px) {
-    .cust-kpi-grid { grid-template-columns: 1fr; }
+@media (max-width: 991px) {
+    .cust-kpi-grid {
+        display: flex;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .cust-kpi-card {
+        flex: 0 0 210px;
+        min-width: 210px;
+    }
 }
 .cust-kpi-card {
     background: #FFFFFF;
     border: 1.5px solid #E2E8F0;
-    border-radius: 20px;
-    padding: 18px 20px;
+    border-radius: 18px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     text-decoration: none;
     color: inherit;
-    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.02);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
     position: relative;
     overflow: hidden;
+    min-width: 0;
 }
 .cust-kpi-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 26px -6px rgba(15, 23, 42, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px -5px rgba(15, 23, 42, 0.1);
     border-color: #CBD5E1;
     color: inherit;
 }
 .cust-kpi-card.active-kpi {
     border-color: #2563EB !important;
     background: #F8FAFC !important;
-    box-shadow: 0 10px 24px -4px rgba(37, 99, 235, 0.2) !important;
+    box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.25) !important;
 }
 .cust-kpi-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     flex-shrink: 0;
     transition: transform 0.25s ease;
 }
@@ -445,15 +481,18 @@ if ($active_sales_id > 0) {
     transform: scale(1.08);
 }
 .cust-kpi-title {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 800;
     color: #64748B;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 3px;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .cust-kpi-val {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 800;
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
     color: #0F172A;
@@ -461,19 +500,22 @@ if ($active_sales_id > 0) {
     letter-spacing: -0.02em;
 }
 .cust-kpi-sub {
-    font-size: 11px;
+    font-size: 10.5px;
     color: #94A3B8;
     font-weight: 600;
     margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Filter Toolbar Card */
 .brandkit-filter-card {
     background: #FFFFFF;
     border: 1.5px solid #E2E8F0;
-    border-radius: 22px;
-    padding: 22px 26px;
-    margin-bottom: 24px;
+    border-radius: 20px;
+    padding: 20px 24px;
+    margin-bottom: 22px;
     box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.03);
 }
 .brandkit-filter-label {
@@ -488,9 +530,9 @@ if ($active_sales_id > 0) {
     gap: 6px;
 }
 .brandkit-input, .brandkit-select {
-    border: 1.5px solid #E2E8F0;
+    border: 1.5px solid #CBD5E1;
     border-radius: 12px;
-    height: 44px;
+    height: 42px;
     font-size: 13.5px;
     font-weight: 600;
     color: #1E293B;
@@ -500,7 +542,7 @@ if ($active_sales_id > 0) {
 }
 .brandkit-input:focus, .brandkit-select:focus {
     border-color: #2563EB;
-    box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     outline: none;
     background-color: #FFFFFF;
 }
@@ -511,7 +553,7 @@ if ($active_sales_id > 0) {
     font-family: 'Plus Jakarta Sans', sans-serif;
     border: none;
     border-radius: 12px;
-    height: 44px;
+    height: 42px;
     padding: 0 20px;
     display: inline-flex;
     align-items: center;
@@ -521,6 +563,7 @@ if ($active_sales_id > 0) {
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     text-decoration: none;
     cursor: pointer;
+    white-space: nowrap;
 }
 .brandkit-btn-primary:hover {
     transform: translateY(-2px);
@@ -533,7 +576,7 @@ if ($active_sales_id > 0) {
     font-weight: 700;
     border: 1.5px solid #E2E8F0;
     border-radius: 12px;
-    height: 44px;
+    height: 42px;
     padding: 0 18px;
     display: inline-flex;
     align-items: center;
@@ -541,6 +584,7 @@ if ($active_sales_id > 0) {
     gap: 6px;
     transition: all 0.2s ease;
     text-decoration: none;
+    white-space: nowrap;
 }
 .brandkit-btn-reset:hover {
     background: #F1F5F9;
@@ -552,46 +596,65 @@ if ($active_sales_id > 0) {
 .brandkit-table-card {
     background: #FFFFFF;
     border: 1.5px solid #E2E8F0;
-    border-radius: 22px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 24px -6px rgba(15, 23, 42, 0.05);
+    box-shadow: 0 4px 24px -6px rgba(15, 23, 42, 0.06);
+    margin-bottom: 24px;
+}
+.brandkit-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.brandkit-table-responsive::-webkit-scrollbar {
+    height: 7px;
+}
+.brandkit-table-responsive::-webkit-scrollbar-track {
+    background: #F1F5F9;
+}
+.brandkit-table-responsive::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 10px;
 }
 .brandkit-table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: separate;
+    border-spacing: 0;
     margin-bottom: 0;
 }
 .brandkit-table thead th {
-    background: #0F172A;
-    color: #F1F5F9;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 16px 18px;
-    border: none;
-    white-space: nowrap;
+    background: #0B1120 !important;
+    color: #F8FAFC !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    padding: 15px 14px !important;
+    border: none !important;
+    white-space: nowrap !important;
 }
 .brandkit-table tbody td {
-    padding: 14px 18px;
-    border-bottom: 1px solid #F1F5F9;
-    vertical-align: middle;
+    padding: 12px 14px !important;
+    border-bottom: 1px solid #F1F5F9 !important;
+    vertical-align: middle !important;
+    background: #FFFFFF;
+    font-size: 13px;
 }
-.brandkit-table tbody tr {
-    transition: background-color 0.2s ease;
-}
-.brandkit-table tbody tr:hover {
-    background-color: #F8FAFC;
+.brandkit-table tbody tr:hover td {
+    background: #F8FAFC !important;
 }
 
 .shop-avatar-box {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
     background: #EFF6FF;
     color: #2563EB;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 14px;
     flex-shrink: 0;
 }
 .wa-badge-pill {
@@ -599,14 +662,15 @@ if ($active_sales_id > 0) {
     color: #047857 !important;
     border: 1px solid #A7F3D0;
     border-radius: 50px;
-    padding: 4px 12px;
+    padding: 4px 10px;
     font-weight: 700;
-    font-size: 11.5px;
+    font-size: 11px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
     text-decoration: none !important;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 .wa-badge-pill:hover {
     background: #D1FAE5;
@@ -619,8 +683,8 @@ if ($active_sales_id > 0) {
     color: #1E40AF;
     border: 1px solid #BFDBFE;
     border-radius: 50px;
-    padding: 4px 12px;
-    font-size: 11.5px;
+    padding: 4px 10px;
+    font-size: 11px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
@@ -632,20 +696,21 @@ if ($active_sales_id > 0) {
     color: #334155;
     border: 1px solid #E2E8F0;
     border-radius: 50px;
-    padding: 4px 12px;
-    font-size: 11.5px;
+    padding: 4px 10px;
+    font-size: 11px;
     font-weight: 700;
+    white-space: nowrap;
 }
 .sales-avatar-badge {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 8px;
     background: linear-gradient(135deg, #2563EB, #1D4ED8);
     color: #FFFFFF;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 800;
     font-family: 'Outfit', sans-serif;
     flex-shrink: 0;
@@ -654,7 +719,7 @@ if ($active_sales_id > 0) {
     background: #2563EB;
     color: #FFFFFF;
     border-radius: 50px;
-    padding: 3px 10px;
+    padding: 2px 8px;
     font-size: 11.5px;
     font-weight: 800;
     font-family: 'Outfit', sans-serif;
@@ -676,32 +741,34 @@ if ($active_sales_id > 0) {
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     color: #FFFFFF !important;
     font-weight: 800;
-    font-size: 11.5px;
+    font-size: 11px;
     border: none;
-    border-radius: 10px;
-    padding: 4px 10px;
+    border-radius: 9px;
+    padding: 4px 9px;
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
     text-decoration: none !important;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 .btn-fu-action:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
 }
 .action-circle-btn {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 11.5px;
     border: 1px solid transparent;
     transition: all 0.2s ease;
     text-decoration: none;
+    flex-shrink: 0;
 }
 .action-circle-btn:hover {
     transform: translateY(-1px);
@@ -753,15 +820,15 @@ if ($active_sales_id > 0) {
 .brandkit-forum-card {
     background: #FFFFFF;
     border: 1.5px solid #E2E8F0;
-    border-radius: 22px;
+    border-radius: 20px;
     box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
 }
 .forum-card-item {
     background: #FFFFFF;
     border: 1.5px solid #E2E8F0;
-    border-radius: 16px;
+    border-radius: 14px;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
 }
@@ -771,14 +838,14 @@ if ($active_sales_id > 0) {
     box-shadow: 0 8px 22px -4px rgba(37, 99, 235, 0.1);
 }
 .author-avatar-badge {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     background: linear-gradient(135deg, #2563EB, #1D4ED8);
     color: #FFFFFF;
     font-family: 'Outfit', sans-serif;
     font-weight: 800;
-    font-size: 14px;
+    font-size: 13.5px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -788,7 +855,7 @@ if ($active_sales_id > 0) {
 .answer-card {
     border: 1.5px solid #E2E8F0;
     border-left: 4px solid #2563EB !important;
-    border-radius: 14px !important;
+    border-radius: 12px !important;
     background: #F8FAFC;
     transition: all 0.2s ease;
 }
@@ -1131,20 +1198,20 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
 
     <!-- Data Table Card Container -->
     <div class="brandkit-table-card">
-        <div class="table-responsive" id="customer-table-container">
-            <table class="table table-hover align-middle sortable-table brandkit-table mb-0">
+        <div class="brandkit-table-responsive" id="customer-table-container">
+            <table class="table align-middle brandkit-table mb-0">
                 <thead>
                     <tr>
-                        <th style="width: 17%;">NAMA TOKO</th>
-                        <th style="width: 20%;">PIC & KONTAK</th>
-                        <th style="width: 10%;">KATEGORI</th>
-                        <th style="width: 11%;">KOTA</th>
-                        <th style="width: 13%;">SALES</th>
-                        <th class="text-center" style="width: 5%;">FU</th>
-                        <th class="text-center" style="width: 5%;">KANDIDAT</th>
-                        <th class="text-center" style="width: 5%;">DEAL</th>
-                        <th class="text-center" style="width: 4%;">MAPS</th>
-                        <th class="text-center" style="width: 10%;">AKSI</th>
+                        <th style="min-width: 190px;">NAMA TOKO</th>
+                        <th style="min-width: 190px;">PIC & KONTAK</th>
+                        <th style="min-width: 100px;">KATEGORI</th>
+                        <th style="min-width: 120px;">KOTA</th>
+                        <th style="min-width: 130px;">SALES</th>
+                        <th class="text-center" style="min-width: 60px;">FU</th>
+                        <th class="text-center" style="min-width: 75px;">KANDIDAT</th>
+                        <th class="text-center" style="min-width: 65px;">DEAL</th>
+                        <th class="text-center" style="min-width: 55px;">MAPS</th>
+                        <th class="text-center" style="min-width: 150px;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1372,7 +1439,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentUserId = <?php echo $_SESSION['user_id']; ?>;
     const isSuperAdmin = '<?php echo $_SESSION['role']; ?>' === 'superadmin';
     const questionsTable = document.getElementById('questionsTable');
-    const tableBody = document.querySelector('.sortable-table tbody');
+    const tableBody = document.querySelector('.brandkit-table tbody') || document.querySelector('table tbody');
     const notification = document.getElementById('notification');
 
     // Q&A Live Search
