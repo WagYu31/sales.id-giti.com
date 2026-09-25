@@ -287,382 +287,475 @@ if ($active_sales_id > 0) {
 
 <style>
 /* =========================================================
-   BRANDKIT DESIGN SYSTEM — DATABASE CUSTOMER & FORUM Q&A
+   TASTE-SKILL DESIGN SYSTEM — SALES WORKSPACE & CRM
+   (Linear / Raycast / Stripe Grade Interface)
    ========================================================= */
 
-/* Hero Banner */
-.brandkit-hero {
-    background: linear-gradient(135deg, #090D16 0%, #0F172A 50%, #1E293B 100%);
-    border-radius: 24px;
-    padding: 30px 34px;
-    margin-bottom: 22px;
-    color: #FFFFFF;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 16px 36px -10px rgba(15, 23, 42, 0.35);
-}
-.brandkit-hero::before {
-    content: '';
-    position: absolute;
-    top: -80px; right: -80px;
-    width: 320px; height: 320px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 70%);
-    pointer-events: none;
-}
-.brandkit-hero::after {
-    content: '';
-    position: absolute;
-    bottom: -60px; left: 20%;
-    width: 260px; height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
-    pointer-events: none;
-}
-.brandkit-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 14px;
-    border-radius: 50px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(10px);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #93C5FD;
-}
-.brandkit-eyebrow .pulse-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #38BDF8;
-    box-shadow: 0 0 8px #38BDF8;
-    animation: pulse-glow 2s infinite ease-in-out;
-}
-@keyframes pulse-glow {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 0.6; }
-}
-.brandkit-hero-title {
-    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
-    font-size: 26px;
-    font-weight: 800;
-    color: #FFFFFF;
-    letter-spacing: -0.02em;
-    line-height: 1.25;
-    margin-bottom: 6px;
-}
-.brandkit-hero-subtitle {
-    font-size: 13.5px;
-    color: rgba(226, 232, 240, 0.85);
-    line-height: 1.5;
-    max-width: 680px;
-    margin: 0;
-}
-.brandkit-btn-glass {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 18px;
-    border-radius: 50px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1.5px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(12px);
-    color: #FFFFFF;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    text-decoration: none;
-}
-.brandkit-btn-glass:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.35);
-    color: #FFFFFF;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-}
-.btn-add-customer-vip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 20px;
-    border-radius: 50px;
-    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-    color: #FFFFFF !important;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 800;
-    font-size: 13px;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
-    text-decoration: none !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-.btn-add-customer-vip:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.55);
-    color: #FFFFFF !important;
-}
-.btn-icon-badge {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.25);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
+:root {
+    --taste-bg: #F8FAFC;
+    --taste-card: #FFFFFF;
+    --taste-border: #E2E8F0;
+    --taste-border-focus: #3B82F6;
+    --taste-text-main: #0F172A;
+    --taste-text-muted: #64748B;
+    --taste-text-sub: #94A3B8;
+    --taste-primary: #0F172A;
+    --taste-primary-hover: #1E293B;
+    --taste-accent: #2563EB;
+    --taste-emerald: #10B981;
+    --taste-amber: #F59E0B;
+    --taste-purple: #8B5CF6;
 }
 
-/* Bento KPI Grid */
-.cust-kpi-grid {
+/* Page Container Header */
+.taste-header {
+    background: #FFFFFF;
+    border: 1px solid var(--taste-border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+}
+.taste-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--taste-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+}
+.taste-breadcrumb .pulse-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #EFF6FF;
+    color: #2563EB;
+    border: 1px solid #DBEAFE;
+    padding: 2px 8px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 800;
+}
+.taste-breadcrumb .pulse-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2563EB;
+    box-shadow: 0 0 6px rgba(37, 99, 235, 0.6);
+    animation: taste-pulse 2s infinite ease-in-out;
+}
+@keyframes taste-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.5; }
+}
+.taste-title {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--taste-text-main);
+    letter-spacing: -0.025em;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.taste-total-pill {
+    background: #F1F5F9;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 50px;
+    border: 1px solid #E2E8F0;
+    letter-spacing: 0;
+}
+.taste-subtitle {
+    font-size: 13.5px;
+    color: var(--taste-text-muted);
+    margin: 0;
+    max-width: 680px;
+    line-height: 1.5;
+}
+
+/* Action Buttons */
+.taste-btn-primary {
+    background: #0F172A;
+    color: #FFFFFF !important;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: 1px solid #0F172A;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
+    cursor: pointer;
+    white-space: nowrap;
+}
+.taste-btn-primary:hover {
+    background: #1E293B;
+    border-color: #1E293B;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+.taste-btn-secondary {
+    background: #FFFFFF;
+    color: #334155 !important;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 16px;
+    border-radius: 10px;
+    border: 1.5px solid var(--taste-border);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.taste-btn-secondary:hover {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+    color: #0F172A !important;
+    transform: translateY(-1px);
+}
+
+/* Status Filter Metrics Bar (Linear Segmented Style) */
+.taste-metrics-bar {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 12px;
     margin-bottom: 20px;
 }
 @media (max-width: 991px) {
-    .cust-kpi-grid {
+    .taste-metrics-bar {
         display: flex;
         overflow-x: auto;
         gap: 10px;
-        padding-bottom: 8px;
+        padding-bottom: 6px;
         -webkit-overflow-scrolling: touch;
     }
-    .cust-kpi-card {
+    .taste-metric-item {
         flex: 0 0 210px;
         min-width: 210px;
     }
 }
-.cust-kpi-card {
+.taste-metric-item {
     background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
-    border-radius: 18px;
+    border: 1.5px solid var(--taste-border);
+    border-radius: 14px;
     padding: 14px 16px;
+    text-decoration: none !important;
+    color: inherit !important;
     display: flex;
     align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+    justify-content: space-between;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
     position: relative;
     overflow: hidden;
-    min-width: 0;
 }
-.cust-kpi-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 22px -5px rgba(15, 23, 42, 0.1);
+.taste-metric-item:hover {
+    transform: translateY(-2px);
     border-color: #CBD5E1;
-    color: inherit;
+    box-shadow: 0 6px 16px -4px rgba(15, 23, 42, 0.08);
 }
-.cust-kpi-card.active-kpi {
+.taste-metric-item.active-metric {
     border-color: #2563EB !important;
     background: #F8FAFC !important;
-    box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.25) !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12), 0 4px 12px -2px rgba(37, 99, 235, 0.1) !important;
 }
-.cust-kpi-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 13px;
+.taste-metric-item.active-metric::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: #2563EB;
+}
+.taste-metric-info {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-    transition: transform 0.25s ease;
+    flex-direction: column;
 }
-.cust-kpi-card:hover .cust-kpi-icon {
-    transform: scale(1.08);
-}
-.cust-kpi-title {
-    font-size: 10.5px;
-    font-weight: 800;
-    color: #64748B;
+.taste-metric-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--taste-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.cust-kpi-val {
-    font-size: 22px;
-    font-weight: 800;
-    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
-    color: #0F172A;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-}
-.cust-kpi-sub {
-    font-size: 10.5px;
-    color: #94A3B8;
-    font-weight: 600;
-    margin-top: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Filter Toolbar Card */
-.brandkit-filter-card {
-    background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
-    border-radius: 20px;
-    padding: 20px 24px;
-    margin-bottom: 22px;
-    box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.03);
-}
-.brandkit-filter-label {
-    font-size: 11px;
-    font-weight: 800;
-    color: #64748B;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
     display: flex;
     align-items: center;
     gap: 6px;
+    margin-bottom: 3px;
 }
-.brandkit-input, .brandkit-select {
-    border: 1.5px solid #CBD5E1;
-    border-radius: 12px;
+.taste-metric-label .indicator-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.dot-all { background: #64748B; }
+.dot-pending { background: #F59E0B; box-shadow: 0 0 6px rgba(245, 158, 11, 0.6); }
+.dot-fu { background: #2563EB; box-shadow: 0 0 6px rgba(37, 99, 235, 0.6); }
+.dot-kandidat { background: #8B5CF6; box-shadow: 0 0 6px rgba(139, 92, 246, 0.6); }
+.dot-deal { background: #10B981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
+
+.taste-metric-val {
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--taste-text-main);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+.taste-metric-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* Command & Filter Bar */
+.taste-filter-card {
+    background: #FFFFFF;
+    border: 1px solid var(--taste-border);
+    border-radius: 16px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+.taste-input-group {
+    position: relative;
+    width: 100%;
+}
+.taste-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    font-size: 15px;
+    pointer-events: none;
+}
+.taste-input {
+    width: 100%;
     height: 42px;
+    padding: 0 14px 0 40px;
+    border-radius: 10px;
+    border: 1.5px solid var(--taste-border);
     font-size: 13.5px;
     font-weight: 600;
-    color: #1E293B;
+    color: var(--taste-text-main);
+    background: #FFFFFF;
     transition: all 0.2s ease;
-    padding: 0 14px;
-    background-color: #FFFFFF;
 }
-.brandkit-input:focus, .brandkit-select:focus {
+.taste-input:focus {
     border-color: #2563EB;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     outline: none;
-    background-color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
-.brandkit-btn-primary {
-    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-    color: #FFFFFF;
+.taste-select {
+    height: 42px;
+    border-radius: 10px;
+    border: 1.5px solid var(--taste-border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--taste-text-main);
+    padding: 0 12px;
+    background-color: #FFFFFF;
+    transition: all 0.2s ease;
+}
+.taste-select:focus {
+    border-color: #2563EB;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.taste-filter-label {
+    font-size: 11px;
     font-weight: 800;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    border: none;
-    border-radius: 12px;
+    color: var(--taste-text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.taste-btn-apply {
     height: 42px;
     padding: 0 20px;
+    border-radius: 10px;
+    background: #2563EB;
+    color: #FFFFFF;
+    border: none;
+    font-size: 13px;
+    font-weight: 800;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    text-decoration: none;
+    gap: 7px;
+    transition: all 0.2s ease;
     cursor: pointer;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
     white-space: nowrap;
 }
-.brandkit-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.4);
-    color: #FFFFFF;
+.taste-btn-apply:hover {
+    background: #1D4ED8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
-.brandkit-btn-reset {
-    background: #F8FAFC;
-    color: #475569;
-    font-weight: 700;
-    border: 1.5px solid #E2E8F0;
-    border-radius: 12px;
+.taste-btn-reset {
     height: 42px;
-    padding: 0 18px;
+    padding: 0 16px;
+    border-radius: 10px;
+    background: #F8FAFC;
+    color: var(--taste-text-muted);
+    border: 1.5px solid var(--taste-border);
+    font-size: 13px;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
+    text-decoration: none !important;
     transition: all 0.2s ease;
-    text-decoration: none;
     white-space: nowrap;
 }
-.brandkit-btn-reset:hover {
+.taste-btn-reset:hover {
     background: #F1F5F9;
-    color: #0F172A;
+    color: var(--taste-text-main);
     border-color: #CBD5E1;
 }
 
-/* Customer Data Table */
-.brandkit-table-card {
+/* Forum Q&A Card */
+.taste-forum-card {
     background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
-    border-radius: 20px;
+    border: 1px solid var(--taste-border);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 24px -6px rgba(15, 23, 42, 0.06);
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+.taste-forum-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #FFFFFF;
+    cursor: pointer;
+    user-select: none;
+}
+.forum-item-row {
+    background: #FFFFFF;
+    border: 1px solid var(--taste-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.forum-item-row:hover {
+    border-color: #93C5FD;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+    transform: translateY(-1px);
+}
+.author-pill {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    color: #FFFFFF;
+    font-weight: 800;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Linear-Grade Customer Table */
+.taste-table-card {
+    background: #FFFFFF;
+    border: 1px solid var(--taste-border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 16px -4px rgba(15, 23, 42, 0.04);
     margin-bottom: 24px;
 }
-.brandkit-table-responsive {
+.taste-table-responsive {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
-.brandkit-table-responsive::-webkit-scrollbar {
+.taste-table-responsive::-webkit-scrollbar {
     height: 7px;
 }
-.brandkit-table-responsive::-webkit-scrollbar-track {
-    background: #F1F5F9;
+.taste-table-responsive::-webkit-scrollbar-track {
+    background: #F8FAFC;
 }
-.brandkit-table-responsive::-webkit-scrollbar-thumb {
+.taste-table-responsive::-webkit-scrollbar-thumb {
     background: #CBD5E1;
     border-radius: 10px;
 }
-.brandkit-table {
+.taste-table {
     width: 100%;
     min-width: 1100px;
     border-collapse: separate;
     border-spacing: 0;
     margin-bottom: 0;
 }
-.brandkit-table thead th {
-    background: #0B1120 !important;
+.taste-table thead th {
+    background: #0F172A !important;
     color: #F8FAFC !important;
     font-size: 11px !important;
     font-weight: 800 !important;
     letter-spacing: 0.06em !important;
     text-transform: uppercase !important;
-    padding: 15px 14px !important;
+    padding: 14px 14px !important;
     border: none !important;
     white-space: nowrap !important;
 }
-.brandkit-table tbody td {
+.taste-table tbody td {
     padding: 12px 14px !important;
     border-bottom: 1px solid #F1F5F9 !important;
     vertical-align: middle !important;
     background: #FFFFFF;
     font-size: 13px;
+    color: #1E293B;
 }
-.brandkit-table tbody tr:hover td {
+.taste-table tbody tr:hover td {
     background: #F8FAFC !important;
 }
 
-.shop-avatar-box {
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
+/* Shop Avatar & Badges */
+.taste-shop-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
     background: #EFF6FF;
     color: #2563EB;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 13px;
     flex-shrink: 0;
 }
-.wa-badge-pill {
+.taste-wa-pill {
     background: #ECFDF5;
     color: #047857 !important;
     border: 1px solid #A7F3D0;
     border-radius: 50px;
-    padding: 4px 10px;
+    padding: 3px 10px;
     font-weight: 700;
     font-size: 11px;
     display: inline-flex;
@@ -672,50 +765,46 @@ if ($active_sales_id > 0) {
     transition: all 0.2s ease;
     white-space: nowrap;
 }
-.wa-badge-pill:hover {
+.taste-wa-pill:hover {
     background: #D1FAE5;
-    color: #065F46 !important;
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
 }
-.city-pill {
-    background: #EFF6FF;
-    color: #1E40AF;
-    border: 1px solid #BFDBFE;
-    border-radius: 50px;
-    padding: 4px 10px;
-    font-size: 11px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-}
-.category-pill {
+.taste-category-pill {
     background: #F8FAFC;
     color: #334155;
     border: 1px solid #E2E8F0;
     border-radius: 50px;
-    padding: 4px 10px;
+    padding: 3px 9px;
     font-size: 11px;
     font-weight: 700;
     white-space: nowrap;
 }
-.sales-avatar-badge {
+.taste-city-pill {
+    background: #EFF6FF;
+    color: #1E40AF;
+    border: 1px solid #BFDBFE;
+    border-radius: 50px;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.taste-sales-badge {
     width: 26px;
     height: 26px;
-    border-radius: 8px;
+    border-radius: 7px;
     background: linear-gradient(135deg, #2563EB, #1D4ED8);
     color: #FFFFFF;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 800;
     font-family: 'Outfit', sans-serif;
     flex-shrink: 0;
 }
-.fu-counter-badge {
+.taste-fu-pill {
     background: #2563EB;
     color: #FFFFFF;
     border-radius: 50px;
@@ -725,25 +814,27 @@ if ($active_sales_id > 0) {
     font-family: 'Outfit', sans-serif;
     display: inline-block;
     text-decoration: none;
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition: all 0.2s ease;
 }
-.fu-counter-badge:hover {
+.taste-fu-pill:hover {
     background: #1D4ED8;
     transform: scale(1.08);
     color: #FFFFFF;
 }
-.fu-counter-badge.empty {
+.taste-fu-pill.empty {
     background: #F1F5F9;
     color: #64748B;
     border: 1px solid #CBD5E1;
 }
-.btn-fu-action {
+
+/* Action Icons */
+.btn-quick-fu {
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     color: #FFFFFF !important;
     font-weight: 800;
     font-size: 11px;
     border: none;
-    border-radius: 9px;
+    border-radius: 8px;
     padding: 4px 9px;
     display: inline-flex;
     align-items: center;
@@ -753,11 +844,11 @@ if ($active_sales_id > 0) {
     transition: all 0.2s ease;
     white-space: nowrap;
 }
-.btn-fu-action:hover {
+.btn-quick-fu:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
 }
-.action-circle-btn {
+.taste-icon-btn {
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -770,175 +861,97 @@ if ($active_sales_id > 0) {
     text-decoration: none;
     flex-shrink: 0;
 }
-.action-circle-btn:hover {
+.taste-icon-btn:hover {
     transform: translateY(-1px);
 }
-.action-circle-btn.view {
-    background: #EFF6FF;
-    color: #2563EB;
-    border-color: #BFDBFE;
-}
-.action-circle-btn.view:hover {
-    background: #DBEAFE;
-    color: #1D4ED8;
-}
-.action-circle-btn.edit {
-    background: #F8FAFC;
-    color: #475569;
-    border-color: #CBD5E1;
-}
-.action-circle-btn.edit:hover {
-    background: #E2E8F0;
-    color: #0F172A;
-}
-.action-circle-btn.delete {
-    background: #FEF2F2;
-    color: #DC2626;
-    border-color: #FECACA;
-}
-.action-circle-btn.delete:hover {
-    background: #FEE2E2;
-    color: #B91C1C;
-}
-.action-circle-btn.map {
-    background: #ECFDF5;
-    color: #059669;
-    border-color: #A7F3D0;
-}
-.action-circle-btn.map:hover {
-    background: #D1FAE5;
-    color: #047857;
-}
-.action-circle-btn.map-disabled {
-    background: #F8FAFC;
-    color: #CBD5E1;
-    border-color: #E2E8F0;
-    cursor: not-allowed;
-}
+.taste-icon-btn.view { background: #EFF6FF; color: #2563EB; border-color: #BFDBFE; }
+.taste-icon-btn.view:hover { background: #DBEAFE; color: #1D4ED8; }
+.taste-icon-btn.edit { background: #F8FAFC; color: #475569; border-color: #CBD5E1; }
+.taste-icon-btn.edit:hover { background: #E2E8F0; color: #0F172A; }
+.taste-icon-btn.delete { background: #FEF2F2; color: #DC2626; border-color: #FECACA; }
+.taste-icon-btn.delete:hover { background: #FEE2E2; color: #B91C1C; }
+.taste-icon-btn.map { background: #ECFDF5; color: #059669; border-color: #A7F3D0; }
+.taste-icon-btn.map:hover { background: #D1FAE5; color: #047857; }
+.taste-icon-btn.map-disabled { background: #F8FAFC; color: #CBD5E1; border-color: #E2E8F0; cursor: not-allowed; }
 
-/* Forum Q&A Components */
-.brandkit-forum-card {
-    background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04);
-    overflow: hidden;
-    margin-bottom: 22px;
-}
-.forum-card-item {
-    background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
-    border-radius: 14px;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    cursor: pointer;
-}
-.forum-card-item:hover {
-    transform: translateY(-2px);
-    border-color: #93C5FD;
-    box-shadow: 0 8px 22px -4px rgba(37, 99, 235, 0.1);
-}
-.author-avatar-badge {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #2563EB, #1D4ED8);
-    color: #FFFFFF;
-    font-family: 'Outfit', sans-serif;
-    font-weight: 800;
-    font-size: 13.5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
-    flex-shrink: 0;
-}
 .answer-card {
-    border: 1.5px solid #E2E8F0;
-    border-left: 4px solid #2563EB !important;
-    border-radius: 12px !important;
+    border: 1px solid var(--taste-border);
+    border-left: 3px solid #2563EB !important;
+    border-radius: 10px !important;
     background: #F8FAFC;
-    transition: all 0.2s ease;
-}
-.answer-card:hover {
-    background: #FFFFFF;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-}
-.question-meta, .answer-meta {
-    font-size: 12px;
-    color: #64748B;
-    font-weight: 600;
 }
 </style>
 
 <!-- TOP RUNNING TEXT ANNOUNCEMENT TICKER BANNER -->
 <?php include 'includes/announcement_widget.php'; ?>
 
-<!-- BRANDKIT UNIFIED HERO HEADER -->
-<div class="brandkit-hero">
-    <div class="d-flex flex-wrap justify-content-between align-items-center position-relative" style="z-index:2;">
+<!-- TASTE-SKILL WORKSPACE HEADER -->
+<div class="taste-header">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
-            <div class="d-flex align-items-center gap-2 mb-2.5">
-                <span class="brandkit-eyebrow"><span class="pulse-dot"></span> CRM & CUSTOMER DIRECTORY</span>
-                <span class="text-white-50">/</span>
-                <span style="font-size:12px; color:rgba(226,232,240,0.85); font-weight:600;">Loewix Sales Workspace</span>
+            <div class="taste-breadcrumb">
+                <span class="pulse-badge"><span class="dot"></span> CRM & LEADS</span>
+                <span>/</span>
+                <span>Loewix Sales Workspace</span>
             </div>
-            <h1 class="brandkit-hero-title">Database Customer & Forum Q&A 👥💬</h1>
-            <p class="brandkit-hero-subtitle">Ecosystem terpadu pengelolaan database customer, riwayat interaksi PIC, koordinasi follow-up tim, serta diskusi solusi teknis produk.</p>
+            <h1 class="taste-title">
+                Database Customer
+                <span class="taste-total-pill"><?php echo number_format($stat_total); ?> Leads</span>
+            </h1>
+            <p class="taste-subtitle">Direktori pelanggan, riwayat PIC & kontak WhatsApp, koordinasi follow-up tim sales, dan status closing.</p>
         </div>
-        <div class="mt-3 mt-lg-0 d-flex flex-wrap gap-2.5 align-items-center">
-            <a href="customer_add.php" class="btn-add-customer-vip">
-                <span class="btn-icon-badge"><i class="bi bi-plus-lg"></i></span>
-                <span>Tambah Customer Baru</span>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <a href="customer_add.php" class="taste-btn-primary">
+                <i class="bi bi-plus-lg"></i>
+                <span>Tambah Customer</span>
             </a>
-            <button class="brandkit-btn-glass" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
-                <i class="bi bi-chat-square-quote-fill text-warning"></i>
-                <span>Tanya Tim Sales</span>
+            <button class="taste-btn-secondary" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent">
+                <i class="bi bi-chat-left-text-fill text-primary"></i>
+                <span>Forum Q&A (<?php echo count($questions); ?>)</span>
             </button>
         </div>
     </div>
 </div>
 
 <!-- SECTION 1: COLLAPSIBLE FORUM Q&A ACCORDION -->
-<div id="forum-section" class="brandkit-forum-card">
-    <div class="py-3.5 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3 bg-white" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent" aria-expanded="false">
+<div id="forum-section" class="taste-forum-card">
+    <div class="taste-forum-header" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent" aria-expanded="false">
         <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle bg-primary bg-gradient d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width:42px; height:42px;">
-                <i class="bi bi-chat-left-dots-fill fs-5"></i>
+            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width:36px; height:36px; font-size:14px;">
+                <i class="bi bi-chat-left-dots-fill"></i>
             </div>
             <div>
-                <h5 class="mb-0 fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:16px;">
-                    Forum Q&A & Diskusi Sales 
-                    <span class="badge bg-primary rounded-pill ms-2" style="font-size:11.5px; padding:4px 10px;"><?php echo count($questions); ?> Topik</span>
-                </h5>
-                <small class="text-muted" style="font-size:12px;">Tempat bertanya & berbagi solusi seputar produk/customer (Klik untuk buka / tutup)</small>
+                <div class="fw-bold text-dark" style="font-size:14.5px;">
+                    Forum Diskusi & Q&A Sales
+                    <span class="badge bg-primary rounded-pill ms-1" style="font-size:11px;"><?php echo count($questions); ?> Topik</span>
+                </div>
+                <small class="text-muted" style="font-size:12px;">Tempat bertanya & berbagi solusi seputar customer/produk (Klik untuk buka/tutup)</small>
             </div>
         </div>
         <div class="d-flex align-items-center gap-2" onclick="event.stopPropagation();">
-            <button class="btn btn-sm btn-primary rounded-pill px-3 py-1.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+            <button class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm d-inline-flex align-items-center gap-1" style="font-size:12px;" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
                 <i class="bi bi-plus-circle-fill"></i> Buat Pertanyaan
             </button>
-            <span class="btn btn-sm btn-light rounded-circle border p-0 d-inline-flex align-items-center justify-content-center" style="width:34px; height:34px;" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent">
-                <i class="bi bi-chevron-down text-muted"></i>
+            <span class="btn btn-sm btn-light rounded-circle border p-0 d-inline-flex align-items-center justify-content-center" style="width:30px; height:30px;" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent">
+                <i class="bi bi-chevron-down text-muted" style="font-size:12px;"></i>
             </span>
         </div>
     </div>
 
     <div class="collapse" id="forumCollapseContent">
-        <div class="p-4 bg-light border-top">
-            <!-- Search Bar -->
+        <div class="p-3 bg-light border-top">
             <div class="mb-3">
-                <div class="input-group shadow-2sm" style="border-radius:12px; overflow:hidden;">
+                <div class="input-group" style="border-radius:10px; overflow:hidden;">
                     <span class="input-group-text bg-white border-end-0 text-muted ps-3"><i class="bi bi-search"></i></span>
-                    <input type="text" id="liveSearchInput" class="form-control border-start-0 ps-1 fw-semibold" placeholder="Cari pertanyaan, kata kunci, atau nama sales..." style="height:44px; font-size:13.5px;">
+                    <input type="text" id="liveSearchInput" class="form-control border-start-0 ps-1 fw-semibold" placeholder="Cari pertanyaan, kata kunci, atau nama sales..." style="height:40px; font-size:13px;">
                 </div>
             </div>
 
-            <!-- Discussion Items Feed -->
-            <div class="d-flex flex-column gap-2.5" id="forumFeedContainer">
+            <div class="d-flex flex-column gap-2" id="forumFeedContainer">
                 <?php if (empty($questions)): ?>
                     <div class="text-center p-4 bg-white rounded-3 border">
-                        <i class="bi bi-chat-square-dots text-primary fs-2 mb-2 d-block"></i>
-                        <h6 class="fw-bold text-dark mb-1">Belum ada diskusi sales.</h6>
+                        <i class="bi bi-chat-square-dots text-primary fs-3 mb-1 d-block"></i>
+                        <h6 class="fw-bold text-dark mb-1" style="font-size:14px;">Belum ada diskusi sales.</h6>
                         <small class="text-muted">Klik "Buat Pertanyaan" di atas untuk memulai diskusi!</small>
                     </div>
                 <?php else: ?>
@@ -946,7 +959,7 @@ if ($active_sales_id > 0) {
                         $hasAnswers = count($q['answers']) > 0;
                         $ansPillStyle = $hasAnswers ? 'background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE;' : 'background:#FEF3C7; color:#92400E; border:1px solid #FDE68A;';
                     ?>
-                    <div class="forum-card-item card border-0 shadow-2sm" id="question-row-<?php echo $q['id']; ?>"
+                    <div class="forum-item-row" id="question-row-<?php echo $q['id']; ?>"
                         data-question-id="<?php echo $q['id']; ?>"
                         data-title="<?php echo htmlspecialchars($q['title']); ?>"
                         data-body="<?php echo htmlspecialchars($q['body']); ?>"
@@ -955,33 +968,32 @@ if ($active_sales_id > 0) {
                         data-answers='<?php echo json_encode($q['answers']); ?>'
                         data-bs-toggle="modal" data-bs-target="#viewQuestionModal" onclick="populateAndShowModal(this)">
                         
-                        <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
-                            <div class="d-flex align-items-center gap-3" style="min-width:280px; flex: 1 1 400px;">
-                                <div class="author-avatar-badge">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div class="d-flex align-items-center gap-3" style="min-width:260px; flex: 1 1 350px;">
+                                <div class="author-pill">
                                     <?php echo strtoupper(substr($q['author'], 0, 1)); ?>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:14.5px; line-height:1.3;">
-                                        <i class="bi bi-question-circle-fill text-primary me-1"></i>
+                                    <div class="fw-bold text-dark" style="font-size:13.5px; line-height:1.3;">
                                         <?php echo htmlspecialchars($q['title']); ?>
                                     </div>
-                                    <div class="text-muted small mt-0.5" style="font-size:12.5px;">
-                                        <?php echo htmlspecialchars(substr($q['body'], 0, 100)) . (strlen($q['body']) > 100 ? '...' : ''); ?>
+                                    <div class="text-muted small" style="font-size:12px;">
+                                        <?php echo htmlspecialchars(substr($q['body'], 0, 90)) . (strlen($q['body']) > 90 ? '...' : ''); ?>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="d-flex align-items-center gap-3 ms-auto" onclick="event.stopPropagation();">
                                 <div class="text-end d-none d-sm-block">
-                                    <div class="fw-semibold text-dark" style="font-size:12px;"><?php echo htmlspecialchars($q['author']); ?></div>
-                                    <small class="text-muted" style="font-size:11px;"><?php echo date('d M Y', strtotime($q['created_at'])); ?></small>
+                                    <div class="fw-semibold text-dark" style="font-size:11.5px;"><?php echo htmlspecialchars($q['author']); ?></div>
+                                    <small class="text-muted" style="font-size:10.5px;"><?php echo date('d M Y', strtotime($q['created_at'])); ?></small>
                                 </div>
-                                <span class="badge rounded-pill fw-bold" style="<?php echo $ansPillStyle; ?> font-size:11.5px; padding:6px 14px;" data-bs-toggle="modal" data-bs-target="#viewQuestionModal" onclick="populateAndShowModal(this.closest('.forum-card-item'))">
+                                <span class="badge rounded-pill fw-bold" style="<?php echo $ansPillStyle; ?> font-size:11px; padding:5px 12px;" data-bs-toggle="modal" data-bs-target="#viewQuestionModal" onclick="populateAndShowModal(this.closest('.forum-item-row'))">
                                     <i class="bi bi-chat-right-text-fill me-1"></i> <?php echo count($q['answers']); ?> Jawaban
                                 </span>
                                 <?php if ($_SESSION['user_id'] == $q['author_id'] || $_SESSION['role'] === 'superadmin'): ?>
-                                    <button class="btn btn-sm btn-light border text-danger rounded-circle p-0 d-inline-flex align-items-center justify-content-center delete-btn" data-id="<?php echo $q['id']; ?>" data-type="question" title="Hapus Pertanyaan" style="width:30px; height:30px;">
-                                        <i class="bi bi-trash-fill" style="font-size:12px;"></i>
+                                    <button class="btn btn-sm btn-light border text-danger rounded-circle p-0 d-inline-flex align-items-center justify-content-center delete-btn" data-id="<?php echo $q['id']; ?>" data-type="question" title="Hapus Pertanyaan" style="width:28px; height:28px;">
+                                        <i class="bi bi-trash-fill" style="font-size:11px;"></i>
                                     </button>
                                 <?php endif; ?>
                             </div>
@@ -995,102 +1007,89 @@ if ($active_sales_id > 0) {
 </div>
 
 <!-- SECTION 2: DAFTAR CUSTOMER -->
-<?php
-// Direct sync with leaderboard ranking dataset to guarantee exact 100% match
-if (!empty($ranking_data) && $active_sales_id > 0) {
-    foreach ($ranking_data as $rd) {
-        if ((int)$rd['sales_id'] === (int)$active_sales_id) {
-            $stat_sudah_fu = (int)$rd['total_fu'];
-            break;
-        }
-    }
-}
-?>
 <div id="customer-section">
 
-    <!-- KPI Summary Metrics Bento Grid -->
-    <div class="cust-kpi-grid">
+    <!-- KPI Status Segment Bar (Linear Style) -->
+    <div class="taste-metrics-bar">
         <!-- 1. Total Customer -->
-        <a href="index.php#customer-section" class="cust-kpi-card <?php if (empty($filter_fu)) echo 'active-kpi'; ?>" title="Klik untuk menampilkan semua customer">
-            <div class="cust-kpi-icon" style="background:#F1F5F9; color:#334155;">
-                <i class="bi bi-shop"></i>
+        <a href="index.php#customer-section" class="taste-metric-item <?php if (empty($filter_fu)) echo 'active-metric'; ?>" title="Klik untuk menampilkan semua customer">
+            <div class="taste-metric-info">
+                <div class="taste-metric-label"><span class="indicator-dot dot-all"></span> Semua</div>
+                <div class="taste-metric-val"><?php echo number_format($stat_total); ?></div>
             </div>
-            <div>
-                <div class="cust-kpi-title">Total Customer</div>
-                <div class="cust-kpi-val"><?php echo number_format($stat_total); ?></div>
-                <div class="cust-kpi-sub">Semua Customer</div>
+            <div class="taste-metric-icon" style="background:#F1F5F9; color:#334155;">
+                <i class="bi bi-people-fill"></i>
             </div>
         </a>
 
         <!-- 2. Belum Follow Up -->
-        <a href="index.php?filter_fu=belum<?php echo $filter_sales ? '&filter_sales=' . $filter_sales : ''; ?>#customer-section" class="cust-kpi-card <?php if ($filter_fu === 'belum') echo 'active-kpi'; ?>" style="<?php if ($filter_fu === 'belum') echo 'border-color:#F59E0B !important; background:#FFFBEB !important;'; ?>" title="Klik untuk memfilter customer belum follow up">
-            <div class="cust-kpi-icon" style="background:#FEF3C7; color:#D97706;">
-                <i class="bi bi-hourglass-split"></i>
+        <a href="index.php?filter_fu=belum<?php echo $filter_sales ? '&filter_sales=' . $filter_sales : ''; ?>#customer-section" class="taste-metric-item <?php if ($filter_fu === 'belum') echo 'active-metric'; ?>" title="Klik untuk memfilter customer belum follow up">
+            <div class="taste-metric-info">
+                <div class="taste-metric-label" style="color:#D97706;"><span class="indicator-dot dot-pending"></span> Belum FU</div>
+                <div class="taste-metric-val" style="color:#B45309;"><?php echo number_format($stat_belum_fu); ?></div>
             </div>
-            <div>
-                <div class="cust-kpi-title" style="color:#D97706;">Belum Follow Up</div>
-                <div class="cust-kpi-val" style="color:#B45309;"><?php echo number_format($stat_belum_fu); ?></div>
-                <div class="cust-kpi-sub">Belum Pernah Di-FU</div>
+            <div class="taste-metric-icon" style="background:#FEF3C7; color:#D97706;">
+                <i class="bi bi-hourglass-split"></i>
             </div>
         </a>
 
         <!-- 3. Sudah Follow Up -->
-        <a href="index.php?filter_fu=sudah<?php echo $filter_sales ? '&filter_sales=' . $filter_sales : ''; ?>#customer-section" class="cust-kpi-card <?php if ($filter_fu === 'sudah') echo 'active-kpi'; ?>" style="<?php if ($filter_fu === 'sudah') echo 'border-color:#2563EB !important; background:#EFF6FF !important;'; ?>" title="Klik untuk memfilter customer sudah follow up">
-            <div class="cust-kpi-icon" style="background:#EFF6FF; color:#2563EB;">
-                <i class="bi bi-chat-left-dots-fill"></i>
+        <a href="index.php?filter_fu=sudah<?php echo $filter_sales ? '&filter_sales=' . $filter_sales : ''; ?>#customer-section" class="taste-metric-item <?php if ($filter_fu === 'sudah') echo 'active-metric'; ?>" title="Klik untuk memfilter customer sudah follow up">
+            <div class="taste-metric-info">
+                <div class="taste-metric-label" style="color:#2563EB;"><span class="indicator-dot dot-fu"></span> Sudah FU</div>
+                <div class="taste-metric-val" style="color:#1D4ED8;"><?php echo number_format($stat_sudah_fu); ?></div>
             </div>
-            <div>
-                <div class="cust-kpi-title" style="color:#2563EB;">Sudah Follow Up</div>
-                <div class="cust-kpi-val" style="color:#1D4ED8;"><?php echo number_format($stat_sudah_fu); ?></div>
-                <div class="cust-kpi-sub">Activity Follow Up</div>
+            <div class="taste-metric-icon" style="background:#EFF6FF; color:#2563EB;">
+                <i class="bi bi-chat-left-dots-fill"></i>
             </div>
         </a>
 
         <!-- 4. Kandidat -->
-        <a href="kandidat_customer.php?filter=kandidat" class="cust-kpi-card" title="Buka Halaman Kandidat Customer">
-            <div class="cust-kpi-icon" style="background:#FAF5FF; color:#7C3AED;">
-                <i class="bi bi-star-fill"></i>
+        <a href="kandidat_customer.php?filter=kandidat" class="taste-metric-item" title="Buka Halaman Kandidat Customer">
+            <div class="taste-metric-info">
+                <div class="taste-metric-label" style="color:#7C3AED;"><span class="indicator-dot dot-kandidat"></span> Kandidat</div>
+                <div class="taste-metric-val" style="color:#6D28D9;"><?php echo number_format($stat_kandidat); ?></div>
             </div>
-            <div>
-                <div class="cust-kpi-title" style="color:#7C3AED;">Kandidat</div>
-                <div class="cust-kpi-val" style="color:#6D28D9;"><?php echo number_format($stat_kandidat); ?></div>
-                <div class="cust-kpi-sub">Toko Kandidat</div>
+            <div class="taste-metric-icon" style="background:#FAF5FF; color:#7C3AED;">
+                <i class="bi bi-star-fill"></i>
             </div>
         </a>
 
         <!-- 5. Deal -->
-        <a href="kandidat_customer.php?filter=acc_boss" class="cust-kpi-card" title="Buka Halaman Customer Deal">
-            <div class="cust-kpi-icon" style="background:#ECFDF5; color:#059669;">
-                <i class="bi bi-patch-check-fill"></i>
+        <a href="kandidat_customer.php?filter=acc_boss" class="taste-metric-item" title="Buka Halaman Customer Deal">
+            <div class="taste-metric-info">
+                <div class="taste-metric-label" style="color:#059669;"><span class="indicator-dot dot-deal"></span> Deal Closing</div>
+                <div class="taste-metric-val" style="color:#047857;"><?php echo number_format($stat_deal); ?></div>
             </div>
-            <div>
-                <div class="cust-kpi-title" style="color:#059669;">Deal / Closing</div>
-                <div class="cust-kpi-val" style="color:#047857;"><?php echo number_format($stat_deal); ?></div>
-                <div class="cust-kpi-sub">Customer Deal</div>
+            <div class="taste-metric-icon" style="background:#ECFDF5; color:#059669;">
+                <i class="bi bi-patch-check-fill"></i>
             </div>
         </a>
     </div>
 
-    <!-- Filter Toolbar Card -->
-    <div class="brandkit-filter-card">
+    <!-- Filter Control Card -->
+    <div class="taste-filter-card">
         <form method="GET" action="index.php#customer-section" id="index-filter-form">
-            <div class="row g-3 align-items-end mb-3">
-                <!-- Cari Kata Kunci / Toko / PIC -->
+            <div class="row g-2.5 align-items-end mb-2.5">
+                <!-- Search Input -->
                 <div class="col-lg-6 col-md-12 col-12">
-                    <label for="search" class="brandkit-filter-label">
-                        <i class="bi bi-search text-primary"></i> Cari Kata Kunci / Toko / PIC / No HP
+                    <label for="search" class="taste-filter-label">
+                        <i class="bi bi-search text-primary"></i> Cari Toko / PIC / No HP
                     </label>
-                    <input type="text" name="search" id="search" class="form-control brandkit-input fw-semibold" placeholder="Ketik nama toko, nama PIC, atau no HP..." value="<?php echo htmlspecialchars($search_keyword); ?>">
+                    <div class="taste-input-group">
+                        <i class="bi bi-search taste-input-icon"></i>
+                        <input type="text" name="search" id="search" class="taste-input" placeholder="Ketik nama toko, PIC, atau no telp..." value="<?php echo htmlspecialchars($search_keyword); ?>">
+                    </div>
                 </div>
 
                 <!-- Filter Kota -->
                 <div class="col-lg-3 col-md-6 col-12">
-                    <label for="filter_kota" class="brandkit-filter-label">
-                        <i class="bi bi-geo-alt-fill text-danger"></i> Filter Kota / Daerah
+                    <label for="filter_kota" class="taste-filter-label">
+                        <i class="bi bi-geo-alt-fill text-danger"></i> Kota / Daerah
                     </label>
-                    <select name="filter_kota" id="filter_kota" class="form-select brandkit-select fw-semibold">
+                    <select name="filter_kota" id="filter_kota" class="form-select taste-select">
                         <option value="">Semua Daerah / Kota</option>
-                        <optgroup label="📍 REGION & PROVINSI UTAMA">
+                        <optgroup label="📍 REGION & PROVINSI">
                             <option value="Jawa Barat" <?php if ($filter_kota === 'Jawa Barat') echo 'selected'; ?>>🏞️ Jawa Barat</option>
                             <option value="Jawa Tengah" <?php if ($filter_kota === 'Jawa Tengah') echo 'selected'; ?>>🏯 Jawa Tengah</option>
                             <option value="Jawa Timur" <?php if ($filter_kota === 'Jawa Timur') echo 'selected'; ?>>🌊 Jawa Timur</option>
@@ -1110,7 +1109,7 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
                             <option value="Kalimantan" <?php if ($filter_kota === 'Kalimantan') echo 'selected'; ?>>🌲 Kalimantan</option>
                             <option value="Sulawesi" <?php if ($filter_kota === 'Sulawesi') echo 'selected'; ?>>🏝️ Sulawesi</option>
                         </optgroup>
-                        <optgroup label="🏙️ DAFTAR KOTA SPESIFIK">
+                        <optgroup label="🏙️ DAFTAR KOTA">
                             <?php foreach ($cities as $city): ?>
                                 <option value="<?php echo htmlspecialchars($city); ?>" <?php if ($filter_kota === $city) echo 'selected'; ?>>
                                     🏙️ <?php echo htmlspecialchars($city); ?>
@@ -1122,10 +1121,10 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
 
                 <!-- Filter Kategori -->
                 <div class="col-lg-3 col-md-6 col-12">
-                    <label for="filter_kategori" class="brandkit-filter-label">
-                        <i class="bi bi-tags-fill text-primary"></i> Filter Kategori
+                    <label for="filter_kategori" class="taste-filter-label">
+                        <i class="bi bi-tags-fill text-primary"></i> Kategori
                     </label>
-                    <select name="filter_kategori" id="filter_kategori" class="form-select brandkit-select fw-semibold">
+                    <select name="filter_kategori" id="filter_kategori" class="form-select taste-select">
                         <option value="">Semua Kategori</option>
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?php echo htmlspecialchars($cat); ?>" <?php if ($filter_kategori === $cat) echo 'selected'; ?>>
@@ -1136,14 +1135,14 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
                 </div>
             </div>
 
-            <div class="row g-3 align-items-end">
-                <!-- Filter Sales (Superadmin/Adminsales only) -->
+            <div class="row g-2.5 align-items-end">
+                <!-- Filter Sales -->
                 <?php if ($_SESSION['role'] !== 'sales'): ?>
                 <div class="col-lg-3 col-md-6 col-12">
-                    <label for="filter_sales" class="brandkit-filter-label">
-                        <i class="bi bi-person-badge-fill text-info"></i> Filter Sales
+                    <label for="filter_sales" class="taste-filter-label">
+                        <i class="bi bi-person-badge-fill text-info"></i> Sales PIC
                     </label>
-                    <select name="filter_sales" id="filter_sales" class="form-select brandkit-select fw-semibold">
+                    <select name="filter_sales" id="filter_sales" class="form-select taste-select">
                         <option value="">Semua Sales</option>
                         <?php foreach ($all_sales as $s): ?>
                             <option value="<?php echo $s['id']; ?>" <?php if ($filter_sales === intval($s['id'])) echo 'selected'; ?>>
@@ -1156,36 +1155,36 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
 
                 <!-- Filter Status Follow Up -->
                 <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-3 col-md-6' : 'col-lg-4 col-md-6'; ?> col-12">
-                    <label for="filter_fu" class="brandkit-filter-label">
+                    <label for="filter_fu" class="taste-filter-label">
                         <i class="bi bi-telephone-outbound-fill text-success"></i> Status Follow Up
                     </label>
-                    <select name="filter_fu" id="filter_fu" class="form-select brandkit-select fw-semibold">
+                    <select name="filter_fu" id="filter_fu" class="form-select taste-select">
                         <option value="">Semua Status FU</option>
-                        <option value="sudah" <?php if ($filter_fu === 'sudah') echo 'selected'; ?>>✅ Sudah Pernah Di-FU</option>
-                        <option value="belum" <?php if ($filter_fu === 'belum') echo 'selected'; ?>>⏳ Belum Pernah Di-FU</option>
+                        <option value="sudah" <?php if ($filter_fu === 'sudah') echo 'selected'; ?>>✅ Sudah Di-FU</option>
+                        <option value="belum" <?php if ($filter_fu === 'belum') echo 'selected'; ?>>⏳ Belum Di-FU</option>
                     </select>
                 </div>
 
                 <!-- Entri Per Halaman -->
                 <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-2 col-md-6' : 'col-lg-3 col-md-6'; ?> col-12">
-                    <label for="limit" class="brandkit-filter-label">
+                    <label for="limit" class="taste-filter-label">
                         <i class="bi bi-layers-fill text-primary"></i> Entri Per Halaman
                     </label>
-                    <select name="limit" id="limit" class="form-select brandkit-select fw-semibold">
-                        <option value="20" <?php if ($limit == 20) echo 'selected'; ?>>20 data per halaman</option>
-                        <option value="25" <?php if ($limit == 25) echo 'selected'; ?>>25 data per halaman</option>
-                        <option value="50" <?php if ($limit == 50) echo 'selected'; ?>>50 data per halaman</option>
-                        <option value="100" <?php if ($limit == 100) echo 'selected'; ?>>100 data per halaman</option>
+                    <select name="limit" id="limit" class="form-select taste-select">
+                        <option value="20" <?php if ($limit == 20) echo 'selected'; ?>>20 data</option>
+                        <option value="25" <?php if ($limit == 25) echo 'selected'; ?>>25 data</option>
+                        <option value="50" <?php if ($limit == 50) echo 'selected'; ?>>50 data</option>
+                        <option value="100" <?php if ($limit == 100) echo 'selected'; ?>>100 data</option>
                     </select>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="<?php echo ($_SESSION['role'] !== 'sales') ? 'col-lg-4 col-md-12' : 'col-lg-5 col-md-12'; ?> col-12 d-flex gap-2">
-                    <button type="submit" class="brandkit-btn-primary flex-grow-1">
+                    <button type="submit" class="taste-btn-apply flex-grow-1">
                         <i class="bi bi-funnel-fill"></i> Terapkan Filter
                     </button>
                     <?php if (!empty($search_keyword) || !empty($filter_kota) || !empty($filter_kategori) || $filter_sales > 0 || !empty($filter_fu) || $limit != 25): ?>
-                        <a href="index.php#customer-section" class="brandkit-btn-reset" title="Reset Filter">
+                        <a href="index.php#customer-section" class="taste-btn-reset" title="Reset Filter">
                             <i class="bi bi-arrow-counterclockwise"></i> Reset
                         </a>
                     <?php endif; ?>
@@ -1197,9 +1196,9 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
     <div id="notification" class="alert" style="display:none;"></div>
 
     <!-- Data Table Card Container -->
-    <div class="brandkit-table-card">
-        <div class="brandkit-table-responsive" id="customer-table-container">
-            <table class="table align-middle brandkit-table mb-0">
+    <div class="taste-table-card">
+        <div class="taste-table-responsive" id="customer-table-container">
+            <table class="table align-middle taste-table mb-0">
                 <thead>
                     <tr>
                         <th style="min-width: 190px;">NAMA TOKO</th>
@@ -1220,11 +1219,11 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
                         <tr id="customer-row-<?php echo $customer['id']; ?>">
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <div class="shop-avatar-box">
+                                    <div class="taste-shop-icon">
                                         <i class="bi bi-shop"></i>
                                     </div>
                                     <div>
-                                        <div class="fw-bold text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:13.5px; color:#0F172A; line-height:1.35;">
+                                        <div class="fw-bold text-dark" style="font-size:13.5px; line-height:1.35;">
                                             <?php echo htmlspecialchars($customer['nama_toko']); ?>
                                         </div>
                                     </div>
@@ -1242,12 +1241,12 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
                                         
                                         echo '<div class="d-flex align-items-center flex-wrap gap-1.5 small fw-semibold text-dark my-1">';
                                         if ($show_name) {
-                                            echo '<span class="d-inline-flex align-items-center text-muted" style="font-size:12px;"><i class="bi bi-person-fill me-1 text-primary"></i>' . htmlspecialchars($display_pic) . '</span>';
+                                            echo '<span class="d-inline-flex align-items-center text-muted" style="font-size:11.5px;"><i class="bi bi-person-fill me-1 text-primary"></i>' . htmlspecialchars($display_pic) . '</span>';
                                         }
                                         if (!empty($phone_number)) {
                                             $cleaned_tel = preg_replace('/[^0-9]/', '', $phone_number);
                                             $wa_number = (substr($cleaned_tel, 0, 1) === '0') ? '62' . substr($cleaned_tel, 1) : $cleaned_tel;
-                                            echo '<a href="https://wa.me/' . $wa_number . '" target="_blank" class="wa-badge-pill"><i class="bi bi-whatsapp"></i> ' . htmlspecialchars($phone_number) . '</a>';
+                                            echo '<a href="https://wa.me/' . $wa_number . '" target="_blank" class="taste-wa-pill"><i class="bi bi-whatsapp"></i> ' . htmlspecialchars($phone_number) . '</a>';
                                         }
                                         echo '</div>';
                                     }
@@ -1255,14 +1254,14 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
                                 ?>
                             </td>
                             <td>
-                                <span class="category-pill"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span>
+                                <span class="taste-category-pill"><?php echo htmlspecialchars($customer['kategori'] ?? '-'); ?></span>
                             </td>
                             <td>
                                 <?php 
                                 $city_val = trim($customer['all_cities'] ?? '');
                                 if (!empty($city_val) && $city_val !== '-'): 
                                 ?>
-                                    <span class="city-pill">
+                                    <span class="taste-city-pill">
                                         📍 <?php echo htmlspecialchars($city_val); ?>
                                     </span>
                                 <?php else: ?>
@@ -1272,7 +1271,7 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
                             <td>
                                 <?php if ($customer['nama_sales']): ?>
                                     <div class="d-flex align-items-center gap-2" style="white-space:nowrap;">
-                                        <div class="sales-avatar-badge">
+                                        <div class="taste-sales-badge">
                                             <?php echo strtoupper(substr($customer['nama_sales'], 0, 1)); ?>
                                         </div>
                                         <span class="fw-semibold text-dark" style="font-size:12.5px;"><?php echo htmlspecialchars($customer['nama_sales']); ?></span>
@@ -1283,7 +1282,7 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
                             </td>
                             <td class="text-center">
                                 <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" title="<?php echo ($customer['total_fu_all_time'] > $customer['fu_count']) ? 'Di-FU sales saat ini: ' . $customer['fu_count'] . 'x (Total riwayat lama: ' . $customer['total_fu_all_time'] . 'x)' : 'Lihat Riwayat Follow Up (' . $customer['fu_count'] . ')'; ?>" class="text-decoration-none">
-                                    <span class="fu-counter-badge <?php echo $customer['fu_count'] > 0 ? '' : 'empty'; ?>"><?php echo $customer['fu_count']; ?></span>
+                                    <span class="taste-fu-pill <?php echo $customer['fu_count'] > 0 ? '' : 'empty'; ?>"><?php echo $customer['fu_count']; ?></span>
                                 </a>
                             </td>
                             <td class="text-center">
@@ -1294,23 +1293,23 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
                             </td>
                             <td class="text-center">
                                 <?php if (!empty($customer['primary_map_link'])): ?>
-                                    <a href="<?php echo htmlspecialchars($customer['primary_map_link']); ?>" target="_blank" class="action-circle-btn map" title="Buka di Google Maps"><i class="bi bi-geo-alt-fill"></i></a>
+                                    <a href="<?php echo htmlspecialchars($customer['primary_map_link']); ?>" target="_blank" class="taste-icon-btn map" title="Buka di Google Maps"><i class="bi bi-geo-alt-fill"></i></a>
                                 <?php else: ?>
-                                    <button class="action-circle-btn map-disabled" disabled title="Tidak ada koordinat maps"><i class="bi bi-geo-alt"></i></button>
+                                    <button class="taste-icon-btn map-disabled" disabled title="Tidak ada koordinat maps"><i class="bi bi-geo-alt"></i></button>
                                 <?php endif; ?>
                             </td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center align-items-center gap-1.5" style="white-space:nowrap;">
-                                    <a href="followup_add.php?customer_id=<?php echo $customer['id']; ?>" class="btn-fu-action" title="Tambah Follow Up Baru">
+                                    <a href="followup_add.php?customer_id=<?php echo $customer['id']; ?>" class="btn-quick-fu" title="Tambah Follow Up Baru">
                                         <i class="bi bi-plus-circle-fill"></i> + FU
                                     </a>
-                                    <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" class="action-circle-btn view" title="Lihat Riwayat Follow Up"><i class="bi bi-eye-fill"></i></a>
+                                    <a href="followup_view.php?customer_id=<?php echo $customer['id']; ?>" class="taste-icon-btn view" title="Lihat Riwayat Follow Up"><i class="bi bi-eye-fill"></i></a>
                                     <?php 
                                     $can_edit_delete = ($_SESSION['role'] == 'superadmin') || ($_SESSION['role'] == 'sales' && $_SESSION['user_id'] == $customer['sales_id']);
                                     if ($can_edit_delete): 
                                     ?>
-                                        <a href="customer_edit.php?id=<?php echo $customer['id']; ?>" class="action-circle-btn edit" title="Edit Customer"><i class="bi bi-pencil-fill"></i></a>
-                                        <a href="customer_delete.php?id=<?php echo $customer['id']; ?>" class="action-circle-btn delete" title="Hapus Customer" onclick="return confirm('Yakin hapus customer ini?')"><i class="bi bi-trash-fill"></i></a>
+                                        <a href="customer_edit.php?id=<?php echo $customer['id']; ?>" class="taste-icon-btn edit" title="Edit Customer"><i class="bi bi-pencil-fill"></i></a>
+                                        <a href="customer_delete.php?id=<?php echo $customer['id']; ?>" class="taste-icon-btn delete" title="Hapus Customer" onclick="return confirm('Yakin hapus customer ini?')"><i class="bi bi-trash-fill"></i></a>
                                     <?php endif; ?>
                                 </div>
                             </td>
@@ -1376,18 +1375,18 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
 <!-- Modal View Question & Answers -->
 <div class="modal fade" id="viewQuestionModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden;">
+    <div class="modal-content" style="border-radius:16px; border:none; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.15);">
       <div class="modal-header" style="background:#0F172A; color:#FFF;">
-        <h5 class="modal-title fw-bold" id="q-modal-title" style="font-size:16px;"></h5>
+        <h5 class="modal-title fw-bold" id="q-modal-title" style="font-size:15px;"></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4">
         <div class="bg-light rounded-3 p-3 mb-3 border">
-            <p class="mb-2 fw-semibold text-dark" id="q-modal-body" style="font-size:14.5px; line-height:1.6;"></p>
+            <p class="mb-2 fw-semibold text-dark" id="q-modal-body" style="font-size:14px; line-height:1.6;"></p>
             <div class="question-meta"><i class="bi bi-person-fill text-primary"></i> Ditanyakan oleh <span id="q-modal-author" class="fw-bold text-dark"></span> pada <span id="q-modal-date"></span></div>
         </div>
         <hr class="my-3">
-        <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-chat-square-text-fill text-primary me-2"></i>Jawaban Tim Sales</h6>
+        <h6 class="fw-bold mb-3 text-dark" style="font-size:14px;"><i class="bi bi-chat-square-text-fill text-primary me-2"></i>Jawaban Tim Sales</h6>
         <div id="q-modal-answers-list"></div>
         <form class="add-answer-form mt-4 bg-white p-3 border rounded-3">
             <input type="hidden" id="q-modal-question-id" name="question_id">
@@ -1405,9 +1404,9 @@ if (!empty($ranking_data) && $active_sales_id > 0) {
 <!-- Modal Add Question -->
 <div class="modal fade" id="addQuestionModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius:20px; border:none; overflow:hidden;">
+    <div class="modal-content" style="border-radius:16px; border:none; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.15);">
       <div class="modal-header" style="background:#0F172A; color:#FFF;">
-        <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Buat Pertanyaan Baru</h5>
+        <h5 class="modal-title fw-bold" style="font-size:15px;"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Buat Pertanyaan Baru</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4">
@@ -1439,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentUserId = <?php echo $_SESSION['user_id']; ?>;
     const isSuperAdmin = '<?php echo $_SESSION['role']; ?>' === 'superadmin';
     const questionsTable = document.getElementById('questionsTable');
-    const tableBody = document.querySelector('.brandkit-table tbody') || document.querySelector('table tbody');
+    const tableBody = document.querySelector('.taste-table tbody') || document.querySelector('.brandkit-table tbody') || document.querySelector('table tbody');
     const notification = document.getElementById('notification');
 
     // Q&A Live Search
@@ -1447,7 +1446,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (liveSearchInput) {
         liveSearchInput.addEventListener('keyup', function() {
             const filter = this.value.toLowerCase();
-            document.querySelectorAll('.forum-card-item').forEach(card => {
+            document.querySelectorAll('.forum-item-row, .forum-card-item').forEach(card => {
                 card.style.display = card.textContent.toLowerCase().includes(filter) ? '' : 'none';
             });
         });
