@@ -483,8 +483,7 @@ if ($active_sales_id > 0) {
     </div>
 </div>
 
-<?php include 'includes/bonus_competition_widget.php'; ?>
-<?php include 'includes/sales_ranking_widget.php'; ?>
+<?php include 'includes/competition_unified_tabs.php'; ?>
 
 <!-- SECTION 1: COLLAPSIBLE FORUM Q&A ACCORDION -->
 <div id="forum-section" class="mb-4">
