@@ -1284,28 +1284,278 @@ $loewixPriceList = $tiptokMaster6;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
         }
 
-        /* Detail Modal Stat Cards */
-        .detail-stat-card {
+        /* =========================================================================
+           TASTE-SKILL REDESIGN: DETAIL MODAL & MODERN METRICS BENTO
+           ========================================================================= */
+        .modal-taste-detail .modal-dialog {
+            max-width: 1140px !important;
+            width: 95% !important;
+            margin: 1.5rem auto !important;
+        }
+        .modal-taste-detail .modal-content {
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+            overflow: hidden !important;
+            background: #f8fafc !important;
+        }
+        .modal-taste-detail .modal-header {
+            background: #ffffff !important;
+            border-bottom: 1.5px solid #e2e8f0 !important;
+            padding: 18px 24px !important;
+        }
+        .modal-taste-detail .modal-body {
+            padding: 20px 24px !important;
+            background: #f8fafc !important;
+        }
+        .modal-taste-detail .modal-footer {
+            background: #ffffff !important;
+            border-top: 1.5px solid #e2e8f0 !important;
+            padding: 14px 24px !important;
+        }
+
+        /* 1. Bento KPI Metric Cards */
+        .kpi-bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        @media (max-width: 991px) {
+            .kpi-bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 575px) {
+            .kpi-bento-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .kpi-bento-card {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
             border-radius: 14px;
             padding: 14px 16px;
-            border: 2px solid transparent;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .kpi-bento-card:hover {
+            transform: translateY(-2px);
+            border-color: #cbd5e1;
+            box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+        }
+        .kpi-bento-card.card-blue { border-left: 4px solid #3b82f6; }
+        .kpi-bento-card.card-emerald { border-left: 4px solid #10b981; }
+        .kpi-bento-card.card-amber { border-left: 4px solid #f59e0b; }
+        .kpi-bento-card.card-purple { border-left: 4px solid #8b5cf6; }
+
+        .kpi-icon-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+        .pill-blue { background: #eff6ff; color: #2563eb; }
+        .pill-emerald { background: #ecfdf5; color: #059669; }
+        .pill-amber { background: #fffbeb; color: #d97706; }
+        .pill-purple { background: #f5f3ff; color: #7c3aed; }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+        .kpi-value {
+            font-size: 22px;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.2;
+            margin-top: 4px;
+            margin-bottom: 2px;
+            color: #0f172a;
+        }
+        .kpi-subtext {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        /* 2. Store & Sales Profile Banner */
+        .detail-store-banner {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        }
+        .store-avatar-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            border: 1px solid #bfdbfe;
+        }
+        .detail-meta-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 12px;
+            gap: 8px;
+        }
+
+        /* 3. Taste Segmented Tab Controls */
+        .taste-tab-bar {
+            background: #e2e8f0;
+            border-radius: 12px;
+            padding: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .taste-tab-item {
+            padding: 7px 16px;
+            border-radius: 9px;
+            border: none;
+            background: transparent;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #64748b;
             transition: all 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
         }
-        .detail-stat-card.stat-blue {
-            background-color: var(--accent-blue-light);
-            border-color: #bfdbfe;
+        .taste-tab-item:hover {
+            color: #0f172a;
         }
-        .detail-stat-card.stat-emerald {
-            background-color: var(--accent-emerald-light);
-            border-color: #a7f3d0;
+        .taste-tab-item.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
-        .detail-stat-card.stat-amber {
-            background-color: var(--accent-amber-light);
-            border-color: #fde68a;
+
+        /* 4. Taste High-End Data Table */
+        .taste-table-container {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
         }
-        .detail-stat-card.stat-purple {
-            background-color: var(--accent-purple-light);
-            border-color: #e9d5ff;
+        .taste-data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 0;
+        }
+        .taste-data-table thead th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 12px 14px;
+            border-bottom: 1.5px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        .taste-data-table tbody tr {
+            transition: background 0.15s ease;
+        }
+        .taste-data-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        .taste-data-table tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+        .taste-data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .taste-data-table tfoot td {
+            background: #f8fafc;
+            border-top: 2px solid #e2e8f0;
+            padding: 14px;
+            font-weight: 800;
+        }
+
+        /* Modern Status Badges */
+        .badge-soft-emerald {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            padding: 4px 9px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .badge-soft-amber {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+            padding: 4px 9px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .badge-soft-rose {
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+            padding: 4px 9px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .badge-soft-blue {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+            padding: 4px 9px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
         }
 
         .form-label-taste {
@@ -2477,188 +2727,205 @@ $loewixPriceList = $tiptokMaster6;
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 3: DETAIL LENGKAP & RIWAYAT KUNJUNGAN TOKO (PROFESIONAL & KOMPLIT)   -->
+    <!-- MODAL 3: DETAIL LENGKAP & RIWAYAT KUNJUNGAN TOKO (AWWWARDS / TASTE REDESIGN)-->
     <!-- ========================================================================= -->
-    <div class="modal fade modal-taste" id="modalDetailTiptok" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-taste modal-taste-detail" id="modalDetailTiptok" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
+                <!-- Modal Top Header -->
                 <div class="modal-header d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <h5 class="modal-title font-weight-bold text-dark mb-0">Detail Konsinyasi & Histori Audit</h5>
-                            <span class="taste-badge badge-neutral font-monospace font-weight-bold" id="detBadgeKode">-</span>
-                            <span class="taste-badge badge-active-tag" id="detBadgeStatus">Aktif</span>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <h5 class="modal-title font-weight-bold text-dark mb-0 fs-5">Detail Konsinyasi &amp; Histori Toko</h5>
+                            <span class="taste-badge badge-neutral font-monospace font-weight-bold px-2 py-0.5" id="detBadgeKode" style="font-size: 11.5px; border-radius: 6px;">-</span>
+                            <span class="taste-badge badge-active-tag px-2 py-0.5" id="detBadgeStatus" style="font-size: 11.5px; border-radius: 6px;">Aktif</span>
                         </div>
-                        <div class="text-secondary text-sm font-weight-bold" id="detailKodeTitip">Ringkasan stok titipan toko dan histori audit kunjungan</div>
+                        <div class="text-secondary text-xs font-weight-bold mt-0.5" id="detailKodeTitip">Ringkasan stok titipan toko dan histori audit kunjungan</div>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="cetakSuratJalanDetail()" title="Cetak Surat Jalan / Bukti Titip">
-                            <i class="fa-solid fa-print me-1 text-primary"></i> Cetak Surat Titip
+                        <button type="button" class="btn btn-sm btn-outline-secondary font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px;" onclick="cetakSuratJalanDetail()" title="Cetak Surat Jalan / Bukti Titip">
+                            <i class="fa-solid fa-print me-1.5 text-primary"></i> Cetak Surat Titip
                         </button>
-                        <button type="button" class="btn-taste-emerald btn-sm py-1" onclick="shareWhatsappDetail()" title="Bagikan Ringkasan Stok ke WhatsApp">
-                            <i class="fa-brands fa-whatsapp me-1"></i> Share WA
+                        <button type="button" class="btn btn-sm btn-success font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px; background: #059669; border-color: #059669;" onclick="shareWhatsappDetail()" title="Bagikan Ringkasan Stok ke WhatsApp">
+                            <i class="fa-brands fa-whatsapp me-1.5"></i> Share WA
                         </button>
                         <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                 </div>
                 
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <div id="detailLoading" class="text-center py-5">
                         <div class="spinner-border spinner-border-sm text-dark" role="status"></div>
                         <p class="text-muted text-sm mt-2 font-weight-bold">Memuat riwayat konsinyasi...</p>
                     </div>
 
                     <div id="detailContent" class="d-none">
-                        <!-- 1. EXECUTIVE KPI SUMMARY METRICS -->
-                        <div class="row g-3 mb-4">
-                            <div class="col-6 col-md-3">
-                                <div class="detail-stat-card stat-blue">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <span class="text-xs font-weight-bold text-uppercase" style="color: #1e40af; letter-spacing: 0.05em;">Total Titip Awal</span>
-                                        <i class="fa-solid fa-boxes-stacked" style="color: #2563eb; font-size: 16px;"></i>
-                                    </div>
-                                    <h3 class="font-weight-bolder mb-0" id="detKpiTitip" style="font-family: 'Outfit', sans-serif; color: #1e3a8a;">0 Unit</h3>
-                                    <div class="text-xs font-weight-bold text-muted mt-1">Stok diserahkan</div>
+                        <!-- 1. BENTO KPI METRICS STRIP -->
+                        <div class="kpi-bento-grid">
+                            <div class="kpi-bento-card card-blue">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="kpi-label">Total Titip Awal</span>
+                                    <div class="kpi-icon-pill pill-blue"><i class="fa-solid fa-boxes-stacked"></i></div>
                                 </div>
+                                <div class="kpi-value" id="detKpiTitip">0 Unit</div>
+                                <div class="kpi-subtext">Stok diserahkan</div>
                             </div>
-                            <div class="col-6 col-md-3">
-                                <div class="detail-stat-card stat-emerald">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <span class="text-xs font-weight-bold text-uppercase" style="color: #065f46; letter-spacing: 0.05em;">Sisa Stok Fisik</span>
-                                        <i class="fa-solid fa-warehouse" style="color: #059669; font-size: 16px;"></i>
-                                    </div>
-                                    <h3 class="font-weight-bolder mb-0" id="detKpiSisa" style="font-family: 'Outfit', sans-serif; color: #047857;">0 Unit</h3>
-                                    <div class="text-xs font-weight-bold text-muted mt-1">Masih di toko</div>
+                            <div class="kpi-bento-card card-emerald">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="kpi-label">Sisa Stok Fisik</span>
+                                    <div class="kpi-icon-pill pill-emerald"><i class="fa-solid fa-warehouse"></i></div>
                                 </div>
+                                <div class="kpi-value text-success" id="detKpiSisa" style="color: #059669 !important;">0 Unit</div>
+                                <div class="kpi-subtext">Masih di toko</div>
                             </div>
-                            <div class="col-6 col-md-3">
-                                <div class="detail-stat-card stat-amber">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <span class="text-xs font-weight-bold text-uppercase" style="color: #92400e; letter-spacing: 0.05em;">Total Terjual</span>
-                                        <i class="fa-solid fa-cart-shopping" style="color: #d97706; font-size: 16px;"></i>
-                                    </div>
-                                    <h3 class="font-weight-bolder mb-0" id="detKpiTerjual" style="font-family: 'Outfit', sans-serif; color: #b45309;">0 Unit</h3>
-                                    <div class="text-xs font-weight-bold text-muted mt-1" id="detKpiSellRate">0% laku terjual</div>
+                            <div class="kpi-bento-card card-amber">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="kpi-label">Total Terjual</span>
+                                    <div class="kpi-icon-pill pill-amber"><i class="fa-solid fa-bag-shopping"></i></div>
                                 </div>
+                                <div class="kpi-value text-warning" id="detKpiTerjual" style="color: #d97706 !important;">0 Unit</div>
+                                <div class="kpi-subtext" id="detKpiSellRate">0% laku terjual</div>
                             </div>
-                            <div class="col-6 col-md-3">
-                                <div class="detail-stat-card stat-purple">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <span class="text-xs font-weight-bold text-uppercase" style="color: #6b21a8; letter-spacing: 0.05em;">Total Insentif</span>
-                                        <i class="fa-solid fa-sack-dollar" style="color: #9333ea; font-size: 16px;"></i>
-                                    </div>
-                                    <h3 class="font-weight-bolder mb-0" id="detKpiInsentif" style="font-family: 'Outfit', sans-serif; color: #7e22ce;">Rp 0</h3>
-                                    <div class="text-xs font-weight-bold text-muted mt-1">Reward terakumulasi</div>
+                            <div class="kpi-bento-card card-purple">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="kpi-label">Total Insentif</span>
+                                    <div class="kpi-icon-pill pill-purple"><i class="fa-solid fa-coins"></i></div>
                                 </div>
+                                <div class="kpi-value text-purple" id="detKpiInsentif" style="color: #7c3aed !important;">Rp 0</div>
+                                <div class="kpi-subtext">Reward terakumulasi</div>
                             </div>
                         </div>
 
-                        <!-- 2. STORE & SALES PROFILE CARD -->
-                        <div class="p-3 mb-4 rounded-3 bg-light border" style="border: 2px solid #cbd5e1 !important;">
+                        <!-- 2. REFINED STORE & SALES PROFILE BANNER -->
+                        <div class="detail-store-banner">
                             <div class="row align-items-center g-3">
-                                <div class="col-md-7 border-end-md">
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <h5 class="font-weight-bold text-dark mb-0" id="detNamaToko">-</h5>
-                                        <span class="taste-badge badge-dealer-tag" id="detKategoriToko">Dealer</span>
-                                    </div>
-                                    <div class="text-sm text-secondary font-weight-bold" id="detAlamatToko">-</div>
-                                    <div class="d-flex align-items-center gap-3 mt-2 flex-wrap">
-                                        <a href="javascript:void(0)" id="detLinkWa" target="_blank" class="text-xs font-weight-bold text-success d-inline-flex align-items-center gap-1">
-                                            <i class="fa-brands fa-whatsapp" style="font-size: 14px;"></i> <span id="detTelpToko">-</span>
-                                        </a>
-                                        <a href="javascript:void(0)" id="detLinkGmaps" target="_blank" class="text-xs font-weight-bold text-primary d-inline-flex align-items-center gap-1">
-                                            <i class="fa-solid fa-location-dot" style="font-size: 13px;"></i> Lihat Peta Lokasi
-                                        </a>
+                                <div class="col-lg-6 col-12">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="store-avatar-box">
+                                            <i class="fa-solid fa-shop"></i>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 mb-0.5 flex-wrap">
+                                                <h5 class="fw-bold text-dark mb-0 fs-6" id="detNamaToko">-</h5>
+                                                <span class="taste-badge badge-dealer-tag" id="detKategoriToko">Dealer</span>
+                                            </div>
+                                            <div class="text-xs text-muted font-weight-bold" id="detAlamatToko">-</div>
+                                            <div class="d-flex align-items-center gap-3 mt-1.5 flex-wrap">
+                                                <a href="javascript:void(0)" id="detLinkWa" target="_blank" class="text-xs fw-bold text-success d-inline-flex align-items-center gap-1">
+                                                    <i class="fa-brands fa-whatsapp"></i> <span id="detTelpToko">-</span>
+                                                </a>
+                                                <a href="javascript:void(0)" id="detLinkGmaps" target="_blank" class="text-xs fw-bold text-primary d-inline-flex align-items-center gap-1">
+                                                    <i class="fa-solid fa-location-dot"></i> Peta Lokasi
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-5">
-                                    <div class="d-flex flex-column gap-1">
-                                        <div class="d-flex justify-content-between text-sm">
-                                            <span class="text-secondary font-weight-bold">Sales Penanggung Jawab:</span>
-                                            <strong class="text-dark" id="detNamaSales">-</strong>
+                                <div class="col-lg-6 col-12">
+                                    <div class="row g-2">
+                                        <div class="col-sm-4 col-6">
+                                            <div class="detail-meta-pill">
+                                                <span class="text-muted" style="font-size: 11px;">Sales PIC:</span>
+                                                <strong class="text-dark text-truncate" id="detNamaSales">-</strong>
+                                            </div>
                                         </div>
-                                        <div class="d-flex justify-content-between text-sm">
-                                            <span class="text-secondary font-weight-bold">Tanggal Titip Barang:</span>
-                                            <strong class="text-dark" id="detTglTitip">-</strong>
+                                        <div class="col-sm-4 col-6">
+                                            <div class="detail-meta-pill">
+                                                <span class="text-muted" style="font-size: 11px;">Tgl Titip:</span>
+                                                <strong class="text-dark" id="detTglTitip">-</strong>
+                                            </div>
                                         </div>
-                                        <div class="d-flex justify-content-between text-sm">
-                                            <span class="text-secondary font-weight-bold">Audit Terakhir:</span>
-                                            <strong class="text-primary" id="detLastAudit">-</strong>
+                                        <div class="col-sm-4 col-12">
+                                            <div class="detail-meta-pill">
+                                                <span class="text-muted" style="font-size: 11px;">Terakhir Audit:</span>
+                                                <strong class="text-primary" id="detLastAudit">-</strong>
+                                            </div>
                                         </div>
-                                        <div class="d-flex justify-content-between text-sm mt-1" id="detRowCatatan">
-                                            <span class="text-secondary font-weight-bold">Catatan:</span>
-                                            <span class="text-dark font-weight-bold text-end" id="detCatatan">-</span>
-                                        </div>
+                                    </div>
+                                    <div class="detail-meta-pill mt-2 d-none" id="detRowCatatan">
+                                        <span class="text-muted" style="font-size: 11px;"><i class="fa-regular fa-note-sticky me-1"></i> Catatan:</span>
+                                        <span class="text-dark fw-bold text-truncate" id="detCatatan">-</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. ACTION SHORTCUT BUTTONS -->
-                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-                            <div class="form-label-taste mb-0">Rincian Stok Barang Titipan</div>
+                        <!-- 3. TASTE SEGMENTED TAB CONTROLS & ACTIONS -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                            <div class="taste-tab-bar">
+                                <button type="button" class="taste-tab-item active" id="tabBtnStok" onclick="switchDetailTab('stok')">
+                                    <i class="fa-solid fa-boxes-stacked"></i> Rincian Stok Fisik <span class="badge bg-primary text-white ms-1" id="detBadgeCountItems">0</span>
+                                </button>
+                                <button type="button" class="taste-tab-item" id="tabBtnAudit" onclick="switchDetailTab('audit')">
+                                    <i class="fa-solid fa-clipboard-list"></i> Riwayat Audit &amp; Kunjungan <span class="badge bg-secondary text-white ms-1" id="detBadgeCountLogs">0</span>
+                                </button>
+                            </div>
                             <div class="d-flex align-items-center gap-2">
-                                <button type="button" class="btn-taste-primary btn-sm py-1" onclick="openCekSisaFromDetail()">
-                                    <i class="fa-solid fa-clipboard-check me-1"></i> Input Cek Sisa Fisik
+                                <button type="button" class="btn btn-sm btn-primary font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px;" onclick="openCekSisaFromDetail()">
+                                    <i class="fa-solid fa-clipboard-check me-1.5"></i> Input Cek Sisa Fisik
                                 </button>
-                                <button type="button" class="btn-taste-secondary btn-sm py-1" onclick="openEditFromDetail()">
-                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit Titipan
+                                <button type="button" class="btn btn-sm btn-outline-secondary font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px;" onclick="openEditFromDetail()">
+                                    <i class="fa-solid fa-pen-to-square me-1.5"></i> Edit Titipan
                                 </button>
                             </div>
                         </div>
 
-                        <!-- 4. TABEL RINCIAN STOK BARANG -->
-                        <div class="table-responsive border rounded-3 mb-4" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden;">
-                            <table class="table taste-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 5%;">#</th>
-                                        <th style="width: 32%;">NAMA BARANG & TIPE</th>
-                                        <th style="width: 10%; text-align: center;">STOK AWAL</th>
-                                        <th style="width: 10%; text-align: center;">SISA STOK</th>
-                                        <th style="width: 10%; text-align: center;">TERJUAL</th>
-                                        <th style="width: 13%; text-align: center;">STATUS</th>
-                                        <th style="width: 15%; text-align: right;">INSENTIF / UNIT</th>
-                                        <th style="width: 15%; text-align: right;">TOTAL INSENTIF</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="detItemsBody"></tbody>
-                                <tfoot id="detItemsFoot" style="background-color: #f8fafc; border-top: 2px solid #cbd5e1; font-weight: 800;"></tfoot>
-                            </table>
+                        <!-- 4. PANE TAB 1: RINCIAN STOK BARANG -->
+                        <div id="paneDetailStok">
+                            <div class="taste-table-container">
+                                <div class="table-responsive">
+                                    <table class="taste-data-table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 44px; text-align: center;">#</th>
+                                                <th>NAMA BARANG &amp; MODEL</th>
+                                                <th style="text-align: center; width: 95px;">TITIP AWAL</th>
+                                                <th style="text-align: center; width: 105px;">SISA FISIK</th>
+                                                <th style="text-align: center; width: 95px;">TERJUAL</th>
+                                                <th style="text-align: center; width: 130px;">STATUS UNIT</th>
+                                                <th style="text-align: right; width: 120px;">TARIF REWARD</th>
+                                                <th style="text-align: right; width: 130px;">TOTAL REWARD</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="detItemsBody"></tbody>
+                                        <tfoot id="detItemsFoot"></tfoot>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- 5. RIWAYAT KUNJUNGAN & AUDIT SISA STOK -->
-                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-                            <div class="form-label-taste mb-0">Riwayat Audit Kunjungan & Laporan Penjualan</div>
-                            <span class="text-xs font-weight-bold text-muted" id="detTotalKunjunganBadge">0 Kunjungan Terdata</span>
-                        </div>
-                        <div class="table-responsive border rounded-3 mb-2" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden;">
-                            <table class="table taste-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>TGL KUNJUNGAN</th>
-                                        <th>SALES</th>
-                                        <th>BARANG DIAUDIT</th>
-                                        <th class="text-center">SISA FISIK</th>
-                                        <th class="text-center">LAKU</th>
-                                        <th>NO. INVOICE</th>
-                                        <th class="text-end">INSENTIF</th>
-                                        <th class="text-center">BUKTI</th>
-                                        <th>CATATAN</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="detLogsBody"></tbody>
-                            </table>
+                        <!-- 5. PANE TAB 2: RIWAYAT KUNJUNGAN & AUDIT SISA STOK -->
+                        <div id="paneDetailAudit" class="d-none">
+                            <div class="taste-table-container">
+                                <div class="table-responsive">
+                                    <table class="taste-data-table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>TGL KUNJUNGAN</th>
+                                                <th>SALES AUDIT</th>
+                                                <th>BARANG DIAUDIT</th>
+                                                <th style="text-align: center;">SISA FISIK</th>
+                                                <th style="text-align: center;">LAKU</th>
+                                                <th>NO. INVOICE</th>
+                                                <th style="text-align: right;">REWARD DIDAPAT</th>
+                                                <th style="text-align: center;">BUKTI</th>
+                                                <th>CATATAN</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="detLogsBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal-footer p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                <div class="modal-footer d-flex justify-content-between align-items-center">
                     <div class="text-xs text-secondary font-weight-bold">
                         <i class="fa-solid fa-shield-halved text-success me-1"></i> Data diverifikasi oleh Sistem Sales Loewix
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-sm btn-secondary px-3 py-1.5 font-weight-bold" style="border-radius: 9px;" data-bs-dismiss="modal">Tutup</button>
                     </div>
                 </div>
             </div>
@@ -4090,6 +4357,25 @@ $loewixPriceList = $tiptokMaster6;
         // =========================================================================
         let currentDetailData = null;
 
+        
+        function switchDetailTab(tabName) {
+            const paneStok = document.getElementById('paneDetailStok');
+            const paneAudit = document.getElementById('paneDetailAudit');
+            const btnStok = document.getElementById('tabBtnStok');
+            const btnAudit = document.getElementById('tabBtnAudit');
+
+            if (tabName === 'audit') {
+                if (paneStok) paneStok.classList.add('d-none');
+                if (paneAudit) paneAudit.classList.remove('d-none');
+                if (btnStok) btnStok.classList.remove('active');
+                if (btnAudit) btnAudit.classList.add('active');
+            } else {
+                if (paneAudit) paneAudit.classList.add('d-none');
+                if (paneStok) paneStok.classList.remove('d-none');
+                if (btnAudit) btnAudit.classList.remove('active');
+                if (btnStok) btnStok.classList.add('active');
+            }
+        }
         function openModalDetailTiptok(idPenitipan) {
             document.getElementById('detailLoading').classList.remove('d-none');
             document.getElementById('detailContent').classList.add('d-none');
@@ -4183,12 +4469,19 @@ $loewixPriceList = $tiptokMaster6;
                             if (rowCat) rowCat.classList.add('d-none');
                         }
 
-                        // 4. Rincian Stok Items Table
+                        // 4. Update Tab Count Badges & Reset to Tab 1
+                        const countItemsBadge = document.getElementById('detBadgeCountItems');
+                        if (countItemsBadge) countItemsBadge.textContent = items.length;
+                        const countLogsBadge = document.getElementById('detBadgeCountLogs');
+                        if (countLogsBadge) countLogsBadge.textContent = logs.length;
+                        switchDetailTab('stok');
+
+                        // 5. Rincian Stok Items Table (Taste High-End Design)
                         const itemBody = document.getElementById('detItemsBody');
                         const itemFoot = document.getElementById('detItemsFoot');
                         itemBody.innerHTML = '';
                         if (!items || items.length === 0) {
-                            itemBody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted font-weight-bold">Tidak ada barang titipan terdaftar.</td></tr>';
+                            itemBody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted font-weight-bold">Tidak ada barang titipan terdaftar.</td></tr>';
                             if (itemFoot) itemFoot.innerHTML = '';
                         } else {
                             items.forEach((it, idx) => {
@@ -4200,26 +4493,31 @@ $loewixPriceList = $tiptokMaster6;
 
                                 let statusBadge = '';
                                 if (qTerjual === 0) {
-                                    statusBadge = `<span class="taste-badge badge-active-tag" style="font-size:12px;">100% Utuh</span>`;
+                                    statusBadge = `<span class="badge-soft-emerald"><i class="fa-solid fa-shield-check"></i> 100% Utuh</span>`;
                                 } else if (qSisa === 0) {
-                                    statusBadge = `<span class="taste-badge badge-danger-tag" style="font-size:12px;">Habis Terjual</span>`;
+                                    statusBadge = `<span class="badge-soft-rose"><i class="fa-solid fa-circle-check"></i> Habis Terjual</span>`;
                                 } else {
-                                    statusBadge = `<span class="taste-badge badge-warning-tag" style="font-size:12px;">${qTerjual} Terjual</span>`;
+                                    const pct = qTitip > 0 ? Math.round((qTerjual / qTitip) * 100) : 0;
+                                    statusBadge = `<span class="badge-soft-amber"><i class="fa-solid fa-bag-shopping"></i> ${qTerjual} Laku (${pct}%)</span>`;
                                 }
+
+                                const catBadge = it.tipe_barang ? `<span class="taste-badge badge-dealer-tag ms-1.5" style="font-size: 10px; padding: 2px 7px;">${escapeHtml(it.tipe_barang)}</span>` : '';
 
                                 itemBody.innerHTML += `
                                     <tr>
-                                        <td class="font-weight-bold text-secondary text-center">${idx + 1}</td>
+                                        <td class="font-weight-bold text-secondary text-center" style="font-size: 12px;">#${idx + 1}</td>
                                         <td>
-                                            <div class="font-weight-bold" style="font-size: 14.5px; color: #020617;">${escapeHtml(it.nama_barang)}</div>
-                                            <span class="text-xs text-muted font-weight-bold">${escapeHtml(it.tipe_barang || 'Perangkat Loewix')}</span>
+                                            <div class="d-flex align-items-center">
+                                                <strong class="text-dark" style="font-size: 13.5px;">${escapeHtml(it.nama_barang)}</strong>
+                                                ${catBadge}
+                                            </div>
                                         </td>
-                                        <td class="text-center font-weight-bold text-dark" style="font-size: 14.5px;">${qTitip}</td>
-                                        <td class="text-center font-weight-bold text-success" style="font-size: 15px;">${qSisa}</td>
-                                        <td class="text-center font-weight-bold text-danger" style="font-size: 15px;">${qTerjual}</td>
+                                        <td class="text-center font-weight-bold text-dark" style="font-size: 14px;">${qTitip}</td>
+                                        <td class="text-center font-weight-bold text-success" style="font-size: 14.5px;">${qSisa}</td>
+                                        <td class="text-center font-weight-bold ${qTerjual > 0 ? 'text-danger' : 'text-muted'}" style="font-size: 14.5px;">${qTerjual}</td>
                                         <td class="text-center">${statusBadge}</td>
-                                        <td class="text-end font-weight-bold" style="font-size: 13.5px;">Rp ${new Intl.NumberFormat('id-ID').format(insUnit)}</td>
-                                        <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(totalIns)}</td>
+                                        <td class="text-end font-weight-bold text-secondary" style="font-size: 13px;">Rp ${new Intl.NumberFormat('id-ID').format(insUnit)}</td>
+                                        <td class="text-end font-weight-bold text-success" style="font-size: 14.5px;">Rp ${new Intl.NumberFormat('id-ID').format(totalIns)}</td>
                                     </tr>
                                 `;
                             });
@@ -4227,11 +4525,11 @@ $loewixPriceList = $tiptokMaster6;
                             if (itemFoot) {
                                 itemFoot.innerHTML = `
                                     <tr>
-                                        <td colspan="2" class="text-end text-dark font-weight-bolder py-3" style="font-size: 14px; letter-spacing: 0.05em;">TOTAL KESELURUHAN:</td>
+                                        <td colspan="2" class="text-end text-dark font-weight-bolder py-3" style="font-size: 13px; letter-spacing: 0.05em;">TOTAL KESELURUHAN:</td>
                                         <td class="text-center font-weight-bolder text-dark" style="font-size: 15px;">${sumTitip}</td>
                                         <td class="text-center font-weight-bolder text-success" style="font-size: 15px;">${sumSisa}</td>
-                                        <td class="text-center font-weight-bolder text-danger" style="font-size: 15px;">${sumTerjual}</td>
-                                        <td class="text-center font-weight-bold text-muted">${sellRate}% Laku</td>
+                                        <td class="text-center font-weight-bolder ${sumTerjual > 0 ? 'text-danger' : 'text-muted'}" style="font-size: 15px;">${sumTerjual}</td>
+                                        <td class="text-center"><span class="badge-soft-blue">${sellRate}% Laku</span></td>
                                         <td class="text-end text-muted">-</td>
                                         <td class="text-end font-weight-bolder text-success" style="font-size: 16px;">Rp ${new Intl.NumberFormat('id-ID').format(sumInsentif)}</td>
                                     </tr>
@@ -4239,11 +4537,8 @@ $loewixPriceList = $tiptokMaster6;
                             }
                         }
 
-                        // 5. Riwayat Kunjungan Logs
+                        // 6. Riwayat Kunjungan Logs (Taste High-End Design)
                         const logBody = document.getElementById('detLogsBody');
-                        const totKunjunganBadge = document.getElementById('detTotalKunjunganBadge');
-                        if (totKunjunganBadge) totKunjunganBadge.textContent = `${logs.length} Kunjungan Terdata`;
-
                         logBody.innerHTML = '';
                         if (!logs || logs.length === 0) {
                             logBody.innerHTML = `
@@ -4252,35 +4547,35 @@ $loewixPriceList = $tiptokMaster6;
                                         <i class="fa-solid fa-clipboard-list mb-2" style="font-size: 32px; color: #94a3b8; display: block;"></i>
                                         <div class="font-weight-bold text-dark text-base">Belum Ada Riwayat Kunjungan Audit</div>
                                         <p class="text-xs mb-3 text-muted">Lakukan kunjungan ke toko untuk memeriksa sisa stok fisik dan mencatat penjualan.</p>
-                                        <button type="button" class="btn-taste-primary btn-sm" onclick="openCekSisaFromDetail()">
-                                            <i class="fa-solid fa-plus me-1"></i> Input Kunjungan Pertama
+                                        <button type="button" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" style="border-radius: 9px;" onclick="openCekSisaFromDetail()">
+                                            <i class="fa-solid fa-plus me-1.5"></i> Input Kunjungan Pertama
                                         </button>
                                     </td>
                                 </tr>
                             `;
                         } else {
                             logs.forEach(l => {
-                                const invBadge = l.no_inv ? `<span class="taste-badge badge-invoice-tag">${escapeHtml(l.no_inv)}</span>` : '<span class="text-muted text-xs">-</span>';
+                                const invBadge = l.no_inv ? `<span class="badge-soft-emerald"><i class="fa-solid fa-file-invoice"></i> ${escapeHtml(l.no_inv)}</span>` : '<span class="badge-soft-amber"><i class="fa-solid fa-clock"></i> Belum Ada INV</span>';
                                 const lakuVal = parseInt(l.qty_terjual_kunjungan) || 0;
-                                const lakuDisplay = lakuVal > 0 ? `<span class="taste-badge badge-danger-tag">${lakuVal} Laku</span>` : `<span class="taste-badge badge-neutral">0</span>`;
+                                const lakuDisplay = lakuVal > 0 ? `<span class="badge-soft-rose fw-bold">${lakuVal} Laku</span>` : `<span class="text-muted">0</span>`;
                                 const insVal = parseFloat(l.insentif_didapat) || 0;
                                 
                                 let fotoBtn = '<span class="text-muted text-xs">-</span>';
                                 if (l.foto_kunjungan) {
-                                    fotoBtn = `<a href="uploads/tiptok/${escapeHtml(l.foto_kunjungan)}" target="_blank" class="btn btn-sm btn-outline-dark py-0 px-2 font-weight-bold" style="font-size: 11px;"><i class="fa-solid fa-image me-1"></i> Foto</a>`;
+                                    fotoBtn = `<a href="uploads/tiptok/${escapeHtml(l.foto_kunjungan)}" target="_blank" class="btn btn-sm btn-outline-dark py-0.5 px-2 font-weight-bold" style="font-size: 11px; border-radius: 6px;"><i class="fa-solid fa-image me-1"></i> Foto</a>`;
                                 }
 
                                 logBody.innerHTML += `
                                     <tr>
-                                        <td class="font-weight-bold text-dark">${escapeHtml(l.tgl_kunjungan)}</td>
-                                        <td><strong>${escapeHtml(l.nama_sales || 'Sales')}</strong></td>
-                                        <td><strong>${escapeHtml(l.nama_barang || 'Semua Barang')}</strong></td>
-                                        <td class="text-center font-weight-bold text-success" style="font-size: 14.5px;">${l.stok_sisa}</td>
-                                        <td class="text-center font-weight-bold">${lakuDisplay}</td>
+                                        <td class="font-weight-bold text-dark" style="font-size: 12.5px;">${escapeHtml(l.tgl_kunjungan)}</td>
+                                        <td><strong class="text-dark" style="font-size: 13px;">${escapeHtml(l.nama_sales || 'Sales')}</strong></td>
+                                        <td><span class="fw-bold text-dark" style="font-size: 13px;">${escapeHtml(l.nama_barang || 'Semua Barang')}</span></td>
+                                        <td class="text-center font-weight-bold text-success" style="font-size: 14px;">${l.stok_sisa}</td>
+                                        <td class="text-center">${lakuDisplay}</td>
                                         <td>${invBadge}</td>
-                                        <td class="text-end font-weight-bold text-success">Rp ${new Intl.NumberFormat('id-ID').format(insVal)}</td>
+                                        <td class="text-end font-weight-bold text-success" style="font-size: 14px;">Rp ${new Intl.NumberFormat('id-ID').format(insVal)}</td>
                                         <td class="text-center">${fotoBtn}</td>
-                                        <td class="text-sm text-secondary font-weight-bold">${escapeHtml(l.catatan_kunjungan || '-')}</td>
+                                        <td class="text-xs text-secondary font-weight-bold">${escapeHtml(l.catatan_kunjungan || '-')}</td>
                                     </tr>
                                 `;
                             });
