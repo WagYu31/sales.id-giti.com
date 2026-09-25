@@ -287,9 +287,9 @@ if ($qDealersPreload) {
         .segment-btn {
             border: none;
             background: transparent;
-            padding: 8px 16px;
+            padding: 7px 14px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 800;
             color: #64748b;
             cursor: pointer;
@@ -297,6 +297,7 @@ if ($qDealersPreload) {
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap !important;
         }
         .segment-btn:hover {
             color: #0f172a;
@@ -381,10 +382,10 @@ if ($qDealersPreload) {
             white-space: nowrap;
         }
         .table-invoice tbody td {
-            padding: 14px 16px;
-            vertical-align: middle;
+            padding: 12px 14px !important;
+            vertical-align: top !important;
             border-bottom: 1px solid #f1f5f9;
-            font-size: 13.5px;
+            font-size: 13px;
             color: #1e293b;
         }
         .table-invoice tbody tr:hover td {
@@ -396,25 +397,27 @@ if ($qDealersPreload) {
             background: #fef3c7;
             color: #b45309;
             border: 1.5px solid #fde68a;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 11.5px;
+            padding: 4px 8px;
+            border-radius: 7px;
+            font-size: 11px;
             font-weight: 800;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            white-space: nowrap !important;
         }
         .badge-verified-inv {
             background: #ecfdf5;
             color: #047857;
             border: 1.5px solid #a7f3d0;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 7px;
+            font-size: 11.5px;
             font-weight: 800;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            white-space: nowrap !important;
         }
 
         /* Buttons */
@@ -452,6 +455,7 @@ if ($qDealersPreload) {
             gap: 5px;
             cursor: pointer;
             transition: all 0.15s;
+            white-space: nowrap !important;
         }
         .btn-brand-amber:hover {
             background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
@@ -826,33 +830,29 @@ if ($qDealersPreload) {
                     </button>
                 </div>
 
-                <!-- 3. FILTER & SEARCH CONTROLS -->
+                <!-- 3. FILTER & SEARCH CONTROLS (BALANCED & RESPONSIVE) -->
                 <div class="filter-panel-card">
-                    <div class="row g-3 align-items-center justify-content-between">
-                        <div class="col-lg-6 col-md-12">
-                            <div class="segment-filter-group" id="statusFilterGroup">
-                                <button type="button" class="segment-btn active" id="btnFilterAll" onclick="setFilterStatus('all', this)">
-                                    <i class="fa-solid fa-list"></i> Semua Penjualan
-                                </button>
-                                <button type="button" class="segment-btn" id="btnFilterPending" onclick="setFilterStatus('pending', this)">
-                                    <i class="fa-solid fa-triangle-exclamation text-warning"></i> Belum Invoice 
-                                    <span class="badge bg-warning text-dark px-1.5 py-0.5" id="badgePendingCount" style="font-size: 10.5px;"><?php echo $statPendingTrx; ?></span>
-                                </button>
-                                <button type="button" class="segment-btn" id="btnFilterInvoiced" onclick="setFilterStatus('invoiced', this)">
-                                    <i class="fa-solid fa-circle-check text-success"></i> Sudah Ber-Invoice
-                                </button>
-                            </div>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="segment-filter-group" id="statusFilterGroup">
+                            <button type="button" class="segment-btn active" id="btnFilterAll" onclick="setFilterStatus('all', this)">
+                                <i class="fa-solid fa-list"></i> Semua Penjualan
+                            </button>
+                            <button type="button" class="segment-btn" id="btnFilterPending" onclick="setFilterStatus('pending', this)">
+                                <i class="fa-solid fa-triangle-exclamation text-warning"></i> Belum Invoice 
+                                <span class="badge bg-warning text-dark px-1.5 py-0.5" id="badgePendingCount" style="font-size: 10.5px;"><?php echo $statPendingTrx; ?></span>
+                            </button>
+                            <button type="button" class="segment-btn" id="btnFilterInvoiced" onclick="setFilterStatus('invoiced', this)">
+                                <i class="fa-solid fa-circle-check text-success"></i> Sudah Ber-Invoice
+                            </button>
                         </div>
-                        <div class="col-lg-6 col-md-12">
-                            <div class="d-flex gap-2 justify-content-lg-end flex-wrap align-items-center">
-                                <div class="search-input-box flex-grow-1" style="max-width: 320px;">
-                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                    <input type="text" id="searchInput" class="form-control" placeholder="Cari toko, barang, invoice..." oninput="handleSearchInput()">
-                                </div>
-                                <button type="button" class="btn btn-outline-secondary mb-0 px-3 font-weight-bold" style="border-radius: 12px; height: 42px;" onclick="toggleAdvancedFilters()">
-                                    <i class="fa-solid fa-filter me-1"></i> Filter Lanjutan
-                                </button>
+                        <div class="d-flex align-items-center gap-2 flex-grow-1 justify-content-sm-end" style="min-width: 280px;">
+                            <div class="search-input-box" style="width: 280px; max-width: 100%;">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="searchInput" class="form-control" placeholder="Cari toko, barang, invoice..." oninput="handleSearchInput()">
                             </div>
+                            <button type="button" class="btn btn-outline-secondary mb-0 px-3 font-weight-bold" style="border-radius: 12px; height: 42px; white-space: nowrap;" onclick="toggleAdvancedFilters()">
+                                <i class="fa-solid fa-filter me-1"></i> Filter Lanjutan
+                            </button>
                         </div>
                     </div>
 
@@ -924,14 +924,14 @@ if ($qDealersPreload) {
                         <table class="table table-invoice" id="tableInvoices">
                             <thead>
                                 <tr>
-                                    <th style="width: 40px; text-align: center;">
+                                    <th style="width: 36px; text-align: center;">
                                         <input type="checkbox" id="checkAllItems" class="form-check-input" style="cursor: pointer;" onchange="toggleCheckAll(this)">
                                     </th>
-                                    <th style="width: 26%;">TOKO / DEALER MITRA</th>
-                                    <th style="width: 24%;">PRODUK &amp; TERJUAL</th>
-                                    <th style="width: 14%; text-align: right;">REWARD INSENTIF</th>
-                                    <th style="width: 16%;">TGL &amp; KODE AUDIT</th>
-                                    <th style="width: 20%;">STATUS &amp; NO. INVOICE</th>
+                                    <th style="width: 22%;">TOKO / DEALER MITRA</th>
+                                    <th style="width: 20%;">PRODUK &amp; TERJUAL</th>
+                                    <th style="width: 13%; text-align: right;">REWARD INSENTIF</th>
+                                    <th style="width: 17%;">TGL &amp; KODE AUDIT</th>
+                                    <th style="width: 28%; text-align: right;">STATUS &amp; NO. INVOICE</th>
                                 </tr>
                             </thead>
                             <tbody id="invoicesTableBody">
@@ -1348,10 +1348,13 @@ if ($qDealersPreload) {
                     const medal = s.rank === 1 ? '🥇 ' : (s.rank === 2 ? '🥈 ' : (s.rank === 3 ? '🥉 ' : ''));
                     
                     html += `
-                        <button type="button" class="sales-chip-btn ${isSelected ? 'active' : ''}" onclick="selectSalesFilter(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
-                            <span>${medal}<strong>${escapeHtml(s.nama_sales)}</strong></span>
-                            <span class="chip-count">${s.invoiced_unit} Unit / ${s.count_invoices} INV</span>
-                        </button>
+                        const displayUnit = (s.total_terjual !== undefined && s.total_terjual > 0) ? s.total_terjual : (s.invoiced_unit || 0);
+                        html += `
+                            <button type="button" class="sales-chip-btn ${isSelected ? 'active' : ''}" onclick="selectSalesFilter(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
+                                <span>${medal}<strong>${escapeHtml(s.nama_sales)}</strong></span>
+                                <span class="chip-count">${displayUnit} Unit ${s.count_invoices > 0 ? '/ ' + s.count_invoices + ' INV' : ''}</span>
+                            </button>
+                        `;
                     `;
                 });
             }
@@ -1623,37 +1626,35 @@ if ($qDealersPreload) {
                 const isClaimed = (it.id_claim && parseInt(it.id_claim) > 0);
 
                 const statusPill = isPending ? `
-                    <div class="d-flex align-items-center justify-content-between gap-2">
-                        <span class="badge-pending-inv">
+                    <div class="d-flex align-items-center justify-content-end gap-1.5 flex-nowrap">
+                        <span class="badge-pending-inv" style="font-size: 11px; padding: 4px 8px; white-space: nowrap;">
                             <i class="fa-solid fa-clock"></i> Belum Diinput
                         </span>
-                        <div class="d-flex align-items-center gap-1.5">
-                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2.5 mb-0" style="border-radius: 8px; font-weight: 700; font-size: 11.5px;" title="Batalkan Penjualan & Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
-                                <i class="fa-solid fa-trash-can me-1"></i> Batal Terjual
-                            </button>
-                            <button type="button" class="btn-brand-amber" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
-                                <i class="fa-solid fa-plus"></i> Input Invoice
-                            </button>
-                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 mb-0" style="border-radius: 7px; font-weight: 700; font-size: 11px; height: 28px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" title="Batalkan Penjualan & Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
+                            <i class="fa-solid fa-trash-can"></i> Batal
+                        </button>
+                        <button type="button" class="btn-brand-amber" style="height: 28px; font-size: 11.5px; padding: 0 10px; border-radius: 7px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
+                            <i class="fa-solid fa-plus"></i> Input Invoice
+                        </button>
                     </div>
                 ` : `
-                    <div class="d-flex align-items-center justify-content-between gap-2">
-                        <div>
-                            <span class="badge-verified-inv">
+                    <div class="d-flex align-items-center justify-content-end gap-2 flex-nowrap">
+                        <div class="text-end">
+                            <span class="badge-verified-inv" style="font-size: 11.5px; padding: 4px 8px; white-space: nowrap;">
                                 <i class="fa-solid fa-file-invoice"></i> ${escapeHtml(it.no_inv)}
                             </span>
-                            ${it.tgl_invoice ? `<div class="text-xs text-muted font-weight-bold mt-1"><i class="fa-regular fa-calendar me-1"></i> ${escapeHtml(it.tgl_invoice)}</div>` : ''}
+                            ${it.tgl_invoice ? `<div class="text-xs text-muted font-weight-bold mt-0.5"><i class="fa-regular fa-calendar me-1"></i> ${escapeHtml(it.tgl_invoice)}</div>` : ''}
                         </div>
-                        <div class="d-flex align-items-center gap-1">
-                            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2 mb-0" style="border-radius: 6px;" title="Edit No. Invoice" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
-                                <i class="fa-solid fa-pen"></i>
+                        <div class="d-inline-flex align-items-center gap-1 flex-nowrap">
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Edit No. Invoice" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
+                                <i class="fa-solid fa-pen" style="font-size: 11px;"></i>
                             </button>
                             ${!isClaimed ? `
-                                <button type="button" class="btn btn-sm btn-outline-warning py-1 px-2 mb-0" style="border-radius: 6px;" title="Reset No. Invoice (Jadikan Belum Diinput)" onclick="hapusInvoiceSingle(${it.id_kunjungan}, '${escapeHtml(it.no_inv)}')">
-                                    <i class="fa-solid fa-eraser"></i>
+                                <button type="button" class="btn btn-sm btn-outline-warning py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Reset No. Invoice (Jadikan Belum Diinput)" onclick="hapusInvoiceSingle(${it.id_kunjungan}, '${escapeHtml(it.no_inv)}')">
+                                    <i class="fa-solid fa-eraser" style="font-size: 11px;"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 mb-0" style="border-radius: 6px;" title="Batalkan Penjualan & Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
-                                    <i class="fa-solid fa-trash-can"></i>
+                                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Batalkan Penjualan & Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
+                                    <i class="fa-solid fa-trash-can" style="font-size: 11px;"></i>
                                 </button>
                             ` : `
                                 <span class="badge bg-light text-muted" style="font-size:10px;" title="Terkunci dalam klaim">Terkunci</span>
@@ -1664,36 +1665,36 @@ if ($qDealersPreload) {
 
                 html += `
                     <tr id="rowTrx_${it.id_kunjungan}">
-                        <td class="text-center">
+                        <td class="text-center" style="vertical-align: top; padding-top: 13px;">
                             <input type="checkbox" class="form-check-input row-checkbox" value="${it.id_kunjungan}" style="cursor: pointer;" onchange="onRowCheckboxChange(this, ${it.id_kunjungan})">
                         </td>
-                        <td>
-                            <div class="font-weight-bold text-dark" style="font-size: 14px;">${escapeHtml(it.nama_toko || 'Toko Mitra')}</div>
-                            <div class="d-flex align-items-center gap-2 mt-0.5">
-                                ${it.kategori_toko ? `<span class="badge bg-light text-secondary px-2 py-0.5" style="font-size: 10.5px; border: 1px solid #cbd5e1;">${escapeHtml(it.kategori_toko)}</span>` : ''}
+                        <td style="vertical-align: top; padding-top: 13px;">
+                            <div class="font-weight-bold text-dark" style="font-size: 13.5px; line-height: 1.3;">${escapeHtml(it.nama_toko || 'Toko Mitra')}</div>
+                            <div class="d-flex align-items-center gap-1.5 mt-1">
+                                ${it.kategori_toko ? `<span class="badge bg-light text-secondary px-1.5 py-0.5" style="font-size: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">${escapeHtml(it.kategori_toko)}</span>` : ''}
                                 <span class="text-xs text-muted font-weight-bold">${escapeHtml(it.kota_toko || '')}</span>
                             </div>
                         </td>
-                        <td>
-                            <div class="font-weight-bold text-dark" style="font-size: 13.5px;">${escapeHtml(it.nama_barang)}</div>
-                            <div class="d-flex align-items-center gap-2 mt-1">
-                                <span class="badge bg-danger text-white px-2 py-0.5" style="font-size: 11.5px; font-weight: 800;">
+                        <td style="vertical-align: top; padding-top: 13px;">
+                            <div class="font-weight-bold text-dark" style="font-size: 13px; line-height: 1.3;">${escapeHtml(it.nama_barang)}</div>
+                            <div class="d-flex align-items-center gap-1.5 mt-1">
+                                <span class="badge bg-danger text-white px-2 py-0.5" style="font-size: 11px; font-weight: 800; border-radius: 5px;">
                                     Laku: ${qty} Unit
                                 </span>
                                 <span class="text-xs text-muted font-weight-bold">(@ Rp ${new Intl.NumberFormat('id-ID').format(insUnit)})</span>
                             </div>
                         </td>
-                        <td class="text-end">
-                            <div style="font-family: var(--font-heading); font-size: 16px; font-weight: 800; color: #047857;">
+                        <td class="text-end" style="vertical-align: top; padding-top: 13px;">
+                            <div style="font-family: var(--font-heading); font-size: 15px; font-weight: 800; color: #047857; line-height: 1.2;">
                                 Rp ${new Intl.NumberFormat('id-ID').format(subtotalIns)}
                             </div>
-                            <div class="text-xs text-muted font-weight-bold">Estimasi Reward</div>
+                            <div class="text-xs text-muted font-weight-bold mt-0.5">Estimasi Reward</div>
                         </td>
-                        <td>
-                            <div class="font-weight-bold text-dark" style="font-size: 13px;"><i class="fa-regular fa-calendar-check text-primary me-1"></i> ${escapeHtml(it.tgl_kunjungan)}</div>
-                            <div class="font-monospace text-xs text-secondary font-weight-bold mt-0.5">${escapeHtml(it.kode_kunjungan)}</div>
+                        <td style="vertical-align: top; padding-top: 13px;">
+                            <div class="font-weight-bold text-dark" style="font-size: 12.5px; white-space: nowrap;"><i class="fa-regular fa-calendar-check text-primary me-1"></i> ${escapeHtml(it.tgl_kunjungan)}</div>
+                            <div class="font-monospace text-xs text-secondary font-weight-bold mt-0.5" style="white-space: nowrap; max-width: 165px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(it.kode_kunjungan)}">${escapeHtml(it.kode_kunjungan)}</div>
                             <div class="mt-1">
-                                <span class="badge" style="background: rgba(37,99,235,0.1); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.25); font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 700;">
+                                <span class="badge" style="background: rgba(37,99,235,0.08); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.2); font-size: 10.5px; padding: 2px 7px; border-radius: 5px; font-weight: 700; white-space: nowrap;">
                                     <i class="fa-solid fa-user-tie me-1"></i> ${escapeHtml(it.nama_sales || 'Sales')}
                                 </span>
                             </div>
