@@ -1346,15 +1346,14 @@ if ($qDealersPreload) {
                 leaderboard.forEach(s => {
                     const isSelected = (currentSalesFilter == s.id_sales && s.id_sales > 0) || (currentSalesName === s.nama_sales && currentSalesName !== '');
                     const medal = s.rank === 1 ? '🥇 ' : (s.rank === 2 ? '🥈 ' : (s.rank === 3 ? '🥉 ' : ''));
+                    const displayUnit = (s.total_terjual !== undefined && s.total_terjual > 0) ? s.total_terjual : (s.invoiced_unit || 0);
+                    const invSub = s.count_invoices > 0 ? ` / ${s.count_invoices} INV` : '';
                     
                     html += `
-                        const displayUnit = (s.total_terjual !== undefined && s.total_terjual > 0) ? s.total_terjual : (s.invoiced_unit || 0);
-                        html += `
-                            <button type="button" class="sales-chip-btn ${isSelected ? 'active' : ''}" onclick="selectSalesFilter(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
-                                <span>${medal}<strong>${escapeHtml(s.nama_sales)}</strong></span>
-                                <span class="chip-count">${displayUnit} Unit ${s.count_invoices > 0 ? '/ ' + s.count_invoices + ' INV' : ''}</span>
-                            </button>
-                        `;
+                        <button type="button" class="sales-chip-btn ${isSelected ? 'active' : ''}" onclick="selectSalesFilter(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
+                            <span>${medal}<strong>${escapeHtml(s.nama_sales)}</strong></span>
+                            <span class="chip-count">${displayUnit} Unit${invSub}</span>
+                        </button>
                     `;
                 });
             }
