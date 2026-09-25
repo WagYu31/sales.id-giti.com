@@ -483,8 +483,6 @@ if ($active_sales_id > 0) {
     </div>
 </div>
 
-<?php include 'includes/competition_unified_tabs.php'; ?>
-
 <!-- SECTION 1: COLLAPSIBLE FORUM Q&A ACCORDION -->
 <div id="forum-section" class="mb-4">
     <div class="card border-0 shadow-sm" style="border-radius:18px; overflow:hidden;">
