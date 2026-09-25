@@ -181,21 +181,72 @@ $sqlPenitipan = "SELECT p.*, $custSelect,
                  ORDER BY p.id DESC";
 $resPenitipan = $conn->query($sqlPenitipan);
 
-// Ambil daftar sales aktif untuk dropdown & filter PIC (Preload)
-$colNamaSales = "nama_lengkap";
-$chkColSales = @$conn->query("SHOW COLUMNS FROM sales LIKE 'nama_lengkap'");
-if (!$chkColSales || $chkColSales->num_rows == 0) {
-    $colNamaSales = "nama";
+// Ambil daftar sales aktif untuk dropdown & filter PIC (Preload - Robust Schema Detection)
+$salesCols = [];
+$chkSalesCols = @$conn->query("SHOW COLUMNS FROM sales");
+if ($chkSalesCols) {
+    while ($c = $chkSalesCols->fetch_assoc()) {
+        $salesCols[strtolower($c['Field'])] = true;
+    }
 }
-$qSalesList = $conn->query("SELECT id, $colNamaSales AS nama_sales, role FROM sales WHERE deleted_at IS NULL ORDER BY (role = 'sales') DESC, $colNamaSales ASC");
+
+$nameExpr = "'Sales'";
+if (isset($salesCols['nama_lengkap']) && isset($salesCols['nama'])) {
+    $nameExpr = "COALESCE(NULLIF(nama_lengkap, ''), nama, 'Sales')";
+} elseif (isset($salesCols['nama_lengkap'])) {
+    $nameExpr = "COALESCE(nama_lengkap, 'Sales')";
+} elseif (isset($salesCols['nama'])) {
+    $nameExpr = "COALESCE(nama, 'Sales')";
+} elseif (isset($salesCols['username'])) {
+    $nameExpr = "COALESCE(username, 'Sales')";
+}
+
+$roleExpr = "'Sales'";
+if (isset($salesCols['role']) && isset($salesCols['jabatan'])) {
+    $roleExpr = "COALESCE(NULLIF(role, ''), jabatan, 'Sales')";
+} elseif (isset($salesCols['role'])) {
+    $roleExpr = "COALESCE(role, 'Sales')";
+} elseif (isset($salesCols['jabatan'])) {
+    $roleExpr = "COALESCE(jabatan, 'Sales')";
+}
+
+$whereSales = "1=1";
+if (isset($salesCols['deleted_at'])) {
+    $whereSales .= " AND deleted_at IS NULL";
+}
+if (isset($salesCols['status'])) {
+    $whereSales .= " AND (status != 'nonaktif' AND status != 'inactive' AND status != 'deleted')";
+}
+
+$orderSales = "ORDER BY $nameExpr ASC";
+if (isset($salesCols['role'])) {
+    $orderSales = "ORDER BY (LOWER(role) = 'sales') DESC, $nameExpr ASC";
+} elseif (isset($salesCols['jabatan'])) {
+    $orderSales = "ORDER BY (LOWER(jabatan) = 'sales') DESC, $nameExpr ASC";
+}
+
 $salesOptionList = [];
-if ($qSalesList) {
+$qSalesList = @$conn->query("SELECT id, $nameExpr AS nama_sales, $roleExpr AS jabatan_sales FROM sales WHERE $whereSales $orderSales");
+if ($qSalesList && $qSalesList->num_rows > 0) {
     while ($sRow = $qSalesList->fetch_assoc()) {
         $salesOptionList[] = [
             'id' => intval($sRow['id']),
             'nama' => $sRow['nama_sales'] ?? 'Sales',
-            'jabatan' => $sRow['role'] ?? 'Sales'
+            'jabatan' => $sRow['jabatan_sales'] ?? 'Sales'
         ];
+    }
+} else {
+    $qFallback = @$conn->query("SELECT * FROM sales LIMIT 100");
+    if ($qFallback && $qFallback->num_rows > 0) {
+        while ($sRow = $qFallback->fetch_assoc()) {
+            $nm = $sRow['nama_lengkap'] ?? ($sRow['nama'] ?? ($sRow['username'] ?? 'Sales'));
+            $jb = $sRow['role'] ?? ($sRow['jabatan'] ?? 'Sales');
+            $salesOptionList[] = [
+                'id' => intval($sRow['id']),
+                'nama' => $nm,
+                'jabatan' => $jb
+            ];
+        }
     }
 }
 
@@ -2930,7 +2981,7 @@ $loewixPriceList = $tiptokMaster6;
             if (!Array.isArray(salesListCache) || salesListCache.length === 0) return;
             const selTambah = document.getElementById('selectSalesTambah');
             if (selTambah) {
-                const curVal = selTambah.value;
+                const curVal = selTambah.value || '<?php echo $idSesi; ?>';
                 let html = '<option value="">-- Pilih Sales PIC --</option>';
                 salesListCache.forEach(s => {
                     const jabText = s.jabatan ? ` (${s.jabatan})` : '';
@@ -2938,6 +2989,17 @@ $loewixPriceList = $tiptokMaster6;
                     html += `<option value="${s.id}" ${isSel}>${escapeHtml(s.nama)}${escapeHtml(jabText)}</option>`;
                 });
                 selTambah.innerHTML = html;
+            }
+            const selEdit = document.getElementById('editSelectSales');
+            if (selEdit && selEdit.options.length <= 1) {
+                const curEditVal = selEdit.value;
+                let htmlEdit = '<option value="">-- Pilih Sales PIC --</option>';
+                salesListCache.forEach(s => {
+                    const jabText = s.jabatan ? ` (${s.jabatan})` : '';
+                    const isSel = (s.id == curEditVal) ? 'selected' : '';
+                    htmlEdit += `<option value="${s.id}" ${isSel}>${escapeHtml(s.nama)}${escapeHtml(jabText)}</option>`;
+                });
+                selEdit.innerHTML = htmlEdit;
             }
         }
 
