@@ -539,18 +539,18 @@ table tr td { font-size: 0.85em; }
                 <span>Menu Utama</span>
             </div>
 
-            <a href="index.php" class="sidebar-link <?php echo $currentPage=='index.php'?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
-                    <i class="bi bi-trophy-fill"></i>
-                </span>
-                <span class="nav-link-text">Dashboard &amp; Leaderboard</span>
-            </a>
-
             <a href="customer_management.php" class="sidebar-link <?php echo $currentPage=='customer_management.php'?'active':''; ?>">
                 <span class="nav-icon-badge" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6;">
                     <i class="bi bi-grid-1x2-fill"></i>
                 </span>
-                <span class="nav-link-text">Dashboard Sales</span>
+                <span class="nav-link-text">Dashboard Utama</span>
+            </a>
+
+            <a href="index.php" class="sidebar-link <?php echo $currentPage=='index.php'?'active':''; ?>">
+                <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                    <i class="bi bi-people-fill"></i>
+                </span>
+                <span class="nav-link-text">Database Customer &amp; Forum</span>
             </a>
 
             <a href="promosi_management.php" class="sidebar-link <?php echo $currentPage=='promosi_management.php'?'active':''; ?>">
@@ -632,18 +632,18 @@ table tr td { font-size: 0.85em; }
                 <span>Menu Utama</span>
             </div>
 
-            <a href="index.php" class="sidebar-link <?php echo $currentPage=='index.php'?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
-                    <i class="bi bi-trophy-fill"></i>
-                </span>
-                <span class="nav-link-text">Dashboard &amp; Leaderboard</span>
-            </a>
-
             <a href="customer_management.php" class="sidebar-link <?php echo $currentPage=='customer_management.php'?'active':''; ?>">
                 <span class="nav-icon-badge" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6;">
                     <i class="bi bi-grid-1x2-fill"></i>
                 </span>
-                <span class="nav-link-text">Dashboard Sales</span>
+                <span class="nav-link-text">Dashboard Utama</span>
+            </a>
+
+            <a href="index.php" class="sidebar-link <?php echo $currentPage=='index.php'?'active':''; ?>">
+                <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                    <i class="bi bi-people-fill"></i>
+                </span>
+                <span class="nav-link-text">Database Customer &amp; Forum</span>
             </a>
 
             <a href="sales_work_plan.php" class="sidebar-link <?php echo $currentPage=='sales_work_plan.php'?'active':''; ?>">

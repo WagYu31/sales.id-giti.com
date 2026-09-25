@@ -34,22 +34,22 @@ if (!function_exists('getAllSystemMenus')) {
                 'color' => '#3b82f6',
                 'menus' => [
                     [
-                        'key'         => 'dashboard_leaderboard',
-                        'label'       => 'Dashboard & Leaderboard',
-                        'url'         => 'index.php',
-                        'icon'        => 'bi bi-trophy-fill',
-                        'color'       => '#f59e0b',
-                        'description' => 'Monitoring ranking sales, leaderboard kompetisi bonus, dan performa omset',
-                        'has_actions' => ['access', 'export']
-                    ],
-                    [
                         'key'         => 'dashboard_sales',
-                        'label'       => 'Dashboard Sales (Pelanggan)',
+                        'label'       => 'Dashboard Utama',
                         'url'         => 'customer_management.php',
                         'icon'        => 'bi bi-grid-1x2-fill',
                         'color'       => '#2563eb',
-                        'description' => 'Manajemen database pelanggan, kontak PIC, filter wilayah, dan pipeline leads',
+                        'description' => 'Dashboard utama ringkasan KPI, leaderboard kompetisi sales, dan akses cepat',
                         'has_actions' => ['access', 'create', 'edit', 'delete', 'export']
+                    ],
+                    [
+                        'key'         => 'dashboard_leaderboard',
+                        'label'       => 'Database Customer & Forum',
+                        'url'         => 'index.php',
+                        'icon'        => 'bi bi-people-fill',
+                        'color'       => '#10b981',
+                        'description' => 'Manajemen database pelanggan, kontak PIC, filter wilayah, dan forum diskusi sales',
+                        'has_actions' => ['access', 'export']
                     ],
                     [
                         'key'         => 'sales_work_plan',
