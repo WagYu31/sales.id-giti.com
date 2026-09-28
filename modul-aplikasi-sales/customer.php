@@ -990,6 +990,21 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
         padding: 12px 10px !important;
       }
     }
+
+    /* ── Geofence Leaflet Interactive Maps ── */
+    #map_create, #map_edit, .leaflet-geofence-map {
+      height: 250px !important;
+      min-height: 250px !important;
+      width: 100% !important;
+      border-radius: 12px !important;
+      border: 1.5px solid #cbd5e1 !important;
+      margin-top: 10px !important;
+      margin-bottom: 8px !important;
+      background: #f8fafc !important;
+      position: relative !important;
+      z-index: 1 !important;
+      overflow: hidden !important;
+    }
   </style>
 </head>
 <body class="g-sidenav-show bg-gray-200">
@@ -1252,7 +1267,7 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
                 </div>
 
                 <!-- Leaflet Map create -->
-                <div id="map_create"></div>
+                <div id="map_create" class="leaflet-geofence-map" style="height: 250px; min-height: 250px; width: 100%; border-radius: 12px; border: 1.5px solid #cbd5e1; margin-top: 10px; margin-bottom: 8px; z-index: 1;"></div>
 
                 <!-- GPS button and Radius input -->
                 <div class="d-flex justify-content-between align-items-center mt-3">
@@ -1916,7 +1931,8 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
                   </div>
                 </div>
 
-                <div id="map_edit"></div>
+                <!-- Leaflet Map edit -->
+                <div id="map_edit" class="leaflet-geofence-map" style="height: 250px; min-height: 250px; width: 100%; border-radius: 12px; border: 1.5px solid #cbd5e1; margin-top: 10px; margin-bottom: 8px; z-index: 1;"></div>
 
                 <!-- GPS button and Radius input -->
                 <div class="d-flex justify-content-between align-items-center mt-3">
@@ -2432,6 +2448,12 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
           circleEdit.setLatLng(latlng).setRadius(radVal);
           mapEditInstance.invalidateSize();
       }
+
+      setTimeout(() => {
+        if (mapEditInstance) {
+          mapEditInstance.invalidateSize();
+        }
+      }, 250);
   });
 
   function updateEditMapData(latlng, rad) {
@@ -2506,6 +2528,27 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
         });
     }
   });
+
+  // Enter key support for map searches
+  const gmapSearchInput = document.getElementById('gmap_search');
+  if (gmapSearchInput) {
+    gmapSearchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('gmap_search_btn').click();
+      }
+    });
+  }
+
+  const gmapSearchEditInput = document.getElementById('gmap_search_edit');
+  if (gmapSearchEditInput) {
+    gmapSearchEditInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('gmap_search_btn_edit').click();
+      }
+    });
+  }
 
   // ── Edit Modal Population ──
   let deletedExistingPhotos = [];
