@@ -60,6 +60,13 @@ $roleBadgeBg = match($userRole) {
             <span class="nav-link-text">Rencana Kerja Sales</span>
         </a>
 
+        <a href="../sales_orders.php" class="sidebar-link">
+            <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
+                <i class="bi bi-cart3"></i>
+            </span>
+            <span class="nav-link-text">Pesanan Penjualan (SO)</span>
+        </a>
+
         <?php if ($userRole === 'superadmin'): ?>
         <a href="../followup_report.php" class="sidebar-link">
             <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
@@ -117,6 +124,13 @@ $roleBadgeBg = match($userRole) {
                 <i class="bi bi-receipt-cutoff"></i>
             </span>
             <span class="nav-link-text">No. Invoice TIP TOK</span>
+        </a>
+
+        <a href="../sales_orders.php" class="sidebar-link">
+            <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
+                <i class="bi bi-cart3"></i>
+            </span>
+            <span class="nav-link-text">Pesanan Penjualan (SO)</span>
         </a>
 
         <a href="customer.php" class="sidebar-link <?php echo in_array($currFile, ['customer.php', 'customer-detail.php', 'tambah-customer.php', 'edit-customer.php']) ? 'active' : ''; ?>">
