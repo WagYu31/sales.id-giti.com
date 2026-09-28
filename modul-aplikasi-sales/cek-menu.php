@@ -91,7 +91,7 @@ $roleBadgeBg = match($userRole) {
             <span>Aplikasi Sales Canvas (Mobile)</span>
         </div>
 
-        <a href="kegiatan.php" class="sidebar-link <?php echo in_array($currFile, ['kegiatan.php', 'kegiatan-selesai.php', 'kegiatan-db.php', 'detail_kegiatan.php']) ? 'active' : ''; ?>">
+        <a href="kegiatan.php" class="sidebar-link <?php echo in_array($currFile, ['kegiatan.php', 'kegiatan-selesai.php', 'kegiatan-db.php', 'detail_kegiatan.php', 'edit_kegiatan.php']) ? 'active' : ''; ?>">
             <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
                 <i class="bi bi-grid-1x2-fill"></i>
             </span>
