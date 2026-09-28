@@ -377,9 +377,9 @@ require_once 'includes/header.php';
                 <thead class="table-dark-header">
                     <tr>
                         <th style="width: 22%;">KATEGORI</th>
-                        <th style="width: 48%;">TIPE &amp; DESKRIPSI</th>
-                        <th class="text-end" style="width: 20%;">HARGA (MSRP)</th>
-                        <th class="text-center" style="width: 10%;">AKSI</th>
+                        <th style="width: 48%;">TIPE PRODUK</th>
+                        <th class="text-end" style="width: 18%;">HARGA (MSRP)</th>
+                        <th class="text-center" style="width: 12%;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody id="priceTableBody">
@@ -435,6 +435,66 @@ require_once 'includes/header.php';
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detail Spesifikasi Produk (Accurate Style) -->
+<div class="modal fade" id="specModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 18px; border: none; overflow: hidden; box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);">
+            <!-- Modal Header -->
+            <div class="modal-header d-flex align-items-center justify-content-between px-4 py-3" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.2); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="modal-title fw-bold text-white mb-0" style="font-size: 15px;">Detail Spesifikasi Barang</h6>
+                        <span class="text-muted small" style="font-size: 11px; color: #94a3b8 !important;">Informasi teknis dan deskripsi fitur produk</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-4 bg-white">
+                <!-- Product Badges & Type -->
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                    <span class="badge" id="specModalCategory" style="background: rgba(37,99,235,0.08); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.25); font-size: 11px; padding: 4px 8px; font-weight: 700; border-radius: 6px;">
+                        KATEGORI
+                    </span>
+                    <span class="font-monospace fw-bold text-dark" id="specModalPrice" style="font-size: 14px;">
+                        Rp 0
+                    </span>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-3" id="specModalType" style="font-size: 18px; line-height: 1.3;">
+                    Tipe Produk
+                </h5>
+
+                <!-- Spesifikasi Box -->
+                <div class="p-3 rounded-3" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
+                    <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom" style="border-color: #e2e8f0 !important;">
+                        <span class="text-xs text-muted fw-bold text-uppercase d-flex align-items-center gap-1.5">
+                            <i class="bi bi-file-text-fill text-primary"></i> Rincian Spesifikasi &amp; Fitur
+                        </span>
+                        <button type="button" class="btn btn-sm btn-link text-primary p-0 text-decoration-none fw-bold" style="font-size: 11px;" id="btnCopySpec" title="Salin Spesifikasi">
+                            <i class="bi bi-clipboard me-1"></i> Salin
+                        </button>
+                    </div>
+                    <div id="specModalDesc" class="text-dark" style="font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;">
+                        -
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-top-0 px-4 pb-3 pt-0 bg-white">
+                <button type="button" class="btn btn-secondary w-100 rounded-pill fw-bold" data-bs-dismiss="modal" style="font-size: 13px; height: 38px;">
+                    Tutup
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -815,6 +875,35 @@ $(document).ready(function() {
                     }
                 }, 'json');
             }
+        });
+    });
+
+    // Accurate-Style Info Icon Click
+    let currentSpecText = '';
+    const specModal = new bootstrap.Modal(document.getElementById('specModal'));
+
+    $('#priceTableBody').on('click', '.btn-desc-info', function() {
+        const type = $(this).data('type') || '-';
+        const category = $(this).data('category') || '-';
+        const price = $(this).data('price') || '-';
+        const desc = $(this).data('desc') || 'Tidak ada catatan spesifikasi tambahan untuk produk ini.';
+        currentSpecText = `${type}\n${desc}`;
+
+        $('#specModalType').text(type);
+        $('#specModalCategory').html('<i class="bi bi-tag-fill me-1 opacity-75"></i>' + escapeHtml(category));
+        $('#specModalPrice').text(price);
+        $('#specModalDesc').text(desc);
+
+        specModal.show();
+    });
+
+    // Copy spec button
+    $('#btnCopySpec').on('click', function() {
+        navigator.clipboard.writeText(currentSpecText).then(() => {
+            const btn = $(this);
+            const orig = btn.html();
+            btn.html('<i class="bi bi-check-lg text-success me-1"></i> Tersalin!');
+            setTimeout(() => btn.html(orig), 2000);
         });
     });
 
