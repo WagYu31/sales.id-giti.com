@@ -581,6 +581,13 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-link-text">Rencana Kerja Sales</span>
             </a>
 
+            <a href="sales_orders.php" class="sidebar-link <?php echo in_array($currentPage,['sales_orders.php','sales_order_form.php','sales_order_print.php'])?'active':''; ?>">
+                <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
+                    <i class="bi bi-cart3"></i>
+                </span>
+                <span class="nav-link-text">Pesanan Penjualan (SO)</span>
+            </a>
+
             <!-- APLIKASI SALES (MOBILE) -->
             <div class="nav-section-title" style="margin-top: 14px;">
                 <span class="nav-section-dot dot-cyan"></span>
@@ -651,6 +658,13 @@ table tr td { font-size: 0.85em; }
                     <i class="bi bi-calendar-check-fill"></i>
                 </span>
                 <span class="nav-link-text">Rencana Kerja Sales</span>
+            </a>
+
+            <a href="sales_orders.php" class="sidebar-link <?php echo in_array($currentPage,['sales_orders.php','sales_order_form.php','sales_order_print.php'])?'active':''; ?>">
+                <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
+                    <i class="bi bi-cart3"></i>
+                </span>
+                <span class="nav-link-text">Pesanan Penjualan (SO)</span>
             </a>
 
             <?php if ($userRoleClean === 'superadmin'): ?>
