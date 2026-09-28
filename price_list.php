@@ -39,14 +39,6 @@ require_once 'includes/header.php';
     margin: 0;
     max-width: 600px;
 }
-
-.settings-box {
-    background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
-    border: 1.5px solid #DBEAFE;
-    border-radius: 18px;
-    padding: 24px;
-    margin-bottom: 24px;
-}
 </style>
 
 <!-- Hero Header -->
@@ -67,34 +59,6 @@ require_once 'includes/header.php';
             </button>
         </div>
     </div>
-</div>
-
-<!-- Settings Box Card -->
-<div class="settings-box">
-    <h5 class="fw-bold mb-3 text-dark" style="font-family:'Plus Jakarta Sans', sans-serif; font-size:15px;">
-        <i class="bi bi-gear-fill text-primary me-2"></i> Pengaturan Diskon (%)
-    </h5>
-    <form id="settingsForm" class="row g-3 align-items-end">
-        <div class="col-md-4">
-            <label class="form-label">Dealer Discount (%)</label>
-            <div class="input-group">
-                <input type="number" step="0.01" name="dealer_discount" id="set_dealer" class="form-control" required>
-                <span class="input-group-text bg-white fw-bold">%</span>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Master Dealer Discount (%)</label>
-            <div class="input-group">
-                <input type="number" step="0.01" name="master_dealer_discount" id="set_master" class="form-control" required>
-                <span class="input-group-text bg-white fw-bold">%</span>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100">
-                <i class="bi bi-save-fill"></i> Update Persentase Diskon
-            </button>
-        </div>
-    </form>
 </div>
 
 <!-- Main Table Card -->
@@ -270,29 +234,6 @@ $(document).ready(function() {
         e.preventDefault();
         $.post('ajax_price_handler.php', $(this).serialize(), function(res) {
             if(res.success) { pModal.hide(); loadTable(); Swal.fire('Berhasil!', '', 'success'); }
-        }, 'json');
-    });
-    
-    // Ambil nilai diskon saat halaman dimuat
-    $.get('ajax_price_handler.php', { action: 'get_settings' }, function(res) {
-        if(res.success) {
-            $('#set_dealer').val(res.data.dealer_discount);
-            $('#set_master').val(res.data.master_dealer_discount);
-        }
-    }, 'json');
-    
-    // Simpan perubahan diskon
-    $('#settingsForm').on('submit', function(e) {
-        e.preventDefault();
-        $.post('ajax_price_handler.php', { 
-            action: 'update_settings', 
-            dealer_discount: $('#set_dealer').val(), 
-            master_dealer_discount: $('#set_master').val() 
-        }, function(res) {
-            if(res.success) {
-                Swal.fire('Berhasil!', 'Persentase diskon diperbarui.', 'success');
-                loadTable();
-            }
         }, 'json');
     });
 });
