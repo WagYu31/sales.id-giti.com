@@ -7,10 +7,9 @@
 
 $page_title = 'Pesanan Penjualan (Sales Order)';
 require_once 'includes/db.php';
+require_once 'includes/sales_order_helper.php';
+ensureSalesOrderTables($conn);
 require_once 'includes/header.php';
-
-// Pastikan tabel ada
-require_once 'ajax_sales_order.php';
 
 $soId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $isEdit = false;

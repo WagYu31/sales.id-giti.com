@@ -6,7 +6,8 @@
  */
 
 require_once 'includes/db.php';
-require_once 'ajax_sales_order.php';
+require_once 'includes/sales_order_helper.php';
+ensureSalesOrderTables($conn);
 
 $soId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($soId <= 0) {

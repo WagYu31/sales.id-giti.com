@@ -6,8 +6,9 @@
 
 $page_title = 'Daftar Pesanan Penjualan (Sales Order)';
 require_once 'includes/db.php';
+require_once 'includes/sales_order_helper.php';
+ensureSalesOrderTables($conn);
 require_once 'includes/header.php';
-require_once 'ajax_sales_order.php';
 
 // Filter Parameters
 $search = trim($_GET['search'] ?? '');
