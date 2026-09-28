@@ -63,6 +63,7 @@ if (!$checkTbl || mysqli_num_rows($checkTbl) == 0) {
             `stok_sebelumnya` INT NOT NULL,
             `stok_sisa` INT NOT NULL,
             `qty_terjual_kunjungan` INT NOT NULL DEFAULT 0,
+            `no_so` VARCHAR(100) NULL,
             `no_inv` VARCHAR(100) NULL,
             `tgl_invoice` DATE NULL,
             `insentif_didapat` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
@@ -76,6 +77,12 @@ if (!$checkTbl || mysqli_num_rows($checkTbl) == 0) {
             INDEX (`id_claim`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
         
+        // Auto Add no_so column if not exists
+        $chkColSo = mysqli_query($conn, "SHOW COLUMNS FROM `tiptok_kunjungan` LIKE 'no_so'");
+        if ($chkColSo && mysqli_num_rows($chkColSo) === 0) {
+            mysqli_query($conn, "ALTER TABLE `tiptok_kunjungan` ADD COLUMN `no_so` VARCHAR(100) NULL AFTER `qty_terjual_kunjungan`");
+        }
+
         mysqli_query($conn, "CREATE TABLE IF NOT EXISTS `tiptok_claim` (
             `id` INT AUTO_INCREMENT PRIMARY KEY,
             `kode_claim` VARCHAR(50) NOT NULL UNIQUE,
@@ -101,6 +108,7 @@ if (!$checkTbl || mysqli_num_rows($checkTbl) == 0) {
             `id_penitipan` INT NOT NULL,
             `id_item` INT NOT NULL,
             `nama_barang` VARCHAR(255) NOT NULL,
+            `no_so` VARCHAR(100) NULL,
             `no_inv` VARCHAR(100) NULL,
             `qty_terjual` INT NOT NULL,
             `insentif_per_unit` DECIMAL(15,2) NOT NULL,
@@ -108,6 +116,11 @@ if (!$checkTbl || mysqli_num_rows($checkTbl) == 0) {
             INDEX (`id_claim`),
             INDEX (`id_kunjungan_log`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $chkColClaimSo = mysqli_query($conn, "SHOW COLUMNS FROM `tiptok_claim_detail` LIKE 'no_so'");
+        if ($chkColClaimSo && mysqli_num_rows($chkColClaimSo) === 0) {
+            mysqli_query($conn, "ALTER TABLE `tiptok_claim_detail` ADD COLUMN `no_so` VARCHAR(100) NULL AFTER `nama_barang`");
+        }
     }
 }
 
@@ -171,6 +184,7 @@ $sqlPenitipan = "SELECT p.*, $custSelect,
                         SUM(i.qty_sisa) AS sum_sisa,
                         SUM(i.qty_terjual) AS sum_terjual,
                         SUM(i.total_insentif) AS sum_insentif,
+                        (SELECT k.no_so FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id AND k.no_so IS NOT NULL AND k.no_so != '' ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_no_so,
                         (SELECT k.no_inv FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id AND k.no_inv IS NOT NULL AND k.no_inv != '' ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_no_inv,
                         (SELECT k.tgl_kunjungan FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_kunjungan
                  FROM tiptok_penitipan p 
@@ -2123,7 +2137,13 @@ $loewixPriceList = $tiptokMaster6;
                                                 <div class="taste-badge badge-invoice-tag mb-1" style="font-size: 11.5px; padding: 2px 7px;">
                                                     <i class="fa-solid fa-receipt me-1"></i><?php echo htmlspecialchars($row['last_no_inv']); ?>
                                                 </div>
-                                            <?php else: ?>
+                                            <?php endif; ?>
+                                            <?php if (!empty($row['last_no_so'])) : ?>
+                                                <div class="badge bg-light text-primary border border-primary-subtle mb-1" style="font-size: 11px; padding: 2px 6px; font-weight: 600; display: inline-block;">
+                                                    <i class="fa-solid fa-file-lines me-1"></i>SO: <?php echo htmlspecialchars($row['last_no_so']); ?>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if (empty($row['last_no_inv']) && empty($row['last_no_so'])) : ?>
                                                 <div class="text-muted" style="font-size: 12px; font-weight: 600; font-style: italic; margin-bottom: 4px;">
                                                     <i class="fa-regular fa-clock me-1"></i>Belum ada invoice
                                                 </div>

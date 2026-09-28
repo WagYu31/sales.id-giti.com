@@ -111,6 +111,16 @@ if (!$checkTbl || mysqli_num_rows($checkTbl) == 0) {
     }
 }
 
+// Auto-ensure no_so column in tiptok_kunjungan and tiptok_claim_detail
+$chkColSo = @mysqli_query($conn, "SHOW COLUMNS FROM `tiptok_kunjungan` LIKE 'no_so'");
+if ($chkColSo && mysqli_num_rows($chkColSo) == 0) {
+    @mysqli_query($conn, "ALTER TABLE `tiptok_kunjungan` ADD COLUMN `no_so` VARCHAR(100) NULL AFTER `no_inv`");
+}
+$chkColClaimSo = @mysqli_query($conn, "SHOW COLUMNS FROM `tiptok_claim_detail` LIKE 'no_so'");
+if ($chkColClaimSo && mysqli_num_rows($chkColClaimSo) == 0) {
+    @mysqli_query($conn, "ALTER TABLE `tiptok_claim_detail` ADD COLUMN `no_so` VARCHAR(100) NULL AFTER `no_inv`");
+}
+
 $idUser = $_SESSION['id'];
 $namaUser = $_SESSION['nama'] ?? ($nmUser ?? 'Sales');
 $jabatanUser = $_SESSION['jabatan'] ?? ($role ?? 'Sales');
@@ -1244,7 +1254,7 @@ if ($action === 'get_tiptok_invoices') {
 
     if (!empty($search)) {
         $safeSearch = $conn->real_escape_string($search);
-        $where[] = "($custField LIKE '%$safeSearch%' OR p.kode_titip LIKE '%$safeSearch%' OR k.kode_kunjungan LIKE '%$safeSearch%' OR i.nama_barang LIKE '%$safeSearch%' OR k.no_inv LIKE '%$safeSearch%' OR p.nama_sales LIKE '%$safeSearch%' OR k.nama_sales LIKE '%$safeSearch%')";
+        $where[] = "($custField LIKE '%$safeSearch%' OR p.kode_titip LIKE '%$safeSearch%' OR k.kode_kunjungan LIKE '%$safeSearch%' OR i.nama_barang LIKE '%$safeSearch%' OR k.no_inv LIKE '%$safeSearch%' OR k.no_so LIKE '%$safeSearch%' OR p.nama_sales LIKE '%$safeSearch%' OR k.nama_sales LIKE '%$safeSearch%')";
     }
 
     $whereClause = implode(" AND ", $where);
@@ -1253,7 +1263,7 @@ if ($action === 'get_tiptok_invoices') {
                    COALESCE(NULLIF(p.id_sales, 0), k.id_sales) AS id_sales, 
                    COALESCE(NULLIF(p.nama_sales, ''), k.nama_sales) AS nama_sales, 
                    k.kode_kunjungan, k.tgl_kunjungan, k.stok_sebelumnya, k.stok_sisa, 
-                   k.qty_terjual_kunjungan, k.no_inv, k.tgl_invoice, k.insentif_didapat, 
+                   k.qty_terjual_kunjungan, k.no_inv, k.no_so, k.tgl_invoice, k.insentif_didapat, 
                    k.catatan_kunjungan, k.foto_kunjungan, k.id_claim, k.created_at,
                    i.nama_barang, i.tipe_barang, i.insentif_per_unit,
                    p.kode_titip, p.tgl_titip, p.id_customer,
@@ -1379,11 +1389,12 @@ if ($action === 'get_tiptok_invoices') {
 }
 
 // -------------------------------------------------------------
-// 13. SIMPAN NO. INVOICE SINGLE ITEM
+// 13. SIMPAN NO. INVOICE & SO SINGLE ITEM
 // -------------------------------------------------------------
 if ($action === 'simpan_invoice_item') {
     $id_kunjungan = intval($_POST['id_kunjungan'] ?? 0);
     $no_inv = trim($_POST['no_inv'] ?? '');
+    $no_so = trim($_POST['no_so'] ?? '');
     $tgl_invoice = trim($_POST['tgl_invoice'] ?? '');
     $catatan = trim($_POST['catatan_invoice'] ?? '');
 
@@ -1391,18 +1402,22 @@ if ($action === 'simpan_invoice_item') {
         echo json_encode(['status' => 'error', 'message' => 'ID Transaksi Kunjungan tidak valid.']);
         exit;
     }
-    if (empty($no_inv)) {
-        echo json_encode(['status' => 'error', 'message' => 'Nomor Invoice wajib diisi.']);
+    if (empty($no_inv) && empty($no_so)) {
+        echo json_encode(['status' => 'error', 'message' => 'Silakan isi minimal Nomor Invoice atau Nomor SO.']);
         exit;
     }
     if (empty($tgl_invoice)) {
         $tgl_invoice = date('Y-m-d');
     }
 
-    $stmt = $conn->prepare("UPDATE tiptok_kunjungan SET no_inv = ?, tgl_invoice = ? WHERE id = ?");
-    $stmt->bind_param("ssi", $no_inv, $tgl_invoice, $id_kunjungan);
+    $stmt = $conn->prepare("UPDATE tiptok_kunjungan SET no_inv = ?, no_so = ?, tgl_invoice = ?, catatan_kunjungan = COALESCE(NULLIF(?, ''), catatan_kunjungan) WHERE id = ?");
+    $stmt->bind_param("ssssi", $no_inv, $no_so, $tgl_invoice, $catatan, $id_kunjungan);
     if ($stmt->execute()) {
-        echo json_encode(['status' => 'success', 'message' => "Nomor Invoice [{$no_inv}] berhasil disimpan."]);
+        $infoParts = [];
+        if (!empty($no_inv)) $infoParts[] = "Invoice: {$no_inv}";
+        if (!empty($no_so)) $infoParts[] = "SO: {$no_so}";
+        $label = implode(' | ', $infoParts);
+        echo json_encode(['status' => 'success', 'message' => "Data [{$label}] berhasil disimpan."]);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan invoice: ' . $conn->error]);
     }
@@ -1411,15 +1426,16 @@ if ($action === 'simpan_invoice_item') {
 }
 
 // -------------------------------------------------------------
-// 14. SIMPAN BATCH / KOLEKTIF NO. INVOICE (MULTI ITEMS)
+// 14. SIMPAN BATCH / KOLEKTIF NO. INVOICE & SO (MULTI ITEMS)
 // -------------------------------------------------------------
 if ($action === 'simpan_batch_invoice') {
     $idListRaw = $_POST['id_kunjungan_list'] ?? [];
     $no_inv = trim($_POST['no_inv'] ?? '');
+    $no_so = trim($_POST['no_so'] ?? '');
     $tgl_invoice = trim($_POST['tgl_invoice'] ?? '');
 
-    if (empty($no_inv)) {
-        echo json_encode(['status' => 'error', 'message' => 'Nomor Invoice kolektif wajib diisi.']);
+    if (empty($no_inv) && empty($no_so)) {
+        echo json_encode(['status' => 'error', 'message' => 'Silakan isi minimal Nomor Invoice atau Nomor SO kolektif.']);
         exit;
     }
     if (empty($tgl_invoice)) {
@@ -1441,18 +1457,33 @@ if ($action === 'simpan_batch_invoice') {
     }
 
     if (empty($idArray)) {
-        echo json_encode(['status' => 'error', 'message' => 'Pilih minimal satu item barang untuk mengisi No. Invoice.']);
+        echo json_encode(['status' => 'error', 'message' => 'Pilih minimal satu item barang untuk mengisi No. Invoice / SO.']);
         exit;
     }
 
     $idString = implode(',', $idArray);
     $safeInv = $conn->real_escape_string($no_inv);
+    $safeSo = $conn->real_escape_string($no_so);
     $safeTgl = $conn->real_escape_string($tgl_invoice);
 
-    $upd = $conn->query("UPDATE tiptok_kunjungan SET no_inv = '$safeInv', tgl_invoice = '$safeTgl' WHERE id IN ($idString)");
+    $setClause = [];
+    if (!empty($no_inv)) {
+        $setClause[] = "no_inv = '$safeInv'";
+    }
+    if (!empty($no_so)) {
+        $setClause[] = "no_so = '$safeSo'";
+    }
+    $setClause[] = "tgl_invoice = '$safeTgl'";
+    $setString = implode(", ", $setClause);
+
+    $upd = $conn->query("UPDATE tiptok_kunjungan SET $setString WHERE id IN ($idString)");
     if ($upd) {
         $count = count($idArray);
-        echo json_encode(['status' => 'success', 'message' => "Berhasil menetapkan No. Invoice [{$no_inv}] ke {$count} transaksi barang terpilih."]);
+        $infoParts = [];
+        if (!empty($no_inv)) $infoParts[] = "Invoice: {$no_inv}";
+        if (!empty($no_so)) $infoParts[] = "SO: {$no_so}";
+        $label = implode(' | ', $infoParts);
+        echo json_encode(['status' => 'success', 'message' => "Berhasil menetapkan [{$label}] ke {$count} transaksi barang terpilih."]);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Gagal mengupdate batch invoice: ' . $conn->error]);
     }
@@ -1460,7 +1491,7 @@ if ($action === 'simpan_batch_invoice') {
 }
 
 // -------------------------------------------------------------
-// 15. HAPUS / RESET NO. INVOICE DARI ITEM
+// 15. HAPUS / RESET NO. INVOICE & SO DARI ITEM
 // -------------------------------------------------------------
 if ($action === 'hapus_invoice_item') {
     $id_kunjungan = intval($_POST['id_kunjungan'] ?? 0);
@@ -1470,19 +1501,19 @@ if ($action === 'hapus_invoice_item') {
     }
 
     // Cek apakah item sudah diajukan claim
-    $qCheck = $conn->query("SELECT id_claim, no_inv FROM tiptok_kunjungan WHERE id = $id_kunjungan");
+    $qCheck = $conn->query("SELECT id_claim, no_inv, no_so FROM tiptok_kunjungan WHERE id = $id_kunjungan");
     if ($qCheck && $qCheck->num_rows > 0) {
         $row = $qCheck->fetch_assoc();
         if (!empty($row['id_claim'])) {
-            echo json_encode(['status' => 'error', 'message' => 'No. Invoice tidak dapat dihapus karena transaksi ini sudah masuk proses klaim insentif.']);
+            echo json_encode(['status' => 'error', 'message' => 'Data tidak dapat dihapus karena transaksi ini sudah masuk proses klaim insentif.']);
             exit;
         }
     }
 
-    $stmt = $conn->prepare("UPDATE tiptok_kunjungan SET no_inv = NULL, tgl_invoice = NULL WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE tiptok_kunjungan SET no_inv = NULL, no_so = NULL, tgl_invoice = NULL WHERE id = ?");
     $stmt->bind_param("i", $id_kunjungan);
     if ($stmt->execute()) {
-        echo json_encode(['status' => 'success', 'message' => 'No. Invoice berhasil direset.']);
+        echo json_encode(['status' => 'success', 'message' => 'No. Invoice & SO berhasil direset.']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Gagal mereset invoice: ' . $conn->error]);
     }

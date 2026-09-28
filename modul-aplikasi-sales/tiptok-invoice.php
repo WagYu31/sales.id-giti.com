@@ -17,6 +17,12 @@ if ($chkSC && $chkSC->num_rows > 0) {
     $hasSalesCustomer = true;
 }
 
+// Auto-ensure no_so column in tiptok_kunjungan
+$chkColSo = @$conn->query("SHOW COLUMNS FROM `tiptok_kunjungan` LIKE 'no_so'");
+if ($chkColSo && $chkColSo->num_rows == 0) {
+    @$conn->query("ALTER TABLE `tiptok_kunjungan` ADD COLUMN `no_so` VARCHAR(100) NULL AFTER `no_inv`");
+}
+
 // Initial counts for PHP preload
 $whereSales = ($role === 'Sales') ? " AND (p.id_sales = '$idSesi' OR k.id_sales = '$idSesi') " : "";
 $qInitStats = $conn->query("SELECT 
@@ -410,6 +416,19 @@ if ($qDealersPreload) {
             background: #ecfdf5;
             color: #047857;
             border: 1.5px solid #a7f3d0;
+            padding: 4px 8px;
+            border-radius: 7px;
+            font-size: 11.5px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap !important;
+        }
+        .badge-so-inv {
+            background: #eef2ff;
+            color: #4338ca;
+            border: 1.5px solid #c7d2fe;
             padding: 4px 8px;
             border-radius: 7px;
             font-size: 11.5px;
@@ -848,7 +867,7 @@ if ($qDealersPreload) {
                         <div class="d-flex align-items-center gap-2 flex-grow-1 justify-content-sm-end" style="min-width: 280px;">
                             <div class="search-input-box" style="width: 280px; max-width: 100%;">
                                 <i class="fa-solid fa-magnifying-glass"></i>
-                                <input type="text" id="searchInput" class="form-control" placeholder="Cari toko, barang, invoice..." oninput="handleSearchInput()">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Cari toko, barang, invoice, SO..." oninput="handleSearchInput()">
                             </div>
                             <button type="button" class="btn btn-outline-secondary mb-0 px-3 font-weight-bold" style="border-radius: 12px; height: 42px; white-space: nowrap;" onclick="toggleAdvancedFilters()">
                                 <i class="fa-solid fa-filter me-1"></i> Filter Lanjutan
@@ -931,7 +950,7 @@ if ($qDealersPreload) {
                                     <th style="width: 20%;">PRODUK &amp; TERJUAL</th>
                                     <th style="width: 13%; text-align: right;">REWARD INSENTIF</th>
                                     <th style="width: 17%;">TGL &amp; KODE AUDIT</th>
-                                    <th style="width: 28%; text-align: right;">STATUS &amp; NO. INVOICE</th>
+                                    <th style="width: 28%; text-align: right;">STATUS, INVOICE &amp; SO</th>
                                 </tr>
                             </thead>
                             <tbody id="invoicesTableBody">
@@ -1048,23 +1067,34 @@ if ($qDealersPreload) {
 
                         <!-- Form Input Groups (Clean & Modern) -->
                         <div class="mb-3">
-                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
-                                <i class="fa-solid fa-receipt text-primary"></i> NOMOR INVOICE / FAKTUR <span class="text-danger">*</span>
+                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center justify-content-between">
+                                <span class="d-flex align-items-center gap-1.5">
+                                    <i class="fa-solid fa-clipboard-list text-primary"></i> NOMOR SO (SALES ORDER)
+                                </span>
+                                <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10px;">Bisa diisi SO / INV</span>
                             </label>
-                            <input type="text" name="no_inv" id="singleInputNoInv" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" required>
-                            <div class="form-text text-xs text-muted mt-1">Masukkan nomor faktur resmi yang diterbitkan untuk toko ini.</div>
+                            <input type="text" name="no_so" id="singleInputNoSo" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: SO/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;">
+                            <div class="form-text text-xs text-muted mt-1">Nomor Sales Order (SO) dari sistem kantor / ERP.</div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
-                                <i class="fa-regular fa-calendar-days text-primary"></i> TANGGAL INVOICE / FAKTUR <span class="text-danger">*</span>
+                                <i class="fa-solid fa-receipt text-primary"></i> NOMOR INVOICE / FAKTUR
+                            </label>
+                            <input type="text" name="no_inv" id="singleInputNoInv" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;">
+                            <div class="form-text text-xs text-muted mt-1">Nomor faktur / invoice resmi yang diterbitkan untuk toko ini.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
+                                <i class="fa-regular fa-calendar-days text-primary"></i> TANGGAL TRANSAKSI / FAKTUR <span class="text-danger">*</span>
                             </label>
                             <input type="date" name="tgl_invoice" id="singleInputTglInv" class="form-control font-weight-bold" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" value="<?php echo date('Y-m-d'); ?>" required>
                         </div>
 
                         <div class="mb-1">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
-                                <i class="fa-regular fa-note-sticky text-secondary"></i> CATATAN INVOICE (OPSIONAL)
+                                <i class="fa-regular fa-note-sticky text-secondary"></i> CATATAN INVOICE / SO (OPSIONAL)
                             </label>
                             <textarea name="catatan_invoice" id="singleInputCatatan" class="form-control" rows="2" placeholder="Catatan nomor faktur / referensi..." style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;"></textarea>
                         </div>
@@ -1072,7 +1102,7 @@ if ($qDealersPreload) {
                     <div class="modal-footer p-3 bg-white border-top d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-light px-4 font-weight-bold" style="border-radius: 10px; border: 1.5px solid #e2e8f0; color: #475569;" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" id="btnSaveSingleInvoice" class="btn btn-dark px-4 font-weight-bold" style="border-radius: 10px; background: #0f172a; color: white;">
-                            <i class="fa-solid fa-check me-1"></i> Simpan Invoice
+                            <i class="fa-solid fa-check me-1"></i> Simpan Data
                         </button>
                     </div>
                 </form>
@@ -1081,7 +1111,7 @@ if ($qDealersPreload) {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 2: INPUT BATCH / KOLEKTIF NO. INVOICE                               -->
+    <!-- MODAL 2: INPUT BATCH / KOLEKTIF NO. INVOICE & SO                          -->
     <!-- ========================================================================= -->
     <div class="modal fade" id="modalBatchInvoice" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -1092,8 +1122,8 @@ if ($qDealersPreload) {
                             <i class="fa-solid fa-layer-group"></i>
                         </div>
                         <div>
-                            <h5 class="modal-title font-weight-bold text-white mb-0">Input No. Invoice Kolektif</h5>
-                            <div class="text-xs mt-0.5" style="color: #94a3b8;">Tetapkan satu No. Invoice ke beberapa transaksi sekaligus</div>
+                            <h5 class="modal-title font-weight-bold text-white mb-0">Input No. Invoice & SO Kolektif</h5>
+                            <div class="text-xs mt-0.5" style="color: #94a3b8;">Tetapkan No. Invoice dan/atau No. SO ke beberapa transaksi sekaligus</div>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1110,16 +1140,27 @@ if ($qDealersPreload) {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
-                                <i class="fa-solid fa-receipt text-primary"></i> NOMOR INVOICE KOLEKTIF <span class="text-danger">*</span>
+                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center justify-content-between">
+                                <span class="d-flex align-items-center gap-1.5">
+                                    <i class="fa-solid fa-clipboard-list text-primary"></i> NOMOR SO KOLEKTIF
+                                </span>
+                                <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10px;">Bisa diisi SO / INV</span>
                             </label>
-                            <input type="text" name="no_inv" id="batchInputNoInv" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" required>
-                            <div class="form-text text-xs text-muted mt-1">Nomor ini akan disimpan ke semua item yang Anda centang.</div>
+                            <input type="text" name="no_so" id="batchInputNoSo" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: SO/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;">
+                            <div class="form-text text-xs text-muted mt-1">Nomor SO yang akan disimpan ke semua item yang Anda centang.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
+                                <i class="fa-solid fa-receipt text-primary"></i> NOMOR INVOICE KOLEKTIF
+                            </label>
+                            <input type="text" name="no_inv" id="batchInputNoInv" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;">
+                            <div class="form-text text-xs text-muted mt-1">Nomor Invoice yang akan disimpan ke semua item yang Anda centang.</div>
                         </div>
 
                         <div class="mb-1">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
-                                <i class="fa-regular fa-calendar-days text-primary"></i> TANGGAL INVOICE / FAKTUR <span class="text-danger">*</span>
+                                <i class="fa-regular fa-calendar-days text-primary"></i> TANGGAL TRANSAKSI / FAKTUR <span class="text-danger">*</span>
                             </label>
                             <input type="date" name="tgl_invoice" id="batchInputTglInv" class="form-control font-weight-bold" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" value="<?php echo date('Y-m-d'); ?>" required>
                         </div>
@@ -1618,7 +1659,7 @@ if ($qDealersPreload) {
 
             let html = '';
             items.forEach(it => {
-                const isPending = (!it.no_inv || it.no_inv.trim() === '');
+                const isPending = (!it.no_inv || it.no_inv.trim() === '') && (!it.no_so || it.no_so.trim() === '');
                 const qty = parseInt(it.qty_terjual_kunjungan) || 0;
                 const insUnit = parseFloat(it.insentif_per_unit) || 0;
                 const subtotalIns = parseFloat(it.insentif_didapat) || (qty * insUnit);
@@ -1633,23 +1674,30 @@ if ($qDealersPreload) {
                             <i class="fa-solid fa-trash-can"></i> Batal
                         </button>
                         <button type="button" class="btn-brand-amber" style="height: 28px; font-size: 11.5px; padding: 0 10px; border-radius: 7px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
-                            <i class="fa-solid fa-plus"></i> Input Invoice
+                            <i class="fa-solid fa-plus"></i> Input SO / Inv
                         </button>
                     </div>
                 ` : `
                     <div class="d-flex align-items-center justify-content-end gap-2 flex-nowrap">
-                        <div class="text-end">
-                            <span class="badge-verified-inv" style="font-size: 11.5px; padding: 4px 8px; white-space: nowrap;">
-                                <i class="fa-solid fa-file-invoice"></i> ${escapeHtml(it.no_inv)}
-                            </span>
-                            ${it.tgl_invoice ? `<div class="text-xs text-muted font-weight-bold mt-0.5"><i class="fa-regular fa-calendar me-1"></i> ${escapeHtml(it.tgl_invoice)}</div>` : ''}
+                        <div class="text-end d-flex flex-column align-items-end gap-1">
+                            ${it.no_so ? `
+                                <span class="badge-so-inv" style="font-size: 11px; padding: 3px 8px; white-space: nowrap;">
+                                    <i class="fa-solid fa-clipboard-list"></i> SO: ${escapeHtml(it.no_so)}
+                                </span>
+                            ` : ''}
+                            ${it.no_inv ? `
+                                <span class="badge-verified-inv" style="font-size: 11px; padding: 3px 8px; white-space: nowrap;">
+                                    <i class="fa-solid fa-file-invoice"></i> INV: ${escapeHtml(it.no_inv)}
+                                </span>
+                            ` : ''}
+                            ${it.tgl_invoice ? `<div class="text-xs text-muted font-weight-bold" style="font-size: 10.5px;"><i class="fa-regular fa-calendar me-1"></i> ${escapeHtml(it.tgl_invoice)}</div>` : ''}
                         </div>
                         <div class="d-inline-flex align-items-center gap-1 flex-nowrap">
-                            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Edit No. Invoice" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Edit No. SO / Invoice" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
                                 <i class="fa-solid fa-pen" style="font-size: 11px;"></i>
                             </button>
                             ${!isClaimed ? `
-                                <button type="button" class="btn btn-sm btn-outline-warning py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Reset No. Invoice (Jadikan Belum Diinput)" onclick="hapusInvoiceSingle(${it.id_kunjungan}, '${escapeHtml(it.no_inv)}')">
+                                <button type="button" class="btn btn-sm btn-outline-warning py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Reset No. SO & Invoice (Jadikan Belum Diinput)" onclick="hapusInvoiceSingle(${it.id_kunjungan}, '${escapeHtml(it.no_so || it.no_inv || '')}')">
                                     <i class="fa-solid fa-eraser" style="font-size: 11px;"></i>
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Batalkan Penjualan & Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
@@ -1762,7 +1810,7 @@ if ($qDealersPreload) {
         }
 
         // =========================================================================
-        // MODAL SINGLE INVOICE
+        // MODAL SINGLE INVOICE & SO
         // =========================================================================
         function openSingleInvoiceModal(idKunjungan) {
             const it = invoicesData.find(x => x.id_kunjungan == idKunjungan);
@@ -1774,19 +1822,27 @@ if ($qDealersPreload) {
             document.getElementById('singlePrevQty').textContent = `Terjual: ${it.qty_terjual_kunjungan} Unit`;
             document.getElementById('singlePrevInsentif').textContent = `Subtotal Reward: Rp ${new Intl.NumberFormat('id-ID').format(it.insentif_didapat || 0)}`;
 
+            document.getElementById('singleInputNoSo').value = it.no_so || '';
             document.getElementById('singleInputNoInv').value = it.no_inv || '';
             document.getElementById('singleInputTglInv').value = it.tgl_invoice || '<?php echo date('Y-m-d'); ?>';
             document.getElementById('singleInputCatatan').value = it.catatan_kunjungan || '';
 
-            const isEdit = (it.no_inv && it.no_inv.trim() !== '');
-            document.getElementById('singleModalTitle').textContent = isEdit ? 'Edit No. Invoice' : 'Input No. Invoice';
-            document.getElementById('singleModalSubtitle').textContent = isEdit ? 'Perbarui nomor faktur penjualan yang telah diinput' : 'Tetapkan nomor faktur penjualan TIP TOK';
+            const isEdit = (it.no_inv && it.no_inv.trim() !== '') || (it.no_so && it.no_so.trim() !== '');
+            document.getElementById('singleModalTitle').textContent = isEdit ? 'Edit No. SO / Invoice' : 'Input No. SO / Invoice';
+            document.getElementById('singleModalSubtitle').textContent = isEdit ? 'Perbarui nomor SO atau faktur penjualan yang telah diinput' : 'Tetapkan nomor SO atau faktur penjualan TIP TOK';
 
             showModalSafe('modalSingleInvoice');
         }
 
         function submitSingleInvoice(e) {
             e.preventDefault();
+            const noSo = document.getElementById('singleInputNoSo').value.trim();
+            const noInv = document.getElementById('singleInputNoInv').value.trim();
+            if (!noSo && !noInv) {
+                Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Harap isi Nomor SO atau Nomor Invoice (minimal salah satu).' });
+                return;
+            }
+
             const form = document.getElementById('formSingleInvoice');
             const formData = new FormData(form);
             formData.append('action', 'simpan_invoice_item');
@@ -1802,14 +1858,14 @@ if ($qDealersPreload) {
                 .then(res => {
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Invoice';
+                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Data';
                     }
                     if (res && res.status === 'success') {
                         hideModalSafe('modalSingleInvoice');
                         Swal.fire({
                             icon: 'success',
                             title: 'Tersimpan!',
-                            text: res.message || 'Nomor Invoice berhasil disimpan.',
+                            text: res.message || 'Data SO / Invoice berhasil disimpan.',
                             timer: 1600,
                             showConfirmButton: false
                         });
@@ -1822,7 +1878,7 @@ if ($qDealersPreload) {
                     console.error(err);
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Invoice';
+                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Data';
                     }
                     Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
                 });
@@ -1834,7 +1890,7 @@ if ($qDealersPreload) {
         function openBatchInvoiceModal() {
             const count = selectedTrxIds.size;
             if (count === 0) {
-                Swal.fire({ icon: 'warning', title: 'Pilih Transaksi', text: 'Centang minimal satu transaksi untuk mengisi No. Invoice.' });
+                Swal.fire({ icon: 'warning', title: 'Pilih Transaksi', text: 'Centang minimal satu transaksi untuk mengisi No. SO / Invoice.' });
                 return;
             }
 
@@ -1851,6 +1907,7 @@ if ($qDealersPreload) {
             document.getElementById('batchModalSelectedCount').textContent = `${count} Transaksi Terpilih`;
             document.getElementById('batchModalTotalUnit').textContent = `${sumUnit} Unit Terjual`;
             document.getElementById('batchModalDealerSummary').textContent = `Toko: ${Array.from(tokoSet).join(', ') || '-'}`;
+            document.getElementById('batchInputNoSo').value = '';
             document.getElementById('batchInputNoInv').value = '';
             document.getElementById('batchInputTglInv').value = '<?php echo date('Y-m-d'); ?>';
 
@@ -1859,16 +1916,18 @@ if ($qDealersPreload) {
 
         function submitBatchInvoice(e) {
             e.preventDefault();
+            const noSo = document.getElementById('batchInputNoSo').value.trim();
             const noInv = document.getElementById('batchInputNoInv').value.trim();
             const tglInv = document.getElementById('batchInputTglInv').value;
 
-            if (!noInv) {
-                Swal.fire({ icon: 'warning', title: 'Wajib Diisi', text: 'Silakan isi Nomor Invoice kolektif.' });
+            if (!noSo && !noInv) {
+                Swal.fire({ icon: 'warning', title: 'Wajib Diisi', text: 'Silakan isi Nomor SO atau Nomor Invoice kolektif (minimal salah satu).' });
                 return;
             }
 
             const formData = new FormData();
             formData.append('action', 'simpan_batch_invoice');
+            formData.append('no_so', noSo);
             formData.append('no_inv', noInv);
             formData.append('tgl_invoice', tglInv);
             formData.append('id_kunjungan_list', Array.from(selectedTrxIds).join(','));
@@ -1891,7 +1950,7 @@ if ($qDealersPreload) {
                         Swal.fire({
                             icon: 'success',
                             title: 'Sukses!',
-                            text: res.message || 'No. Invoice kolektif berhasil diterapkan.',
+                            text: res.message || 'Data SO / Invoice kolektif berhasil diterapkan.',
                             timer: 1800,
                             showConfirmButton: false
                         });
@@ -1911,17 +1970,17 @@ if ($qDealersPreload) {
         }
 
         // =========================================================================
-        // HAPUS / RESET NO. INVOICE
+        // HAPUS / RESET NO. SO & INVOICE
         // =========================================================================
-        function hapusInvoiceSingle(idKunjungan, currentNoInv) {
+        function hapusInvoiceSingle(idKunjungan, currentRef) {
             Swal.fire({
-                title: 'Reset No. Invoice?',
-                html: `Apakah Anda yakin ingin menghapus nomor faktur <strong>${escapeHtml(currentNoInv)}</strong> dari transaksi ini?`,
+                title: 'Reset No. SO / Invoice?',
+                html: `Apakah Anda yakin ingin menghapus data SO/Invoice <strong>${escapeHtml(currentRef)}</strong> dari transaksi ini?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: '<i class="fa-solid fa-trash-can me-1"></i> Ya, Reset Invoice',
+                confirmButtonText: '<i class="fa-solid fa-trash-can me-1"></i> Ya, Reset',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -1936,13 +1995,13 @@ if ($qDealersPreload) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Direset!',
-                                    text: res.message || 'No. Invoice berhasil direset.',
+                                    text: res.message || 'Data SO / Invoice berhasil direset.',
                                     timer: 1400,
                                     showConfirmButton: false
                                 });
                                 loadInvoicesData();
                             } else {
-                                Swal.fire({ icon: 'error', title: 'Gagal', text: (res && res.message) ? res.message : 'Gagal mereset invoice.' });
+                                Swal.fire({ icon: 'error', title: 'Gagal', text: (res && res.message) ? res.message : 'Gagal mereset data.' });
                             }
                         })
                         .catch(err => {
