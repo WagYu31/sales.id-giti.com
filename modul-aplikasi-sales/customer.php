@@ -991,19 +991,236 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
       }
     }
 
-    /* ── Geofence Leaflet Interactive Maps ── */
+    /* ── Geofence Leaflet Interactive Maps & Senior-Friendly Design System ── */
+    :root {
+      --kb-primary: #1d4ed8;
+      --kb-primary-hover: #1e40af;
+      --kb-primary-light: #eff6ff;
+      --kb-primary-border: #93c5fd;
+      --kb-slate-950: #020617;
+      --kb-slate-900: #0f172a;
+      --kb-slate-800: #1e293b;
+      --kb-slate-700: #334155;
+      --kb-slate-600: #475569;
+      --kb-slate-500: #64748b;
+      --kb-slate-400: #94a3b8;
+      --kb-slate-300: #cbd5e1;
+      --kb-slate-200: #e2e8f0;
+      --kb-slate-100: #f1f5f9;
+      --kb-slate-50: #f8fafc;
+      --kb-radius-lg: 18px;
+      --kb-radius-md: 12px;
+      --kb-radius-sm: 8px;
+    }
+
+    .kb-section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e40af;
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .kb-section-badge-green {
+      color: #065f46;
+      background: #ecfdf5;
+      border-color: #86efac;
+    }
+    .kb-section-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .kb-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--kb-slate-900);
+      margin-bottom: 8px;
+    }
+    .kb-label-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .kb-label-icon i {
+      font-size: 16px;
+      color: var(--kb-primary);
+    }
+
+    .kb-input {
+      width: 100%;
+      height: 48px;
+      background-color: #ffffff;
+      border: 2px solid var(--kb-slate-300);
+      border-radius: var(--kb-radius-md);
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--kb-slate-950);
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .kb-input:focus {
+      border-color: var(--kb-primary);
+      box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.18);
+      background-color: #ffffff;
+    }
+    .kb-input::placeholder {
+      color: var(--kb-slate-400);
+      font-size: 13.5px;
+      font-weight: 500;
+    }
+    textarea.kb-input {
+      height: auto;
+      min-height: 80px;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .kb-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%231e293b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 16px;
+      padding-right: 38px !important;
+      cursor: pointer;
+    }
+
+    .kb-map-search-wrap {
+      display: flex;
+      gap: 8px;
+    }
+
+    .kb-radius-presets {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .kb-preset-btn {
+      flex: 1;
+      padding: 6px 4px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1.5px solid var(--kb-slate-300);
+      border-radius: 8px;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .kb-preset-btn:hover {
+      background: var(--kb-slate-100);
+      border-color: var(--kb-slate-400);
+    }
+    .kb-preset-btn.active {
+      background: var(--kb-primary);
+      border-color: var(--kb-primary);
+      color: #ffffff;
+    }
+
+    .kb-coord-badge {
+      background: #f8fafc;
+      border: 2px solid var(--kb-slate-300);
+      border-radius: var(--kb-radius-sm);
+      padding: 8px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--kb-slate-950);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .kb-coord-label {
+      font-size: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      color: var(--kb-slate-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kb-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      font-size: 14.5px;
+      font-weight: 700;
+      border-radius: var(--kb-radius-md);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+    }
+    .kb-btn-secondary {
+      background: #ffffff;
+      color: var(--kb-slate-800);
+      border: 2px solid var(--kb-slate-300);
+    }
+    .kb-btn-secondary:hover {
+      background: var(--kb-slate-100);
+      border-color: var(--kb-slate-500);
+      color: var(--kb-slate-950);
+    }
+    .kb-btn-primary {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+      color: #ffffff !important;
+      box-shadow: 0 4px 16px rgba(29, 78, 216, 0.35);
+    }
+    .kb-btn-primary:hover {
+      background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+      box-shadow: 0 6px 24px rgba(29, 78, 216, 0.45);
+      transform: translateY(-2px);
+    }
+
+    #edit_kategori_dealer:checked + .span-dealer {
+      border-color: #2563eb;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      color: #1d4ed8;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);
+    }
+    #edit_kategori_installer:checked + .span-installer {
+      border-color: #7c3aed;
+      background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+      color: #6d28d9;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.15);
+    }
+    #edit_kategori_user:checked + .span-user {
+      border-color: #059669;
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      color: #065f46;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.15);
+    }
+
     #map_create, #map_edit, .leaflet-geofence-map {
-      height: 250px !important;
-      min-height: 250px !important;
+      height: 280px !important;
+      min-height: 280px !important;
       width: 100% !important;
-      border-radius: 12px !important;
-      border: 1.5px solid #cbd5e1 !important;
+      border-radius: 14px !important;
+      border: 2px solid #cbd5e1 !important;
       margin-top: 10px !important;
       margin-bottom: 8px !important;
       background: #f8fafc !important;
       position: relative !important;
       z-index: 1 !important;
       overflow: hidden !important;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
     }
   </style>
 </head>
@@ -1802,51 +2019,86 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
       </div>
     </div>
 
-    <!-- Modal Edit -->
+    <!-- Modal Edit Customer (Senior-Friendly & Gambar 2 Architecture) -->
     <div class="modal fade" id="editModal" tabindex="-1">
-      <div class="modal-dialog modal-xl">
-        <form method="POST" class="modal-content modal-content-premium" enctype="multipart/form-data" id="editCustomerForm">
-          <div class="modal-header modal-header-premium">
-            <h5 class="modal-title modal-title-premium">
-              <span class="material-symbols-outlined">manage_accounts</span>
-              Ubah Data Sales Customer
-            </h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <form method="POST" class="modal-content" enctype="multipart/form-data" id="editCustomerForm" style="border-radius: 20px; border: 2px solid #cbd5e1; box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25); overflow: hidden;">
+          
+          <!-- Modal Header Premium -->
+          <div class="modal-header d-flex align-items-center justify-content-between px-4 py-3" style="border-bottom: 2px solid #e2e8f0; background: #ffffff;">
+            <div class="d-flex align-items-center gap-3">
+              <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.35); flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 26px;">edit_document</span>
+              </div>
+              <div>
+                <h4 style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">Ubah Data Sales Customer</h4>
+                <p style="margin: 2px 0 0; font-size: 13px; color: #64748b; font-weight: 500;">Perbarui data identitas toko, nomor kontak, kategori, dan titik radius geofence GPS.</p>
+              </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 14px;"></button>
           </div>
-          <div class="modal-body modal-body-premium">
-            <div class="row">
+
+          <!-- Modal Body -->
+          <div class="modal-body p-4" style="background: #ffffff;">
+            <div class="row g-4">
               
-              <!-- EDIT LEFT SIDE: Details -->
-              <div class="col-lg-7" style="border-right: 1px solid #f1f5f9; padding-right: 28px;">
+              <!-- ════ LEFT COLUMN: Detail Customer ════ -->
+              <div class="col-lg-7 pe-lg-4" style="border-right: 2px solid #e2e8f0;">
                 <input type="hidden" name="update_id" id="edit_id">
+
+                <!-- Section 1 Header -->
+                <div class="kb-section-badge">
+                  <span class="dot"></span>
+                  <span>01. INFORMASI CUSTOMER</span>
+                </div>
                 
-                <div class="row">
-                  <div class="col-md-6 form-group-premium">
-                    <label class="form-label-premium">Nama Toko / Personal</label>
-                    <input type="text" name="edit_nama" id="edit_nama" class="input-premium" required>
+                <div class="row g-3">
+                  <!-- Nama Toko -->
+                  <div class="col-md-6">
+                    <label class="kb-label">
+                      <span class="kb-label-icon">
+                        <i class="bi bi-shop-window text-primary"></i>
+                        <span>Nama Toko / Mitra / Personal</span>
+                      </span>
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-0.5 fw-bold" style="font-size: 11px;">* Wajib Diisi</span>
+                    </label>
+                    <input type="text" name="edit_nama" id="edit_nama" class="kb-input" placeholder="Masukkan nama toko..." required>
                   </div>
                   
-                  <div class="col-md-6 form-group-premium">
-                    <label class="form-label-premium">Kategori Customer</label>
-                    <div class="d-flex align-items-center gap-4 mt-2">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="edit_kategori" id="edit_kategori_dealer" value="Dealer" required>
-                        <label class="form-check-label font-weight-bold text-sm text-dark" for="edit_kategori_dealer">Dealer</label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="edit_kategori" id="edit_kategori_installer" value="Installer">
-                        <label class="form-check-label font-weight-bold text-sm text-dark" for="edit_kategori_installer">Installer</label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="edit_kategori" id="edit_kategori_user" value="User">
-                        <label class="form-check-label font-weight-bold text-sm text-dark" for="edit_kategori_user">User</label>
-                      </div>
+                  <!-- Kategori Customer (Pills Segmented) -->
+                  <div class="col-md-6">
+                    <label class="kb-label">
+                      <span class="kb-label-icon">
+                        <i class="bi bi-tags-fill text-primary"></i>
+                        <span>Kategori Customer</span>
+                      </span>
+                    </label>
+                    <div class="category-pill-group">
+                      <label class="category-pill-label" for="edit_kategori_dealer">
+                        <input class="category-pill-input" type="radio" name="edit_kategori" id="edit_kategori_dealer" value="Dealer" required checked>
+                        <span class="category-pill-span span-dealer">Dealer</span>
+                      </label>
+                      <label class="category-pill-label" for="edit_kategori_installer">
+                        <input class="category-pill-input" type="radio" name="edit_kategori" id="edit_kategori_installer" value="Installer">
+                        <span class="category-pill-span span-installer">Installer</span>
+                      </label>
+                      <label class="category-pill-label" for="edit_kategori_user">
+                        <input class="category-pill-input" type="radio" name="edit_kategori" id="edit_kategori_user" value="User">
+                        <span class="category-pill-span span-user">User</span>
+                      </label>
                     </div>
                   </div>
 
-                  <div class="col-md-6 form-group-premium">
-                    <label class="form-label-premium">Wilayah Customer</label>
-                    <select name="edit_id_wilayah" id="edit_id_wilayah" class="input-premium" required>
+                  <!-- Wilayah Customer -->
+                  <div class="col-md-6">
+                    <label class="kb-label">
+                      <span class="kb-label-icon">
+                        <i class="bi bi-geo-fill text-primary"></i>
+                        <span>Wilayah Customer</span>
+                      </span>
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-0.5 fw-bold" style="font-size: 11px;">* Wajib Diisi</span>
+                    </label>
+                    <select name="edit_id_wilayah" id="edit_id_wilayah" class="kb-input kb-select" required>
                       <option value="">-- Pilih Wilayah --</option>
                       <?php 
                       $wQuery2 = mysqli_query($conn, "SELECT * FROM wilayah WHERE deleted_at IS NULL ORDER BY nama ASC");
@@ -1857,54 +2109,86 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
                     </select>
                   </div>
                   
-                  <div class="col-md-6 form-group-premium">
-                    <label class="form-label-premium">No. Telepon</label>
-                    <input type="text" name="edit_telp" id="edit_telp" class="input-premium">
+                  <!-- No Telepon -->
+                  <div class="col-md-6">
+                    <label class="kb-label">
+                      <span class="kb-label-icon">
+                        <i class="bi bi-telephone-fill text-primary"></i>
+                        <span>No. Telepon (WhatsApp)</span>
+                      </span>
+                    </label>
+                    <input type="text" name="edit_telp" id="edit_telp" class="kb-input" placeholder="Contoh: 0812345678">
                   </div>
                   
-                  <div class="col-md-6 form-group-premium">
-                    <label class="form-label-premium">Email</label>
-                    <input type="text" name="edit_email" id="edit_email" class="input-premium">
+                  <!-- Email -->
+                  <div class="col-md-6">
+                    <label class="kb-label">
+                      <span class="kb-label-icon">
+                        <i class="bi bi-envelope-fill text-primary"></i>
+                        <span>Email Customer</span>
+                      </span>
+                    </label>
+                    <input type="email" name="edit_email" id="edit_email" class="kb-input" placeholder="customer@domain.com">
                   </div>
                   
-                  <div class="col-md-6 form-group-premium">
-                    <label class="form-label-premium">Kota</label>
-                    <input type="text" name="edit_kota" id="edit_kota" class="input-premium">
+                  <!-- Kota -->
+                  <div class="col-md-6">
+                    <label class="kb-label">
+                      <span class="kb-label-icon">
+                        <i class="bi bi-building-fill text-primary"></i>
+                        <span>Kota Asal</span>
+                      </span>
+                    </label>
+                    <input type="text" name="edit_kota" id="edit_kota" class="kb-input" placeholder="Kota domisili toko...">
                   </div>
 
-                  <div class="col-md-12 form-group-premium">
-                    <label class="form-label-premium">Alamat Lengkap</label>
-                    <input type="text" name="edit_alamat" id="edit_alamat" class="input-premium">
+                  <!-- Alamat Lengkap -->
+                  <div class="col-12">
+                    <label class="kb-label">
+                      <span class="kb-label-icon">
+                        <i class="bi bi-card-text text-primary"></i>
+                        <span>Alamat Lengkap Toko / Kantor</span>
+                      </span>
+                    </label>
+                    <textarea name="edit_alamat" id="edit_alamat" class="kb-input" rows="2" style="min-height: 65px;" placeholder="Alamat lengkap jalan, nomor, RT/RW..."></textarea>
                   </div>
 
-                  <!-- Edit TIP TOK Store Switch -->
-                  <div class="col-md-12 form-group-premium mt-2">
-                    <div class="d-flex align-items-center justify-content-between p-3 rounded-3" style="background: rgba(245, 158, 11, 0.08); border: 1.5px dashed rgba(245, 158, 11, 0.4);">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="material-symbols-outlined text-warning" style="font-size:22px;">inventory_2</span>
+                  <!-- TIP TOK Banner Card -->
+                  <div class="col-12">
+                    <div class="d-flex align-items-center justify-content-between p-3 rounded-3" style="background: rgba(245, 158, 11, 0.08); border: 2px dashed rgba(245, 158, 11, 0.45); border-radius: 14px;">
+                      <div class="d-flex align-items-center gap-3">
+                        <span class="material-symbols-outlined text-warning" style="font-size:28px;">inventory_2</span>
                         <div>
-                          <span style="font-weight:800; font-size:13px; color:#92400e; display:block;">Mitra TIP TOK (Konsinyasi Toko)</span>
-                          <span style="font-size:11.5px; color:#b45309;">Toko dititipkan stok barang konsinyasi display Loewix</span>
+                          <span style="font-weight:800; font-size:13.5px; color:#92400e; display:block;">Mitra TIP TOK (Konsinyasi Toko)</span>
+                          <span style="font-size:12px; color:#b45309;">Toko dititipkan stok barang konsinyasi display Loewix</span>
                         </div>
                       </div>
                       <div class="form-check form-switch mb-0">
-                        <input class="form-check-input" type="checkbox" name="edit_is_tiptok" id="edit_is_tiptok" value="1" style="width: 2.2em; height: 1.2em; cursor: pointer;">
+                        <input class="form-check-input" type="checkbox" name="edit_is_tiptok" id="edit_is_tiptok" value="1" style="width: 2.4em; height: 1.3em; cursor: pointer;">
                       </div>
                     </div>
                   </div>
 
-                  <!-- Existing Photos -->
-                  <div class="col-md-12 form-group-premium mt-3">
-                    <label class="form-label-premium">Foto Dokumentasi Saat Ini (Klik ❌ untuk Menghapus)</label>
-                    <div class="d-flex flex-wrap gap-3 mb-3" id="edit_existing_photos_container">
-                      <!-- preview -->
-                    </div>
+                  <!-- Existing Photos & Dropzone -->
+                  <div class="col-12 mt-2">
+                    <label class="kb-label">
+                      <span class="kb-label-icon">
+                        <i class="bi bi-images text-primary"></i>
+                        <span>Foto Dokumentasi Saat Ini (Klik ❌ untuk Menghapus)</span>
+                      </span>
+                    </label>
+                    <div class="d-flex flex-wrap gap-2.5 mb-3" id="edit_existing_photos_container"></div>
                     <input type="hidden" name="deleted_existing_photos" id="deleted_existing_photos">
                     
-                    <label class="form-label-premium">Tambah Foto Dokumentasi Baru</label>
-                    <div class="dropzone-area" id="dropzone_edit">
-                      <span class="material-symbols-outlined dropzone-icon">cloud_upload</span>
-                      <p class="dropzone-text">Drag &amp; drop file baru di sini, atau klik untuk memilih</p>
+                    <label class="kb-label">
+                      <span class="kb-label-icon">
+                        <i class="bi bi-cloud-arrow-up-fill text-primary"></i>
+                        <span>Tambah Foto Dokumentasi Baru</span>
+                      </span>
+                    </label>
+                    <div class="dropzone-area" id="dropzone_edit" style="border: 2px dashed #cbd5e1; border-radius: 14px; padding: 20px;">
+                      <span class="material-symbols-outlined dropzone-icon" style="font-size: 32px;">cloud_upload</span>
+                      <p class="dropzone-text" style="font-size: 13px;">Drag &amp; drop file baru di sini, atau klik untuk memilih</p>
                       <input type="file" id="foto_input_edit" name="edit_foto[]" multiple accept="image/*" class="d-none">
                     </div>
                     <div class="preview-grid" id="preview_grid_edit"></div>
@@ -1912,76 +2196,110 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
                 </div>
               </div>
 
-              <!-- EDIT RIGHT SIDE: Location map -->
-              <div class="col-lg-5" style="padding-left: 28px;">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;">
-                    <div style="width:3px;height:16px;background:#10b981;border-radius:2px;"></div>
-                    <span style="font-size:12px;font-weight:800;color:#1e293b;text-transform: uppercase; letter-spacing: 0.05em;">Edit Koordinat Toko (Geofence)</span>
+              <!-- ════ RIGHT COLUMN: Peta & Geofence GPS ════ -->
+              <div class="col-lg-5 ps-lg-4">
+                
+                <!-- Section 2 Header -->
+                <div class="kb-section-badge kb-section-badge-green">
+                  <span class="dot"></span>
+                  <span>02. TITIK LOKASI &amp; GEOFENCE GPS</span>
                 </div>
 
-                <div class="form-group-premium">
-                  <label class="form-label-premium">
-                    <i class="fa-solid fa-magnifying-glass text-xs me-1 text-primary"></i> Cari Alamat / Koordinat Baru
+                <!-- Search Input Group -->
+                <div class="mb-3">
+                  <label class="kb-label">
+                    <span class="kb-label-icon">
+                      <i class="bi bi-geo-alt-fill text-success"></i>
+                      <span>Cari Koordinat / Alamat Toko</span>
+                    </span>
                   </label>
-                  <div class="d-flex gap-2">
-                    <input type="text" id="gmap_search_edit" class="input-premium" placeholder="Contoh: Surabaya atau -7.250, 112.750...">
-                    <button type="button" id="gmap_search_btn_edit" class="btn bg-gradient-info text-white font-weight-bold" style="border-radius:10px; padding: 12px 18px; font-size:11px; display:inline-flex; align-items:center; gap:4px; margin-bottom:0;">
-                      <i class="fa-solid fa-magnifying-glass text-xs"></i> CARI
+                  <div class="kb-map-search-wrap">
+                    <input type="text" id="gmap_search_edit" class="kb-input" placeholder="Contoh: Surabaya atau -7.250, 112.750...">
+                    <button type="button" id="gmap_search_btn_edit" class="kb-btn kb-btn-primary px-3.5 py-2 flex-shrink-0" style="font-size: 14px;">
+                      <i class="bi bi-search"></i>
+                      <span>Cari</span>
                     </button>
                   </div>
                 </div>
 
                 <!-- Leaflet Map edit -->
-                <div id="map_edit" class="leaflet-geofence-map" style="height: 250px; min-height: 250px; width: 100%; border-radius: 12px; border: 1.5px solid #cbd5e1; margin-top: 10px; margin-bottom: 8px; z-index: 1;"></div>
+                <div id="map_edit" class="leaflet-geofence-map"></div>
 
-                <!-- GPS button and Radius input -->
+                <!-- GPS Location & Quick Actions -->
                 <div class="d-flex justify-content-between align-items-center mt-3">
-                  <button type="button" id="btn_get_location_edit" class="btn btn-outline-primary btn-sm mb-0 d-flex align-items-center gap-1 font-weight-bold" style="border-radius: 8px; font-size: 11px;">
-                    <i class="fa-solid fa-location-crosshairs text-xs"></i> Dapatkan Lokasi Saya
+                  <button type="button" id="btn_get_location_edit" class="btn btn-sm d-flex align-items-center gap-2 py-2 px-3.5 rounded-pill fw-bold text-white" style="font-size: 13px; background: #059669; border: none; box-shadow: 0 3px 10px rgba(5, 150, 105, 0.3);">
+                    <i class="bi bi-crosshair fs-6"></i>
+                    <span>Dapatkan Lokasi Saya (GPS)</span>
                   </button>
                   <div class="d-flex align-items-center gap-2">
-                    <span class="text-xs text-secondary font-weight-bold">Radius:</span>
-                    <input type="number" id="edit_radius_input" class="input-premium" value="100" style="font-size:12px; padding: 6px 8px !important; text-align:center; width: 60px; border-radius: 8px; margin-bottom: 0;">
-                    <span class="text-xs text-secondary font-weight-bold">Meter</span>
+                    <span class="text-xs fw-bold text-dark font-monospace">Radius:</span>
+                    <span class="badge bg-primary px-2.5 py-1.5 font-monospace fs-7 fw-bold" id="slider_val_edit_badge">100m</span>
                   </div>
                 </div>
 
-                <!-- Radius Slider -->
-                <div class="mt-3">
-                  <label class="form-label-premium d-flex justify-content-between mb-1" style="font-size: 10px; color:#64748b;">
-                    <span>Sesuaikan Geofence Radius (Meter)</span>
-                    <span id="slider_val_edit" class="text-primary font-weight-bold">100m</span>
-                  </label>
-                  <input type="range" id="radius_slider_edit" min="10" max="1000" step="10" value="100" class="form-range w-100" style="accent-color: #3b82f6;">
+                <!-- Geofence Radius Card with Presets -->
+                <div class="mt-3 p-3 bg-white rounded-3 border" style="border: 2px solid #cbd5e1 !important;">
+                  <div class="d-flex justify-content-between align-items-center mb-1.5">
+                    <span class="text-sm fw-bold text-dark">Radius Geofence Check-in</span>
+                    <span class="text-xs text-muted fw-semibold">Jarak toleransi absen sales</span>
+                  </div>
+                  <input type="range" id="radius_slider_edit" min="10" max="1000" step="10" value="100" class="w-100" style="accent-color: #1d4ed8; height: 8px;">
+                  
+                  <!-- Quick Preset Pills -->
+                  <div class="kb-radius-presets mt-2">
+                    <div class="kb-preset-btn kb-preset-edit" data-val="50">50 m</div>
+                    <div class="kb-preset-btn kb-preset-edit active" data-val="100">100 m</div>
+                    <div class="kb-preset-btn kb-preset-edit" data-val="200">200 m</div>
+                    <div class="kb-preset-btn kb-preset-edit" data-val="500">500 m</div>
+                    <div class="kb-preset-btn kb-preset-edit" data-val="1000">1 km</div>
+                  </div>
                 </div>
 
-                <!-- Latitude and Longitude readouts -->
+                <!-- Coordinate Details Badges -->
                 <div class="row g-2 mt-2">
                   <div class="col-6">
-                    <label class="form-label-premium" style="font-size: 9px; color:#64748b;">Latitude</label>
-                    <input type="text" id="edit_lat_display" class="input-premium" placeholder="-6.xxxxx" style="font-family: monospace; font-size:12px; padding: 8px 12px !important; background:#f8fafc; border-radius: 8px;" readonly>
+                    <div class="kb-coord-badge">
+                      <span class="kb-coord-label">Latitude</span>
+                      <span id="edit_lat_display_text" class="fw-bold text-dark">-6.130371</span>
+                    </div>
                   </div>
                   <div class="col-6">
-                    <label class="form-label-premium" style="font-size: 9px; color:#64748b;">Longitude</label>
-                    <input type="text" id="edit_lon_display" class="input-premium" placeholder="106.xxxxx" style="font-family: monospace; font-size:12px; padding: 8px 12px !important; background:#f8fafc; border-radius: 8px;" readonly>
+                    <div class="kb-coord-badge">
+                      <span class="kb-coord-label">Longitude</span>
+                      <span id="edit_lon_display_text" class="fw-bold text-dark">106.751442</span>
+                    </div>
                   </div>
                 </div>
 
-                <!-- Hidden parameters to submit -->
+                <!-- Reverse Geocoded Address Preview Box -->
+                <div class="mt-3">
+                  <div class="p-3 rounded-3 text-sm text-dark d-flex align-items-start gap-2.5" style="border: 2px solid #93c5fd; background: #eff6ff;">
+                    <i class="bi bi-geo-alt-fill text-primary fs-5 mt-0.5"></i>
+                    <span id="edit_location_address_text" class="fw-bold text-dark">Mengarahkan pin peta ke titik lokasi target...</span>
+                  </div>
+                </div>
+
+                <!-- Hidden inputs to submit -->
                 <input type="hidden" id="edit_lat" name="edit_lat">
                 <input type="hidden" id="edit_lon" name="edit_lon">
-                <input type="hidden" id="edit_radius" name="edit_radius">
+                <input type="hidden" id="edit_radius" name="edit_radius" value="100">
+                <input type="hidden" id="edit_radius_input" value="100">
                 <input type="hidden" id="edit_location_address" name="edit_location_address">
               </div>
 
             </div>
           </div>
-          <div class="modal-footer modal-footer-premium">
-            <button type="submit" class="btn-submit-premium">
-              <span class="material-symbols-outlined">save</span>
-              Simpan Perubahan
+
+          <!-- Modal Footer Premium -->
+          <div class="modal-footer d-flex align-items-center justify-content-end gap-3 px-4 py-3" style="border-top: 2px solid #e2e8f0; background: #ffffff;">
+            <button type="button" class="kb-btn kb-btn-secondary" data-bs-dismiss="modal">
+              <i class="bi bi-x-lg"></i>
+              <span>Batal</span>
             </button>
-            <button type="button" class="btn bg-gradient-secondary font-weight-bold" data-bs-dismiss="modal" style="border-radius: 10px; padding: 10px 20px; font-size: 13px;">Batal</button>
+            <button type="submit" class="kb-btn kb-btn-primary" id="btnSubmitEditCustomer">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Simpan Perubahan</span>
+            </button>
           </div>
         </form>
       </div>
@@ -2379,155 +2697,210 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
   const radInputEdit = document.getElementById('edit_radius_input');
   const radSliderEdit = document.getElementById('radius_slider_edit');
   const sliderValEdit = document.getElementById('slider_val_edit');
+  const sliderValEditBadge = document.getElementById('slider_val_edit_badge');
 
   function syncRadiusEdit(value) {
     const r = parseInt(value) || defaultRad;
-    radInputEdit.value = r;
-    radSliderEdit.value = r;
-    sliderValEdit.innerText = r + 'm';
+    if (radInputEdit) radInputEdit.value = r;
+    if (radSliderEdit) radSliderEdit.value = r;
+    if (sliderValEdit) sliderValEdit.innerText = r + 'm';
+    if (sliderValEditBadge) sliderValEditBadge.innerText = r + 'm';
     if (circleEdit) {
       circleEdit.setRadius(r);
     }
-    document.getElementById('edit_radius').value = r;
+    const editRadiusHidden = document.getElementById('edit_radius');
+    if (editRadiusHidden) editRadiusHidden.value = r;
+
+    // Update active preset button
+    document.querySelectorAll('.kb-preset-edit').forEach(btn => {
+      if (parseInt(btn.dataset.val) === r) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
   }
 
-  radInputEdit.addEventListener('input', function() {
-    syncRadiusEdit(this.value);
-  });
+  if (radInputEdit) {
+    radInputEdit.addEventListener('input', function() {
+      syncRadiusEdit(this.value);
+    });
+  }
 
-  radSliderEdit.addEventListener('input', function() {
-    syncRadiusEdit(this.value);
+  if (radSliderEdit) {
+    radSliderEdit.addEventListener('input', function() {
+      syncRadiusEdit(this.value);
+    });
+  }
+
+  // Hook up preset buttons
+  document.querySelectorAll('.kb-preset-edit').forEach(btn => {
+    btn.addEventListener('click', function() {
+      syncRadiusEdit(this.dataset.val);
+    });
   });
 
   const editModalEl = document.getElementById('editModal');
-  editModalEl.addEventListener('shown.bs.modal', function () {
-      let latVal = parseFloat(document.getElementById('edit_lat').value);
-      let lonVal = parseFloat(document.getElementById('edit_lon').value);
-      const radVal = parseInt(document.getElementById('edit_radius').value) || defaultRad;
-      
-      // If values are empty/NaN, use defaults and save them so fields are never blank
-      if (isNaN(latVal) || isNaN(lonVal)) {
-        latVal = defaultLat;
-        lonVal = defaultLon;
-        document.getElementById('edit_lat').value = defaultLat;
-        document.getElementById('edit_lon').value = defaultLon;
-        document.getElementById('edit_lat_display').value = defaultLat.toFixed(6);
-        document.getElementById('edit_lon_display').value = defaultLon.toFixed(6);
-      }
-      
-      const latlng = L.latLng(latVal, lonVal);
-      syncRadiusEdit(radVal);
-      
-      if (!mapEditInstance) {
-          mapEditInstance = L.map('map_edit').setView(latlng, 15);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(mapEditInstance);
-          
-          markerEdit = L.marker(latlng, { draggable: true }).addTo(mapEditInstance);
-          circleEdit = L.circle(latlng, {
-            radius: radVal,
-            color: '#2563eb', // Blue border
-            fillColor: '#3b82f6', // Light blue fill
-            fillOpacity: 0.12,
-            weight: 1.5,
-            dashArray: '5, 5'
-          }).addTo(mapEditInstance);
-          
-          mapEditInstance.on('click', function(e) {
-            updateEditMapData(e.latlng, radInputEdit.value);
-          });
-          
-          markerEdit.on('dragend', function() {
-            updateEditMapData(markerEdit.getLatLng(), radInputEdit.value);
-          });
-      } else {
-          mapEditInstance.setView(latlng, 15);
-          markerEdit.setLatLng(latlng);
-          circleEdit.setLatLng(latlng).setRadius(radVal);
-          mapEditInstance.invalidateSize();
-      }
-
-      setTimeout(() => {
-        if (mapEditInstance) {
-          mapEditInstance.invalidateSize();
+  if (editModalEl) {
+    editModalEl.addEventListener('shown.bs.modal', function () {
+        let latVal = parseFloat(document.getElementById('edit_lat').value);
+        let lonVal = parseFloat(document.getElementById('edit_lon').value);
+        const radVal = parseInt(document.getElementById('edit_radius').value) || defaultRad;
+        
+        // If values are empty/NaN, use defaults and save them so fields are never blank
+        if (isNaN(latVal) || isNaN(lonVal)) {
+          latVal = defaultLat;
+          lonVal = defaultLon;
+          document.getElementById('edit_lat').value = defaultLat;
+          document.getElementById('edit_lon').value = defaultLon;
+          if (document.getElementById('edit_lat_display')) document.getElementById('edit_lat_display').value = defaultLat.toFixed(6);
+          if (document.getElementById('edit_lon_display')) document.getElementById('edit_lon_display').value = defaultLon.toFixed(6);
+          if (document.getElementById('edit_lat_display_text')) document.getElementById('edit_lat_display_text').innerText = defaultLat.toFixed(6);
+          if (document.getElementById('edit_lon_display_text')) document.getElementById('edit_lon_display_text').innerText = defaultLon.toFixed(6);
         }
-      }, 250);
-  });
+        
+        const latlng = L.latLng(latVal, lonVal);
+        syncRadiusEdit(radVal);
+        
+        if (!mapEditInstance) {
+            mapEditInstance = L.map('map_edit').setView(latlng, 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '© OpenStreetMap contributors'
+            }).addTo(mapEditInstance);
+            
+            markerEdit = L.marker(latlng, { draggable: true }).addTo(mapEditInstance);
+            circleEdit = L.circle(latlng, {
+              radius: radVal,
+              color: '#2563eb', // Blue border
+              fillColor: '#3b82f6', // Light blue fill
+              fillOpacity: 0.12,
+              weight: 1.5,
+              dashArray: '5, 5'
+            }).addTo(mapEditInstance);
+            
+            mapEditInstance.on('click', function(e) {
+              updateEditMapData(e.latlng, radSliderEdit ? radSliderEdit.value : 100);
+            });
+            
+            markerEdit.on('dragend', function() {
+              updateEditMapData(markerEdit.getLatLng(), radSliderEdit ? radSliderEdit.value : 100);
+            });
+        } else {
+            mapEditInstance.setView(latlng, 15);
+            markerEdit.setLatLng(latlng);
+            circleEdit.setLatLng(latlng).setRadius(radVal);
+            mapEditInstance.invalidateSize();
+        }
+
+        setTimeout(() => {
+          if (mapEditInstance) {
+            mapEditInstance.invalidateSize();
+          }
+        }, 250);
+    });
+  }
 
   function updateEditMapData(latlng, rad) {
       const r = parseInt(rad) || defaultRad;
-      markerEdit.setLatLng(latlng);
-      circleEdit.setLatLng(latlng).setRadius(r);
-      mapEditInstance.setView(latlng, 16);
+      if (markerEdit) markerEdit.setLatLng(latlng);
+      if (circleEdit) {
+        circleEdit.setLatLng(latlng);
+        circleEdit.setRadius(r);
+      }
+      if (mapEditInstance) mapEditInstance.setView(latlng, 16);
       
-      document.getElementById('edit_lat').value = latlng.lat;
-      document.getElementById('edit_lon').value = latlng.lng;
-      document.getElementById('edit_lat_display').value = latlng.lat.toFixed(6);
-      document.getElementById('edit_lon_display').value = latlng.lng.toFixed(6);
+      const editLat = document.getElementById('edit_lat');
+      const editLon = document.getElementById('edit_lon');
+      const editLatDisp = document.getElementById('edit_lat_display');
+      const editLonDisp = document.getElementById('edit_lon_display');
+      const editLatText = document.getElementById('edit_lat_display_text');
+      const editLonText = document.getElementById('edit_lon_display_text');
+      const editLocAddrText = document.getElementById('edit_location_address_text');
+      const editLocAddrHidden = document.getElementById('edit_location_address');
+
+      if (editLat) editLat.value = latlng.lat;
+      if (editLon) editLon.value = latlng.lng;
+      if (editLatDisp) editLatDisp.value = latlng.lat.toFixed(6);
+      if (editLonDisp) editLonDisp.value = latlng.lng.toFixed(6);
+      if (editLatText) editLatText.innerText = latlng.lat.toFixed(6);
+      if (editLonText) editLonText.innerText = latlng.lng.toFixed(6);
+
       syncRadiusEdit(r);
       
+      if (editLocAddrText) editLocAddrText.innerText = 'Mengambil nama lokasi alamat...';
+
       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&accept-language=id`)
         .then(res => res.json())
         .then(data => {
-          document.getElementById('edit_location_address').value = data?.display_name || '';
+          const addr = data?.display_name || '';
+          if (editLocAddrHidden) editLocAddrHidden.value = addr;
+          if (editLocAddrText) editLocAddrText.innerText = addr || 'Titik koordinat berhasil ditentukan.';
         })
         .catch(() => {
-          document.getElementById('edit_location_address').value = '';
+          if (editLocAddrHidden) editLocAddrHidden.value = '';
+          if (editLocAddrText) editLocAddrText.innerText = 'Koordinat: ' + latlng.lat.toFixed(6) + ', ' + latlng.lng.toFixed(6);
         });
   }
 
   // GPS Edit Event
-  document.getElementById('btn_get_location_edit').addEventListener('click', function() {
-    const btn = this;
-    const origContent = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mencari Lokasi...';
+  const btnGetLocEdit = document.getElementById('btn_get_location_edit');
+  if (btnGetLocEdit) {
+    btnGetLocEdit.addEventListener('click', function() {
+      const btn = this;
+      const origContent = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-arrow-repeat spin-icon"></i> Mencari Lokasi...';
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          updateEditMapData(L.latLng(lat, lon), radInputEdit.value);
-          btn.disabled = false;
-          btn.innerHTML = origContent;
-        },
-        function(error) {
-          alert("Gagal mendapatkan lokasi: " + error.message);
-          btn.disabled = false;
-          btn.innerHTML = origContent;
-        },
-        { enableHighAccuracy: true, timeout: 5000 }
-      );
-    } else {
-      alert("Browser Anda tidak mendukung pencarian lokasi (Geolocation).");
-      btn.disabled = false;
-      btn.innerHTML = origContent;
-    }
-  });
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const curRad = radSliderEdit ? radSliderEdit.value : 100;
+            updateEditMapData(L.latLng(lat, lon), curRad);
+            btn.disabled = false;
+            btn.innerHTML = origContent;
+          },
+          function(error) {
+            alert("Gagal mendapatkan lokasi: " + error.message);
+            btn.disabled = false;
+            btn.innerHTML = origContent;
+          },
+          { enableHighAccuracy: true, timeout: 5000 }
+        );
+      } else {
+        alert("Browser Anda tidak mendukung pencarian lokasi (Geolocation).");
+        btn.disabled = false;
+        btn.innerHTML = origContent;
+      }
+    });
+  }
 
-  document.getElementById('gmap_search_btn_edit').addEventListener('click', function() {
-    const query = document.getElementById('gmap_search_edit').value.trim();
-    if (query === "" || !mapEditInstance) return;
+  const btnSearchEdit = document.getElementById('gmap_search_btn_edit');
+  if (btnSearchEdit) {
+    btnSearchEdit.addEventListener('click', function() {
+      const query = document.getElementById('gmap_search_edit').value.trim();
+      if (query === "" || !mapEditInstance) return;
 
-    const coordsRegex = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
-    if (coordsRegex.test(query)) {
-      const parts = query.split(',');
-      updateEditMapData(L.latLng(parseFloat(parts[0]), parseFloat(parts[1])), radInputEdit.value);
-    } else {
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=id&accept-language=id`)
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.length > 0) {
-            updateEditMapData(L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon)), radInputEdit.value);
-          } else {
-            alert("Lokasi tidak ditemukan.");
-          }
-        });
-    }
-  });
+      const coordsRegex = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
+      const curRad = radSliderEdit ? radSliderEdit.value : 100;
+      if (coordsRegex.test(query)) {
+        const parts = query.split(',');
+        updateEditMapData(L.latLng(parseFloat(parts[0]), parseFloat(parts[1])), curRad);
+      } else {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=id&accept-language=id`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.length > 0) {
+              updateEditMapData(L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon)), curRad);
+            } else {
+              alert("Lokasi tidak ditemukan.");
+            }
+          });
+      }
+    });
+  }
 
   // Enter key support for map searches
   const gmapSearchInput = document.getElementById('gmap_search');
@@ -2545,7 +2918,8 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
     gmapSearchEditInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        document.getElementById('gmap_search_btn_edit').click();
+        const searchBtn = document.getElementById('gmap_search_btn_edit');
+        if (searchBtn) searchBtn.click();
       }
     });
   }
@@ -2573,16 +2947,33 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
       }
 
       // GPS Data Populate
-      document.getElementById('edit_lat').value = btn.dataset.lat || "";
-      document.getElementById('edit_lon').value = btn.dataset.lon || "";
-      document.getElementById('edit_radius').value = btn.dataset.rad || "100";
-      document.getElementById('edit_radius_input').value = btn.dataset.rad || "100";
-      document.getElementById('edit_location_address').value = btn.dataset.alamatLokasi || "";
-      
       const latVal = parseFloat(btn.dataset.lat);
       const lonVal = parseFloat(btn.dataset.lon);
-      document.getElementById('edit_lat_display').value = isNaN(latVal) ? "" : latVal.toFixed(6);
-      document.getElementById('edit_lon_display').value = isNaN(lonVal) ? "" : lonVal.toFixed(6);
+      const radVal = parseInt(btn.dataset.rad) || 100;
+      const addrVal = btn.dataset.alamatLokasi || "";
+
+      document.getElementById('edit_lat').value = isNaN(latVal) ? "" : latVal;
+      document.getElementById('edit_lon').value = isNaN(lonVal) ? "" : lonVal;
+      document.getElementById('edit_radius').value = radVal;
+      if (document.getElementById('edit_radius_input')) document.getElementById('edit_radius_input').value = radVal;
+      document.getElementById('edit_location_address').value = addrVal;
+      
+      if (document.getElementById('edit_lat_display')) {
+        document.getElementById('edit_lat_display').value = isNaN(latVal) ? "" : latVal.toFixed(6);
+      }
+      if (document.getElementById('edit_lon_display')) {
+        document.getElementById('edit_lon_display').value = isNaN(lonVal) ? "" : lonVal.toFixed(6);
+      }
+      if (document.getElementById('edit_lat_display_text')) {
+        document.getElementById('edit_lat_display_text').innerText = isNaN(latVal) ? "-" : latVal.toFixed(6);
+      }
+      if (document.getElementById('edit_lon_display_text')) {
+        document.getElementById('edit_lon_display_text').innerText = isNaN(lonVal) ? "-" : lonVal.toFixed(6);
+      }
+      if (document.getElementById('edit_location_address_text')) {
+        document.getElementById('edit_location_address_text').innerText = addrVal || 'Titik koordinat toko terpasang.';
+      }
+      syncRadiusEdit(radVal);
 
       // Existing photos preview with delete
       const existingContainer = document.getElementById('edit_existing_photos_container');
@@ -2615,9 +3006,9 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
         existingContainer.innerHTML = '<span class="text-muted" style="font-size: 12px;">Belum ada dokumentasi foto.</span>';
       }
 
-      const kategori = btn.dataset.kategori;
+      const kategori = (btn.dataset.kategori || '').toLowerCase().trim();
       document.querySelectorAll('input[name="edit_kategori"]').forEach(radio => {
-        radio.checked = (radio.value === kategori);
+        radio.checked = (radio.value.toLowerCase().trim() === kategori);
       });
     });
   });
