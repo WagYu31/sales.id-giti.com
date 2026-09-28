@@ -210,7 +210,7 @@ require_once 'includes/header.php';
                 <span>Price List Produk</span>
             </div>
             <h1 class="price-hero-title">Price List Produk Loewix 🏷️</h1>
-            <p class="price-hero-subtitle">Katalog daftar harga resmi produk, perhitungan otomatis diskon Dealer &amp; Master Dealer.</p>
+            <p class="price-hero-subtitle">Katalog daftar harga resmi produk Loewix.</p>
         </div>
         <div class="mt-3 mt-md-0">
             <button class="btn btn-primary shadow-lg" id="btn-open-add" style="border-radius: 12px; font-weight: 700; padding: 10px 20px;">
@@ -222,7 +222,7 @@ require_once 'includes/header.php';
 
 <!-- Stat Overview Ribbon -->
 <div class="row g-3 mb-4" id="statsRibbon">
-    <div class="col-6 col-lg-3">
+    <div class="col-md-4">
         <div class="stat-card-taste">
             <div class="stat-icon-wrapper" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
                 <i class="bi bi-box-seam-fill"></i>
@@ -234,7 +234,7 @@ require_once 'includes/header.php';
             </div>
         </div>
     </div>
-    <div class="col-6 col-lg-3">
+    <div class="col-md-4">
         <div class="stat-card-taste">
             <div class="stat-icon-wrapper" style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
                 <i class="bi bi-grid-fill"></i>
@@ -246,7 +246,7 @@ require_once 'includes/header.php';
             </div>
         </div>
     </div>
-    <div class="col-6 col-lg-3">
+    <div class="col-md-4">
         <div class="stat-card-taste">
             <div class="stat-icon-wrapper" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
                 <i class="bi bi-tags-fill"></i>
@@ -255,20 +255,6 @@ require_once 'includes/header.php';
                 <div class="text-xs text-muted fw-bold text-uppercase">Rentang Harga (MSRP)</div>
                 <div class="fw-bold text-dark mb-0 font-monospace" style="font-size: 14.5px;" id="statPriceRange">-</div>
                 <div class="small text-muted" style="font-size: 11.5px;">Harga katalog resmi</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3">
-        <div class="stat-card-taste">
-            <div class="stat-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                <i class="bi bi-percent"></i>
-            </div>
-            <div>
-                <div class="text-xs text-muted fw-bold text-uppercase">Diskon Khusus Mitra</div>
-                <div class="fw-bold text-dark mb-0 font-monospace" style="font-size: 14.5px;">
-                    <span class="text-primary" id="statDealerDisc">D: 20%</span> | <span class="text-success" id="statMasterDisc">MD: 35%</span>
-                </div>
-                <div class="small text-muted" style="font-size: 11.5px;">Margin laba otomatis</div>
             </div>
         </div>
     </div>
@@ -390,12 +376,10 @@ require_once 'includes/header.php';
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-dark-header">
                     <tr>
-                        <th style="width: 18%;">KATEGORI</th>
-                        <th style="width: 32%;">TIPE &amp; DESKRIPSI</th>
-                        <th class="text-end" style="width: 15%;">MSRP (USER)</th>
-                        <th class="text-end" style="width: 15%;">DEALER</th>
-                        <th class="text-end" style="width: 15%;">MASTER DEALER</th>
-                        <th class="text-center" style="width: 5%;">AKSI</th>
+                        <th style="width: 22%;">KATEGORI</th>
+                        <th style="width: 48%;">TIPE &amp; DESKRIPSI</th>
+                        <th class="text-end" style="width: 20%;">HARGA (MSRP)</th>
+                        <th class="text-center" style="width: 10%;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody id="priceTableBody">
@@ -476,7 +460,7 @@ function loadTable() {
         $('#btnClearSearch').addClass('d-none');
     }
 
-    $('#priceTableBody').html('<tr><td colspan="6" class="text-center py-5"><div class="spinner-border spinner-border-sm text-primary mb-2"></div><div class="text-xs text-muted fw-bold">Memuat daftar produk katalog...</div></td></tr>');
+    $('#priceTableBody').html('<tr><td colspan="4" class="text-center py-5"><div class="spinner-border spinner-border-sm text-primary mb-2"></div><div class="text-xs text-muted fw-bold">Memuat daftar produk katalog...</div></td></tr>');
 
     $.ajax({
         url: 'ajax_price_handler.php',
@@ -493,7 +477,7 @@ function loadTable() {
         dataType: 'json',
         success: function(res) {
             if (!res.success) {
-                $('#priceTableBody').html('<tr><td colspan="6" class="text-center text-danger p-4">Gagal memuat data.</td></tr>');
+                $('#priceTableBody').html('<tr><td colspan="4" class="text-center text-danger p-4">Gagal memuat data.</td></tr>');
                 return;
             }
 
@@ -544,7 +528,7 @@ function loadTable() {
             renderActiveFilterTags(s, totalRows);
         },
         error: function(xhr) {
-            $('#priceTableBody').html('<tr><td colspan="6" class="text-center text-danger p-4">Gagal memuat data. Cek koneksi atau file handler.</td></tr>');
+            $('#priceTableBody').html('<tr><td colspan="4" class="text-center text-danger p-4">Gagal memuat data. Cek koneksi atau file handler.</td></tr>');
             console.error(xhr.responseText);
         }
     });

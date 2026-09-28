@@ -144,16 +144,7 @@ if ($action == 'get_prices') {
                             ".(!empty($p['description']) ? "<div class='text-muted small mt-1' style='line-height: 1.35; font-size: 12px;'>".nl2br(htmlspecialchars($p['description']))."</div>" : "")."
                         </td>
                         <td class='text-end' style='vertical-align: middle;'>
-                            <div class='font-monospace fw-bold text-dark' style='font-size: 13.5px;'>Rp ".number_format($msrp, 0, ',', '.')."</div>
-                            <span class='text-muted' style='font-size: 10.5px;'>User Price</span>
-                        </td>
-                        <td class='text-end' style='vertical-align: middle;'>
-                            <div class='font-monospace fw-bold text-primary' style='font-size: 14px;'>Rp ".number_format($p_dealer, 0, ',', '.')."</div>
-                            <span class='badge bg-primary-subtle text-primary border border-primary-subtle' style='font-size: 10px; padding: 1px 6px;'>-{$d_disc}%</span>
-                        </td>
-                        <td class='text-end' style='vertical-align: middle;'>
-                            <div class='font-monospace fw-bold text-success' style='font-size: 14px;'>Rp ".number_format($p_master, 0, ',', '.')."</div>
-                            <span class='badge bg-success-subtle text-success border border-success-subtle' style='font-size: 10px; padding: 1px 6px;'>-{$m_disc}%</span>
+                            <div class='font-monospace fw-bold text-dark' style='font-size: 14px;'>Rp ".number_format($msrp, 0, ',', '.')."</div>
                         </td>
                         <td class='text-center' style='vertical-align: middle;'>
                             <div class='btn-group btn-group-sm' style='box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden;'>
@@ -165,7 +156,7 @@ if ($action == 'get_prices') {
         }
     } else {
         $html = "<tr>
-                    <td colspan='6' class='text-center py-5'>
+                    <td colspan='4' class='text-center py-5'>
                         <div class='d-inline-flex p-3 rounded-circle mb-3' style='background: #f1f5f9; color: #64748b;'>
                             <i class='bi bi-search fs-2'></i>
                         </div>
