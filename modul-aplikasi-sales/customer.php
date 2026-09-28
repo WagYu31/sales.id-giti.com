@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'])) {
         error_log("Failed to prepare UPDATE sales_customer: " . $conn->error);
         $errorMsg = "Gagal memproses pembaruan customer: " . $conn->error;
     } else {
-        $stmt->bind_param("ssisssssisssssi", $nama, $kategori, $is_tiptok, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json_updated, $lat, $lon, $rad, $location_address, $id);
+        $stmt->bind_param("ssissssisssssi", $nama, $kategori, $is_tiptok, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json_updated, $lat, $lon, $rad, $location_address, $id);
         if ($stmt->execute()) {
             $successMsg = "Data Customer berhasil diperbarui!";
         } else {
