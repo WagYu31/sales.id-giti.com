@@ -2062,9 +2062,6 @@ $loewixPriceList = $tiptokMaster6;
                                                 <span class="font-weight-bold text-dark" style="font-size: 15px; line-height: 1.3;"><?php echo htmlspecialchars($row['nama_toko'] ?? 'Toko Tidak Ditemukan'); ?></span>
                                                 <span class="taste-badge badge-dealer-tag" style="font-size: 10.5px; padding: 2px 7px;"><?php echo htmlspecialchars($row['kategori_customer'] ?? 'Dealer'); ?></span>
                                             </div>
-                                            <div class="text-muted" style="font-size: 12.5px; font-weight: 600; margin-top: 4px; line-height: 1.4;">
-                                                <i class="fa-solid fa-location-dot text-secondary me-1" style="font-size: 11px;"></i><?php echo htmlspecialchars($row['alamat_toko'] ?? '-'); ?><?php echo !empty($row['kota_toko']) ? ', ' . htmlspecialchars($row['kota_toko']) : ''; ?>
-                                            </div>
                                             <?php if (!empty($telpRaw)) : ?>
                                                 <div style="margin-top: 6px;">
                                                     <a href="https://wa.me/<?php echo $telpRaw; ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 3px 9px; border-radius: 6px; font-size: 12px; font-weight: 700; text-decoration: none;">
