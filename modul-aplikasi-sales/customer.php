@@ -33,14 +33,30 @@ if (isset($_GET['delete_id'])) {
     exit();
 }
 
-// Auto-ensure is_tiptok column exists
-$chkCol = @$conn->query("SHOW COLUMNS FROM sales_customer LIKE 'is_tiptok'");
-if ($chkCol && $chkCol->num_rows == 0) {
-    @$conn->query("ALTER TABLE sales_customer ADD COLUMN `is_tiptok` TINYINT(1) NOT NULL DEFAULT 0 AFTER `kategori`");
+// Auto-ensure columns exist in sales_customer
+$chkCols = @$conn->query("SHOW COLUMNS FROM sales_customer");
+if ($chkCols) {
+    $existingCols = [];
+    while ($r = $chkCols->fetch_assoc()) {
+        $existingCols[] = strtolower($r['Field']);
+    }
+    if (!in_array('is_tiptok', $existingCols)) {
+        @$conn->query("ALTER TABLE sales_customer ADD COLUMN `is_tiptok` TINYINT(1) NOT NULL DEFAULT 0 AFTER `kategori`");
+    }
+    if (!in_array('kode_customer', $existingCols)) {
+        @$conn->query("ALTER TABLE sales_customer ADD COLUMN `kode_customer` VARCHAR(50) NULL AFTER `id`");
+    }
+    if (!in_array('rad', $existingCols)) {
+        @$conn->query("ALTER TABLE sales_customer ADD COLUMN `rad` VARCHAR(50) NULL AFTER `lon`");
+    }
+    if (!in_array('alamat_lokasi', $existingCols)) {
+        @$conn->query("ALTER TABLE sales_customer ADD COLUMN `alamat_lokasi` TEXT NULL AFTER `rad`");
+    }
 }
 
 // UPDATE
 $successMsg = "";
+$errorMsg = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'])) {
     $id = $_POST['update_id'];
     $nama = $_POST['edit_nama'];
@@ -125,11 +141,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'])) {
     $foto_json_updated = !empty($merged_photos) ? json_encode($merged_photos) : NULL;
 
     $stmt = $conn->prepare("UPDATE sales_customer SET nama = ?, kategori = ?, is_tiptok = ?, telp_pribadi = ?, email = ?, alamat = ?, kota = ?, id_wilayah = ?, foto = ?, lat = ?, lon = ?, rad = ?, alamat_lokasi = ?, updated_at = NOW() WHERE id = ?");
-    $stmt->bind_param("ssisssssisssssi", $nama, $kategori, $is_tiptok, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json_updated, $lat, $lon, $rad, $location_address, $id);
-    $stmt->execute();
-    $stmt->close();
-
-    $successMsg = "Data Customer berhasil diperbarui!";
+    if (!$stmt) {
+        error_log("Failed to prepare UPDATE sales_customer: " . $conn->error);
+        $errorMsg = "Gagal memproses pembaruan customer: " . $conn->error;
+    } else {
+        $stmt->bind_param("ssisssssisssssi", $nama, $kategori, $is_tiptok, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json_updated, $lat, $lon, $rad, $location_address, $id);
+        if ($stmt->execute()) {
+            $successMsg = "Data Customer berhasil diperbarui!";
+        } else {
+            error_log("Failed to execute UPDATE sales_customer: " . $stmt->error);
+            $errorMsg = "Gagal memperbarui customer: " . $stmt->error;
+        }
+        $stmt->close();
+    }
 }
 
 // INSERT
@@ -192,12 +216,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_id'])) {
     }
     $kode_customer = 'CUST-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
 
-    $stmt = $conn->prepare("INSERT INTO sales_customer (kode_customer, kategori, is_tiptok, nama, telp_pribadi, email, alamat, kota, id_wilayah, foto, lat, lon, rad, alamat_lokasi, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
-    $stmt->bind_param("ssisssssisssss", $kode_customer, $kategori, $is_tiptok, $nama, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json, $lat, $lon, $rad, $location_address);
-    $stmt->execute();
-    $stmt->close();
-
-    $successMsg = "Customer baru berhasil ditambahkan!";
+    $stmt = $conn->prepare("INSERT INTO sales_customer (kode_customer, kategori, is_tiptok, nama, telp_pribadi, email, alamat, kota, id_wilayah, foto, lat, lon, rad, alamat_lokasi, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+    if (!$stmt) {
+        error_log("Failed to prepare INSERT sales_customer: " . $conn->error);
+        $errorMsg = "Gagal memproses penambahan customer: " . $conn->error;
+    } else {
+        $stmt->bind_param("ssisssssisssss", $kode_customer, $kategori, $is_tiptok, $nama, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json, $lat, $lon, $rad, $location_address);
+        if ($stmt->execute()) {
+            $successMsg = "Customer baru berhasil ditambahkan!";
+        } else {
+            error_log("Failed to execute INSERT sales_customer: " . $stmt->error);
+            $errorMsg = "Gagal menyimpan customer: " . $stmt->error;
+        }
+        $stmt->close();
+    }
 }
 
 // Ambil data wilayah untuk filter
@@ -971,6 +1003,14 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
       <div class="alert alert-success text-white font-weight-bold mb-4" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: none; border-radius: 12px; padding: 14px 20px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);">
         <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 8px;">check_circle</span>
         <?php echo $successMsg; ?>
+      </div>
+    <?php endif; ?>
+
+    <!-- Error Alert -->
+    <?php if (!empty($errorMsg)): ?>
+      <div class="alert alert-danger text-white font-weight-bold mb-4" style="background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%); border: none; border-radius: 12px; padding: 14px 20px; box-shadow: 0 4px 14px rgba(244, 63, 94, 0.25);">
+        <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 8px;">error</span>
+        <?php echo $errorMsg; ?>
       </div>
     <?php endif; ?>
 
