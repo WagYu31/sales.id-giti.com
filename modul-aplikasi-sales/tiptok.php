@@ -835,6 +835,90 @@ $loewixPriceList = $tiptokMaster6;
             outline: none;
             box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06);
         }
+
+        /* ── Searchable Select2 Filter Fields (Type-to-Search) ── */
+        .tiptok-filter-card .select2-container {
+            width: 100% !important;
+            display: block !important;
+        }
+        .tiptok-filter-card .select2-container--bootstrap-5 .select2-selection {
+            height: 38px !important;
+            min-height: 38px !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+            background-color: #ffffff !important;
+            font-size: 12.5px !important;
+            font-weight: 500 !important;
+            color: #0f172a !important;
+            padding: 5px 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            box-shadow: none !important;
+            transition: all 0.15s ease !important;
+        }
+        .tiptok-filter-card .select2-container--bootstrap-5:hover .select2-selection {
+            border-color: #cbd5e1 !important;
+        }
+        .tiptok-filter-card .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+        .tiptok-filter-card .select2-container--bootstrap-5.select2-container--open .select2-selection {
+            border-color: #0f172a !important;
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06) !important;
+            outline: none !important;
+        }
+        .tiptok-filter-card .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+            color: #0f172a !important;
+            font-size: 12.5px !important;
+            font-weight: 500 !important;
+            padding-left: 0 !important;
+            padding-right: 20px !important;
+            line-height: normal !important;
+        }
+        .tiptok-filter-card .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            right: 10px !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1) !important;
+            background: #ffffff !important;
+            overflow: hidden !important;
+            z-index: 9999 !important;
+        }
+        .select2-search--dropdown {
+            padding: 8px !important;
+            background: #f8fafc !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+        .select2-search--dropdown .select2-search__field {
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 6px !important;
+            padding: 7px 12px !important;
+            font-size: 12.5px !important;
+            background: #ffffff !important;
+            color: #0f172a !important;
+            outline: none !important;
+            width: 100% !important;
+        }
+        .select2-search--dropdown .select2-search__field:focus {
+            border-color: #0f172a !important;
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06) !important;
+        }
+        .select2-results__option {
+            padding: 8px 12px !important;
+            font-size: 12.5px !important;
+            color: #334155 !important;
+        }
+        .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+        .select2-container--bootstrap-5 .select2-results__option[aria-selected=true] {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+        }
+
         .active-tag-chip {
             display: inline-flex;
             align-items: center;
@@ -3770,13 +3854,54 @@ $loewixPriceList = $tiptokMaster6;
             }
         }
 
+        function initSelect2Filters() {
+            if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
+                $('#filterToko').select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    dropdownAutoWidth: true,
+                    placeholder: 'Ketik untuk mencari toko...',
+                    allowClear: false,
+                    minimumResultsForSearch: 0
+                }).on('select2:select select2:clear change', function() {
+                    applyAllTiptokFilters();
+                });
+
+                $('#filterSales').select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    dropdownAutoWidth: true,
+                    placeholder: 'Ketik untuk mencari sales...',
+                    allowClear: false,
+                    minimumResultsForSearch: 0
+                }).on('select2:select select2:clear change', function() {
+                    applyAllTiptokFilters();
+                });
+
+                // Auto-focus search input when opened
+                $(document).on('select2:open', () => {
+                    const searchField = document.querySelector('.select2-search__field');
+                    if (searchField) {
+                        searchField.setAttribute('placeholder', 'Ketik nama untuk mencari...');
+                        setTimeout(() => searchField.focus(), 30);
+                    }
+                });
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             updateBadgeCounts();
             loadDealers();
             loadSalesOptions();
             tambahBarisBarang();
             applyAllTiptokFilters();
+            initSelect2Filters();
         });
+
+        // Also call immediately if DOM is already loaded
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            initSelect2Filters();
+        }
 
         function populateSalesSelects() {
             if (!Array.isArray(salesListCache) || salesListCache.length === 0) return;
@@ -4178,6 +4303,9 @@ $loewixPriceList = $tiptokMaster6;
             } else if (field === 'toko') {
                 const sel = document.getElementById('filterToko');
                 if (sel) sel.value = '';
+                if (typeof jQuery !== 'undefined' && $('#filterToko').data('select2')) {
+                    $('#filterToko').val('').trigger('change.select2');
+                }
             } else if (field === 'status') {
                 const sel = document.getElementById('filterStatus');
                 if (sel) sel.value = '';
@@ -4187,6 +4315,9 @@ $loewixPriceList = $tiptokMaster6;
             } else if (field === 'sales') {
                 const sel = document.getElementById('filterSales');
                 if (sel) sel.value = '';
+                if (typeof jQuery !== 'undefined' && $('#filterSales').data('select2')) {
+                    $('#filterSales').val('').trigger('change.select2');
+                }
             } else if (field === 'invoice') {
                 const sel = document.getElementById('filterInvoice');
                 if (sel) sel.value = '';
@@ -4209,6 +4340,11 @@ $loewixPriceList = $tiptokMaster6;
             if (selInvoice) selInvoice.value = '';
             const selSort = document.getElementById('filterSort');
             if (selSort) selSort.value = 'newest';
+
+            if (typeof jQuery !== 'undefined') {
+                if ($('#filterToko').data('select2')) $('#filterToko').val('').trigger('change.select2');
+                if ($('#filterSales').data('select2')) $('#filterSales').val('').trigger('change.select2');
+            }
 
             applyAllTiptokFilters();
         }
