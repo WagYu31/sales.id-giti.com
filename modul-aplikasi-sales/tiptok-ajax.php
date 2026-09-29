@@ -950,14 +950,14 @@ if ($action === 'ajukan_claim') {
     $tgl_claim = date('Y-m-d');
 
     // Ensure columns exist
-    $chkColPen = @$conn->query("SHOW COLUMNS FROM `tiptok_claim` LIKE 'id_penitipan'");
+    $chkColPen = $conn->query("SHOW COLUMNS FROM `tiptok_claim` LIKE 'id_penitipan'");
     if ($chkColPen && $chkColPen->num_rows == 0) {
-        @$conn->query("ALTER TABLE `tiptok_claim` ADD COLUMN `id_penitipan` INT NULL AFTER `id_sales`, ADD COLUMN `nama_toko` VARCHAR(255) NULL AFTER `id_penitipan`");
+        $conn->query("ALTER TABLE `tiptok_claim` ADD COLUMN `id_penitipan` INT NULL AFTER `id_sales`, ADD COLUMN `nama_toko` VARCHAR(255) NULL AFTER `id_penitipan`");
     }
 
     // Insert master claim with id_penitipan and nama_toko
     $stmtClaim = $conn->prepare("INSERT INTO tiptok_claim (kode_claim, id_penitipan, nama_toko, id_sales, nama_sales, tgl_claim, total_unit_terjual, total_nominal_insentif, status_claim, catatan_claim, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'menunggu_approval', ?, NOW(), NOW())");
-    $stmtClaim->bind_param("sisisids", $kode_claim, $id_penitipan, $namaTokoClaim, $idUser, $namaUser, $tgl_claim, $totalUnit, $totalNominal, $catatan_claim);
+    $stmtClaim->bind_param("sisissids", $kode_claim, $id_penitipan, $namaTokoClaim, $idUser, $namaUser, $tgl_claim, $totalUnit, $totalNominal, $catatan_claim);
     
     if (!$stmtClaim->execute()) {
         echo json_encode(['status' => 'error', 'message' => 'Gagal membuat pengajuan klaim: ' . $stmtClaim->error]);

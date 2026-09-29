@@ -87,6 +87,8 @@ if (!$checkTbl || mysqli_num_rows($checkTbl) == 0) {
             `id` INT AUTO_INCREMENT PRIMARY KEY,
             `kode_claim` VARCHAR(50) NOT NULL UNIQUE,
             `id_sales` INT NOT NULL,
+            `id_penitipan` INT NULL,
+            `nama_toko` VARCHAR(255) NULL,
             `nama_sales` VARCHAR(100) NOT NULL,
             `tgl_claim` DATE NOT NULL,
             `total_unit_terjual` INT NOT NULL,
@@ -98,8 +100,13 @@ if (!$checkTbl || mysqli_num_rows($checkTbl) == 0) {
             `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
             `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             INDEX (`id_sales`),
+            INDEX (`id_penitipan`),
             INDEX (`status_claim`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        $chkColPen = mysqli_query($conn, "SHOW COLUMNS FROM `tiptok_claim` LIKE 'id_penitipan'");
+        if ($chkColPen && mysqli_num_rows($chkColPen) == 0) {
+            mysqli_query($conn, "ALTER TABLE `tiptok_claim` ADD COLUMN `id_penitipan` INT NULL AFTER `id_sales`, ADD COLUMN `nama_toko` VARCHAR(255) NULL AFTER `id_penitipan`");
+        }
         
         mysqli_query($conn, "CREATE TABLE IF NOT EXISTS `tiptok_claim_detail` (
             `id` INT AUTO_INCREMENT PRIMARY KEY,
