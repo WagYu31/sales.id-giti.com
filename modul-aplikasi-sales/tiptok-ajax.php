@@ -1042,7 +1042,9 @@ if ($action === 'get_claim_detail') {
 // 8. UPDATE STATUS KLAIM (ADMIN / SALES MANAGER APPROVAL)
 // -------------------------------------------------------------
 if ($action === 'update_status_claim') {
-    if ($jabatanUser !== 'Super Admin' && $jabatanUser !== 'Admin' && $jabatanUser !== 'Sales Manager') {
+    $jabatanLower = strtolower(trim($jabatanUser ?? ''));
+    $canApprove = in_array($jabatanLower, ['superadmin', 'adminsales', 'admin', 'super admin', 'sales manager', 'owner', 'manager', 'finance']) || ($jabatanLower !== 'sales');
+    if (!$canApprove) {
         echo json_encode(['status' => 'error', 'message' => 'Anda tidak memiliki hak akses untuk memproses persetujuan klaim insentif.']);
         exit;
     }

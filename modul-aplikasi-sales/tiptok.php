@@ -7,8 +7,10 @@ $pageNow = "TIP TOK";
 $currentPage = "Today";
 
 $idSesi = $_SESSION["id"] ?? 0;
-$role = $_SESSION["jabatan"] ?? 'Sales';
+$role = $_SESSION["jabatan"] ?? ($_SESSION["role"] ?? 'Sales');
 $namaSesi = $nmUser ?? ($_SESSION["nama"] ?? 'Sales');
+$userRoleClean = strtolower(trim($role ?? ''));
+$canApprove = in_array($userRoleClean, ['superadmin', 'adminsales', 'admin', 'super admin', 'sales manager', 'owner', 'manager', 'finance']) || ($userRoleClean !== 'sales');
 
 // Safeguard: Pastikan tabel TIP TOK sudah ada sebelum query
 $checkTbl = mysqli_query($conn, "SHOW TABLES LIKE 'tiptok_penitipan'");
@@ -3818,7 +3820,7 @@ $loewixPriceList = $tiptokMaster6;
                         </table>
                     </div>
 
-                    <?php if ($role === 'Super Admin' || $role === 'Admin' || $role === 'Sales Manager') : ?>
+                    <?php if ($canApprove) : ?>
                         <div class="p-3 rounded-3 bg-white border mt-3" style="border: 1.5px solid #cbd5e1 !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <div class="form-label-taste mb-0 text-dark font-weight-bold" style="font-size: 13px;">
@@ -6248,6 +6250,19 @@ $loewixPriceList = $tiptokMaster6;
                                         tglCairHtml = '<span class="text-muted text-xs"><i class="fa-solid fa-ban me-1 text-danger"></i> Tidak Cair</span>';
                                     }
 
+                                    let actionBtnHtml = `
+                                        <button type="button" class="btn btn-sm btn-primary py-1 px-2.5 font-weight-bold shadow-sm d-inline-flex align-items-center gap-1" style="border-radius: 8px; font-size: 11.5px;" onclick="openModalDetailClaim(${c.id})">
+                                            <i class="fa-solid fa-stamp"></i> Approval
+                                        </button>
+                                    `;
+                                    if (c.status_claim !== 'menunggu_approval') {
+                                        actionBtnHtml = `
+                                            <button type="button" class="btn-table-secondary" onclick="openModalDetailClaim(${c.id})">
+                                                <i class="fa-solid fa-eye me-1"></i> Rincian
+                                            </button>
+                                        `;
+                                    }
+
                                     bodyClaim.innerHTML += `
                                         <tr>
                                             <td class="font-monospace font-weight-bold" style="font-size: 13.5px;">${escapeHtml(c.kode_claim)}</td>
@@ -6259,9 +6274,7 @@ $loewixPriceList = $tiptokMaster6;
                                             <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(c.total_nominal_insentif)}</td>
                                             <td class="text-center"><span class="taste-badge ${stBadge}">${escapeHtml((c.status_claim || '').toUpperCase())}</span></td>
                                             <td style="text-align: right;">
-                                                <button type="button" class="btn-table-secondary" onclick="openModalDetailClaim(${c.id})">
-                                                    <i class="fa-solid fa-eye me-1"></i> Rincian
-                                                </button>
+                                                ${actionBtnHtml}
                                             </td>
                                         </tr>
                                     `;
