@@ -64,14 +64,16 @@ $types = '';
 $active_sales_id = 0;
 if (isset($_SESSION['role']) && $_SESSION['role'] == 'sales') {
     $active_sales_id = (int)$_SESSION['user_id'];
-    $sql_where_conditions[] = "c.sales_id = ?";
-    $params[] = $_SESSION['user_id'];
-    $types .= 'i';
+    $sql_where_conditions[] = "(c.sales_id = ? OR c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL))";
+    $params[] = $active_sales_id;
+    $params[] = $active_sales_id;
+    $types .= 'ii';
 } elseif ($filter_sales > 0) {
     $active_sales_id = $filter_sales;
-    $sql_where_conditions[] = "c.sales_id = ?";
-    $params[] = $filter_sales;
-    $types .= 'i';
+    $sql_where_conditions[] = "(c.sales_id = ? OR c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL))";
+    $params[] = $active_sales_id;
+    $params[] = $active_sales_id;
+    $types .= 'ii';
 }
 
 if (!empty($filter_kota)) {
@@ -131,7 +133,7 @@ $offset = ($page - 1) * $limit;
 $sql = "
     SELECT 
         c.id, c.tgl_input, c.nama_toko, c.deal, c.kandidat, c.sales_id, c.kategori,
-        s.nama_lengkap AS nama_sales,
+        COALESCE(s.nama_lengkap, (SELECT s2.nama_lengkap FROM follow_ups fu2 JOIN sales s2 ON fu2.sales_id = s2.id WHERE fu2.customer_id = c.id AND fu2.deleted_at IS NULL ORDER BY fu2.id DESC LIMIT 1)) AS nama_sales,
         (SELECT GROUP_CONCAT(DISTINCT cp.nama_pic ORDER BY cp.id SEPARATOR '||') FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL) AS all_pics,
         (SELECT GROUP_CONCAT(DISTINCT cp.tlp_pic ORDER BY cp.id SEPARATOR '||') FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL) AS all_phones,
         (SELECT GROUP_CONCAT(DISTINCT ca.kota ORDER BY ca.id SEPARATOR ', ') FROM customer_addresses ca WHERE ca.customer_id = c.id AND ca.deleted_at IS NULL) AS all_cities,
@@ -213,13 +215,15 @@ $stats_params = [];
 $stats_types = '';
 
 if (isset($_SESSION['role']) && $_SESSION['role'] == 'sales') {
-    $stats_where[] = "c.sales_id = ?";
-    $stats_params[] = $_SESSION['user_id'];
-    $stats_types .= 'i';
+    $stats_where[] = "(c.sales_id = ? OR c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL))";
+    $stats_params[] = (int)$_SESSION['user_id'];
+    $stats_params[] = (int)$_SESSION['user_id'];
+    $stats_types .= 'ii';
 } elseif ($filter_sales > 0) {
-    $stats_where[] = "c.sales_id = ?";
+    $stats_where[] = "(c.sales_id = ? OR c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL))";
     $stats_params[] = $filter_sales;
-    $stats_types .= 'i';
+    $stats_params[] = $filter_sales;
+    $stats_types .= 'ii';
 }
 
 $stats_where_sql = implode(' AND ', $stats_where);
