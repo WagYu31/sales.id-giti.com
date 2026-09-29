@@ -1123,6 +1123,127 @@ $loewixPriceList = $tiptokMaster6;
             border-color: #cbd5e1;
         }
 
+        /* ── Modern Claim Store Table & Toolbar Styling (Quiet Luxury Theme) ── */
+        .card-claim-stores-wrapper {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px -3px rgba(15, 23, 42, 0.04);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .claim-stores-toolbar {
+            padding: 16px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .segmented-claim-tabs {
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 9px;
+            border: 1px solid #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .btn-claim-tab {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 6px 13px;
+            border-radius: 7px;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            line-height: 1.3;
+            cursor: pointer;
+        }
+        .btn-claim-tab:hover {
+            color: #0f172a;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .btn-claim-tab.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+        }
+        .table-claim-modern {
+            margin-bottom: 0;
+            width: 100%;
+        }
+        .table-claim-modern th {
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 13px 15px;
+            border: none;
+            vertical-align: middle !important;
+            white-space: nowrap;
+        }
+        .table-claim-modern td {
+            padding: 13px 15px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+            color: #0f172a;
+            background-color: #ffffff;
+            transition: background-color 0.15s ease;
+        }
+        .table-claim-modern tbody tr:hover td {
+            background-color: #f8fafc !important;
+        }
+        .table-claim-modern tr.store-row-ready td {
+            background-color: rgba(16, 185, 129, 0.035) !important;
+        }
+        .table-claim-modern tr.store-row-ready td:first-child {
+            border-left: 3.5px solid #10b981;
+        }
+        .store-avatar-chip {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .sales-avatar-chip {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+        .claim-progress-wrap {
+            min-width: 220px;
+            max-width: 320px;
+        }
+        .claim-progress-track {
+            height: 8px;
+            border-radius: 6px;
+            background-color: #e2e8f0;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
         /* Modern Minimalist Table Action Buttons */
         .btn-table-primary {
             background: #0f172a;
@@ -2611,9 +2732,14 @@ $loewixPriceList = $tiptokMaster6;
                         <div class="metric-card-themed metric-theme-purple h-100">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="metric-label-txt">Toko Tembus Target (≥ 50 Unit)</span>
-                                <span class="taste-badge badge-active-tag" style="font-size: 11.5px;">
-                                    MIN. 50 UNIT / TOKO
-                                </span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="taste-badge badge-active-tag" style="font-size: 11px;">
+                                        MIN. 50 UNIT / TOKO
+                                    </span>
+                                    <div class="metric-icon-box icon-purple">
+                                        <i class="fa-solid fa-trophy"></i>
+                                    </div>
+                                </div>
                             </div>
                             <div class="metric-val-large">
                                 <span id="claimStatEligibleCount"><?php echo $eligibleStoresCount; ?></span> 
@@ -2646,65 +2772,74 @@ $loewixPriceList = $tiptokMaster6;
                 </div>
 
                 <!-- DAFTAR PROGRES & KLAIM PER TOKO MITRA (HIGH-DENSITY ENTERPRISE TABLE) -->
-                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="font-weight-bold text-dark text-sm text-uppercase" style="letter-spacing: 0.05em;">
-                            <i class="fa-solid fa-store me-1 text-primary"></i> Progres Penjualan & Status Klaim Per Toko Mitra
+                <div class="card-claim-stores-wrapper">
+                    <!-- Header Toolbar -->
+                    <div class="claim-stores-toolbar">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center justify-content-center rounded-3" style="width: 38px; height: 38px; background: #0f172a; color: #ffffff; font-size: 16px; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12); flex-shrink: 0;">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <h6 class="mb-0 font-weight-bold text-dark" style="font-size: 14.5px; letter-spacing: -0.01em;">PROGRES PENJUALAN & STATUS KLAIM PER TOKO MITRA</h6>
+                                    <span class="taste-badge badge-neutral" id="claimStoreCountBadge" style="font-size: 11px; font-weight: 700;">0 Toko</span>
+                                </div>
+                                <div class="text-muted mt-0" style="font-size: 11.5px;">Syarat pencairan insentif minimal 50 unit per masing-masing toko mitra.</div>
+                            </div>
                         </div>
-                        <span class="taste-badge badge-neutral" id="claimStoreCountBadge" style="font-size: 11.5px;">0 Toko</span>
+
+                        <!-- Filter Tabs & Search Controls -->
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <!-- Quick Filter Tabs -->
+                            <div class="segmented-claim-tabs" role="group">
+                                <button type="button" class="btn btn-claim-tab active" id="tabClaimAll" onclick="filterClaimStoresTable('all', this)">
+                                    Semua (<span id="countTabClaimAll">0</span>)
+                                </button>
+                                <button type="button" class="btn btn-claim-tab" id="tabClaimEligible" onclick="filterClaimStoresTable('eligible', this)">
+                                    <i class="fa-solid fa-circle-check text-success"></i> Siap Klaim (<span id="countTabClaimEligible">0</span>)
+                                </button>
+                                <button type="button" class="btn btn-claim-tab" id="tabClaimProgress" onclick="filterClaimStoresTable('progress', this)">
+                                    <i class="fa-solid fa-hourglass-half text-warning"></i> Progres (<span id="countTabClaimProgress">0</span>)
+                                </button>
+                                <button type="button" class="btn btn-claim-tab" id="tabClaimZero" onclick="filterClaimStoresTable('zero', this)">
+                                    Belum Ada Laku (<span id="countTabClaimZero">0</span>)
+                                </button>
+                            </div>
+
+                            <!-- Live Search Input -->
+                            <div class="input-group input-group-sm" style="width: 220px;">
+                                <span class="input-group-text bg-white border-end-0" style="border-radius: 8px 0 0 8px; border-color: #cbd5e1;">
+                                    <i class="fa-solid fa-magnifying-glass text-muted" style="font-size: 12px;"></i>
+                                </span>
+                                <input type="text" id="searchClaimStoresInput" class="form-control form-control-sm border-start-0" placeholder="Cari toko / sales..." style="border-radius: 0 8px 8px 0; font-size: 12px; border-color: #cbd5e1;" oninput="onSearchClaimStores(this.value)">
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Filter Tabs & Search Controls -->
-                    <div class="d-flex flex-wrap align-items-center gap-2">
-                        <!-- Quick Filter Tabs -->
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-secondary active btn-claim-filter-tab" id="tabClaimAll" onclick="filterClaimStoresTable('all', this)" style="font-size: 11.5px; font-weight: 700;">
-                                Semua (<span id="countTabClaimAll">0</span>)
-                            </button>
-                            <button type="button" class="btn btn-outline-success btn-claim-filter-tab" id="tabClaimEligible" onclick="filterClaimStoresTable('eligible', this)" style="font-size: 11.5px; font-weight: 700;">
-                                <i class="fa-solid fa-circle-check me-1"></i>Siap Klaim (<span id="countTabClaimEligible">0</span>)
-                            </button>
-                            <button type="button" class="btn btn-outline-primary btn-claim-filter-tab" id="tabClaimProgress" onclick="filterClaimStoresTable('progress', this)" style="font-size: 11.5px; font-weight: 700;">
-                                Progres (<span id="countTabClaimProgress">0</span>)
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-claim-filter-tab" id="tabClaimZero" onclick="filterClaimStoresTable('zero', this)" style="font-size: 11.5px; font-weight: 700;">
-                                Belum Ada Laku (<span id="countTabClaimZero">0</span>)
-                            </button>
-                        </div>
-
-                        <!-- Live Search Input -->
-                        <div class="input-group input-group-sm" style="width: 220px;">
-                            <span class="input-group-text bg-white border-end-0" style="border-radius: 8px 0 0 8px; border-color: #cbd5e1;">
-                                <i class="fa-solid fa-magnifying-glass text-muted" style="font-size: 12px;"></i>
-                            </span>
-                            <input type="text" id="searchClaimStoresInput" class="form-control form-control-sm border-start-0" placeholder="Cari toko / sales..." style="border-radius: 0 8px 8px 0; font-size: 12px; border-color: #cbd5e1;" oninput="onSearchClaimStores(this.value)">
-                        </div>
+                    <!-- High-Density Table with Smooth Hover -->
+                    <div class="table-responsive" style="margin: 0;">
+                        <table class="table table-claim-modern table-hover mb-0" id="tableClaimStores">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;" class="text-center">NO</th>
+                                    <th><i class="fa-solid fa-store me-1 text-secondary"></i> TOKO / DEALER MITRA</th>
+                                    <th><i class="fa-solid fa-user-tie me-1 text-secondary"></i> SALES PIC</th>
+                                    <th class="text-center" style="width: 140px;"><i class="fa-solid fa-boxes-stacked me-1 text-secondary"></i> UNIT TERJUAL</th>
+                                    <th style="min-width: 260px;"><i class="fa-solid fa-bullseye me-1 text-secondary"></i> PROGRES TARGET (MIN. 50 UNIT)</th>
+                                    <th class="text-end" style="width: 160px;"><i class="fa-solid fa-wallet me-1 text-secondary"></i> ESTIMASI INSENTIF</th>
+                                    <th class="text-center" style="width: 140px;"><i class="fa-solid fa-circle-check me-1 text-secondary"></i> STATUS KLAIM</th>
+                                    <th class="text-end" style="width: 170px;"><i class="fa-solid fa-bolt me-1 text-secondary"></i> AKSI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyClaimStores">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted font-weight-bold">
+                                        <i class="fa-solid fa-spinner fa-spin me-2"></i> Memuat data progres klaim toko...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-
-                <!-- High-Density Table with Smooth Hover -->
-                <div class="table-responsive border rounded-3 mb-4 shadow-sm" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden; background: #fff;">
-                    <table class="table table-vibrant table-hover mb-0" id="tableClaimStores">
-                        <thead>
-                            <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                                <th style="width: 50px;" class="text-center">NO</th>
-                                <th>TOKO / DEALER MITRA</th>
-                                <th>SALES PIC</th>
-                                <th class="text-center" style="width: 140px;">UNIT TERJUAL</th>
-                                <th style="min-width: 240px;">PROGRES TARGET (MIN. 50 UNIT)</th>
-                                <th class="text-end" style="width: 160px;">ESTIMASI INSENTIF</th>
-                                <th class="text-center" style="width: 140px;">STATUS KLAIM</th>
-                                <th class="text-end" style="width: 170px;">AKSI</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyClaimStores">
-                            <tr>
-                                <td colspan="8" class="text-center py-4 text-muted font-weight-bold">
-                                    <i class="fa-solid fa-spinner fa-spin me-2"></i> Memuat data progres klaim toko...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
 
                 <!-- RINCIAN UNIT TERJUAL BELUM DIKLAIM -->
@@ -5989,8 +6124,9 @@ $loewixPriceList = $tiptokMaster6;
             if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" class="text-center py-4 text-muted font-weight-bold">
-                            <i class="fa-solid fa-store-slash mb-1 me-1 text-secondary"></i> Tidak ada toko yang sesuai dengan filter atau pencarian saat ini.
+                        <td colspan="8" class="text-center py-5 text-muted font-weight-bold">
+                            <div class="mb-2"><i class="fa-solid fa-store-slash text-secondary" style="font-size: 26px; opacity: 0.5;"></i></div>
+                            Tidak ada toko mitra yang sesuai dengan filter atau pencarian saat ini.
                         </td>
                     </tr>
                 `;
@@ -5999,53 +6135,83 @@ $loewixPriceList = $tiptokMaster6;
 
             filtered.forEach((s, idx) => {
                 const isReady = s.is_eligible;
-                const safeName = escapeHtml(s.nama_toko);
+                const safeName = escapeHtml(s.nama_toko || 'Toko Mitra');
                 const jsSafeName = safeName.replace(/'/g, "\\'");
                 const progressVal = Math.min(100, s.progress || 0);
                 const hasSales = s.total_unclaimed_units > 0;
 
-                let statusBadge = '<span class="taste-badge badge-neutral" style="font-size: 11px; opacity: 0.65;">BELUM ADA LAKU</span>';
+                const initialChar = (s.nama_toko || 'T').trim().charAt(0).toUpperCase();
+                const avatarBg = isReady ? 'var(--pastel-green-bg)' : (hasSales ? 'var(--pastel-blue-bg)' : '#f1f5f9');
+                const avatarBorder = isReady ? 'var(--pastel-green-border)' : (hasSales ? 'var(--pastel-blue-border)' : '#e2e8f0');
+                const avatarColor = isReady ? 'var(--pastel-green-text)' : (hasSales ? 'var(--pastel-blue-text)' : '#64748b');
+
+                let statusBadge = '<span class="taste-badge badge-neutral" style="font-size: 10.5px; opacity: 0.7; padding: 4px 9px;"><i class="fa-solid fa-minus me-1"></i>BELUM ADA LAKU</span>';
                 if (isReady) {
-                    statusBadge = '<span class="taste-badge badge-active-tag" style="font-size: 11px;"><i class="fa-solid fa-circle-check me-1"></i>SIAP KLAIM</span>';
+                    statusBadge = '<span class="taste-badge badge-active-tag" style="font-size: 11px; padding: 4px 10px; font-weight: 700;"><i class="fa-solid fa-circle-check me-1 text-success"></i>SIAP KLAIM</span>';
                 } else if (hasSales) {
-                    statusBadge = `<span class="taste-badge badge-invoice-tag" style="font-size: 11px;"><i class="fa-solid fa-hourglass-half me-1"></i>PROGRES (${progressVal}%)</span>`;
+                    statusBadge = `<span class="taste-badge badge-invoice-tag" style="font-size: 10.5px; padding: 4px 9px; font-weight: 700;"><i class="fa-solid fa-hourglass-half me-1"></i>PROGRES (${progressVal}%)</span>`;
                 }
 
                 tbody.innerHTML += `
-                    <tr style="${isReady ? 'background-color: rgba(16, 185, 129, 0.04);' : ''}">
-                        <td class="text-center text-muted font-weight-bold" style="font-size: 12px;">${idx + 1}</td>
+                    <tr class="${isReady ? 'store-row-ready' : ''}">
+                        <td class="text-center" style="vertical-align: middle;">
+                            <span class="badge rounded-circle bg-light text-secondary border font-weight-bold" style="width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">
+                                ${idx + 1}
+                            </span>
+                        </td>
                         <td>
-                            <div>
-                                <div class="font-weight-bold text-dark" style="font-size: 14px;">${safeName}</div>
-                                <div class="d-flex align-items-center gap-1 mt-0">
-                                    <span class="taste-badge badge-neutral" style="font-size: 10px; padding: 2px 6px;">${escapeHtml(s.kode_titip || 'TITIP')}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="store-avatar-chip" style="background: ${avatarBg}; border: 1px solid ${avatarBorder}; color: ${avatarColor};">
+                                    ${initialChar}
+                                </div>
+                                <div>
+                                    <div class="font-weight-bold text-dark" style="font-size: 13.5px; line-height: 1.25;">${safeName}</div>
+                                    <div class="d-flex align-items-center gap-1 mt-1">
+                                        <span class="taste-badge badge-neutral" style="font-size: 10px; font-family: monospace; padding: 2px 6px;">
+                                            <i class="fa-solid fa-receipt me-1 text-muted" style="font-size: 9px;"></i>${escapeHtml(s.kode_titip || 'TITIP')}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <div class="font-weight-bold text-dark" style="font-size: 13px;">${escapeHtml(s.nama_sales || '-')}</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="sales-avatar-chip">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                </div>
+                                <div>
+                                    <div class="font-weight-bold text-dark" style="font-size: 12.5px; line-height: 1.2;">${escapeHtml(s.nama_sales || '-')}</div>
+                                    <div class="text-muted" style="font-size: 10.5px;">Sales Rep</div>
+                                </div>
+                            </div>
                         </td>
                         <td class="text-center">
-                            <div class="font-weight-bolder ${isReady ? 'text-success' : (hasSales ? 'text-primary' : 'text-muted')}" style="font-size: 15.5px;">
-                                ${s.total_unclaimed_units} <span class="text-muted" style="font-size: 11.5px; font-weight: 600;">/ 50 Unit</span>
+                            <div class="d-inline-flex align-items-baseline gap-1 px-2 py-1 rounded-3" style="background: ${isReady ? 'var(--pastel-green-bg)' : (hasSales ? 'var(--pastel-blue-bg)' : '#f8fafc')}; border: 1px solid ${isReady ? 'var(--pastel-green-border)' : (hasSales ? 'var(--pastel-blue-border)' : '#e2e8f0')};">
+                                <span class="font-weight-bolder ${isReady ? 'text-success' : (hasSales ? 'text-primary' : 'text-muted')}" style="font-size: 15px;">${s.total_unclaimed_units}</span>
+                                <span class="text-muted font-weight-bold" style="font-size: 11px;">/ 50 pcs</span>
                             </div>
                         </td>
                         <td>
-                            <div style="max-width: 320px;">
-                                <div class="d-flex justify-content-between align-items-center text-xs mb-1">
-                                    <span class="font-weight-bold ${isReady ? 'text-success' : 'text-primary'}">${progressVal}% tercapai</span>
-                                    <span class="${isReady ? 'text-success font-weight-bold' : 'text-muted font-weight-bold'}">
-                                        ${isReady ? '<i class="fa-solid fa-circle-check me-1"></i>Target Tercapai' : `Kurang ${s.sisa_unit} Unit`}
+                            <div class="claim-progress-wrap">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge ${isReady ? 'badge-active-tag' : (hasSales ? 'badge-invoice-tag' : 'badge-neutral')}" style="font-size: 10px; padding: 2px 7px;">
+                                        <i class="fa-solid fa-chart-line me-1"></i>${progressVal}% tercapai
+                                    </span>
+                                    <span class="font-weight-bold ${isReady ? 'text-success' : 'text-muted'}" style="font-size: 11px;">
+                                        ${isReady ? '<i class="fa-solid fa-circle-check text-success me-1"></i>Target Tercapai' : `Kurang <span class="text-danger font-weight-bold">${s.sisa_unit}</span> unit`}
                                     </span>
                                 </div>
-                                <div class="progress" style="height: 7px; border-radius: 4px; background-color: #e2e8f0;">
-                                    <div class="progress-bar ${isReady ? 'bg-success' : 'bg-primary'}" role="progressbar" style="width: ${progressVal}%;" aria-valuenow="${progressVal}" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="claim-progress-track">
+                                    <div class="progress-bar ${isReady ? 'bg-success' : (progressVal >= 50 ? 'bg-primary' : 'bg-info')}" role="progressbar" style="width: ${progressVal}%; height: 100%; transition: width 0.3s ease;" aria-valuenow="${progressVal}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             </div>
                         </td>
                         <td class="text-end">
-                            <div class="font-weight-bolder ${hasSales ? 'text-success' : 'text-muted'}" style="font-size: 14.5px;">
+                            <div class="font-weight-bolder ${hasSales ? 'text-success' : 'text-muted'}" style="font-size: 14.5px; letter-spacing: -0.2px;">
                                 Rp ${new Intl.NumberFormat('id-ID').format(s.total_unclaimed_nominal)}
+                            </div>
+                            <div class="text-muted font-weight-medium" style="font-size: 10.5px;">
+                                ${hasSales ? s.items_count + ' transaksi laku' : 'Belum ada laku'}
                             </div>
                         </td>
                         <td class="text-center">
@@ -6054,16 +6220,16 @@ $loewixPriceList = $tiptokMaster6;
                         <td class="text-end">
                             <div class="d-flex justify-content-end align-items-center gap-1">
                                 ${isReady ? `
-                                    <button type="button" class="btn-taste-primary btn-sm py-1 px-3 font-weight-bold" onclick="openModalSubmitClaimForStore(${s.id_penitipan}, '${jsSafeName}', ${s.total_unclaimed_units}, ${s.total_unclaimed_nominal})">
-                                        <i class="fa-solid fa-paper-plane me-1"></i> Klaim
+                                    <button type="button" class="btn btn-sm btn-success py-1 px-3 font-weight-bold shadow-sm d-inline-flex align-items-center gap-1" style="border-radius: 8px; font-size: 11.5px;" onclick="openModalSubmitClaimForStore(${s.id_penitipan}, '${jsSafeName}', ${s.total_unclaimed_units}, ${s.total_unclaimed_nominal})">
+                                        <i class="fa-solid fa-paper-plane"></i> Klaim
                                     </button>
                                 ` : `
-                                    <button type="button" class="btn btn-sm btn-light py-1 px-2 text-muted border font-weight-bold" disabled style="font-size: 11px; cursor: not-allowed; border-radius: 6px;">
-                                        <i class="fa-solid fa-lock me-1"></i> Min. 50
+                                    <button type="button" class="btn btn-sm btn-light py-1 px-2 text-muted border font-weight-bold d-inline-flex align-items-center gap-1" disabled style="font-size: 11px; cursor: not-allowed; border-radius: 8px; background: #f8fafc;" title="Syarat klaim minimal 50 unit per toko mitra">
+                                        <i class="fa-solid fa-lock text-muted" style="font-size: 10px;"></i> Min. 50
                                     </button>
                                 `}
                                 ${hasSales ? `
-                                    <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Lihat Rincian Unit Toko Ini" onclick="quickFilterStoreUnclaimed(${s.id_penitipan})" style="border-radius: 6px; font-size: 11.5px;">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Filter Rincian Barang Toko Ini" onclick="quickFilterStoreUnclaimed(${s.id_penitipan})" style="border-radius: 8px; font-size: 11px;">
                                         <i class="fa-solid fa-filter"></i>
                                     </button>
                                 ` : ''}
@@ -6076,7 +6242,7 @@ $loewixPriceList = $tiptokMaster6;
 
         function filterClaimStoresTable(filterType, btnEl) {
             currentClaimStoreFilter = filterType;
-            document.querySelectorAll('.btn-claim-filter-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.btn-claim-tab, .btn-claim-filter-tab').forEach(b => b.classList.remove('active'));
             if (btnEl) btnEl.classList.add('active');
             renderClaimStoresTable();
         }
