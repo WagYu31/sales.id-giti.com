@@ -27,9 +27,8 @@ $dbName = $conn->query("SELECT DATABASE()")->fetch_row()[0] ?? 'unknown';
 echo "Database Terhubung: $dbName\n\n";
 
 // 1. CARI BACKUP DATABASE DARI aaPanel (/www/backup/database/)
-echo "[1] Memeriksa Backup Otomatis aaPanel di /www/backup/database/ ...\n";
-$backupDirs = [
-    '/www/backup/database',
+echo "[1] Memeriksa Backup Otomatis aaPanel di /www/backup/ ...\n";
+$backupRoots = [
     '/www/backup',
     '/var/backups',
     __DIR__ . '/backup',
@@ -37,20 +36,22 @@ $backupDirs = [
 ];
 
 $foundBackups = [];
-foreach ($backupDirs as $dir) {
-    if (is_dir($dir)) {
-        $files = scandir($dir);
-        foreach ($files as $f) {
-            if (preg_match('/\.(sql|sql\.gz)$/i', $f)) {
-                $filePath = $dir . '/' . $f;
-                $size = round(filesize($filePath) / 1024 / 1024, 2);
-                $foundBackups[] = [
-                    'path' => $filePath,
-                    'file' => $f,
-                    'size_mb' => $size,
-                    'time' => date('Y-m-d H:i:s', filemtime($filePath))
-                ];
-            }
+foreach ($backupRoots as $root) {
+    if (!is_dir($root)) continue;
+    $it = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+    foreach ($it as $file) {
+        if ($file->isFile() && preg_match('/\.(sql|sql\.gz)$/i', $file->getFilename())) {
+            $path = $file->getPathname();
+            $size = round(filesize($path) / 1024 / 1024, 2);
+            $foundBackups[] = [
+                'path' => $path,
+                'file' => $file->getFilename(),
+                'size_mb' => $size,
+                'time' => date('Y-m-d H:i:s', filemtime($path))
+            ];
         }
     }
 }
