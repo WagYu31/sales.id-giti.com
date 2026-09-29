@@ -441,238 +441,243 @@ $loewixPriceList = $tiptokMaster6;
 
     <style>
         /* ═════════════════════════════════════════════════════════
-           VIBRANT, HIGH-CONTRAST & SENIOR-FRIENDLY DESIGN SYSTEM
+           MINIMALIST EDITORIAL & WARM MONOCHROME DESIGN SYSTEM
+           Refined, quiet luxury UI with muted spot pastels
            ═════════════════════════════════════════════════════════ */
         :root {
-            --bg-canvas: #f1f5f9;
+            --bg-canvas: #f8fafc;
             --surface-card: #ffffff;
-            --border-subtle: #cbd5e1;
-            --border-hover: #94a3b8;
+            --border-subtle: #e2e8f0;
+            --border-hover: #cbd5e1;
             --text-primary: #0f172a;
-            --text-secondary: #334155;
-            --text-muted: #64748b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
             --accent-dark: #0f172a;
-            --accent-blue: #2563eb;
-            --accent-blue-light: #eff6ff;
-            --accent-emerald: #059669;
-            --accent-emerald-light: #ecfdf5;
-            --accent-amber: #d97706;
-            --accent-amber-light: #fffbeb;
-            --accent-purple: #7c3aed;
-            --accent-purple-light: #faf5ff;
-            --accent-rose: #dc2626;
-            --accent-rose-light: #fee2e2;
+
+            /* Muted Spot Pastels (Quiet Luxury) */
+            --pastel-green-bg: #edf3ec;
+            --pastel-green-text: #2d5a27;
+            --pastel-green-border: #d1e7dd;
+
+            --pastel-red-bg: #fdebec;
+            --pastel-red-text: #8f2d2a;
+            --pastel-red-border: #f8d7da;
+
+            --pastel-amber-bg: #fdf6e2;
+            --pastel-amber-text: #855d00;
+            --pastel-amber-border: #ffebaa;
+
+            --pastel-blue-bg: #e1f3fe;
+            --pastel-blue-text: #1e5c8a;
+            --pastel-blue-border: #bee5eb;
+
+            --pastel-slate-bg: #f1f5f9;
+            --pastel-slate-text: #475569;
+            --pastel-slate-border: #e2e8f0;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            background: var(--bg-canvas);
             color: var(--text-primary);
             letter-spacing: -0.01em;
             min-height: 100vh;
         }
 
-        /* ── HERO BANNER HEADER ── */
+        /* ── HERO BANNER HEADER (Executive Architectural Minimalist) ── */
         .hero-banner-tiptok {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e293b 100%);
-            border-radius: 20px;
-            padding: 26px 30px;
+            background: #0f172a;
+            border-radius: 14px;
+            padding: 24px 28px;
             color: #ffffff;
             position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.25);
-            border: 2px solid rgba(255, 255, 255, 0.08);
-            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #1e293b;
+            margin-bottom: 20px;
         }
         .hero-banner-tiptok::after {
-            content: '';
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+            display: none !important;
         }
         .hero-tag {
-            font-size: 12.5px;
-            font-weight: 800;
+            font-size: 11px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            background: rgba(59, 130, 246, 0.25);
-            color: #93c5fd;
-            border: 1px solid rgba(147, 197, 253, 0.4);
-            padding: 5px 14px;
-            border-radius: 20px;
+            letter-spacing: 0.06em;
+            background: rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            padding: 4px 10px;
+            border-radius: 6px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .hero-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 30px;
-            font-weight: 900;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
             color: #ffffff;
             letter-spacing: -0.02em;
             margin: 0;
-            line-height: 1.2;
+            line-height: 1.25;
         }
         .hero-title-highlight {
-            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 0.85em;
+            background: none !important;
+            -webkit-text-fill-color: initial !important;
         }
         .hero-desc {
-            font-size: 14.5px;
-            font-weight: 500;
-            color: #cbd5e1;
+            font-size: 13.5px;
+            font-weight: 400;
+            color: #94a3b8;
             margin: 6px 0 0 0;
-            max-width: 680px;
+            max-width: 620px;
             line-height: 1.5;
         }
         .btn-hero-claim {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: rgba(255, 255, 255, 0.08);
             color: #ffffff;
-            border: 2px solid #fbbf24;
-            border-radius: 12px;
-            padding: 11px 22px;
-            font-size: 14.5px;
-            font-weight: 800;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 9px 18px;
+            font-size: 13.5px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 16px rgba(217, 119, 6, 0.35);
+            transition: all 0.15s ease;
+            box-shadow: none;
             text-decoration: none;
             cursor: pointer;
         }
         .btn-hero-claim:hover {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.3);
             color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45);
+            transform: translateY(-1px);
         }
         .btn-hero-add {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: #ffffff;
-            border: 2px solid #34d399;
-            border-radius: 12px;
-            padding: 11px 24px;
-            font-size: 14.5px;
-            font-weight: 800;
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid #ffffff;
+            border-radius: 8px;
+            padding: 9px 20px;
+            font-size: 13.5px;
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             text-decoration: none;
             cursor: pointer;
         }
         .btn-hero-add:hover {
-            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-            color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+            background: #f1f5f9;
+            color: #0f172a;
+            border-color: #f1f5f9;
+            transform: translateY(-1px);
         }
         .btn-hero-invoice {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            color: #ffffff;
-            border: 2px solid #38bdf8;
-            border-radius: 12px;
-            padding: 11px 22px;
-            font-size: 14.5px;
-            font-weight: 800;
+            background: rgba(255, 255, 255, 0.06);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 8px;
+            padding: 9px 18px;
+            font-size: 13.5px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
+            transition: all 0.15s ease;
+            box-shadow: none;
             text-decoration: none;
             cursor: pointer;
         }
         .btn-hero-invoice:hover {
-            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
             color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+            transform: translateY(-1px);
         }
 
+        /* ── BENTO METRICS GRID (Warm Minimalist) ── */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
         @media (max-width: 1100px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .metrics-grid { grid-template-columns: 1fr; } }
 
         .metric-card-themed {
-            border-radius: 18px;
-            padding: 22px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px;
+            padding: 18px 20px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
         }
         .metric-card-themed:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.12);
+            border-color: #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
         
-        /* Themed Variations */
-        .metric-theme-blue {
-            background: linear-gradient(145deg, #ffffff 0%, #eff6ff 100%);
-            border: 2px solid #bfdbfe;
-            border-top: 6px solid #2563eb;
-        }
-        .metric-theme-emerald {
-            background: linear-gradient(145deg, #ffffff 0%, #ecfdf5 100%);
-            border: 2px solid #a7f3d0;
-            border-top: 6px solid #059669;
-        }
-        .metric-theme-amber {
-            background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%);
-            border: 2px solid #fde68a;
-            border-top: 6px solid #d97706;
-        }
+        /* Themed Variations - Normalized to Clean Monochromatic Surfaces */
+        .metric-theme-blue,
+        .metric-theme-emerald,
+        .metric-theme-amber,
         .metric-theme-purple {
-            background: linear-gradient(145deg, #ffffff 0%, #faf5ff 100%);
-            border: 2px solid #e9d5ff;
-            border-top: 6px solid #7c3aed;
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-top: 1px solid #e2e8f0 !important;
         }
 
         .metric-icon-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 15px;
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #475569 !important;
+            box-shadow: none !important;
         }
-        .icon-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-        .icon-emerald { background: linear-gradient(135deg, #10b981, #047857); color: #fff; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
-        .icon-amber { background: linear-gradient(135deg, #f59e0b, #b45309); color: #fff; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); }
-        .icon-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+        .icon-blue,
+        .icon-emerald,
+        .icon-amber,
+        .icon-purple {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            box-shadow: none !important;
+        }
 
         .metric-label-txt {
-            font-size: 13px;
-            font-weight: 800;
+            font-size: 11.5px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #475569;
+            letter-spacing: 0.04em;
+            color: #64748b;
         }
         .metric-val-large {
-            font-family: 'Outfit', sans-serif;
-            font-size: 34px;
-            font-weight: 900;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
             letter-spacing: -0.02em;
-            line-height: 1.1;
+            line-height: 1.15;
             margin: 8px 0;
+            color: #0f172a !important;
         }
 
         /* ── Segmented Nav & Search ── */
@@ -681,208 +686,203 @@ $loewixPriceList = $tiptokMaster6;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 14px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
         .segmented-nav-vibrant {
             background: #ffffff;
-            padding: 6px;
-            border-radius: 14px;
+            padding: 4px;
+            border-radius: 10px;
             display: inline-flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 6px;
-            border: 2px solid #cbd5e1;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+            gap: 4px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
         }
         .segment-btn-vibrant {
-            border: 1.5px solid transparent;
-            background: #ffffff;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 13.5px;
-            font-weight: 800;
-            color: #475569;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 7px 14px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
             cursor: pointer;
-            transition: all 0.18s ease;
+            transition: all 0.15s ease;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .segment-btn-vibrant:hover {
-            background: #f1f5f9;
+            background: #f8fafc;
             color: #0f172a;
-            border-color: #cbd5e1;
         }
         .segment-btn-vibrant.active {
             background: #0f172a !important;
             color: #ffffff !important;
             border-color: #0f172a !important;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+            box-shadow: none !important;
         }
         .segment-btn-vibrant.active .segment-badge-vibrant {
-            background: rgba(255, 255, 255, 0.2) !important;
+            background: rgba(255, 255, 255, 0.15) !important;
             color: #ffffff !important;
         }
         .segment-badge-vibrant {
-            font-size: 12px;
-            font-weight: 800;
-            background: #e2e8f0;
-            color: #0f172a;
-            padding: 2px 8px;
-            border-radius: 6px;
-            transition: all 0.18s ease;
+            font-size: 11px;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 2px 7px;
+            border-radius: 5px;
+            transition: all 0.15s ease;
         }
         .btn-tab-claim-vibrant {
-            background: #fffbeb;
-            color: #92400e;
-            border: 1.5px solid #fde68a;
+            background: transparent;
+            color: #475569;
+            border: 1px solid transparent;
         }
         .btn-tab-claim-vibrant:hover {
-            background: #fef3c7;
-            color: #78350f;
-            border-color: #f59e0b;
+            background: #f8fafc;
+            color: #0f172a;
         }
         .btn-tab-claim-vibrant.active {
             background: #0f172a !important;
-            color: #fbbf24 !important;
+            color: #ffffff !important;
             border-color: #0f172a !important;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+            box-shadow: none !important;
         }
         .btn-tab-claim-vibrant.active i {
-            color: #fbbf24 !important;
+            color: #ffffff !important;
         }
 
         .search-container-vibrant {
             position: relative;
-            min-width: 320px;
+            min-width: 280px;
             flex: 1;
-            max-width: 420px;
+            max-width: 360px;
         }
         .search-icon-vibrant {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 15px;
-            color: #3b82f6;
+            font-size: 13.5px;
+            color: #94a3b8;
             pointer-events: none;
         }
         .search-input-vibrant {
             width: 100%;
-            height: 48px;
+            height: 40px;
             background: #ffffff;
-            border: 2px solid #cbd5e1;
-            border-radius: 14px;
-            padding: 8px 16px 8px 44px;
-            font-size: 14.5px;
-            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            padding: 6px 14px 6px 38px;
+            font-size: 13.5px;
+            font-weight: 500;
             color: #0f172a;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+            transition: all 0.15s ease;
+            box-shadow: none;
         }
         .search-input-vibrant:focus {
-            border-color: #2563eb;
+            border-color: #0f172a;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06);
         }
 
-        /* ── Professional Filter Suite (Accurate & Executive Style) ── */
+        /* ── Professional Filter Suite (Minimalist Layout) ── */
         .tiptok-filter-card {
             background: #ffffff;
-            border: 2px solid #cbd5e1;
-            border-radius: 16px;
-            padding: 18px 22px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            transition: border-color 0.15s ease;
         }
         .tiptok-filter-card:hover {
-            border-color: #94a3b8;
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+            border-color: #cbd5e1;
         }
         .filter-suite-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 14px;
-            padding-bottom: 12px;
-            border-bottom: 1.5px solid #f1f5f9;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
         }
         .filter-icon-badge {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            color: #2563eb;
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            background: #f8fafc;
+            color: #475569;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
-            border: 1px solid #bfdbfe;
+            font-size: 13px;
+            border: 1px solid #e2e8f0;
         }
         .filter-field-label {
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.03em;
             color: #475569;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
         .filter-field-select {
-            height: 42px;
-            background: #f8fafc;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
+            height: 38px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 500;
             color: #0f172a;
-            transition: all 0.2s ease;
-            padding: 6px 12px;
+            transition: all 0.15s ease;
+            padding: 6px 10px;
         }
         .filter-field-select:hover {
-            background: #ffffff;
-            border-color: #94a3b8;
+            border-color: #cbd5e1;
         }
         .filter-field-select:focus {
-            background: #ffffff;
-            border-color: #2563eb;
+            border-color: #0f172a;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06);
         }
         .active-tag-chip {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            padding: 3px 9px;
-            border-radius: 6px;
+            gap: 5px;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            padding: 3px 8px;
+            border-radius: 5px;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 600;
             transition: all 0.15s ease;
         }
         .active-tag-chip .remove-chip {
             cursor: pointer;
-            color: #93c5fd;
+            color: #94a3b8;
             margin-left: 2px;
             transition: color 0.15s ease;
         }
         .active-tag-chip .remove-chip:hover {
-            color: #dc2626;
+            color: #8f2d2a;
         }
 
-        /* ── Data Surface Table (Colorful Overhaul) ── */
+        /* ── Data Surface Table (Warm Monochrome Architecture) ── */
         .data-card-vibrant {
             background: #ffffff;
-            border: 2px solid #cbd5e1;
-            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
             margin-bottom: 24px;
         }
         .table-vibrant {
@@ -892,33 +892,33 @@ $loewixPriceList = $tiptokMaster6;
             margin: 0;
         }
         .table-vibrant th {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: #0f172a;
             color: #ffffff;
-            font-size: 12.5px;
-            font-weight: 800;
+            font-size: 11.5px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 16px 18px;
-            border-bottom: 3px solid #3b82f6;
+            letter-spacing: 0.04em;
+            padding: 13px 16px;
+            border-bottom: 1px solid #1e293b;
             white-space: nowrap;
         }
         .table-vibrant td {
-            padding: 14px 16px !important;
+            padding: 12px 14px !important;
             vertical-align: top !important;
-            border-bottom: 1.5px solid #e2e8f0;
-            font-size: 13.5px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
             color: #0f172a;
             background-color: #ffffff;
             transition: background-color 0.15s ease;
         }
 
-        /* Compact Inventory Monitoring Feed for Main Table */
+        /* Minimal Inventory Feed */
         .monitoring-box {
             background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
             padding: 4px 6px;
-            max-height: 155px;
+            max-height: 140px;
             overflow-y: auto;
         }
         .monitoring-box::-webkit-scrollbar {
@@ -932,182 +932,204 @@ $loewixPriceList = $tiptokMaster6;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 3px 7px;
+            padding: 3px 6px;
             margin-bottom: 2px;
             background: #ffffff;
             border: 1px solid #f1f5f9;
-            border-radius: 6px;
+            border-radius: 5px;
             font-size: 11.5px;
             transition: background 0.12s ease;
         }
         .monitoring-item-row:hover {
-            background: #f1f5f9;
+            background: #f8fafc;
             border-color: #e2e8f0;
         }
         .badge-sisa-pill {
-            background: #ecfdf5;
-            color: #059669;
-            border: 1px solid #a7f3d0;
-            padding: 1px 6px;
+            background: var(--pastel-green-bg);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+            padding: 1px 5px;
             border-radius: 4px;
-            font-size: 11px;
-            font-weight: 800;
+            font-size: 10.5px;
+            font-weight: 700;
         }
         .badge-laku-pill {
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
-            padding: 1px 6px;
+            background: var(--pastel-red-bg);
+            color: var(--pastel-red-text);
+            border: 1px solid var(--pastel-red-border);
+            padding: 1px 5px;
             border-radius: 4px;
-            font-size: 11px;
-            font-weight: 800;
+            font-size: 10.5px;
+            font-weight: 700;
         }
         .table-vibrant tr:nth-child(even) td {
-            background-color: #fbfcfe;
+            background-color: #ffffff;
         }
         .table-vibrant tr:hover td {
-            background-color: #eff6ff !important;
+            background-color: #f8fafc !important;
         }
         .table-vibrant tr:last-child td {
             border-bottom: none;
         }
 
-        /* Badges & Micro Chips */
+        /* Muted Spot Pastel Badges */
         .taste-badge {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 12.5px;
-            font-weight: 800;
-            border: 1.5px solid transparent;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
             line-height: 1.2;
+            border: 1px solid transparent;
         }
-        .badge-neutral { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
-        .badge-dealer-tag { background: #dbeafe; color: #1e40af; border-color: #93c5fd; font-weight: 800; }
-        .badge-active-tag { background: #dcfce7; color: #15803d; border-color: #86efac; font-weight: 800; }
-        .badge-invoice-tag { background: #fef3c7; color: #92400e; border-color: #fcd34d; font-family: monospace; font-size: 13px; font-weight: 800; }
-        .badge-danger-tag { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; font-weight: 800; }
-        .badge-sales-tag { background: #f3e8ff; color: #6b21a8; border-color: #d8b4fe; font-weight: 800; }
+        .badge-neutral { 
+            background: var(--pastel-slate-bg); 
+            color: var(--pastel-slate-text); 
+            border-color: var(--pastel-slate-border); 
+        }
+        .badge-dealer-tag { 
+            background: var(--pastel-slate-bg); 
+            color: var(--pastel-slate-text); 
+            border-color: var(--pastel-slate-border); 
+            font-weight: 600; 
+        }
+        .badge-active-tag { 
+            background: var(--pastel-green-bg); 
+            color: var(--pastel-green-text); 
+            border-color: var(--pastel-green-border); 
+            font-weight: 700; 
+        }
+        .badge-invoice-tag { 
+            background: var(--pastel-amber-bg); 
+            color: var(--pastel-amber-text); 
+            border-color: var(--pastel-amber-border); 
+            font-family: monospace; 
+            font-size: 11.5px; 
+            font-weight: 700; 
+        }
+        .badge-danger-tag { 
+            background: var(--pastel-red-bg); 
+            color: var(--pastel-red-text); 
+            border-color: var(--pastel-red-border); 
+            font-weight: 700; 
+        }
+        .badge-sales-tag { 
+            background: #f8fafc; 
+            color: #64748b; 
+            border-color: #e2e8f0; 
+            font-weight: 600; 
+        }
 
         /* Item Row Pill */
         .taste-item-pill {
             background: #ffffff;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 10px;
-            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 7px 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 10px;
             margin: 4px 0;
-            box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
-            transition: all 0.15s ease;
+            box-shadow: none;
+            transition: border-color 0.15s ease;
         }
         .taste-item-pill:hover {
-            border-color: #94a3b8;
-            box-shadow: 0 4px 8px rgba(15, 23, 42, 0.08);
+            border-color: #cbd5e1;
         }
 
-        /* Modern Vibrant Table Action Buttons */
+        /* Modern Minimalist Table Action Buttons */
         .btn-table-primary {
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            background: #0f172a;
             color: #ffffff !important;
-            border: none;
-            border-radius: 9px;
-            height: 33px;
-            padding: 0 13px;
-            font-size: 12.5px;
-            font-weight: 700;
+            border: 1px solid #0f172a;
+            border-radius: 7px;
+            height: 30px;
+            padding: 0 10px;
+            font-size: 11.5px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.32);
+            gap: 5px;
+            transition: all 0.15s ease;
+            box-shadow: none;
             cursor: pointer;
             text-decoration: none;
             white-space: nowrap;
-            letter-spacing: 0.01em;
         }
         .btn-table-primary:hover {
-            background: linear-gradient(135deg, #047857 0%, #059669 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
+            background: #334155;
+            border-color: #334155;
             color: #ffffff !important;
-        }
-        .btn-table-primary:active {
-            transform: translateY(0);
         }
 
         .btn-table-secondary {
-            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-            color: #ffffff !important;
-            border: none;
-            border-radius: 9px;
-            width: 33px;
-            height: 33px;
-            font-size: 13px;
+            background: #ffffff;
+            color: #475569 !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            width: 30px;
+            height: 30px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+            transition: all 0.15s ease;
+            box-shadow: none;
             cursor: pointer;
             text-decoration: none;
         }
         .btn-table-secondary:hover {
-            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.4);
-            color: #ffffff !important;
+            background: #f8fafc;
+            color: #0f172a !important;
+            border-color: #cbd5e1;
         }
 
         .btn-table-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: #ffffff !important;
-            border: none;
-            border-radius: 9px;
-            width: 33px;
-            height: 33px;
-            font-size: 13px;
+            background: #ffffff;
+            color: #475569 !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            width: 30px;
+            height: 30px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 3px 8px rgba(245, 158, 11, 0.25);
+            transition: all 0.15s ease;
+            box-shadow: none;
             cursor: pointer;
             text-decoration: none;
         }
         .btn-table-warning:hover {
-            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(245, 158, 11, 0.4);
-            color: #ffffff !important;
+            background: var(--pastel-amber-bg);
+            color: var(--pastel-amber-text) !important;
+            border-color: var(--pastel-amber-border);
         }
 
         .btn-table-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: #ffffff !important;
-            border: none;
-            border-radius: 9px;
-            width: 33px;
-            height: 33px;
-            font-size: 13px;
+            background: #ffffff;
+            color: #475569 !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            width: 30px;
+            height: 30px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 3px 8px rgba(239, 68, 68, 0.25);
+            transition: all 0.15s ease;
+            box-shadow: none;
             cursor: pointer;
             text-decoration: none;
         }
         .btn-table-danger:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(239, 68, 68, 0.4);
-            color: #ffffff !important;
+            background: var(--pastel-red-bg);
+            color: var(--pastel-red-text) !important;
+            border-color: var(--pastel-red-border);
         }
 
         /* Modal Styles & Smooth Scrolling Architecture */
@@ -1531,36 +1553,38 @@ $loewixPriceList = $tiptokMaster6;
             border-color: #cbd5e1;
             box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
         }
-        .kpi-bento-card.card-blue { border-left: 4px solid #3b82f6; }
-        .kpi-bento-card.card-emerald { border-left: 4px solid #10b981; }
-        .kpi-bento-card.card-amber { border-left: 4px solid #f59e0b; }
-        .kpi-bento-card.card-purple { border-left: 4px solid #8b5cf6; }
+        .kpi-bento-card.card-blue,
+        .kpi-bento-card.card-emerald,
+        .kpi-bento-card.card-amber,
+        .kpi-bento-card.card-purple { 
+            border: 1px solid #e2e8f0; 
+        }
 
         .kpi-icon-pill {
             width: 32px;
             height: 32px;
-            border-radius: 9px;
+            border-radius: 8px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-size: 13px;
         }
-        .pill-blue { background: #eff6ff; color: #2563eb; }
-        .pill-emerald { background: #ecfdf5; color: #059669; }
-        .pill-amber { background: #fffbeb; color: #d97706; }
-        .pill-purple { background: #f5f3ff; color: #7c3aed; }
+        .pill-blue { background: var(--pastel-slate-bg); color: var(--pastel-slate-text); }
+        .pill-emerald { background: var(--pastel-green-bg); color: var(--pastel-green-text); }
+        .pill-amber { background: var(--pastel-amber-bg); color: var(--pastel-amber-text); }
+        .pill-purple { background: var(--pastel-slate-bg); color: var(--pastel-slate-text); }
 
         .kpi-label {
             font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.06em;
+            font-weight: 700;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
             color: #64748b;
         }
         .kpi-value {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             line-height: 1.2;
             margin-top: 4px;
             margin-bottom: 2px;
@@ -1568,7 +1592,7 @@ $loewixPriceList = $tiptokMaster6;
         }
         .kpi-subtext {
             font-size: 11.5px;
-            font-weight: 600;
+            font-weight: 500;
             color: #94a3b8;
         }
 
@@ -1582,17 +1606,17 @@ $loewixPriceList = $tiptokMaster6;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
         }
         .store-avatar-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            color: #2563eb;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #0f172a;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             flex-shrink: 0;
-            border: 1px solid #bfdbfe;
+            border: 1px solid #e2e8f0;
         }
         .detail-meta-pill {
             display: flex;
@@ -1981,12 +2005,12 @@ $loewixPriceList = $tiptokMaster6;
 
         <div class="container-fluid py-4 px-4">
 
-            <!-- 1. VIBRANT HERO BANNER HEADER -->
+            <!-- 1. MINIMALIST HERO BANNER HEADER -->
             <div class="hero-banner-tiptok">
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                     <div>
                         <div class="hero-tag">
-                            <i class="fa-solid fa-sparkles text-warning me-1"></i> APLIKASI SALES & KONSINYASI
+                            <i class="fa-solid fa-layer-group me-1"></i> APLIKASI SALES &amp; KONSINYASI
                         </div>
                         <h1 class="hero-title">
                             TIP TOK <span class="hero-title-highlight">(Titip Barang Di Toko)</span>
@@ -1995,26 +2019,26 @@ $loewixPriceList = $tiptokMaster6;
                             Manajemen penitipan stok toko dealer mitra, pemantauan sisa fisik kunjungan, dan klaim reward insentif min. 50 unit.
                         </p>
                     </div>
-                    <div class="d-flex align-items-center gap-2.5 flex-wrap">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
                         <a href="tiptok-invoice.php" class="btn-hero-invoice">
-                            <i class="fa-solid fa-receipt" style="font-size: 17px;"></i>
+                            <i class="fa-solid fa-receipt"></i>
                             <span>No. Invoice TIP TOK</span>
                         </a>
                         <button class="btn-hero-claim" onclick="openTabKlaimInsentif()">
-                            <i class="fa-solid fa-hand-holding-dollar text-warning-light" style="font-size: 18px;"></i>
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
                             <span>Klaim Insentif</span>
                         </button>
                         <button class="btn-hero-add" onclick="openModalTambahPenitipan()">
-                            <i class="fa-solid fa-circle-plus" style="font-size: 18px;"></i>
+                            <i class="fa-solid fa-plus"></i>
                             <span>Titip Barang Baru</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. HIGH-CONTRAST COLORFUL BENTO METRICS GRID -->
+            <!-- 2. MINIMALIST BENTO METRICS GRID -->
             <div class="metrics-grid">
-                <!-- Metric 1: Toko Aktif (Ocean Blue Theme) -->
+                <!-- Metric 1: Toko Aktif -->
                 <div class="metric-card-themed metric-theme-blue">
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="metric-label-txt">Toko Dealer Aktif</span>
@@ -2022,18 +2046,18 @@ $loewixPriceList = $tiptokMaster6;
                             <i class="fa-solid fa-store"></i>
                         </div>
                     </div>
-                    <div class="metric-val-large" id="metricValTokoAktif" style="color: #1d4ed8;">
+                    <div class="metric-val-large" id="metricValTokoAktif">
                         <?php echo number_format($totalTokoAktif, 0, ',', '.'); ?>
                     </div>
                     <div class="d-flex align-items-center gap-2" id="metricSubToko">
-                        <span class="taste-badge badge-active-tag" style="font-size:12px; padding:3px 10px;">
-                            <i class="fa-solid fa-circle text-xxs me-1"></i> Aktif
+                        <span class="taste-badge badge-active-tag">
+                            Aktif
                         </span>
-                        <span style="font-weight: 700; color: #334155; font-size: 13.5px;">dengan stok titipan</span>
+                        <span style="font-weight: 500; color: #64748b; font-size: 13px;">dengan stok titipan</span>
                     </div>
                 </div>
 
-                <!-- Metric 2: Sisa Stok di Toko (Emerald Mint Theme) -->
+                <!-- Metric 2: Sisa Stok di Toko -->
                 <div class="metric-card-themed metric-theme-emerald">
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="metric-label-txt">Sisa Stok di Toko</span>
@@ -2041,19 +2065,19 @@ $loewixPriceList = $tiptokMaster6;
                             <i class="fa-solid fa-boxes-stacked"></i>
                         </div>
                     </div>
-                    <div class="metric-val-large" style="color: #047857;">
+                    <div class="metric-val-large">
                         <span id="metricValSisa"><?php echo number_format($totalUnitSisa, 0, ',', '.'); ?></span> 
-                        <span style="font-size: 16px; font-weight: 800; color: #64748b;">/ <span id="metricValTitip"><?php echo number_format($totalUnitTitip, 0, ',', '.'); ?></span> unit</span>
+                        <span style="font-size: 14.5px; font-weight: 600; color: #64748b;">/ <span id="metricValTitip"><?php echo number_format($totalUnitTitip, 0, ',', '.'); ?></span> unit</span>
                     </div>
-                    <div class="d-flex align-items-center gap-2" style="font-size: 13.5px; font-weight: 700; color: #334155;">
+                    <div class="d-flex align-items-center gap-2" style="font-size: 13px; font-weight: 600; color: #64748b;">
                         <span>Terjual:</span>
-                        <span class="taste-badge badge-danger-tag" style="font-size: 13px; padding: 2px 10px;">
+                        <span class="taste-badge badge-danger-tag">
                             <span id="metricValTerjual"><?php echo number_format($totalUnitTerjual, 0, ',', '.'); ?></span> Unit
                         </span>
                     </div>
                 </div>
 
-                <!-- Metric 3: Akumulasi Insentif (Golden Amber Theme) -->
+                <!-- Metric 3: Akumulasi Insentif -->
                 <div class="metric-card-themed metric-theme-amber">
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="metric-label-txt">Akumulasi Insentif</span>
@@ -2061,32 +2085,32 @@ $loewixPriceList = $tiptokMaster6;
                             <i class="fa-solid fa-coins"></i>
                         </div>
                     </div>
-                    <div class="metric-val-large" style="font-size: 30px; color: #b45309;">
+                    <div class="metric-val-large">
                         Rp <span id="metricValInsentif"><?php echo number_format($totalInsentifPool, 0, ',', '.'); ?></span>
                     </div>
-                    <div style="font-size: 13px; font-weight: 700; color: #64748b;" id="metricSubInsentif">
-                        <i class="fa-solid fa-circle-check text-success me-1"></i> Dari total <strong class="text-dark" id="metricInsentifTerjualUnit"><?php echo number_format($totalUnitTerjual, 0, ',', '.'); ?> unit</strong> yang telah terjual
+                    <div style="font-size: 12.5px; font-weight: 500; color: #64748b;" id="metricSubInsentif">
+                        Dari total <strong class="text-dark" id="metricInsentifTerjualUnit"><?php echo number_format($totalUnitTerjual, 0, ',', '.'); ?> unit</strong> yang terjual
                     </div>
                 </div>
 
-                <!-- Metric 4: Target Klaim 50 Unit (Royal Purple Theme) -->
+                <!-- Metric 4: Target Klaim 50 Unit -->
                 <div class="metric-card-themed metric-theme-purple">
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="metric-label-txt">Target Klaim (Min. 50 Unit)</span>
-                        <span id="metricClaimStatusBadge" class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>" style="font-size: 12px; padding: 3px 8px;">
+                        <span id="metricClaimStatusBadge" class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>">
                             <?php echo $isClaimEligible ? 'SIAP KLAIM' : 'PROSES'; ?>
                         </span>
                     </div>
-                    <div class="metric-val-large" style="color: #6d28d9;">
+                    <div class="metric-val-large">
                         <span id="metricValUnclaimed"><?php echo $unclaimedUnits; ?></span> 
-                        <span style="font-size: 16px; font-weight: 800; color: #64748b;">/ 50 unit</span>
+                        <span style="font-size: 14.5px; font-weight: 600; color: #64748b;">/ 50 unit</span>
                     </div>
-                    <div class="progress mt-1 mb-1" style="height: 10px; background-color: #e2e8f0; border-radius: 20px; overflow: hidden;">
-                        <div class="progress-bar" id="metricClaimProgressBar" style="width: <?php echo $claimProgress; ?>%; background: <?php echo $isClaimEligible ? '#059669' : 'linear-gradient(90deg, #7c3aed, #ec4899)'; ?>; border-radius: 20px;"></div>
+                    <div class="progress mt-1 mb-1" style="height: 6px; background-color: #e2e8f0; border-radius: 6px; overflow: hidden;">
+                        <div class="progress-bar" id="metricClaimProgressBar" style="width: <?php echo $claimProgress; ?>%; background: <?php echo $isClaimEligible ? '#15803d' : '#0f172a'; ?>; border-radius: 6px;"></div>
                     </div>
-                    <div class="d-flex justify-content-between" style="font-size: 12.5px; font-weight: 800;">
+                    <div class="d-flex justify-content-between" style="font-size: 12px; font-weight: 600;">
                         <span style="color: #64748b;" id="metricClaimProgressTxt"><?php echo $claimProgress; ?>% tercapai</span>
-                        <span id="metricClaimRemainingTxt" style="color: <?php echo $isClaimEligible ? '#059669' : '#dc2626'; ?>;"><?php echo $isClaimEligible ? 'Target tercapai!' : "Kurang $sisaTarget unit"; ?></span>
+                        <span id="metricClaimRemainingTxt" style="color: <?php echo $isClaimEligible ? '#15803d' : '#64748b'; ?>;"><?php echo $isClaimEligible ? 'Target tercapai!' : "Kurang $sisaTarget unit"; ?></span>
                     </div>
                 </div>
             </div>
@@ -2098,16 +2122,16 @@ $loewixPriceList = $tiptokMaster6;
                         <i class="fa-solid fa-list-ul me-1"></i> Semua <span class="segment-badge-vibrant" id="badgeCountAll">0</span>
                     </button>
                     <button id="btnFilterAktif" class="segment-btn-vibrant" onclick="filterTable('aktif', this)">
-                        <i class="fa-solid fa-circle-check text-success me-1"></i> Stok Aktif <span class="segment-badge-vibrant" id="badgeCountAktif">0</span>
+                        <i class="fa-solid fa-circle-check me-1"></i> Stok Aktif <span class="segment-badge-vibrant" id="badgeCountAktif">0</span>
                     </button>
                     <button id="btnFilterTerjual" class="segment-btn-vibrant" onclick="filterTable('terjual', this)">
-                        <i class="fa-solid fa-fire text-warning me-1"></i> Ada Penjualan <span class="segment-badge-vibrant" id="badgeCountTerjual">0</span>
+                        <i class="fa-solid fa-bolt me-1"></i> Ada Penjualan <span class="segment-badge-vibrant" id="badgeCountTerjual">0</span>
                     </button>
                     <button id="btnFilterSelesai" class="segment-btn-vibrant" onclick="filterTable('selesai', this)">
-                        <i class="fa-solid fa-flag-checkered text-secondary me-1"></i> Selesai <span class="segment-badge-vibrant" id="badgeCountSelesai">0</span>
+                        <i class="fa-solid fa-check-double me-1"></i> Selesai <span class="segment-badge-vibrant" id="badgeCountSelesai">0</span>
                     </button>
                     <button id="btnTabKlaimInsentif" class="segment-btn-vibrant btn-tab-claim-vibrant" onclick="switchViewToClaims(this)">
-                        <i class="fa-solid fa-receipt text-warning"></i> Tab Klaim Insentif
+                        <i class="fa-solid fa-receipt me-1"></i> Tab Klaim Insentif
                     </button>
                 </div>
 
@@ -2128,7 +2152,7 @@ $loewixPriceList = $tiptokMaster6;
                             <i class="fa-solid fa-sliders"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold mb-0 text-dark" style="font-size: 14.5px;">Filter &amp; Penelusuran Cepat TIP TOK</h6>
+                            <h6 class="fw-bold mb-0 text-dark" style="font-size: 14px;">Filter &amp; Penelusuran Cepat TIP TOK</h6>
                             <span class="text-muted" style="font-size: 11.5px;">Saring data stok titipan toko mitra berdasarkan kriteria spesifik</span>
                         </div>
                     </div>
@@ -2143,7 +2167,7 @@ $loewixPriceList = $tiptokMaster6;
                     <!-- Dropdown 1: Toko / Mitra -->
                     <div class="col-lg-4 col-md-6 col-12">
                         <label class="filter-field-label">
-                            <i class="fa-solid fa-store text-primary"></i> Toko / Dealer Mitra
+                            <i class="fa-solid fa-store text-muted"></i> Toko / Dealer Mitra
                         </label>
                         <select id="filterToko" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
                             <option value="">Semua Toko Mitra (<?php echo count($uniqueTokos); ?> Toko)</option>
@@ -2158,20 +2182,20 @@ $loewixPriceList = $tiptokMaster6;
                     <!-- Dropdown 2: Status Penitipan -->
                     <div class="col-lg-4 col-md-6 col-12">
                         <label class="filter-field-label">
-                            <i class="fa-solid fa-circle-check text-success"></i> Status Penitipan
+                            <i class="fa-solid fa-circle-check text-muted"></i> Status Penitipan
                         </label>
                         <select id="filterStatus" class="form-select filter-field-select" onchange="onFilterStatusChange(this.value)">
                             <option value="">Semua Status</option>
-                            <option value="aktif">🟢 Stok Aktif (Ada Sisa)</option>
-                            <option value="terjual">🔥 Ada Penjualan</option>
-                            <option value="selesai">🏁 Selesai / Habis</option>
+                            <option value="aktif">Stok Aktif (Ada Sisa)</option>
+                            <option value="terjual">Ada Penjualan</option>
+                            <option value="selesai">Selesai / Habis</option>
                         </select>
                     </div>
 
                     <!-- Dropdown 3: Periode Titip -->
                     <div class="col-lg-4 col-md-6 col-12">
                         <label class="filter-field-label">
-                            <i class="fa-regular fa-calendar-days text-warning"></i> Periode Titip (Bulan)
+                            <i class="fa-regular fa-calendar-days text-muted"></i> Periode Titip (Bulan)
                         </label>
                         <select id="filterPeriode" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
                             <option value="">Semua Periode</option>
@@ -2184,7 +2208,7 @@ $loewixPriceList = $tiptokMaster6;
                     <!-- Dropdown 4: Petugas Sales -->
                     <div class="col-lg-4 col-md-6 col-12">
                         <label class="filter-field-label">
-                            <i class="fa-solid fa-user-tie text-purple"></i> Petugas Sales
+                            <i class="fa-solid fa-user-tie text-muted"></i> Petugas Sales
                         </label>
                         <select id="filterSales" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
                             <option value="">Semua Petugas Sales</option>
@@ -2199,28 +2223,28 @@ $loewixPriceList = $tiptokMaster6;
                     <!-- Dropdown 5: Status Invoice -->
                     <div class="col-lg-4 col-md-6 col-12">
                         <label class="filter-field-label">
-                            <i class="fa-solid fa-receipt text-info"></i> Status Invoice / SO
+                            <i class="fa-solid fa-receipt text-muted"></i> Status Invoice / SO
                         </label>
                         <select id="filterInvoice" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
                             <option value="">Semua Status Invoice</option>
-                            <option value="ada">✅ Sudah Terbit Invoice / SO</option>
-                            <option value="belum">⏳ Belum Ada Invoice</option>
+                            <option value="ada">Sudah Terbit Invoice / SO</option>
+                            <option value="belum">Belum Ada Invoice</option>
                         </select>
                     </div>
 
                     <!-- Dropdown 6: Urutan Tampilan (Sorting) -->
                     <div class="col-lg-4 col-md-6 col-12">
                         <label class="filter-field-label">
-                            <i class="fa-solid fa-arrow-down-wide-short text-indigo"></i> Urutkan Tampilan
+                            <i class="fa-solid fa-arrow-down-wide-short text-muted"></i> Urutkan Tampilan
                         </label>
                         <select id="filterSort" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
-                            <option value="newest">📅 Tanggal Titip (Terbaru)</option>
-                            <option value="oldest">📅 Tanggal Titip (Terlama)</option>
-                            <option value="toko_asc">🏪 Nama Toko (A - Z)</option>
-                            <option value="toko_desc">🏪 Nama Toko (Z - A)</option>
-                            <option value="sisa_desc">📦 Sisa Stok (Terbanyak)</option>
-                            <option value="terjual_desc">🔥 Terjual / Laku (Terbanyak)</option>
-                            <option value="insentif_desc">💰 Insentif (Tertinggi)</option>
+                            <option value="newest">Tanggal Titip (Terbaru)</option>
+                            <option value="oldest">Tanggal Titip (Terlama)</option>
+                            <option value="toko_asc">Nama Toko (A - Z)</option>
+                            <option value="toko_desc">Nama Toko (Z - A)</option>
+                            <option value="sisa_desc">Sisa Stok (Terbanyak)</option>
+                            <option value="terjual_desc">Terjual / Laku (Terbanyak)</option>
+                            <option value="insentif_desc">Insentif (Tertinggi)</option>
                         </select>
                     </div>
                 </div>
@@ -2316,12 +2340,12 @@ $loewixPriceList = $tiptokMaster6;
                                         <!-- Toko / Dealer -->
                                         <td style="vertical-align: top; padding-top: 14px;">
                                             <div class="d-flex align-items-center gap-1.5 flex-wrap">
-                                                <span class="font-weight-bold text-dark" style="font-size: 15px; line-height: 1.3;"><?php echo htmlspecialchars($row['nama_toko'] ?? 'Toko Tidak Ditemukan'); ?></span>
-                                                <span class="taste-badge badge-dealer-tag" style="font-size: 10.5px; padding: 2px 7px;"><?php echo htmlspecialchars($row['kategori_customer'] ?? 'Dealer'); ?></span>
+                                                <span class="font-weight-bold text-dark" style="font-size: 14px; line-height: 1.3;"><?php echo htmlspecialchars($row['nama_toko'] ?? 'Toko Tidak Ditemukan'); ?></span>
+                                                <span class="taste-badge badge-dealer-tag" style="font-size: 10.5px; padding: 1px 6px;"><?php echo htmlspecialchars($row['kategori_customer'] ?? 'Dealer'); ?></span>
                                             </div>
                                             <?php if (!empty($telpRaw)) : ?>
-                                                <div style="margin-top: 6px;">
-                                                    <a href="https://wa.me/<?php echo $telpRaw; ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 3px 9px; border-radius: 6px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                                                <div style="margin-top: 5px;">
+                                                    <a href="https://wa.me/<?php echo $telpRaw; ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 5px; background: var(--pastel-green-bg); color: var(--pastel-green-text); border: 1px solid var(--pastel-green-border); padding: 2px 7px; border-radius: 5px; font-size: 11.5px; font-weight: 600; text-decoration: none;">
                                                         <i class="fa-brands fa-whatsapp"></i> <?php echo htmlspecialchars($row['telp_toko']); ?>
                                                     </a>
                                                 </div>
@@ -2330,14 +2354,14 @@ $loewixPriceList = $tiptokMaster6;
 
                                         <!-- Kode & Tanggal -->
                                         <td style="vertical-align: top; padding-top: 14px;">
-                                            <div class="font-monospace" style="font-size: 12.5px; font-weight: 800; color: #0f172a; background: #f8fafc; padding: 3px 8px; border-radius: 6px; border: 1px solid #cbd5e1; border-left: 3px solid #2563eb; display: inline-block; white-space: nowrap;">
+                                            <div class="font-monospace" style="font-size: 12px; font-weight: 700; color: #0f172a; background: #f8fafc; padding: 2px 7px; border-radius: 5px; border: 1px solid #e2e8f0; border-left: 3px solid #0f172a; display: inline-block; white-space: nowrap;">
                                                 <?php echo htmlspecialchars($row['kode_titip']); ?>
                                             </div>
-                                            <div class="text-muted" style="font-size: 12.5px; font-weight: 600; margin-top: 5px;">
-                                                <i class="fa-regular fa-calendar me-1 text-primary"></i><?php echo date('d M Y', strtotime($row['tgl_titip'])); ?>
+                                            <div class="text-muted" style="font-size: 12px; font-weight: 500; margin-top: 4px;">
+                                                <i class="fa-regular fa-calendar me-1"></i><?php echo date('d M Y', strtotime($row['tgl_titip'])); ?>
                                             </div>
                                             <div style="margin-top: 4px;">
-                                                <span class="taste-badge badge-sales-tag" style="font-size: 11.5px; padding: 2px 8px;">
+                                                <span class="taste-badge badge-sales-tag" style="font-size: 11px; padding: 1px 7px;">
                                                     <i class="fa-solid fa-user-tie me-1"></i><?php echo htmlspecialchars($row['nama_sales'] ?? 'Sales'); ?>
                                                 </span>
                                             </div>
@@ -2347,7 +2371,7 @@ $loewixPriceList = $tiptokMaster6;
                                         <td style="vertical-align: top; padding-top: 14px;">
                                             <div class="d-flex align-items-center justify-content-between mb-1.5 px-0.5">
                                                 <span class="text-xs fw-bold text-dark">
-                                                    <i class="fa-solid fa-boxes-stacked text-primary me-1"></i> <?php echo count($itemList); ?> Model <span class="text-muted">(<?php echo $sumTitip; ?> Unit)</span>
+                                                    <i class="fa-solid fa-boxes-stacked text-muted me-1"></i> <?php echo count($itemList); ?> Model <span class="text-muted">(<?php echo $sumTitip; ?> Unit)</span>
                                                 </span>
                                                 <div class="d-flex align-items-center gap-1">
                                                     <span class="badge-sisa-pill">
@@ -2388,24 +2412,24 @@ $loewixPriceList = $tiptokMaster6;
                                         <!-- Invoice & Insentif -->
                                         <td style="vertical-align: top; padding-top: 14px;">
                                             <?php if (!empty($row['last_no_inv'])) : ?>
-                                                <div class="taste-badge badge-invoice-tag mb-1" style="font-size: 11.5px; padding: 2px 7px;">
+                                                <div class="taste-badge badge-invoice-tag mb-1" style="font-size: 11px; padding: 1px 6px;">
                                                     <i class="fa-solid fa-receipt me-1"></i><?php echo htmlspecialchars($row['last_no_inv']); ?>
                                                 </div>
                                             <?php endif; ?>
                                             <?php if (!empty($row['last_no_so'])) : ?>
-                                                <div class="badge bg-light text-primary border border-primary-subtle mb-1" style="font-size: 11px; padding: 2px 6px; font-weight: 600; display: inline-block;">
-                                                    <i class="fa-solid fa-file-lines me-1"></i>SO: <?php echo htmlspecialchars($row['last_no_so']); ?>
+                                                <div class="taste-badge badge-neutral mb-1" style="font-size: 11px; padding: 1px 6px;">
+                                                    SO: <?php echo htmlspecialchars($row['last_no_so']); ?>
                                                 </div>
                                             <?php endif; ?>
                                             <?php if (empty($row['last_no_inv']) && empty($row['last_no_so'])) : ?>
-                                                <div class="text-muted" style="font-size: 12px; font-weight: 600; font-style: italic; margin-bottom: 4px;">
-                                                    <i class="fa-regular fa-clock me-1"></i>Belum ada invoice
+                                                <div class="text-muted" style="font-size: 11.5px; font-weight: 500; font-style: italic; margin-bottom: 3px;">
+                                                    Belum ada invoice
                                                 </div>
                                             <?php endif; ?>
-                                            <div style="font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 900; color: #047857; line-height: 1.2;">
+                                            <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 800; color: #0f172a; line-height: 1.2;">
                                                 Rp <?php echo number_format($sumInsentif, 0, ',', '.'); ?>
                                             </div>
-                                            <div class="text-muted" style="font-size: 12px; font-weight: 700; margin-top: 2px;">
+                                            <div class="text-muted" style="font-size: 11.5px; font-weight: 600; margin-top: 2px;">
                                                 Terjual: <strong class="text-dark"><?php echo $sumTerjual; ?> unit</strong>
                                             </div>
                                         </td>
@@ -2415,10 +2439,11 @@ $loewixPriceList = $tiptokMaster6;
                                             <?php if ($statusPen === 'aktif' && $sumSisa > 0) : ?>
                                                 <span class="badge-soft-emerald"><i class="fa-solid fa-circle-check"></i> Aktif</span>
                                             <?php elseif ($statusPen === 'selesai' || $sumSisa === 0) : ?>
-                                                <span class="taste-badge badge-neutral" style="font-size: 11px; padding: 3px 8px;"><i class="fa-solid fa-circle-minus me-1"></i> Selesai</span>
+                                                <span class="taste-badge badge-neutral" style="font-size: 11px; padding: 2px 7px;">Selesai</span>
                                             <?php else : ?>
                                                 <span class="badge-soft-rose"><i class="fa-solid fa-ban"></i> Ditarik</span>
                                             <?php endif; ?>
+                                        </td>
                                         </td>
 
                                         <!-- Aksi -->
@@ -2465,12 +2490,12 @@ $loewixPriceList = $tiptokMaster6;
                             <tr id="tiptokEmptyFilterRow" style="display: none;">
                                 <td colspan="7" class="text-center py-5">
                                     <div class="py-4">
-                                        <div style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 12px; border: 1px solid #bfdbfe;">
+                                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #f8fafc; color: #64748b; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 10px; border: 1px solid #e2e8f0;">
                                             <i class="fa-solid fa-filter-circle-xmark"></i>
                                         </div>
-                                        <h6 class="fw-bold text-dark mb-1" style="font-size: 15px;">Tidak Ada Data Penitipan Yang Sesuai</h6>
-                                        <p class="text-muted small mb-3" style="max-width: 420px; margin: 0 auto;">Tidak ditemukan data penitipan barang yang cocok dengan kombinasi filter dan kata kunci yang Anda pilih.</p>
-                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-bold px-3 py-1.5" onclick="resetAllTiptokFilters()">
+                                        <h6 class="fw-bold text-dark mb-1" style="font-size: 14px;">Tidak Ada Data Penitipan Yang Sesuai</h6>
+                                        <p class="text-muted small mb-3" style="max-width: 400px; margin: 0 auto; font-size: 12.5px;">Tidak ditemukan data penitipan barang yang cocok dengan kombinasi filter dan kata kunci yang Anda pilih.</p>
+                                        <button type="button" class="btn-taste-secondary" onclick="resetAllTiptokFilters()" style="font-size: 12.5px; padding: 6px 14px;">
                                             <i class="fa-solid fa-rotate-left me-1"></i> Reset Semua Filter
                                         </button>
                                     </div>
@@ -2485,8 +2510,8 @@ $loewixPriceList = $tiptokMaster6;
             <div id="viewKlaimInsentif" class="data-card-vibrant d-none p-4">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
                     <div>
-                        <h3 class="font-weight-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">Klaim Insentif Penjualan</h3>
-                        <p class="text-secondary text-sm mb-0">Akumulasi unit terjual dari seluruh kunjungan toko dealer. Syarat klaim minimal <strong>50 Unit</strong>.</p>
+                        <h3 class="font-weight-bold text-dark mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px;">Klaim Insentif Penjualan</h3>
+                        <p class="text-muted text-sm mb-0">Akumulasi unit terjual dari seluruh kunjungan toko dealer. Syarat klaim minimal <strong>50 Unit</strong>.</p>
                     </div>
                     <button class="btn-taste-secondary" onclick="switchViewToTable()">
                         <i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Tabel Penitipan
@@ -2498,19 +2523,19 @@ $loewixPriceList = $tiptokMaster6;
                         <div class="metric-card-themed metric-theme-purple h-100">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="metric-label-txt">Unit Terjual Siap Klaim</span>
-                                <span class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>" style="font-size: 12.5px;">
+                                <span class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>" style="font-size: 11.5px;">
                                     <?php echo $isClaimEligible ? 'SYARAT TERPENUHI (>= 50)' : 'BELUM MEMENUHI (< 50)'; ?>
                                 </span>
                             </div>
-                            <div class="metric-val-large" style="color: #6d28d9;"><?php echo $unclaimedUnits; ?> <span style="font-size: 16px; font-weight: 700; color: #64748b;">/ 50 unit minimal</span></div>
-                            <div class="progress my-2" style="height: 10px; background-color: #e2e8f0; border-radius: 10px;">
-                                <div class="progress-bar" style="width: <?php echo $claimProgress; ?>%; background: linear-gradient(90deg, #7c3aed, #ec4899); border-radius: 10px;"></div>
+                            <div class="metric-val-large"><?php echo $unclaimedUnits; ?> <span style="font-size: 14.5px; font-weight: 600; color: #64748b;">/ 50 unit minimal</span></div>
+                            <div class="progress my-2" style="height: 6px; background-color: #e2e8f0; border-radius: 6px;">
+                                <div class="progress-bar" style="width: <?php echo $claimProgress; ?>%; background: <?php echo $isClaimEligible ? '#15803d' : '#0f172a'; ?>; border-radius: 6px;"></div>
                             </div>
                             <div class="text-sm font-weight-bold mt-2">
                                 <?php if ($isClaimEligible) : ?>
-                                    <span class="text-success"><i class="fa-solid fa-check-circle me-1"></i>Syarat 50 unit terpenuhi. Anda siap mengajukan klaim insentif.</span>
+                                    <span class="text-success" style="font-size: 12.5px;"><i class="fa-solid fa-check-circle me-1"></i>Syarat 50 unit terpenuhi. Anda siap mengajukan klaim insentif.</span>
                                 <?php else : ?>
-                                    <span class="text-danger"><i class="fa-solid fa-circle-info me-1"></i>Perlu <?php echo $sisaTarget; ?> unit lagi untuk dapat mengajukan klaim insentif.</span>
+                                    <span class="text-muted" style="font-size: 12.5px;"><i class="fa-solid fa-circle-info me-1"></i>Perlu <?php echo $sisaTarget; ?> unit lagi untuk dapat mengajukan klaim insentif.</span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -2525,14 +2550,14 @@ $loewixPriceList = $tiptokMaster6;
                                         <i class="fa-solid fa-wallet"></i>
                                     </div>
                                 </div>
-                                <div class="metric-val-large" style="font-size: 32px; color: #047857;">
+                                <div class="metric-val-large" style="font-size: 26px;">
                                     Rp <?php echo number_format($unclaimedNominal, 0, ',', '.'); ?>
                                 </div>
-                                <p class="text-sm font-weight-bold text-secondary mb-0">Total akumulasi dari unit barang yang terjual dengan No. Invoice valid.</p>
+                                <p class="text-sm text-muted mb-0" style="font-size: 12.5px;">Total akumulasi dari unit barang yang terjual dengan No. Invoice valid.</p>
                             </div>
                             <div class="mt-3">
                                 <?php if ($isClaimEligible) : ?>
-                                    <button class="btn-hero-claim w-100 justify-content-center" onclick="openModalSubmitClaim()">
+                                    <button class="btn-taste-primary w-100 justify-content-center" onclick="openModalSubmitClaim()">
                                         <i class="fa-solid fa-paper-plane me-1"></i> Ajukan Klaim Insentif Sekarang
                                     </button>
                                 <?php else : ?>
@@ -4086,7 +4111,7 @@ $loewixPriceList = $tiptokMaster6;
             const elSubInsentif = document.getElementById('metricSubInsentif');
             if (elInsentif) elInsentif.textContent = formatIdNumber(totalInsentif);
             if (elSubInsentif) {
-                elSubInsentif.innerHTML = `<i class="fa-solid fa-circle-check text-success me-1"></i> Dari total <strong class="text-dark">${formatIdNumber(totalTerjual)} unit</strong> yang telah terjual`;
+                elSubInsentif.innerHTML = `Dari total <strong class="text-dark">${formatIdNumber(totalTerjual)} unit</strong> yang terjual`;
             }
 
             // 4. Target Klaim (Min. 50 Unit)
@@ -4104,12 +4129,12 @@ $loewixPriceList = $tiptokMaster6;
             if (elUnclaimed) elUnclaimed.textContent = formatIdNumber(totalUnclaimed);
             if (elProgressBar) {
                 elProgressBar.style.width = progress + '%';
-                elProgressBar.style.background = isEligible ? '#059669' : 'linear-gradient(90deg, #7c3aed, #ec4899)';
+                elProgressBar.style.background = isEligible ? '#15803d' : '#0f172a';
             }
             if (elProgressTxt) elProgressTxt.textContent = progress + '% tercapai';
             if (elRemainingTxt) {
                 elRemainingTxt.textContent = isEligible ? 'Target tercapai!' : `Kurang ${formatIdNumber(sisaTarget)} unit`;
-                elRemainingTxt.style.color = isEligible ? '#059669' : '#dc2626';
+                elRemainingTxt.style.color = isEligible ? '#15803d' : '#64748b';
             }
             if (elStatusBadge) {
                 elStatusBadge.className = `taste-badge ${isEligible ? 'badge-active-tag' : 'badge-neutral'}`;
