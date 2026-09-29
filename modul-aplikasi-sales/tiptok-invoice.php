@@ -816,6 +816,9 @@ if ($qDealersPreload) {
                             <a href="tiptok.php" class="btn btn-outline-light mb-0 font-weight-bold" style="border-radius: 8px; padding: 8px 16px; font-size: 13px; border-color: rgba(255, 255, 255, 0.2);">
                                 <i class="fa-solid fa-box-archive me-1.5"></i> Penitipan Stok
                             </a>
+                            <a href="../sales_orders.php" class="btn btn-outline-light mb-0 font-weight-bold" style="border-radius: 8px; padding: 8px 16px; font-size: 13px; border-color: rgba(255, 255, 255, 0.2);">
+                                <i class="fa-solid fa-clipboard-list me-1.5"></i> No. SO
+                            </a>
                             <button type="button" class="btn mb-0 font-weight-bold" style="background: #ffffff; color: #0f172a; border-radius: 8px; padding: 8px 16px; font-size: 13px; box-shadow: none;" onclick="loadInvoicesData()">
                                 <i class="fa-solid fa-rotate me-1.5"></i> Refresh
                             </button>

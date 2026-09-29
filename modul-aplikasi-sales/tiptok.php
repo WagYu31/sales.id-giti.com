@@ -537,7 +537,9 @@ $loewixPriceList = $tiptokMaster6;
             max-width: 620px;
             line-height: 1.5;
         }
-        .btn-hero-claim {
+        .btn-hero-claim,
+        .btn-hero-invoice,
+        .btn-hero-so {
             background: rgba(255, 255, 255, 0.08);
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -553,7 +555,9 @@ $loewixPriceList = $tiptokMaster6;
             text-decoration: none;
             cursor: pointer;
         }
-        .btn-hero-claim:hover {
+        .btn-hero-claim:hover,
+        .btn-hero-invoice:hover,
+        .btn-hero-so:hover {
             background: rgba(255, 255, 255, 0.14);
             border-color: rgba(255, 255, 255, 0.3);
             color: #ffffff;
@@ -579,28 +583,6 @@ $loewixPriceList = $tiptokMaster6;
             background: #f1f5f9;
             color: #0f172a;
             border-color: #f1f5f9;
-            transform: translateY(-1px);
-        }
-        .btn-hero-invoice {
-            background: rgba(255, 255, 255, 0.06);
-            color: #f8fafc;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            border-radius: 8px;
-            padding: 9px 18px;
-            font-size: 13.5px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.15s ease;
-            box-shadow: none;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .btn-hero-invoice:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
             transform: translateY(-1px);
         }
 
@@ -2020,17 +2002,21 @@ $loewixPriceList = $tiptokMaster6;
                         </p>
                     </div>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <button class="btn-hero-add" onclick="openModalTambahPenitipan()">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Titip Barang</span>
+                        </button>
                         <a href="tiptok-invoice.php" class="btn-hero-invoice">
                             <i class="fa-solid fa-receipt"></i>
                             <span>No. Invoice TIP TOK</span>
                         </a>
+                        <a href="../sales_orders.php" class="btn-hero-so">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                            <span>No. SO</span>
+                        </a>
                         <button class="btn-hero-claim" onclick="openTabKlaimInsentif()">
                             <i class="fa-solid fa-hand-holding-dollar"></i>
                             <span>Klaim Insentif</span>
-                        </button>
-                        <button class="btn-hero-add" onclick="openModalTambahPenitipan()">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>Titip Barang Baru</span>
                         </button>
                     </div>
                 </div>
@@ -4266,6 +4252,8 @@ $loewixPriceList = $tiptokMaster6;
 
         function openTabKlaimInsentif() {
             switchViewToClaims();
+            const vClaim = document.getElementById('viewKlaimInsentif');
+            if (vClaim) vClaim.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function loadDealers() {
