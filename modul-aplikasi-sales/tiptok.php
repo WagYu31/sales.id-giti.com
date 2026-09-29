@@ -2189,16 +2189,16 @@ $loewixPriceList = $tiptokMaster6;
                         </span>
                     </div>
                     <div class="metric-val-large">
-                        <span id="metricValUnclaimed"><?php echo $eligibleStoresCount; ?></span> 
+                        <span id="metricValEligibleStores"><?php echo $eligibleStoresCount; ?></span> 
                         <span style="font-size: 14.5px; font-weight: 600; color: #64748b;">Toko Siap</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-2" style="font-size: 11.5px; font-weight: 600;">
-                        <span style="color: #64748b;">Target Per Toko:</span>
-                        <strong class="text-dark">Min. 50 Unit</strong>
+                        <span style="color: #64748b;">Total Unit Belum Klaim:</span>
+                        <strong class="text-dark"><span id="metricValUnclaimed"><?php echo $unclaimedUnits; ?></span> Unit</strong>
                     </div>
                     <div class="d-flex justify-content-between align-items-center" style="font-size: 11.5px; font-weight: 600;">
                         <span style="color: #64748b;">Insentif Siap Cair:</span>
-                        <strong class="text-success">Rp <?php echo number_format($eligibleNominalTotal, 0, ',', '.'); ?></strong>
+                        <strong class="text-success" id="metricValEligibleNominal">Rp <?php echo number_format($eligibleNominalTotal, 0, ',', '.'); ?></strong>
                     </div>
                 </div>
             </div>
@@ -2645,15 +2645,66 @@ $loewixPriceList = $tiptokMaster6;
                     </div>
                 </div>
 
-                <!-- DAFTAR PROGRES & KLAIM PER TOKO -->
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="font-weight-bold text-dark text-sm text-uppercase" style="letter-spacing: 0.05em;">
-                        <i class="fa-solid fa-store me-1 text-primary"></i> Progres Penjualan & Status Klaim Per Toko Mitra
+                <!-- DAFTAR PROGRES & KLAIM PER TOKO MITRA (HIGH-DENSITY ENTERPRISE TABLE) -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="font-weight-bold text-dark text-sm text-uppercase" style="letter-spacing: 0.05em;">
+                            <i class="fa-solid fa-store me-1 text-primary"></i> Progres Penjualan & Status Klaim Per Toko Mitra
+                        </div>
+                        <span class="taste-badge badge-neutral" id="claimStoreCountBadge" style="font-size: 11.5px;">0 Toko</span>
                     </div>
-                    <span class="text-xs text-muted font-weight-bold">Target: 50 Unit / Toko</span>
+
+                    <!-- Filter Tabs & Search Controls -->
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <!-- Quick Filter Tabs -->
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary active btn-claim-filter-tab" id="tabClaimAll" onclick="filterClaimStoresTable('all', this)" style="font-size: 11.5px; font-weight: 700;">
+                                Semua (<span id="countTabClaimAll">0</span>)
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-claim-filter-tab" id="tabClaimEligible" onclick="filterClaimStoresTable('eligible', this)" style="font-size: 11.5px; font-weight: 700;">
+                                <i class="fa-solid fa-circle-check me-1"></i>Siap Klaim (<span id="countTabClaimEligible">0</span>)
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-claim-filter-tab" id="tabClaimProgress" onclick="filterClaimStoresTable('progress', this)" style="font-size: 11.5px; font-weight: 700;">
+                                Progres (<span id="countTabClaimProgress">0</span>)
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-claim-filter-tab" id="tabClaimZero" onclick="filterClaimStoresTable('zero', this)" style="font-size: 11.5px; font-weight: 700;">
+                                Belum Ada Laku (<span id="countTabClaimZero">0</span>)
+                            </button>
+                        </div>
+
+                        <!-- Live Search Input -->
+                        <div class="input-group input-group-sm" style="width: 220px;">
+                            <span class="input-group-text bg-white border-end-0" style="border-radius: 8px 0 0 8px; border-color: #cbd5e1;">
+                                <i class="fa-solid fa-magnifying-glass text-muted" style="font-size: 12px;"></i>
+                            </span>
+                            <input type="text" id="searchClaimStoresInput" class="form-control form-control-sm border-start-0" placeholder="Cari toko / sales..." style="border-radius: 0 8px 8px 0; font-size: 12px; border-color: #cbd5e1;" oninput="onSearchClaimStores(this.value)">
+                        </div>
+                    </div>
                 </div>
-                <div id="claimStoresGrid" class="row mb-4">
-                    <div class="col-12"><div class="p-4 text-center text-muted bg-light rounded-3 font-weight-bold">Memuat data progres toko...</div></div>
+
+                <!-- High-Density Table with Smooth Hover -->
+                <div class="table-responsive border rounded-3 mb-4 shadow-sm" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden; background: #fff;">
+                    <table class="table table-vibrant table-hover mb-0" id="tableClaimStores">
+                        <thead>
+                            <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                <th style="width: 50px;" class="text-center">NO</th>
+                                <th>TOKO / DEALER MITRA</th>
+                                <th>SALES PIC</th>
+                                <th class="text-center" style="width: 140px;">UNIT TERJUAL</th>
+                                <th style="min-width: 240px;">PROGRES TARGET (MIN. 50 UNIT)</th>
+                                <th class="text-end" style="width: 160px;">ESTIMASI INSENTIF</th>
+                                <th class="text-center" style="width: 140px;">STATUS KLAIM</th>
+                                <th class="text-end" style="width: 170px;">AKSI</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyClaimStores">
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted font-weight-bold">
+                                    <i class="fa-solid fa-spinner fa-spin me-2"></i> Memuat data progres klaim toko...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- RINCIAN UNIT TERJUAL BELUM DIKLAIM -->
@@ -5796,6 +5847,9 @@ $loewixPriceList = $tiptokMaster6;
         // KLAIM INSENTIF (PER TOKO MITRA - MIN. 50 UNIT)
         // =========================================================================
         let cachedClaimData = null;
+        let allClaimStores = [];
+        let currentClaimStoreFilter = 'all';
+        let currentClaimStoreSearch = '';
 
         function loadClaimSummary() {
             fetch('tiptok-ajax.php?action=get_claim_summary')
@@ -5804,6 +5858,7 @@ $loewixPriceList = $tiptokMaster6;
                     if (res && res.status === 'success') {
                         const d = res.data;
                         cachedClaimData = d;
+                        allClaimStores = d.stores || [];
 
                         // Update summary numbers in Tab Klaim Insentif
                         const statEligibleCount = document.getElementById('claimStatEligibleCount');
@@ -5812,87 +5867,41 @@ $loewixPriceList = $tiptokMaster6;
                         const statEligibleNominal = document.getElementById('claimStatEligibleNominal');
                         if (statEligibleNominal) statEligibleNominal.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(d.total_eligible_nominal || 0);
 
-                        // Render Cards Grid for Stores
-                        const storesGrid = document.getElementById('claimStoresGrid');
-                        if (storesGrid) {
-                            storesGrid.innerHTML = '';
-                            if (!d.stores || d.stores.length === 0) {
-                                storesGrid.innerHTML = `
-                                    <div class="col-12">
-                                        <div class="p-4 text-center text-muted bg-light rounded-3 font-weight-bold" style="border: 2px dashed #cbd5e1;">
-                                            <i class="fa-solid fa-store-slash mb-2" style="font-size: 28px; color: #94a3b8;"></i>
-                                            <div>Belum ada data penjualan toko untuk klaim insentif.</div>
-                                        </div>
-                                    </div>
-                                `;
-                            } else {
-                                d.stores.forEach(s => {
-                                    const isReady = s.is_eligible;
-                                    const safeName = escapeHtml(s.nama_toko);
-                                    const jsSafeName = safeName.replace(/'/g, "\\'");
-                                    const progressVal = Math.min(100, s.progress || 0);
-                                    
-                                    storesGrid.innerHTML += `
-                                        <div class="col-md-6 col-lg-4 mb-3">
-                                            <div class="card h-100 shadow-sm" style="border: 2px solid ${isReady ? '#10b981' : '#e2e8f0'}; border-radius: 14px; overflow: hidden; background: #fff;">
-                                                <div class="p-3 border-bottom d-flex justify-content-between align-items-start" style="background: ${isReady ? 'rgba(16, 185, 129, 0.06)' : '#f8fafc'};">
-                                                    <div>
-                                                        <div class="d-flex align-items-center gap-1 mb-1">
-                                                            <span class="taste-badge badge-neutral" style="font-size: 10px;">${escapeHtml(s.kode_titip || 'TITIP')}</span>
-                                                            <span class="text-xs text-muted font-weight-bold">• ${escapeHtml(s.nama_sales || 'Sales')}</span>
-                                                        </div>
-                                                        <h5 class="font-weight-bold text-dark mb-0" style="font-size: 16px;">${safeName}</h5>
-                                                    </div>
-                                                    <div>
-                                                        ${isReady ? 
-                                                            '<span class="taste-badge badge-active-tag" style="font-size: 11px;"><i class="fa-solid fa-check me-1"></i>SIAP KLAIM</span>' : 
-                                                            '<span class="taste-badge badge-neutral" style="font-size: 11px;"><i class="fa-solid fa-lock me-1"></i>TERKUNCI</span>'
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div class="p-3 d-flex flex-column justify-content-between" style="flex: 1;">
-                                                    <div>
-                                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                                            <span class="text-xs text-muted font-weight-bold">PROGRES TARGET (MIN 50)</span>
-                                                            <span class="font-weight-bolder ${isReady ? 'text-success' : 'text-primary'}" style="font-size: 14px;">
-                                                                ${s.total_unclaimed_units} <span class="text-muted" style="font-size: 12px; font-weight: 600;">/ 50 Unit</span>
-                                                            </span>
-                                                        </div>
-                                                        <div class="progress mb-2" style="height: 10px; border-radius: 6px; background-color: #f1f5f9;">
-                                                            <div class="progress-bar ${isReady ? 'bg-success' : 'bg-primary'}" role="progressbar" style="width: ${progressVal}%;" aria-valuenow="${progressVal}" aria-valuemin="0" aria-valuemax="100"></div>
-                                                        </div>
-                                                        <div class="d-flex justify-content-between align-items-center text-xs mb-3">
-                                                            <span class="text-muted font-weight-bold">${progressVal}% tercapai</span>
-                                                            ${isReady ? 
-                                                                '<span class="text-success font-weight-bold"><i class="fa-solid fa-circle-check me-1"></i>Target Tercapai!</span>' : 
-                                                                `<span class="text-muted font-weight-bold">Kurang <strong>${s.sisa_unit} unit</strong> lagi</span>`
-                                                            }
-                                                        </div>
-                                                        
-                                                        <div class="p-2 rounded-2 mb-3 d-flex justify-content-between align-items-center" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                                                            <span class="text-xs text-muted font-weight-bold">Estimasi Insentif:</span>
-                                                            <strong class="text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(s.total_unclaimed_nominal)}</strong>
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
-                                                        ${isReady ? `
-                                                            <button type="button" class="btn-taste-primary w-100 py-2 font-weight-bold" onclick="openModalSubmitClaimForStore(${s.id_penitipan}, '${jsSafeName}', ${s.total_unclaimed_units}, ${s.total_unclaimed_nominal})">
-                                                                <i class="fa-solid fa-paper-plane me-1"></i> Ajukan Klaim Toko Ini
-                                                            </button>
-                                                        ` : `
-                                                            <button type="button" class="btn btn-sm btn-light w-100 py-2 text-muted font-weight-bold border" disabled style="cursor: not-allowed; border-radius: 10px; background-color: #f8fafc;">
-                                                                <i class="fa-solid fa-lock me-1"></i> Terkunci (Perlu 50 Unit)
-                                                            </button>
-                                                        `}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `;
-                                });
-                            }
+                        // Sync Metric 4 in top dashboard
+                        const elEligibleStores = document.getElementById('metricValEligibleStores');
+                        if (elEligibleStores) elEligibleStores.textContent = d.total_eligible_stores || 0;
+                        const elEligibleNom = document.getElementById('metricValEligibleNominal');
+                        if (elEligibleNom) elEligibleNom.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(d.total_eligible_nominal || 0);
+                        const elStatusBadge = document.getElementById('metricClaimStatusBadge');
+                        if (elStatusBadge) {
+                            const isAny = (d.total_eligible_stores || 0) > 0;
+                            elStatusBadge.className = `taste-badge ${isAny ? 'badge-active-tag' : 'badge-neutral'}`;
+                            elStatusBadge.textContent = isAny ? `${d.total_eligible_stores} TOKO SIAP` : 'PROSES';
                         }
+
+                        // Update Tab Counters
+                        const countAll = allClaimStores.length;
+                        const countEligible = allClaimStores.filter(s => s.is_eligible).length;
+                        const countProgress = allClaimStores.filter(s => s.total_unclaimed_units > 0 && !s.is_eligible).length;
+                        const countZero = allClaimStores.filter(s => s.total_unclaimed_units === 0).length;
+
+                        const elBadge = document.getElementById('claimStoreCountBadge');
+                        if (elBadge) elBadge.textContent = countAll + ' Toko';
+
+                        const elTabAll = document.getElementById('countTabClaimAll');
+                        if (elTabAll) elTabAll.textContent = countAll;
+
+                        const elTabEligible = document.getElementById('countTabClaimEligible');
+                        if (elTabEligible) elTabEligible.textContent = countEligible;
+
+                        const elTabProgress = document.getElementById('countTabClaimProgress');
+                        if (elTabProgress) elTabProgress.textContent = countProgress;
+
+                        const elTabZero = document.getElementById('countTabClaimZero');
+                        if (elTabZero) elTabZero.textContent = countZero;
+
+                        // Render High-Density Stores Table
+                        renderClaimStoresTable();
 
                         // Populate Filter Dropdown
                         const filterSelect = document.getElementById('filterTokoUnclaimed');
@@ -5901,7 +5910,9 @@ $loewixPriceList = $tiptokMaster6;
                             filterSelect.innerHTML = `<option value="all">Semua Toko (${(d.unclaimed_items || []).length} Item)</option>`;
                             if (d.stores) {
                                 d.stores.forEach(s => {
-                                    filterSelect.innerHTML += `<option value="${s.id_penitipan}">${escapeHtml(s.nama_toko)} (${s.total_unclaimed_units} Unit)</option>`;
+                                    if (s.total_unclaimed_units > 0) {
+                                        filterSelect.innerHTML += `<option value="${s.id_penitipan}">${escapeHtml(s.nama_toko)} (${s.total_unclaimed_units} Unit)</option>`;
+                                    }
                                 });
                             }
                             filterSelect.value = curVal;
@@ -5947,6 +5958,142 @@ $loewixPriceList = $tiptokMaster6;
                     }
                 })
                 .catch(err => console.error('Error loading claim summary:', err));
+        }
+
+        function renderClaimStoresTable() {
+            const tbody = document.getElementById('bodyClaimStores');
+            if (!tbody) return;
+
+            let filtered = allClaimStores.slice();
+
+            // 1. Filter Tab
+            if (currentClaimStoreFilter === 'eligible') {
+                filtered = filtered.filter(s => s.is_eligible);
+            } else if (currentClaimStoreFilter === 'progress') {
+                filtered = filtered.filter(s => s.total_unclaimed_units > 0 && !s.is_eligible);
+            } else if (currentClaimStoreFilter === 'zero') {
+                filtered = filtered.filter(s => s.total_unclaimed_units === 0);
+            }
+
+            // 2. Filter Search
+            if (currentClaimStoreSearch) {
+                const q = currentClaimStoreSearch.toLowerCase();
+                filtered = filtered.filter(s => 
+                    (s.nama_toko && s.nama_toko.toLowerCase().includes(q)) ||
+                    (s.kode_titip && s.kode_titip.toLowerCase().includes(q)) ||
+                    (s.nama_sales && s.nama_sales.toLowerCase().includes(q))
+                );
+            }
+
+            tbody.innerHTML = '';
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted font-weight-bold">
+                            <i class="fa-solid fa-store-slash mb-1 me-1 text-secondary"></i> Tidak ada toko yang sesuai dengan filter atau pencarian saat ini.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filtered.forEach((s, idx) => {
+                const isReady = s.is_eligible;
+                const safeName = escapeHtml(s.nama_toko);
+                const jsSafeName = safeName.replace(/'/g, "\\'");
+                const progressVal = Math.min(100, s.progress || 0);
+                const hasSales = s.total_unclaimed_units > 0;
+
+                let statusBadge = '<span class="taste-badge badge-neutral" style="font-size: 11px; opacity: 0.65;">BELUM ADA LAKU</span>';
+                if (isReady) {
+                    statusBadge = '<span class="taste-badge badge-active-tag" style="font-size: 11px;"><i class="fa-solid fa-circle-check me-1"></i>SIAP KLAIM</span>';
+                } else if (hasSales) {
+                    statusBadge = `<span class="taste-badge badge-invoice-tag" style="font-size: 11px;"><i class="fa-solid fa-hourglass-half me-1"></i>PROGRES (${progressVal}%)</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr style="${isReady ? 'background-color: rgba(16, 185, 129, 0.04);' : ''}">
+                        <td class="text-center text-muted font-weight-bold" style="font-size: 12px;">${idx + 1}</td>
+                        <td>
+                            <div>
+                                <div class="font-weight-bold text-dark" style="font-size: 14px;">${safeName}</div>
+                                <div class="d-flex align-items-center gap-1 mt-0">
+                                    <span class="taste-badge badge-neutral" style="font-size: 10px; padding: 2px 6px;">${escapeHtml(s.kode_titip || 'TITIP')}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="font-weight-bold text-dark" style="font-size: 13px;">${escapeHtml(s.nama_sales || '-')}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="font-weight-bolder ${isReady ? 'text-success' : (hasSales ? 'text-primary' : 'text-muted')}" style="font-size: 15.5px;">
+                                ${s.total_unclaimed_units} <span class="text-muted" style="font-size: 11.5px; font-weight: 600;">/ 50 Unit</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="max-width: 320px;">
+                                <div class="d-flex justify-content-between align-items-center text-xs mb-1">
+                                    <span class="font-weight-bold ${isReady ? 'text-success' : 'text-primary'}">${progressVal}% tercapai</span>
+                                    <span class="${isReady ? 'text-success font-weight-bold' : 'text-muted font-weight-bold'}">
+                                        ${isReady ? '<i class="fa-solid fa-circle-check me-1"></i>Target Tercapai' : `Kurang ${s.sisa_unit} Unit`}
+                                    </span>
+                                </div>
+                                <div class="progress" style="height: 7px; border-radius: 4px; background-color: #e2e8f0;">
+                                    <div class="progress-bar ${isReady ? 'bg-success' : 'bg-primary'}" role="progressbar" style="width: ${progressVal}%;" aria-valuenow="${progressVal}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <div class="font-weight-bolder ${hasSales ? 'text-success' : 'text-muted'}" style="font-size: 14.5px;">
+                                Rp ${new Intl.NumberFormat('id-ID').format(s.total_unclaimed_nominal)}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            ${statusBadge}
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end align-items-center gap-1">
+                                ${isReady ? `
+                                    <button type="button" class="btn-taste-primary btn-sm py-1 px-3 font-weight-bold" onclick="openModalSubmitClaimForStore(${s.id_penitipan}, '${jsSafeName}', ${s.total_unclaimed_units}, ${s.total_unclaimed_nominal})">
+                                        <i class="fa-solid fa-paper-plane me-1"></i> Klaim
+                                    </button>
+                                ` : `
+                                    <button type="button" class="btn btn-sm btn-light py-1 px-2 text-muted border font-weight-bold" disabled style="font-size: 11px; cursor: not-allowed; border-radius: 6px;">
+                                        <i class="fa-solid fa-lock me-1"></i> Min. 50
+                                    </button>
+                                `}
+                                ${hasSales ? `
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Lihat Rincian Unit Toko Ini" onclick="quickFilterStoreUnclaimed(${s.id_penitipan})" style="border-radius: 6px; font-size: 11.5px;">
+                                        <i class="fa-solid fa-filter"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterClaimStoresTable(filterType, btnEl) {
+            currentClaimStoreFilter = filterType;
+            document.querySelectorAll('.btn-claim-filter-tab').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            renderClaimStoresTable();
+        }
+
+        function onSearchClaimStores(query) {
+            currentClaimStoreSearch = (query || '').toLowerCase().trim();
+            renderClaimStoresTable();
+        }
+
+        function quickFilterStoreUnclaimed(idPen) {
+            const sel = document.getElementById('filterTokoUnclaimed');
+            if (sel) {
+                sel.value = idPen;
+                filterUnclaimedItemsByStore(idPen);
+                const el = document.getElementById('tableUnclaimedItems');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
 
         function renderUnclaimedItems(items) {

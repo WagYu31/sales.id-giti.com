@@ -769,6 +769,32 @@ if ($action === 'get_claim_summary') {
     $totalNominal = 0;
     $storesMap = [];
 
+    // Ambil seluruh toko penitipan aktif
+    $wherePenSales = ($jabatanUser === 'Sales') ? " WHERE p.id_sales = '$idUser' " : "";
+    $sqlAllStores = "SELECT p.id AS id_penitipan, p.kode_titip, p.nama_sales, $custField AS nama_toko 
+                     FROM tiptok_penitipan p 
+                     $custJoin 
+                     $wherePenSales 
+                     ORDER BY p.id DESC";
+    $resAllStores = $conn->query($sqlAllStores);
+    if ($resAllStores) {
+        while ($st = $resAllStores->fetch_assoc()) {
+            $idP = intval($st['id_penitipan']);
+            $storesMap[$idP] = [
+                'id_penitipan' => $idP,
+                'kode_titip' => $st['kode_titip'] ?? 'TITIP',
+                'nama_toko' => $st['nama_toko'] ?? 'Toko Tanpa Nama',
+                'nama_sales' => $st['nama_sales'] ?? 'Sales',
+                'total_unclaimed_units' => 0,
+                'total_unclaimed_nominal' => 0,
+                'is_eligible' => false,
+                'progress' => 0,
+                'sisa_unit' => 50,
+                'items_count' => 0,
+            ];
+        }
+    }
+
     if ($res) {
         while ($r = $res->fetch_assoc()) {
             $totalUnit += intval($r['qty_terjual_kunjungan']);
@@ -779,9 +805,9 @@ if ($action === 'get_claim_summary') {
             if (!isset($storesMap[$idPen])) {
                 $storesMap[$idPen] = [
                     'id_penitipan' => $idPen,
-                    'kode_titip' => $r['kode_titip'],
+                    'kode_titip' => $r['kode_titip'] ?? 'TITIP',
                     'nama_toko' => $r['nama_toko'] ?? 'Toko Tanpa Nama',
-                    'nama_sales' => $r['nama_sales'],
+                    'nama_sales' => $r['nama_sales'] ?? 'Sales',
                     'total_unclaimed_units' => 0,
                     'total_unclaimed_nominal' => 0,
                     'is_eligible' => false,
