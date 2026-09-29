@@ -138,16 +138,22 @@ if ($action === 'search_products') {
     
     $results = [];
     while ($row = $res->fetch_assoc()) {
+        $rawDesc = trim($row['description'] ?? '');
+        $parts = preg_split('/(\s*[\—\–]\s*|\s+--\s+|\r\n|\n)/u', $rawDesc, 2);
+        $title = !empty($parts[0]) ? trim($parts[0]) : $row['type'];
+        
+        $displayText = "[{$row['category']}] " . ($title !== $row['type'] ? "{$title} ({$row['type']})" : $title) . " — Rp " . number_format($row['msrp'], 0, ',', '.');
+
         $results[] = [
-            'id' => $row['id'],
+            'id' => (int)$row['id'],
             'category' => $row['category'],
             'type' => $row['type'],
             'code' => $row['type'],
-            'name' => $row['description'] ? $row['description'] : $row['type'],
-            'description' => $row['description'] ?? '',
+            'name' => $title,
+            'description' => $rawDesc,
             'msrp' => (float)$row['msrp'],
             'unit' => 'PCS',
-            'text' => "[{$row['category']}] {$row['type']} — Rp " . number_format($row['msrp'], 0, ',', '.')
+            'text' => $displayText
         ];
     }
     

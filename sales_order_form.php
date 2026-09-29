@@ -67,6 +67,27 @@ if ($qSales) {
         $salesList[] = $s;
     }
 }
+
+// Ambil daftar produk katalog Loewix untuk autokomplit instan di baris tabel
+$catalogProducts = [];
+$qProd = $conn->query("SELECT id, category, type, description, msrp FROM product_prices ORDER BY category ASC, type ASC");
+if ($qProd) {
+    while ($p = $qProd->fetch_assoc()) {
+        $rawDesc = trim($p['description'] ?? '');
+        $parts = preg_split('/(\s*[\—\–]\s*|\s+--\s+|\r\n|\n)/u', $rawDesc, 2);
+        $title = !empty($parts[0]) ? trim($parts[0]) : $p['type'];
+        $catalogProducts[] = [
+            'id' => (int)$p['id'],
+            'category' => $p['category'],
+            'type' => $p['type'],
+            'code' => $p['type'],
+            'name' => $title,
+            'description' => $rawDesc,
+            'msrp' => (float)$p['msrp'],
+            'unit' => 'PCS'
+        ];
+    }
+}
 ?>
 
 <style>
@@ -555,6 +576,19 @@ if ($qSales) {
                         </table>
                     </div>
 
+                    <!-- Datalist Autocomplete Produk & Kode Katalog Loewix -->
+                    <datalist id="catalogProductsDatalist">
+                        <?php foreach ($catalogProducts as $cp): ?>
+                            <option value="<?php echo htmlspecialchars($cp['name']); ?>">[<?php echo htmlspecialchars($cp['category']); ?>] <?php echo htmlspecialchars($cp['code']); ?> &mdash; Rp <?php echo number_format($cp['msrp'], 0, ',', '.'); ?></option>
+                        <?php endforeach; ?>
+                    </datalist>
+
+                    <datalist id="catalogCodesDatalist">
+                        <?php foreach ($catalogProducts as $cp): ?>
+                            <option value="<?php echo htmlspecialchars($cp['code']); ?>"><?php echo htmlspecialchars($cp['name']); ?> &mdash; Rp <?php echo number_format($cp['msrp'], 0, ',', '.'); ?></option>
+                        <?php endforeach; ?>
+                    </datalist>
+
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <span class="badge" style="background:var(--pastel-slate-bg); color:var(--pastel-slate-text); border:1px solid var(--pastel-slate-border); padding:6px 12px; font-weight:600; font-size:12px;" id="txtTotalItemsCount">
                             0 Barang (0 Kuantitas)
@@ -897,10 +931,10 @@ $(document).ready(function() {
                         </button>
                     </td>
                     <td>
-                        <input type="text" class="form-control form-control-sm accurate-input fw-semibold item-field-name" data-index="${idx}" value="${escapeHtml(item.item_name || '')}" placeholder="Nama Barang">
+                        <input type="text" list="catalogProductsDatalist" class="form-control form-control-sm accurate-input fw-semibold item-field-name" data-index="${idx}" value="${escapeHtml(item.item_name || '')}" placeholder="Ketik / Pilih Nama Barang">
                     </td>
                     <td>
-                        <input type="text" class="form-control form-control-sm accurate-input font-monospace item-field-code" data-index="${idx}" value="${escapeHtml(item.item_code || '')}" placeholder="Kode / SKU">
+                        <input type="text" list="catalogCodesDatalist" class="form-control form-control-sm accurate-input font-monospace item-field-code" data-index="${idx}" value="${escapeHtml(item.item_code || '')}" placeholder="Kode / SKU">
                     </td>
                     <td style="text-align: center;">
                         <input type="number" min="1" step="1" class="form-control form-control-sm accurate-input text-center fw-bold item-field-qty" data-index="${idx}" value="${qty}">
@@ -977,14 +1011,66 @@ $(document).ready(function() {
         });
     });
 
-    // Realtime Item Field Changes
+    // Realtime Item Field Changes with Smart Catalog Autocomplete
+    const catalogList = <?php echo json_encode($catalogProducts, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?> || [];
+    const catalogByName = {};
+    const catalogByCode = {};
+    catalogList.forEach(p => {
+        if (p.name) catalogByName[p.name.trim().toLowerCase()] = p;
+        if (p.code) catalogByCode[p.code.trim().toLowerCase()] = p;
+    });
+
     $(document).on('input change', '.item-field-name', function() {
         const idx = $(this).data('index');
-        items[idx].item_name = $(this).val();
+        const val = $(this).val();
+        items[idx].item_name = val;
+
+        const cleanVal = (val || '').trim().toLowerCase();
+        const matched = catalogByName[cleanVal] || catalogByCode[cleanVal];
+        if (matched) {
+            items[idx].product_id = matched.id;
+            if (!items[idx].item_code || items[idx].item_code === '') {
+                items[idx].item_code = matched.code;
+                $(`#itemsTableBody tr[data-index="${idx}"] .item-field-code`).val(matched.code);
+            }
+            if (!items[idx].unit_price || items[idx].unit_price == 0) {
+                items[idx].unit_price = matched.msrp;
+                $(`#itemsTableBody tr[data-index="${idx}"] .item-field-price`).val(matched.msrp);
+            }
+            if (!items[idx].unit) {
+                items[idx].unit = matched.unit || 'PCS';
+                $(`#itemsTableBody tr[data-index="${idx}"] .item-field-unit`).val(items[idx].unit);
+            }
+            if (!items[idx].item_description) {
+                items[idx].item_description = matched.description;
+            }
+            recalculateRow(idx);
+        }
     });
+
     $(document).on('input change', '.item-field-code', function() {
         const idx = $(this).data('index');
-        items[idx].item_code = $(this).val();
+        const val = $(this).val();
+        items[idx].item_code = val;
+
+        const cleanVal = (val || '').trim().toLowerCase();
+        const matched = catalogByCode[cleanVal];
+        if (matched) {
+            items[idx].product_id = matched.id;
+            if (!items[idx].item_name || items[idx].item_name === '') {
+                items[idx].item_name = matched.name;
+                $(`#itemsTableBody tr[data-index="${idx}"] .item-field-name`).val(matched.name);
+            }
+            if (!items[idx].unit_price || items[idx].unit_price == 0) {
+                items[idx].unit_price = matched.msrp;
+                $(`#itemsTableBody tr[data-index="${idx}"] .item-field-price`).val(matched.msrp);
+            }
+            if (!items[idx].unit) {
+                items[idx].unit = matched.unit || 'PCS';
+                $(`#itemsTableBody tr[data-index="${idx}"] .item-field-unit`).val(items[idx].unit);
+            }
+            recalculateRow(idx);
+        }
     });
     $(document).on('input change', '.item-field-qty', function() {
         const idx = $(this).data('index');
