@@ -184,6 +184,7 @@ $sqlPenitipan = "SELECT p.*, $custSelect,
                         SUM(i.qty_sisa) AS sum_sisa,
                         SUM(i.qty_terjual) AS sum_terjual,
                         SUM(i.total_insentif) AS sum_insentif,
+                        (SELECT COALESCE(SUM(k.qty_terjual_kunjungan), 0) FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id AND k.id_claim IS NULL AND k.qty_terjual_kunjungan > 0) AS sum_unclaimed,
                         (SELECT k.no_so FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id AND k.no_so IS NOT NULL AND k.no_so != '' ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_no_so,
                         (SELECT k.no_inv FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id AND k.no_inv IS NOT NULL AND k.no_inv != '' ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_no_inv,
                         (SELECT k.tgl_kunjungan FROM tiptok_kunjungan k WHERE k.id_penitipan = p.id ORDER BY k.tgl_kunjungan DESC, k.id DESC LIMIT 1) AS last_kunjungan
@@ -2021,10 +2022,10 @@ $loewixPriceList = $tiptokMaster6;
                             <i class="fa-solid fa-store"></i>
                         </div>
                     </div>
-                    <div class="metric-val-large" style="color: #1d4ed8;">
+                    <div class="metric-val-large" id="metricValTokoAktif" style="color: #1d4ed8;">
                         <?php echo number_format($totalTokoAktif, 0, ',', '.'); ?>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2" id="metricSubToko">
                         <span class="taste-badge badge-active-tag" style="font-size:12px; padding:3px 10px;">
                             <i class="fa-solid fa-circle text-xxs me-1"></i> Aktif
                         </span>
@@ -2041,13 +2042,13 @@ $loewixPriceList = $tiptokMaster6;
                         </div>
                     </div>
                     <div class="metric-val-large" style="color: #047857;">
-                        <?php echo number_format($totalUnitSisa, 0, ',', '.'); ?> 
-                        <span style="font-size: 16px; font-weight: 800; color: #64748b;">/ <?php echo number_format($totalUnitTitip, 0, ',', '.'); ?> unit</span>
+                        <span id="metricValSisa"><?php echo number_format($totalUnitSisa, 0, ',', '.'); ?></span> 
+                        <span style="font-size: 16px; font-weight: 800; color: #64748b;">/ <span id="metricValTitip"><?php echo number_format($totalUnitTitip, 0, ',', '.'); ?></span> unit</span>
                     </div>
                     <div class="d-flex align-items-center gap-2" style="font-size: 13.5px; font-weight: 700; color: #334155;">
                         <span>Terjual:</span>
                         <span class="taste-badge badge-danger-tag" style="font-size: 13px; padding: 2px 10px;">
-                            <?php echo number_format($totalUnitTerjual, 0, ',', '.'); ?> Unit
+                            <span id="metricValTerjual"><?php echo number_format($totalUnitTerjual, 0, ',', '.'); ?></span> Unit
                         </span>
                     </div>
                 </div>
@@ -2061,10 +2062,10 @@ $loewixPriceList = $tiptokMaster6;
                         </div>
                     </div>
                     <div class="metric-val-large" style="font-size: 30px; color: #b45309;">
-                        Rp <?php echo number_format($totalInsentifPool, 0, ',', '.'); ?>
+                        Rp <span id="metricValInsentif"><?php echo number_format($totalInsentifPool, 0, ',', '.'); ?></span>
                     </div>
-                    <div style="font-size: 13px; font-weight: 700; color: #64748b;">
-                        <i class="fa-solid fa-circle-check text-success me-1"></i> Dari total unit yang telah terjual
+                    <div style="font-size: 13px; font-weight: 700; color: #64748b;" id="metricSubInsentif">
+                        <i class="fa-solid fa-circle-check text-success me-1"></i> Dari total <strong class="text-dark" id="metricInsentifTerjualUnit"><?php echo number_format($totalUnitTerjual, 0, ',', '.'); ?> unit</strong> yang telah terjual
                     </div>
                 </div>
 
@@ -2072,20 +2073,20 @@ $loewixPriceList = $tiptokMaster6;
                 <div class="metric-card-themed metric-theme-purple">
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="metric-label-txt">Target Klaim (Min. 50 Unit)</span>
-                        <span class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>" style="font-size: 12px; padding: 3px 8px;">
+                        <span id="metricClaimStatusBadge" class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>" style="font-size: 12px; padding: 3px 8px;">
                             <?php echo $isClaimEligible ? 'SIAP KLAIM' : 'PROSES'; ?>
                         </span>
                     </div>
                     <div class="metric-val-large" style="color: #6d28d9;">
-                        <?php echo $unclaimedUnits; ?> 
+                        <span id="metricValUnclaimed"><?php echo $unclaimedUnits; ?></span> 
                         <span style="font-size: 16px; font-weight: 800; color: #64748b;">/ 50 unit</span>
                     </div>
                     <div class="progress mt-1 mb-1" style="height: 10px; background-color: #e2e8f0; border-radius: 20px; overflow: hidden;">
-                        <div class="progress-bar" style="width: <?php echo $claimProgress; ?>%; background: <?php echo $isClaimEligible ? '#059669' : 'linear-gradient(90deg, #7c3aed, #ec4899)'; ?>; border-radius: 20px;"></div>
+                        <div class="progress-bar" id="metricClaimProgressBar" style="width: <?php echo $claimProgress; ?>%; background: <?php echo $isClaimEligible ? '#059669' : 'linear-gradient(90deg, #7c3aed, #ec4899)'; ?>; border-radius: 20px;"></div>
                     </div>
                     <div class="d-flex justify-content-between" style="font-size: 12.5px; font-weight: 800;">
-                        <span style="color: #64748b;"><?php echo $claimProgress; ?>% tercapai</span>
-                        <span style="color: <?php echo $isClaimEligible ? '#059669' : '#dc2626'; ?>;"><?php echo $isClaimEligible ? 'Target tercapai!' : "Kurang $sisaTarget unit"; ?></span>
+                        <span style="color: #64748b;" id="metricClaimProgressTxt"><?php echo $claimProgress; ?>% tercapai</span>
+                        <span id="metricClaimRemainingTxt" style="color: <?php echo $isClaimEligible ? '#059669' : '#dc2626'; ?>;"><?php echo $isClaimEligible ? 'Target tercapai!' : "Kurang $sisaTarget unit"; ?></span>
                     </div>
                 </div>
             </div>
@@ -2299,9 +2300,12 @@ $loewixPriceList = $tiptokMaster6;
                                         data-has-inv="<?php echo (!empty($row['last_no_inv']) || !empty($row['last_no_so'])) ? '1' : '0'; ?>"
                                         data-tgl="<?php echo date('Y-m-d', strtotime($row['tgl_titip'])); ?>"
                                         data-periode="<?php echo date('Y-m', strtotime($row['tgl_titip'])); ?>"
+                                        data-sum-titip="<?php echo $sumTitip; ?>"
                                         data-sum-sisa="<?php echo $sumSisa; ?>"
                                         data-sum-terjual="<?php echo $sumTerjual; ?>"
                                         data-sum-insentif="<?php echo $sumInsentif; ?>"
+                                        data-sum-unclaimed="<?php echo intval(!empty($row['sum_unclaimed']) ? $row['sum_unclaimed'] : $sumTerjual); ?>"
+                                        data-id-cust="<?php echo htmlspecialchars($row['id_customer'] ?? $row['nama_toko'], ENT_QUOTES); ?>"
                                         data-kode="<?php echo htmlspecialchars($row['kode_titip'] ?? '', ENT_QUOTES); ?>"
                                         data-items="<?php echo htmlspecialchars(implode(' ', $itemNames), ENT_QUOTES); ?>"
                                         data-raw-id="<?php echo $row['id']; ?>">
@@ -3999,8 +4003,118 @@ $loewixPriceList = $tiptokMaster6;
             if (elVisCount) elVisCount.textContent = visibleCount;
             if (elTotCount) elTotCount.textContent = rows.length;
 
+            // Live calculate top 4 metric cards based on filtered rows
+            updateMetricsFromVisibleRows(rows);
+
             // Render active filter chips
             renderActiveFilterChips({ query, tokoVal, statusVal, periodeVal, salesVal, invoiceVal });
+        }
+
+        function updateMetricsFromVisibleRows(rows) {
+            if (!rows) {
+                const tbody = document.querySelector('#mainTiptokTable tbody');
+                if (!tbody) return;
+                rows = Array.from(tbody.querySelectorAll('tr.tiptok-row'));
+            }
+
+            let totalSisa = 0;
+            let totalTitip = 0;
+            let totalTerjual = 0;
+            let totalInsentif = 0;
+            let totalUnclaimed = 0;
+            const uniqueTokoSet = new Set();
+            const activeTokoSet = new Set();
+
+            rows.forEach(r => {
+                if (r.style.display !== 'none') {
+                    const sisa = parseInt(r.dataset.sumSisa || 0);
+                    const titip = parseInt(r.dataset.sumTitip || 0);
+                    const terjual = parseInt(r.dataset.sumTerjual || 0);
+                    const insentif = parseFloat(r.dataset.sumInsentif || 0);
+                    const unclaimed = parseInt(r.dataset.sumUnclaimed || terjual);
+                    const tokoKey = r.dataset.idCust || r.dataset.toko || '';
+
+                    totalSisa += sisa;
+                    totalTitip += titip;
+                    totalTerjual += terjual;
+                    totalInsentif += insentif;
+                    totalUnclaimed += unclaimed;
+
+                    if (tokoKey) {
+                        uniqueTokoSet.add(tokoKey);
+                        if (sisa > 0) {
+                            activeTokoSet.add(tokoKey);
+                        }
+                    }
+                }
+            });
+
+            const formatIdNumber = (num) => new Intl.NumberFormat('id-ID').format(num);
+
+            // 1. Toko Dealer Aktif
+            const elTokoVal = document.getElementById('metricValTokoAktif');
+            const elTokoSub = document.getElementById('metricSubToko');
+            if (elTokoVal) {
+                if (activeTokoSet.size > 0) {
+                    elTokoVal.textContent = formatIdNumber(activeTokoSet.size);
+                    if (elTokoSub) {
+                        elTokoSub.innerHTML = `<span class="taste-badge badge-active-tag" style="font-size:12px; padding:3px 10px;"><i class="fa-solid fa-circle text-xxs me-1"></i> Aktif</span> <span style="font-weight: 700; color: #334155; font-size: 13.5px;">dengan stok titipan</span>`;
+                    }
+                } else if (uniqueTokoSet.size > 0) {
+                    elTokoVal.textContent = formatIdNumber(uniqueTokoSet.size);
+                    if (elTokoSub) {
+                        elTokoSub.innerHTML = `<span class="taste-badge badge-neutral" style="font-size:12px; padding:3px 10px;"><i class="fa-solid fa-flag-checkered text-xxs me-1"></i> Selesai</span> <span style="font-weight: 700; color: #334155; font-size: 13.5px;">stok habis / ditarik</span>`;
+                    }
+                } else {
+                    elTokoVal.textContent = '0';
+                    if (elTokoSub) {
+                        elTokoSub.innerHTML = `<span class="taste-badge badge-neutral" style="font-size:12px; padding:3px 10px;"><i class="fa-solid fa-store-slash text-xxs me-1"></i> 0 Toko</span> <span style="font-weight: 700; color: #334155; font-size: 13.5px;">sesuai filter</span>`;
+                    }
+                }
+            }
+
+            // 2. Sisa Stok di Toko
+            const elSisa = document.getElementById('metricValSisa');
+            const elTitip = document.getElementById('metricValTitip');
+            const elTerjual = document.getElementById('metricValTerjual');
+            if (elSisa) elSisa.textContent = formatIdNumber(totalSisa);
+            if (elTitip) elTitip.textContent = formatIdNumber(totalTitip);
+            if (elTerjual) elTerjual.textContent = formatIdNumber(totalTerjual);
+
+            // 3. Akumulasi Insentif
+            const elInsentif = document.getElementById('metricValInsentif');
+            const elSubInsentif = document.getElementById('metricSubInsentif');
+            if (elInsentif) elInsentif.textContent = formatIdNumber(totalInsentif);
+            if (elSubInsentif) {
+                elSubInsentif.innerHTML = `<i class="fa-solid fa-circle-check text-success me-1"></i> Dari total <strong class="text-dark">${formatIdNumber(totalTerjual)} unit</strong> yang telah terjual`;
+            }
+
+            // 4. Target Klaim (Min. 50 Unit)
+            const claimTarget = 50;
+            const progress = Math.min(100, Math.round((totalUnclaimed / claimTarget) * 1000) / 10);
+            const isEligible = (totalUnclaimed >= claimTarget);
+            const sisaTarget = Math.max(0, claimTarget - totalUnclaimed);
+
+            const elUnclaimed = document.getElementById('metricValUnclaimed');
+            const elProgressBar = document.getElementById('metricClaimProgressBar');
+            const elProgressTxt = document.getElementById('metricClaimProgressTxt');
+            const elRemainingTxt = document.getElementById('metricClaimRemainingTxt');
+            const elStatusBadge = document.getElementById('metricClaimStatusBadge');
+
+            if (elUnclaimed) elUnclaimed.textContent = formatIdNumber(totalUnclaimed);
+            if (elProgressBar) {
+                elProgressBar.style.width = progress + '%';
+                elProgressBar.style.background = isEligible ? '#059669' : 'linear-gradient(90deg, #7c3aed, #ec4899)';
+            }
+            if (elProgressTxt) elProgressTxt.textContent = progress + '% tercapai';
+            if (elRemainingTxt) {
+                elRemainingTxt.textContent = isEligible ? 'Target tercapai!' : `Kurang ${formatIdNumber(sisaTarget)} unit`;
+                elRemainingTxt.style.color = isEligible ? '#059669' : '#dc2626';
+            }
+            if (elStatusBadge) {
+                elStatusBadge.className = `taste-badge ${isEligible ? 'badge-active-tag' : 'badge-neutral'}`;
+                elStatusBadge.textContent = isEligible ? 'SIAP KLAIM' : 'PROSES';
+            }
         }
 
         function renderActiveFilterChips(filters) {
