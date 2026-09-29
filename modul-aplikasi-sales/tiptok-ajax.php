@@ -1050,6 +1050,7 @@ if ($action === 'update_status_claim') {
     $id_claim = intval($_POST['id_claim'] ?? 0);
     $status_claim = trim($_POST['status_claim'] ?? '');
     $catatan_admin = trim($_POST['catatan_admin'] ?? '');
+    $custom_tgl_cair = trim($_POST['tgl_cair'] ?? '');
 
     $allowedStatus = ['menunggu_approval', 'disetujui', 'cair', 'ditolak'];
     if (!in_array($status_claim, $allowedStatus)) {
@@ -1057,10 +1058,13 @@ if ($action === 'update_status_claim') {
         exit;
     }
 
-    $tgl_cair_sql = ($status_claim === 'cair') ? "tgl_cair = NOW()," : "";
+    $tgl_cair_val = null;
+    if ($status_claim === 'cair') {
+        $tgl_cair_val = !empty($custom_tgl_cair) ? $custom_tgl_cair : date('Y-m-d');
+    }
 
-    $stmt = $conn->prepare("UPDATE tiptok_claim SET status_claim = ?, $tgl_cair_sql catatan_admin = ?, updated_at = NOW() WHERE id = ?");
-    $stmt->bind_param("ssi", $status_claim, $catatan_admin, $id_claim);
+    $stmt = $conn->prepare("UPDATE tiptok_claim SET status_claim = ?, tgl_cair = ?, catatan_admin = ?, updated_at = NOW() WHERE id = ?");
+    $stmt->bind_param("sssi", $status_claim, $tgl_cair_val, $catatan_admin, $id_claim);
     
     if ($stmt->execute()) {
         // Jika ditolak, unbind id_claim pada tiptok_kunjungan agar bisa diajukan kembali di kemudian hari

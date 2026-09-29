@@ -2884,7 +2884,8 @@ $loewixPriceList = $tiptokMaster6;
                                 <th>KODE KLAIM</th>
                                 <th>TOKO / DEALER</th>
                                 <th>SALES</th>
-                                <th>TGL KLAIM</th>
+                                <th><i class="fa-regular fa-calendar text-primary me-1"></i> TGL KLAIM</th>
+                                <th><i class="fa-regular fa-calendar-check text-success me-1"></i> TGL CAIR</th>
                                 <th class="text-center">TOTAL UNIT</th>
                                 <th class="text-end">NOMINAL (RP)</th>
                                 <th class="text-center">STATUS</th>
@@ -2892,7 +2893,7 @@ $loewixPriceList = $tiptokMaster6;
                             </tr>
                         </thead>
                         <tbody id="bodyClaimHistory">
-                            <tr><td colspan="8" class="text-center py-3 text-muted">Memuat riwayat klaim...</td></tr>
+                            <tr><td colspan="9" class="text-center py-3 text-muted">Memuat riwayat klaim...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -3618,49 +3619,111 @@ $loewixPriceList = $tiptokMaster6;
     <!-- MODAL 4: PENGAJUAN KLAIM INSENTIF (MIN 50 UNIT PER TOKO)                  -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalSubmitClaim" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div>
-                        <h5 class="modal-title font-weight-bold text-dark mb-0">Ajukan Klaim Insentif Toko</h5>
-                        <div class="text-secondary text-sm font-weight-bold">Konfirmasi pengajuan klaim insentif toko mitra (Min. 50 unit)</div>
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
+            <div class="modal-content" style="border-radius: 18px; border:none; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);">
+                <!-- Header -->
+                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; border-radius: 18px 18px 0 0;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); border: 1.5px solid rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 20px;">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="modal-title font-weight-bold text-white mb-0" style="font-size: 18px;">Ajukan Klaim Insentif</h5>
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 10.5px; padding: 3px 8px; border-radius: 6px; font-weight: 700;">TARGET LOLOS</span>
+                            </div>
+                            <div class="text-xs text-white-50 mt-0.5">Konfirmasi pengajuan reward pencapaian penjualan mitra</div>
+                        </div>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 
                 <form id="formSubmitClaim" onsubmit="submitKlaimInsentif(event)">
                     <input type="hidden" name="id_penitipan" id="claimModalIdPenitipan" value="">
-                    <div class="modal-body p-4">
-                        <div class="p-3 mb-3 rounded-3 border text-center" style="background-color: var(--accent-emerald-light); border: 2px solid #a7f3d0 !important;">
-                            <div class="text-xs font-weight-bold text-uppercase" style="color: var(--accent-emerald); letter-spacing: 0.05em;">Toko Dealer Mitra</div>
-                            <h4 class="font-weight-bolder my-1" id="claimModalNamaToko" style="color: #065f46; font-family: 'Plus Jakarta Sans', sans-serif;">-</h4>
-                            <div class="d-flex justify-content-center align-items-center gap-3 mt-2 pt-2 border-top border-success-subtle">
-                                <div>
-                                    <div class="text-xs text-muted font-weight-bold">UNIT TERJUAL</div>
-                                    <div class="font-weight-bolder text-dark" id="claimModalTotalUnit" style="font-size: 20px;">-</div>
+                    
+                    <div class="modal-body p-4" style="background-color: #f8fafc;">
+                        <!-- Store Certificate Card -->
+                        <div class="p-3 mb-3 rounded-3 bg-white border" style="border: 1.5px solid #e2e8f0 !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);">
+                            <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <div id="claimModalAvatar" style="width: 36px; height: 36px; border-radius: 10px; background: #ecfdf5; border: 1.5px solid #a7f3d0; color: #047857; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center;">
+                                        T
+                                    </div>
+                                    <div>
+                                        <div class="text-xs text-muted font-weight-bold text-uppercase" style="letter-spacing: 0.04em;">Toko Dealer Mitra</div>
+                                        <h5 class="font-weight-bold text-dark mb-0" id="claimModalNamaToko" style="font-size: 16px;">-</h5>
+                                    </div>
                                 </div>
-                                <div class="vr"></div>
-                                <div>
-                                    <div class="text-xs text-muted font-weight-bold">TOTAL INSENTIF</div>
-                                    <div class="font-weight-bolder text-success" id="claimModalNominal" style="font-size: 20px;">-</div>
+                                <span class="badge" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-size: 10.5px; font-weight: 700; padding: 4px 8px; border-radius: 6px;">
+                                    <i class="fa-solid fa-circle-check me-1"></i> Syarat &ge; 50 Unit Lolos
+                                </span>
+                            </div>
+
+                            <!-- Metrics Row (2 Clean Pillars) -->
+                            <div class="row g-2 pt-1 text-center">
+                                <div class="col-6">
+                                    <div class="p-2.5 rounded-2" style="background: #f8fafc; border: 1px solid #f1f5f9;">
+                                        <div class="text-xs text-muted font-weight-bold text-uppercase" style="letter-spacing: 0.03em;">Total Terjual</div>
+                                        <div class="font-weight-bolder text-dark my-0.5" id="claimModalTotalUnit" style="font-size: 21px; font-family: 'Outfit', sans-serif;">-</div>
+                                        <div class="text-xs text-secondary" style="font-size: 11px;">Akumulasi unit toko</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2.5 rounded-2" style="background: #ecfdf5; border: 1px solid #d1fae5;">
+                                        <div class="text-xs font-weight-bold text-uppercase" style="color: #047857; letter-spacing: 0.03em;">Total Insentif</div>
+                                        <div class="font-weight-bolder my-0.5" id="claimModalNominal" style="font-size: 21px; color: #059669; font-family: 'Outfit', sans-serif;">-</div>
+                                        <div class="text-xs font-weight-bold" style="color: #047857; font-size: 11px;"><i class="fa-solid fa-wallet me-1"></i> Siap Dicairkan</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="alert alert-success d-flex align-items-center mb-3 py-2 px-3" style="font-size: 12.5px; border-radius: 10px;">
-                            <i class="fa-solid fa-circle-check text-success me-2" style="font-size: 16px;"></i>
-                            <div>Syarat target <strong>50 Unit</strong> untuk toko ini telah terpenuhi dan siap diajukan ke admin / finance.</div>
+                        <!-- Date & Lifecycle Transparency (Tgl Klaim & Tgl Cair) -->
+                        <div class="p-3 mb-3 rounded-3 bg-white border" style="border: 1.5px solid #e2e8f0 !important;">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-2" style="letter-spacing: 0.05em;">
+                                <i class="fa-regular fa-calendar-days text-primary me-1"></i> Alur Waktu Klaim & Pencairan
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="p-2 rounded-2 border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                                        <div class="text-xs text-muted font-weight-bold">TGL PENGAJUAN (KLAIM)</div>
+                                        <div class="font-weight-bold text-dark mt-1" style="font-size: 13.5px;">
+                                            <i class="fa-solid fa-paper-plane text-primary me-1" style="font-size: 11px;"></i>
+                                            <span id="claimModalTglClaim"><?php echo date('d M Y'); ?></span>
+                                        </div>
+                                        <div class="text-xs text-muted" style="font-size: 10.5px;">Tercatat otomatis hari ini</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 rounded-2 border" style="background: #fffbeb; border-color: #fde68a !important;">
+                                        <div class="text-xs font-weight-bold" style="color: #92400e;">TGL PENCAIRAN (CAIR)</div>
+                                        <div class="font-weight-bold mt-1" style="font-size: 13.5px; color: #b45309;">
+                                            <i class="fa-solid fa-hourglass-half me-1" style="font-size: 11px;"></i> Menunggu Transfer
+                                        </div>
+                                        <div class="text-xs text-muted" style="font-size: 10.5px;">Diinput oleh Admin/Finance</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2 pt-2 border-top d-flex align-items-start gap-1.5 text-secondary" style="font-size: 11.5px; line-height: 1.4;">
+                                <i class="fa-solid fa-circle-info text-primary mt-0.5" style="font-size: 12px;"></i>
+                                <span>Setelah diajukan, tim Finance akan memverifikasi dan mencairkan insentif. <strong>Tgl Cair</strong> akan otomatis terbit saat dana ditransfer.</span>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label-taste">Catatan Pengajuan Klaim (Opsional)</label>
-                            <textarea name="catatan_claim" class="form-control-taste w-100" rows="3" placeholder="Catatan pengajuan klaim insentif toko ini..."></textarea>
+                        <!-- Notes Textarea -->
+                        <div>
+                            <label class="form-label-taste mb-1" style="font-size: 12px; font-weight: 700; color: #334155;">Catatan Pengajuan Klaim (Opsional)</label>
+                            <textarea name="catatan_claim" class="form-control-taste w-100" rows="2" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 13px; padding: 10px 12px;" placeholder="Misal: Mohon ditransfer ke rekening BCA an. Sales..."></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer p-3 bg-light border-top">
-                        <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" id="btnProsesClaim" class="btn-taste-primary">
-                            <i class="fa-solid fa-paper-plane me-1"></i> Ajukan Klaim Toko Ini
+
+                    <!-- Footer -->
+                    <div class="modal-footer p-3 bg-white border-top d-flex justify-content-between align-items-center" style="border-radius: 0 0 18px 18px;">
+                        <button type="button" class="btn btn-sm btn-light border px-3 font-weight-bold text-secondary" style="border-radius: 9px; height: 38px;" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                        <button type="submit" id="btnProsesClaim" class="btn btn-sm font-weight-bold text-white shadow-sm d-inline-flex align-items-center gap-1.5 px-4" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; border-radius: 9px; height: 38px; font-size: 13px;">
+                            <i class="fa-solid fa-paper-plane" style="font-size: 12px;"></i> Konfirmasi & Ajukan Klaim
                         </button>
                     </div>
                 </form>
@@ -3673,32 +3736,66 @@ $loewixPriceList = $tiptokMaster6;
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalClaimApproval" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div>
-                        <h5 class="modal-title font-weight-bold text-dark mb-0">Rincian Pengajuan Klaim Insentif</h5>
-                        <div class="text-secondary text-sm font-weight-bold" id="claimKodeTitle">-</div>
+            <div class="modal-content" style="border-radius: 18px; border:none; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; border-radius: 18px 18px 0 0;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(37, 99, 235, 0.2); border: 1.5px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 20px;">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="modal-title font-weight-bold text-white mb-0" style="font-size: 18px;">Rincian Pengajuan Klaim Insentif</h5>
+                                <span class="badge" id="claimKodeTitle" style="background: rgba(255, 255, 255, 0.15); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25); font-size: 11px; font-family: monospace;">-</span>
+                            </div>
+                            <div class="text-xs text-white-50 mt-0.5">Audit item penjualan yang diklaim dan histori pencairan dana</div>
+                        </div>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 
-                <div class="modal-body p-4">
-                    <div class="p-3 mb-3 rounded-3 bg-light border" style="border: 2px solid #cbd5e1 !important;">
-                        <div class="d-flex justify-content-between align-items-center">
+                <div class="modal-body p-4" style="background-color: #f8fafc;">
+                    <!-- Overview Banner -->
+                    <div class="p-3 mb-3 rounded-3 bg-white border" style="border: 1.5px solid #e2e8f0 !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div>
+                                <div class="text-xs text-muted font-weight-bold text-uppercase" style="letter-spacing: 0.04em;">Sales Pengaju</div>
                                 <h5 class="font-weight-bold text-dark mb-0" id="claimSalesName">-</h5>
-                                <div class="text-sm font-weight-bold text-primary mt-1" id="claimTokoName"><i class="fa-solid fa-store me-1"></i><span>-</span></div>
-                                <span class="text-sm text-secondary font-weight-bold" id="claimTgl">-</span>
+                                <div class="text-sm font-weight-bold text-primary mt-1" id="claimTokoName">
+                                    <i class="fa-solid fa-store me-1"></i><span>-</span>
+                                </div>
                             </div>
-                            <div class="text-end">
-                                <span class="taste-badge" id="claimStatusBadge">-</span>
-                                <h4 class="font-weight-bolder text-success mt-1 mb-0" id="claimNominal" style="font-family: 'Outfit', sans-serif;">-</h4>
+                            <div class="text-md-end">
+                                <div id="claimStatusBadgeWrap">
+                                    <span class="taste-badge" id="claimStatusBadge">-</span>
+                                </div>
+                                <h3 class="font-weight-bolder text-success mt-1 mb-0" id="claimNominal" style="font-family: 'Outfit', sans-serif;">-</h3>
+                                <div class="text-xs text-muted font-weight-bold" id="claimUnitCount">- Unit</div>
+                            </div>
+                        </div>
+
+                        <!-- Date Timeline Strip: Tgl Klaim vs Tgl Cair -->
+                        <div class="row g-2 mt-2 pt-2 border-top">
+                            <div class="col-6">
+                                <div class="p-2 rounded-2" style="background: #f8fafc; border: 1px solid #f1f5f9;">
+                                    <div class="text-xs text-muted font-weight-bold"><i class="fa-regular fa-calendar text-primary me-1"></i> TGL KLAIM (PENGAJUAN)</div>
+                                    <div class="font-weight-bold text-dark mt-0.5" id="claimTglClaimVal" style="font-size: 13px;">-</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 rounded-2" style="background: #f8fafc; border: 1px solid #f1f5f9;">
+                                    <div class="text-xs text-muted font-weight-bold"><i class="fa-regular fa-calendar-check text-success me-1"></i> TGL CAIR (PENCAIRAN)</div>
+                                    <div class="font-weight-bold mt-0.5" id="claimTglCairVal" style="font-size: 13px;">-</div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-label-taste mb-2">Detail Item Penjualan dalam Klaim</div>
-                    <div class="table-responsive border rounded-3 mb-3" style="border: 2px solid #cbd5e1 !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="form-label-taste mb-0 text-dark font-weight-bold" style="font-size: 12.5px;">Detail Item Penjualan dalam Klaim</div>
+                        <span class="text-xs text-muted">Hanya item terverifikasi faktur penjualan</span>
+                    </div>
+
+                    <div class="table-responsive border rounded-3 mb-3 bg-white" style="border: 1.5px solid #e2e8f0 !important;">
                         <table class="table taste-table mb-0">
                             <thead>
                                 <tr>
@@ -3715,34 +3812,45 @@ $loewixPriceList = $tiptokMaster6;
                     </div>
 
                     <?php if ($role === 'Super Admin' || $role === 'Admin' || $role === 'Sales Manager') : ?>
-                        <div class="p-3 rounded-3 bg-light border mt-3" style="border: 2px solid #cbd5e1 !important;">
-                            <div class="form-label-taste mb-2">Proses Persetujuan Klaim (Admin View)</div>
+                        <div class="p-3 rounded-3 bg-white border mt-3" style="border: 1.5px solid #cbd5e1 !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="form-label-taste mb-0 text-dark font-weight-bold" style="font-size: 13px;">
+                                    <i class="fa-solid fa-shield-halved text-primary me-1"></i> Proses Persetujuan & Pencairan Dana (Admin / Finance)
+                                </div>
+                                <span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 10px;">FINANCE DISBURSEMENT</span>
+                            </div>
                             <div class="row g-2">
-                                <div class="col-md-6">
-                                    <label class="form-label-taste">Ubah Status</label>
-                                    <select id="updateClaimStatusSelect" class="form-control-taste w-100">
+                                <div class="col-md-4">
+                                    <label class="form-label-taste" style="font-size: 11.5px;">Ubah Status Klaim</label>
+                                    <select id="updateClaimStatusSelect" class="form-control-taste w-100" onchange="toggleTglCairField(this.value)">
                                         <option value="menunggu_approval">Menunggu Approval</option>
                                         <option value="disetujui">Disetujui</option>
                                         <option value="cair">Cair (Selesai Dibayarkan)</option>
                                         <option value="ditolak">Ditolak</option>
                                     </select>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label-taste">Catatan Admin / Payout</label>
-                                    <input type="text" id="updateClaimAdminNote" class="form-control-taste w-100" placeholder="No referensi transfer / catatan...">
+                                <div class="col-md-4" id="wrapTglCair" style="display: none;">
+                                    <label class="form-label-taste" style="font-size: 11.5px; color: #047857;">
+                                        <i class="fa-solid fa-calendar-check me-1"></i> Tgl Cair (Transfer)
+                                    </label>
+                                    <input type="date" id="updateClaimTglCair" class="form-control-taste w-100" value="<?php echo date('Y-m-d'); ?>">
+                                </div>
+                                <div class="col-md-4" id="wrapAdminNote">
+                                    <label class="form-label-taste" style="font-size: 11.5px;">Catatan Admin / No. Ref Transfer</label>
+                                    <input type="text" id="updateClaimAdminNote" class="form-control-taste w-100" placeholder="No referensi transfer bank / catatan...">
                                 </div>
                             </div>
-                            <div class="text-end mt-2">
-                                <button class="btn-taste-primary btn-sm" onclick="submitUpdateClaimStatus()">
-                                    <i class="fa-solid fa-check me-1"></i> Simpan Status Klaim
+                            <div class="text-end mt-2 pt-2 border-top">
+                                <button type="button" class="btn btn-sm btn-primary font-weight-bold px-3 py-1.5 shadow-sm" style="border-radius: 8px; font-size: 12.5px;" onclick="submitUpdateClaimStatus()">
+                                    <i class="fa-solid fa-check me-1"></i> Simpan Status & Pencairan
                                 </button>
                             </div>
                         </div>
                     <?php endif; ?>
                 </div>
 
-                <div class="modal-footer p-3 bg-light border-top">
-                    <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Tutup</button>
+                <div class="modal-footer p-3 bg-white border-top d-flex justify-content-end" style="border-radius: 0 0 18px 18px;">
+                    <button type="button" class="btn btn-sm btn-light border px-4 font-weight-bold text-secondary" style="border-radius: 8px; height: 36px;" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -6116,7 +6224,7 @@ $loewixPriceList = $tiptokMaster6;
                         if (bodyClaim) {
                             bodyClaim.innerHTML = '';
                             if (!d.claim_history || d.claim_history.length === 0) {
-                                bodyClaim.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted font-weight-bold">Belum ada riwayat pengajuan klaim.</td></tr>';
+                                bodyClaim.innerHTML = '<tr><td colspan="9" class="text-center py-3 text-muted font-weight-bold">Belum ada riwayat pengajuan klaim.</td></tr>';
                             } else {
                                 d.claim_history.forEach(c => {
                                     let stBadge = 'badge-neutral';
@@ -6126,12 +6234,20 @@ $loewixPriceList = $tiptokMaster6;
 
                                     const storeDisplay = c.display_nama_toko || c.nama_toko || 'Toko Mitra';
 
+                                    let tglCairHtml = '<span class="badge" style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-size: 11px;"><i class="fa-regular fa-clock me-1"></i> Menunggu Cair</span>';
+                                    if (c.status_claim === 'cair') {
+                                        tglCairHtml = `<span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 11px; font-weight: 700;"><i class="fa-solid fa-circle-check me-1"></i> ${c.tgl_cair || c.tgl_claim}</span>`;
+                                    } else if (c.status_claim === 'ditolak') {
+                                        tglCairHtml = '<span class="text-muted text-xs"><i class="fa-solid fa-ban me-1 text-danger"></i> Tidak Cair</span>';
+                                    }
+
                                     bodyClaim.innerHTML += `
                                         <tr>
-                                            <td class="font-monospace font-weight-bold" style="font-size: 14px;">${escapeHtml(c.kode_claim)}</td>
+                                            <td class="font-monospace font-weight-bold" style="font-size: 13.5px;">${escapeHtml(c.kode_claim)}</td>
                                             <td><strong>${escapeHtml(storeDisplay)}</strong></td>
                                             <td><strong>${escapeHtml(c.nama_sales)}</strong></td>
-                                            <td class="font-weight-bold">${c.tgl_claim}</td>
+                                            <td class="font-weight-bold text-dark"><i class="fa-regular fa-calendar text-primary me-1" style="font-size: 11px;"></i> ${c.tgl_claim}</td>
+                                            <td>${tglCairHtml}</td>
                                             <td class="text-center font-weight-bold" style="font-size: 14.5px;">${c.total_unit_terjual} Unit</td>
                                             <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(c.total_nominal_insentif)}</td>
                                             <td class="text-center"><span class="taste-badge ${stBadge}">${escapeHtml((c.status_claim || '').toUpperCase())}</span></td>
@@ -6357,6 +6473,11 @@ $loewixPriceList = $tiptokMaster6;
             const nameEl = document.getElementById('claimModalNamaToko');
             if (nameEl) nameEl.textContent = namaToko;
 
+            const avatarEl = document.getElementById('claimModalAvatar');
+            if (avatarEl) {
+                avatarEl.textContent = (namaToko || 'T').trim().charAt(0).toUpperCase();
+            }
+
             const unitEl = document.getElementById('claimModalTotalUnit');
             if (unitEl) unitEl.textContent = units + ' Unit';
 
@@ -6364,6 +6485,23 @@ $loewixPriceList = $tiptokMaster6;
             if (nomEl) nomEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(nominal);
 
             showModalSafe('modalSubmitClaim');
+        }
+
+        function toggleTglCairField(val) {
+            const wrap = document.getElementById('wrapTglCair');
+            const wrapNote = document.getElementById('wrapAdminNote');
+            if (!wrap) return;
+            if (val === 'cair') {
+                wrap.style.display = 'block';
+                if (wrapNote) {
+                    wrapNote.className = 'col-md-4';
+                }
+            } else {
+                wrap.style.display = 'none';
+                if (wrapNote) {
+                    wrapNote.className = 'col-md-8';
+                }
+            }
         }
 
         function submitKlaimInsentif(e) {
@@ -6416,8 +6554,11 @@ $loewixPriceList = $tiptokMaster6;
                 .then(res => {
                     if (res && res.status === 'success') {
                         const cl = res.data.claim;
-                        document.getElementById('claimKodeTitle').textContent = 'Kode Klaim: ' + (cl.kode_claim || '-');
-                        document.getElementById('claimSalesName').textContent = cl.nama_sales || '-';
+                        const kodeEl = document.getElementById('claimKodeTitle');
+                        if (kodeEl) kodeEl.textContent = cl.kode_claim || '-';
+
+                        const salesEl = document.getElementById('claimSalesName');
+                        if (salesEl) salesEl.textContent = cl.nama_sales || '-';
                         
                         const storeDisplay = cl.display_nama_toko || cl.nama_toko || 'Toko Mitra';
                         const tokoEl = document.getElementById('claimTokoName');
@@ -6427,17 +6568,46 @@ $loewixPriceList = $tiptokMaster6;
                             else tokoEl.textContent = storeDisplay;
                         }
 
-                        document.getElementById('claimTgl').textContent = 'Tgl: ' + (cl.tgl_claim || '-') + ' (' + (cl.total_unit_terjual || 0) + ' Unit)';
-                        document.getElementById('claimNominal').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(cl.total_nominal_insentif || 0);
+                        const tglClaimEl = document.getElementById('claimTglClaimVal');
+                        if (tglClaimEl) tglClaimEl.textContent = cl.tgl_claim || '-';
+
+                        const tglCairEl = document.getElementById('claimTglCairVal');
+                        if (tglCairEl) {
+                            if (cl.status_claim === 'cair' && cl.tgl_cair) {
+                                tglCairEl.innerHTML = `<span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 11.5px; font-weight: 700;"><i class="fa-solid fa-calendar-check me-1"></i> ${cl.tgl_cair}</span>`;
+                            } else if (cl.status_claim === 'ditolak') {
+                                tglCairEl.innerHTML = `<span class="text-danger text-xs font-weight-bold"><i class="fa-solid fa-ban me-1"></i> Ditolak (Tidak Cair)</span>`;
+                            } else {
+                                tglCairEl.innerHTML = `<span class="badge" style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-size: 11px;"><i class="fa-regular fa-clock me-1"></i> Menunggu Transfer</span>`;
+                            }
+                        }
+
+                        const unitCountEl = document.getElementById('claimUnitCount');
+                        if (unitCountEl) unitCountEl.textContent = (cl.total_unit_terjual || 0) + ' Unit Terjual';
+
+                        const nomEl = document.getElementById('claimNominal');
+                        if (nomEl) nomEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(cl.total_nominal_insentif || 0);
 
                         const badge = document.getElementById('claimStatusBadge');
                         if (badge) {
-                            badge.className = 'taste-badge ' + (cl.status_claim === 'cair' || cl.status_claim === 'disetujui' ? 'badge-active-tag' : 'badge-invoice-tag');
+                            let stBadge = 'badge-neutral';
+                            if (cl.status_claim === 'cair' || cl.status_claim === 'disetujui') stBadge = 'badge-active-tag';
+                            else if (cl.status_claim === 'menunggu_approval') stBadge = 'badge-invoice-tag';
+                            else if (cl.status_claim === 'ditolak') stBadge = 'badge-danger-tag';
+                            badge.className = 'taste-badge ' + stBadge;
                             badge.textContent = (cl.status_claim || '').toUpperCase();
                         }
 
                         const selStatus = document.getElementById('updateClaimStatusSelect');
-                        if (selStatus) selStatus.value = cl.status_claim;
+                        if (selStatus) {
+                            selStatus.value = cl.status_claim;
+                            toggleTglCairField(cl.status_claim);
+                        }
+
+                        const inputTglCair = document.getElementById('updateClaimTglCair');
+                        if (inputTglCair) {
+                            inputTglCair.value = cl.tgl_cair || '<?php echo date('Y-m-d'); ?>';
+                        }
 
                         const noteAdmin = document.getElementById('updateClaimAdminNote');
                         if (noteAdmin) noteAdmin.value = cl.catatan_admin || '';
@@ -6470,6 +6640,7 @@ $loewixPriceList = $tiptokMaster6;
         function submitUpdateClaimStatus() {
             const selEl = document.getElementById('updateClaimStatusSelect');
             const noteEl = document.getElementById('updateClaimAdminNote');
+            const tglCairEl = document.getElementById('updateClaimTglCair');
             const status = selEl ? selEl.value : '';
             const note = noteEl ? noteEl.value : '';
 
@@ -6478,6 +6649,9 @@ $loewixPriceList = $tiptokMaster6;
             formData.append('id_claim', currentClaimId);
             formData.append('status_claim', status);
             formData.append('catatan_admin', note);
+            if (status === 'cair' && tglCairEl && tglCairEl.value) {
+                formData.append('tgl_cair', tglCairEl.value);
+            }
 
             fetch('tiptok-ajax.php', { method: 'POST', body: formData })
                 .then(r => r.json())
