@@ -54,59 +54,71 @@ if ($chkCols) {
     }
 }
 
-// Auto-seed from official 1.000 customers JSON if empty or old seed (<500 items)
-$chkCustCnt = @$conn->query("SELECT COUNT(*) as cnt FROM sales_customer WHERE deleted_at IS NULL");
-$curCustCnt = ($chkCustCnt && $rC = $chkCustCnt->fetch_assoc()) ? (int)$rC['cnt'] : 0;
+// Auto-seed from official 1.000 customers JSON (NON-DESTRUCTIVE: preserves all existing data)
 $jsonCustFile = __DIR__ . '/../includes/customers_data.json';
-if ($curCustCnt < 500 && file_exists($jsonCustFile)) {
-    $custData = json_decode(file_get_contents($jsonCustFile), true);
-    if (is_array($custData) && count($custData) > 0) {
-        $conn->query("CREATE TABLE IF NOT EXISTS `wilayah` (
-            `id` INT AUTO_INCREMENT PRIMARY KEY,
-            `nama` VARCHAR(100) NOT NULL,
-            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-            `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            `deleted_at` DATETIME NULL,
-            INDEX (`nama`),
-            INDEX (`deleted_at`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-        $standardRegions = ['Jabodetabek', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'Kalimantan', 'Sulawesi', 'Bali & Nusa Tenggara', 'Lainnya'];
-        foreach ($standardRegions as $rName) {
-            $chk = $conn->query("SELECT id FROM `wilayah` WHERE `nama` = '" . $conn->real_escape_string($rName) . "' AND `deleted_at` IS NULL");
-            if ($chk && $chk->num_rows === 0) {
-                $conn->query("INSERT INTO `wilayah` (`nama`) VALUES ('" . $conn->real_escape_string($rName) . "')");
-            }
+if (file_exists($jsonCustFile)) {
+    // Only check if table is totally empty or merge without deleting
+    $chkCustCnt = @$conn->query("SELECT COUNT(*) as cnt FROM sales_customer WHERE deleted_at IS NULL");
+    $curCustCnt = ($chkCustCnt && $rC = $chkCustCnt->fetch_assoc()) ? (int)$rC['cnt'] : 0;
+    
+    // Create wilayah table if needed
+    $conn->query("CREATE TABLE IF NOT EXISTS `wilayah` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `nama` VARCHAR(100) NOT NULL,
+        `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        `deleted_at` DATETIME NULL,
+        INDEX (`nama`),
+        INDEX (`deleted_at`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    $standardRegions = ['Jabodetabek', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'Kalimantan', 'Sulawesi', 'Bali & Nusa Tenggara', 'Lainnya'];
+    foreach ($standardRegions as $rName) {
+        $chk = $conn->query("SELECT id FROM `wilayah` WHERE `nama` = '" . $conn->real_escape_string($rName) . "' AND `deleted_at` IS NULL");
+        if ($chk && $chk->num_rows === 0) {
+            $conn->query("INSERT INTO `wilayah` (`nama`) VALUES ('" . $conn->real_escape_string($rName) . "')");
         }
-        $wilayahMap = [];
-        $wRes = $conn->query("SELECT id, nama FROM `wilayah` WHERE `deleted_at` IS NULL");
-        if ($wRes) {
-            while ($w = $wRes->fetch_assoc()) {
-                $wilayahMap[strtolower(trim($w['nama']))] = (int)$w['id'];
+    }
+    
+    if ($curCustCnt < 50) { // Only seed if table is virtually empty, and NEVER truncate
+        $custData = json_decode(file_get_contents($jsonCustFile), true);
+        if (is_array($custData) && count($custData) > 0) {
+            $wilayahMap = [];
+            $wRes = $conn->query("SELECT id, nama FROM `wilayah` WHERE `deleted_at` IS NULL");
+            if ($wRes) {
+                while ($w = $wRes->fetch_assoc()) {
+                    $wilayahMap[strtolower(trim($w['nama']))] = (int)$w['id'];
+                }
             }
-        }
-        $defaultWilayahId = $wilayahMap['jabodetabek'] ?? 1;
+            $defaultWilayahId = $wilayahMap['jabodetabek'] ?? 1;
 
-        $conn->query("TRUNCATE TABLE `sales_customer`");
-        $st = $conn->prepare("INSERT INTO `sales_customer` (kode_customer, kategori, is_tiptok, nama, telp_pribadi, email, alamat, kota, id_wilayah, lat, lon, rad, alamat_lokasi, created_at, updated_at) VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
-        if ($st) {
-            foreach ($custData as $c) {
-                $kod = $c['kode_customer'] ?? '';
-                $kat = $c['kategori'] ?? 'Dealer';
-                $nam = $c['nama'] ?? '';
-                $tlp = $c['telp_pribadi'] ?? '';
-                $eml = $c['email'] ?? '';
-                $alm = $c['alamat'] ?? '';
-                $kot = $c['kota'] ?? '';
-                $wNm = strtolower(trim($c['wilayah'] ?? ''));
-                $iWil = $wilayahMap[$wNm] ?? $defaultWilayahId;
-                $la = $c['lat'] ?? '-6.1754';
-                $lo = $c['lon'] ?? '106.8272';
-                $ra = $c['rad'] ?? '100';
-                $lok = $c['alamat_lokasi'] ?? ($alm ?: $kot);
-                $st->bind_param("ssssssissss", $kod, $kat, $nam, $tlp, $eml, $alm, $kot, $iWil, $la, $lo, $ra, $lok);
-                $st->execute();
+            $st = $conn->prepare("INSERT INTO `sales_customer` (kode_customer, kategori, is_tiptok, nama, telp_pribadi, email, alamat, kota, id_wilayah, lat, lon, rad, alamat_lokasi, created_at, updated_at) VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+            if ($st) {
+                foreach ($custData as $c) {
+                    $kod = $c['kode_customer'] ?? '';
+                    $kat = $c['kategori'] ?? 'Dealer';
+                    $nam = $c['nama'] ?? '';
+                    $tlp = $c['telp_pribadi'] ?? '';
+                    $eml = $c['email'] ?? '';
+                    $alm = $c['alamat'] ?? '';
+                    $kot = $c['kota'] ?? '';
+                    $wNm = strtolower(trim($c['wilayah'] ?? ''));
+                    $iWil = $wilayahMap[$wNm] ?? $defaultWilayahId;
+                    $la = $c['lat'] ?? '-6.1754';
+                    $lo = $c['lon'] ?? '106.8272';
+                    $ra = $c['rad'] ?? '100';
+                    $lok = $c['alamat_lokasi'] ?? ($alm ?: $kot);
+                    
+                    // Check if customer with same name already exists
+                    $chkExist = $conn->query("SELECT id FROM sales_customer WHERE nama = '" . $conn->real_escape_string($nam) . "' LIMIT 1");
+                    if ($chkExist && $chkExist->num_rows > 0) {
+                        continue; // Do not overwrite existing
+                    }
+
+                    $st->bind_param("ssssssissss", $kod, $kat, $nam, $tlp, $eml, $alm, $kot, $iWil, $la, $lo, $ra, $lok);
+                    $st->execute();
+                }
+                $st->close();
             }
-            $st->close();
         }
     }
 }

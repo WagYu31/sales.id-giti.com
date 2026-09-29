@@ -151,9 +151,8 @@ foreach ($conns as $connKey => $db) {
         }
     }
 
-    echo "2. Mengosongkan data lama & mengimpor 1.000 customer resmi...\n";
-    $db->query("TRUNCATE TABLE `sales_customer`");
-
+    echo "2. Menyinkronkan 1.000 customer resmi (AMAN: Data lama TIDAK dihapus)...\n";
+    
     $stmt = $db->prepare("INSERT INTO `sales_customer` (kode_customer, kategori, is_tiptok, nama, telp_pribadi, email, alamat, kota, id_wilayah, lat, lon, rad, alamat_lokasi, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
     if (!$stmt) {
         echo "Warning: Prepare statement sales_customer gagal: " . $db->error . "\n";
@@ -161,11 +160,21 @@ foreach ($conns as $connKey => $db) {
     }
 
     $inserted = 0;
+    $skipped = 0;
     foreach ($customers as $c) {
+        $nama = trim($c['nama'] ?? '');
+        if (empty($nama)) continue;
+
+        // Cek jika sudah ada customer dengan nama ini (jangan duplikat atau timpa)
+        $chkExist = $db->query("SELECT id FROM `sales_customer` WHERE `nama` = '" . $db->real_escape_string($nama) . "' LIMIT 1");
+        if ($chkExist && $chkExist->num_rows > 0) {
+            $skipped++;
+            continue;
+        }
+
         $kode = $c['kode_customer'] ?? '';
         $kategori = $c['kategori'] ?? 'Dealer';
         $is_tiptok = 0;
-        $nama = $c['nama'] ?? '';
         $telp = $c['telp_pribadi'] ?? '';
         $email = $c['email'] ?? '';
         $alamat = $c['alamat'] ?? '';
@@ -185,46 +194,47 @@ foreach ($conns as $connKey => $db) {
         }
     }
     $stmt->close();
-    echo "✓ Berhasil mengimpor: {$inserted} customer ke tabel `sales_customer`!\n";
+    echo "✓ Berhasil menambah: {$inserted} customer baru (Dilewati karena sudah ada: {$skipped}). Data lama tetap aman!\n";
 
-    // 3. Jika database ini juga memiliki tabel customers (sales_id_giti), sinkronkan juga
+    // 3. Jika database ini juga memiliki tabel customers (sales_id_giti), sinkronkan tanpa truncate
     $chkCustTbl = $db->query("SHOW TABLES LIKE 'customers'");
     if ($chkCustTbl && $chkCustTbl->num_rows > 0) {
-        echo "3. Menyinkronkan juga ke tabel legacy `customers`, `customer_addresses`, `customer_pics`...\n";
-        $db->query("SET FOREIGN_KEY_CHECKS = 0;");
-        $db->query("TRUNCATE TABLE `customers`");
-        $db->query("TRUNCATE TABLE `customer_addresses`");
-        $db->query("TRUNCATE TABLE `customer_pics`");
-        $db->query("SET FOREIGN_KEY_CHECKS = 1;");
+        echo "3. Menyinkronkan juga ke tabel legacy `customers` tanpa menghapus data lama...\n";
 
-        $stC = $db->prepare("INSERT INTO `customers` (id, sales_id, tgl_input, nama_toko, kategori, deal, kandidat, potensial, acc_boss) VALUES (?, 1, NOW(), ?, ?, 'DEAL', 'Y', 'Y', 'Y')");
+        $stC = $db->prepare("INSERT INTO `customers` (sales_id, tgl_input, nama_toko, kategori, deal, kandidat, potensial, acc_boss) VALUES (1, NOW(), ?, ?, 'DEAL', 'Y', 'Y', 'Y')");
         $stA = $db->prepare("INSERT INTO `customer_addresses` (customer_id, alamat, kota, provinsi, link_google_map) VALUES (?, ?, ?, ?, ?)");
         $stP = $db->prepare("INSERT INTO `customer_pics` (customer_id, nama_pic, tlp_pic) VALUES (?, ?, ?)");
 
-        $cIdx = 1;
         foreach ($customers as $c) {
-            $id = $cIdx++;
-            $nama = $c['nama'] ?? '';
+            $nama = trim($c['nama'] ?? '');
+            if (empty($nama)) continue;
+
+            $chkLeg = $db->query("SELECT id FROM `customers` WHERE `nama_toko` = '" . $db->real_escape_string($nama) . "' LIMIT 1");
+            if ($chkLeg && $chkLeg->num_rows > 0) {
+                continue;
+            }
+
             $kat = strtoupper($c['kategori'] ?? 'DEALER');
-            $stC->bind_param("iss", $id, $nama, $kat);
-            $stC->execute();
+            $stC->bind_param("ss", $nama, $kat);
+            if ($stC->execute()) {
+                $newId = $db->insert_id;
+                $alamat = $c['alamat'] ?? '';
+                $kota = $c['kota'] ?? '';
+                $prov = $c['wilayah'] ?? '';
+                $mapLink = "https://maps.google.com/?q=" . ($c['lat'] ?? '-6.1754') . "," . ($c['lon'] ?? '106.8272');
+                $stA->bind_param("issss", $newId, $alamat, $kota, $prov, $mapLink);
+                $stA->execute();
 
-            $alamat = $c['alamat'] ?? '';
-            $kota = $c['kota'] ?? '';
-            $prov = $c['wilayah'] ?? '';
-            $mapLink = "https://maps.google.com/?q=" . ($c['lat'] ?? '-6.1754') . "," . ($c['lon'] ?? '106.8272');
-            $stA->bind_param("issss", $id, $alamat, $kota, $prov, $mapLink);
-            $stA->execute();
-
-            $pic = $c['kontak'] ?: $nama;
-            $telp = $c['telp_pribadi'] ?? '';
-            $stP->bind_param("iss", $id, $pic, $telp);
-            $stP->execute();
+                $pic = $c['kontak'] ?: $nama;
+                $telp = $c['telp_pribadi'] ?? '';
+                $stP->bind_param("iss", $newId, $pic, $telp);
+                $stP->execute();
+            }
         }
         $stC->close();
         $stA->close();
         $stP->close();
-        echo "✓ Berhasil menyinkronkan 1.000 data ke `customers`!\n";
+        echo "✓ Berhasil menyinkronkan data ke `customers`!\n";
     }
 
     // Statistik saat ini
