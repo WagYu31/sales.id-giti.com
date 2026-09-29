@@ -293,6 +293,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_id'])) {
         $stmt->bind_param("ssisssssisssss", $kode_customer, $kategori, $is_tiptok, $nama, $telp, $email, $alamat, $kota, $id_wilayah, $foto_json, $lat, $lon, $rad, $location_address);
         if ($stmt->execute()) {
             $successMsg = "Customer baru berhasil ditambahkan!";
+            
+            // Sync otomatis ke Database CRM utama (includes/db.php)
+            $dbInc = __DIR__ . '/../includes/db.php';
+            if (file_exists($dbInc)) {
+                @call_user_func(function() use ($dbInc, $nama, $kategori, $alamat, $kota, $telp, $lat, $lon) {
+                    mysqli_report(MYSQLI_REPORT_OFF);
+                    require $dbInc;
+                    if (isset($conn) && $conn && !$conn->connect_error) {
+                        $chk = $conn->query("SELECT id FROM customers WHERE nama_toko = '" . $conn->real_escape_string($nama) . "' LIMIT 1");
+                        if ($chk && $chk->num_rows === 0) {
+                            $stC = $conn->prepare("INSERT INTO customers (sales_id, tgl_input, nama_toko, kategori, deal, kandidat, potensial, acc_boss) VALUES (1, NOW(), ?, ?, 'DEAL', 'Y', 'Y', 'Y')");
+                            if ($stC) {
+                                $katUpper = strtoupper($kategori);
+                                $stC->bind_param("ss", $nama, $katUpper);
+                                if ($stC->execute()) {
+                                    $cId = $conn->insert_id;
+                                    $map = "https://maps.google.com/?q={$lat},{$lon}";
+                                    $stA = $conn->prepare("INSERT INTO customer_addresses (customer_id, alamat, kota, link_google_map) VALUES (?, ?, ?, ?)");
+                                    if ($stA) {
+                                        $stA->bind_param("isss", $cId, $alamat, $kota, $map);
+                                        $stA->execute();
+                                        $stA->close();
+                                    }
+                                    $stP = $conn->prepare("INSERT INTO customer_pics (customer_id, nama_pic, tlp_pic) VALUES (?, ?, ?)");
+                                    if ($stP) {
+                                        $stP->bind_param("iss", $cId, $nama, $telp);
+                                        $stP->execute();
+                                        $stP->close();
+                                    }
+                                }
+                                $stC->close();
+                            }
+                        }
+                    }
+                });
+            }
         } else {
             error_log("Failed to execute INSERT sales_customer: " . $stmt->error);
             $errorMsg = "Gagal menyimpan customer: " . $stmt->error;

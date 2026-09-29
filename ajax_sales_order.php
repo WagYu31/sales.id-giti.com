@@ -56,10 +56,21 @@ if ($action === 'get_next_so_number') {
 // =========================================================================
 if ($action === 'search_customers') {
     $search = trim($_GET['q'] ?? $_GET['search'] ?? '');
-    
-    // Prioritaskan tabel resmi sales_customer jika tersedia
-    $chkSC = $conn->query("SHOW TABLES LIKE 'sales_customer'");
-    if ($chkSC && $chkSC->num_rows > 0) {
+    $results = [];
+    $seenNames = [];
+
+    // 1. CARI DARI DATABASE CANVAS (teknisi_api_root -> sales_customer)
+    // Tempat customer dari menu "Customer Toko/Dealer" (seperti WAGYU A5) disimpan
+    $connCanvas = null;
+    if (file_exists(__DIR__ . '/modul-aplikasi-sales/conn.php')) {
+        $connCanvas = (function() {
+            mysqli_report(MYSQLI_REPORT_OFF);
+            include __DIR__ . '/modul-aplikasi-sales/conn.php';
+            return (isset($conn) && $conn && !$conn->connect_error) ? $conn : null;
+        })();
+    }
+
+    if ($connCanvas) {
         $where = "WHERE deleted_at IS NULL";
         $params = [];
         $types = "";
@@ -74,84 +85,93 @@ if ($action === 'search_customers') {
         $sql = "SELECT id, kode_customer, nama, kategori, telp_pribadi, email, alamat, kota
                 FROM sales_customer
                 $where
-                ORDER BY nama ASC
+                ORDER BY id DESC
                 LIMIT 30";
-        $stmt = $conn->prepare($sql);
-        if (!empty($types)) {
-            $stmt->bind_param($types, ...$params);
+        $stmt = $connCanvas->prepare($sql);
+        if ($stmt) {
+            if (!empty($types)) {
+                $stmt->bind_param($types, ...$params);
+            }
+            $stmt->execute();
+            $res = $stmt->get_result();
+            while ($row = $res->fetch_assoc()) {
+                $nameKey = strtolower(trim($row['nama']));
+                if (isset($seenNames[$nameKey])) continue;
+                $seenNames[$nameKey] = true;
+
+                $code = !empty($row['kode_customer']) ? "[{$row['kode_customer']}]" : "[C." . str_pad($row['id'], 5, '0', STR_PAD_LEFT) . "]";
+                $fullAddress = trim(($row['alamat'] ?? '') . (!empty($row['kota']) ? ', ' . $row['kota'] : ''));
+                $results[] = [
+                    'id' => $row['id'],
+                    'customer_code' => $row['kode_customer'] ?: $code,
+                    'nama_toko' => $row['nama'],
+                    'kategori' => $row['kategori'] ?? 'DEALER',
+                    'text' => "{$code} {$row['nama']}" . ($row['kategori'] ? " — [{$row['kategori']}]" : ""),
+                    'alamat' => $fullAddress,
+                    'nama_pic' => $row['nama'],
+                    'tlp_pic' => $row['telp_pribadi'] ?? '',
+                    'sales_id' => '',
+                    'sales_name' => ''
+                ];
+            }
+            $stmt->close();
         }
-        $stmt->execute();
-        $res = $stmt->get_result();
-        
-        $results = [];
-        while ($row = $res->fetch_assoc()) {
-            $code = !empty($row['kode_customer']) ? "[{$row['kode_customer']}]" : "[C." . str_pad($row['id'], 5, '0', STR_PAD_LEFT) . "]";
-            $fullAddress = trim(($row['alamat'] ?? '') . (!empty($row['kota']) ? ', ' . $row['kota'] : ''));
-            $results[] = [
-                'id' => $row['id'],
-                'customer_code' => $row['kode_customer'] ?: $code,
-                'nama_toko' => $row['nama'],
-                'kategori' => $row['kategori'] ?? 'DEALER',
-                'text' => "{$code} {$row['nama']}" . ($row['kategori'] ? " — [{$row['kategori']}]" : ""),
-                'alamat' => $fullAddress,
-                'nama_pic' => $row['nama'],
-                'tlp_pic' => $row['telp_pribadi'] ?? '',
-                'sales_id' => '',
-                'sales_name' => ''
-            ];
-        }
-        echo json_encode(['results' => $results]);
-        exit;
     }
-    
-    $where = "WHERE c.deleted_at IS NULL";
-    $params = [];
-    $types = "";
+
+    // 2. CARI DARI DATABASE CRM (includes/db.php -> customers & addresses)
+    $whereC = "WHERE c.deleted_at IS NULL";
+    $paramsC = [];
+    $typesC = "";
     
     if (!empty($search)) {
-        $where .= " AND (c.nama_toko LIKE ? OR c.kategori LIKE ? OR ca.alamat LIKE ? OR ca.kota LIKE ? OR cp.nama_pic LIKE ?)";
+        $whereC .= " AND (c.nama_toko LIKE ? OR c.kategori LIKE ? OR ca.alamat LIKE ? OR ca.kota LIKE ? OR cp.nama_pic LIKE ?)";
         $s = "%$search%";
-        $params = [$s, $s, $s, $s, $s];
-        $types = "sssss";
+        $paramsC = [$s, $s, $s, $s, $s];
+        $typesC = "sssss";
     }
     
-    $sql = "SELECT c.id, c.nama_toko, c.kategori, c.sales_id,
-                   ca.alamat, ca.kota, ca.provinsi,
-                   cp.nama_pic, cp.tlp_pic,
-                   s.nama_lengkap as sales_name
-            FROM customers c
-            LEFT JOIN customer_addresses ca ON ca.customer_id = c.id AND ca.deleted_at IS NULL
-            LEFT JOIN customer_pics cp ON cp.customer_id = c.id AND cp.deleted_at IS NULL
-            LEFT JOIN sales s ON s.id = c.sales_id
-            $where
-            GROUP BY c.id
-            ORDER BY c.nama_toko ASC
-            LIMIT 30";
+    $sqlC = "SELECT c.id, c.nama_toko, c.kategori, c.sales_id,
+                    ca.alamat, ca.kota, ca.provinsi,
+                    cp.nama_pic, cp.tlp_pic,
+                    COALESCE(s.nama_lengkap, '') as sales_name
+             FROM customers c
+             LEFT JOIN customer_addresses ca ON ca.customer_id = c.id AND ca.deleted_at IS NULL
+             LEFT JOIN customer_pics cp ON cp.customer_id = c.id AND cp.deleted_at IS NULL
+             LEFT JOIN sales s ON s.id = c.sales_id
+             $whereC
+             GROUP BY c.id
+             ORDER BY c.nama_toko ASC
+             LIMIT 30";
+             
+    $stmtC = $conn->prepare($sqlC);
+    if ($stmtC) {
+        if (!empty($typesC)) {
+            $stmtC->bind_param($typesC, ...$paramsC);
+        }
+        $stmtC->execute();
+        $resC = $stmtC->get_result();
+        while ($row = $resC->fetch_assoc()) {
+            $nameKey = strtolower(trim($row['nama_toko']));
+            if (isset($seenNames[$nameKey])) continue;
+            $seenNames[$nameKey] = true;
+
+            $code = "[C." . str_pad($row['id'], 5, '0', STR_PAD_LEFT) . "]";
+            $fullAddress = trim(($row['alamat'] ?? '') . ($row['kota'] ? ', ' . $row['kota'] : ''));
             
-    $stmt = $conn->prepare($sql);
-    if (!empty($types)) {
-        $stmt->bind_param($types, ...$params);
-    }
-    $stmt->execute();
-    $res = $stmt->get_result();
-    
-    $results = [];
-    while ($row = $res->fetch_assoc()) {
-        $code = "[C." . str_pad($row['id'], 5, '0', STR_PAD_LEFT) . "]";
-        $fullAddress = trim(($row['alamat'] ?? '') . ($row['kota'] ? ', ' . $row['kota'] : ''));
-        
-        $results[] = [
-            'id' => $row['id'],
-            'customer_code' => $code,
-            'nama_toko' => $row['nama_toko'],
-            'kategori' => $row['kategori'] ?? 'DEALER',
-            'text' => "{$code} {$row['nama_toko']}" . ($row['kategori'] ? " — [{$row['kategori']}]" : ""),
-            'alamat' => $fullAddress,
-            'nama_pic' => $row['nama_pic'] ?? '',
-            'tlp_pic' => $row['tlp_pic'] ?? '',
-            'sales_id' => $row['sales_id'] ?? '',
-            'sales_name' => $row['sales_name'] ?? ''
-        ];
+            $results[] = [
+                'id' => $row['id'],
+                'customer_code' => $code,
+                'nama_toko' => $row['nama_toko'],
+                'kategori' => $row['kategori'] ?? 'DEALER',
+                'text' => "{$code} {$row['nama_toko']}" . ($row['kategori'] ? " — [{$row['kategori']}]" : ""),
+                'alamat' => $fullAddress,
+                'nama_pic' => $row['nama_pic'] ?: $row['nama_toko'],
+                'tlp_pic' => $row['tlp_pic'] ?? '',
+                'sales_id' => $row['sales_id'] ?? '',
+                'sales_name' => $row['sales_name'] ?? ''
+            ];
+        }
+        $stmtC->close();
     }
     
     echo json_encode(['results' => $results]);
