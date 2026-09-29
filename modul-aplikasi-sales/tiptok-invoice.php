@@ -155,51 +155,70 @@ if ($qDealersPreload) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
+        /* ═════════════════════════════════════════════════════════
+           MINIMALIST EDITORIAL & WARM MONOCHROME DESIGN SYSTEM
+           Refined, quiet luxury UI with muted spot pastels
+           ═════════════════════════════════════════════════════════ */
         :root {
             --font-main: 'Plus Jakarta Sans', sans-serif;
-            --font-heading: 'Outfit', sans-serif;
-            --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --accent-blue: #2563eb;
-            --accent-emerald: #059669;
-            --accent-amber: #d97706;
-            --accent-rose: #e11d48;
-            --card-radius: 16px;
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --card-radius: 12px;
+            --bg-canvas: #f8fafc;
+            --surface-card: #ffffff;
+            --border-subtle: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+
+            /* Muted Spot Pastels (Quiet Luxury) */
+            --pastel-green-bg: #edf3ec;
+            --pastel-green-text: #2d5a27;
+            --pastel-green-border: #d1e7dd;
+
+            --pastel-red-bg: #fdebec;
+            --pastel-red-text: #8f2d2a;
+            --pastel-red-border: #f8d7da;
+
+            --pastel-amber-bg: #fdf6e2;
+            --pastel-amber-text: #855d00;
+            --pastel-amber-border: #ffebaa;
+
+            --pastel-blue-bg: #e1f3fe;
+            --pastel-blue-text: #1e5c8a;
+            --pastel-blue-border: #bee5eb;
+
+            --pastel-slate-bg: #f1f5f9;
+            --pastel-slate-text: #475569;
+            --pastel-slate-border: #e2e8f0;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            color: #0f172a;
+            font-family: var(--font-main);
+            background: var(--bg-canvas);
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
             min-height: 100vh;
         }
 
         /* Hero Banner */
         .hero-banner-invoice {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            background: #0f172a;
             border-radius: var(--card-radius);
-            padding: 26px 30px;
+            padding: 24px 28px;
             color: #ffffff;
-            box-shadow: 0 12px 30px -10px rgba(15, 23, 42, 0.4);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 24px;
+            border: 1px solid #1e293b;
+            margin-bottom: 20px;
         }
         .hero-banner-invoice::before {
-            content: '';
-            position: absolute;
-            top: -60px;
-            right: -60px;
-            width: 240px;
-            height: 240px;
-            background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, rgba(14, 165, 233, 0) 70%);
-            border-radius: 50%;
-            pointer-events: none;
+            display: none !important;
         }
 
         .hero-title {
             font-family: var(--font-heading);
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 800;
             letter-spacing: -0.02em;
             margin-bottom: 4px;
@@ -210,93 +229,104 @@ if ($qDealersPreload) {
             font-size: 13.5px;
             color: #94a3b8;
             margin-bottom: 0;
-            font-weight: 500;
+            font-weight: 400;
+            max-width: 650px;
+            line-height: 1.5;
         }
 
-        /* Metric Bento Cards */
+        /* Metric Bento Cards (Warm Minimalist) */
         .metric-card-inv {
-            background: #ffffff;
+            background: #ffffff !important;
             border-radius: var(--card-radius);
-            padding: 20px 22px;
-            border: 1.5px solid #e2e8f0;
-            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04);
-            transition: all 0.2s ease;
+            padding: 18px 20px;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
             position: relative;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             height: 100%;
         }
         .metric-card-inv:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 22px -5px rgba(0, 0, 0, 0.08);
+            border-color: #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
 
         .metric-card-inv .metric-icon-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            margin-bottom: 12px;
+            font-size: 15px;
+            margin-bottom: 10px;
+            background: #f8fafc !important;
+            color: #475569 !important;
+            border: 1px solid #e2e8f0;
+            box-shadow: none !important;
         }
 
         .metric-card-inv .metric-value {
             font-family: var(--font-heading);
-            font-size: 26px;
-            font-weight: 900;
-            line-height: 1.1;
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.15;
             margin-bottom: 2px;
+            color: #0f172a !important;
+            letter-spacing: -0.02em;
         }
         .metric-card-inv .metric-label {
-            font-size: 12.5px;
+            font-size: 11.5px;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
 
-        .theme-blue .metric-icon-box { background: rgba(37, 99, 235, 0.12); color: #2563eb; }
-        .theme-blue .metric-value { color: #1e40af; }
+        .theme-blue .metric-icon-box,
+        .theme-amber .metric-icon-box,
+        .theme-emerald .metric-icon-box,
+        .theme-purple .metric-icon-box {
+            background: #f8fafc !important;
+            color: #475569 !important;
+        }
 
-        .theme-amber .metric-icon-box { background: rgba(217, 119, 6, 0.12); color: #d97706; }
-        .theme-amber .metric-value { color: #b45309; }
-
-        .theme-emerald .metric-icon-box { background: rgba(5, 150, 105, 0.12); color: #059669; }
-        .theme-emerald .metric-value { color: #047857; }
-
-        .theme-purple .metric-icon-box { background: rgba(147, 51, 234, 0.12); color: #9333ea; }
-        .theme-purple .metric-value { color: #7e22ce; }
+        .theme-blue .metric-value,
+        .theme-amber .metric-value,
+        .theme-emerald .metric-value,
+        .theme-purple .metric-value {
+            color: #0f172a !important;
+        }
 
         /* Filter Controls */
         .filter-panel-card {
             background: #ffffff;
             border-radius: var(--card-radius);
-            padding: 18px 24px;
-            border: 1.5px solid #e2e8f0;
-            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.03);
-            margin-bottom: 20px;
+            padding: 16px 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            margin-bottom: 18px;
         }
 
         .segment-filter-group {
             display: inline-flex;
-            background: #f1f5f9;
+            background: #ffffff;
             padding: 4px;
-            border-radius: 12px;
+            border-radius: 10px;
             gap: 4px;
             border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
         }
 
         .segment-btn {
-            border: none;
+            border: 1px solid transparent;
             background: transparent;
             padding: 7px 14px;
-            border-radius: 8px;
-            font-size: 12.5px;
-            font-weight: 800;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
             color: #64748b;
             cursor: pointer;
             transition: all 0.15s ease;
@@ -306,12 +336,17 @@ if ($qDealersPreload) {
             white-space: nowrap !important;
         }
         .segment-btn:hover {
+            background: #f8fafc;
             color: #0f172a;
         }
         .segment-btn.active {
-            background: #ffffff;
-            color: #0f172a;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            background: #0f172a !important;
+            color: #ffffff !important;
+            border-color: #0f172a !important;
+            box-shadow: none !important;
+        }
+        .segment-btn.active i {
+            color: #ffffff !important;
         }
 
         /* Search input */
@@ -324,40 +359,43 @@ if ($qDealersPreload) {
             top: 50%;
             transform: translateY(-50%);
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 13.5px;
+            pointer-events: none;
         }
         .search-input-box input {
             padding-left: 38px;
-            border-radius: 12px;
-            border: 2px solid #cbd5e1;
+            border-radius: 9px;
+            border: 1px solid #e2e8f0;
             font-size: 13.5px;
-            font-weight: 600;
+            font-weight: 500;
             color: #0f172a;
-            height: 42px;
+            height: 40px;
+            transition: all 0.15s ease;
+            box-shadow: none;
         }
         .search-input-box input:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            border-color: #0f172a;
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06);
             outline: none;
         }
 
         /* Batch Action Floating Bar */
         .batch-action-bar {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 14px;
+            background: #0f172a;
+            border-radius: 12px;
             padding: 12px 20px;
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
+            box-shadow: 0 4px 15px -3px rgba(15, 23, 42, 0.15);
             margin-bottom: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            animation: slideDown 0.2s ease-out;
+            border: 1px solid #1e293b;
+            animation: slideDown 0.15s ease-out;
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-8px); }
+            from { opacity: 0; transform: translateY(-6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -365,8 +403,8 @@ if ($qDealersPreload) {
         .data-card-inv {
             background: #ffffff;
             border-radius: var(--card-radius);
-            border: 1.5px solid #e2e8f0;
-            box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
             overflow: hidden;
         }
 
@@ -377,14 +415,14 @@ if ($qDealersPreload) {
             border-spacing: 0;
         }
         .table-invoice thead th {
-            background: #f8fafc;
-            color: #475569;
+            background: #0f172a;
+            color: #ffffff;
             font-size: 11.5px;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 14px 16px;
-            border-bottom: 2px solid #e2e8f0;
+            letter-spacing: 0.04em;
+            padding: 13px 16px;
+            border-bottom: 1px solid #1e293b;
             white-space: nowrap;
         }
         .table-invoice tbody td {
@@ -392,7 +430,7 @@ if ($qDealersPreload) {
             vertical-align: top !important;
             border-bottom: 1px solid #f1f5f9;
             font-size: 13px;
-            color: #1e293b;
+            color: #0f172a;
         }
         .table-invoice tbody tr:hover td {
             background-color: #f8fafc;
@@ -400,39 +438,39 @@ if ($qDealersPreload) {
 
         /* Badges */
         .badge-pending-inv {
-            background: #fef3c7;
-            color: #b45309;
-            border: 1.5px solid #fde68a;
-            padding: 4px 8px;
-            border-radius: 7px;
+            background: var(--pastel-amber-bg);
+            color: var(--pastel-amber-text);
+            border: 1px solid var(--pastel-amber-border);
+            padding: 2px 7px;
+            border-radius: 5px;
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 4px;
             white-space: nowrap !important;
         }
         .badge-verified-inv {
-            background: #ecfdf5;
-            color: #047857;
-            border: 1.5px solid #a7f3d0;
-            padding: 4px 8px;
-            border-radius: 7px;
-            font-size: 11.5px;
-            font-weight: 800;
+            background: var(--pastel-green-bg);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 4px;
             white-space: nowrap !important;
         }
         .badge-so-inv {
-            background: #eef2ff;
-            color: #4338ca;
-            border: 1.5px solid #c7d2fe;
-            padding: 4px 8px;
-            border-radius: 7px;
-            font-size: 11.5px;
-            font-weight: 800;
+            background: var(--pastel-slate-bg);
+            color: var(--pastel-slate-text);
+            border: 1px solid var(--pastel-slate-border);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 4px;
@@ -441,298 +479,297 @@ if ($qDealersPreload) {
 
         /* Buttons */
         .btn-brand-primary {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #ffffff;
-            border: none;
-            border-radius: 10px;
+            background: #0f172a;
+            color: #ffffff !important;
+            border: 1px solid #0f172a;
+            border-radius: 8px;
             padding: 8px 16px;
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             transition: all 0.15s ease;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+            box-shadow: none;
             text-decoration: none;
+            cursor: pointer;
         }
         .btn-brand-primary:hover {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            color: #ffffff;
-            transform: translateY(-1px);
+            background: #334155;
+            border-color: #334155;
+            color: #ffffff !important;
         }
 
         .btn-brand-amber {
-            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 800;
+            background: #0f172a;
+            color: #ffffff !important;
+            border: 1px solid #0f172a;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11.5px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             cursor: pointer;
             transition: all 0.15s;
             white-space: nowrap !important;
+            box-shadow: none;
         }
         .btn-brand-amber:hover {
-            background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
-            color: #ffffff;
+            background: #334155;
+            border-color: #334155;
+            color: #ffffff !important;
         }
 
         .btn-brand-secondary {
             background: #ffffff;
-            color: #334155;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 800;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11.5px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             cursor: pointer;
             transition: all 0.15s;
         }
         .btn-brand-secondary:hover {
-            background: #f1f5f9;
+            background: #f8fafc;
             color: #0f172a;
+            border-color: #cbd5e1;
         }
 
         /* Form Inputs in Modal */
         .form-label-taste {
-            font-size: 12.5px;
-            font-weight: 800;
+            font-size: 11px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #1e293b;
-            margin-bottom: 6px;
+            letter-spacing: 0.04em;
+            color: #475569;
+            margin-bottom: 5px;
             display: block;
         }
         .form-control-taste {
-            border: 2px solid #cbd5e1;
-            border-radius: 12px;
-            padding: 9px 14px;
-            font-size: 14px;
-            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
             color: #0f172a;
             transition: border-color 0.15s, box-shadow 0.15s;
             background-color: #ffffff;
         }
         .form-control-taste:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+            border-color: #0f172a;
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06);
             outline: none;
         }
 
         /* ------------------------------------------------------------- */
-        /* CLEAN MODERN SALES PILL CHIPS (taste-skill aligned)           */
+        /* CLEAN MODERN SALES PILL CHIPS                                 */
         /* ------------------------------------------------------------- */
         .sales-chips-bar {
             display: flex;
             align-items: center;
             gap: 8px;
             overflow-x: auto;
-            padding: 4px 2px 14px 2px;
-            margin-bottom: 12px;
+            padding: 4px 2px 12px 2px;
+            margin-bottom: 10px;
             scrollbar-width: thin;
         }
         .sales-chip-btn {
             background: #ffffff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 30px;
-            padding: 6px 14px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #334155;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #475569;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.15s ease;
             display: inline-flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
             white-space: nowrap;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            box-shadow: none;
         }
         .sales-chip-btn:hover {
             border-color: #cbd5e1;
             background: #f8fafc;
-            transform: translateY(-1px);
+            color: #0f172a;
         }
         .sales-chip-btn.active {
             background: #0f172a;
             color: #ffffff;
             border-color: #0f172a;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+            box-shadow: none;
         }
         .sales-chip-btn .chip-count {
             background: #f1f5f9;
             color: #475569;
             font-size: 11px;
-            font-weight: 800;
-            padding: 2px 7px;
-            border-radius: 12px;
-            transition: all 0.2s;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 10px;
+            transition: all 0.15s;
         }
         .sales-chip-btn.active .chip-count {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.18);
             color: #ffffff;
         }
 
         /* ------------------------------------------------------------- */
-        /* ELEGANT 3D SALES PODIUM (LEADERBOARD VIEW)                    */
+        /* MINIMALIST SALES PODIUM (LEADERBOARD VIEW)                    */
         /* ------------------------------------------------------------- */
         .podium-container {
             max-width: 1000px;
-            margin: 0 auto 30px auto;
+            margin: 0 auto 24px auto;
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            gap: 20px;
+            gap: 16px;
             flex-wrap: wrap;
         }
         .podium-card {
             background: #ffffff;
-            border-radius: 20px;
-            padding: 24px 20px;
-            border: 1.5px solid #e2e8f0;
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+            border-radius: 12px;
+            padding: 22px 18px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
             text-align: center;
             position: relative;
             flex: 1;
-            min-width: 260px;
-            max-width: 320px;
-            transition: all 0.25s ease;
+            min-width: 250px;
+            max-width: 310px;
+            transition: border-color 0.15s ease;
         }
         .podium-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.15);
+            border-color: #cbd5e1;
         }
         .podium-card.rank-1 {
             order: 2;
-            padding-top: 32px;
-            padding-bottom: 30px;
-            border-color: #fde68a;
-            background: linear-gradient(180deg, #fffbeb 0%, #ffffff 40%);
-            box-shadow: 0 15px 35px -8px rgba(217, 119, 6, 0.2);
-            transform: scale(1.04);
+            padding-top: 26px;
+            padding-bottom: 24px;
+            border: 1.5px solid #0f172a;
             z-index: 2;
-        }
-        .podium-card.rank-1:hover {
-            transform: scale(1.04) translateY(-4px);
         }
         .podium-card.rank-2 {
             order: 1;
-            border-color: #e2e8f0;
-            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 40%);
+            border: 1px solid #e2e8f0;
         }
         .podium-card.rank-3 {
             order: 3;
-            border-color: #ffedd5;
-            background: linear-gradient(180deg, #fff7ed 0%, #ffffff 40%);
+            border: 1px solid #e2e8f0;
         }
 
         .podium-avatar {
-            width: 58px;
-            height: 58px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            margin: 0 auto 12px auto;
+            margin: 0 auto 10px auto;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: var(--font-heading);
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 800;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-            border: 3px solid #ffffff;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #0f172a;
         }
         .podium-card.rank-1 .podium-avatar {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: #0f172a;
             color: #ffffff;
-            width: 68px;
-            height: 68px;
-            font-size: 24px;
+            border-color: #0f172a;
+            width: 56px;
+            height: 56px;
+            font-size: 19px;
         }
         .podium-card.rank-2 .podium-avatar {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            color: #ffffff;
+            background: #f1f5f9;
+            color: #475569;
         }
         .podium-card.rank-3 .podium-avatar {
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-            color: #ffffff;
+            background: #f8fafc;
+            color: #475569;
         }
 
         .podium-rank-badge {
             position: absolute;
-            top: -14px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 800;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
         .podium-card.rank-1 .podium-rank-badge {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: #0f172a;
             color: #ffffff;
         }
         .podium-card.rank-2 .podium-rank-badge {
-            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
-            color: #ffffff;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
         }
         .podium-card.rank-3 .podium-rank-badge {
-            background: linear-gradient(135deg, #fb923c 0%, #c2410c 100%);
-            color: #ffffff;
+            background: #f8fafc;
+            color: #475569;
+            border: 1px solid #e2e8f0;
         }
 
         /* Top Page Navigation View Switcher */
         .page-view-nav {
             display: inline-flex;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(8px);
-            padding: 4px;
-            border-radius: 12px;
-            gap: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 3px;
+            border-radius: 9px;
+            gap: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
         .page-view-nav-btn {
             border: none;
             background: transparent;
-            padding: 8px 18px;
-            border-radius: 9px;
+            padding: 7px 15px;
+            border-radius: 7px;
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 600;
             color: #cbd5e1;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             display: inline-flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
         }
         .page-view-nav-btn:hover {
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.06);
         }
         .page-view-nav-btn.active {
             background: #ffffff;
             color: #0f172a;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         /* Progress Bar */
         .podium-progress {
             background: #e2e8f0;
-            border-radius: 10px;
-            height: 7px;
+            border-radius: 6px;
+            height: 6px;
             overflow: hidden;
-            margin-top: 8px;
+            margin-top: 6px;
         }
         .podium-progress-bar {
-            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            background: #0f172a;
             height: 100%;
-            border-radius: 10px;
-            transition: width 0.6s ease;
+            border-radius: 6px;
+            transition: width 0.4s ease;
         }
     </style>
 </head>
@@ -751,10 +788,10 @@ if ($qDealersPreload) {
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                     <div>
                         <div class="d-flex align-items-center gap-2 mb-2">
-                            <span class="badge" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px;">
+                            <span class="badge" style="background: rgba(255, 255, 255, 0.08); color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.12); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;">
                                 <i class="fa-solid fa-receipt me-1"></i> MODUL FAKTUR KHUSUS
                             </span>
-                            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px;">
+                            <span class="badge" style="background: rgba(255, 255, 255, 0.08); color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.12); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;">
                                 Program TIP TOK
                             </span>
                         </div>
@@ -772,14 +809,14 @@ if ($qDealersPreload) {
                                 <i class="fa-solid fa-file-invoice"></i> Daftar Faktur
                             </button>
                             <button type="button" class="page-view-nav-btn" id="btnNavLeaderboard" onclick="switchMainView('leaderboard')">
-                                <i class="fa-solid fa-trophy text-warning"></i> Leaderboard Sales
+                                <i class="fa-solid fa-trophy"></i> Leaderboard Sales
                             </button>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <a href="tiptok.php" class="btn btn-outline-light mb-0 font-weight-bold" style="border-radius: 10px; padding: 9px 16px; font-size: 13px;">
+                            <a href="tiptok.php" class="btn btn-outline-light mb-0 font-weight-bold" style="border-radius: 8px; padding: 8px 16px; font-size: 13px; border-color: rgba(255, 255, 255, 0.2);">
                                 <i class="fa-solid fa-box-archive me-1.5"></i> Penitipan Stok
                             </a>
-                            <button type="button" class="btn btn-primary mb-0 font-weight-bold" style="border-radius: 10px; padding: 9px 16px; font-size: 13px;" onclick="loadInvoicesData()">
+                            <button type="button" class="btn mb-0 font-weight-bold" style="background: #ffffff; color: #0f172a; border-radius: 8px; padding: 8px 16px; font-size: 13px; box-shadow: none;" onclick="loadInvoicesData()">
                                 <i class="fa-solid fa-rotate me-1.5"></i> Refresh
                             </button>
                         </div>
@@ -810,7 +847,7 @@ if ($qDealersPreload) {
                                 <div class="metric-value" id="statPendingUnit"><?php echo number_format($statPendingUnit); ?> Unit</div>
                                 <div class="metric-label">Belum Ada No. Invoice</div>
                             </div>
-                            <div class="text-xs font-weight-bold mt-2" style="color: #b45309;" id="statPendingTrxText"><?php echo $statPendingTrx; ?> transaksi menunggu invoice</div>
+                            <div class="text-xs text-muted font-weight-bold mt-2" id="statPendingTrxText"><?php echo $statPendingTrx; ?> transaksi menunggu invoice</div>
                         </div>
                     </div>
                     <div class="col-xl-3 col-sm-6">
@@ -820,7 +857,7 @@ if ($qDealersPreload) {
                                 <div class="metric-value" id="statInvoicedUnit"><?php echo number_format($statInvoicedUnit); ?> Unit</div>
                                 <div class="metric-label">Sudah Ber-Invoice</div>
                             </div>
-                            <div class="text-xs text-success font-weight-bold mt-2">Faktur tercatat &amp; siap klaim</div>
+                            <div class="text-xs text-muted font-weight-bold mt-2">Faktur tercatat &amp; siap klaim</div>
                         </div>
                     </div>
                     <div class="col-xl-3 col-sm-6">
@@ -857,11 +894,11 @@ if ($qDealersPreload) {
                                 <i class="fa-solid fa-list"></i> Semua Penjualan
                             </button>
                             <button type="button" class="segment-btn" id="btnFilterPending" onclick="setFilterStatus('pending', this)">
-                                <i class="fa-solid fa-triangle-exclamation text-warning"></i> Belum Invoice 
-                                <span class="badge bg-warning text-dark px-1.5 py-0.5" id="badgePendingCount" style="font-size: 10.5px;"><?php echo $statPendingTrx; ?></span>
+                                <i class="fa-solid fa-triangle-exclamation"></i> Belum Invoice 
+                                <span class="badge px-1.5 py-0.5" id="badgePendingCount" style="background: var(--pastel-amber-bg); color: var(--pastel-amber-text); border: 1px solid var(--pastel-amber-border); font-size: 10.5px; font-weight: 700; border-radius: 10px;"><?php echo $statPendingTrx; ?></span>
                             </button>
                             <button type="button" class="segment-btn" id="btnFilterInvoiced" onclick="setFilterStatus('invoiced', this)">
-                                <i class="fa-solid fa-circle-check text-success"></i> Sudah Ber-Invoice
+                                <i class="fa-solid fa-circle-check"></i> Sudah Ber-Invoice
                             </button>
                         </div>
                         <div class="d-flex align-items-center gap-2 flex-grow-1 justify-content-sm-end" style="min-width: 280px;">
@@ -869,7 +906,7 @@ if ($qDealersPreload) {
                                 <i class="fa-solid fa-magnifying-glass"></i>
                                 <input type="text" id="searchInput" class="form-control" placeholder="Cari toko, barang, invoice, SO..." oninput="handleSearchInput()">
                             </div>
-                            <button type="button" class="btn btn-outline-secondary mb-0 px-3 font-weight-bold" style="border-radius: 12px; height: 42px; white-space: nowrap;" onclick="toggleAdvancedFilters()">
+                            <button type="button" class="btn mb-0 px-3 font-weight-bold" style="border: 1px solid #e2e8f0; border-radius: 8px; height: 38px; white-space: nowrap; color: #475569; background: #ffffff; font-size: 12.5px; box-shadow: none;" onclick="toggleAdvancedFilters()">
                                 <i class="fa-solid fa-filter me-1"></i> Filter Lanjutan
                             </button>
                         </div>
@@ -916,7 +953,7 @@ if ($qDealersPreload) {
                 <!-- 4. BATCH ACTION BAR (Shown when checkboxes are checked) -->
                 <div id="batchActionBar" class="batch-action-bar d-none">
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.2); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        <div style="width: 36px; height: 36px; border-radius: 8px; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 15px;">
                             <i class="fa-solid fa-check-double"></i>
                         </div>
                         <div>
@@ -925,13 +962,13 @@ if ($qDealersPreload) {
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-light mb-0 font-weight-bold" onclick="unselectAllCheckboxes()">
+                        <button type="button" class="btn btn-sm mb-0 font-weight-bold" style="background: transparent; color: #64748b; border: 1px solid #cbd5e1; border-radius: 6px;" onclick="unselectAllCheckboxes()">
                             Batal
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger mb-0 font-weight-bold px-3" onclick="batalkanPenjualanBatch()">
+                        <button type="button" class="btn btn-sm mb-0 font-weight-bold px-3" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); border-radius: 6px;" onclick="batalkanPenjualanBatch()">
                             <i class="fa-solid fa-rotate-left me-1.5"></i> Batalkan Penjualan Terpilih
                         </button>
-                        <button type="button" class="btn btn-sm btn-success mb-0 font-weight-bold px-3" onclick="openBatchInvoiceModal()">
+                        <button type="button" class="btn btn-sm mb-0 font-weight-bold px-3" style="background: #0f172a; color: #ffffff; border-radius: 6px;" onclick="openBatchInvoiceModal()">
                             <i class="fa-solid fa-file-pen me-1.5"></i> Input No. Invoice Kolektif
                         </button>
                     </div>
@@ -973,7 +1010,7 @@ if ($qDealersPreload) {
                 <!-- Podium Top Performers -->
                 <div class="text-center mb-4">
                     <h4 class="font-weight-bold text-dark mb-1" style="font-family: var(--font-heading);">
-                        🏆 Leaderboard &amp; Performa Sales TIP TOK
+                        Leaderboard &amp; Performa Sales TIP TOK
                     </h4>
                     <p class="text-sm text-muted mb-0">
                         Peringkat performa sales berdasarkan unit faktur terbit, omset konsinyasi, dan target klaim insentif.
@@ -983,7 +1020,7 @@ if ($qDealersPreload) {
                 <!-- 3D Podium Container -->
                 <div class="podium-container" id="podiumCardsContainer">
                     <div class="text-center py-4 w-100">
-                        <div class="spinner-border spinner-border-sm text-primary mb-2"></div>
+                        <div class="spinner-border spinner-border-sm text-dark mb-2"></div>
                         <div class="text-xs text-muted font-weight-bold">Menyiapkan podium sales...</div>
                     </div>
                 </div>
@@ -992,10 +1029,10 @@ if ($qDealersPreload) {
                 <div class="data-card-inv mt-4">
                     <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light flex-wrap gap-2">
                         <div>
-                            <h6 class="font-weight-bold text-dark mb-0"><i class="fa-solid fa-list-ol text-primary me-1.5"></i> Tabel Peringkat Lengkap Seluruh Sales</h6>
+                            <h6 class="font-weight-bold text-dark mb-0"><i class="fa-solid fa-list-ol text-secondary me-1.5"></i> Tabel Peringkat Lengkap Seluruh Sales</h6>
                             <span class="text-xs text-muted font-weight-bold">Diurutkan otomatis: Unit Ber-Invoice &gt; Total Terjual &gt; Total Insentif</span>
                         </div>
-                        <span class="badge text-white px-3 py-1.5" style="background: #0f172a; border-radius: 20px; font-size: 11.5px; font-weight: 800;">
+                        <span class="badge text-white px-2.5 py-1" style="background: #0f172a; border-radius: 6px; font-size: 11px; font-weight: 700;">
                             Target Klaim: Min. 50 Unit
                         </span>
                     </div>
@@ -1034,14 +1071,14 @@ if ($qDealersPreload) {
     <!-- ========================================================================= -->
     <div class="modal fade" id="modalSingleInvoice" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 25px 50px -12px rgba(15,23,42,0.35); overflow: hidden;">
-                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 20px 24px;">
+            <div class="modal-content" style="border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                <div class="modal-header" style="background: #0f172a; color: #ffffff; padding: 18px 24px;">
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); border: 1.5px solid rgba(56, 189, 248, 0.35); display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 19px;">
+                        <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 17px;">
                             <i class="fa-solid fa-file-invoice"></i>
                         </div>
                         <div>
-                            <h5 class="modal-title font-weight-bold text-white mb-0" id="singleModalTitle">Input No. Invoice</h5>
+                            <h5 class="modal-title font-weight-bold text-white mb-0" id="singleModalTitle" style="font-size: 16px;">Input No. Invoice</h5>
                             <div class="text-xs mt-0.5" style="color: #94a3b8;" id="singleModalSubtitle">Tetapkan nomor faktur penjualan TIP TOK</div>
                         </div>
                     </div>
@@ -1053,15 +1090,15 @@ if ($qDealersPreload) {
                     <div class="modal-body p-4 bg-white">
                         
                         <!-- Info Card Ringkasan Transaksi -->
-                        <div class="p-3 mb-4 rounded-3" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
+                        <div class="p-3 mb-4 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="font-weight-bold text-dark fs-6" id="singlePrevNamaToko">-</span>
-                                <span class="badge text-white px-2.5 py-1" style="background: #0f172a; border-radius: 20px; font-size: 11px; font-weight: 800;" id="singlePrevQty">0 Unit</span>
+                                <span class="badge text-white px-2.5 py-1" style="background: #0f172a; border-radius: 6px; font-size: 11px; font-weight: 700;" id="singlePrevQty">0 Unit</span>
                             </div>
                             <div class="text-xs text-secondary font-weight-bold" id="singlePrevNamaBarang">-</div>
-                            <div class="d-flex align-items-center justify-content-between p-2 rounded-2 mt-2" style="background: #ecfdf5; border: 1px solid #a7f3d0;">
-                                <span class="text-xs text-success font-weight-bold"><i class="fa-solid fa-coins me-1"></i> Subtotal Reward Insentif:</span>
-                                <span class="text-xs font-weight-bold text-success fs-6" id="singlePrevInsentif">Rp 0</span>
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded-2 mt-2" style="background: #ffffff; border: 1px solid #e2e8f0;">
+                                <span class="text-xs text-muted font-weight-bold"><i class="fa-solid fa-coins me-1"></i> Subtotal Reward Insentif:</span>
+                                <span class="text-xs font-weight-bold text-dark fs-6" id="singlePrevInsentif">Rp 0</span>
                             </div>
                         </div>
 
@@ -1069,39 +1106,39 @@ if ($qDealersPreload) {
                         <div class="mb-3">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center justify-content-between">
                                 <span class="d-flex align-items-center gap-1.5">
-                                    <i class="fa-solid fa-clipboard-list text-primary"></i> NOMOR SO (SALES ORDER)
+                                    <i class="fa-solid fa-clipboard-list text-secondary"></i> NOMOR SO (SALES ORDER)
                                 </span>
                                 <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10px;">Bisa diisi SO / INV</span>
                             </label>
-                            <input type="text" name="no_so" id="singleInputNoSo" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: SO/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;">
+                            <input type="text" name="no_so" id="singleInputNoSo" class="form-control form-control-taste font-monospace font-weight-bold" placeholder="Contoh: SO/2026/09/001">
                             <div class="form-text text-xs text-muted mt-1">Nomor Sales Order (SO) dari sistem kantor / ERP.</div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
-                                <i class="fa-solid fa-receipt text-primary"></i> NOMOR INVOICE / FAKTUR
+                                <i class="fa-solid fa-receipt text-secondary"></i> NOMOR INVOICE / FAKTUR
                             </label>
-                            <input type="text" name="no_inv" id="singleInputNoInv" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;">
+                            <input type="text" name="no_inv" id="singleInputNoInv" class="form-control form-control-taste font-monospace font-weight-bold" placeholder="Contoh: INV/2026/09/001">
                             <div class="form-text text-xs text-muted mt-1">Nomor faktur / invoice resmi yang diterbitkan untuk toko ini.</div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
-                                <i class="fa-regular fa-calendar-days text-primary"></i> TANGGAL TRANSAKSI / FAKTUR <span class="text-danger">*</span>
+                                <i class="fa-regular fa-calendar-days text-secondary"></i> TANGGAL TRANSAKSI / FAKTUR <span class="text-danger">*</span>
                             </label>
-                            <input type="date" name="tgl_invoice" id="singleInputTglInv" class="form-control font-weight-bold" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" value="<?php echo date('Y-m-d'); ?>" required>
+                            <input type="date" name="tgl_invoice" id="singleInputTglInv" class="form-control form-control-taste font-weight-bold" value="<?php echo date('Y-m-d'); ?>" required>
                         </div>
 
                         <div class="mb-1">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
                                 <i class="fa-regular fa-note-sticky text-secondary"></i> CATATAN INVOICE / SO (OPSIONAL)
                             </label>
-                            <textarea name="catatan_invoice" id="singleInputCatatan" class="form-control" rows="2" placeholder="Catatan nomor faktur / referensi..." style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;"></textarea>
+                            <textarea name="catatan_invoice" id="singleInputCatatan" class="form-control form-control-taste" rows="2" placeholder="Catatan nomor faktur / referensi..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer p-3 bg-white border-top d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-light px-4 font-weight-bold" style="border-radius: 10px; border: 1.5px solid #e2e8f0; color: #475569;" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" id="btnSaveSingleInvoice" class="btn btn-dark px-4 font-weight-bold" style="border-radius: 10px; background: #0f172a; color: white;">
+                        <button type="button" class="btn btn-light px-4 font-weight-bold mb-0" style="border-radius: 8px; border: 1px solid #e2e8f0; color: #475569;" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" id="btnSaveSingleInvoice" class="btn btn-dark px-4 font-weight-bold mb-0" style="border-radius: 8px; background: #0f172a; color: white;">
                             <i class="fa-solid fa-check me-1"></i> Simpan Data
                         </button>
                     </div>
@@ -1115,14 +1152,14 @@ if ($qDealersPreload) {
     <!-- ========================================================================= -->
     <div class="modal fade" id="modalBatchInvoice" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 25px 50px -12px rgba(15,23,42,0.35); overflow: hidden;">
-                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 20px 24px;">
+            <div class="modal-content" style="border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                <div class="modal-header" style="background: #0f172a; color: #ffffff; padding: 18px 24px;">
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); border: 1.5px solid rgba(16, 185, 129, 0.35); display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 19px;">
+                        <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 17px;">
                             <i class="fa-solid fa-layer-group"></i>
                         </div>
                         <div>
-                            <h5 class="modal-title font-weight-bold text-white mb-0">Input No. Invoice & SO Kolektif</h5>
+                            <h5 class="modal-title font-weight-bold text-white mb-0" style="font-size: 16px;">Input No. Invoice &amp; SO Kolektif</h5>
                             <div class="text-xs mt-0.5" style="color: #94a3b8;">Tetapkan No. Invoice dan/atau No. SO ke beberapa transaksi sekaligus</div>
                         </div>
                     </div>
@@ -1131,10 +1168,10 @@ if ($qDealersPreload) {
                 
                 <form id="formBatchInvoice" onsubmit="submitBatchInvoice(event)">
                     <div class="modal-body p-4 bg-white">
-                        <div class="p-3 mb-4 rounded-3" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
+                        <div class="p-3 mb-4 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold text-dark fs-6" id="batchModalSelectedCount">0 Transaksi Terpilih</span>
-                                <span class="badge text-white px-2.5 py-1" style="background: #059669; border-radius: 20px; font-size: 11px; font-weight: 800;" id="batchModalTotalUnit">0 Unit</span>
+                                <span class="badge text-white px-2.5 py-1" style="background: #0f172a; border-radius: 6px; font-size: 11px; font-weight: 700;" id="batchModalTotalUnit">0 Unit</span>
                             </div>
                             <div class="text-xs text-muted mt-1.5" id="batchModalDealerSummary">-</div>
                         </div>
@@ -1142,32 +1179,32 @@ if ($qDealersPreload) {
                         <div class="mb-3">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center justify-content-between">
                                 <span class="d-flex align-items-center gap-1.5">
-                                    <i class="fa-solid fa-clipboard-list text-primary"></i> NOMOR SO KOLEKTIF
+                                    <i class="fa-solid fa-clipboard-list text-secondary"></i> NOMOR SO KOLEKTIF
                                 </span>
                                 <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10px;">Bisa diisi SO / INV</span>
                             </label>
-                            <input type="text" name="no_so" id="batchInputNoSo" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: SO/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;">
+                            <input type="text" name="no_so" id="batchInputNoSo" class="form-control form-control-taste font-monospace font-weight-bold" placeholder="Contoh: SO/2026/09/001">
                             <div class="form-text text-xs text-muted mt-1">Nomor SO yang akan disimpan ke semua item yang Anda centang.</div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
-                                <i class="fa-solid fa-receipt text-primary"></i> NOMOR INVOICE KOLEKTIF
+                                <i class="fa-solid fa-receipt text-secondary"></i> NOMOR INVOICE KOLEKTIF
                             </label>
-                            <input type="text" name="no_inv" id="batchInputNoInv" class="form-control form-control-lg font-monospace fs-6 font-weight-bold" placeholder="Contoh: INV/2026/09/001" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;">
+                            <input type="text" name="no_inv" id="batchInputNoInv" class="form-control form-control-taste font-monospace font-weight-bold" placeholder="Contoh: INV/2026/09/001">
                             <div class="form-text text-xs text-muted mt-1">Nomor Invoice yang akan disimpan ke semua item yang Anda centang.</div>
                         </div>
 
                         <div class="mb-1">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center gap-1.5">
-                                <i class="fa-regular fa-calendar-days text-primary"></i> TANGGAL TRANSAKSI / FAKTUR <span class="text-danger">*</span>
+                                <i class="fa-regular fa-calendar-days text-secondary"></i> TANGGAL TRANSAKSI / FAKTUR <span class="text-danger">*</span>
                             </label>
-                            <input type="date" name="tgl_invoice" id="batchInputTglInv" class="form-control font-weight-bold" style="border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; background: #ffffff;" value="<?php echo date('Y-m-d'); ?>" required>
+                            <input type="date" name="tgl_invoice" id="batchInputTglInv" class="form-control form-control-taste font-weight-bold" value="<?php echo date('Y-m-d'); ?>" required>
                         </div>
                     </div>
                     <div class="modal-footer p-3 bg-white border-top d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-light px-4 font-weight-bold" style="border-radius: 10px; border: 1.5px solid #e2e8f0; color: #475569;" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" id="btnSaveBatchInvoice" class="btn btn-dark px-4 font-weight-bold" style="border-radius: 10px; background: #0f172a; color: white;">
+                        <button type="button" class="btn btn-light px-4 font-weight-bold mb-0" style="border-radius: 8px; border: 1px solid #e2e8f0; color: #475569;" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" id="btnSaveBatchInvoice" class="btn btn-dark px-4 font-weight-bold mb-0" style="border-radius: 8px; background: #0f172a; color: white;">
                             <i class="fa-solid fa-check me-1"></i> Terapkan ke Semua Item
                         </button>
                     </div>
@@ -1386,13 +1423,13 @@ if ($qDealersPreload) {
             if (leaderboard && leaderboard.length > 0) {
                 leaderboard.forEach(s => {
                     const isSelected = (currentSalesFilter == s.id_sales && s.id_sales > 0) || (currentSalesName === s.nama_sales && currentSalesName !== '');
-                    const medal = s.rank === 1 ? '🥇 ' : (s.rank === 2 ? '🥈 ' : (s.rank === 3 ? '🥉 ' : ''));
+                    const rankPill = (s.rank && s.rank <= 3) ? `#${s.rank} ` : '';
                     const displayUnit = (s.total_terjual !== undefined && s.total_terjual > 0) ? s.total_terjual : (s.invoiced_unit || 0);
                     const invSub = s.count_invoices > 0 ? ` / ${s.count_invoices} INV` : '';
                     
                     html += `
                         <button type="button" class="sales-chip-btn ${isSelected ? 'active' : ''}" onclick="selectSalesFilter(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
-                            <span>${medal}<strong>${escapeHtml(s.nama_sales)}</strong></span>
+                            <span><strong>${rankPill}${escapeHtml(s.nama_sales)}</strong></span>
                             <span class="chip-count">${displayUnit} Unit${invSub}</span>
                         </button>
                     `;
@@ -1404,7 +1441,7 @@ if ($qDealersPreload) {
             const countText = document.getElementById('salesChipsCountText');
             if (countText) {
                 if (currentSalesName) {
-                    countText.innerHTML = `Filter aktif: <strong class="text-primary">${escapeHtml(currentSalesName)}</strong>`;
+                    countText.innerHTML = `Filter aktif: <strong>${escapeHtml(currentSalesName)}</strong>`;
                 } else {
                     countText.textContent = `Menampilkan seluruh ${leaderboard ? leaderboard.length : 0} sales`;
                 }
@@ -1466,7 +1503,7 @@ if ($qDealersPreload) {
             top3.forEach(s => {
                 const rank = s.rank;
                 const rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : 'rank-3');
-                const rankTitle = rank === 1 ? '🥇 JUARA 1' : (rank === 2 ? '🥈 JUARA 2' : '🥉 JUARA 3');
+                const rankTitle = `JUARA ${rank}`;
                 const initials = s.nama_sales ? s.nama_sales.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'SL';
 
                 html += `
@@ -1481,27 +1518,27 @@ if ($qDealersPreload) {
                             ${escapeHtml(s.nama_sales)}
                         </h5>
                         <div class="text-xs text-muted font-weight-bold mt-0.5 mb-3">
-                            <i class="fa-solid fa-store text-primary me-1"></i> ${s.total_toko} Toko Mitra Aktif
+                            <i class="fa-solid fa-store me-1"></i> ${s.total_toko} Toko Mitra Aktif
                         </div>
 
                         <!-- Highlights Box -->
-                        <div class="p-2.5 rounded-3 mb-3 text-start" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
+                        <div class="p-2.5 rounded-3 mb-3 text-start" style="background: #f8fafc; border: 1px solid #e2e8f0;">
                             <div class="d-flex justify-content-between align-items-center mb-1.5">
                                 <span class="text-xs font-weight-bold text-secondary">Faktur Terbit:</span>
-                                <span class="badge text-white px-2 py-0.5" style="background: #047857; font-size: 11px; font-weight: 800; border-radius: 6px;">
+                                <span class="badge-verified-inv" style="font-size: 11px; padding: 2px 7px;">
                                     <i class="fa-solid fa-file-invoice me-1"></i> ${s.invoiced_unit} Unit (${s.count_invoices} INV)
                                 </span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="text-xs font-weight-bold text-secondary">Total Terjual:</span>
-                                <span class="badge bg-light text-dark px-2 py-0.5" style="font-size: 11px; font-weight: 800; border: 1px solid #cbd5e1; border-radius: 6px;">
+                                <span class="badge px-2 py-0.5" style="background: #ffffff; color: #0f172a; font-size: 11px; font-weight: 700; border: 1px solid #e2e8f0; border-radius: 4px;">
                                     ${s.total_terjual} Unit Fisik
                                 </span>
                             </div>
                             ${s.pending_unit > 0 ? `
                                 <div class="d-flex justify-content-between align-items-center mt-1.5 pt-1.5 border-top">
-                                    <span class="text-xs font-weight-bold" style="color: #b45309;">Belum Invoice:</span>
-                                    <span class="badge bg-warning text-dark px-2 py-0.5" style="font-size: 10.5px; font-weight: 800; border-radius: 6px;">
+                                    <span class="text-xs font-weight-bold text-muted">Belum Invoice:</span>
+                                    <span class="badge-pending-inv" style="font-size: 10.5px; padding: 2px 6px;">
                                         ${s.pending_unit} Unit (${s.count_pending_trx} Trx)
                                     </span>
                                 </div>
@@ -1518,7 +1555,7 @@ if ($qDealersPreload) {
                                 <div class="podium-progress-bar" style="width: ${s.claim_progress}%;"></div>
                             </div>
                             <div class="text-xs text-muted mt-1">
-                                ${s.units_needed > 0 ? `Kurang <strong class="text-danger">${s.units_needed} Unit</strong> lagi` : '<strong class="text-success"><i class="fa-solid fa-circle-check"></i> Siap Klaim!</strong>'}
+                                ${s.units_needed > 0 ? `Kurang <strong class="text-dark">${s.units_needed} Unit</strong> lagi` : '<strong style="color: var(--pastel-green-text);"><i class="fa-solid fa-circle-check"></i> Siap Klaim!</strong>'}
                             </div>
                         </div>
 
@@ -1526,11 +1563,11 @@ if ($qDealersPreload) {
                         <div class="pt-2.5 border-top d-flex align-items-center justify-content-between">
                             <div class="text-start">
                                 <div class="text-xs text-muted font-weight-bold">Estimasi Reward:</div>
-                                <div style="font-family: var(--font-heading); font-size: 16px; font-weight: 900; color: #047857;">
+                                <div style="font-family: var(--font-heading); font-size: 16px; font-weight: 800; color: #0f172a;">
                                     Rp ${new Intl.NumberFormat('id-ID').format(s.total_insentif)}
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-dark mb-0 font-weight-bold px-3" style="border-radius: 9px; font-size: 11.5px; background: #0f172a;" onclick="filterAndSwitchToInvoices(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
+                            <button type="button" class="btn btn-sm mb-0 font-weight-bold px-3" style="border-radius: 6px; font-size: 11.5px; background: #0f172a; color: #ffffff;" onclick="filterAndSwitchToInvoices(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
                                 Faktur <i class="fa-solid fa-arrow-right ms-1"></i>
                             </button>
                         </div>
@@ -1563,31 +1600,31 @@ if ($qDealersPreload) {
 
             let html = '';
             leaderboard.forEach(s => {
-                const medalText = s.rank === 1 ? '🥇 #1' : (s.rank === 2 ? '🥈 #2' : (s.rank === 3 ? '🥉 #3' : `#${s.rank}`));
-                const badgeColor = s.rank === 1 ? 'background: #fef3c7; color: #b45309; border: 1.5px solid #fde68a;' : (s.rank === 2 ? 'background: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1;' : (s.rank === 3 ? 'background: #ffedd5; color: #c2410c; border: 1.5px solid #fed7aa;' : 'background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0;'));
+                const medalText = `#${s.rank}`;
+                const badgeColor = s.rank === 1 ? 'background: #0f172a; color: #ffffff;' : (s.rank === 2 ? 'background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;' : (s.rank === 3 ? 'background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0;' : 'background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0;'));
                 const initials = s.nama_sales ? s.nama_sales.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'SL';
 
                 html += `
                     <tr>
                         <td class="text-center">
-                            <span class="badge px-2.5 py-1.5 font-weight-bold" style="${badgeColor} font-size: 12px; border-radius: 10px;">
+                            <span class="badge px-2.5 py-1 font-weight-bold" style="${badgeColor} font-size: 11.5px; border-radius: 6px;">
                                 ${medalText}
                             </span>
                         </td>
                         <td>
                             <div class="d-flex align-items-center gap-2.5">
-                                <div style="width: 36px; height: 36px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;">
+                                <div style="width: 34px; height: 34px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
                                     ${escapeHtml(initials)}
                                 </div>
                                 <div>
-                                    <div class="font-weight-bold text-dark" style="font-size: 14px;">${escapeHtml(s.nama_sales)}</div>
+                                    <div class="font-weight-bold text-dark" style="font-size: 13.5px;">${escapeHtml(s.nama_sales)}</div>
                                     <div class="text-xs text-muted font-weight-bold">Sales Canvas TIP TOK</div>
                                 </div>
                             </div>
                         </td>
                         <td class="text-center">
-                            <span class="badge bg-light text-dark px-2.5 py-1" style="font-size: 12px; font-weight: 800; border: 1px solid #cbd5e1; border-radius: 8px;">
-                                <i class="fa-solid fa-store text-primary me-1"></i> ${s.total_toko} Toko
+                            <span class="badge px-2.5 py-1" style="background: #f8fafc; color: #475569; font-size: 11.5px; font-weight: 600; border: 1px solid #e2e8f0; border-radius: 6px;">
+                                <i class="fa-solid fa-store me-1 text-muted"></i> ${s.total_toko} Toko
                             </span>
                         </td>
                         <td>
@@ -1599,7 +1636,7 @@ if ($qDealersPreload) {
                                 <div class="podium-progress-bar" style="width: ${s.claim_progress}%;"></div>
                             </div>
                             <div class="text-xs text-muted">
-                                ${s.units_needed > 0 ? `Kurang <span class="text-danger font-weight-bold">${s.units_needed} Unit</span> untuk klaim` : '<span class="text-success font-weight-bold"><i class="fa-solid fa-circle-check"></i> Memenuhi Syarat Klaim!</span>'}
+                                ${s.units_needed > 0 ? `Kurang <span class="font-weight-bold text-dark">${s.units_needed} Unit</span> untuk klaim` : '<span class="font-weight-bold" style="color: var(--pastel-green-text);"><i class="fa-solid fa-circle-check"></i> Memenuhi Syarat Klaim!</span>'}
                             </div>
                         </td>
                         <td>
@@ -1615,10 +1652,10 @@ if ($qDealersPreload) {
                             </div>
                         </td>
                         <td class="text-end">
-                            <div style="font-family: var(--font-heading); font-size: 15px; font-weight: 800; color: #047857;">
+                            <div style="font-family: var(--font-heading); font-size: 14.5px; font-weight: 800; color: #0f172a;">
                                 Rp ${new Intl.NumberFormat('id-ID').format(s.total_insentif)}
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2.5 font-weight-bold mt-1 mb-0" style="border-radius: 8px; font-size: 11px;" onclick="filterAndSwitchToInvoices(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
+                            <button type="button" class="btn btn-sm mb-0 font-weight-bold py-1 px-2.5 mt-1" style="border: 1px solid #e2e8f0; border-radius: 6px; font-size: 11px; background: #ffffff; color: #0f172a;" onclick="filterAndSwitchToInvoices(${s.id_sales}, '${escapeHtml(s.nama_sales)}')">
                                 <i class="fa-solid fa-magnifying-glass me-1"></i> Lihat Faktur
                             </button>
                         </td>
@@ -1667,13 +1704,13 @@ if ($qDealersPreload) {
 
                 const statusPill = isPending ? `
                     <div class="d-flex align-items-center justify-content-end gap-1.5 flex-nowrap">
-                        <span class="badge-pending-inv" style="font-size: 11px; padding: 4px 8px; white-space: nowrap;">
+                        <span class="badge-pending-inv" style="font-size: 11px; padding: 3px 8px; white-space: nowrap;">
                             <i class="fa-solid fa-clock"></i> Belum Diinput
                         </span>
-                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 mb-0" style="border-radius: 7px; font-weight: 700; font-size: 11px; height: 28px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" title="Batalkan Penjualan & Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
+                        <button type="button" class="btn btn-sm mb-0" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); border-radius: 6px; font-weight: 600; font-size: 11px; height: 28px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 0 8px;" title="Batalkan Penjualan &amp; Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
                             <i class="fa-solid fa-trash-can"></i> Batal
                         </button>
-                        <button type="button" class="btn-brand-amber" style="height: 28px; font-size: 11.5px; padding: 0 10px; border-radius: 7px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
+                        <button type="button" class="btn-brand-amber" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
                             <i class="fa-solid fa-plus"></i> Input SO / Inv
                         </button>
                     </div>
@@ -1693,14 +1730,14 @@ if ($qDealersPreload) {
                             ${it.tgl_invoice ? `<div class="text-xs text-muted font-weight-bold" style="font-size: 10.5px;"><i class="fa-regular fa-calendar me-1"></i> ${escapeHtml(it.tgl_invoice)}</div>` : ''}
                         </div>
                         <div class="d-inline-flex align-items-center gap-1 flex-nowrap">
-                            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Edit No. SO / Invoice" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
+                            <button type="button" class="btn btn-sm mb-0" style="border: 1px solid #e2e8f0; border-radius: 6px; height: 28px; background: #ffffff; color: #475569; padding: 0 8px;" title="Edit No. SO / Invoice" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
                                 <i class="fa-solid fa-pen" style="font-size: 11px;"></i>
                             </button>
                             ${!isClaimed ? `
-                                <button type="button" class="btn btn-sm btn-outline-warning py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Reset No. SO & Invoice (Jadikan Belum Diinput)" onclick="hapusInvoiceSingle(${it.id_kunjungan}, '${escapeHtml(it.no_so || it.no_inv || '')}')">
+                                <button type="button" class="btn btn-sm mb-0" style="border: 1px solid var(--pastel-amber-border); background: var(--pastel-amber-bg); color: var(--pastel-amber-text); border-radius: 6px; height: 28px; padding: 0 8px;" title="Reset No. SO &amp; Invoice (Jadikan Belum Diinput)" onclick="hapusInvoiceSingle(${it.id_kunjungan}, '${escapeHtml(it.no_so || it.no_inv || '')}')">
                                     <i class="fa-solid fa-eraser" style="font-size: 11px;"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 mb-0" style="border-radius: 6px; height: 28px;" title="Batalkan Penjualan & Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
+                                <button type="button" class="btn btn-sm mb-0" style="border: 1px solid var(--pastel-red-border); background: var(--pastel-red-bg); color: var(--pastel-red-text); border-radius: 6px; height: 28px; padding: 0 8px;" title="Batalkan Penjualan &amp; Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
                                     <i class="fa-solid fa-trash-can" style="font-size: 11px;"></i>
                                 </button>
                             ` : `
@@ -1718,30 +1755,30 @@ if ($qDealersPreload) {
                         <td style="vertical-align: top; padding-top: 13px;">
                             <div class="font-weight-bold text-dark" style="font-size: 13.5px; line-height: 1.3;">${escapeHtml(it.nama_toko || 'Toko Mitra')}</div>
                             <div class="d-flex align-items-center gap-1.5 mt-1">
-                                ${it.kategori_toko ? `<span class="badge bg-light text-secondary px-1.5 py-0.5" style="font-size: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">${escapeHtml(it.kategori_toko)}</span>` : ''}
+                                ${it.kategori_toko ? `<span class="badge px-1.5 py-0.5" style="background: #f1f5f9; color: #475569; font-size: 10px; border: 1px solid #e2e8f0; border-radius: 4px;">${escapeHtml(it.kategori_toko)}</span>` : ''}
                                 <span class="text-xs text-muted font-weight-bold">${escapeHtml(it.kota_toko || '')}</span>
                             </div>
                         </td>
                         <td style="vertical-align: top; padding-top: 13px;">
                             <div class="font-weight-bold text-dark" style="font-size: 13px; line-height: 1.3;">${escapeHtml(it.nama_barang)}</div>
                             <div class="d-flex align-items-center gap-1.5 mt-1">
-                                <span class="badge bg-danger text-white px-2 py-0.5" style="font-size: 11px; font-weight: 800; border-radius: 5px;">
+                                <span class="badge px-2 py-0.5" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); font-size: 11px; font-weight: 700; border-radius: 4px;">
                                     Laku: ${qty} Unit
                                 </span>
                                 <span class="text-xs text-muted font-weight-bold">(@ Rp ${new Intl.NumberFormat('id-ID').format(insUnit)})</span>
                             </div>
                         </td>
                         <td class="text-end" style="vertical-align: top; padding-top: 13px;">
-                            <div style="font-family: var(--font-heading); font-size: 15px; font-weight: 800; color: #047857; line-height: 1.2;">
+                            <div style="font-family: var(--font-heading); font-size: 14.5px; font-weight: 800; color: #0f172a; line-height: 1.2;">
                                 Rp ${new Intl.NumberFormat('id-ID').format(subtotalIns)}
                             </div>
                             <div class="text-xs text-muted font-weight-bold mt-0.5">Estimasi Reward</div>
                         </td>
                         <td style="vertical-align: top; padding-top: 13px;">
-                            <div class="font-weight-bold text-dark" style="font-size: 12.5px; white-space: nowrap;"><i class="fa-regular fa-calendar-check text-primary me-1"></i> ${escapeHtml(it.tgl_kunjungan)}</div>
+                            <div class="font-weight-bold text-dark" style="font-size: 12.5px; white-space: nowrap;"><i class="fa-regular fa-calendar-check text-secondary me-1"></i> ${escapeHtml(it.tgl_kunjungan)}</div>
                             <div class="font-monospace text-xs text-secondary font-weight-bold mt-0.5" style="white-space: nowrap; max-width: 165px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(it.kode_kunjungan)}">${escapeHtml(it.kode_kunjungan)}</div>
                             <div class="mt-1">
-                                <span class="badge" style="background: rgba(37,99,235,0.08); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.2); font-size: 10.5px; padding: 2px 7px; border-radius: 5px; font-weight: 700; white-space: nowrap;">
+                                <span class="badge" style="background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; font-size: 10.5px; padding: 2px 7px; border-radius: 4px; font-weight: 600; white-space: nowrap;">
                                     <i class="fa-solid fa-user-tie me-1"></i> ${escapeHtml(it.nama_sales || 'Sales')}
                                 </span>
                             </div>
