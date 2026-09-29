@@ -162,7 +162,20 @@ if ($action === 'save_sales_order') {
     $so_id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
     
     $so_number = trim($_POST['so_number'] ?? '');
-    $so_date = trim($_POST['so_date'] ?? date('Y-m-d'));
+    
+    // Normalize date format (handles YYYY-MM-DD or DD/MM/YYYY)
+    $rawDate = trim($_POST['so_date'] ?? '');
+    if (!empty($rawDate)) {
+        if (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $rawDate, $m)) {
+            $so_date = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+        } else {
+            $time = strtotime($rawDate);
+            $so_date = $time ? date('Y-m-d', $time) : date('Y-m-d');
+        }
+    } else {
+        $so_date = date('Y-m-d');
+    }
+
     $customer_id = !empty($_POST['customer_id']) ? (int)$_POST['customer_id'] : null;
     $customer_code = trim($_POST['customer_code'] ?? '');
     $customer_name = trim($_POST['customer_name'] ?? '');
@@ -176,7 +189,17 @@ if ($action === 'save_sales_order') {
     $payment_terms = trim($_POST['payment_terms'] ?? 'C.O.D');
     $po_number = trim($_POST['po_number'] ?? '');
     $shipping_address = trim($_POST['shipping_address'] ?? ($customer_address ?: ''));
-    $shipping_date = !empty($_POST['shipping_date']) ? $_POST['shipping_date'] : null;
+    
+    $rawShipDate = trim($_POST['shipping_date'] ?? '');
+    $shipping_date = null;
+    if (!empty($rawShipDate)) {
+        if (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $rawShipDate, $m)) {
+            $shipping_date = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+        } else {
+            $time = strtotime($rawShipDate);
+            $shipping_date = $time ? date('Y-m-d', $time) : null;
+        }
+    }
     $shipping_method = trim($_POST['shipping_method'] ?? '');
     $branch = trim($_POST['branch'] ?? 'Kantor Pusat');
     $currency = 'IDR';
@@ -292,7 +315,7 @@ if ($action === 'save_sales_order') {
                 grand_total = ?, special_notes = ?, status = ?
                 WHERE id = ?");
             
-            $stmt->bind_param("ssisssssissssssssiidddddsssi",
+            $stmt->bind_param("ssisssssissssssssiiddsddddssi",
                 $so_number, $so_date, $customer_id, $customer_code, $customer_name,
                 $customer_address, $customer_pic, $customer_phone, $sales_id, $sales_name,
                 $payment_terms, $po_number, $shipping_address, $shipping_date, $shipping_method,
@@ -322,7 +345,7 @@ if ($action === 'save_sales_order') {
                 grand_total, special_notes, status, created_by
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
-            $stmt->bind_param("ssisssssissssssssiidddddsssi",
+            $stmt->bind_param("ssisssssissssssssiiddsddddssi",
                 $so_number, $so_date, $customer_id, $customer_code, $customer_name,
                 $customer_address, $customer_pic, $customer_phone, $sales_id, $sales_name,
                 $payment_terms, $po_number, $shipping_address, $shipping_date, $shipping_method,
@@ -368,8 +391,8 @@ if ($action === 'save_sales_order') {
             'so_number' => $so_number
         ]);
         exit;
-    } catch (Exception $e) {
-        $conn->rollback();
+    } catch (Throwable $e) {
+        if ($conn) $conn->rollback();
         echo json_encode(['success' => false, 'message' => 'Gagal menyimpan pesanan: ' . $e->getMessage()]);
         exit;
     }

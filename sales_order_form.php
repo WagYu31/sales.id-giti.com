@@ -1146,9 +1146,16 @@ $(document).ready(function() {
                     Swal.fire({ icon: 'error', title: 'Gagal', text: res.message || 'Terjadi kesalahan saat menyimpan pesanan.' });
                 }
             },
-            error: function() {
+            error: function(xhr) {
                 btnSave.prop('disabled', false).html('<i class="bi bi-check2 me-1"></i> Simpan Pesanan');
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi gangguan jaringan atau server saat menyimpan data.' });
+                let errMsg = 'Terjadi gangguan jaringan atau server saat menyimpan data.';
+                if (xhr && xhr.responseText) {
+                    try {
+                        let errObj = JSON.parse(xhr.responseText);
+                        if (errObj && errObj.message) errMsg = errObj.message;
+                    } catch(e) {}
+                }
+                Swal.fire({ icon: 'error', title: 'Error', text: errMsg });
             }
         });
     }
