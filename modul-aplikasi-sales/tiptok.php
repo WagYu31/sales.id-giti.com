@@ -194,6 +194,33 @@ $sqlPenitipan = "SELECT p.*, $custSelect,
                  GROUP BY p.id 
                  ORDER BY p.id DESC";
 $resPenitipan = $conn->query($sqlPenitipan);
+$allPenitipanRows = [];
+$uniqueTokos = [];
+$uniqueSales = [];
+$uniquePeriodes = [];
+
+$mIndo = ['01'=>'Januari', '02'=>'Februari', '03'=>'Maret', '04'=>'April', '05'=>'Mei', '06'=>'Juni', '07'=>'Juli', '08'=>'Agustus', '09'=>'September', '10'=>'Oktober', '11'=>'November', '12'=>'Desember'];
+
+if ($resPenitipan && $resPenitipan->num_rows > 0) {
+    while ($r = $resPenitipan->fetch_assoc()) {
+        $allPenitipanRows[] = $r;
+        if (!empty($r['nama_toko'])) {
+            $uniqueTokos[$r['nama_toko']] = ($uniqueTokos[$r['nama_toko']] ?? 0) + 1;
+        }
+        if (!empty($r['nama_sales'])) {
+            $uniqueSales[$r['nama_sales']] = ($uniqueSales[$r['nama_sales']] ?? 0) + 1;
+        }
+        if (!empty($r['tgl_titip'])) {
+            $pKey = date('Y-m', strtotime($r['tgl_titip']));
+            $mNum = date('m', strtotime($r['tgl_titip']));
+            $yNum = date('Y', strtotime($r['tgl_titip']));
+            $uniquePeriodes[$pKey] = ($mIndo[$mNum] ?? date('M', strtotime($r['tgl_titip']))) . ' ' . $yNum;
+        }
+    }
+    ksort($uniqueTokos);
+    ksort($uniqueSales);
+    krsort($uniquePeriodes);
+}
 
 // Ambil daftar sales aktif untuk dropdown & filter PIC (Preload - Robust Schema Detection)
 $salesCols = [];
@@ -757,6 +784,95 @@ $loewixPriceList = $tiptokMaster6;
             border-color: #2563eb;
             outline: none;
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+        }
+
+        /* ── Professional Filter Suite (Accurate & Executive Style) ── */
+        .tiptok-filter-card {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+            transition: all 0.2s ease;
+        }
+        .tiptok-filter-card:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+        }
+        .filter-suite-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1.5px solid #f1f5f9;
+        }
+        .filter-icon-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            border: 1px solid #bfdbfe;
+        }
+        .filter-field-label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #475569;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .filter-field-select {
+            height: 42px;
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            transition: all 0.2s ease;
+            padding: 6px 12px;
+        }
+        .filter-field-select:hover {
+            background: #ffffff;
+            border-color: #94a3b8;
+        }
+        .filter-field-select:focus {
+            background: #ffffff;
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .active-tag-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            transition: all 0.15s ease;
+        }
+        .active-tag-chip .remove-chip {
+            cursor: pointer;
+            color: #93c5fd;
+            margin-left: 2px;
+            transition: color 0.15s ease;
+        }
+        .active-tag-chip .remove-chip:hover {
+            color: #dc2626;
         }
 
         /* ── Data Surface Table (Colorful Overhaul) ── */
@@ -1994,9 +2110,129 @@ $loewixPriceList = $tiptokMaster6;
                     </button>
                 </div>
 
-                <div class="search-container-vibrant">
+                <div class="search-container-vibrant position-relative">
                     <i class="fa-solid fa-magnifying-glass search-icon-vibrant"></i>
-                    <input type="text" id="tiptokSearchInput" class="search-input-vibrant" placeholder="Cari toko, barang, invoice..." onkeyup="searchTiptokTable()">
+                    <input type="text" id="tiptokSearchInput" class="search-input-vibrant" placeholder="Cari toko, barang, invoice..." oninput="onTiptokSearchInput(this)">
+                    <button type="button" id="btnClearTiptokSearch" class="btn btn-sm position-absolute text-muted d-none border-0" style="right: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; padding: 4px;" title="Hapus pencarian" onclick="clearTiptokSearch()">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3.5 PROFESSIONAL FILTER SUITE (DROPDOWNS & ADVANCED CONTROLS) -->
+            <div id="tiptokFilterCard" class="tiptok-filter-card">
+                <div class="filter-suite-header">
+                    <div class="d-flex align-items-center gap-2.5">
+                        <div class="filter-icon-badge">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark" style="font-size: 14.5px;">Filter &amp; Penelusuran Cepat TIP TOK</h6>
+                            <span class="text-muted" style="font-size: 11.5px;">Saring data stok titipan toko mitra berdasarkan kriteria spesifik</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" id="btnResetFilters" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5 fw-bold px-3 py-1.5 rounded-pill" title="Reset Semua Filter ke Default" onclick="resetAllTiptokFilters()" style="font-size: 12px;">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Filter
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-2.5">
+                    <!-- Dropdown 1: Toko / Mitra -->
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <label class="filter-field-label">
+                            <i class="fa-solid fa-store text-primary"></i> Toko / Dealer Mitra
+                        </label>
+                        <select id="filterToko" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
+                            <option value="">Semua Toko Mitra (<?php echo count($uniqueTokos); ?> Toko)</option>
+                            <?php foreach ($uniqueTokos as $tokoName => $cToko) : ?>
+                                <option value="<?php echo htmlspecialchars($tokoName, ENT_QUOTES); ?>">
+                                    <?php echo htmlspecialchars($tokoName); ?> (<?php echo $cToko; ?> titipan)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Dropdown 2: Status Penitipan -->
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <label class="filter-field-label">
+                            <i class="fa-solid fa-circle-check text-success"></i> Status Penitipan
+                        </label>
+                        <select id="filterStatus" class="form-select filter-field-select" onchange="onFilterStatusChange(this.value)">
+                            <option value="">Semua Status</option>
+                            <option value="aktif">🟢 Stok Aktif (Ada Sisa)</option>
+                            <option value="terjual">🔥 Ada Penjualan</option>
+                            <option value="selesai">🏁 Selesai / Habis</option>
+                        </select>
+                    </div>
+
+                    <!-- Dropdown 3: Periode Titip -->
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <label class="filter-field-label">
+                            <i class="fa-regular fa-calendar-days text-warning"></i> Periode Titip (Bulan)
+                        </label>
+                        <select id="filterPeriode" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
+                            <option value="">Semua Periode</option>
+                            <?php foreach ($uniquePeriodes as $pKey => $pLabel) : ?>
+                                <option value="<?php echo $pKey; ?>"><?php echo $pLabel; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Dropdown 4: Petugas Sales -->
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <label class="filter-field-label">
+                            <i class="fa-solid fa-user-tie text-purple"></i> Petugas Sales
+                        </label>
+                        <select id="filterSales" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
+                            <option value="">Semua Petugas Sales</option>
+                            <?php foreach ($uniqueSales as $sName => $cSales) : ?>
+                                <option value="<?php echo htmlspecialchars($sName, ENT_QUOTES); ?>">
+                                    <?php echo htmlspecialchars($sName); ?> (<?php echo $cSales; ?> titipan)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Dropdown 5: Status Invoice -->
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <label class="filter-field-label">
+                            <i class="fa-solid fa-receipt text-info"></i> Status Invoice / SO
+                        </label>
+                        <select id="filterInvoice" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
+                            <option value="">Semua Status Invoice</option>
+                            <option value="ada">✅ Sudah Terbit Invoice / SO</option>
+                            <option value="belum">⏳ Belum Ada Invoice</option>
+                        </select>
+                    </div>
+
+                    <!-- Dropdown 6: Urutan Tampilan (Sorting) -->
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <label class="filter-field-label">
+                            <i class="fa-solid fa-arrow-down-wide-short text-indigo"></i> Urutkan Tampilan
+                        </label>
+                        <select id="filterSort" class="form-select filter-field-select" onchange="applyAllTiptokFilters()">
+                            <option value="newest">📅 Tanggal Titip (Terbaru)</option>
+                            <option value="oldest">📅 Tanggal Titip (Terlama)</option>
+                            <option value="toko_asc">🏪 Nama Toko (A - Z)</option>
+                            <option value="toko_desc">🏪 Nama Toko (Z - A)</option>
+                            <option value="sisa_desc">📦 Sisa Stok (Terbanyak)</option>
+                            <option value="terjual_desc">🔥 Terjual / Laku (Terbanyak)</option>
+                            <option value="insentif_desc">💰 Insentif (Tertinggi)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Active Filters & Summary Strip -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 pt-2.5 border-top" style="border-color: #f1f5f9 !important;">
+                    <div class="d-flex align-items-center gap-1.5 flex-wrap" id="activeFilterTags">
+                        <span class="text-xs text-muted fw-bold text-uppercase me-1"><i class="fa-solid fa-filter me-1"></i>Filter Aktif:</span>
+                        <span class="badge bg-light text-secondary border px-2 py-1" id="noFilterBadge" style="font-size: 11px;">Semua data ditampilkan</span>
+                    </div>
+                    <div class="text-muted fw-bold" style="font-size: 12.5px;">
+                        Menampilkan <span id="visibleRowCount" class="text-primary fw-bolder">0</span> dari <span id="totalRowCount">0</span> data penitipan
+                    </div>
                 </div>
             </div>
 
@@ -2023,8 +2259,8 @@ $loewixPriceList = $tiptokMaster6;
                             $countTerjual = 0;
                             $countSelesai = 0;
 
-                            if ($resPenitipan && $resPenitipan->num_rows > 0) {
-                                while ($row = $resPenitipan->fetch_assoc()) {
+                            if (!empty($allPenitipanRows)) {
+                                foreach ($allPenitipanRows as $row) {
                                     $countAll++;
                                     $idPen = $row['id'];
                                     $statusPen = $row['status'];
@@ -2039,8 +2275,10 @@ $loewixPriceList = $tiptokMaster6;
 
                                     $qItems = $conn->query("SELECT * FROM tiptok_items WHERE id_penitipan = $idPen ORDER BY id ASC");
                                     $itemList = [];
+                                    $itemNames = [];
                                     while ($it = $qItems->fetch_assoc()) {
                                         $itemList[] = $it;
+                                        $itemNames[] = $it['nama_barang'];
                                     }
 
                                     $filterCat = 'all';
@@ -2051,9 +2289,24 @@ $loewixPriceList = $tiptokMaster6;
                                     $telpRaw = preg_replace('/\D/', '', $row['telp_toko'] ?? '');
                                     if (substr($telpRaw, 0, 1) === '0') $telpRaw = '62' . substr($telpRaw, 1);
                                     ?>
-                                    <tr class="tiptok-row" data-category="<?php echo $filterCat; ?>">
+                                    <tr class="tiptok-row" 
+                                        data-category="<?php echo $filterCat; ?>"
+                                        data-toko="<?php echo htmlspecialchars($row['nama_toko'] ?? '', ENT_QUOTES); ?>"
+                                        data-sales="<?php echo htmlspecialchars($row['nama_sales'] ?? '', ENT_QUOTES); ?>"
+                                        data-status-val="<?php echo ($statusPen === 'aktif' && $sumSisa > 0) ? 'aktif' : (($sumTerjual > 0 && ($statusPen === 'selesai' || $sumSisa === 0)) ? 'selesai' : (($sumTerjual > 0) ? 'terjual' : 'selesai')); ?>"
+                                        data-has-sisa="<?php echo ($sumSisa > 0) ? '1' : '0'; ?>"
+                                        data-has-terjual="<?php echo ($sumTerjual > 0) ? '1' : '0'; ?>"
+                                        data-has-inv="<?php echo (!empty($row['last_no_inv']) || !empty($row['last_no_so'])) ? '1' : '0'; ?>"
+                                        data-tgl="<?php echo date('Y-m-d', strtotime($row['tgl_titip'])); ?>"
+                                        data-periode="<?php echo date('Y-m', strtotime($row['tgl_titip'])); ?>"
+                                        data-sum-sisa="<?php echo $sumSisa; ?>"
+                                        data-sum-terjual="<?php echo $sumTerjual; ?>"
+                                        data-sum-insentif="<?php echo $sumInsentif; ?>"
+                                        data-kode="<?php echo htmlspecialchars($row['kode_titip'] ?? '', ENT_QUOTES); ?>"
+                                        data-items="<?php echo htmlspecialchars(implode(' ', $itemNames), ENT_QUOTES); ?>"
+                                        data-raw-id="<?php echo $row['id']; ?>">
                                         <td class="text-center font-weight-bold" style="vertical-align: top; padding-top: 14px;">
-                                            <span style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 12px; display: inline-block;"><?php echo $no++; ?></span>
+                                            <span class="tiptok-row-num" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 12px; display: inline-block;"><?php echo $no++; ?></span>
                                         </td>
                                         
                                         <!-- Toko / Dealer -->
@@ -2205,6 +2458,20 @@ $loewixPriceList = $tiptokMaster6;
                                     </td>
                                 </tr>
                             <?php } ?>
+                            <tr id="tiptokEmptyFilterRow" style="display: none;">
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="py-4">
+                                        <div style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 12px; border: 1px solid #bfdbfe;">
+                                            <i class="fa-solid fa-filter-circle-xmark"></i>
+                                        </div>
+                                        <h6 class="fw-bold text-dark mb-1" style="font-size: 15px;">Tidak Ada Data Penitipan Yang Sesuai</h6>
+                                        <p class="text-muted small mb-3" style="max-width: 420px; margin: 0 auto;">Tidak ditemukan data penitipan barang yang cocok dengan kombinasi filter dan kata kunci yang Anda pilih.</p>
+                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-bold px-3 py-1.5" onclick="resetAllTiptokFilters()">
+                                            <i class="fa-solid fa-rotate-left me-1"></i> Reset Semua Filter
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -3493,6 +3760,7 @@ $loewixPriceList = $tiptokMaster6;
             loadDealers();
             loadSalesOptions();
             tambahBarisBarang();
+            applyAllTiptokFilters();
         });
 
         function populateSalesSelects() {
@@ -3551,38 +3819,281 @@ $loewixPriceList = $tiptokMaster6;
             currentFilterCategory = category;
             switchViewToTable();
 
-            document.querySelectorAll('.segment-btn-vibrant').forEach(b => b.classList.remove('active'));
-            if (btn) {
-                btn.classList.add('active');
-            } else {
-                const targetBtn = document.getElementById(category === 'all' ? 'btnFilterAll' : (category === 'aktif' ? 'btnFilterAktif' : (category === 'terjual' ? 'btnFilterTerjual' : 'btnFilterSelesai')));
-                if (targetBtn) targetBtn.classList.add('active');
+            const selStatus = document.getElementById('filterStatus');
+            if (selStatus) {
+                selStatus.value = (category === 'all') ? '' : category;
             }
 
-            const rows = document.querySelectorAll('#mainTiptokTable tbody tr.tiptok-row');
+            applyAllTiptokFilters();
+        }
+
+        function onFilterStatusChange(val) {
+            currentFilterCategory = val || 'all';
+            applyAllTiptokFilters();
+        }
+
+        function onTiptokSearchInput(inp) {
+            applyAllTiptokFilters();
+        }
+
+        function clearTiptokSearch() {
+            const inp = document.getElementById('tiptokSearchInput');
+            if (inp) {
+                inp.value = '';
+                inp.focus();
+            }
+            applyAllTiptokFilters();
+        }
+
+        function searchTiptokTable() {
+            applyAllTiptokFilters();
+        }
+
+        function applyAllTiptokFilters() {
+            const query = (document.getElementById('tiptokSearchInput')?.value || '').toLowerCase().trim();
+            const tokoVal = document.getElementById('filterToko')?.value || '';
+            const statusVal = document.getElementById('filterStatus')?.value || '';
+            const periodeVal = document.getElementById('filterPeriode')?.value || '';
+            const salesVal = document.getElementById('filterSales')?.value || '';
+            const invoiceVal = document.getElementById('filterInvoice')?.value || '';
+            const sortVal = document.getElementById('filterSort')?.value || 'newest';
+
+            // Show/hide clear search button
+            const btnClearSearch = document.getElementById('btnClearTiptokSearch');
+            if (btnClearSearch) {
+                if (query.length > 0) {
+                    btnClearSearch.classList.remove('d-none');
+                } else {
+                    btnClearSearch.classList.add('d-none');
+                }
+            }
+
+            // Sync segmented nav button based on statusVal
+            document.querySelectorAll('.segment-btn-vibrant').forEach(b => {
+                if (b.id !== 'btnTabKlaimInsentif') b.classList.remove('active');
+            });
+            if (statusVal === 'aktif') {
+                document.getElementById('btnFilterAktif')?.classList.add('active');
+            } else if (statusVal === 'terjual') {
+                document.getElementById('btnFilterTerjual')?.classList.add('active');
+            } else if (statusVal === 'selesai') {
+                document.getElementById('btnFilterSelesai')?.classList.add('active');
+            } else {
+                document.getElementById('btnFilterAll')?.classList.add('active');
+            }
+
+            const tbody = document.querySelector('#mainTiptokTable tbody');
+            if (!tbody) return;
+            const rows = Array.from(tbody.querySelectorAll('tr.tiptok-row'));
+            let visibleCount = 0;
+
             rows.forEach(row => {
-                const cats = row.getAttribute('data-category') || '';
-                if (category === 'all' || cats.includes(category)) {
+                const textContent = (row.textContent || '').toLowerCase();
+                const rowToko = row.getAttribute('data-toko') || '';
+                const rowStatus = row.getAttribute('data-status-val') || '';
+                const rowHasSisa = row.getAttribute('data-has-sisa') === '1';
+                const rowHasTerjual = row.getAttribute('data-has-terjual') === '1';
+                const rowPeriode = row.getAttribute('data-periode') || '';
+                const rowSales = row.getAttribute('data-sales') || '';
+                const rowHasInv = row.getAttribute('data-has-inv') === '1';
+                const rowItems = (row.getAttribute('data-items') || '').toLowerCase();
+                const rowKode = (row.getAttribute('data-kode') || '').toLowerCase();
+
+                // 1. Search Query
+                let matchQuery = true;
+                if (query !== '') {
+                    matchQuery = textContent.includes(query) || rowItems.includes(query) || rowKode.includes(query);
+                }
+
+                // 2. Toko
+                let matchToko = true;
+                if (tokoVal !== '') {
+                    matchToko = (rowToko === tokoVal);
+                }
+
+                // 3. Status
+                let matchStatus = true;
+                if (statusVal === 'aktif') {
+                    matchStatus = rowHasSisa;
+                } else if (statusVal === 'terjual') {
+                    matchStatus = rowHasTerjual;
+                } else if (statusVal === 'selesai') {
+                    matchStatus = (!rowHasSisa) || (rowStatus === 'selesai');
+                }
+
+                // 4. Periode
+                let matchPeriode = true;
+                if (periodeVal !== '') {
+                    matchPeriode = (rowPeriode === periodeVal);
+                }
+
+                // 5. Sales
+                let matchSales = true;
+                if (salesVal !== '') {
+                    matchSales = (rowSales === salesVal);
+                }
+
+                // 6. Invoice
+                let matchInvoice = true;
+                if (invoiceVal === 'ada') {
+                    matchInvoice = rowHasInv;
+                } else if (invoiceVal === 'belum') {
+                    matchInvoice = !rowHasInv;
+                }
+
+                if (matchQuery && matchToko && matchStatus && matchPeriode && matchSales && matchInvoice) {
                     row.style.display = '';
+                    visibleCount++;
                 } else {
                     row.style.display = 'none';
                 }
             });
+
+            // Sorting
+            rows.sort((a, b) => {
+                switch (sortVal) {
+                    case 'oldest':
+                        return (a.dataset.tgl || '').localeCompare(b.dataset.tgl || '') || (parseInt(a.dataset.rawId || 0) - parseInt(b.dataset.rawId || 0));
+                    case 'toko_asc':
+                        return (a.dataset.toko || '').localeCompare(b.dataset.toko || '');
+                    case 'toko_desc':
+                        return (b.dataset.toko || '').localeCompare(a.dataset.toko || '');
+                    case 'sisa_desc':
+                        return parseInt(b.dataset.sumSisa || 0) - parseInt(a.dataset.sumSisa || 0);
+                    case 'terjual_desc':
+                        return parseInt(b.dataset.sumTerjual || 0) - parseInt(a.dataset.sumTerjual || 0);
+                    case 'insentif_desc':
+                        return parseFloat(b.dataset.sumInsentif || 0) - parseFloat(a.dataset.sumInsentif || 0);
+                    case 'newest':
+                    default:
+                        return (b.dataset.tgl || '').localeCompare(a.dataset.tgl || '') || (parseInt(b.dataset.rawId || 0) - parseInt(a.dataset.rawId || 0));
+                }
+            });
+
+            // Re-order rows in DOM
+            const emptyRow = document.getElementById('tiptokEmptyFilterRow');
+            rows.forEach(r => tbody.appendChild(r));
+            if (emptyRow) tbody.appendChild(emptyRow);
+
+            // Update row numbers for visible rows
+            let visibleIndex = 1;
+            rows.forEach(r => {
+                if (r.style.display !== 'none') {
+                    const numEl = r.querySelector('.tiptok-row-num');
+                    if (numEl) numEl.textContent = visibleIndex++;
+                }
+            });
+
+            // Show/hide empty state
+            if (emptyRow) {
+                if (visibleCount === 0 && rows.length > 0) {
+                    emptyRow.style.display = '';
+                } else {
+                    emptyRow.style.display = 'none';
+                }
+            }
+
+            // Counters update
+            const elVisCount = document.getElementById('visibleRowCount');
+            const elTotCount = document.getElementById('totalRowCount');
+            if (elVisCount) elVisCount.textContent = visibleCount;
+            if (elTotCount) elTotCount.textContent = rows.length;
+
+            // Render active filter chips
+            renderActiveFilterChips({ query, tokoVal, statusVal, periodeVal, salesVal, invoiceVal });
         }
 
-        function searchTiptokTable() {
-            const query = (document.getElementById('tiptokSearchInput')?.value || '').toLowerCase();
-            const rows = document.querySelectorAll('#mainTiptokTable tbody tr.tiptok-row');
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(query) ? '' : 'none';
-            });
+        function renderActiveFilterChips(filters) {
+            const container = document.getElementById('activeFilterTags');
+            if (!container) return;
+
+            let chipsHtml = '<span class="text-xs text-muted fw-bold text-uppercase me-1"><i class="fa-solid fa-filter me-1"></i>Filter Aktif:</span>';
+            let hasActive = false;
+
+            if (filters.query) {
+                hasActive = true;
+                chipsHtml += `<span class="active-tag-chip"><i class="fa-solid fa-magnifying-glass me-1"></i> Cari: "${escapeHtml(filters.query)}" <i class="fa-solid fa-xmark remove-chip" onclick="clearFilterField('search')"></i></span>`;
+            }
+            if (filters.tokoVal) {
+                hasActive = true;
+                chipsHtml += `<span class="active-tag-chip"><i class="fa-solid fa-store me-1"></i> Toko: ${escapeHtml(filters.tokoVal)} <i class="fa-solid fa-xmark remove-chip" onclick="clearFilterField('toko')"></i></span>`;
+            }
+            if (filters.statusVal) {
+                hasActive = true;
+                const statusLabels = { aktif: 'Stok Aktif', terjual: 'Ada Penjualan', selesai: 'Selesai' };
+                chipsHtml += `<span class="active-tag-chip"><i class="fa-solid fa-circle-check me-1"></i> Status: ${statusLabels[filters.statusVal] || filters.statusVal} <i class="fa-solid fa-xmark remove-chip" onclick="clearFilterField('status')"></i></span>`;
+            }
+            if (filters.periodeVal) {
+                hasActive = true;
+                const pSel = document.getElementById('filterPeriode');
+                const pText = pSel ? pSel.options[pSel.selectedIndex]?.text : filters.periodeVal;
+                chipsHtml += `<span class="active-tag-chip"><i class="fa-regular fa-calendar me-1"></i> Periode: ${escapeHtml(pText)} <i class="fa-solid fa-xmark remove-chip" onclick="clearFilterField('periode')"></i></span>`;
+            }
+            if (filters.salesVal) {
+                hasActive = true;
+                chipsHtml += `<span class="active-tag-chip"><i class="fa-solid fa-user-tie me-1"></i> Sales: ${escapeHtml(filters.salesVal)} <i class="fa-solid fa-xmark remove-chip" onclick="clearFilterField('sales')"></i></span>`;
+            }
+            if (filters.invoiceVal) {
+                hasActive = true;
+                const invLabels = { ada: 'Ada Invoice', belum: 'Belum Invoice' };
+                chipsHtml += `<span class="active-tag-chip"><i class="fa-solid fa-receipt me-1"></i> Invoice: ${invLabels[filters.invoiceVal] || filters.invoiceVal} <i class="fa-solid fa-xmark remove-chip" onclick="clearFilterField('invoice')"></i></span>`;
+            }
+
+            if (!hasActive) {
+                chipsHtml += `<span class="badge bg-light text-secondary border px-2 py-1" id="noFilterBadge" style="font-size: 11px;">Semua data ditampilkan</span>`;
+            }
+
+            container.innerHTML = chipsHtml;
+        }
+
+        function clearFilterField(field) {
+            if (field === 'search') {
+                const inp = document.getElementById('tiptokSearchInput');
+                if (inp) inp.value = '';
+            } else if (field === 'toko') {
+                const sel = document.getElementById('filterToko');
+                if (sel) sel.value = '';
+            } else if (field === 'status') {
+                const sel = document.getElementById('filterStatus');
+                if (sel) sel.value = '';
+            } else if (field === 'periode') {
+                const sel = document.getElementById('filterPeriode');
+                if (sel) sel.value = '';
+            } else if (field === 'sales') {
+                const sel = document.getElementById('filterSales');
+                if (sel) sel.value = '';
+            } else if (field === 'invoice') {
+                const sel = document.getElementById('filterInvoice');
+                if (sel) sel.value = '';
+            }
+            applyAllTiptokFilters();
+        }
+
+        function resetAllTiptokFilters() {
+            const sInput = document.getElementById('tiptokSearchInput');
+            if (sInput) sInput.value = '';
+            const selToko = document.getElementById('filterToko');
+            if (selToko) selToko.value = '';
+            const selStatus = document.getElementById('filterStatus');
+            if (selStatus) selStatus.value = '';
+            const selPeriode = document.getElementById('filterPeriode');
+            if (selPeriode) selPeriode.value = '';
+            const selSales = document.getElementById('filterSales');
+            if (selSales) selSales.value = '';
+            const selInvoice = document.getElementById('filterInvoice');
+            if (selInvoice) selInvoice.value = '';
+            const selSort = document.getElementById('filterSort');
+            if (selSort) selSort.value = 'newest';
+
+            applyAllTiptokFilters();
         }
 
         function switchViewToClaims(btn) {
             const vTable = document.getElementById('viewPenitipanTable');
             const vClaim = document.getElementById('viewKlaimInsentif');
+            const fCard = document.getElementById('tiptokFilterCard');
             if (vTable) vTable.classList.add('d-none');
+            if (fCard) fCard.classList.add('d-none');
             if (vClaim) vClaim.classList.remove('d-none');
             
             // Remove active from all filter buttons and activate ONLY claim tab button
@@ -3596,8 +4107,10 @@ $loewixPriceList = $tiptokMaster6;
         function switchViewToTable() {
             const vTable = document.getElementById('viewPenitipanTable');
             const vClaim = document.getElementById('viewKlaimInsentif');
+            const fCard = document.getElementById('tiptokFilterCard');
             if (vClaim) vClaim.classList.add('d-none');
             if (vTable) vTable.classList.remove('d-none');
+            if (fCard) fCard.classList.remove('d-none');
 
             // Deactivate claim tab button
             const claimBtn = document.getElementById('btnTabKlaimInsentif');
