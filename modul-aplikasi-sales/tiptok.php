@@ -145,18 +145,35 @@ $totalUnitSisa = intval($dataUnit['total_sisa'] ?? 0);
 $totalUnitTerjual = intval($dataUnit['total_terjual'] ?? 0);
 $totalInsentifPool = floatval($dataUnit['total_insentif'] ?? 0);
 
-// 3. Total Unit Terjual yang Belum Diklaim (Unclaimed Eligible)
+// 3. Status Klaim Insentif Per Toko (Syarat: Minimal 50 Unit per Toko)
 $filterSalesKunjungan = ($role === 'Sales') ? " AND k.id_sales = '$idSesi' " : "";
-$qUnclaimed = $conn->query("SELECT SUM(k.qty_terjual_kunjungan) as total_unclaimed, SUM(k.insentif_didapat) as nominal_unclaimed 
-                           FROM tiptok_kunjungan k 
-                           WHERE k.id_claim IS NULL AND k.qty_terjual_kunjungan > 0 $filterSalesKunjungan");
-$dataUnclaimed = $qUnclaimed ? $qUnclaimed->fetch_assoc() : [];
-$unclaimedUnits = intval($dataUnclaimed['total_unclaimed'] ?? 0);
-$unclaimedNominal = floatval($dataUnclaimed['nominal_unclaimed'] ?? 0);
-
+$qUnclaimedStores = $conn->query("SELECT k.id_penitipan, 
+                                        SUM(k.qty_terjual_kunjungan) as total_unclaimed, 
+                                        SUM(k.insentif_didapat) as nominal_unclaimed 
+                                 FROM tiptok_kunjungan k 
+                                 WHERE k.id_claim IS NULL AND k.qty_terjual_kunjungan > 0 $filterSalesKunjungan
+                                 GROUP BY k.id_penitipan");
+$eligibleStoresCount = 0;
+$eligibleNominalTotal = 0;
+$totalAllUnclaimed = 0;
+$totalAllNominal = 0;
+if ($qUnclaimedStores) {
+    while ($us = $qUnclaimedStores->fetch_assoc()) {
+        $uUnits = intval($us['total_unclaimed']);
+        $uNom = floatval($us['nominal_unclaimed']);
+        $totalAllUnclaimed += $uUnits;
+        $totalAllNominal += $uNom;
+        if ($uUnits >= 50) {
+            $eligibleStoresCount++;
+            $eligibleNominalTotal += $uNom;
+        }
+    }
+}
 $claimTarget = 50;
+$unclaimedUnits = $totalAllUnclaimed;
+$unclaimedNominal = $totalAllNominal;
+$isClaimEligible = ($eligibleStoresCount > 0);
 $claimProgress = min(100, round(($unclaimedUnits / $claimTarget) * 100, 1));
-$isClaimEligible = ($unclaimedUnits >= $claimTarget);
 $sisaTarget = max(0, $claimTarget - $unclaimedUnits);
 
 // Query Data Master Penitipan (Dukungan database ganda: sales_customer & customers)
@@ -2163,24 +2180,25 @@ $loewixPriceList = $tiptokMaster6;
                     </div>
                 </div>
 
-                <!-- Metric 4: Target Klaim 50 Unit -->
+                <!-- Metric 4: Target Klaim 50 Unit Per Toko -->
                 <div class="metric-card-themed metric-theme-purple">
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="metric-label-txt">Target Klaim (Min. 50 Unit)</span>
-                        <span id="metricClaimStatusBadge" class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>">
-                            <?php echo $isClaimEligible ? 'SIAP KLAIM' : 'PROSES'; ?>
+                        <span class="metric-label-txt">Target Klaim (Min. 50/Toko)</span>
+                        <span id="metricClaimStatusBadge" class="taste-badge <?php echo ($eligibleStoresCount > 0) ? 'badge-active-tag' : 'badge-neutral'; ?>">
+                            <?php echo ($eligibleStoresCount > 0) ? ($eligibleStoresCount . ' TOKO SIAP') : 'PROSES'; ?>
                         </span>
                     </div>
                     <div class="metric-val-large">
-                        <span id="metricValUnclaimed"><?php echo $unclaimedUnits; ?></span> 
-                        <span style="font-size: 14.5px; font-weight: 600; color: #64748b;">/ 50 unit</span>
+                        <span id="metricValUnclaimed"><?php echo $eligibleStoresCount; ?></span> 
+                        <span style="font-size: 14.5px; font-weight: 600; color: #64748b;">Toko Siap</span>
                     </div>
-                    <div class="progress mt-1 mb-1" style="height: 6px; background-color: #e2e8f0; border-radius: 6px; overflow: hidden;">
-                        <div class="progress-bar" id="metricClaimProgressBar" style="width: <?php echo $claimProgress; ?>%; background: <?php echo $isClaimEligible ? '#15803d' : '#0f172a'; ?>; border-radius: 6px;"></div>
+                    <div class="d-flex justify-content-between align-items-center mt-2" style="font-size: 11.5px; font-weight: 600;">
+                        <span style="color: #64748b;">Target Per Toko:</span>
+                        <strong class="text-dark">Min. 50 Unit</strong>
                     </div>
-                    <div class="d-flex justify-content-between" style="font-size: 12px; font-weight: 600;">
-                        <span style="color: #64748b;" id="metricClaimProgressTxt"><?php echo $claimProgress; ?>% tercapai</span>
-                        <span id="metricClaimRemainingTxt" style="color: <?php echo $isClaimEligible ? '#15803d' : '#64748b'; ?>;"><?php echo $isClaimEligible ? 'Target tercapai!' : "Kurang $sisaTarget unit"; ?></span>
+                    <div class="d-flex justify-content-between align-items-center" style="font-size: 11.5px; font-weight: 600;">
+                        <span style="color: #64748b;">Insentif Siap Cair:</span>
+                        <strong class="text-success">Rp <?php echo number_format($eligibleNominalTotal, 0, ',', '.'); ?></strong>
                     </div>
                 </div>
             </div>
@@ -2580,8 +2598,8 @@ $loewixPriceList = $tiptokMaster6;
             <div id="viewKlaimInsentif" class="data-card-vibrant d-none p-4">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
                     <div>
-                        <h3 class="font-weight-bold text-dark mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px;">Klaim Insentif Penjualan</h3>
-                        <p class="text-muted text-sm mb-0">Akumulasi unit terjual dari seluruh kunjungan toko dealer. Syarat klaim minimal <strong>50 Unit</strong>.</p>
+                        <h3 class="font-weight-bold text-dark mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px;">Klaim Insentif Penjualan (Per Toko Mitra)</h3>
+                        <p class="text-muted text-sm mb-0">Perhitungan klaim insentif berlaku <strong>per masing-masing toko mitra</strong>. Syarat klaim minimal <strong>50 Unit</strong> terjual pada toko tersebut.</p>
                     </div>
                     <button class="btn-taste-secondary" onclick="switchViewToTable()">
                         <i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Tabel Penitipan
@@ -2592,21 +2610,19 @@ $loewixPriceList = $tiptokMaster6;
                     <div class="col-md-6 mb-3">
                         <div class="metric-card-themed metric-theme-purple h-100">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="metric-label-txt">Unit Terjual Siap Klaim</span>
-                                <span class="taste-badge <?php echo $isClaimEligible ? 'badge-active-tag' : 'badge-neutral'; ?>" style="font-size: 11.5px;">
-                                    <?php echo $isClaimEligible ? 'SYARAT TERPENUHI (>= 50)' : 'BELUM MEMENUHI (< 50)'; ?>
+                                <span class="metric-label-txt">Toko Tembus Target (≥ 50 Unit)</span>
+                                <span class="taste-badge badge-active-tag" style="font-size: 11.5px;">
+                                    MIN. 50 UNIT / TOKO
                                 </span>
                             </div>
-                            <div class="metric-val-large"><?php echo $unclaimedUnits; ?> <span style="font-size: 14.5px; font-weight: 600; color: #64748b;">/ 50 unit minimal</span></div>
-                            <div class="progress my-2" style="height: 6px; background-color: #e2e8f0; border-radius: 6px;">
-                                <div class="progress-bar" style="width: <?php echo $claimProgress; ?>%; background: <?php echo $isClaimEligible ? '#15803d' : '#0f172a'; ?>; border-radius: 6px;"></div>
+                            <div class="metric-val-large">
+                                <span id="claimStatEligibleCount"><?php echo $eligibleStoresCount; ?></span> 
+                                <span style="font-size: 14.5px; font-weight: 600; color: #64748b;">Toko Siap Klaim</span>
                             </div>
                             <div class="text-sm font-weight-bold mt-2">
-                                <?php if ($isClaimEligible) : ?>
-                                    <span class="text-success" style="font-size: 12.5px;"><i class="fa-solid fa-check-circle me-1"></i>Syarat 50 unit terpenuhi. Anda siap mengajukan klaim insentif.</span>
-                                <?php else : ?>
-                                    <span class="text-muted" style="font-size: 12.5px;"><i class="fa-solid fa-circle-info me-1"></i>Perlu <?php echo $sisaTarget; ?> unit lagi untuk dapat mengajukan klaim insentif.</span>
-                                <?php endif; ?>
+                                <span class="text-muted" style="font-size: 12.5px;">
+                                    <i class="fa-solid fa-circle-info me-1"></i>Hanya toko yang mencapai minimal 50 unit yang dapat diajukan klaim pencairan insentif.
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -2615,32 +2631,43 @@ $loewixPriceList = $tiptokMaster6;
                         <div class="metric-card-themed metric-theme-emerald h-100 d-flex flex-column justify-content-between">
                             <div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="metric-label-txt">Total Nominal Insentif Siap Cair</span>
+                                    <span class="metric-label-txt">Total Insentif Siap Cair</span>
                                     <div class="metric-icon-box icon-emerald">
                                         <i class="fa-solid fa-wallet"></i>
                                     </div>
                                 </div>
-                                <div class="metric-val-large" style="font-size: 26px;">
-                                    Rp <?php echo number_format($unclaimedNominal, 0, ',', '.'); ?>
+                                <div class="metric-val-large" id="claimStatEligibleNominal" style="font-size: 26px;">
+                                    Rp <?php echo number_format($eligibleNominalTotal, 0, ',', '.'); ?>
                                 </div>
-                                <p class="text-sm text-muted mb-0" style="font-size: 12.5px;">Total akumulasi dari unit barang yang terjual dengan No. Invoice valid.</p>
-                            </div>
-                            <div class="mt-3">
-                                <?php if ($isClaimEligible) : ?>
-                                    <button class="btn-taste-primary w-100 justify-content-center" onclick="openModalSubmitClaim()">
-                                        <i class="fa-solid fa-paper-plane me-1"></i> Ajukan Klaim Insentif Sekarang
-                                    </button>
-                                <?php else : ?>
-                                    <button class="btn-taste-secondary w-100 justify-content-center text-muted" disabled style="opacity: 0.7; cursor: not-allowed;">
-                                        <i class="fa-solid fa-lock me-1"></i> Klaim Terkunci (Min. 50 Unit)
-                                    </button>
-                                <?php endif; ?>
+                                <p class="text-sm text-muted mb-0" style="font-size: 12.5px;">Total nominal dari seluruh toko yang sudah memenuhi syarat minimal 50 unit.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="font-weight-bold text-dark text-sm text-uppercase mb-2" style="letter-spacing: 0.05em;">Rincian Unit Terjual Belum Diklaim</div>
+                <!-- DAFTAR PROGRES & KLAIM PER TOKO -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="font-weight-bold text-dark text-sm text-uppercase" style="letter-spacing: 0.05em;">
+                        <i class="fa-solid fa-store me-1 text-primary"></i> Progres Penjualan & Status Klaim Per Toko Mitra
+                    </div>
+                    <span class="text-xs text-muted font-weight-bold">Target: 50 Unit / Toko</span>
+                </div>
+                <div id="claimStoresGrid" class="row mb-4">
+                    <div class="col-12"><div class="p-4 text-center text-muted bg-light rounded-3 font-weight-bold">Memuat data progres toko...</div></div>
+                </div>
+
+                <!-- RINCIAN UNIT TERJUAL BELUM DIKLAIM -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+                    <div class="font-weight-bold text-dark text-sm text-uppercase" style="letter-spacing: 0.05em;">
+                        <i class="fa-solid fa-boxes-stacked me-1 text-primary"></i> Rincian Unit Terjual Belum Diklaim
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-xs text-muted font-weight-bold">Filter Toko:</span>
+                        <select id="filterTokoUnclaimed" class="form-select form-select-sm" style="font-size: 12px; font-weight: 700; border-radius: 8px; width: auto;" onchange="filterUnclaimedItemsByStore(this.value)">
+                            <option value="all">Semua Toko</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive border rounded-3 mb-4" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden;">
                     <table class="table table-vibrant mb-0" id="tableUnclaimedItems">
                         <thead>
@@ -2660,12 +2687,16 @@ $loewixPriceList = $tiptokMaster6;
                     </table>
                 </div>
 
-                <div class="font-weight-bold text-dark text-sm text-uppercase mb-2" style="letter-spacing: 0.05em;">Riwayat Pengajuan Klaim</div>
+                <!-- RIWAYAT PENGAJUAN KLAIM -->
+                <div class="font-weight-bold text-dark text-sm text-uppercase mb-2" style="letter-spacing: 0.05em;">
+                    <i class="fa-solid fa-clock-rotate-left me-1 text-primary"></i> Riwayat Pengajuan Klaim
+                </div>
                 <div class="table-responsive border rounded-3" style="border: 2px solid #cbd5e1 !important; border-radius: 14px; overflow: hidden;">
                     <table class="table table-vibrant mb-0" id="tableClaimHistory">
                         <thead>
                             <tr>
                                 <th>KODE KLAIM</th>
+                                <th>TOKO / DEALER</th>
                                 <th>SALES</th>
                                 <th>TGL KLAIM</th>
                                 <th class="text-center">TOTAL UNIT</th>
@@ -2675,7 +2706,7 @@ $loewixPriceList = $tiptokMaster6;
                             </tr>
                         </thead>
                         <tbody id="bodyClaimHistory">
-                            <tr><td colspan="7" class="text-center py-3 text-muted">Memuat riwayat klaim...</td></tr>
+                            <tr><td colspan="8" class="text-center py-3 text-muted">Memuat riwayat klaim...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -3387,36 +3418,52 @@ $loewixPriceList = $tiptokMaster6;
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 4: PENGAJUAN KLAIM INSENTIF (MIN 50 UNIT)                           -->
+    <!-- MODAL 4: PENGAJUAN KLAIM INSENTIF (MIN 50 UNIT PER TOKO)                  -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalSubmitClaim" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <div>
-                        <h5 class="modal-title font-weight-bold text-dark mb-0">Ajukan Klaim Insentif</h5>
-                        <div class="text-secondary text-sm font-weight-bold">Konfirmasi pengajuan klaim insentif minimal 50 unit</div>
+                        <h5 class="modal-title font-weight-bold text-dark mb-0">Ajukan Klaim Insentif Toko</h5>
+                        <div class="text-secondary text-sm font-weight-bold">Konfirmasi pengajuan klaim insentif toko mitra (Min. 50 unit)</div>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 
                 <form id="formSubmitClaim" onsubmit="submitKlaimInsentif(event)">
+                    <input type="hidden" name="id_penitipan" id="claimModalIdPenitipan" value="">
                     <div class="modal-body p-4">
                         <div class="p-3 mb-3 rounded-3 border text-center" style="background-color: var(--accent-emerald-light); border: 2px solid #a7f3d0 !important;">
-                            <div class="text-xs font-weight-bold text-uppercase" style="color: var(--accent-emerald); letter-spacing: 0.05em;">Total Unit Siap Klaim</div>
-                            <h2 class="font-weight-bolder my-1" style="color: var(--accent-emerald); font-family: 'Outfit', sans-serif; font-size: 36px;"><?php echo $unclaimedUnits; ?> Unit</h2>
-                            <div class="text-sm font-weight-bold text-dark">Estimasi Nominal: <span class="text-success" style="font-size: 16px;">Rp <?php echo number_format($unclaimedNominal, 0, ',', '.'); ?></span></div>
+                            <div class="text-xs font-weight-bold text-uppercase" style="color: var(--accent-emerald); letter-spacing: 0.05em;">Toko Dealer Mitra</div>
+                            <h4 class="font-weight-bolder my-1" id="claimModalNamaToko" style="color: #065f46; font-family: 'Plus Jakarta Sans', sans-serif;">-</h4>
+                            <div class="d-flex justify-content-center align-items-center gap-3 mt-2 pt-2 border-top border-success-subtle">
+                                <div>
+                                    <div class="text-xs text-muted font-weight-bold">UNIT TERJUAL</div>
+                                    <div class="font-weight-bolder text-dark" id="claimModalTotalUnit" style="font-size: 20px;">-</div>
+                                </div>
+                                <div class="vr"></div>
+                                <div>
+                                    <div class="text-xs text-muted font-weight-bold">TOTAL INSENTIF</div>
+                                    <div class="font-weight-bolder text-success" id="claimModalNominal" style="font-size: 20px;">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-success d-flex align-items-center mb-3 py-2 px-3" style="font-size: 12.5px; border-radius: 10px;">
+                            <i class="fa-solid fa-circle-check text-success me-2" style="font-size: 16px;"></i>
+                            <div>Syarat target <strong>50 Unit</strong> untuk toko ini telah terpenuhi dan siap diajukan ke admin / finance.</div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label-taste">Catatan Pengajuan Klaim (Opsional)</label>
-                            <textarea name="catatan_claim" class="form-control-taste w-100" rows="3" placeholder="Catatan pengajuan klaim insentif..."></textarea>
+                            <textarea name="catatan_claim" class="form-control-taste w-100" rows="3" placeholder="Catatan pengajuan klaim insentif toko ini..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer p-3 bg-light border-top">
                         <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" id="btnProsesClaim" class="btn-taste-primary">
-                            <i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Klaim
+                            <i class="fa-solid fa-paper-plane me-1"></i> Ajukan Klaim Toko Ini
                         </button>
                     </div>
                 </form>
@@ -3443,6 +3490,7 @@ $loewixPriceList = $tiptokMaster6;
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="font-weight-bold text-dark mb-0" id="claimSalesName">-</h5>
+                                <div class="text-sm font-weight-bold text-primary mt-1" id="claimTokoName"><i class="fa-solid fa-store me-1"></i><span>-</span></div>
                                 <span class="text-sm text-secondary font-weight-bold" id="claimTgl">-</span>
                             </div>
                             <div class="text-end">
@@ -5745,50 +5793,142 @@ $loewixPriceList = $tiptokMaster6;
         }
 
         // =========================================================================
-        // KLAIM INSENTIF
+        // KLAIM INSENTIF (PER TOKO MITRA - MIN. 50 UNIT)
         // =========================================================================
+        let cachedClaimData = null;
+
         function loadClaimSummary() {
             fetch('tiptok-ajax.php?action=get_claim_summary')
                 .then(r => r.json())
                 .then(res => {
                     if (res && res.status === 'success') {
                         const d = res.data;
-                        const bodyUnclaimed = document.getElementById('bodyUnclaimedItems');
-                        if (bodyUnclaimed) {
-                            bodyUnclaimed.innerHTML = '';
-                            if (!d.unclaimed_items || d.unclaimed_items.length === 0) {
-                                bodyUnclaimed.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-muted font-weight-bold">Tidak ada unit terjual yang menunggu klaim.</td></tr>';
+                        cachedClaimData = d;
+
+                        // Update summary numbers in Tab Klaim Insentif
+                        const statEligibleCount = document.getElementById('claimStatEligibleCount');
+                        if (statEligibleCount) statEligibleCount.textContent = d.total_eligible_stores || 0;
+
+                        const statEligibleNominal = document.getElementById('claimStatEligibleNominal');
+                        if (statEligibleNominal) statEligibleNominal.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(d.total_eligible_nominal || 0);
+
+                        // Render Cards Grid for Stores
+                        const storesGrid = document.getElementById('claimStoresGrid');
+                        if (storesGrid) {
+                            storesGrid.innerHTML = '';
+                            if (!d.stores || d.stores.length === 0) {
+                                storesGrid.innerHTML = `
+                                    <div class="col-12">
+                                        <div class="p-4 text-center text-muted bg-light rounded-3 font-weight-bold" style="border: 2px dashed #cbd5e1;">
+                                            <i class="fa-solid fa-store-slash mb-2" style="font-size: 28px; color: #94a3b8;"></i>
+                                            <div>Belum ada data penjualan toko untuk klaim insentif.</div>
+                                        </div>
+                                    </div>
+                                `;
                             } else {
-                                d.unclaimed_items.forEach(u => {
-                                    bodyUnclaimed.innerHTML += `
-                                        <tr>
-                                            <td class="font-weight-bold">${u.tgl_kunjungan}</td>
-                                            <td><strong>${escapeHtml(u.nama_toko)}</strong></td>
-                                            <td><strong>${escapeHtml(u.nama_barang)}</strong></td>
-                                            <td><span class="taste-badge badge-invoice-tag">${escapeHtml(u.no_inv || '-')}</span></td>
-                                            <td class="text-center font-weight-bold text-danger" style="font-size: 15px;">${u.qty_terjual_kunjungan}</td>
-                                            <td class="text-end font-weight-bold">Rp ${new Intl.NumberFormat('id-ID').format(u.insentif_per_unit)}</td>
-                                            <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(u.insentif_didapat)}</td>
-                                        </tr>
+                                d.stores.forEach(s => {
+                                    const isReady = s.is_eligible;
+                                    const safeName = escapeHtml(s.nama_toko);
+                                    const jsSafeName = safeName.replace(/'/g, "\\'");
+                                    const progressVal = Math.min(100, s.progress || 0);
+                                    
+                                    storesGrid.innerHTML += `
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="card h-100 shadow-sm" style="border: 2px solid ${isReady ? '#10b981' : '#e2e8f0'}; border-radius: 14px; overflow: hidden; background: #fff;">
+                                                <div class="p-3 border-bottom d-flex justify-content-between align-items-start" style="background: ${isReady ? 'rgba(16, 185, 129, 0.06)' : '#f8fafc'};">
+                                                    <div>
+                                                        <div class="d-flex align-items-center gap-1 mb-1">
+                                                            <span class="taste-badge badge-neutral" style="font-size: 10px;">${escapeHtml(s.kode_titip || 'TITIP')}</span>
+                                                            <span class="text-xs text-muted font-weight-bold">• ${escapeHtml(s.nama_sales || 'Sales')}</span>
+                                                        </div>
+                                                        <h5 class="font-weight-bold text-dark mb-0" style="font-size: 16px;">${safeName}</h5>
+                                                    </div>
+                                                    <div>
+                                                        ${isReady ? 
+                                                            '<span class="taste-badge badge-active-tag" style="font-size: 11px;"><i class="fa-solid fa-check me-1"></i>SIAP KLAIM</span>' : 
+                                                            '<span class="taste-badge badge-neutral" style="font-size: 11px;"><i class="fa-solid fa-lock me-1"></i>TERKUNCI</span>'
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="p-3 d-flex flex-column justify-content-between" style="flex: 1;">
+                                                    <div>
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <span class="text-xs text-muted font-weight-bold">PROGRES TARGET (MIN 50)</span>
+                                                            <span class="font-weight-bolder ${isReady ? 'text-success' : 'text-primary'}" style="font-size: 14px;">
+                                                                ${s.total_unclaimed_units} <span class="text-muted" style="font-size: 12px; font-weight: 600;">/ 50 Unit</span>
+                                                            </span>
+                                                        </div>
+                                                        <div class="progress mb-2" style="height: 10px; border-radius: 6px; background-color: #f1f5f9;">
+                                                            <div class="progress-bar ${isReady ? 'bg-success' : 'bg-primary'}" role="progressbar" style="width: ${progressVal}%;" aria-valuenow="${progressVal}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between align-items-center text-xs mb-3">
+                                                            <span class="text-muted font-weight-bold">${progressVal}% tercapai</span>
+                                                            ${isReady ? 
+                                                                '<span class="text-success font-weight-bold"><i class="fa-solid fa-circle-check me-1"></i>Target Tercapai!</span>' : 
+                                                                `<span class="text-muted font-weight-bold">Kurang <strong>${s.sisa_unit} unit</strong> lagi</span>`
+                                                            }
+                                                        </div>
+                                                        
+                                                        <div class="p-2 rounded-2 mb-3 d-flex justify-content-between align-items-center" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                                                            <span class="text-xs text-muted font-weight-bold">Estimasi Insentif:</span>
+                                                            <strong class="text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(s.total_unclaimed_nominal)}</strong>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        ${isReady ? `
+                                                            <button type="button" class="btn-taste-primary w-100 py-2 font-weight-bold" onclick="openModalSubmitClaimForStore(${s.id_penitipan}, '${jsSafeName}', ${s.total_unclaimed_units}, ${s.total_unclaimed_nominal})">
+                                                                <i class="fa-solid fa-paper-plane me-1"></i> Ajukan Klaim Toko Ini
+                                                            </button>
+                                                        ` : `
+                                                            <button type="button" class="btn btn-sm btn-light w-100 py-2 text-muted font-weight-bold border" disabled style="cursor: not-allowed; border-radius: 10px; background-color: #f8fafc;">
+                                                                <i class="fa-solid fa-lock me-1"></i> Terkunci (Perlu 50 Unit)
+                                                            </button>
+                                                        `}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     `;
                                 });
                             }
                         }
 
+                        // Populate Filter Dropdown
+                        const filterSelect = document.getElementById('filterTokoUnclaimed');
+                        if (filterSelect) {
+                            const curVal = filterSelect.value || 'all';
+                            filterSelect.innerHTML = `<option value="all">Semua Toko (${(d.unclaimed_items || []).length} Item)</option>`;
+                            if (d.stores) {
+                                d.stores.forEach(s => {
+                                    filterSelect.innerHTML += `<option value="${s.id_penitipan}">${escapeHtml(s.nama_toko)} (${s.total_unclaimed_units} Unit)</option>`;
+                                });
+                            }
+                            filterSelect.value = curVal;
+                        }
+
+                        // Render Unclaimed items table
+                        renderUnclaimedItems(d.unclaimed_items || []);
+
+                        // Render Claim History table
                         const bodyClaim = document.getElementById('bodyClaimHistory');
                         if (bodyClaim) {
                             bodyClaim.innerHTML = '';
                             if (!d.claim_history || d.claim_history.length === 0) {
-                                bodyClaim.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-muted font-weight-bold">Belum ada riwayat pengajuan klaim.</td></tr>';
+                                bodyClaim.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted font-weight-bold">Belum ada riwayat pengajuan klaim.</td></tr>';
                             } else {
                                 d.claim_history.forEach(c => {
                                     let stBadge = 'badge-neutral';
                                     if (c.status_claim === 'disetujui' || c.status_claim === 'cair') stBadge = 'badge-active-tag';
                                     else if (c.status_claim === 'menunggu_approval') stBadge = 'badge-invoice-tag';
+                                    else if (c.status_claim === 'ditolak') stBadge = 'badge-danger-tag';
+
+                                    const storeDisplay = c.display_nama_toko || c.nama_toko || 'Toko Mitra';
 
                                     bodyClaim.innerHTML += `
                                         <tr>
                                             <td class="font-monospace font-weight-bold" style="font-size: 14px;">${escapeHtml(c.kode_claim)}</td>
+                                            <td><strong>${escapeHtml(storeDisplay)}</strong></td>
                                             <td><strong>${escapeHtml(c.nama_sales)}</strong></td>
                                             <td class="font-weight-bold">${c.tgl_claim}</td>
                                             <td class="text-center font-weight-bold" style="font-size: 14.5px;">${c.total_unit_terjual} Unit</td>
@@ -5809,7 +5949,52 @@ $loewixPriceList = $tiptokMaster6;
                 .catch(err => console.error('Error loading claim summary:', err));
         }
 
-        function openModalSubmitClaim() {
+        function renderUnclaimedItems(items) {
+            const bodyUnclaimed = document.getElementById('bodyUnclaimedItems');
+            if (!bodyUnclaimed) return;
+            bodyUnclaimed.innerHTML = '';
+            if (!items || items.length === 0) {
+                bodyUnclaimed.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-muted font-weight-bold">Tidak ada unit terjual yang menunggu klaim.</td></tr>';
+                return;
+            }
+            items.forEach(u => {
+                bodyUnclaimed.innerHTML += `
+                    <tr>
+                        <td class="font-weight-bold">${u.tgl_kunjungan}</td>
+                        <td><strong>${escapeHtml(u.nama_toko)}</strong></td>
+                        <td><strong>${escapeHtml(u.nama_barang)}</strong></td>
+                        <td><span class="taste-badge badge-invoice-tag">${escapeHtml(u.no_inv || '-')}</span></td>
+                        <td class="text-center font-weight-bold text-danger" style="font-size: 15px;">${u.qty_terjual_kunjungan}</td>
+                        <td class="text-end font-weight-bold">Rp ${new Intl.NumberFormat('id-ID').format(u.insentif_per_unit)}</td>
+                        <td class="text-end font-weight-bold text-success" style="font-size: 15px;">Rp ${new Intl.NumberFormat('id-ID').format(u.insentif_didapat)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterUnclaimedItemsByStore(idPen) {
+            if (!cachedClaimData || !cachedClaimData.unclaimed_items) return;
+            if (idPen === 'all') {
+                renderUnclaimedItems(cachedClaimData.unclaimed_items);
+            } else {
+                const filtered = cachedClaimData.unclaimed_items.filter(u => String(u.id_penitipan) === String(idPen));
+                renderUnclaimedItems(filtered);
+            }
+        }
+
+        function openModalSubmitClaimForStore(idPen, namaToko, units, nominal) {
+            const inputIdPen = document.getElementById('claimModalIdPenitipan');
+            if (inputIdPen) inputIdPen.value = idPen;
+
+            const nameEl = document.getElementById('claimModalNamaToko');
+            if (nameEl) nameEl.textContent = namaToko;
+
+            const unitEl = document.getElementById('claimModalTotalUnit');
+            if (unitEl) unitEl.textContent = units + ' Unit';
+
+            const nomEl = document.getElementById('claimModalNominal');
+            if (nomEl) nomEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(nominal);
+
             showModalSafe('modalSubmitClaim');
         }
 
@@ -5830,13 +6015,13 @@ $loewixPriceList = $tiptokMaster6;
                 .then(res => {
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Klaim';
+                        btn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Ajukan Klaim Toko Ini';
                     }
 
                     if (res && res.status === 'success') {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Klaim Diajukan!',
+                            title: 'Klaim Toko Berhasil Diajukan!',
                             text: res.message,
                             confirmButtonText: 'OK'
                         }).then(() => location.reload());
@@ -5848,7 +6033,7 @@ $loewixPriceList = $tiptokMaster6;
                     console.error(err);
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Klaim';
+                        btn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Ajukan Klaim Toko Ini';
                     }
                     Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan saat mengajukan klaim.' });
                 });
@@ -5865,6 +6050,15 @@ $loewixPriceList = $tiptokMaster6;
                         const cl = res.data.claim;
                         document.getElementById('claimKodeTitle').textContent = 'Kode Klaim: ' + (cl.kode_claim || '-');
                         document.getElementById('claimSalesName').textContent = cl.nama_sales || '-';
+                        
+                        const storeDisplay = cl.display_nama_toko || cl.nama_toko || 'Toko Mitra';
+                        const tokoEl = document.getElementById('claimTokoName');
+                        if (tokoEl) {
+                            const span = tokoEl.querySelector('span');
+                            if (span) span.textContent = storeDisplay;
+                            else tokoEl.textContent = storeDisplay;
+                        }
+
                         document.getElementById('claimTgl').textContent = 'Tgl: ' + (cl.tgl_claim || '-') + ' (' + (cl.total_unit_terjual || 0) + ' Unit)';
                         document.getElementById('claimNominal').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(cl.total_nominal_insentif || 0);
 

@@ -10,31 +10,33 @@ header('Access-Control-Allow-Methods: GET');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 
-$apkUrl = 'https://jadwal.id-giti.com/staff/download/LoewixSales-v1.9.8.apk?v=' . time();
+$apkUrl = 'https://jadwal.id-giti.com/staff/download/LoewixSales-v1.9.11.apk?v=' . time();
+
+$msg = 'Versi terbaru (v1.9.11) tersedia! Pembaruan fleksibilitas No. Invoice: Opsi Gabung 1 Faktur (sama untuk semua barang laku) atau Pisah No. Invoice per barang, dilengkapi shortcut nomor invoice terakhir & auto-increment.';
 
 $response = [
     'status'         => 'success',
-    'latest_version' => '1.9.8',
-    'min_version'    => '1.9.8',
-    'version'        => '1.9.8',
-    'version_code'   => 198,
+    'latest_version' => '1.9.11',
+    'min_version'    => '1.9.11',
+    'version'        => '1.9.11',
+    'version_code'   => 210,
     'force_update'   => true,
     'update_url'     => $apkUrl,
     'download_url'   => $apkUrl,
-    'update_message' => 'Versi terbaru (v1.9.8) tersedia! Update tarif insentif resmi TIP TOK: 4MP IP Camera Rp 30.000/unit & 2MP AHD Rp 15.000/unit.',
-    'force_message'  => 'Versi aplikasi Anda perlu diperbarui ke v1.9.8 untuk sinkronisasi tarif insentif terbaru.',
-    'changelog'      => 'Versi terbaru (v1.9.8) tersedia! Update tarif insentif resmi TIP TOK: 4MP IP Camera Rp 30.000/unit & 2MP AHD Rp 15.000/unit.',
+    'update_message' => $msg,
+    'force_message'  => $msg,
+    'changelog'      => $msg,
     'data' => [
-        'latest_version' => '1.9.8',
-        'min_version'    => '1.9.8',
-        'version'        => '1.9.8',
-        'version_code'   => 198,
+        'latest_version' => '1.9.11',
+        'min_version'    => '1.9.11',
+        'version'        => '1.9.11',
+        'version_code'   => 210,
         'force_update'   => true,
         'update_url'     => $apkUrl,
         'download_url'   => $apkUrl,
-        'update_message' => 'Versi terbaru (v1.9.8) tersedia! Update tarif insentif resmi TIP TOK: 4MP IP Camera Rp 30.000/unit & 2MP AHD Rp 15.000/unit.',
-        'force_message'  => 'Versi aplikasi Anda perlu diperbarui ke v1.9.8 untuk sinkronisasi tarif insentif terbaru.',
-        'changelog'      => 'Versi terbaru (v1.9.8) tersedia! Update tarif insentif resmi TIP TOK: 4MP IP Camera Rp 30.000/unit & 2MP AHD Rp 15.000/unit.',
+        'update_message' => $msg,
+        'force_message'  => $msg,
+        'changelog'      => $msg,
     ]
 ];
 

@@ -309,6 +309,22 @@ if ($action === 'get_dashboard') {
                     ];
                 }
             }
+            // Hitung status unclaimed insentif khusus toko ini
+            $qStoreUnclaimed = $conn->query("SELECT SUM(qty_terjual_kunjungan) as total_unclaimed, SUM(insentif_didapat) as nominal_unclaimed 
+                                            FROM tiptok_kunjungan 
+                                            WHERE id_penitipan = $idPen AND id_claim IS NULL AND qty_terjual_kunjungan > 0");
+            $unclaimedStoreUnits = 0;
+            $unclaimedStoreNominal = 0.0;
+            if ($qStoreUnclaimed && $rowU = $qStoreUnclaimed->fetch_assoc()) {
+                $unclaimedStoreUnits = intval($rowU['total_unclaimed'] ?? 0);
+                $unclaimedStoreNominal = floatval($rowU['nominal_unclaimed'] ?? 0);
+            }
+            $row['unclaimed_units'] = $unclaimedStoreUnits;
+            $row['unclaimed_nominal'] = $unclaimedStoreNominal;
+            $row['is_claim_eligible'] = ($unclaimedStoreUnits >= 50);
+            $row['claim_progress'] = min(100.0, round(($unclaimedStoreUnits / 50) * 100, 1));
+            $row['sisa_unit_klaim'] = max(0, 50 - $unclaimedStoreUnits);
+
             $row['items'] = $items;
             $row['id'] = intval($row['id']);
             $row['id_customer'] = intval($row['id_customer']);
@@ -317,6 +333,15 @@ if ($action === 'get_dashboard') {
             $row['sum_terjual'] = intval($row['sum_terjual'] ?? 0);
             $row['sum_insentif'] = floatval($row['sum_insentif'] ?? 0);
             $penitipanList[] = $row;
+        }
+    }
+
+    $eligibleStoresCount = 0;
+    $eligibleNominalTotal = 0.0;
+    foreach ($penitipanList as $pItem) {
+        if (!empty($pItem['is_claim_eligible'])) {
+            $eligibleStoresCount++;
+            $eligibleNominalTotal += floatval($pItem['unclaimed_nominal']);
         }
     }
 
@@ -331,9 +356,11 @@ if ($action === 'get_dashboard') {
                 'total_insentif' => $totalInsentif,
                 'unclaimed_units' => $unclaimedUnits,
                 'unclaimed_nominal' => $unclaimedNominal,
+                'eligible_stores_count' => $eligibleStoresCount,
+                'eligible_nominal_total' => $eligibleNominalTotal,
                 'claim_target' => $claimTarget,
                 'claim_progress' => $claimProgress,
-                'is_claim_eligible' => $isClaimEligible,
+                'is_claim_eligible' => ($eligibleStoresCount > 0),
             ],
             'penitipan_list' => $penitipanList,
         ]
@@ -616,12 +643,13 @@ if ($action === 'audit_kunjungan') {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 5. CLAIM INSENTIF (MIN. 50 UNIT)
+// 5. CLAIM INSENTIF (MIN. 50 UNIT PER TOKO)
 // ─────────────────────────────────────────────────────────────
 if ($action === 'claim_insentif') {
     $input = !empty($jsonInput) ? $jsonInput : $_POST;
 
     $idSales = intval($input['sales_id'] ?? ($input['id_sales'] ?? 0));
+    $idPenitipan = intval($input['id_penitipan'] ?? 0);
     $namaSales = trim($input['nama_sales'] ?? '');
     $catatanClaim = trim($input['catatan_claim'] ?? '');
 
@@ -630,11 +658,39 @@ if ($action === 'claim_insentif') {
         exit;
     }
 
-    // Ambil semua log penjualan yang belum diklaim
+    if ($idPenitipan <= 0) {
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'Pilih toko yang ingin diajukan klaim insentifnya! Syarat klaim berlaku minimal 50 unit per masing-masing toko mitra.'
+        ]);
+        exit;
+    }
+
+    // Ensure columns exist in tiptok_claim
+    $chkColPen = @$conn->query("SHOW COLUMNS FROM `tiptok_claim` LIKE 'id_penitipan'");
+    if ($chkColPen && $chkColPen->num_rows == 0) {
+        @$conn->query("ALTER TABLE `tiptok_claim` ADD COLUMN `id_penitipan` INT NULL AFTER `id_sales`, ADD COLUMN `nama_toko` VARCHAR(255) NULL AFTER `id_penitipan`");
+    }
+
+    // Ambil nama toko
+    $custJoin = $hasSalesCustomer ? "JOIN sales_customer c ON p.id_customer = c.id" : "JOIN customers c ON p.id_customer = c.id";
+    $custField = $hasSalesCustomer ? "c.nama" : "c.nama_toko";
+    $qPen = $conn->query("SELECT p.*, $custField AS nama_toko FROM tiptok_penitipan p $custJoin WHERE p.id = $idPenitipan LIMIT 1");
+    $namaToko = 'Toko Mitra';
+    if ($qPen && $rPen = $qPen->fetch_assoc()) {
+        $namaToko = !empty($rPen['nama_toko']) ? $rPen['nama_toko'] : 'Toko Mitra';
+        if (empty($namaSales) && !empty($rPen['nama_sales'])) {
+            $namaSales = $rPen['nama_sales'];
+        }
+    }
+
+    // Ambil semua log penjualan yang belum diklaim KHUSUS TOKO INI
     $qUnclaimed = $conn->query("SELECT k.id as id_kunjungan, k.id_penitipan, k.id_item, k.qty_terjual_kunjungan, k.no_inv, k.insentif_didapat, i.nama_barang, i.insentif_per_unit 
                                 FROM tiptok_kunjungan k 
                                 JOIN tiptok_items i ON k.id_item = i.id 
-                                WHERE k.id_claim IS NULL AND k.qty_terjual_kunjungan > 0 AND k.id_sales = $idSales 
+                                WHERE k.id_claim IS NULL 
+                                  AND k.qty_terjual_kunjungan > 0 
+                                  AND k.id_penitipan = $idPenitipan
                                 ORDER BY k.id ASC");
     $unclaimedRows = [];
     $totalUnitTerjual = 0;
@@ -649,7 +705,10 @@ if ($action === 'claim_insentif') {
     }
 
     if ($totalUnitTerjual < 50) {
-        echo json_encode(['status' => 'error', 'message' => "Syarat klaim insentif minimal 50 unit terjual! Saat ini baru terkumpul $totalUnitTerjual unit (Kurang " . (50 - $totalUnitTerjual) . " unit lagi)."]);
+        echo json_encode([
+            'status' => 'error', 
+            'message' => "Syarat klaim insentif minimal 50 unit terjual per toko! Toko '$namaToko' baru mencapai $totalUnitTerjual unit (Kurang " . (50 - $totalUnitTerjual) . " unit lagi)."
+        ]);
         exit;
     }
 
@@ -662,8 +721,8 @@ if ($action === 'claim_insentif') {
     $kodeClaim = $prefixClm . str_pad($lastClmNum + 1, 3, '0', STR_PAD_LEFT);
     $tglClaim = date('Y-m-d');
 
-    $stmtClaim = $conn->prepare("INSERT INTO tiptok_claim (kode_claim, id_sales, nama_sales, tgl_claim, total_unit_terjual, total_nominal_insentif, status_claim, catatan_claim, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'menunggu_approval', ?, NOW(), NOW())");
-    $stmtClaim->bind_param("sissids", $kodeClaim, $idSales, $namaSales, $tglClaim, $totalUnitTerjual, $totalNominalInsentif, $catatanClaim);
+    $stmtClaim = $conn->prepare("INSERT INTO tiptok_claim (kode_claim, id_sales, id_penitipan, nama_toko, nama_sales, tgl_claim, total_unit_terjual, total_nominal_insentif, status_claim, catatan_claim, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'menunggu_approval', ?, NOW(), NOW())");
+    $stmtClaim->bind_param("siisssids", $kodeClaim, $idSales, $idPenitipan, $namaToko, $namaSales, $tglClaim, $totalUnitTerjual, $totalNominalInsentif, $catatanClaim);
     
     if (!$stmtClaim->execute()) {
         echo json_encode(['status' => 'error', 'message' => 'Gagal membuat pengajuan klaim: ' . $stmtClaim->error]);
@@ -690,10 +749,12 @@ if ($action === 'claim_insentif') {
 
     echo json_encode([
         'status' => 'success',
-        'message' => "Pengajuan klaim berhasil diajukan dengan kode: $kodeClaim (Total: $totalUnitTerjual unit - Rp " . number_format($totalNominalInsentif, 0, ',', '.') . "). Menunggu persetujuan Admin.",
+        'message' => "Pengajuan klaim toko '$namaToko' berhasil diajukan dengan kode: $kodeClaim (Total: $totalUnitTerjual unit - Rp " . number_format($totalNominalInsentif, 0, ',', '.') . "). Menunggu persetujuan Admin.",
         'data' => [
             'id_claim' => $idClaim,
             'kode_claim' => $kodeClaim,
+            'id_penitipan' => $idPenitipan,
+            'nama_toko' => $namaToko,
             'total_unit' => $totalUnitTerjual,
             'total_nominal' => $totalNominalInsentif,
         ]
@@ -708,11 +769,15 @@ if ($action === 'get_claims') {
     $salesId = intval($_GET['sales_id'] ?? ($jsonInput['sales_id'] ?? 0));
     $whereSales = $salesId > 0 ? " WHERE c.id_sales = $salesId " : "";
 
-    $res = $conn->query("SELECT c.* FROM tiptok_claim c $whereSales ORDER BY c.id DESC LIMIT 50");
+    $res = $conn->query("SELECT c.*, 
+                                COALESCE(NULLIF(c.nama_toko, ''), (SELECT COALESCE(cust.nama, cust.nama_toko) FROM tiptok_penitipan pen LEFT JOIN sales_customer cust ON pen.id_customer = cust.id WHERE pen.id = c.id_penitipan LIMIT 1), 'Toko Mitra') AS display_nama_toko 
+                         FROM tiptok_claim c $whereSales ORDER BY c.id DESC LIMIT 50");
     $claims = [];
     if ($res) {
         while ($row = $res->fetch_assoc()) {
             $row['id'] = intval($row['id']);
+            $row['id_penitipan'] = intval($row['id_penitipan'] ?? 0);
+            $row['nama_toko'] = $row['display_nama_toko'] ?? ($row['nama_toko'] ?? 'Toko Mitra');
             $row['total_unit_terjual'] = intval($row['total_unit_terjual']);
             $row['total_nominal_insentif'] = floatval($row['total_nominal_insentif']);
             $claims[] = $row;
