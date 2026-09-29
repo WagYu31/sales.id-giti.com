@@ -122,13 +122,13 @@ if ($action === 'search_products') {
     $types = "";
     
     if (!empty($search)) {
-        $where .= " AND (category LIKE ? OR type LIKE ? OR description LIKE ?)";
+        $where .= " AND (category LIKE ? OR type LIKE ? OR description LIKE ? OR item_code LIKE ?)";
         $s = "%$search%";
-        $params = [$s, $s, $s];
-        $types = "sss";
+        $params = [$s, $s, $s, $s];
+        $types = "ssss";
     }
     
-    $sql = "SELECT id, category, type, description, msrp FROM product_prices $where ORDER BY category ASC, type ASC LIMIT 40";
+    $sql = "SELECT id, category, type, item_code, description, unit, msrp FROM product_prices $where ORDER BY category ASC, type ASC LIMIT 50";
     $stmt = $conn->prepare($sql);
     if (!empty($types)) {
         $stmt->bind_param($types, ...$params);
@@ -139,20 +139,19 @@ if ($action === 'search_products') {
     $results = [];
     while ($row = $res->fetch_assoc()) {
         $rawDesc = trim($row['description'] ?? '');
-        $parts = preg_split('/(\s*[\—\–]\s*|\s+--\s+|\r\n|\n)/u', $rawDesc, 2);
-        $title = !empty($parts[0]) ? trim($parts[0]) : $row['type'];
-        
-        $displayText = "[{$row['category']}] " . ($title !== $row['type'] ? "{$title} ({$row['type']})" : $title) . " — Rp " . number_format($row['msrp'], 0, ',', '.');
+        $code = !empty($row['item_code']) ? $row['item_code'] : $row['type'];
+        $unit = !empty($row['unit']) ? $row['unit'] : 'UNIT';
+        $displayText = "[{$row['category']}] {$row['type']}" . (!empty($row['item_code']) ? " ({$row['item_code']})" : "") . ($row['msrp'] > 0 ? " — Rp " . number_format($row['msrp'], 0, ',', '.') : "");
 
         $results[] = [
             'id' => (int)$row['id'],
             'category' => $row['category'],
             'type' => $row['type'],
-            'code' => $row['type'],
-            'name' => $title,
+            'code' => $code,
+            'name' => $row['type'],
             'description' => $rawDesc,
             'msrp' => (float)$row['msrp'],
-            'unit' => 'PCS',
+            'unit' => $unit,
             'text' => $displayText
         ];
     }

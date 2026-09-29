@@ -42,12 +42,13 @@ if ($action == 'get_prices') {
     $types = "";
 
     if (!empty($search)) {
-        $where .= " AND (category LIKE ? OR type LIKE ? OR description LIKE ?)";
+        $where .= " AND (category LIKE ? OR type LIKE ? OR description LIKE ? OR item_code LIKE ?)";
         $s = "%$search%";
         $params[] = $s;
         $params[] = $s;
         $params[] = $s;
-        $types .= "sss";
+        $params[] = $s;
+        $types .= "ssss";
     }
 
     if (!empty($category)) {
@@ -113,7 +114,7 @@ if ($action == 'get_prices') {
     $m_disc = $conf['master_dealer_discount'] ?? 35;
 
     // Global Statistics & Category Breakdown
-    $stat_row = $conn->query("SELECT COUNT(*) as total_count, COUNT(DISTINCT category) as cat_count, MIN(msrp) as min_msrp, MAX(msrp) as max_msrp FROM product_prices")->fetch_assoc();
+    $stat_row = $conn->query("SELECT COUNT(*) as total_count, COUNT(DISTINCT category) as cat_count, MIN(CASE WHEN msrp > 0 THEN msrp ELSE NULL END) as min_msrp, MAX(msrp) as max_msrp FROM product_prices")->fetch_assoc();
 
     $cat_res = $conn->query("SELECT category, COUNT(*) as cnt FROM product_prices GROUP BY category ORDER BY cnt DESC, category ASC");
     $categories_list = [];
@@ -133,6 +134,14 @@ if ($action == 'get_prices') {
             $p_dealer = $msrp * (1 - ($d_disc / 100));
             $p_master = $p_dealer * (1 - ($m_disc / 100));
             
+            $codeUnitBadge = !empty($p['item_code']) 
+                ? "<div class='text-muted font-monospace mt-1' style='font-size: 11.5px;'><span class='badge bg-light text-secondary border me-1' style='font-size:10px;'>".htmlspecialchars($p['item_code'])."</span>Satuan: <span class='text-dark fw-semibold'>".htmlspecialchars($p['unit'] ?: 'UNIT')."</span></div>" 
+                : "";
+
+            $priceDisplay = $msrp > 0 
+                ? "Rp " . number_format($msrp, 0, ',', '.') 
+                : "<span class='text-muted small fw-normal' style='font-size:12px;'>Hubungi Sales</span>";
+
             $html .= "<tr class='product-row align-middle'>
                         <td style='vertical-align: middle;'>
                             <span class='badge' style='background: rgba(37,99,235,0.08); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.25); font-size: 11px; padding: 5px 9px; font-weight: 700; border-radius: 6px; letter-spacing: 0.02em;'>
@@ -141,9 +150,10 @@ if ($action == 'get_prices') {
                         </td>
                         <td style='vertical-align: middle;'>
                             <div class='fw-bold text-dark' style='font-size: 14px;'>".htmlspecialchars($p['type'])."</div>
+                            {$codeUnitBadge}
                         </td>
                         <td class='text-end' style='vertical-align: middle;'>
-                            <div class='font-monospace fw-bold text-dark' style='font-size: 14px;'>Rp ".number_format($msrp, 0, ',', '.')."</div>
+                            <div class='font-monospace fw-bold text-dark' style='font-size: 14px;'>{$priceDisplay}</div>
                         </td>
                         <td class='text-center' style='vertical-align: middle;'>
                             <div class='btn-group btn-group-sm' style='box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden;'>

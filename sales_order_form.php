@@ -70,21 +70,21 @@ if ($qSales) {
 
 // Ambil daftar produk katalog Loewix untuk autokomplit instan di baris tabel
 $catalogProducts = [];
-$qProd = $conn->query("SELECT id, category, type, description, msrp FROM product_prices ORDER BY category ASC, type ASC");
+$qProd = $conn->query("SELECT id, category, type, item_code, description, unit, msrp FROM product_prices ORDER BY category ASC, type ASC");
 if ($qProd) {
     while ($p = $qProd->fetch_assoc()) {
         $rawDesc = trim($p['description'] ?? '');
-        $parts = preg_split('/(\s*[\—\–]\s*|\s+--\s+|\r\n|\n)/u', $rawDesc, 2);
-        $title = !empty($parts[0]) ? trim($parts[0]) : $p['type'];
+        $code = !empty($p['item_code']) ? $p['item_code'] : $p['type'];
+        $unit = !empty($p['unit']) ? $p['unit'] : 'UNIT';
         $catalogProducts[] = [
             'id' => (int)$p['id'],
             'category' => $p['category'],
             'type' => $p['type'],
-            'code' => $p['type'],
-            'name' => $title,
+            'code' => $code,
+            'name' => $p['type'],
             'description' => $rawDesc,
             'msrp' => (float)$p['msrp'],
-            'unit' => 'PCS'
+            'unit' => $unit
         ];
     }
 }
@@ -579,13 +579,13 @@ if ($qProd) {
                     <!-- Datalist Autocomplete Produk & Kode Katalog Loewix -->
                     <datalist id="catalogProductsDatalist">
                         <?php foreach ($catalogProducts as $cp): ?>
-                            <option value="<?php echo htmlspecialchars($cp['name']); ?>">[<?php echo htmlspecialchars($cp['category']); ?>] <?php echo htmlspecialchars($cp['code']); ?> &mdash; Rp <?php echo number_format($cp['msrp'], 0, ',', '.'); ?></option>
+                            <option value="<?php echo htmlspecialchars($cp['name']); ?>">[<?php echo htmlspecialchars($cp['category']); ?>] <?php echo htmlspecialchars($cp['code']); ?><?php echo ($cp['msrp'] > 0 ? ' &mdash; Rp ' . number_format($cp['msrp'], 0, ',', '.') : ''); ?></option>
                         <?php endforeach; ?>
                     </datalist>
 
                     <datalist id="catalogCodesDatalist">
                         <?php foreach ($catalogProducts as $cp): ?>
-                            <option value="<?php echo htmlspecialchars($cp['code']); ?>"><?php echo htmlspecialchars($cp['name']); ?> &mdash; Rp <?php echo number_format($cp['msrp'], 0, ',', '.'); ?></option>
+                            <option value="<?php echo htmlspecialchars($cp['code']); ?>"><?php echo htmlspecialchars($cp['name']); ?><?php echo ($cp['msrp'] > 0 ? ' &mdash; Rp ' . number_format($cp['msrp'], 0, ',', '.') : ''); ?></option>
                         <?php endforeach; ?>
                     </datalist>
 
