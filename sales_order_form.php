@@ -70,118 +70,145 @@ if ($qSales) {
 ?>
 
 <style>
-/* =========================================================================
-   ACCURATE ONLINE STYLE SYSTEM - MODIFIED FOR LOEWIX ENTERPRISE
-   ========================================================================= */
+/* ═════════════════════════════════════════════════════════
+   MINIMALIST EDITORIAL & WARM MONOCHROME DESIGN SYSTEM
+   Accurate-inspired form with quiet luxury aesthetic
+   ═════════════════════════════════════════════════════════ */
+:root {
+    --bg-canvas: #f8fafc;
+    --surface-card: #ffffff;
+    --border-subtle: #e2e8f0;
+    --border-hover: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --accent-dark: #0f172a;
+
+    /* Muted Spot Pastels */
+    --pastel-green-bg: #edf3ec;
+    --pastel-green-text: #2d5a27;
+    --pastel-green-border: #d1e7dd;
+
+    --pastel-red-bg: #fdebec;
+    --pastel-red-text: #8f2d2a;
+    --pastel-red-border: #f8d7da;
+
+    --pastel-amber-bg: #fdf6e2;
+    --pastel-amber-text: #855d00;
+    --pastel-amber-border: #ffebaa;
+
+    --pastel-blue-bg: #e1f3fe;
+    --pastel-blue-text: #1e5c8a;
+    --pastel-blue-border: #bee5eb;
+
+    --pastel-slate-bg: #f1f5f9;
+    --pastel-slate-text: #475569;
+    --pastel-slate-border: #e2e8f0;
+}
+
 .accurate-container {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     overflow: hidden;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
 }
 
 .accurate-tab-header {
-    background: #091124;
-    padding: 12px 24px;
+    background: #0f172a;
+    padding: 14px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid #2563EB;
+    border-bottom: 1px solid #1e293b;
 }
 
 .accurate-tab-badge {
-    background: #1E293B;
-    border: 1px solid #334155;
-    color: #F8FAFC;
-    font-size: 13px;
-    font-weight: 700;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    font-size: 12.5px;
+    font-weight: 600;
     padding: 6px 14px;
-    border-radius: 8px 8px 0 0;
+    border-radius: 6px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
 }
 
-.accurate-tab-badge.active-tab {
-    background: #2563EB;
-    color: #FFFFFF;
-    border-color: #2563EB;
-}
-
 .accurate-header-panel {
-    background: #F8FAFC;
-    border-bottom: 1.5px solid #E2E8F0;
+    background: #fafafa;
+    border-bottom: 1px solid #e2e8f0;
     padding: 20px 24px;
 }
 
 .accurate-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    color: #475569;
-    margin-bottom: 5px;
+    color: #64748b;
+    margin-bottom: 6px;
     display: block;
     text-transform: uppercase;
-    letter-spacing: 0.025em;
+    letter-spacing: 0.04em;
 }
 
 .accurate-label.required::after {
     content: " *";
-    color: #EF4444;
+    color: #dc2626;
 }
 
 .accurate-input {
-    background: #FFFFFF;
-    border: 1.5px solid #CBD5E1;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
     border-radius: 8px;
     padding: 8px 12px;
-    font-size: 13.5px;
-    font-weight: 600;
-    color: #1E293B;
-    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+    color: #0f172a;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .accurate-input:focus {
-    border-color: #2563EB;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    border-color: #0f172a;
+    box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06);
     outline: none;
 }
 
 .nav-accurate-tabs {
-    border-bottom: 1.5px solid #E2E8F0;
+    border-bottom: 1px solid #e2e8f0;
     padding: 0 24px;
-    background: #FFFFFF;
+    background: #ffffff;
     display: flex;
-    gap: 8px;
+    gap: 16px;
 }
 
 .nav-accurate-tabs .nav-link {
     border: none;
-    border-bottom: 3px solid transparent;
+    border-bottom: 2px solid transparent;
     border-radius: 0;
-    padding: 12px 18px;
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #64748B;
-    transition: all 0.2s ease;
+    padding: 12px 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    transition: all 0.15s ease;
     display: inline-flex;
     align-items: center;
     gap: 8px;
 }
 
 .nav-accurate-tabs .nav-link:hover {
-    color: #2563EB;
-    background: rgba(37, 99, 235, 0.04);
+    color: #0f172a;
 }
 
 .nav-accurate-tabs .nav-link.active {
-    color: #2563EB;
-    border-bottom-color: #2563EB;
+    color: #0f172a;
+    border-bottom-color: #0f172a;
+    font-weight: 700;
     background: transparent;
 }
 
-/* Tabel Item Order ala Accurate */
+/* Tabel Item Order */
 .accurate-table-wrapper {
     padding: 20px 24px;
 }
@@ -190,36 +217,42 @@ if ($qSales) {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid #E2E8F0;
+    border: 1px solid #e2e8f0;
     border-radius: 10px;
     overflow: hidden;
 }
 
 .table-accurate thead th {
-    background: #334155;
-    color: #FFFFFF;
-    font-size: 12px;
+    background: #0f172a;
+    color: #cbd5e1;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 10px 12px;
+    letter-spacing: 0.05em;
+    padding: 11px 12px;
     border: none;
+    white-space: nowrap;
 }
 
 .table-accurate tbody td {
     padding: 8px 10px;
     vertical-align: middle;
-    border-bottom: 1px solid #F1F5F9;
-    background: #FFFFFF;
+    border-bottom: 1px solid #f1f5f9;
+    background: #ffffff;
+    font-size: 13px;
+}
+
+.table-accurate tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .table-accurate tbody tr:hover td {
-    background: #F8FAFC;
+    background: #f8fafc;
 }
 
 .item-search-bar {
-    background: #EFF6FF;
-    border: 1.5px dashed #93C5FD;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 10px;
     padding: 14px 18px;
     margin-bottom: 16px;
@@ -230,17 +263,17 @@ if ($qSales) {
 
 /* Financial Summary Footer Box */
 .summary-container {
-    background: #F8FAFC;
-    border-top: 1.5px solid #E2E8F0;
-    padding: 24px;
+    background: #fafafa;
+    border-top: 1px solid #e2e8f0;
+    padding: 20px 24px;
 }
 
 .summary-card {
-    background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    padding: 18px 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .summary-row {
@@ -248,23 +281,85 @@ if ($qSales) {
     justify-content: space-between;
     align-items: center;
     padding: 6px 0;
-    font-size: 13.5px;
+    font-size: 13px;
     color: #475569;
 }
 
 .summary-row.total-row {
-    border-top: 2px dashed #CBD5E1;
+    border-top: 1px dashed #cbd5e1;
     margin-top: 10px;
     padding-top: 12px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 800;
-    color: #0F172A;
+    color: #0f172a;
 }
 
-/* Quick Action Top Bar */
-.action-topbar {
-    display: flex;
-    gap: 10px;
+/* Minimalist Button Styles */
+.btn-primary-so {
+    background: #0f172a;
+    color: #ffffff !important;
+    border: 1px solid #0f172a;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    cursor: pointer;
+}
+.btn-primary-so:hover {
+    background: #1e293b;
+    border-color: #1e293b;
+    color: #ffffff !important;
+}
+
+.btn-secondary-so {
+    background: #ffffff;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    cursor: pointer;
+}
+.btn-secondary-so:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a !important;
+}
+
+.btn-row-delete {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+.btn-row-delete:hover {
+    color: #ef4444;
+    background: var(--pastel-red-bg);
+}
+
+/* Select2 Customization for Minimalist Look */
+.select2-container--bootstrap-5 .select2-selection {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    min-height: 38px !important;
+}
+.select2-container--bootstrap-5.select2-container--focus .select2-selection {
+    border-color: #0f172a !important;
+    box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06) !important;
 }
 </style>
 
@@ -274,23 +369,23 @@ if ($qSales) {
         <div class="d-flex align-items-center gap-2 mb-1" style="font-size:12.5px; color:#64748B; font-weight:600;">
             <a href="customer_management.php" class="text-decoration-none text-muted">Dashboard</a>
             <span>›</span>
-            <a href="sales_orders.php" class="text-decoration-none text-primary">Pesanan Penjualan</a>
+            <a href="sales_orders.php" class="text-decoration-none text-dark">Pesanan Penjualan</a>
             <span>›</span>
-            <span><?php echo $isEdit ? 'Edit Pesanan' : 'Data Baru'; ?></span>
+            <span class="text-secondary"><?php echo $isEdit ? 'Edit Pesanan' : 'Data Baru'; ?></span>
         </div>
-        <h2 class="fw-bold mb-0 text-dark" style="font-family:'Outfit', sans-serif;">
-            <i class="bi bi-cart4 text-primary me-2"></i><?php echo $isEdit ? 'Edit Pesanan Penjualan' : 'Buat Pesanan Penjualan Baru'; ?>
+        <h2 class="fw-bold mb-0 text-dark" style="font-family:'Outfit', sans-serif; font-size:24px; letter-spacing:-0.02em;">
+            <i class="bi bi-receipt me-2 text-dark"></i><?php echo $isEdit ? 'Edit Pesanan Penjualan' : 'Buat Pesanan Penjualan Baru'; ?>
         </h2>
     </div>
     <div class="mt-3 mt-md-0 d-flex gap-2">
-        <a href="sales_orders.php" class="btn btn-outline-secondary px-3 py-2 fw-bold" style="border-radius:8px;">
+        <a href="sales_orders.php" class="btn-secondary-so">
             <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
         </a>
-        <button type="button" class="btn btn-success px-4 py-2 fw-bold shadow-sm" id="btnSaveSo" style="border-radius:8px;">
-            <i class="bi bi-check2-circle me-1"></i> <?php echo $isEdit ? 'Perbarui Pesanan' : 'Simpan Pesanan'; ?>
+        <button type="button" class="btn-primary-so" id="btnSaveSo">
+            <i class="bi bi-check2 me-1"></i> <?php echo $isEdit ? 'Perbarui Pesanan' : 'Simpan Pesanan'; ?>
         </button>
         <?php if ($isEdit): ?>
-        <a href="sales_order_print.php?id=<?php echo $orderData['id']; ?>" target="_blank" class="btn btn-primary px-3 py-2 fw-bold shadow-sm" style="border-radius:8px;">
+        <a href="sales_order_print.php?id=<?php echo $orderData['id']; ?>" target="_blank" class="btn-secondary-so">
             <i class="bi bi-printer me-1"></i> Cetak SO
         </a>
         <?php endif; ?>
@@ -305,16 +400,16 @@ if ($qSales) {
         <!-- Accurate Top Dark Tab Header -->
         <div class="accurate-tab-header">
             <div class="d-flex align-items-center gap-2">
-                <span class="accurate-tab-badge active-tab">
-                    <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                <span class="accurate-tab-badge">
+                    <i class="bi bi-file-earmark-spreadsheet"></i>
                     Pesanan Penjualan: <?php echo $isEdit ? htmlspecialchars($orderData['so_number']) : 'Data Baru'; ?>
                 </span>
-                <span class="badge bg-primary bg-opacity-25 text-white border border-primary border-opacity-50 px-3 py-1.5 rounded-pill fw-bold" style="font-size:12px;">
+                <span class="badge" style="background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); font-size:11.5px; font-weight:600; padding:5px 12px; border-radius:6px;">
                     Mata Uang: IDR (Rupiah)
                 </span>
             </div>
             <div>
-                <select name="status" id="status" class="form-select form-select-sm fw-bold bg-dark text-white border-secondary">
+                <select name="status" id="status" class="form-select form-select-sm fw-semibold" style="background:#1e293b; color:#ffffff; border:1px solid #334155; border-radius:6px; font-size:12px;">
                     <?php
                     $statuses = ['Draft', 'Menunggu', 'Diproses', 'Selesai', 'Dibatalkan'];
                     $currStatus = $orderData['status'] ?? 'Menunggu';
@@ -327,13 +422,13 @@ if ($qSales) {
             </div>
         </div>
 
-        <!-- Accurate Header Panel: Customer, Tanggal, No SO (Gambar 1) -->
+        <!-- Accurate Header Panel: Customer, Tanggal, No SO -->
         <div class="accurate-header-panel">
             <div class="row g-3">
                 <!-- Dipesan oleh * -->
                 <div class="col-lg-5 col-md-6">
                     <label class="accurate-label required">
-                        <i class="bi bi-person-circle text-primary me-1"></i> Dipesan Oleh (Customer / Toko)
+                        <i class="bi bi-person me-1"></i> Dipesan Oleh (Customer / Toko)
                     </label>
                     <div class="input-group">
                         <select name="customer_id" id="customer_id" class="form-select accurate-input" style="width: 100%;">
@@ -356,7 +451,7 @@ if ($qSales) {
                 <!-- Tanggal * -->
                 <div class="col-lg-2 col-md-3 col-6">
                     <label class="accurate-label required">
-                        <i class="bi bi-calendar-event text-primary me-1"></i> Tanggal
+                        <i class="bi bi-calendar-event me-1"></i> Tanggal
                     </label>
                     <input type="date" name="so_date" id="so_date" class="form-control accurate-input" 
                            value="<?php echo htmlspecialchars($orderData['so_date'] ?? date('Y-m-d')); ?>" required>
@@ -365,12 +460,12 @@ if ($qSales) {
                 <!-- No Pesanan # * (Format: 2609.SOL.07025) -->
                 <div class="col-lg-3 col-md-3 col-6">
                     <label class="accurate-label required">
-                        <i class="bi bi-hash text-primary me-1"></i> No. Pesanan (SO #)
+                        <i class="bi bi-hash me-1"></i> No. Pesanan (SO #)
                     </label>
                     <div class="input-group">
-                        <input type="text" name="so_number" id="so_number" class="form-control accurate-input font-monospace text-primary fw-bold" 
+                        <input type="text" name="so_number" id="so_number" class="form-control accurate-input font-monospace text-dark fw-bold" 
                                value="<?php echo htmlspecialchars($isEdit ? $orderData['so_number'] : $defaultSoNumber); ?>" required>
-                        <button class="btn btn-outline-secondary" type="button" id="btnRefreshSoNum" title="Generate No. SO Baru">
+                        <button class="btn btn-outline-secondary" type="button" id="btnRefreshSoNum" title="Generate No. SO Baru" style="border-color:#cbd5e1;">
                             <i class="bi bi-arrow-clockwise"></i>
                         </button>
                     </div>
@@ -380,7 +475,7 @@ if ($qSales) {
                 <!-- Sales Representative -->
                 <div class="col-lg-2 col-md-6">
                     <label class="accurate-label">
-                        <i class="bi bi-briefcase text-primary me-1"></i> Sales PIC
+                        <i class="bi bi-briefcase me-1"></i> Sales PIC
                     </label>
                     <select name="sales_id" id="sales_id" class="form-select accurate-input">
                         <option value="">-- Pilih Sales --</option>
@@ -399,16 +494,16 @@ if ($qSales) {
             </div>
         </div>
 
-        <!-- Navigation Tabs: Rincian Barang vs Info Lainnya (Gambar 1 & 2) -->
+        <!-- Navigation Tabs: Rincian Barang vs Info Lainnya -->
         <ul class="nav nav-accurate-tabs" id="accurateTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tab-items-tab" data-bs-toggle="tab" data-bs-target="#tab-items" type="button" role="tab">
-                    <i class="bi bi-box-seam-fill"></i> Rincian Barang &amp; Jasa
+                    <i class="bi bi-box-seam"></i> Rincian Barang &amp; Jasa
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="tab-info-tab" data-bs-toggle="tab" data-bs-target="#tab-info" type="button" role="tab">
-                    <i class="bi bi-info-circle-fill"></i> Info Lainnya &amp; Pengiriman
+                    <i class="bi bi-info-circle"></i> Info Lainnya &amp; Pengiriman
                 </button>
             </li>
         </ul>
@@ -417,7 +512,7 @@ if ($qSales) {
         <div class="tab-content" id="accurateTabContent">
             
             <!-- ============================================================== -->
-            <!-- TAB 1: RINCIAN BARANG & JASA (GAMBAR 1)                         -->
+            <!-- TAB 1: RINCIAN BARANG & JASA                                    -->
             <!-- ============================================================== -->
             <div class="tab-pane fade show active" id="tab-items" role="tabpanel">
                 <div class="accurate-table-wrapper">
@@ -425,7 +520,7 @@ if ($qSales) {
                     <!-- Search / Autocomplete Bar Barang -->
                     <div class="item-search-bar">
                         <div class="flex-grow-1">
-                            <label class="fw-bold text-primary mb-1 d-block" style="font-size:12.5px;">
+                            <label class="accurate-label mb-1 d-block">
                                 <i class="bi bi-search me-1"></i> Cari / Pilih Barang &amp; Jasa dari Database:
                             </label>
                             <select id="catalogProductPicker" class="form-select accurate-input" style="width:100%;">
@@ -433,7 +528,7 @@ if ($qSales) {
                             </select>
                         </div>
                         <div class="align-self-end">
-                            <button type="button" class="btn btn-outline-primary fw-bold px-3 py-2" id="btnAddManualItem" style="border-radius:8px;">
+                            <button type="button" class="btn-secondary-so" id="btnAddManualItem">
                                 <i class="bi bi-plus-lg me-1"></i> Baris Manual
                             </button>
                         </div>
@@ -444,7 +539,7 @@ if ($qSales) {
                         <table class="table-accurate" id="itemsTable">
                             <thead>
                                 <tr>
-                                    <th style="width: 40px; text-align: center;">#</th>
+                                    <th style="width: 44px; text-align: center;">#</th>
                                     <th style="width: 28%;">Nama Barang &amp; Deskripsi</th>
                                     <th style="width: 15%;">Kode / SKU #</th>
                                     <th style="width: 10%; text-align: center;">Qty</th>
@@ -461,11 +556,11 @@ if ($qSales) {
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span class="badge bg-light text-secondary border px-3 py-2 fw-semibold" id="txtTotalItemsCount" style="font-size:12px;">
+                        <span class="badge" style="background:var(--pastel-slate-bg); color:var(--pastel-slate-text); border:1px solid var(--pastel-slate-border); padding:6px 12px; font-weight:600; font-size:12px;" id="txtTotalItemsCount">
                             0 Barang (0 Kuantitas)
                         </span>
-                        <button type="button" class="btn btn-sm btn-link text-decoration-none fw-bold" id="btnClearAllItems">
-                            <i class="bi bi-trash3 text-danger me-1"></i> Kosongkan Semua Baris
+                        <button type="button" class="btn btn-sm btn-link text-decoration-none fw-semibold text-muted" id="btnClearAllItems">
+                            <i class="bi bi-trash3 me-1 text-danger"></i> Kosongkan Semua Baris
                         </button>
                     </div>
                 </div>
@@ -477,14 +572,14 @@ if ($qSales) {
                             <div class="summary-card">
                                 <div class="summary-row">
                                     <span class="fw-semibold">Sub Total:</span>
-                                    <span class="fw-bold font-monospace" id="lblSubtotal">Rp 0</span>
+                                    <span class="fw-bold font-monospace text-dark" id="lblSubtotal">Rp 0</span>
                                     <input type="hidden" name="subtotal" id="inputSubtotal" value="0">
                                 </div>
 
                                 <div class="summary-row align-items-center">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="fw-semibold">Diskon Tambahan:</span>
-                                        <select name="discount_type" id="discount_type" class="form-select form-select-sm" style="width: 75px; font-size:12px;">
+                                        <select name="discount_type" id="discount_type" class="form-select form-select-sm" style="width: 75px; font-size:12px; border-color:#cbd5e1;">
                                             <option value="rp" <?php echo (($orderData['discount_type'] ?? '') === 'rp') ? 'selected' : ''; ?>>Rp</option>
                                             <option value="percent" <?php echo (($orderData['discount_type'] ?? '') === 'percent') ? 'selected' : ''; ?>>%</option>
                                         </select>
@@ -492,10 +587,10 @@ if ($qSales) {
                                     <div style="max-width: 160px;">
                                         <input type="number" step="any" min="0" name="discount_val" id="discount_val" 
                                                class="form-control form-control-sm text-end fw-bold font-monospace" 
-                                               value="<?php echo htmlspecialchars($orderData['discount_val'] ?? '0'); ?>">
+                                               value="<?php echo htmlspecialchars($orderData['discount_val'] ?? '0'); ?>" style="border-color:#cbd5e1;">
                                     </div>
                                 </div>
-                                <div class="text-end text-muted small pe-1 pb-1" id="lblDiscountDeduction" style="display:none; font-size:11.5px;">
+                                <div class="text-end text-muted small pe-1 pb-1" id="lblDiscountDeduction" style="display:none; font-size:11.5px; color:var(--pastel-red-text) !important;">
                                     - Rp 0
                                 </div>
 
@@ -507,12 +602,12 @@ if ($qSales) {
                                             Kena Pajak PPN (11%)
                                         </label>
                                     </div>
-                                    <span class="fw-bold font-monospace" id="lblTaxAmount">Rp 0</span>
+                                    <span class="fw-bold font-monospace text-dark" id="lblTaxAmount">Rp 0</span>
                                 </div>
 
                                 <div class="summary-row total-row">
                                     <span>Total (Grand Total):</span>
-                                    <span class="text-primary fw-bold font-monospace" id="lblGrandTotal" style="font-size:22px;">Rp 0</span>
+                                    <span class="fw-bold font-monospace text-dark" id="lblGrandTotal" style="font-size:20px;">Rp 0</span>
                                     <input type="hidden" name="grand_total" id="inputGrandTotal" value="0">
                                 </div>
                             </div>
@@ -522,7 +617,7 @@ if ($qSales) {
             </div>
 
             <!-- ============================================================== -->
-            <!-- TAB 2: INFO LAINNYA & PENGIRIMAN (GAMBAR 2)                     -->
+            <!-- TAB 2: INFO LAINNYA & PENGIRIMAN                                -->
             <!-- ============================================================== -->
             <div class="tab-pane fade" id="tab-info" role="tabpanel">
                 <div class="p-4">
@@ -530,7 +625,7 @@ if ($qSales) {
                         
                         <!-- Kolom Kiri: Syarat Pembayaran, PO, Alamat, Cabang -->
                         <div class="col-lg-6 border-end">
-                            <h6 class="fw-bold text-primary mb-3">
+                            <h6 class="fw-bold text-dark mb-3">
                                 <i class="bi bi-receipt me-1"></i> Informasi Pembayaran &amp; Toko
                             </h6>
 
@@ -585,13 +680,13 @@ if ($qSales) {
 
                         <!-- Kolom Kanan: Info Pajak, Pengiriman, Catatan -->
                         <div class="col-lg-6">
-                            <h6 class="fw-bold text-primary mb-3">
+                            <h6 class="fw-bold text-dark mb-3">
                                 <i class="bi bi-truck me-1"></i> Informasi Pengiriman &amp; Pajak
                             </h6>
 
-                            <div class="card p-3 mb-3 border bg-light-subtle rounded-3">
+                            <div class="card p-3 mb-3 border rounded-3" style="background:#f8fafc; border-color:#e2e8f0 !important;">
                                 <span class="fw-bold text-dark small mb-2 d-block">
-                                    <i class="bi bi-percent text-success me-1"></i> Opsi Pajak
+                                    <i class="bi bi-percent me-1"></i> Opsi Pajak
                                 </span>
                                 <div class="form-check mb-2">
                                     <input class="form-check-input" type="checkbox" name="tax_inclusive" id="tax_inclusive" value="1" 
@@ -643,11 +738,11 @@ if ($qSales) {
             <span class="text-muted small">Pastikan semua data barang dan customer telah sesuai sebelum menyimpan.</span>
         </div>
         <div class="d-flex gap-2">
-            <a href="sales_orders.php" class="btn btn-outline-secondary px-3 py-2 fw-bold" style="border-radius:8px;">
+            <a href="sales_orders.php" class="btn-secondary-so">
                 Batal
             </a>
-            <button type="button" class="btn btn-primary px-4 py-2 fw-bold shadow-sm" id="btnSaveSoBottom" style="border-radius:8px;">
-                <i class="bi bi-save2 me-1"></i> <?php echo $isEdit ? 'Simpan Perubahan' : 'Simpan Pesanan'; ?>
+            <button type="button" class="btn-primary-so" id="btnSaveSoBottom">
+                <i class="bi bi-check2 me-1"></i> <?php echo $isEdit ? 'Simpan Perubahan' : 'Simpan Pesanan'; ?>
             </button>
         </div>
     </div>
@@ -772,10 +867,10 @@ $(document).ready(function() {
         if (items.length === 0) {
             tbody.append(`
                 <tr>
-                    <td colspan="8" class="text-center py-4 text-muted">
-                        <i class="bi bi-basket3 fs-3 d-block mb-1 text-secondary opacity-50"></i>
-                        Belum ada barang dalam pesanan ini.<br>
-                        <small>Gunakan pencarian di atas atau klik tombol <strong>+ Baris Manual</strong> untuk menambahkan barang.</small>
+                    <td colspan="8" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary opacity-50"></i>
+                        <span class="fw-semibold text-dark d-block mb-1" style="font-size:13px;">Belum ada barang dalam pesanan ini</span>
+                        <small class="text-muted">Gunakan pencarian di atas atau klik tombol <strong>+ Baris Manual</strong> untuk menambahkan barang.</small>
                     </td>
                 </tr>
             `);
@@ -797,7 +892,7 @@ $(document).ready(function() {
             const tr = $(`
                 <tr data-index="${idx}">
                     <td style="text-align: center;">
-                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item px-2 py-1" data-index="${idx}" title="Hapus Baris">
+                        <button type="button" class="btn-row-delete btn-remove-item" data-index="${idx}" title="Hapus Baris">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
@@ -1038,7 +1133,7 @@ $(document).ready(function() {
                         showDenyButton: true,
                         confirmButtonText: '<i class="bi bi-printer me-1"></i> Cetak SO Sekarang',
                         denyButtonText: '<i class="bi bi-list-check me-1"></i> Ke Daftar Pesanan',
-                        confirmButtonColor: '#2563EB',
+                        confirmButtonColor: '#0F172A',
                         denyButtonColor: '#64748B'
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -1052,7 +1147,7 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                btnSave.prop('disabled', false).html('<i class="bi bi-check2-circle me-1"></i> Simpan Pesanan');
+                btnSave.prop('disabled', false).html('<i class="bi bi-check2 me-1"></i> Simpan Pesanan');
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi gangguan jaringan atau server saat menyimpan data.' });
             }
         });
