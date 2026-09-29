@@ -545,7 +545,7 @@ if ($qProd) {
                                 <i class="bi bi-search me-1"></i> Cari / Pilih Barang &amp; Jasa dari Database:
                             </label>
                             <select id="catalogProductPicker" class="form-select accurate-input" style="width:100%;">
-                                <option value="">-- Ketik Nama atau Model CCTV Loewix (LX-4F320-CE, IPCAM, DVR, dll) --</option>
+                                <option value="">-- Cari &amp; Pilih Barang / Jasa (Ketik Nama Barang, Kode 8800xxx, atau Kategori) --</option>
                             </select>
                         </div>
                         <div class="align-self-end">
@@ -847,7 +847,7 @@ $(document).ready(function() {
     // 2. SELECT2 FOR CATALOG PRODUCTS
     $('#catalogProductPicker').select2({
         theme: 'bootstrap-5',
-        placeholder: '-- Ketik Nama atau Model CCTV Loewix (LX-4F320-CE, IPCAM, DVR, dll) --',
+        placeholder: '-- Cari & Pilih Barang / Jasa (Ketik Nama Barang, Kode 8800xxx, atau Kategori) --',
         allowClear: true,
         ajax: {
             url: 'ajax_sales_order.php?action=search_products',
@@ -865,11 +865,11 @@ $(document).ready(function() {
         const prod = e.params.data;
         addItemRow({
             product_id: prod.id,
-            item_code: prod.type || prod.code || '',
+            item_code: prod.code || prod.item_code || '',
             item_name: prod.name || prod.type || '',
             item_description: prod.description || '',
             qty: 1,
-            unit: prod.unit || 'PCS',
+            unit: prod.unit || 'UNIT',
             unit_price: prod.msrp || 0,
             discount_item: 0,
             total_price: prod.msrp || 0
@@ -932,6 +932,7 @@ $(document).ready(function() {
                     </td>
                     <td>
                         <input type="text" list="catalogProductsDatalist" class="form-control form-control-sm accurate-input fw-semibold item-field-name" data-index="${idx}" value="${escapeHtml(item.item_name || '')}" placeholder="Ketik / Pilih Nama Barang">
+                        <input type="text" class="form-control form-control-sm accurate-input text-muted item-field-desc mt-1" style="font-size: 11px; padding: 3px 8px; background: #fafafa;" data-index="${idx}" value="${escapeHtml(item.item_description || '')}" placeholder="+ Deskripsi / Catatan Tambahan (opsional)">
                     </td>
                     <td>
                         <input type="text" list="catalogCodesDatalist" class="form-control form-control-sm accurate-input font-monospace item-field-code" data-index="${idx}" value="${escapeHtml(item.item_code || '')}" placeholder="Kode / SKU">
@@ -940,7 +941,7 @@ $(document).ready(function() {
                         <input type="number" min="1" step="1" class="form-control form-control-sm accurate-input text-center fw-bold item-field-qty" data-index="${idx}" value="${qty}">
                     </td>
                     <td style="text-align: center;">
-                        <input type="text" class="form-control form-control-sm accurate-input text-center item-field-unit" data-index="${idx}" value="${escapeHtml(item.unit || 'PCS')}" placeholder="PCS">
+                        <input type="text" class="form-control form-control-sm accurate-input text-center item-field-unit" data-index="${idx}" value="${escapeHtml(item.unit || 'UNIT')}" placeholder="UNIT">
                     </td>
                     <td style="text-align: right;">
                         <input type="number" min="0" step="any" class="form-control form-control-sm accurate-input text-end font-monospace item-field-price" data-index="${idx}" value="${uPrice}">
@@ -953,7 +954,6 @@ $(document).ready(function() {
                     </td>
                 </tr>
             `);
-
             tbody.append(tr);
         });
 
@@ -978,7 +978,7 @@ $(document).ready(function() {
             item_name: '',
             item_description: '',
             qty: 1,
-            unit: 'PCS',
+            unit: 'UNIT',
             unit_price: 0,
             discount_item: 0,
             total_price: 0
@@ -1038,14 +1038,20 @@ $(document).ready(function() {
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-price`).val(matched.msrp);
             }
             if (!items[idx].unit) {
-                items[idx].unit = matched.unit || 'PCS';
+                items[idx].unit = matched.unit || 'UNIT';
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-unit`).val(items[idx].unit);
             }
             if (!items[idx].item_description) {
                 items[idx].item_description = matched.description;
+                $(`#itemsTableBody tr[data-index="${idx}"] .item-field-desc`).val(matched.description);
             }
             recalculateRow(idx);
         }
+    });
+
+    $(document).on('input change', '.item-field-desc', function() {
+        const idx = $(this).data('index');
+        items[idx].item_description = $(this).val();
     });
 
     $(document).on('input change', '.item-field-code', function() {
@@ -1066,8 +1072,12 @@ $(document).ready(function() {
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-price`).val(matched.msrp);
             }
             if (!items[idx].unit) {
-                items[idx].unit = matched.unit || 'PCS';
+                items[idx].unit = matched.unit || 'UNIT';
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-unit`).val(items[idx].unit);
+            }
+            if (!items[idx].item_description) {
+                items[idx].item_description = matched.description;
+                $(`#itemsTableBody tr[data-index="${idx}"] .item-field-desc`).val(matched.description);
             }
             recalculateRow(idx);
         }

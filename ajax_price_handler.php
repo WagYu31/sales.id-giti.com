@@ -220,15 +220,19 @@ if ($action == 'get_product_details') {
 }
 
 if ($action == 'add_product') {
-    $stmt = $conn->prepare("INSERT INTO product_prices (category, type, description, msrp) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("sssd", $_POST['category'], $_POST['type'], $_POST['description'], $_POST['msrp']);
+    $item_code = trim($_POST['item_code'] ?? '');
+    $unit = trim($_POST['unit'] ?? 'UNIT');
+    $stmt = $conn->prepare("INSERT INTO product_prices (category, type, item_code, description, unit, msrp) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssd", $_POST['category'], $_POST['type'], $item_code, $_POST['description'], $unit, $_POST['msrp']);
     echo json_encode(['success' => $stmt->execute()]);
     exit;
 }
 
 if ($action == 'update_product') {
-    $stmt = $conn->prepare("UPDATE product_prices SET category=?, type=?, description=?, msrp=? WHERE id=?");
-    $stmt->bind_param("sssdi", $_POST['category'], $_POST['type'], $_POST['description'], $_POST['msrp'], $_POST['product_id']);
+    $item_code = trim($_POST['item_code'] ?? '');
+    $unit = trim($_POST['unit'] ?? 'UNIT');
+    $stmt = $conn->prepare("UPDATE product_prices SET category=?, type=?, item_code=?, description=?, unit=?, msrp=? WHERE id=?");
+    $stmt->bind_param("sssssdi", $_POST['category'], $_POST['type'], $item_code, $_POST['description'], $unit, $_POST['msrp'], $_POST['product_id']);
     echo json_encode(['success' => $stmt->execute()]);
     exit;
 }

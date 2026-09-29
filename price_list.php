@@ -414,13 +414,25 @@ require_once 'includes/header.php';
                         <label class="form-label fw-bold text-dark" style="font-size: 13px;">Kategori Produk</label>
                         <input type="text" name="category" id="category" class="form-control" placeholder="mis. 2MP AHD INDOOR, RECORDER DVR" required style="border-radius: 9px;">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-dark" style="font-size: 13px;">Tipe Produk</label>
-                        <input type="text" name="type" id="type" class="form-control" placeholder="mis. LX-502-AHD" required style="border-radius: 9px;">
+                    <div class="row g-2 mb-3">
+                        <div class="col-8">
+                            <label class="form-label fw-bold text-dark" style="font-size: 13px;">Nama / Tipe Produk</label>
+                            <input type="text" name="type" id="type" class="form-control" placeholder="mis. ACCESS POINT RUIJIE RG-RAP2200E" required style="border-radius: 9px;">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label fw-bold text-dark" style="font-size: 13px;">Kode / SKU #</label>
+                            <input type="text" name="item_code" id="item_code" class="form-control font-monospace" placeholder="8800xxx" style="border-radius: 9px;">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-dark" style="font-size: 13px;">Deskripsi Spesifikasi</label>
-                        <textarea name="description" id="description" class="form-control" rows="3" placeholder="Model, resolusi, fitur, dsb..." style="border-radius: 9px;"></textarea>
+                    <div class="row g-2 mb-3">
+                        <div class="col-8">
+                            <label class="form-label fw-bold text-dark" style="font-size: 13px;">Deskripsi / Catatan Tambahan</label>
+                            <input type="text" name="description" id="description" class="form-control" placeholder="Jenis INV / spesifikasi khusus..." style="border-radius: 9px;">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label fw-bold text-dark" style="font-size: 13px;">Satuan</label>
+                            <input type="text" name="unit" id="unit" class="form-control" placeholder="UNIT / PCS / MTR / ROLL" value="UNIT" style="border-radius: 9px;">
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold text-dark" style="font-size: 13px;">Harga User (MSRP)</label>
@@ -846,7 +858,9 @@ $(document).ready(function() {
                 $('#product_id').val(d.id); 
                 $('#category').val(d.category); 
                 $('#type').val(d.type); 
-                $('#description').val(d.description); 
+                $('#item_code').val(d.item_code || ''); 
+                $('#description').val(d.description || ''); 
+                $('#unit').val(d.unit || 'UNIT'); 
                 $('#msrp').val(d.msrp);
                 $('#form_action').val('update_product');
                 $('#modalTitle').text('Edit Produk: ' + d.type);
