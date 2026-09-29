@@ -138,33 +138,130 @@ if (count($txClients) > 10) {
 }
 
 // 4. CEK APAKAH ADA BACKUP SQL TERTENTU YANG BISA LANGSUNG DI-PARSE
-$restoredFromBackup = 0;
+echo "\n[4] Memproses File Backup Database Otomatis aaPanel...\n";
+
+// Prioritaskan file backup teknisi_api_root terbaru
+$candidateBackups = [];
 foreach ($foundBackups as $b) {
-    // Scan for sales_customer
+    if (stripos($b['file'], 'sales_customer') !== false || stripos($b['file'], 'teknisi_api_root') !== false || stripos($b['file'], 'teknisi_root') !== false) {
+        $candidateBackups[] = $b;
+    }
+}
+if (empty($candidateBackups)) {
+    $candidateBackups = $foundBackups;
+}
+
+// Urutkan candidate dari tanggal paling baru
+usort($candidateBackups, function($a, $b) {
+    return strcmp($b['file'], $a['file']);
+});
+
+$restoredFromBackup = 0;
+foreach ($candidateBackups as $b) {
     $path = $b['path'];
-    $cmd = preg_match('/\.gz$/i', $path) ? "zgrep -a -i \"INSERT INTO .sales_customer.\" " . escapeshellarg($path) : "grep -a -i \"INSERT INTO .sales_customer.\" " . escapeshellarg($path);
-    $output = @shell_exec($cmd . " 2>/dev/null");
-    if (!empty($output)) {
-        echo "\n[!] DITEMUKAN DATA SALES_CUSTOMER PADA BACKUP: {$b['file']}!\n";
-        echo "Mengekstrak dan memulihkan data...\n";
+    $isGz = (bool)preg_match('/\.gz$/i', $path);
+    
+    // Baca dan ekstrak tabel sales_customer
+    $gz = $isGz ? @gzopen($path, 'r') : @fopen($path, 'r');
+    if (!$gz) continue;
+    
+    $capturing = false;
+    $tableSql = "";
+    while (!($isGz ? gzeof($gz) : feof($gz))) {
+        $line = $isGz ? gzgets($gz, 65536) : fgets($gz, 65536);
+        if ($line === false) break;
+
+        if (stripos($line, 'CREATE TABLE `sales_customer`') !== false || stripos($line, 'CREATE TABLE IF NOT EXISTS `sales_customer`') !== false) {
+            $capturing = true;
+        }
+
+        if ($capturing) {
+            // Berhenti jika sudah berpindah ke tabel lain
+            if ((preg_match('/^CREATE TABLE `(?!sales_customer)/', $line) || preg_match('/^DROP TABLE .*`(?!sales_customer)/', $line)) && strlen($tableSql) > 50) {
+                break;
+            }
+            $tableSql .= $line;
+        }
+    }
+    if ($isGz) gzclose($gz); else fclose($gz);
+
+    if (empty($tableSql) || stripos($tableSql, 'INSERT INTO') === false) {
+        continue;
+    }
+
+    echo "\n[!] Ditemukan struktur & data `sales_customer` di: {$b['file']}!\n";
+    echo "Mengekstrak ke tabel staging sementara `sales_customer_restore_temp`...\n";
+
+    // 1. Buat tabel temp dengan skema persis dari backup
+    $conn->query("DROP TABLE IF EXISTS `sales_customer_restore_temp`");
+    
+    // Ganti nama tabel di SQL dump
+    $stagingSql = str_replace('`sales_customer`', '`sales_customer_restore_temp`', $tableSql);
+    $stagingSql = preg_replace('/CREATE TABLE (IF NOT EXISTS )?sales_customer/i', 'CREATE TABLE IF NOT EXISTS `sales_customer_restore_temp`', $stagingSql);
+    $stagingSql = preg_replace('/INSERT INTO sales_customer/i', 'INSERT INTO `sales_customer_restore_temp`', $stagingSql);
+
+    // Eksekusi multi query
+    if ($conn->multi_query($stagingSql)) {
+        do {
+            if ($res = $conn->store_result()) {
+                $res->free();
+            }
+        } while ($conn->more_results() && $conn->next_result());
+    }
+
+    // Cek jumlah data yang berhasil masuk ke temp table
+    $chkTemp = $conn->query("SELECT COUNT(*) as cnt FROM `sales_customer_restore_temp`");
+    $cntTemp = ($chkTemp && $rT = $chkTemp->fetch_assoc()) ? (int)$rT['cnt'] : 0;
+
+    if ($cntTemp > 0) {
+        echo "✓ Berhasil mengekstrak {$cntTemp} customer asli dari backup!\n";
+        echo "Menyinkronkan data lama ke tabel `sales_customer` aktif (aman & tanpa duplikasi)...\n";
+
+        // Ambil kolom dari tabel temp dan tabel tujuan
+        $tempCols = [];
+        $resCols1 = $conn->query("SHOW COLUMNS FROM `sales_customer_restore_temp`");
+        while ($rc = $resCols1->fetch_assoc()) {
+            $tempCols[] = $rc['Field'];
+        }
+
+        $destCols = [];
+        $resCols2 = $conn->query("SHOW COLUMNS FROM `sales_customer`");
+        while ($rc = $resCols2->fetch_assoc()) {
+            $destCols[] = $rc['Field'];
+        }
+
+        $commonCols = array_intersect($tempCols, $destCols);
+        $colList = '`' . implode('`, `', $commonCols) . '`';
+
+        $updatePairs = [];
+        foreach ($commonCols as $cName) {
+            if ($cName !== 'id') {
+                $updatePairs[] = "`$cName` = VALUES(`$cName`)";
+            }
+        }
+        $updateSql = implode(', ', $updatePairs);
+
+        $copySql = "INSERT INTO `sales_customer` ($colList)
+                    SELECT $colList FROM `sales_customer_restore_temp`
+                    ON DUPLICATE KEY UPDATE $updateSql";
         
-        // Simpan baris insert ke file sementara
-        $tmpSql = sys_get_temp_dir() . '/restore_sc_' . time() . '.sql';
-        file_put_contents($tmpSql, $output);
-        
-        // Jalankan insert non-destruktif
-        // Ganti INSERT INTO menjadi INSERT IGNORE INTO agar tidak bentrok
-        $safeOutput = preg_replace('/INSERT\s+INTO/i', 'INSERT IGNORE INTO', $output);
-        
-        // Eksekusi multi query
-        if ($conn->multi_query($safeOutput)) {
-            do {
-                if ($res = $conn->store_result()) {
-                    $res->free();
-                }
-            } while ($conn->more_results() && $conn->next_result());
-            echo "✓ Berhasil memulihkan data sales_customer dari {$b['file']}!\n";
-            $restoredFromBackup++;
+        if ($conn->query($copySql)) {
+            echo "✓ SUKSES: {$cntTemp} customer original dari backup {$b['file']} berhasil digabungkan ke `sales_customer`!\n";
+            $restoredFromBackup += $cntTemp;
+
+            // Pastikan kode_customer terisi CUST-{id} jika masih kosong
+            $conn->query("UPDATE `sales_customer` SET `kode_customer` = CONCAT('CUST-', id) WHERE (`kode_customer` IS NULL OR `kode_customer` = '')");
+
+            // Pastikan alamat_lokasi terisi jika masih kosong
+            $conn->query("UPDATE `sales_customer` SET `alamat_lokasi` = alamat WHERE (`alamat_lokasi` IS NULL OR `alamat_lokasi` = '') AND alamat IS NOT NULL");
+
+            // Buat tabel arsip permanen agar tidak akan pernah hilang lagi
+            $conn->query("CREATE TABLE IF NOT EXISTS `sales_customer_original_archive` AS SELECT * FROM `sales_customer_restore_temp`");
+
+            // Selesai dengan backup yang paling baru
+            break;
+        } else {
+            echo "Error copySql: " . $conn->error . "\n";
         }
     }
 }
