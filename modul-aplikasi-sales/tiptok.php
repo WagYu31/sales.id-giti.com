@@ -3137,6 +3137,17 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
+                        <!-- Panduan Tambah Stok / Total Titip Info -->
+                        <div class="alert alert-info py-2 px-3 mb-2.5 border-0 d-flex align-items-start gap-2" style="background: rgba(37, 99, 235, 0.08); border-left: 3.5px solid #2563eb !important; border-radius: 8px;">
+                            <i class="fa-solid fa-circle-info text-primary mt-0.5" style="font-size: 13px;"></i>
+                            <div class="text-xs text-dark" style="line-height: 1.45;">
+                                <strong>Panduan Stok & Tambah Barang:</strong>
+                                Angka <strong>Qty</strong> di bawah adalah <strong>Total Unit Dititipkan</strong>. Sisa fisik di toko terhitung otomatis: <code>Total Titip − Terjual</code>.
+                                <br>• <strong>Tambah Stok (Restock):</strong> Naikkan angka pada tombol <strong>+</strong> pada model yang ingin ditambah (atau klik <em>+ Tambah Model Kamera Lainnya</em>).
+                                <br>• <strong>Kirim Batch Baru (Disarankan):</strong> Jika toko sudah tuntas terjual dan ber-invoice, Anda dapat membuat titipan baru via tombol <strong>+ Titip Barang</strong> di dashboard utama.
+                            </div>
+                        </div>
+
                         <div id="editContainerItemRows"></div>
 
                         <!-- Tombol Tambah Cepat di Bawah Item Edit -->
@@ -3853,8 +3864,9 @@ $loewixPriceList = $tiptokMaster6;
         function stepQty(rowIndex, delta, prefix = '') {
             const qtyInp = document.getElementById(`inputQty_${prefix}${rowIndex}`);
             if (!qtyInp) return;
+            const minVal = parseInt(qtyInp.getAttribute('min')) || 1;
             let current = parseInt(qtyInp.value) || 0;
-            current = Math.max(1, current + delta);
+            current = Math.max(minVal, current + delta);
             qtyInp.value = current;
             recalcRowSubtotal(rowIndex, prefix);
         }
@@ -3873,6 +3885,29 @@ $loewixPriceList = $tiptokMaster6;
             if (subtotalEl) {
                 subtotalEl.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(subtotal)}`;
             }
+
+            // Live Update Sisa Fisik if Terjual exists
+            const terjualInp = document.getElementById(`hiddenTerjual_${prefix}${rowIndex}`);
+            if (terjualInp) {
+                const terjual = parseInt(terjualInp.value) || 0;
+                const sisa = Math.max(0, qty - terjual);
+                const liveSisaEl = document.getElementById(`liveSisa_${prefix}${rowIndex}`);
+                if (liveSisaEl) {
+                    liveSisaEl.textContent = sisa;
+                    const parentSpan = liveSisaEl.closest('.stock-sisa-indicator');
+                    if (parentSpan) {
+                        parentSpan.className = `stock-sisa-indicator ${sisa > 0 ? 'text-success font-weight-bold' : 'text-secondary'}`;
+                    }
+                }
+                // Jika stok ditambah pada penitipan yang tadinya selesai, otomatis beralih ke 'aktif'
+                if (prefix === 'edit_' && sisa > 0) {
+                    const stSel = document.getElementById('editStatusPenitipan');
+                    if (stSel && stSel.value === 'selesai') {
+                        stSel.value = 'aktif';
+                    }
+                }
+            }
+
             updateModalSummary(prefix);
         }
 
@@ -4925,9 +4960,13 @@ $loewixPriceList = $tiptokMaster6;
                         } else {
                             res.data.items.forEach(it => {
                                 editItemRowIndex++;
-                                const isSold = parseInt(it.qty_terjual) > 0;
+                                const terjual = parseInt(it.qty_terjual) || 0;
+                                const isSold = terjual > 0;
+                                const currentQty = parseInt(it.qty_titip) || 0;
+                                const currentSisa = Math.max(0, currentQty - terjual);
+
                                 const deleteBtn = isSold ? 
-                                    `<span class="taste-badge badge-danger-tag" style="font-size:12px;">Terjual ${it.qty_terjual} unit (Terkunci)</span>` : 
+                                    `<span class="taste-badge badge-danger-tag" style="font-size:11px;" title="Barang tidak dapat dihapus karena sudah ada penjualan"><i class="fa-solid fa-lock me-1"></i>Terjual ${terjual} u</span>` : 
                                     `<button type="button" class="btn btn-sm btn-outline-danger py-1 px-2.5 mb-0 font-weight-bold" style="border-radius: 8px; font-size: 12px;" onclick="hapusBarisBarangEdit(${editItemRowIndex})">
                                         <i class="fa-solid fa-trash-can me-1"></i> Hapus
                                      </button>`;
@@ -4940,6 +4979,7 @@ $loewixPriceList = $tiptokMaster6;
                                 const rowHtml = `
                                     <div class="item-card-row item-row-compact" id="editItemRow_${editItemRowIndex}">
                                         <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="${it.id}">
+                                        <input type="hidden" id="hiddenTerjual_edit_${editItemRowIndex}" value="${terjual}">
                                         <input type="hidden" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" value="${escapeHtml(prodName)}">
                                         <input type="hidden" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" value="${escapeHtml(prodCat)}">
                                         <input type="hidden" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" value="${pInsentif}">
@@ -4960,16 +5000,31 @@ $loewixPriceList = $tiptokMaster6;
                                                 </div>
                                             </div>
 
-                                            <!-- Qty Stepper -->
+                                            <!-- Qty Stepper & Live Stock Breakdown -->
                                             <div class="col-md-3 col-6">
-                                                <div class="d-flex align-items-center justify-content-start justify-content-md-center gap-1.5">
-                                                    <span class="text-xs text-secondary font-weight-bold d-none d-sm-inline">Qty:</span>
-                                                    <div class="taste-qty-stepper-compact">
-                                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
-                                                        <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, parseInt(it.qty_terjual) || 1)}" class="stepper-input-compact" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
-                                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
+                                                <div class="d-flex flex-column align-items-center justify-content-center">
+                                                    <div class="d-flex align-items-center gap-1.5">
+                                                        <span class="text-xs text-secondary font-weight-bold d-none d-sm-inline" style="font-size: 11px;">Total Titip:</span>
+                                                        <div class="taste-qty-stepper-compact">
+                                                            <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
+                                                            <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, terjual || 1)}" class="stepper-input-compact" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
+                                                            <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah Stok">+</button>
+                                                        </div>
+                                                        <span class="text-xs text-muted font-weight-bold">Unit</span>
                                                     </div>
-                                                    <span class="text-xs text-muted font-weight-bold">Unit</span>
+                                                    ${isSold ? `
+                                                        <div class="mt-1 d-flex align-items-center gap-1 text-xs" style="font-size: 10px;">
+                                                            <span class="text-danger font-weight-bold"><i class="fa-solid fa-cart-shopping me-0.5"></i>Terjual: ${terjual}</span>
+                                                            <span class="text-muted">•</span>
+                                                            <span class="stock-sisa-indicator ${currentSisa > 0 ? 'text-success font-weight-bold' : 'text-secondary'}">
+                                                                Sisa Fisik: <strong id="liveSisa_edit_${editItemRowIndex}">${currentSisa}</strong> u
+                                                            </span>
+                                                        </div>
+                                                    ` : `
+                                                        <div class="mt-1 text-muted text-xs font-weight-semibold" style="font-size: 10px;">
+                                                            <i class="fa-solid fa-box-open me-0.5"></i> Belum ada laku
+                                                        </div>
+                                                    `}
                                                 </div>
                                             </div>
 
