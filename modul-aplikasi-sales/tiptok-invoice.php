@@ -1090,6 +1090,7 @@ if ($qDealersPreload) {
                 
                 <form id="formSingleInvoice" onsubmit="submitSingleInvoice(event)">
                     <input type="hidden" name="id_kunjungan" id="singleIdKunjungan">
+                    <input type="hidden" name="id_kunjungan_list" id="singleIdKunjunganList">
                     <div class="modal-body p-4 bg-white">
                         
                         <!-- Info Card Ringkasan Transaksi -->
@@ -1228,7 +1229,8 @@ if ($qDealersPreload) {
         let currentSalesFilter = 0;
         let currentSalesName = '';
         let currentMainView = 'invoices'; // 'invoices' | 'leaderboard'
-        let selectedTrxIds = new Set();
+        let selectedGroupIds = new Set();
+        let selectedTrxIds = selectedGroupIds; // backward compatibility alias
         let searchTimeout = null;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1670,13 +1672,14 @@ if ($qDealersPreload) {
         }
 
         // =========================================================================
-        // INVOICES DATA TABLE (INVOICES VIEW)
+        // =========================================================================
+        // INVOICES DATA TABLE (INVOICES VIEW) - GROUPED PER INVOICE
         // =========================================================================
         function renderInvoicesTable(items) {
             const tbody = document.getElementById('invoicesTableBody');
             if (!tbody) return;
 
-            selectedTrxIds.clear();
+            selectedGroupIds.clear();
             updateBatchActionBar();
 
             const checkAll = document.getElementById('checkAllItems');
@@ -1700,20 +1703,20 @@ if ($qDealersPreload) {
             let html = '';
             items.forEach(it => {
                 const isPending = (!it.no_inv || it.no_inv.trim() === '') && (!it.no_so || it.no_so.trim() === '');
-                const qty = parseInt(it.qty_terjual_kunjungan) || 0;
-                const insUnit = parseFloat(it.insentif_per_unit) || 0;
-                const subtotalIns = parseFloat(it.insentif_didapat) || (qty * insUnit);
-                const isClaimed = (it.id_claim && parseInt(it.id_claim) > 0);
+                const isClaimed = it.is_claimed;
+                const totalQty = parseInt(it.total_qty) || 0;
+                const totalIns = parseFloat(it.total_insentif) || 0;
+                const productCount = it.items ? it.items.length : 1;
 
                 const statusPill = isPending ? `
                     <div class="d-flex align-items-center justify-content-end gap-1.5 flex-nowrap">
                         <span class="badge-pending-inv" style="font-size: 11px; padding: 3px 8px; white-space: nowrap;">
                             <i class="fa-solid fa-clock"></i> Belum Diinput
                         </span>
-                        <button type="button" class="btn btn-sm mb-0" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); border-radius: 6px; font-weight: 600; font-size: 11px; height: 28px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 0 8px;" title="Batalkan Penjualan &amp; Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
+                        <button type="button" class="btn btn-sm mb-0" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); border-radius: 6px; font-weight: 600; font-size: 11px; height: 28px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 0 8px;" title="Batalkan Seluruh Penjualan Toko Ini &amp; Kembalikan Stok" onclick="batalkanPenjualanGroup('${it.group_id}')">
                             <i class="fa-solid fa-trash-can"></i> Batal
                         </button>
-                        <button type="button" class="btn-brand-amber" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
+                        <button type="button" class="btn-brand-amber" onclick="openSingleInvoiceModal('${it.group_id}')">
                             <i class="fa-solid fa-plus"></i> Input SO / Inv
                         </button>
                     </div>
@@ -1733,14 +1736,14 @@ if ($qDealersPreload) {
                             ${it.tgl_invoice ? `<div class="text-xs text-muted font-weight-bold" style="font-size: 10.5px;"><i class="fa-regular fa-calendar me-1"></i> ${escapeHtml(it.tgl_invoice)}</div>` : ''}
                         </div>
                         <div class="d-inline-flex align-items-center gap-1 flex-nowrap">
-                            <button type="button" class="btn btn-sm mb-0" style="border: 1px solid #e2e8f0; border-radius: 6px; height: 28px; background: #ffffff; color: #475569; padding: 0 8px;" title="Edit No. SO / Invoice" onclick="openSingleInvoiceModal(${it.id_kunjungan})">
+                            <button type="button" class="btn btn-sm mb-0" style="border: 1px solid #e2e8f0; border-radius: 6px; height: 28px; background: #ffffff; color: #475569; padding: 0 8px;" title="Edit No. SO / Invoice" onclick="openSingleInvoiceModal('${it.group_id}')">
                                 <i class="fa-solid fa-pen" style="font-size: 11px;"></i>
                             </button>
                             ${!isClaimed ? `
-                                <button type="button" class="btn btn-sm mb-0" style="border: 1px solid var(--pastel-amber-border); background: var(--pastel-amber-bg); color: var(--pastel-amber-text); border-radius: 6px; height: 28px; padding: 0 8px;" title="Reset No. SO &amp; Invoice (Jadikan Belum Diinput)" onclick="hapusInvoiceSingle(${it.id_kunjungan}, '${escapeHtml(it.no_so || it.no_inv || '')}')">
+                                <button type="button" class="btn btn-sm mb-0" style="border: 1px solid var(--pastel-amber-border); background: var(--pastel-amber-bg); color: var(--pastel-amber-text); border-radius: 6px; height: 28px; padding: 0 8px;" title="Reset No. SO &amp; Invoice (Jadikan Belum Diinput)" onclick="hapusInvoiceGroup('${it.group_id}')">
                                     <i class="fa-solid fa-eraser" style="font-size: 11px;"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm mb-0" style="border: 1px solid var(--pastel-red-border); background: var(--pastel-red-bg); color: var(--pastel-red-text); border-radius: 6px; height: 28px; padding: 0 8px;" title="Batalkan Penjualan &amp; Kembalikan Stok ke Toko" onclick="batalkanPenjualanSingle(${it.id_kunjungan}, '${escapeHtml(it.kode_kunjungan || '')}', ${qty}, '${escapeHtml(it.nama_barang || '')}')">
+                                <button type="button" class="btn btn-sm mb-0" style="border: 1px solid var(--pastel-red-border); background: var(--pastel-red-bg); color: var(--pastel-red-text); border-radius: 6px; height: 28px; padding: 0 8px;" title="Batalkan Seluruh Penjualan &amp; Kembalikan Stok ke Toko" onclick="batalkanPenjualanGroup('${it.group_id}')">
                                     <i class="fa-solid fa-trash-can" style="font-size: 11px;"></i>
                                 </button>
                             ` : `
@@ -1750,43 +1753,89 @@ if ($qDealersPreload) {
                     </div>
                 `;
 
+                // Products list formatting
+                let productsHtml = '';
+                if (!it.items || it.items.length <= 1) {
+                    const singleItem = (it.items && it.items.length > 0) ? it.items[0] : it;
+                    const itemQty = singleItem.qty_terjual_kunjungan || totalQty;
+                    const insUnit = singleItem.insentif_per_unit || 0;
+                    productsHtml = `
+                        <div class="font-weight-bold text-dark" style="font-size: 13px; line-height: 1.3;">${escapeHtml(singleItem.nama_barang || '-')}</div>
+                        <div class="d-flex align-items-center gap-1.5 mt-1">
+                            <span class="badge px-2 py-0.5" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); font-size: 11px; font-weight: 700; border-radius: 4px;">
+                                Laku: ${itemQty} Unit
+                            </span>
+                            <span class="text-xs text-muted font-weight-bold">(@ Rp ${new Intl.NumberFormat('id-ID').format(insUnit)})</span>
+                        </div>
+                    `;
+                } else {
+                    productsHtml = `
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge px-2 py-0.5" style="background: #0f172a; color: #ffffff; font-size: 11px; font-weight: 700; border-radius: 4px;">
+                                Total: ${totalQty} Unit
+                            </span>
+                            <span class="text-xs text-muted font-weight-bold">(${productCount} Macam Barang)</span>
+                        </div>
+                        <div class="d-flex flex-column gap-1.5">
+                            ${it.items.map(p => `
+                                <div class="d-flex align-items-center justify-content-between p-1.5 rounded" style="background: #f8fafc; border: 1px solid #f1f5f9; font-size: 12px;">
+                                    <div class="d-flex align-items-center gap-1.5 text-truncate me-2" style="max-width: 230px;">
+                                        <i class="fa-solid fa-box text-secondary" style="font-size: 10px;"></i>
+                                        <span class="font-weight-bold text-dark text-truncate" title="${escapeHtml(p.nama_barang)}">${escapeHtml(p.nama_barang)}</span>
+                                    </div>
+                                    <div class="d-inline-flex align-items-center gap-1 flex-shrink-0">
+                                        <span class="badge px-1.5 py-0.5" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); font-size: 10.5px; font-weight: 700; border-radius: 4px;">
+                                            ${p.qty_terjual_kunjungan} Unit
+                                        </span>
+                                        ${!isClaimed ? `
+                                            <button type="button" class="btn btn-link text-muted p-0 ms-1" style="font-size: 11px; line-height: 1;" title="Batalkan item ini saja &amp; kembalikan stok" onclick="batalkanPenjualanSingle(${p.id_kunjungan}, '${escapeHtml(p.kode_kunjungan || '')}', ${p.qty_terjual_kunjungan}, '${escapeHtml(p.nama_barang || '')}')">
+                                                <i class="fa-solid fa-xmark text-danger opacity-75"></i>
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                const kodeDisplay = (it.kode_kunjungan_list && it.kode_kunjungan_list.length > 1)
+                    ? `${escapeHtml(it.kode_kunjungan_list[0])} s/d ${escapeHtml(it.kode_kunjungan_list[it.kode_kunjungan_list.length - 1])}`
+                    : escapeHtml((it.kode_kunjungan_list && it.kode_kunjungan_list[0]) || (it.kode_kunjungan || '-'));
+
                 html += `
-                    <tr id="rowTrx_${it.id_kunjungan}">
-                        <td class="text-center" style="vertical-align: top; padding-top: 13px;">
-                            <input type="checkbox" class="form-check-input row-checkbox" value="${it.id_kunjungan}" style="cursor: pointer;" onchange="onRowCheckboxChange(this, ${it.id_kunjungan})">
+                    <tr id="rowTrx_${it.group_id}">
+                        <td class="text-center" style="vertical-align: top; padding-top: 14px;">
+                            <input type="checkbox" class="form-check-input row-checkbox" value="${it.group_id}" style="cursor: pointer;" onchange="onRowCheckboxChange(this, '${it.group_id}')">
                         </td>
-                        <td style="vertical-align: top; padding-top: 13px;">
+                        <td style="vertical-align: top; padding-top: 14px;">
                             <div class="font-weight-bold text-dark" style="font-size: 13.5px; line-height: 1.3;">${escapeHtml(it.nama_toko || 'Toko Mitra')}</div>
-                            <div class="d-flex align-items-center gap-1.5 mt-1">
+                            <div class="d-flex align-items-center gap-1.5 mt-1.5">
                                 ${it.kategori_toko ? `<span class="badge px-1.5 py-0.5" style="background: #f1f5f9; color: #475569; font-size: 10px; border: 1px solid #e2e8f0; border-radius: 4px;">${escapeHtml(it.kategori_toko)}</span>` : ''}
                                 <span class="text-xs text-muted font-weight-bold">${escapeHtml(it.kota_toko || '')}</span>
                             </div>
                         </td>
-                        <td style="vertical-align: top; padding-top: 13px;">
-                            <div class="font-weight-bold text-dark" style="font-size: 13px; line-height: 1.3;">${escapeHtml(it.nama_barang)}</div>
-                            <div class="d-flex align-items-center gap-1.5 mt-1">
-                                <span class="badge px-2 py-0.5" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); font-size: 11px; font-weight: 700; border-radius: 4px;">
-                                    Laku: ${qty} Unit
-                                </span>
-                                <span class="text-xs text-muted font-weight-bold">(@ Rp ${new Intl.NumberFormat('id-ID').format(insUnit)})</span>
-                            </div>
+                        <td style="vertical-align: top; padding-top: 14px;">
+                            ${productsHtml}
                         </td>
-                        <td class="text-end" style="vertical-align: top; padding-top: 13px;">
+                        <td class="text-end" style="vertical-align: top; padding-top: 14px;">
                             <div style="font-family: var(--font-heading); font-size: 14.5px; font-weight: 800; color: #0f172a; line-height: 1.2;">
-                                Rp ${new Intl.NumberFormat('id-ID').format(subtotalIns)}
+                                Rp ${new Intl.NumberFormat('id-ID').format(totalIns)}
                             </div>
-                            <div class="text-xs text-muted font-weight-bold mt-0.5">Estimasi Reward</div>
+                            <div class="text-xs text-muted font-weight-bold mt-0.5">Estimasi Reward (${totalQty} Unit)</div>
                         </td>
-                        <td style="vertical-align: top; padding-top: 13px;">
+                        <td style="vertical-align: top; padding-top: 14px;">
                             <div class="font-weight-bold text-dark" style="font-size: 12.5px; white-space: nowrap;"><i class="fa-regular fa-calendar-check text-secondary me-1"></i> ${escapeHtml(it.tgl_kunjungan)}</div>
-                            <div class="font-monospace text-xs text-secondary font-weight-bold mt-0.5" style="white-space: nowrap; max-width: 165px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(it.kode_kunjungan)}">${escapeHtml(it.kode_kunjungan)}</div>
+                            <div class="font-monospace text-xs text-secondary font-weight-bold mt-0.5" style="white-space: nowrap; max-width: 175px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml((it.kode_kunjungan_list || []).join(', '))}">
+                                ${kodeDisplay}
+                            </div>
                             <div class="mt-1">
                                 <span class="badge" style="background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; font-size: 10.5px; padding: 2px 7px; border-radius: 4px; font-weight: 600; white-space: nowrap;">
                                     <i class="fa-solid fa-user-tie me-1"></i> ${escapeHtml(it.nama_sales || 'Sales')}
                                 </span>
                             </div>
                         </td>
-                        <td>
+                        <td style="vertical-align: top; padding-top: 14px;">
                             ${statusPill}
                         </td>
                     </tr>
@@ -1795,11 +1844,11 @@ if ($qDealersPreload) {
             tbody.innerHTML = html;
         }
 
-        function onRowCheckboxChange(cb, id) {
+        function onRowCheckboxChange(cb, gid) {
             if (cb.checked) {
-                selectedTrxIds.add(id);
+                selectedGroupIds.add(gid);
             } else {
-                selectedTrxIds.delete(id);
+                selectedGroupIds.delete(gid);
             }
             updateBatchActionBar();
         }
@@ -1808,15 +1857,15 @@ if ($qDealersPreload) {
             const checkboxes = document.querySelectorAll('.row-checkbox');
             checkboxes.forEach(cb => {
                 cb.checked = master.checked;
-                const id = parseInt(cb.value);
-                if (master.checked) selectedTrxIds.add(id);
-                else selectedTrxIds.delete(id);
+                const gid = cb.value;
+                if (master.checked) selectedGroupIds.add(gid);
+                else selectedGroupIds.delete(gid);
             });
             updateBatchActionBar();
         }
 
         function unselectAllCheckboxes() {
-            selectedTrxIds.clear();
+            selectedGroupIds.clear();
             document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
             const checkAll = document.getElementById('checkAllItems');
             if (checkAll) checkAll.checked = false;
@@ -1826,23 +1875,23 @@ if ($qDealersPreload) {
         function updateBatchActionBar() {
             const bar = document.getElementById('batchActionBar');
             if (!bar) return;
-            const count = selectedTrxIds.size;
+            const count = selectedGroupIds.size;
             if (count > 0) {
                 bar.classList.remove('d-none');
                 
                 let sumUnit = 0;
                 let sumIns = 0;
-                selectedTrxIds.forEach(id => {
-                    const it = invoicesData.find(x => x.id_kunjungan == id);
+                selectedGroupIds.forEach(gid => {
+                    const it = invoicesData.find(x => x.group_id === gid);
                     if (it) {
-                        sumUnit += (parseInt(it.qty_terjual_kunjungan) || 0);
-                        sumIns += (parseFloat(it.insentif_didapat) || 0);
+                        sumUnit += (parseInt(it.total_qty) || 0);
+                        sumIns += (parseFloat(it.total_insentif) || 0);
                     }
                 });
 
                 const textEl = document.getElementById('batchSelectedText');
                 const subEl = document.getElementById('batchSubtotalInfo');
-                if (textEl) textEl.textContent = `${count} Transaksi Penjualan Terpilih`;
+                if (textEl) textEl.textContent = `${count} Faktur Penjualan Terpilih`;
                 if (subEl) subEl.textContent = `Total Fisik: ${sumUnit} Unit | Total Estimasi Insentif: Rp ${new Intl.NumberFormat('id-ID').format(sumIns)}`;
             } else {
                 bar.classList.add('d-none');
@@ -1850,17 +1899,32 @@ if ($qDealersPreload) {
         }
 
         // =========================================================================
-        // MODAL SINGLE INVOICE & SO
+        // MODAL SINGLE / GROUP INVOICE & SO
         // =========================================================================
-        function openSingleInvoiceModal(idKunjungan) {
-            const it = invoicesData.find(x => x.id_kunjungan == idKunjungan);
+        function openSingleInvoiceModal(groupId) {
+            const it = invoicesData.find(x => x.group_id === groupId || (x.kunjungan_ids && x.kunjungan_ids.includes(parseInt(groupId))));
             if (!it) return;
 
-            document.getElementById('singleIdKunjungan').value = idKunjungan;
+            const kunjIds = it.kunjungan_ids || [it.id_kunjungan];
+            document.getElementById('singleIdKunjungan').value = kunjIds[0] || 0;
+            document.getElementById('singleIdKunjunganList').value = kunjIds.join(',');
             document.getElementById('singlePrevNamaToko').textContent = it.nama_toko || 'Toko Mitra';
-            document.getElementById('singlePrevNamaBarang').textContent = it.nama_barang || '-';
-            document.getElementById('singlePrevQty').textContent = `Terjual: ${it.qty_terjual_kunjungan} Unit`;
-            document.getElementById('singlePrevInsentif').textContent = `Subtotal Reward: Rp ${new Intl.NumberFormat('id-ID').format(it.insentif_didapat || 0)}`;
+            document.getElementById('singlePrevQty').textContent = `${it.total_qty || it.qty_terjual_kunjungan} Unit`;
+
+            if (it.items && it.items.length > 1) {
+                const itemDetailsHtml = it.items.map(p => 
+                    `<div class="d-flex justify-content-between align-items-center py-1 border-bottom" style="font-size: 11.5px;">
+                        <span class="text-truncate me-2 text-dark font-weight-bold" title="${escapeHtml(p.nama_barang)}">• ${escapeHtml(p.nama_barang)}</span>
+                        <span class="badge text-white px-2 py-0.5" style="background: #334155; font-size: 10.5px;">${p.qty_terjual_kunjungan} Unit</span>
+                    </div>`
+                ).join('');
+                document.getElementById('singlePrevNamaBarang').innerHTML = itemDetailsHtml;
+            } else {
+                const singleName = (it.items && it.items[0]) ? it.items[0].nama_barang : (it.nama_barang || '-');
+                document.getElementById('singlePrevNamaBarang').textContent = singleName;
+            }
+
+            document.getElementById('singlePrevInsentif').textContent = `Rp ${new Intl.NumberFormat('id-ID').format(it.total_insentif || it.insentif_didapat || 0)}`;
 
             document.getElementById('singleInputNoSo').value = it.no_so || '';
             document.getElementById('singleInputNoInv').value = it.no_inv || '';
@@ -1869,7 +1933,9 @@ if ($qDealersPreload) {
 
             const isEdit = (it.no_inv && it.no_inv.trim() !== '') || (it.no_so && it.no_so.trim() !== '');
             document.getElementById('singleModalTitle').textContent = isEdit ? 'Edit No. SO / Invoice' : 'Input No. SO / Invoice';
-            document.getElementById('singleModalSubtitle').textContent = isEdit ? 'Perbarui nomor SO atau faktur penjualan yang telah diinput' : 'Tetapkan nomor SO atau faktur penjualan TIP TOK';
+            document.getElementById('singleModalSubtitle').textContent = isEdit 
+                ? `Perbarui nomor SO atau faktur penjualan untuk toko ini` 
+                : `Tetapkan nomor SO atau faktur penjualan untuk seluruh barang pada transaksi ini`;
 
             showModalSafe('modalSingleInvoice');
         }
@@ -1928,23 +1994,25 @@ if ($qDealersPreload) {
         // MODAL BATCH INVOICE
         // =========================================================================
         function openBatchInvoiceModal() {
-            const count = selectedTrxIds.size;
+            const count = selectedGroupIds.size;
             if (count === 0) {
-                Swal.fire({ icon: 'warning', title: 'Pilih Transaksi', text: 'Centang minimal satu transaksi untuk mengisi No. SO / Invoice.' });
+                Swal.fire({ icon: 'warning', title: 'Pilih Transaksi', text: 'Centang minimal satu faktur penjualan untuk mengisi No. SO / Invoice kolektif.' });
                 return;
             }
 
             let sumUnit = 0;
             let tokoSet = new Set();
-            selectedTrxIds.forEach(id => {
-                const it = invoicesData.find(x => x.id_kunjungan == id);
+            let allKunjunganIds = [];
+            selectedGroupIds.forEach(gid => {
+                const it = invoicesData.find(x => x.group_id === gid);
                 if (it) {
-                    sumUnit += (parseInt(it.qty_terjual_kunjungan) || 0);
+                    sumUnit += (parseInt(it.total_qty) || 0);
                     if (it.nama_toko) tokoSet.add(it.nama_toko);
+                    if (it.kunjungan_ids) allKunjunganIds.push(...it.kunjungan_ids);
                 }
             });
 
-            document.getElementById('batchModalSelectedCount').textContent = `${count} Transaksi Terpilih`;
+            document.getElementById('batchModalSelectedCount').textContent = `${count} Faktur Terpilih`;
             document.getElementById('batchModalTotalUnit').textContent = `${sumUnit} Unit Terjual`;
             document.getElementById('batchModalDealerSummary').textContent = `Toko: ${Array.from(tokoSet).join(', ') || '-'}`;
             document.getElementById('batchInputNoSo').value = '';
@@ -1965,12 +2033,25 @@ if ($qDealersPreload) {
                 return;
             }
 
+            let allKunjunganIds = [];
+            selectedGroupIds.forEach(gid => {
+                const it = invoicesData.find(x => x.group_id === gid);
+                if (it && it.kunjungan_ids) {
+                    allKunjunganIds.push(...it.kunjungan_ids);
+                }
+            });
+
+            if (allKunjunganIds.length === 0) {
+                Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Tidak ada item transaksi yang dipilih.' });
+                return;
+            }
+
             const formData = new FormData();
             formData.append('action', 'simpan_batch_invoice');
             formData.append('no_so', noSo);
             formData.append('no_inv', noInv);
             formData.append('tgl_invoice', tglInv);
-            formData.append('id_kunjungan_list', Array.from(selectedTrxIds).join(','));
+            formData.append('id_kunjungan_list', allKunjunganIds.join(','));
 
             const btn = document.getElementById('btnSaveBatchInvoice');
             if (btn) {
@@ -2010,23 +2091,29 @@ if ($qDealersPreload) {
         }
 
         // =========================================================================
-        // HAPUS / RESET NO. SO & INVOICE
+        // HAPUS / RESET NO. SO & INVOICE GROUP
         // =========================================================================
-        function hapusInvoiceSingle(idKunjungan, currentRef) {
+        function hapusInvoiceGroup(groupId) {
+            const it = invoicesData.find(x => x.group_id === groupId);
+            if (!it) return;
+
+            const ref = it.no_inv ? `INV: ${it.no_inv}` : (it.no_so ? `SO: ${it.no_so}` : 'Faktur');
+            const kunjIds = it.kunjungan_ids || [it.id_kunjungan];
+
             Swal.fire({
                 title: 'Reset No. SO / Invoice?',
-                html: `Apakah Anda yakin ingin menghapus data SO/Invoice <strong>${escapeHtml(currentRef)}</strong> dari transaksi ini?`,
+                html: `Apakah Anda yakin ingin menghapus data <strong>${escapeHtml(ref)}</strong> dari transaksi toko <strong>${escapeHtml(it.nama_toko)}</strong>?<br><small class="text-muted">Nomor faktur &amp; SO untuk seluruh ${it.items ? it.items.length : 1} barang (${it.total_qty} unit) pada transaksi ini akan dikosongkan.</small>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: '<i class="fa-solid fa-trash-can me-1"></i> Ya, Reset',
+                confirmButtonText: '<i class="fa-solid fa-eraser me-1"></i> Ya, Reset',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const formData = new FormData();
                     formData.append('action', 'hapus_invoice_item');
-                    formData.append('id_kunjungan', idKunjungan);
+                    formData.append('id_kunjungan_list', kunjIds.join(','));
 
                     fetch('tiptok-ajax.php', { method: 'POST', body: formData })
                         .then(r => r.json())
@@ -2053,35 +2140,41 @@ if ($qDealersPreload) {
         }
 
         // =========================================================================
-        // BATALKAN PENJUALAN SINGLE (KEMBALIKAN STOK KE TOKO)
+        // BATALKAN PENJUALAN GROUP (KEMBALIKAN SELURUH STOK TOKO PADA KUNJUNGAN INI)
         // =========================================================================
-        function batalkanPenjualanSingle(idKunjungan, kodeKunjungan, qty, namaBarang) {
+        function batalkanPenjualanGroup(groupId) {
+            const it = invoicesData.find(x => x.group_id === groupId);
+            if (!it) return;
+
+            const kunjIds = it.kunjungan_ids || [it.id_kunjungan];
+            const itemCount = it.items ? it.items.length : 1;
+
             Swal.fire({
-                title: 'Batalkan Penjualan?',
-                html: `Apakah transaksi audit <strong>${escapeHtml(kodeKunjungan || '')}</strong> batal terjual?<br><br>
+                title: 'Batalkan Penjualan Toko Ini?',
+                html: `Apakah transaksi audit pada toko <strong>${escapeHtml(it.nama_toko)}</strong> tanggal <strong>${escapeHtml(it.tgl_kunjungan)}</strong> batal terjual?<br><br>
                        <div class="p-3 bg-light rounded text-start border" style="font-size: 13px;">
                            <div class="text-danger fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Dampak Pembatalan:</div>
-                           • Stok <strong>${qty} unit</strong> (${escapeHtml(namaBarang)}) akan <strong>otomatis dikembalikan ke toko mitra</strong>.<br>
-                           • Laporan terjual dan estimasi insentif pada audit ini akan dihapus dari sistem.
+                           • Seluruh stok sebanyak <strong>${it.total_qty} unit</strong> (${itemCount} jenis barang) akan <strong>otomatis dikembalikan ke toko mitra</strong>.<br>
+                           • Laporan terjual dan estimasi reward (Rp ${new Intl.NumberFormat('id-ID').format(it.total_insentif)}) akan dihapus dari sistem.
                        </div>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: '<i class="fa-solid fa-rotate-left me-1"></i> Ya, Batalkan Penjualan',
+                confirmButtonText: '<i class="fa-solid fa-rotate-left me-1"></i> Ya, Batalkan Semua',
                 cancelButtonText: 'Kembali'
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
                         title: 'Memproses...',
-                        text: 'Mengembalikan stok dan membatalkan penjualan...',
+                        text: 'Mengembalikan stok dan membatalkan transaksi...',
                         allowOutsideClick: false,
                         didOpen: () => Swal.showLoading()
                     });
 
                     const formData = new FormData();
                     formData.append('action', 'batalkan_penjualan_kunjungan');
-                    formData.append('id_kunjungan', idKunjungan);
+                    formData.append('id_kunjungan_list', kunjIds.join(','));
 
                     fetch('tiptok-ajax.php', { method: 'POST', body: formData })
                         .then(r => r.json())
@@ -2108,15 +2201,78 @@ if ($qDealersPreload) {
         }
 
         // =========================================================================
-        // BATALKAN PENJUALAN BATCH (KOLEKTIF)
+        // BATALKAN PENJUALAN SINGLE ITEM (KEMBALIKAN STOK 1 ITEM KE TOKO)
+        // =========================================================================
+        function batalkanPenjualanSingle(idKunjungan, kodeKunjungan, qty, namaBarang) {
+            Swal.fire({
+                title: 'Batalkan Penjualan Item?',
+                html: `Apakah barang <strong>${escapeHtml(namaBarang)}</strong> batal terjual?<br><br>
+                       <div class="p-3 bg-light rounded text-start border" style="font-size: 13px;">
+                           <div class="text-danger fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Dampak Pembatalan:</div>
+                           • Stok <strong>${qty} unit</strong> (${escapeHtml(namaBarang)}) akan <strong>otomatis dikembalikan ke toko mitra</strong>.<br>
+                           • Laporan terjual dan estimasi insentif pada item ini akan dihapus dari sistem.
+                       </div>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fa-solid fa-rotate-left me-1"></i> Ya, Batalkan Item',
+                cancelButtonText: 'Kembali'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Mengembalikan stok dan membatalkan item...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    const formData = new FormData();
+                    formData.append('action', 'batalkan_penjualan_kunjungan');
+                    formData.append('id_kunjungan', idKunjungan);
+
+                    fetch('tiptok-ajax.php', { method: 'POST', body: formData })
+                        .then(r => r.json())
+                        .then(res => {
+                            if (res && res.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Item Dibatalkan!',
+                                    text: res.message || 'Stok berhasil dikembalikan ke toko.',
+                                    timer: 1600,
+                                    showConfirmButton: false
+                                });
+                                loadInvoicesData();
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Gagal Membatalkan', html: (res && res.message) ? res.message : 'Gagal membatalkan transaksi.' });
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            Swal.fire({ icon: 'error', title: 'Error Jaringan', text: 'Terjadi kesalahan koneksi server.' });
+                        });
+                }
+            });
+        }
+
+        // =========================================================================
+        // BATALKAN PENJUALAN BATCH (KOLEKTIF FAKTUR TERPILIH)
         // =========================================================================
         function batalkanPenjualanBatch() {
-            if (selectedTrxIds.size === 0) return;
-            const ids = Array.from(selectedTrxIds);
+            if (selectedGroupIds.size === 0) return;
+            let allKunjunganIds = [];
+            selectedGroupIds.forEach(gid => {
+                const it = invoicesData.find(x => x.group_id === gid);
+                if (it && it.kunjungan_ids) {
+                    allKunjunganIds.push(...it.kunjungan_ids);
+                }
+            });
+
+            if (allKunjunganIds.length === 0) return;
 
             Swal.fire({
                 title: 'Batalkan Penjualan Terpilih?',
-                html: `Apakah Anda yakin ingin membatalkan <strong>${ids.length} transaksi</strong> penjualan yang dipilih?<br><br>
+                html: `Apakah Anda yakin ingin membatalkan <strong>${selectedGroupIds.size} faktur transaksi</strong> (${allKunjunganIds.length} item barang) yang dipilih?<br><br>
                        <div class="p-3 bg-light rounded text-start border" style="font-size: 13px;">
                            <div class="text-danger fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Perhatian:</div>
                            Seluruh unit barang yang batal terjual pada transaksi terpilih akan <strong>otomatis dikembalikan ke stok toko mitra</strong> masing-masing.
@@ -2131,35 +2287,36 @@ if ($qDealersPreload) {
                 if (result.isConfirmed) {
                     Swal.fire({
                         title: 'Memproses...',
-                        text: 'Mengembalikan stok dan membatalkan penjualan terpilih...',
+                        text: 'Mengembalikan stok dan membatalkan transaksi terpilih...',
                         allowOutsideClick: false,
                         didOpen: () => Swal.showLoading()
                     });
 
-                    // Execute serial or parallel deletions
-                    const promises = ids.map(id => {
-                        const fd = new FormData();
-                        fd.append('action', 'batalkan_penjualan_kunjungan');
-                        fd.append('id_kunjungan', id);
-                        return fetch('tiptok-ajax.php', { method: 'POST', body: fd }).then(r => r.json());
-                    });
+                    const fd = new FormData();
+                    fd.append('action', 'batalkan_penjualan_kunjungan');
+                    fd.append('id_kunjungan_list', allKunjunganIds.join(','));
 
-                    Promise.all(promises)
-                        .then(results => {
-                            const successCount = results.filter(r => r && r.status === 'success').length;
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Selesai!',
-                                text: `${successCount} transaksi penjualan berhasil dibatalkan dan stok telah dipulihkan.`,
-                                timer: 1800,
-                                showConfirmButton: false
-                            });
-                            selectedTrxIds.clear();
-                            loadInvoicesData();
+                    fetch('tiptok-ajax.php', { method: 'POST', body: fd })
+                        .then(r => r.json())
+                        .then(res => {
+                            if (res && res.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Selesai!',
+                                    text: res.message || 'Transaksi penjualan berhasil dibatalkan dan stok telah dipulihkan.',
+                                    timer: 1800,
+                                    showConfirmButton: false
+                                });
+                                selectedGroupIds.clear();
+                                loadInvoicesData();
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Gagal', text: (res && res.message) ? res.message : 'Sebagian proses gagal.' });
+                                loadInvoicesData();
+                            }
                         })
                         .catch(err => {
                             console.error(err);
-                            Swal.fire({ icon: 'error', title: 'Error', text: 'Sebagian proses gagal dijalankan.' });
+                            Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
                             loadInvoicesData();
                         });
                 }
