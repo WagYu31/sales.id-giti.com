@@ -159,27 +159,19 @@ if ($action === 'search_dealer') {
             @$conn->query("ALTER TABLE sales_customer ADD COLUMN is_tiptok TINYINT(1) NOT NULL DEFAULT 0 AFTER kategori");
         }
 
-        // Only show stores marked as TIP TOK or with existing consignment records
-        $whereTiptok = " (is_tiptok = 1";
-        if ($hasTiptokTbl) {
-            $whereTiptok .= " OR id IN (SELECT DISTINCT id_customer FROM tiptok_penitipan WHERE deleted_at IS NULL)";
-        }
-        $whereTiptok .= ") ";
-
+        // Tampilkan semua toko aktif (tanpa harus dijadwal atau ditandai dulu)
         if (!empty($q)) {
             $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
                                    FROM sales_customer 
                                    WHERE deleted_at IS NULL 
-                                     AND $whereTiptok
-                                     AND (nama LIKE ? OR telp_pribadi LIKE ? OR alamat LIKE ? OR kota LIKE ?) 
-                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 100");
-            $stmt->bind_param("ssss", $qLike, $qLike, $qLike, $qLike);
+                                     AND (nama LIKE ? OR kode_customer LIKE ? OR telp_pribadi LIKE ? OR alamat LIKE ? OR kota LIKE ?) 
+                                   ORDER BY (is_tiptok = 1) DESC, (kategori = 'Dealer') DESC, nama ASC LIMIT 200");
+            $stmt->bind_param("sssss", $qLike, $qLike, $qLike, $qLike, $qLike);
         } else {
             $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
                                    FROM sales_customer 
                                    WHERE deleted_at IS NULL 
-                                     AND $whereTiptok
-                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 100");
+                                   ORDER BY (is_tiptok = 1) DESC, (kategori = 'Dealer') DESC, nama ASC LIMIT 1000");
         }
     } else {
         if (!empty($q)) {
@@ -481,6 +473,11 @@ if ($action === 'simpan_penitipan') {
         $conn->query("DELETE FROM tiptok_penitipan WHERE id = $id_penitipan");
         echo json_encode(['status' => 'error', 'message' => 'Barang titipan tidak valid. Pastikan nama barang dan jumlah diisi dengan benar.']);
         exit;
+    }
+
+    // Otomatis tandai toko ini sebagai mitra TIP TOK aktif
+    if ($hasSalesCustomer && $id_customer > 0) {
+        @$conn->query("UPDATE sales_customer SET is_tiptok = 1 WHERE id = $id_customer");
     }
 
     echo json_encode([
@@ -1127,6 +1124,9 @@ if ($action === 'update_penitipan') {
                 $conn->query("DELETE FROM tiptok_items WHERE id = $exId AND id_penitipan = $id_penitipan");
             }
         }
+
+        // Otomatis tandai toko ini sebagai mitra TIP TOK aktif
+        @$conn->query("UPDATE sales_customer SET is_tiptok = 1 WHERE id = $id_customer");
 
         $conn->commit();
         echo json_encode(['status' => 'success', 'message' => "Perubahan data penitipan [{$kode_titip}] berhasil disimpan."]);

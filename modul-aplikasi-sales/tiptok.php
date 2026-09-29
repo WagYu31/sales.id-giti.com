@@ -292,13 +292,13 @@ if ($qSalesList && $qSalesList->num_rows > 0) {
     }
 }
 
-// Preload Dealers for TIP TOK
+// Preload Dealers for TIP TOK (Tampilkan semua toko tanpa harus dijadwalkan dulu)
 $dealerOptionList = [];
 if ($hasSalesCustomer) {
     $qDealersPreload = $conn->query("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
                                      FROM sales_customer 
                                      WHERE deleted_at IS NULL 
-                                     ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 500");
+                                     ORDER BY (is_tiptok = 1) DESC, (kategori = 'Dealer') DESC, nama ASC LIMIT 1500");
 } else {
     $qDealersPreload = $conn->query("SELECT c.id, c.id AS kode_customer, c.nama_toko AS nama, c.kategori, 
                                             (SELECT tlp_pic FROM customer_pics WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS telp_pribadi,
@@ -307,7 +307,7 @@ if ($hasSalesCustomer) {
                                             (SELECT link_google_map FROM customer_addresses WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS alamat_lokasi
                                      FROM customers c 
                                      WHERE c.deleted_at IS NULL 
-                                     ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 500");
+                                     ORDER BY (c.kategori = 'DEALER') DESC, c.nama_toko ASC LIMIT 1500");
 }
 if ($qDealersPreload) {
     while ($dRow = $qDealersPreload->fetch_assoc()) {
@@ -2716,17 +2716,14 @@ $loewixPriceList = $tiptokMaster6;
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '5' : '8'; ?>">
                                     <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
                                     <select name="id_customer" id="selectDealer" class="form-control-taste w-100" required onchange="onDealerSelected()">
-                                        <option value="">-- Cari / Pilih Toko Mitra TIP TOK --</option>
-                                        <?php if (empty($dealerOptionList)) : ?>
-                                            <option value="" disabled>⚠️ Belum ada toko bertanda TIP TOK. Tandai toko di menu Customer terlebih dahulu.</option>
-                                        <?php else: ?>
-                                            <?php foreach ($dealerOptionList as $d) : 
-                                                $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
-                                                $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
-                                            ?>
-                                                <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($katBadge . $d['nama'] . $kotaText); ?></option>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
+                                        <option value="">-- Ketik / Pilih Toko Mitra TIP TOK --</option>
+                                        <?php foreach ($dealerOptionList as $d) : 
+                                            $codeBadge = !empty($d['kode_customer']) ? '[' . $d['kode_customer'] . '] ' : '';
+                                            $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
+                                            $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
+                                        ?>
+                                            <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($codeBadge . $katBadge . $d['nama'] . $kotaText); ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <?php if ($role !== 'Sales') : ?>
@@ -2852,12 +2849,13 @@ $loewixPriceList = $tiptokMaster6;
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '4' : '5'; ?>">
                                     <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
                                     <select name="id_customer" id="editSelectDealer" class="form-control-taste w-100" required onchange="onEditDealerSelected()">
-                                        <option value="">-- Pilih Toko Mitra TIP TOK --</option>
+                                        <option value="">-- Ketik / Cari Nama Toko / Dealer --</option>
                                         <?php foreach ($dealerOptionList as $d) : 
+                                            $codeBadge = !empty($d['kode_customer']) ? '[' . $d['kode_customer'] . '] ' : '';
                                             $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
                                             $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
                                         ?>
-                                            <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($katBadge . $d['nama'] . $kotaText); ?></option>
+                                            <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($codeBadge . $katBadge . $d['nama'] . $kotaText); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -3510,7 +3508,7 @@ $loewixPriceList = $tiptokMaster6;
 
     <!-- JavaScript & Logic -->
     <script>
-        let dealersList = [];
+        let dealersList = <?php echo json_encode($dealerOptionList, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?> || [];
         let salesListCache = <?php echo json_encode($salesOptionList, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?> || [];
         let currentLoadedPenitipan = null;
         let currentClaimId = 0;
@@ -3886,6 +3884,14 @@ $loewixPriceList = $tiptokMaster6;
                         setTimeout(() => searchField.focus(), 30);
                     }
                 });
+
+                // Prevent Bootstrap modal from stealing focus from Select2 inputs
+                if (typeof jQuery.fn.modal !== 'undefined' && jQuery.fn.modal.Constructor) {
+                    jQuery.fn.modal.Constructor.prototype.enforceFocus = function() {};
+                    if (jQuery.fn.modal.Constructor.prototype._enforceFocus) {
+                        jQuery.fn.modal.Constructor.prototype._enforceFocus = function() {};
+                    }
+                }
             }
         }
 
@@ -4392,23 +4398,54 @@ $loewixPriceList = $tiptokMaster6;
             if (vClaim) vClaim.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function loadDealers() {
+        function initDealerSelect2() {
+            if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
+                const $sel = $('#selectDealer');
+                if ($sel.length) {
+                    $sel.select2({
+                        dropdownParent: $('#modalTambahPenitipan'),
+                        width: '100%',
+                        placeholder: '-- Ketik / Cari Nama Toko / Dealer --',
+                        allowClear: true
+                    }).off('select2:select select2:clear change.dealerSelect').on('select2:select select2:clear change.dealerSelect', function() {
+                        onDealerSelected();
+                    });
+                }
+            }
+        }
+
+        function loadDealers(selectedId = null) {
             fetch('tiptok-ajax.php?action=search_dealer')
                 .then(r => r.json())
                 .then(res => {
-                    if (res && res.status === 'success' && Array.isArray(res.data)) {
+                    if (res && res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
                         dealersList = res.data;
                         const sel = document.getElementById('selectDealer');
                         if (sel) {
-                            sel.innerHTML = '<option value="">-- Pilih Toko Mitra TIP TOK --</option>';
-                            if (dealersList.length === 0) {
-                                sel.innerHTML += '<option value="" disabled>⚠️ Belum ada toko bertanda TIP TOK. Tandai toko di menu Customer terlebih dahulu.</option>';
-                            } else {
-                                dealersList.forEach(d => {
-                                    const katBadge = d.kategori ? `[${d.kategori}] ` : '';
-                                    sel.innerHTML += `<option value="${d.id}">${katBadge}${escapeHtml(d.nama)} - ${escapeHtml(d.kota || '')}</option>`;
-                                });
-                            }
+                            const curVal = selectedId || sel.value;
+                            let html = '<option value="">-- Ketik / Cari Nama Toko / Dealer --</option>';
+                            dealersList.forEach(d => {
+                                const codeBadge = d.kode_customer ? `[${d.kode_customer}] ` : '';
+                                const katBadge = d.kategori ? `[${d.kategori}] ` : '';
+                                const kotaText = d.kota ? ` - ${d.kota}` : '';
+                                const isSel = (curVal && d.id == curVal) ? 'selected' : '';
+                                html += `<option value="${d.id}" ${isSel}>${codeBadge}${katBadge}${escapeHtml(d.nama)}${escapeHtml(kotaText)}</option>`;
+                            });
+                            sel.innerHTML = html;
+                            initDealerSelect2();
+                            if (curVal) onDealerSelected();
+                        }
+
+                        const editSel = document.getElementById('editSelectDealer');
+                        if (editSel && editSel.options.length <= 1) {
+                            let editHtml = '<option value="">-- Ketik / Cari Nama Toko / Dealer --</option>';
+                            dealersList.forEach(d => {
+                                const codeBadge = d.kode_customer ? `[${d.kode_customer}] ` : '';
+                                const katBadge = d.kategori ? `[${d.kategori}] ` : '';
+                                const kotaText = d.kota ? ` - ${d.kota}` : '';
+                                editHtml += `<option value="${d.id}">${codeBadge}${katBadge}${escapeHtml(d.nama)}${escapeHtml(kotaText)}</option>`;
+                            });
+                            editSel.innerHTML = editHtml;
                         }
                     }
                 })
@@ -4532,7 +4569,20 @@ $loewixPriceList = $tiptokMaster6;
             if (container) container.innerHTML = '';
             itemRowIndex = 0;
             tambahBarisBarang();
+
+            // Reset Select2 value jika sebelumnya sudah terpilih
+            if (typeof jQuery !== 'undefined' && $('#selectDealer').data('select2')) {
+                $('#selectDealer').val('').trigger('change.select2');
+            }
+
             showModalSafe('modalTambahPenitipan');
+
+            // Segarkan data dealer terbaru agar toko yang baru saja ditambahkan (seperti WAGYU A5) langsung muncul
+            loadDealers();
+
+            setTimeout(() => {
+                initDealerSelect2();
+            }, 120);
         }
 
         function submitTambahPenitipan(e) {
@@ -4600,12 +4650,25 @@ $loewixPriceList = $tiptokMaster6;
                         // Dropdown dealer
                         const sel = document.getElementById('editSelectDealer');
                         if (sel) {
-                            sel.innerHTML = '<option value="">-- Pilih Toko Mitra TIP TOK --</option>';
+                            sel.innerHTML = '<option value="">-- Ketik / Cari Nama Toko / Dealer --</option>';
                             dealersList.forEach(d => {
+                                const codeBadge = d.kode_customer ? `[${d.kode_customer}] ` : '';
                                 const katBadge = d.kategori ? `[${d.kategori}] ` : '';
+                                const kotaText = d.kota ? ` - ${d.kota}` : '';
                                 const selected = (d.id == m.id_customer) ? 'selected' : '';
-                                sel.innerHTML += `<option value="${d.id}" ${selected}>${katBadge}${escapeHtml(d.nama)} - ${escapeHtml(d.kota || '')}</option>`;
+                                sel.innerHTML += `<option value="${d.id}" ${selected}>${codeBadge}${katBadge}${escapeHtml(d.nama)}${escapeHtml(kotaText)}</option>`;
                             });
+                        }
+                        if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
+                            $('#editSelectDealer').select2({
+                                dropdownParent: $('#modalEditPenitipan'),
+                                width: '100%',
+                                placeholder: '-- Ketik / Cari Nama Toko / Dealer --',
+                                allowClear: true
+                            }).off('select2:select select2:clear change.editDealerSelect').on('select2:select select2:clear change.editDealerSelect', function() {
+                                onEditDealerSelected();
+                            });
+                            $('#editSelectDealer').val(m.id_customer).trigger('change.select2');
                         }
                         onEditDealerSelected();
 
