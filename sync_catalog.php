@@ -36,7 +36,7 @@ if (!is_array($items) || count($items) === 0) {
 echo "2. Mengosongkan data lama & mengimpor 515 item katalog resmi...\n";
 $conn->query("TRUNCATE TABLE `product_prices`");
 
-$stmt = $conn->prepare("INSERT INTO `product_prices` (category, type, item_code, description, unit, msrp, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+$stmt = $conn->prepare("INSERT INTO `product_prices` (category, type, item_code, description, unit, msrp) VALUES (?, ?, ?, ?, ?, ?)");
 if (!$stmt) {
     die("Prepare statement gagal: " . $conn->error . "\n");
 }

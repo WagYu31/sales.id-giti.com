@@ -29,13 +29,19 @@ if (!function_exists('ensureSalesOrderTables')) {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         // Ensure new columns exist
-        $chkCol = $conn->query("SHOW COLUMNS FROM `product_prices` LIKE 'item_code'");
-        if ($chkCol && $chkCol->num_rows == 0) {
-            $conn->query("ALTER TABLE `product_prices` ADD COLUMN `item_code` VARCHAR(50) NULL AFTER `type`");
-            $conn->query("ALTER TABLE `product_prices` ADD COLUMN `unit` VARCHAR(20) NULL AFTER `description`");
-            $conn->query("ALTER TABLE `product_prices` MODIFY COLUMN `type` VARCHAR(255) NOT NULL");
-            $conn->query("ALTER TABLE `product_prices` MODIFY COLUMN `category` VARCHAR(150) NOT NULL");
+        $cols = [
+            'item_code' => "ALTER TABLE `product_prices` ADD COLUMN `item_code` VARCHAR(50) NULL AFTER `type`",
+            'unit' => "ALTER TABLE `product_prices` ADD COLUMN `unit` VARCHAR(20) NULL DEFAULT 'UNIT' AFTER `description`",
+            'created_at' => "ALTER TABLE `product_prices` ADD COLUMN `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        ];
+        foreach ($cols as $col => $sql) {
+            $chkCol = $conn->query("SHOW COLUMNS FROM `product_prices` LIKE '$col'");
+            if ($chkCol && $chkCol->num_rows == 0) {
+                @$conn->query($sql);
+            }
         }
+        @$conn->query("ALTER TABLE `product_prices` MODIFY COLUMN `type` VARCHAR(255) NOT NULL");
+        @$conn->query("ALTER TABLE `product_prices` MODIFY COLUMN `category` VARCHAR(150) NOT NULL");
 
         // Auto-seed/sync from official 515 catalog JSON if empty or old seed (<500 items)
         $chkP = $conn->query("SELECT COUNT(*) as cnt FROM `product_prices`");
@@ -46,7 +52,7 @@ if (!function_exists('ensureSalesOrderTables')) {
             $catItems = json_decode($jsonStr, true);
             if (is_array($catItems) && count($catItems) > 0) {
                 $conn->query("TRUNCATE TABLE `product_prices`");
-                $st = $conn->prepare("INSERT INTO `product_prices` (category, type, item_code, description, unit, msrp, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+                $st = $conn->prepare("INSERT INTO `product_prices` (category, type, item_code, description, unit, msrp) VALUES (?, ?, ?, ?, ?, ?)");
                 if ($st) {
                     foreach ($catItems as $it) {
                         $cat = $it['category'];
