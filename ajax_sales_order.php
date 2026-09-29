@@ -57,6 +57,53 @@ if ($action === 'get_next_so_number') {
 if ($action === 'search_customers') {
     $search = trim($_GET['q'] ?? $_GET['search'] ?? '');
     
+    // Prioritaskan tabel resmi sales_customer jika tersedia
+    $chkSC = $conn->query("SHOW TABLES LIKE 'sales_customer'");
+    if ($chkSC && $chkSC->num_rows > 0) {
+        $where = "WHERE deleted_at IS NULL";
+        $params = [];
+        $types = "";
+        
+        if (!empty($search)) {
+            $where .= " AND (nama LIKE ? OR kode_customer LIKE ? OR telp_pribadi LIKE ? OR alamat LIKE ? OR kota LIKE ?)";
+            $s = "%$search%";
+            $params = [$s, $s, $s, $s, $s];
+            $types = "sssss";
+        }
+        
+        $sql = "SELECT id, kode_customer, nama, kategori, telp_pribadi, email, alamat, kota
+                FROM sales_customer
+                $where
+                ORDER BY nama ASC
+                LIMIT 30";
+        $stmt = $conn->prepare($sql);
+        if (!empty($types)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $res = $stmt->get_result();
+        
+        $results = [];
+        while ($row = $res->fetch_assoc()) {
+            $code = !empty($row['kode_customer']) ? "[{$row['kode_customer']}]" : "[C." . str_pad($row['id'], 5, '0', STR_PAD_LEFT) . "]";
+            $fullAddress = trim(($row['alamat'] ?? '') . (!empty($row['kota']) ? ', ' . $row['kota'] : ''));
+            $results[] = [
+                'id' => $row['id'],
+                'customer_code' => $row['kode_customer'] ?: $code,
+                'nama_toko' => $row['nama'],
+                'kategori' => $row['kategori'] ?? 'DEALER',
+                'text' => "{$code} {$row['nama']}" . ($row['kategori'] ? " — [{$row['kategori']}]" : ""),
+                'alamat' => $fullAddress,
+                'nama_pic' => $row['nama'],
+                'tlp_pic' => $row['telp_pribadi'] ?? '',
+                'sales_id' => '',
+                'sales_name' => ''
+            ];
+        }
+        echo json_encode(['results' => $results]);
+        exit;
+    }
+    
     $where = "WHERE c.deleted_at IS NULL";
     $params = [];
     $types = "";
