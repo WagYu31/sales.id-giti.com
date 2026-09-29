@@ -15,39 +15,51 @@ if (!function_exists('ensureSalesOrderTables')) {
         // 1. Table product_prices
         $conn->query("CREATE TABLE IF NOT EXISTS `product_prices` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
-            `category` varchar(100) NOT NULL,
-            `type` varchar(150) NOT NULL,
+            `category` varchar(150) NOT NULL,
+            `type` varchar(255) NOT NULL,
+            `item_code` varchar(50) DEFAULT NULL,
             `description` text DEFAULT NULL,
+            `unit` varchar(20) DEFAULT 'UNIT',
             `msrp` decimal(15,2) NOT NULL DEFAULT 0.00,
             `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`)
+            PRIMARY KEY (`id`),
+            INDEX (`category`),
+            INDEX (`type`),
+            INDEX (`item_code`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-        // Seed default Loewix products if empty
+        // Ensure new columns exist
+        $chkCol = $conn->query("SHOW COLUMNS FROM `product_prices` LIKE 'item_code'");
+        if ($chkCol && $chkCol->num_rows == 0) {
+            $conn->query("ALTER TABLE `product_prices` ADD COLUMN `item_code` VARCHAR(50) NULL AFTER `type`");
+            $conn->query("ALTER TABLE `product_prices` ADD COLUMN `unit` VARCHAR(20) NULL AFTER `description`");
+            $conn->query("ALTER TABLE `product_prices` MODIFY COLUMN `type` VARCHAR(255) NOT NULL");
+            $conn->query("ALTER TABLE `product_prices` MODIFY COLUMN `category` VARCHAR(150) NOT NULL");
+        }
+
+        // Auto-seed/sync from official 515 catalog JSON if empty or old seed (<500 items)
         $chkP = $conn->query("SELECT COUNT(*) as cnt FROM `product_prices`");
         $cntP = ($chkP && $r = $chkP->fetch_assoc()) ? (int)$r['cnt'] : 0;
-        if ($cntP === 0) {
-            $seeds = [
-                ['2MP AHD INDOOR', 'LX-4F320-CE', 'Kamera CCTV Loewix 2MP AHD Indoor CatEyes (LX-4F320-CE)', 145000],
-                ['2MP AHD OUTDOOR', 'LX-50F320-CM', 'Kamera CCTV Loewix 2MP AHD Outdoor ColorMax (LX-50F320-CM)', 170000],
-                ['2MP AHD INDOOR', 'LX-4F320-CM', 'Kamera CCTV Loewix 2MP AHD Indoor ColorMax (LX-4F320-CM)', 145000],
-                ['2MP AHD OUTDOOR', 'LX-50F320-CE', 'Kamera CCTV Loewix 2MP AHD Outdoor CatEyes (LX-50F320-CE)', 170000],
-                ['4MP IPCAM INDOOR', 'LX-IPF40CMT02', 'Kamera CCTV Loewix 4MP IP Camera Indoor (LX-IPF40CMT02)', 350000],
-                ['4MP IPCAM OUTDOOR', 'LX-IPF40CMT17', 'Kamera CCTV Loewix 4MP IP Camera Outdoor (LX-IPF40CMT17)', 380000],
-                ['AKSESORIS & KABEL', 'KABEL-RG59-POWER', 'Kabel Coaxial RG59 + Power Loewix 300 Meter', 650000],
-                ['POWER SUPPLY', 'PSU-12V-10A', 'Power Supply Switching Jaring 12V 10A Loewix', 95000],
-                ['POWER SUPPLY', 'PSU-12V-20A', 'Power Supply Switching Jaring 12V 20A Loewix', 150000],
-                ['RECORDER DVR', 'DVR-4CH-5MP', 'Digital Video Recorder Loewix 4 Channel 5MP Hybrid', 450000],
-                ['RECORDER DVR', 'DVR-8CH-5MP', 'Digital Video Recorder Loewix 8 Channel 5MP Hybrid', 650000],
-                ['RECORDER NVR', 'NVR-8CH-4K', 'Network Video Recorder Loewix 8 Channel 4K PoE', 850000]
-            ];
-            $st = $conn->prepare("INSERT INTO product_prices (category, type, description, msrp) VALUES (?, ?, ?, ?)");
-            if ($st) {
-                foreach ($seeds as $s) {
-                    $st->bind_param("sssd", $s[0], $s[1], $s[2], $s[3]);
-                    $st->execute();
+        $jsonFile = __DIR__ . '/catalog_products.json';
+        if ($cntP < 500 && file_exists($jsonFile)) {
+            $jsonStr = file_get_contents($jsonFile);
+            $catItems = json_decode($jsonStr, true);
+            if (is_array($catItems) && count($catItems) > 0) {
+                $conn->query("TRUNCATE TABLE `product_prices`");
+                $st = $conn->prepare("INSERT INTO `product_prices` (category, type, item_code, description, unit, msrp, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+                if ($st) {
+                    foreach ($catItems as $it) {
+                        $cat = $it['category'];
+                        $typ = $it['type'];
+                        $code = $it['item_code'] ?? null;
+                        $desc = $it['description'] ?? '';
+                        $unt = $it['unit'] ?? 'UNIT';
+                        $prc = (float)($it['msrp'] ?? 0);
+                        $st->bind_param("sssssd", $cat, $typ, $code, $desc, $unt, $prc);
+                        $st->execute();
+                    }
+                    $st->close();
                 }
-                $st->close();
             }
         }
 

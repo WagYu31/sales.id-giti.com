@@ -3,6 +3,8 @@ error_reporting(0);
 ini_set('display_errors', 0);
 
 require_once 'includes/db.php';
+require_once 'includes/sales_order_helper.php';
+ensureSalesOrderTables($conn);
 
 // Bersihkan output buffer jika ada spasi/noise dari db.php agar JSON tidak rusak
 if (ob_get_length()) ob_clean();

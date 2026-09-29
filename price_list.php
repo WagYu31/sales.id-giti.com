@@ -1,6 +1,8 @@
 <?php
 $page_title = 'Price List Loewix';
 require_once 'includes/db.php';
+require_once 'includes/sales_order_helper.php';
+ensureSalesOrderTables($conn);
 require_once 'includes/header.php';
 ?>
 
