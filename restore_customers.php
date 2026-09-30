@@ -329,10 +329,20 @@ echo "\n[4] Memperbarui Sorting api_sales_task.php (Terbaru Di Atas)... \n";
 $targetApiDirs = [
     __DIR__ . '/modul-aplikasi-sales/api/api_sales_task.php',
     __DIR__ . '/modul-aplikasi-sales/api_sales_task.php',
+    '/www/wwwroot/api-teknisi.id-giti.com/public/api_sales_task.php',
     '/www/wwwroot/api-teknisi.id-giti.com/api_sales_task.php',
+    '/www/wwwroot/teknisi-api.id-giti.com/public/api_sales_task.php',
     '/www/wwwroot/teknisi-api.id-giti.com/api_sales_task.php',
+    '/www/wwwroot/teknisi-api-github.id-giti.com/public/api_sales_task.php',
+    '/www/wwwroot/jadwal.id-giti.com/teknisi-api-github.id-giti.com/public/api_sales_task.php',
     '/www/wwwroot/jadwal.id-giti.com/modul-aplikasi-sales/api/api_sales_task.php',
 ];
+
+// Tambahkan pencarian dinamis di seluruh folder /www/wwwroot
+$glob1 = glob('/www/wwwroot/*/public/api_sales_task.php') ?: [];
+$glob2 = glob('/www/wwwroot/*/api_sales_task.php') ?: [];
+$glob3 = glob('/www/wwwroot/*/*/public/api_sales_task.php') ?: [];
+$targetApiDirs = array_unique(array_merge($targetApiDirs, $glob1, $glob2, $glob3));
 
 $sortUpdatedCount = 0;
 foreach ($targetApiDirs as $apiFile) {
@@ -354,7 +364,7 @@ foreach ($targetApiDirs as $apiFile) {
     }
 }
 if ($sortUpdatedCount === 0) {
-    echo "  (File api_sales_task lokal sudah menggunakan sorting DESC atau path lain diatur via git)\n";
+    echo "  (Semua file api_sales_task yang terdeteksi sudah menggunakan sorting DESC atau diatur via git)\n";
 }
 
 // 7. STATUS AKHIR
