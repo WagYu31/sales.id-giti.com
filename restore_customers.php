@@ -310,17 +310,31 @@ foreach ($repoDirs as $rd) {
     }
 }
 
-// B. Salin langsung file master api_sales_task.php dari sales ke semua lokasi API
+// B. Salin langsung file master api_sales_task.php dan api_db.php dari sales ke semua lokasi API
 $sourceApiTask = __DIR__ . '/modul-aplikasi-sales/api/api_sales_task.php';
+$sourceApiDb   = __DIR__ . '/modul-aplikasi-sales/api/api_db.php';
+
 $destList = [
     '/www/wwwroot/teknisi-api-github.id-giti.com/public/api_sales_task.php',
     '/www/wwwroot/api-teknisi.id-giti.com/public/api_sales_task.php',
     '/www/wwwroot/api-teknisi.id-giti.com/api_sales_task.php',
 ];
+$destDbList = [
+    '/www/wwwroot/teknisi-api-github.id-giti.com/public/api_db.php',
+    '/www/wwwroot/api-teknisi.id-giti.com/public/api_db.php',
+    '/www/wwwroot/api-teknisi.id-giti.com/api_db.php',
+];
+
 foreach ($destList as $dest) {
     if (file_exists(dirname($dest))) {
         @copy($sourceApiTask, $dest);
         echo "  ✓ Disalin langsung: $dest\n";
+    }
+}
+foreach ($destDbList as $destDb) {
+    if (file_exists(dirname($destDb))) {
+        @copy($sourceApiDb, $destDb);
+        echo "  ✓ Disalin langsung: $destDb\n";
     }
 }
 
