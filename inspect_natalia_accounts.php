@@ -93,7 +93,7 @@ if (count($accounts) >= 2) {
 
         // 3. Nonaktifkan akun duplikat (soft delete) agar tidak muncul dobel di dropdown
         $stmtD = $conn->prepare("UPDATE sales SET deleted_at = NOW() WHERE id = ?");
-        $stmtD->bind_param("ii", $sourceAcc['id']);
+        $stmtD->bind_param("i", $sourceAcc['id']);
         $stmtD->execute();
         $stmtD->close();
 
