@@ -64,16 +64,14 @@ $types = '';
 $active_sales_id = 0;
 if (isset($_SESSION['role']) && $_SESSION['role'] == 'sales') {
     $active_sales_id = (int)$_SESSION['user_id'];
-    $sql_where_conditions[] = "(c.sales_id = ? OR c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL))";
+    $sql_where_conditions[] = "c.sales_id = ?";
     $params[] = $active_sales_id;
-    $params[] = $active_sales_id;
-    $types .= 'ii';
+    $types .= 'i';
 } elseif ($filter_sales > 0) {
     $active_sales_id = $filter_sales;
-    $sql_where_conditions[] = "(c.sales_id = ? OR c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL))";
+    $sql_where_conditions[] = "c.sales_id = ?";
     $params[] = $active_sales_id;
-    $params[] = $active_sales_id;
-    $types .= 'ii';
+    $types .= 'i';
 }
 
 if (!empty($filter_kota)) {
@@ -215,15 +213,13 @@ $stats_params = [];
 $stats_types = '';
 
 if (isset($_SESSION['role']) && $_SESSION['role'] == 'sales') {
-    $stats_where[] = "(c.sales_id = ? OR c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL))";
+    $stats_where[] = "c.sales_id = ?";
     $stats_params[] = (int)$_SESSION['user_id'];
-    $stats_params[] = (int)$_SESSION['user_id'];
-    $stats_types .= 'ii';
+    $stats_types .= 'i';
 } elseif ($filter_sales > 0) {
-    $stats_where[] = "(c.sales_id = ? OR c.id IN (SELECT DISTINCT customer_id FROM follow_ups WHERE sales_id = ? AND deleted_at IS NULL))";
+    $stats_where[] = "c.sales_id = ?";
     $stats_params[] = $filter_sales;
-    $stats_params[] = $filter_sales;
-    $stats_types .= 'ii';
+    $stats_types .= 'i';
 }
 
 $stats_where_sql = implode(' AND ', $stats_where);
