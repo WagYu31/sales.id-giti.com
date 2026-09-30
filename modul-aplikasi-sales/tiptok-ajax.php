@@ -159,19 +159,19 @@ if ($action === 'search_dealer') {
             @$conn->query("ALTER TABLE sales_customer ADD COLUMN is_tiptok TINYINT(1) NOT NULL DEFAULT 0 AFTER kategori");
         }
 
-        // Tampilkan semua toko aktif (tanpa harus dijadwal atau ditandai dulu)
+        // Hanya tampilkan toko aktif yang sudah ditandai sebagai Mitra TIP TOK (is_tiptok = 1)
         if (!empty($q)) {
             $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
                                    FROM sales_customer 
-                                   WHERE deleted_at IS NULL 
+                                   WHERE deleted_at IS NULL AND is_tiptok = 1 
                                      AND (nama LIKE ? OR kode_customer LIKE ? OR telp_pribadi LIKE ? OR alamat LIKE ? OR kota LIKE ?) 
-                                   ORDER BY (is_tiptok = 1) DESC, (kategori = 'Dealer') DESC, nama ASC LIMIT 200");
+                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 200");
             $stmt->bind_param("sssss", $qLike, $qLike, $qLike, $qLike, $qLike);
         } else {
             $stmt = $conn->prepare("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
                                    FROM sales_customer 
-                                   WHERE deleted_at IS NULL 
-                                   ORDER BY (is_tiptok = 1) DESC, (kategori = 'Dealer') DESC, nama ASC LIMIT 1000");
+                                   WHERE deleted_at IS NULL AND is_tiptok = 1 
+                                   ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 1000");
         }
     } else {
         if (!empty($q)) {

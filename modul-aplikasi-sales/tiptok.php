@@ -318,13 +318,13 @@ if ($qSalesList && $qSalesList->num_rows > 0) {
     }
 }
 
-// Preload Dealers for TIP TOK (Tampilkan semua toko tanpa harus dijadwalkan dulu)
+// Preload Dealers for TIP TOK (Hanya toko/dealer yang ditandai TIP TOK)
 $dealerOptionList = [];
 if ($hasSalesCustomer) {
     $qDealersPreload = $conn->query("SELECT id, kode_customer, nama, kategori, telp_pribadi, alamat, kota, alamat_lokasi 
                                      FROM sales_customer 
-                                     WHERE deleted_at IS NULL 
-                                     ORDER BY (is_tiptok = 1) DESC, (kategori = 'Dealer') DESC, nama ASC LIMIT 1500");
+                                     WHERE deleted_at IS NULL AND is_tiptok = 1 
+                                     ORDER BY (kategori = 'Dealer') DESC, nama ASC LIMIT 1500");
 } else {
     $qDealersPreload = $conn->query("SELECT c.id, c.id AS kode_customer, c.nama_toko AS nama, c.kategori, 
                                             (SELECT tlp_pic FROM customer_pics WHERE customer_id = c.id AND deleted_at IS NULL LIMIT 1) AS telp_pribadi,
@@ -2943,14 +2943,18 @@ $loewixPriceList = $tiptokMaster6;
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '5' : '8'; ?>">
                                     <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
                                     <select name="id_customer" id="selectDealer" class="form-control-taste w-100" required onchange="onDealerSelected()">
-                                        <option value="">-- Ketik / Pilih Toko Mitra TIP TOK --</option>
-                                        <?php foreach ($dealerOptionList as $d) : 
-                                            $codeBadge = !empty($d['kode_customer']) ? '[' . $d['kode_customer'] . '] ' : '';
-                                            $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
-                                            $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
-                                        ?>
-                                            <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($codeBadge . $katBadge . $d['nama'] . $kotaText); ?></option>
-                                        <?php endforeach; ?>
+                                        <option value="">-- Ketik / Cari Nama Toko / Dealer --</option>
+                                        <?php if (empty($dealerOptionList)) : ?>
+                                            <option value="" disabled>(Belum ada toko yang ditandai TIP TOK. Tandai toko di menu Customer)</option>
+                                        <?php else : ?>
+                                            <?php foreach ($dealerOptionList as $d) : 
+                                                $codeBadge = !empty($d['kode_customer']) ? '[' . $d['kode_customer'] . '] ' : '';
+                                                $katBadge = !empty($d['kategori']) ? '[' . $d['kategori'] . '] ' : '';
+                                                $kotaText = !empty($d['kota']) ? ' - ' . $d['kota'] : '';
+                                            ?>
+                                                <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($codeBadge . $katBadge . $d['nama'] . $kotaText); ?></option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                                 <?php if ($role !== 'Sales') : ?>
@@ -4804,19 +4808,23 @@ $loewixPriceList = $tiptokMaster6;
             fetch('tiptok-ajax.php?action=search_dealer')
                 .then(r => r.json())
                 .then(res => {
-                    if (res && res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
+                    if (res && res.status === 'success' && Array.isArray(res.data)) {
                         dealersList = res.data;
                         const sel = document.getElementById('selectDealer');
                         if (sel) {
                             const curVal = selectedId || sel.value;
                             let html = '<option value="">-- Ketik / Cari Nama Toko / Dealer --</option>';
-                            dealersList.forEach(d => {
-                                const codeBadge = d.kode_customer ? `[${d.kode_customer}] ` : '';
-                                const katBadge = d.kategori ? `[${d.kategori}] ` : '';
-                                const kotaText = d.kota ? ` - ${d.kota}` : '';
-                                const isSel = (curVal && d.id == curVal) ? 'selected' : '';
-                                html += `<option value="${d.id}" ${isSel}>${codeBadge}${katBadge}${escapeHtml(d.nama)}${escapeHtml(kotaText)}</option>`;
-                            });
+                            if (dealersList.length === 0) {
+                                html += '<option value="" disabled>(Belum ada toko yang ditandai TIP TOK. Tandai toko di menu Customer)</option>';
+                            } else {
+                                dealersList.forEach(d => {
+                                    const codeBadge = d.kode_customer ? `[${d.kode_customer}] ` : '';
+                                    const katBadge = d.kategori ? `[${d.kategori}] ` : '';
+                                    const kotaText = d.kota ? ` - ${d.kota}` : '';
+                                    const isSel = (curVal && d.id == curVal) ? 'selected' : '';
+                                    html += `<option value="${d.id}" ${isSel}>${codeBadge}${katBadge}${escapeHtml(d.nama)}${escapeHtml(kotaText)}</option>`;
+                                });
+                            }
                             sel.innerHTML = html;
                             initDealerSelect2();
                             if (curVal) onDealerSelected();
@@ -4825,12 +4833,16 @@ $loewixPriceList = $tiptokMaster6;
                         const editSel = document.getElementById('editSelectDealer');
                         if (editSel && editSel.options.length <= 1) {
                             let editHtml = '<option value="">-- Ketik / Cari Nama Toko / Dealer --</option>';
-                            dealersList.forEach(d => {
-                                const codeBadge = d.kode_customer ? `[${d.kode_customer}] ` : '';
-                                const katBadge = d.kategori ? `[${d.kategori}] ` : '';
-                                const kotaText = d.kota ? ` - ${d.kota}` : '';
-                                editHtml += `<option value="${d.id}">${codeBadge}${katBadge}${escapeHtml(d.nama)}${escapeHtml(kotaText)}</option>`;
-                            });
+                            if (dealersList.length === 0) {
+                                editHtml += '<option value="" disabled>(Belum ada toko yang ditandai TIP TOK. Tandai toko di menu Customer)</option>';
+                            } else {
+                                dealersList.forEach(d => {
+                                    const codeBadge = d.kode_customer ? `[${d.kode_customer}] ` : '';
+                                    const katBadge = d.kategori ? `[${d.kategori}] ` : '';
+                                    const kotaText = d.kota ? ` - ${d.kota}` : '';
+                                    editHtml += `<option value="${d.id}">${codeBadge}${katBadge}${escapeHtml(d.nama)}${escapeHtml(kotaText)}</option>`;
+                                });
+                            }
                             editSel.innerHTML = editHtml;
                         }
                     }
@@ -5037,13 +5049,19 @@ $loewixPriceList = $tiptokMaster6;
                         const sel = document.getElementById('editSelectDealer');
                         if (sel) {
                             sel.innerHTML = '<option value="">-- Ketik / Cari Nama Toko / Dealer --</option>';
+                            let currentInList = false;
                             dealersList.forEach(d => {
                                 const codeBadge = d.kode_customer ? `[${d.kode_customer}] ` : '';
                                 const katBadge = d.kategori ? `[${d.kategori}] ` : '';
                                 const kotaText = d.kota ? ` - ${d.kota}` : '';
                                 const selected = (d.id == m.id_customer) ? 'selected' : '';
+                                if (d.id == m.id_customer) currentInList = true;
                                 sel.innerHTML += `<option value="${d.id}" ${selected}>${codeBadge}${katBadge}${escapeHtml(d.nama)}${escapeHtml(kotaText)}</option>`;
                             });
+                            if (!currentInList && m.id_customer) {
+                                const fallbackName = m.nama_toko || m.nama_customer || `Toko #${m.id_customer}`;
+                                sel.innerHTML += `<option value="${m.id_customer}" selected>${escapeHtml(fallbackName)} (Toko Saat Ini)</option>`;
+                            }
                         }
                         if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
                             $('#editSelectDealer').select2({

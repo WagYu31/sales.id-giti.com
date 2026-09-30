@@ -393,7 +393,7 @@ if ($action === 'get_dealers') {
         } else {
             $sql = "SELECT id, nama, kategori, telp_pribadi, alamat, kota 
                     FROM sales_customer c
-                    WHERE deleted_at IS NULL $whereSearch 
+                    WHERE deleted_at IS NULL AND is_tiptok = 1 $whereSearch 
                     ORDER BY (kategori = 'Dealer') DESC, nama ASC 
                     LIMIT 50";
         }
