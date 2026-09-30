@@ -26,6 +26,20 @@ SET ks_old.status = 'dibatalkan',
     ks_old.reschedule_reason = CONCAT('[Reschedule] Dijadwalkan ulang ke tanggal ', DATE_FORMAT(ks_new.jadwal, '%d %b %Y %H:%i'))";
 $conn->query($sqlAutoResched);
 
+// Auto-fix 3: Auto-close past-day visits left 'berjalan' without checkout
+$conn->query("UPDATE pelaksanaan_sales ps
+JOIN kegiatan_sales ks ON ks.id = ps.kegiatan_id
+SET ps.status = 'selesai',
+    ps.co_at = DATE_ADD(ps.ci_at, INTERVAL 1 HOUR),
+    ps.catatan_visit = COALESCE(NULLIF(ps.catatan_visit, ''), 'Kunjungan selesai otomatis (Lewat hari)'),
+    ks.status = 'selesai'
+WHERE ps.status = 'berjalan'
+  AND ps.co_at IS NULL
+  AND DATE(ps.ci_at) < CURDATE()");
+
+// Auto-fix 4: Harmonize status '0' in kegiatan_sales to 'dijadwalkan'
+$conn->query("UPDATE kegiatan_sales SET status = 'dijadwalkan' WHERE (status = '0' OR status = '') AND deleted_at IS NULL");
+
 $salesId = intval($_GET['sales_id'] ?? 0);
 $filter  = trim($_GET['filter'] ?? 'today');
 
