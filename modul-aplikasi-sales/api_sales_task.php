@@ -7,7 +7,44 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET');
 
-require_once __DIR__ . '/api_db.php';
+if (!isset($conn) || !$conn) {
+    if (file_exists(__DIR__ . '/api_db.php')) {
+        require_once __DIR__ . '/api_db.php';
+    } else {
+        $envPath = __DIR__ . '/../.env';
+        $envVars = [];
+        if (file_exists($envPath)) {
+            $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                if (strpos(trim($line), '#') === 0) continue;
+                if (strpos($line, '=') === false) continue;
+                list($key, $value) = explode('=', $line, 2);
+                $envVars[trim($key)] = trim($value);
+            }
+        }
+        $host = $envVars['DB_HOST']     ?? 'localhost';
+        $user = $envVars['DB_USERNAME'] ?? 'teknisi_api_root';
+        $pass = $envVars['DB_PASSWORD'] ?? 'OffOff@18';
+        $db   = $envVars['DB_DATABASE'] ?? 'teknisi_api_root';
+
+        mysqli_report(MYSQLI_REPORT_OFF);
+        $conn = @new mysqli($host, $user, $pass, $db);
+        if ($conn->connect_error) {
+            $conn = @new mysqli('localhost', 'teknisi_api_root', 'WagyuA531052002.', 'teknisi_api_root');
+        }
+        if ($conn->connect_error) {
+            $conn = @new mysqli('localhost', 'u836263092_jadwaltest', 'Eddie@1819', 'u836263092_jadwalTest');
+        }
+        if ($conn->connect_error) {
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'Database connection failed: ' . $conn->connect_error]);
+            exit;
+        }
+        $conn->set_charset('utf8mb4');
+        date_default_timezone_set('Asia/Jakarta');
+        $conn->query("SET time_zone = '+07:00'");
+    }
+}
 
 // Auto-fix 1: Mark old tasks referenced in rescheduled_from as 'dibatalkan'
 $conn->query("UPDATE kegiatan_sales SET status = 'dibatalkan' WHERE id IN (SELECT rescheduled_from FROM (SELECT DISTINCT rescheduled_from FROM kegiatan_sales WHERE rescheduled_from IS NOT NULL AND deleted_at IS NULL) AS t) AND status != 'dibatalkan'");
