@@ -63,17 +63,29 @@ $backupDirs = [
 ];
 
 $foundBackups = [];
+$permNotice = false;
 foreach ($backupDirs as $dir) {
     if (!is_dir($dir)) continue;
-    $files = scandir($dir);
+    $files = @scandir($dir);
+    if ($files === false) {
+        $out = @shell_exec("sudo ls -1 " . escapeshellarg($dir) . " 2>/dev/null");
+        if ($out) {
+            $files = array_filter(explode("\n", trim($out)));
+        } else {
+            $permNotice = true;
+            continue;
+        }
+    }
     foreach ($files as $f) {
         if (preg_match('/\.(sql|sql\.gz)$/i', $f)) {
             $fullPath = $dir . '/' . $f;
+            $sz = file_exists($fullPath) ? round(filesize($fullPath) / 1024 / 1024, 2) : 0;
+            $mt = file_exists($fullPath) ? date('Y-m-d H:i:s', filemtime($fullPath)) : '-';
             $foundBackups[] = [
                 'path' => $fullPath,
                 'name' => $f,
-                'size' => round(filesize($fullPath) / 1024 / 1024, 2),
-                'mtime' => date('Y-m-d H:i:s', filemtime($fullPath))
+                'size' => $sz,
+                'mtime' => $mt
             ];
         }
     }
@@ -85,7 +97,10 @@ if (!empty($foundBackups)) {
         echo "   [" . ($idx + 1) . "] {$b['name']} ({$b['size']} MB, tanggal: {$b['mtime']})\n";
     }
 } else {
-    echo "   Tidak ditemukan file backup otomatis di direktori backup standar.\n";
+    echo "   Tidak ditemukan file backup yang dapat dibaca.\n";
+    if ($permNotice) {
+        echo "   (💡 Tip: Jalankan dengan `sudo php restore_initial_assignment.php` untuk membaca folder /www/backup)\n";
+    }
 }
 
 // 4. Analisis Mode Eksekusi
@@ -139,9 +154,23 @@ if ($mode === '--restore-backup' && isset($argv[2])) {
 } elseif ($mode === '--divide-evenly') {
     // Mode Pembagian Merata ke Sales Aktif
     echo "\n4. MEMBAGI RATA CUSTOMER KE SALES AKTIF...\n";
-    // Ambil list sales role 'sales'
+
+    $customIds = [];
+    foreach ($argv as $arg) {
+        if (strpos($arg, '--sales-ids=') === 0) {
+            $raw = substr($arg, strlen('--sales-ids='));
+            $customIds = array_filter(array_map('intval', explode(',', $raw)));
+        }
+    }
+
     $activeSales = [];
-    $resAS = $conn->query("SELECT id, nama_lengkap FROM sales WHERE role = 'sales' AND deleted_at IS NULL ORDER BY id ASC");
+    if (!empty($customIds)) {
+        $inList = implode(',', $customIds);
+        $resAS = $conn->query("SELECT id, nama_lengkap FROM sales WHERE id IN ($inList) AND deleted_at IS NULL ORDER BY id ASC");
+    } else {
+        $resAS = $conn->query("SELECT id, nama_lengkap FROM sales WHERE role = 'sales' AND deleted_at IS NULL ORDER BY id ASC");
+    }
+
     while ($as = $resAS->fetch_assoc()) {
         $activeSales[] = $as;
     }
@@ -151,7 +180,10 @@ if ($mode === '--restore-backup' && isset($argv[2])) {
     }
 
     $salesCount = count($activeSales);
-    echo "Membagi ke {$salesCount} sales: " . implode(', ', array_column($activeSales, 'nama_lengkap')) . "\n";
+    echo "Membagi ke {$salesCount} sales:\n";
+    foreach ($activeSales as $as) {
+        echo "   • [ID: {$as['id']}] {$as['nama_lengkap']}\n";
+    }
 
     // Ambil semua customer ID
     $qAllCust = $conn->query("SELECT id FROM customers WHERE deleted_at IS NULL ORDER BY id ASC");
