@@ -80,17 +80,56 @@ if ($qSampleCities && $qSampleCities->num_rows > 0) {
 }
 echo "\n";
 
-// 5. Daftar Kata Kunci Wilayah Jawa Timur (Wilayah Natalia)
-$jatimKeywords = [
-    'surabaya', 'malang', 'sidoarjo', 'jombang', 'gresik', 'mojokerto', 
-    'pasuruan', 'probolinggo', 'banyuwangi', 'jember', 'kediri', 'madiun', 
-    'blitar', 'bojonegoro', 'tuban', 'lamongan', 'ponorogo', 'tulungagung', 
-    'magetan', 'ngawi', 'situbondo', 'bondowoso', 'trenggalek', 'nganjuk', 
-    'pacitan', 'bangkalan', 'sampang', 'pamekasan', 'sumenep', 'batu', 
-    'lumajang', 'jawa timur', 'jatim'
-];
+// 5. Logika Akurat Deteksi Wilayah Jawa Timur (Bebas False-Positive)
+function is_true_jatim($kota, $alamat, $provinsi) {
+    $text = strtolower(($kota ?? '') . ' ' . ($alamat ?? '') . ' ' . ($provinsi ?? ''));
+    
+    // 1. Abaikan Pemalang (Jawa Tengah) kecuali jika ada tulisan Jawa Timur
+    if (strpos($text, 'pemalang') !== false && strpos($text, 'jawa timur') === false) {
+        return false;
+    }
 
-// 6. Scan Seluruh Database untuk Wilayah Jawa Timur
+    // 2. Abaikan nama tempat mirip 'batu' di luar Jawa Timur
+    $false_positives = [
+        'sumur batu', 'batu ceper', 'cibatu', 'batu ampar', 'batu sangkar', 
+        'batusangkar', 'batu bara', 'batu licin', 'batu aji', 'batuaji'
+    ];
+    foreach ($false_positives as $fp) {
+        if (strpos($text, $fp) !== false && strpos($text, 'jawa timur') === false) {
+            return false;
+        }
+    }
+
+    // 3. Daftar Daerah Jawa Timur yang Unik & Pasti
+    $unambiguous = [
+        'surabaya', 'sidoarjo', 'jombang', 'gresik', 'mojokerto', 
+        'pasuruan', 'probolinggo', 'banyuwangi', 'jember', 'kediri', 'madiun', 
+        'blitar', 'bojonegoro', 'tuban', 'lamongan', 'ponorogo', 'tulungagung', 
+        'magetan', 'ngawi', 'situbondo', 'bondowoso', 'trenggalek', 'nganjuk', 
+        'pacitan', 'bangkalan', 'sampang', 'pamekasan', 'sumenep', 
+        'lumajang', 'jawa timur', 'jatim'
+    ];
+
+    foreach ($unambiguous as $kw) {
+        if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $text)) {
+            return ucfirst($kw);
+        }
+    }
+
+    // 4. Cek Kota Malang secara tepat kata (tidak boleh terkena Pemalang)
+    if (preg_match('/\bmalang\b/i', $text) && strpos($text, 'pemalang') === false) {
+        return 'Malang';
+    }
+
+    // 5. Cek Kota Batu (hanya jika memang kota batu di Jatim)
+    if (preg_match('/\b(kota batu|batu jatim|batu jawa timur|batu, jatim|batu, jawa timur)\b/i', $text)) {
+        return 'Batu';
+    }
+
+    return false;
+}
+
+// 6. Scan Seluruh Database untuk Wilayah Jawa Timur Asli
 $sqlAll = "
     SELECT 
         c.id, 
@@ -118,24 +157,14 @@ if ($resAll) {
         $cid = (int)$row['id'];
         if (isset($matchedCustomers[$cid])) continue;
 
-        $haystack = strtolower(($row['kota'] ?? '') . ' ' . ($row['alamat'] ?? '') . ' ' . ($row['provinsi'] ?? ''));
+        $matchedRegion = is_true_jatim($row['kota'], $row['alamat'], $row['provinsi']);
 
-        // Cek apakah masuk wilayah Jatim atau pernah di-FU Natalia
-        $isJatim = false;
-        $matchedCity = null;
-        foreach ($jatimKeywords as $kw) {
-            if (strpos($haystack, $kw) !== false) {
-                $isJatim = true;
-                $matchedCity = ucfirst($kw);
-                break;
-            }
-        }
-
-        if ($isJatim) {
-            $row['matched_city'] = $matchedCity;
+        if ($matchedRegion) {
+            $row['matched_city'] = $matchedRegion;
             $matchedCustomers[$cid] = $row;
             
-            $cityDisplay = !empty($row['kota']) ? trim($row['kota']) : $matchedCity;
+            // Tampilkan kota yang jelas
+            $cityDisplay = !empty($row['kota']) && stripos($row['kota'], 'JAKARTA') === false ? trim($row['kota']) : $matchedRegion;
             $statsByCity[$cityDisplay] = ($statsByCity[$cityDisplay] ?? 0) + 1;
 
             if ((int)$row['sales_id'] === $nataliaId) {
