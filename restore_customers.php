@@ -28,11 +28,16 @@ echo "Database Terhubung: $dbName\n\n";
 
 // 1. CARI BACKUP DATABASE DARI aaPanel (/www/backup/database/)
 echo "[1] Memeriksa Backup Otomatis aaPanel di /www/backup/ ...\n";
+// Coba copy file backup ke folder webroot agar tidak terblokir open_basedir
+@shell_exec("cp -n /www/backup/database/db_teknisi_api_root* " . escapeshellarg(__DIR__));
+@shell_exec("cp -n /www/backup/db_teknisi_api_root* " . escapeshellarg(__DIR__));
+@shell_exec("cp -n /www/backup/database/*teknisi* " . escapeshellarg(__DIR__));
+
 $backupRoots = [
+    __DIR__,
+    __DIR__ . '/backup',
     '/www/backup',
     '/var/backups',
-    __DIR__ . '/backup',
-    __DIR__
 ];
 
 $foundBackups = [];
