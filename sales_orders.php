@@ -361,8 +361,43 @@ if ($qSales) {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    overflow: hidden;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    overflow: visible !important;
+}
+.table-responsive {
+    overflow-x: auto;
+    overflow-y: visible;
+    min-height: 280px;
+}
+@media (min-width: 992px) {
+    .table-responsive {
+        overflow: visible !important;
+    }
+}
+.table-so .dropdown-menu {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1) !important;
+    z-index: 1060 !important;
+    min-width: 170px;
+    padding: 6px;
+}
+.table-so .dropdown-item {
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    transition: all 0.12s ease;
+}
+.table-so .dropdown-item:hover {
+    background-color: #f1f5f9;
+}
+.table-so .dropdown-item.active {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-weight: 700;
 }
 .table-so {
     width: 100%;
@@ -660,7 +695,13 @@ if ($qSales) {
             </thead>
             <tbody>
                 <?php if ($ordersResult && $ordersResult->num_rows > 0): ?>
-                    <?php while ($row = $ordersResult->fetch_assoc()): ?>
+                    <?php 
+                    $totalOrdersCount = $ordersResult->num_rows;
+                    $orderIndex = 0;
+                    while ($row = $ordersResult->fetch_assoc()): 
+                        $orderIndex++;
+                        $isBottomRow = ($orderIndex >= $totalOrdersCount - 1 && $totalOrdersCount > 1);
+                    ?>
                         <tr id="row-so-<?php echo $row['id']; ?>">
                             <td>
                                 <a href="sales_order_print.php?id=<?php echo $row['id']; ?>" class="fw-bold font-monospace text-decoration-none text-dark" title="Klik untuk Cetak / Lihat Dokumen">
@@ -709,16 +750,29 @@ if ($qSales) {
                                 </span>
                             </td>
                             <td style="text-align: center;">
-                                <div class="dropdown">
-                                    <button class="status-badge-so status-<?php echo $row['status']; ?> dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="dropdown <?php echo $isBottomRow ? 'dropup' : ''; ?>">
+                                    <button class="status-badge-so status-<?php echo $row['status']; ?> dropdown-toggle" 
+                                            type="button" 
+                                            data-bs-toggle="dropdown" 
+                                            data-bs-auto-close="true"
+                                            data-bs-boundary="viewport"
+                                            data-bs-popper-config='{"strategy":"fixed"}'
+                                            aria-expanded="false">
                                         <?php echo $row['status']; ?>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border" style="font-size:12.5px; border-color:#e2e8f0 !important; border-radius:10px;">
+                                    <ul class="dropdown-menu dropdown-menu-end shadow border" style="font-size:12.5px; border-color:#e2e8f0 !important; border-radius:10px; z-index: 1060; min-width: 170px;">
                                         <li><h6 class="dropdown-header text-uppercase" style="font-size:10.5px; letter-spacing:0.04em;">Ubah Status SO</h6></li>
                                         <?php foreach ($optStatuses as $stOption): ?>
                                             <li>
-                                                <a class="dropdown-item btn-change-status py-1.5" href="#" data-id="<?php echo $row['id']; ?>" data-status="<?php echo $stOption; ?>">
-                                                    <span class="status-badge-so status-<?php echo $stOption; ?> py-0 px-2 me-1" style="font-size:10px;">●</span> <?php echo $stOption; ?>
+                                                <a class="dropdown-item btn-change-status py-1.5 <?php echo ($row['status'] === $stOption) ? 'active fw-bold' : ''; ?>" 
+                                                   href="javascript:void(0)" 
+                                                   data-id="<?php echo $row['id']; ?>" 
+                                                   data-status="<?php echo $stOption; ?>">
+                                                    <span class="status-badge-so status-<?php echo $stOption; ?> py-0 px-2 me-1" style="font-size:10px;">●</span> 
+                                                    <span><?php echo $stOption; ?></span>
+                                                    <?php if ($row['status'] === $stOption): ?>
+                                                        <i class="bi bi-check2 ms-auto text-primary"></i>
+                                                    <?php endif; ?>
                                                 </a>
                                             </li>
                                         <?php endforeach; ?>
@@ -757,59 +811,189 @@ if ($qSales) {
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<?php require_once 'includes/footer.php'; ?>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-$(document).ready(function() {
-    // Ubah Status Cepat
-    $('.btn-change-status').on('click', function(e) {
+(function() {
+    // 1. Inisialisasi dropdown Bootstrap dengan strategy: fixed untuk membebaskan dari overflow container
+    function initSoDropdowns() {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+            document.querySelectorAll('.table-so .dropdown-toggle').forEach(function(el) {
+                try {
+                    new bootstrap.Dropdown(el, {
+                        popperConfig: function(defaultBsPopperConfig) {
+                            return Object.assign({}, defaultBsPopperConfig, {
+                                strategy: 'fixed'
+                            });
+                        }
+                    });
+                } catch(e) {
+                    console.warn('Bootstrap dropdown init:', e);
+                }
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSoDropdowns);
+    } else {
+        initSoDropdowns();
+    }
+
+    // 2. Ubah Status Cepat (Native listener agar kebal terhadap library conflict)
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-change-status');
+        if (!btn) return;
         e.preventDefault();
-        const soId = $(this).data('id');
-        const newStatus = $(this).data('status');
 
-        $.post('ajax_sales_order.php', {
-            action: 'update_status',
-            id: soId,
-            status: newStatus
-        }, function(res) {
-            if (res.success) {
-                location.reload();
+        const soId = btn.getAttribute('data-id');
+        const newStatus = btn.getAttribute('data-status');
+        if (!soId || !newStatus) return;
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Mengubah Status...',
+                text: 'Memperbarui status menjadi "' + newStatus + '"',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: function() {
+                    Swal.showLoading();
+                }
+            });
+        }
+
+        const formData = new FormData();
+        formData.append('action', 'update_status');
+        formData.append('id', soId);
+        formData.append('status', newStatus);
+
+        fetch('ajax_sales_order.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(res) {
+            return res.json();
+        })
+        .then(function(res) {
+            if (res && res.success) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Berhasil Diubah!',
+                        text: res.message || ('Status pesanan diperbarui menjadi ' + newStatus),
+                        timer: 1000,
+                        showConfirmButton: false
+                    }).then(function() {
+                        location.reload();
+                    });
+                } else {
+                    location.reload();
+                }
             } else {
-                Swal.fire({ icon: 'error', title: 'Gagal', text: res.message || 'Gagal mengubah status.' });
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Mengubah Status',
+                        text: (res && res.message) ? res.message : 'Gagal mengubah status.'
+                    });
+                } else {
+                    alert((res && res.message) ? res.message : 'Gagal mengubah status.');
+                }
             }
-        }, 'json');
-    });
-
-    // Hapus SO
-    $('.btn-delete-so').on('click', function() {
-        const soId = $(this).data('id');
-        const soNum = $(this).data('num');
-
-        Swal.fire({
-            title: 'Hapus Pesanan?',
-            text: `Apakah Anda yakin ingin menghapus pesanan ${soNum}?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Hapus',
-            cancelButtonText: 'Batal',
-            confirmButtonColor: '#EF4444'
-        }).then((res) => {
-            if (res.isConfirmed) {
-                $.post('ajax_sales_order.php', {
-                    action: 'delete_sales_order',
-                    id: soId
-                }, function(res) {
-                    if (res.success) {
-                        $(`#row-so-${soId}`).fadeOut(300, function() { $(this).remove(); });
-                        Swal.fire({ icon: 'success', title: 'Dihapus', text: 'Pesanan berhasil dihapus.', timer: 1500, showConfirmButton: false });
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'Gagal', text: res.message || 'Gagal menghapus pesanan.' });
-                    }
-                }, 'json');
+        })
+        .catch(function(err) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Jaringan',
+                    text: 'Gagal menghubungi server (' + (err.message || 'Network error') + ')'
+                });
+            } else {
+                alert('Gagal menghubungi server: ' + (err.message || 'Network error'));
             }
         });
     });
-});
-</script>
 
-<?php require_once 'includes/footer.php'; ?>
+    // 3. Hapus Pesanan SO
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-delete-so');
+        if (!btn) return;
+        e.preventDefault();
+
+        const soId = btn.getAttribute('data-id');
+        const soNum = btn.getAttribute('data-num') || '';
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Hapus Pesanan?',
+                text: 'Apakah Anda yakin ingin menghapus pesanan ' + soNum + '?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#EF4444'
+            }).then(function(res) {
+                if (res.isConfirmed) {
+                    Swal.fire({
+                        title: 'Menghapus...',
+                        allowOutsideClick: false,
+                        didOpen: function() {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    const formData = new FormData();
+                    formData.append('action', 'delete_sales_order');
+                    formData.append('id', soId);
+
+                    fetch('ajax_sales_order.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(delRes) {
+                        if (delRes && delRes.success) {
+                            const row = document.getElementById('row-so-' + soId);
+                            if (row) {
+                                row.style.transition = 'opacity 0.3s';
+                                row.style.opacity = '0';
+                                setTimeout(function() { row.remove(); }, 300);
+                            }
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Dihapus',
+                                text: 'Pesanan berhasil dihapus.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: (delRes && delRes.message) ? delRes.message : 'Gagal menghapus pesanan.'
+                            });
+                        }
+                    })
+                    .catch(function(err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Koneksi Gagal',
+                            text: 'Gagal menghubungi server: ' + (err.message || 'Network error')
+                        });
+                    });
+                }
+            });
+        } else {
+            if (confirm('Apakah Anda yakin ingin menghapus pesanan ' + soNum + '?')) {
+                const formData = new FormData();
+                formData.append('action', 'delete_sales_order');
+                formData.append('id', soId);
+                fetch('ajax_sales_order.php', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(r => { if (r.success) location.reload(); else alert(r.message); });
+            }
+        }
+    });
+})();
+</script>
