@@ -2,8 +2,7 @@
 /**
  * restore_customers.php
  * Script Pemulihan & Penyelamatan Data Lama Sales Customer
- * Dapat dijalankan via CLI: php restore_customers.php
- * Atau via Web Browser: https://sales.id-giti.com/restore_customers.php
+ * Dapat dijalankan via CLI: sudo php restore_customers.php
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -25,6 +24,10 @@ if (!isset($conn) || !$conn || $conn->connect_error) {
 
 $dbName = $conn->query("SELECT DATABASE()")->fetch_row()[0] ?? 'unknown';
 echo "Database Terhubung: $dbName\n\n";
+
+// Set MariaDB packet size sebesar mungkin
+@$conn->query("SET GLOBAL max_allowed_packet = 1073741824");
+@$conn->query("SET max_allowed_packet = 1073741824");
 
 function safe_shell_exec($cmd) {
     if (function_exists('shell_exec') && !in_array('shell_exec', array_map('trim', explode(',', (string)ini_get('disable_functions'))))) {
@@ -68,10 +71,9 @@ foreach ($backupRoots as $root) {
             }
         }
     } catch (Exception $e) {
-        // Abaikan folder tanpa izin baca
+        // Abaikan
     }
 }
-$foundBackups = array_values($foundBackups);
 
 // Tambahkan pengecekan langsung ke file backup spesifik 28 & 29 Sep
 $directPaths = [
@@ -144,14 +146,17 @@ foreach ($candidateBackups as $b) {
 
     $capturing = false;
     $createTableLines = [];
-    $insertLines = [];
+    $insertStatements = [];
     $foundTable = false;
+    $currentInsert = "";
+    $readingInsert = false;
 
     while (!($isGz ? gzeof($gz) : feof($gz))) {
-        $line = $isGz ? gzgets($gz, 1048576) : fgets($gz, 1048576);
+        // Baca dalam chunk 4MB
+        $line = $isGz ? gzgets($gz, 4194304) : fgets($gz, 4194304);
         if ($line === false) break;
 
-        if (stripos($line, 'CREATE TABLE `sales_customer`') !== false || stripos($line, 'CREATE TABLE IF NOT EXISTS `sales_customer`') !== false) {
+        if (!$capturing && (stripos($line, 'CREATE TABLE `sales_customer`') !== false || stripos($line, 'CREATE TABLE IF NOT EXISTS `sales_customer`') !== false)) {
             $capturing = true;
             $foundTable = true;
             $createTableLines[] = $line;
@@ -159,30 +164,51 @@ foreach ($candidateBackups as $b) {
         }
 
         if ($capturing) {
-            // Berhenti jika sudah berpindah ke tabel berikutnya
-            if (preg_match('/^-- Table structure for table `(?!sales_customer)/i', $line) ||
+            // Berhenti jika sudah berpindah ke tabel berikutnya (hanya jika sedang tidak di dalam INSERT statement)
+            if (!$readingInsert && (
+                preg_match('/^-- Table structure for table `(?!sales_customer)/i', $line) ||
                 preg_match('/^DROP TABLE IF EXISTS `(?!sales_customer)/i', $line) ||
-                preg_match('/^CREATE TABLE `(?!sales_customer)/i', $line)) {
+                preg_match('/^CREATE TABLE `(?!sales_customer)/i', $line)
+            )) {
                 break;
             }
 
-            if (!empty($createTableLines) && empty($insertLines)) {
+            if (!empty($createTableLines) && empty($insertStatements) && !$readingInsert) {
                 $createTableLines[] = $line;
             }
 
-            if (stripos($line, 'INSERT INTO `sales_customer`') !== false || stripos($line, 'INSERT INTO sales_customer') !== false) {
-                $insertLines[] = $line;
+            // Kumpulkan baris INSERT INTO secara utuh sampai karakter titik-koma ';' penutup
+            if (!$readingInsert) {
+                if (stripos($line, 'INSERT INTO `sales_customer`') !== false || stripos($line, 'INSERT INTO sales_customer') !== false) {
+                    $readingInsert = true;
+                    $currentInsert = $line;
+                }
+            } else {
+                $currentInsert .= $line;
+            }
+
+            if ($readingInsert) {
+                $trimmed = rtrim($currentInsert);
+                // Cek apakah statement sudah selesai ditutup dengan titik-koma ';'
+                if (substr($trimmed, -1) === ';') {
+                    $insertStatements[] = $currentInsert;
+                    $currentInsert = "";
+                    $readingInsert = false;
+                }
             }
         }
     }
+    if ($readingInsert && !empty($currentInsert)) {
+        $insertStatements[] = $currentInsert;
+    }
     if ($isGz) gzclose($gz); else fclose($gz);
 
-    if (!$foundTable || empty($insertLines)) {
+    if (!$foundTable || empty($insertStatements)) {
         echo "  [-] Tidak ditemukan data `sales_customer` di $bFile\n";
         continue;
     }
 
-    echo "  [✓] Ditemukan skema dan " . count($insertLines) . " blok INSERT di {$bFile}!\n";
+    echo "  [✓] Ditemukan skema dan " . count($insertStatements) . " blok INSERT lengkap di {$bFile}!\n";
     echo "  Mengekstrak data ke tabel sementara `sales_customer_restore_temp`...\n";
 
     $conn->query("DROP TABLE IF EXISTS `sales_customer_restore_temp`");
@@ -198,7 +224,7 @@ foreach ($candidateBackups as $b) {
     }
 
     $insertedRows = 0;
-    foreach ($insertLines as $idx => $ins) {
+    foreach ($insertStatements as $idx => $ins) {
         $insClean = str_replace('`sales_customer`', '`sales_customer_restore_temp`', $ins);
         $insClean = preg_replace('/INSERT INTO sales_customer /i', 'INSERT INTO `sales_customer_restore_temp` ', $insClean);
         $insClean = trim($insClean);
@@ -208,15 +234,18 @@ foreach ($candidateBackups as $b) {
 
         if ($conn->query($insClean)) {
             $insertedRows += $conn->affected_rows;
+            echo "  [✓] Berhasil mengeksekusi blok INSERT #" . ($idx + 1) . " (" . $conn->affected_rows . " baris)\n";
         } else {
-            echo "  [x] Error pada blok INSERT #" . ($idx + 1) . ": " . $conn->error . "\n";
+            echo "  [x] Error pada blok INSERT #" . ($idx + 1) . " (" . strlen($insClean) . " byte): " . $conn->error . "\n";
+            echo "      Awal: " . substr($insClean, 0, 120) . "\n";
+            echo "      Akhir: " . substr($insClean, -120) . "\n";
         }
     }
 
     $chkTemp = $conn->query("SELECT COUNT(*) as cnt FROM `sales_customer_restore_temp`");
     $cntTemp = ($chkTemp && $rT = $chkTemp->fetch_assoc()) ? (int)$rT['cnt'] : 0;
 
-    echo "  [✓] Berhasil memasukkan {$cntTemp} baris customer asli ke staging table!\n";
+    echo "  [✓] Total {$cntTemp} baris customer asli ada di staging table!\n";
 
     if ($cntTemp > 0) {
         $tempCols = [];
@@ -264,58 +293,41 @@ foreach ($candidateBackups as $b) {
 $conn->query("UPDATE `sales_customer` SET `kode_customer` = CONCAT('CUST-', LPAD(id, 4, '0')) WHERE (`kode_customer` IS NULL OR `kode_customer` = '')");
 $conn->query("UPDATE `sales_customer` SET `alamat_lokasi` = alamat WHERE (`alamat_lokasi` IS NULL OR `alamat_lokasi` = '') AND alamat IS NOT NULL");
 
-// 5. UPDATE SEMUA FILE API_SALES_TASK DI SERVER AGAR SORTING DESCENDING (TERBARU DI ATAS)
-echo "\n[3] Memperbarui Sorting api_sales_task.php (Terbaru Di Atas)... \n";
+// 5. UPDATE SEMUA REPOSITORY DAN FILE API_SALES_TASK DI SERVER AGAR SORTING DESCENDING
+echo "\n[3] Memperbarui Repository dan Sorting api_sales_task.php (Terbaru Di Atas)... \n";
 
-// Salin langsung file terbaru dari repository teknisi-api-github ke api-teknisi.id-giti.com
-$sourceApi = '/www/wwwroot/teknisi-api-github.id-giti.com/public/api_sales_task.php';
-if (!file_exists($sourceApi)) {
-    $sourceApi = __DIR__ . '/modul-aplikasi-sales/api/api_sales_task.php';
-}
-
-if (file_exists($sourceApi)) {
-    @copy($sourceApi, '/www/wwwroot/api-teknisi.id-giti.com/api_sales_task.php');
-    @copy($sourceApi, '/www/wwwroot/api-teknisi.id-giti.com/public/api_sales_task.php');
-}
-
-$targetApiDirs = [
-    __DIR__ . '/modul-aplikasi-sales/api/api_sales_task.php',
-    __DIR__ . '/modul-aplikasi-sales/api_sales_task.php',
-    '/www/wwwroot/api-teknisi.id-giti.com/public/api_sales_task.php',
-    '/www/wwwroot/api-teknisi.id-giti.com/api_sales_task.php',
-    '/www/wwwroot/teknisi-api.id-giti.com/public/api_sales_task.php',
-    '/www/wwwroot/teknisi-api.id-giti.com/api_sales_task.php',
-    '/www/wwwroot/teknisi-api-github.id-giti.com/public/api_sales_task.php',
-    '/www/wwwroot/jadwal.id-giti.com/teknisi-api-github.id-giti.com/public/api_sales_task.php',
-    '/www/wwwroot/jadwal.id-giti.com/modul-aplikasi-sales/api/api_sales_task.php',
+// A. Lakukan git pull pada repo teknisi-api jika ada
+$repoDirs = [
+    '/www/wwwroot/teknisi-api-github.id-giti.com',
+    '/www/wwwroot/api-teknisi.id-giti.com',
+    '/www/wwwroot/jadwal.id-giti.com',
+    '/www/wwwroot/sales.id-giti.com',
 ];
-
-$glob1 = glob('/www/wwwroot/*/public/api_sales_task.php') ?: [];
-$glob2 = glob('/www/wwwroot/*/api_sales_task.php') ?: [];
-$glob3 = glob('/www/wwwroot/*/*/public/api_sales_task.php') ?: [];
-$targetApiDirs = array_unique(array_merge($targetApiDirs, $glob1, $glob2, $glob3));
-
-$sortUpdatedCount = 0;
-foreach ($targetApiDirs as $apiFile) {
-    if (file_exists($apiFile) && is_writable($apiFile)) {
-        $content = file_get_contents($apiFile);
-        if (strpos($content, '$orderClause = ($filter === \'all\')') === false) {
-            $content = str_replace(
-                'ORDER BY ks.jadwal ASC, ks.id ASC',
-                'ORDER BY ks.jadwal DESC, ks.id DESC',
-                $content
-            );
-            file_put_contents($apiFile, $content);
-            $sortUpdatedCount++;
-            echo "  ✓ Diperbarui: $apiFile\n";
-        }
+foreach ($repoDirs as $rd) {
+    if (is_dir($rd . '/.git')) {
+        $pOut = safe_shell_exec("git -C " . escapeshellarg($rd) . " pull origin main 2>&1");
+        echo "  [Git Pull $rd]: " . trim((string)$pOut) . "\n";
     }
 }
-if ($sortUpdatedCount === 0) {
-    echo "  (Semua file api_sales_task yang terdeteksi sudah menggunakan sorting DESC atau diatur via git)\n";
+
+// B. Salin langsung file master api_sales_task.php dari sales ke semua lokasi API
+$sourceApiTask = __DIR__ . '/modul-aplikasi-sales/api/api_sales_task.php';
+$destList = [
+    '/www/wwwroot/teknisi-api-github.id-giti.com/public/api_sales_task.php',
+    '/www/wwwroot/api-teknisi.id-giti.com/public/api_sales_task.php',
+    '/www/wwwroot/api-teknisi.id-giti.com/api_sales_task.php',
+];
+foreach ($destList as $dest) {
+    if (file_exists(dirname($dest))) {
+        @copy($sourceApiTask, $dest);
+        echo "  ✓ Disalin langsung: $dest\n";
+    }
 }
 
-// 7. STATUS AKHIR
+// C. Reload PHP-FPM agar opcache ter-refresh
+safe_shell_exec("systemctl reload php-fpm 2>&1 || systemctl reload php-fpm-81 2>&1 || systemctl reload php-fpm-80 2>&1 || systemctl reload php-fpm-74 2>&1");
+
+// 6. STATUS AKHIR
 $qTot = $conn->query("SELECT COUNT(*) as cnt FROM sales_customer WHERE deleted_at IS NULL")->fetch_assoc();
 $qSample = $conn->query("SELECT id, nama, alamat, telp_pribadi FROM sales_customer WHERE id IN (22, 15, 16, 36, 46) ORDER BY id ASC");
 
