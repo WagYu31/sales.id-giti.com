@@ -376,54 +376,32 @@ if ($action === 'get_dealers') {
     $search = $conn->real_escape_string($_GET['q'] ?? ($jsonInput['q'] ?? ''));
     
     if ($hasSalesCustomer) {
-        $whereSearch = $search !== '' ? " AND (c.nama LIKE '%$search%' OR c.alamat LIKE '%$search%' OR c.kota LIKE '%$search%') " : "";
-        if ($salesId > 0) {
-            $sql = "SELECT DISTINCT c.id, c.nama, c.kategori, c.telp_pribadi, c.alamat, c.kota, ks.jadwal, ks.id AS id_kegiatan
-                    FROM team_kegiatan_sales tks
-                    JOIN kegiatan_sales ks ON ks.id = tks.id_kegiatan_sales AND ks.deleted_at IS NULL
-                    JOIN sales_customer c  ON c.id  = ks.id_customer        AND c.deleted_at IS NULL
-                    WHERE tks.id_sales = $salesId
-                      AND tks.deleted_at IS NULL
-                      AND DATE(ks.jadwal) = CURDATE()
-                      AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
-                      AND (ks.reschedule_reason IS NULL OR ks.reschedule_reason = '')
-                      AND c.is_tiptok = 1
-                      $whereSearch
-                    ORDER BY ks.jadwal DESC
-                    LIMIT 50";
-        } else {
-            $sql = "SELECT id, nama, kategori, telp_pribadi, alamat, kota 
-                    FROM sales_customer c
-                    WHERE deleted_at IS NULL AND is_tiptok = 1 $whereSearch 
-                    ORDER BY (kategori = 'Dealer') DESC, nama ASC 
-                    LIMIT 50";
-        }
+        $whereSearch = $search !== '' ? " AND (c.nama LIKE '%$search%' OR c.alamat LIKE '%$search%' OR c.kota LIKE '%$search%' OR c.kode_customer LIKE '%$search%') " : "";
+        
+        $sql = "SELECT c.id, c.kode_customer, c.nama, c.kategori, c.telp_pribadi, c.alamat, c.kota, c.is_tiptok,
+                       (SELECT ks.id FROM team_kegiatan_sales tks
+                        JOIN kegiatan_sales ks ON ks.id = tks.id_kegiatan_sales AND ks.deleted_at IS NULL
+                        WHERE tks.id_sales = $salesId AND ks.id_customer = c.id AND DATE(ks.jadwal) = CURDATE()
+                          AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
+                        LIMIT 1) AS id_kegiatan,
+                       (SELECT ks.jadwal FROM team_kegiatan_sales tks
+                        JOIN kegiatan_sales ks ON ks.id = tks.id_kegiatan_sales AND ks.deleted_at IS NULL
+                        WHERE tks.id_sales = $salesId AND ks.id_customer = c.id AND DATE(ks.jadwal) = CURDATE()
+                          AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
+                        LIMIT 1) AS jadwal
+                FROM sales_customer c
+                WHERE c.deleted_at IS NULL AND c.is_tiptok = 1 $whereSearch
+                ORDER BY (jadwal IS NOT NULL) DESC, (c.kategori = 'Dealer') DESC, c.nama ASC
+                LIMIT 500";
     } else {
         $whereSearch = $search !== '' ? " AND (c.nama_toko LIKE '%$search%' OR ca.alamat LIKE '%$search%' OR ca.kota LIKE '%$search%') " : "";
-        if ($salesId > 0) {
-            $sql = "SELECT DISTINCT c.id, c.nama_toko AS nama, c.kategori, pic.tlp_pic AS telp_pribadi, ca.alamat, ca.kota, ks.jadwal, ks.id AS id_kegiatan
-                    FROM team_kegiatan_sales tks
-                    JOIN kegiatan_sales ks ON ks.id = tks.id_kegiatan_sales AND ks.deleted_at IS NULL
-                    JOIN customers c       ON c.id  = ks.id_customer        AND c.deleted_at IS NULL
-                    LEFT JOIN customer_addresses ca ON c.id = ca.customer_id AND ca.deleted_at IS NULL
-                    LEFT JOIN customer_pics pic ON c.id = pic.customer_id AND pic.deleted_at IS NULL
-                    WHERE tks.id_sales = $salesId
-                      AND tks.deleted_at IS NULL
-                      AND DATE(ks.jadwal) = CURDATE()
-                      AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
-                      AND (ks.reschedule_reason IS NULL OR ks.reschedule_reason = '')
-                      $whereSearch
-                    ORDER BY ks.jadwal DESC
-                    LIMIT 50";
-        } else {
-            $sql = "SELECT c.id, c.nama_toko AS nama, c.kategori, pic.tlp_pic AS telp_pribadi, ca.alamat, ca.kota 
-                    FROM customers c
-                    LEFT JOIN customer_addresses ca ON c.id = ca.customer_id AND ca.deleted_at IS NULL
-                    LEFT JOIN customer_pics pic ON c.id = pic.customer_id AND pic.deleted_at IS NULL
-                    WHERE c.deleted_at IS NULL $whereSearch 
-                    ORDER BY (c.kategori = 'Dealer') DESC, c.nama_toko ASC 
-                    LIMIT 50";
-        }
+        $sql = "SELECT c.id, c.nama_toko AS nama, c.kategori, pic.tlp_pic AS telp_pribadi, ca.alamat, ca.kota 
+                FROM customers c
+                LEFT JOIN customer_addresses ca ON c.id = ca.customer_id AND ca.deleted_at IS NULL
+                LEFT JOIN customer_pics pic ON c.id = pic.customer_id AND pic.deleted_at IS NULL
+                WHERE c.deleted_at IS NULL $whereSearch 
+                ORDER BY (c.kategori = 'Dealer') DESC, c.nama_toko ASC 
+                LIMIT 500";
     }
     
     $res = $conn->query($sql);
@@ -474,7 +452,8 @@ if ($action === 'create_penitipan') {
         }
     }
 
-    // Validasi Wajib Jadwal Kunjungan dari Admin pada hari ini
+    // Cek jadwal kunjungan hari ini jika ada (opsional)
+    $idKegiatanSales = null;
     if ($idSales > 0) {
         $checkJadwal = $conn->query("SELECT ks.id FROM team_kegiatan_sales tks
             JOIN kegiatan_sales ks ON ks.id = tks.id_kegiatan_sales AND ks.deleted_at IS NULL
@@ -483,12 +462,8 @@ if ($action === 'create_penitipan') {
               AND DATE(ks.jadwal) = CURDATE()
               AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
             LIMIT 1");
-        if (!$checkJadwal || $checkJadwal->num_rows == 0) {
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Penitipan ditolak: Anda belum memiliki jadwal kunjungan dari Admin untuk toko ini. Titip barang hanya dapat dilakukan jika ada jadwal kunjungan resmi dari Admin.'
-            ]);
-            exit;
+        if ($checkJadwal && $rowJ = $checkJadwal->fetch_assoc()) {
+            $idKegiatanSales = intval($rowJ['id']);
         }
     }
 
