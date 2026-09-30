@@ -387,6 +387,7 @@ if ($action === 'get_dealers') {
                       AND DATE(ks.jadwal) = CURDATE()
                       AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
                       AND (ks.reschedule_reason IS NULL OR ks.reschedule_reason = '')
+                      AND c.is_tiptok = 1
                       $whereSearch
                     ORDER BY ks.jadwal DESC
                     LIMIT 50";
@@ -457,6 +458,20 @@ if ($action === 'create_penitipan') {
     if (empty($items) || !is_array($items)) {
         echo json_encode(['status' => 'error', 'message' => 'Minimal harus menambahkan 1 barang titipan!']);
         exit;
+    }
+
+    // Validasi Wajib Toko Mitra TIP TOK (Harus ditandai)
+    if ($hasSalesCustomer) {
+        $checkTiptok = $conn->query("SELECT is_tiptok FROM sales_customer WHERE id = $idCustomer AND deleted_at IS NULL LIMIT 1");
+        if ($checkTiptok && $rowT = $checkTiptok->fetch_assoc()) {
+            if (intval($rowT['is_tiptok']) !== 1) {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Penitipan ditolak: Toko ini belum ditandai sebagai Mitra Program TIP TOK. Hubungi Admin untuk menandai toko ini di sistem.'
+                ]);
+                exit;
+            }
+        }
     }
 
     // Validasi Wajib Jadwal Kunjungan dari Admin pada hari ini
