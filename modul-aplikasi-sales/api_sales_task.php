@@ -56,6 +56,8 @@ if ($filter === 'today') {
     $dateFilter = "AND DATE(ks.jadwal) > CURDATE()";
 }
 
+$orderClause = ($filter === 'all') ? "ORDER BY ks.jadwal DESC, ks.id DESC" : "ORDER BY ks.jadwal ASC, ks.id ASC";
+
 $sql = "
     SELECT
         ks.id              AS kegiatan_id,
@@ -99,7 +101,7 @@ $sql = "
       AND ks.status NOT IN ('waiting', 'dibatalkan', 'reschedule', 'cancelled')
       AND (ks.reschedule_reason IS NULL OR ks.reschedule_reason = '')
       $dateFilter
-    ORDER BY ks.jadwal ASC
+    $orderClause
 ";
 
 $stmt = $conn->prepare($sql);
