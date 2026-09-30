@@ -1580,10 +1580,11 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
                   <label class="form-label-premium">
                     <i class="fa-solid fa-magnifying-glass text-xs me-1 text-primary"></i> Cari Alamat / Koordinat
                   </label>
-                  <div class="d-flex gap-2">
-                    <input type="text" id="gmap_search" class="input-premium" placeholder="Contoh: Jawa Timur atau -6.175, 106.827...">
-                    <button type="button" id="gmap_search_btn" class="btn bg-gradient-info text-white font-weight-bold" style="border-radius:10px; padding: 12px 18px; font-size:11px; display:inline-flex; align-items:center; gap:4px; margin-bottom:0;">
-                      <i class="fa-solid fa-magnifying-glass text-xs"></i> CARI
+                  <div class="d-flex gap-2 align-items-center" style="width: 100%;">
+                    <input type="text" id="gmap_search" class="input-premium" placeholder="Contoh: Jawa Timur atau -6.175, 106.827..." style="flex: 1 1 auto; min-width: 0;">
+                    <button type="button" id="gmap_search_btn" class="btn btn-primary font-weight-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-shrink-0" style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); color: #ffffff !important; border: none; border-radius: 10px; height: 48px; padding: 0 20px; font-size: 13px; font-weight: 700; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); cursor: pointer; transition: all 0.2s ease; margin-bottom: 0; white-space: nowrap;">
+                      <i class="bi bi-search"></i>
+                      <span>CARI</span>
                     </button>
                   </div>
                 </div>
@@ -2747,22 +2748,45 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
   });
 
   document.getElementById('gmap_search_btn').addEventListener('click', function() {
+    const btn = document.getElementById('gmap_search_btn');
     const query = document.getElementById('gmap_search').value.trim();
     if (query === "") return;
+
+    const origHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span><span>Mencari...</span>';
 
     const coordsRegex = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
     if (coordsRegex.test(query)) {
       const parts = query.split(',');
       updateCreateMapData(L.latLng(parseFloat(parts[0]), parseFloat(parts[1])), radInputCreate.value);
+      btn.disabled = false;
+      btn.innerHTML = origHtml;
     } else {
       fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=id&accept-language=id`)
         .then(res => res.json())
         .then(data => {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
           if (data && data.length > 0) {
             updateCreateMapData(L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon)), radInputCreate.value);
           } else {
-            alert("Alamat tidak ditemukan.");
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Lokasi Tidak Ditemukan',
+                text: 'Lokasi "' + query + '" tidak ditemukan. Coba ketik nama kota/daerah yang lebih umum atau masukkan koordinat (contoh: -6.175, 106.827).',
+                confirmButtonColor: '#2563eb'
+              });
+            } else {
+              alert("Alamat tidak ditemukan.");
+            }
           }
+        })
+        .catch(err => {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+          console.error(err);
         });
     }
   });
