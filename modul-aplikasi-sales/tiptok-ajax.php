@@ -1259,28 +1259,92 @@ if ($action === 'hapus_penitipan') {
     }
     $master = $qCheck->fetch_assoc();
 
-    if ($jabatanUser === 'Sales' && $master['id_sales'] != $idUser) {
+    $userRole = strtolower(trim($_SESSION['role'] ?? $jabatanUser ?? ''));
+    $isSuperAdminOrAdmin = in_array($userRole, ['superadmin', 'admin', 'adminsales', 'manager']);
+
+    if (!$isSuperAdminOrAdmin && strtolower($jabatanUser) === 'sales' && $master['id_sales'] != $idUser) {
         echo json_encode(['status' => 'error', 'message' => 'Anda hanya dapat menghapus data penitipan milik Anda sendiri.']);
         exit;
     }
 
-    // Cek apakah ada kunjungan yang sudah masuk klaim
-    $qClaimed = $conn->query("SELECT COUNT(*) as total FROM tiptok_kunjungan WHERE id_penitipan = $id_penitipan AND id_claim IS NOT NULL");
-    $claimedCount = $qClaimed ? ($qClaimed->fetch_assoc()['total'] ?? 0) : 0;
-    if ($claimedCount > 0) {
-        echo json_encode(['status' => 'error', 'message' => 'Penitipan ini tidak dapat dihapus karena sebagian penjualan sudah masuk ke dalam proses klaim insentif.']);
+    // Cek apakah ada klaim yang sudah dicairkan (status cair)
+    $qPaid = $conn->query("SELECT c.kode_claim FROM tiptok_claim c 
+                           JOIN tiptok_claim_detail d ON d.id_claim = c.id 
+                           WHERE d.id_penitipan = $id_penitipan AND c.status_claim = 'cair' LIMIT 1");
+    if ($qPaid && $qPaid->num_rows > 0 && !$isSuperAdminOrAdmin) {
+        $paidRow = $qPaid->fetch_assoc();
+        echo json_encode([
+            'status' => 'error', 
+            'message' => "Penitipan ini memiliki klaim insentif yang sudah dicairkan [{$paidRow['kode_claim']}]. Hubungi Superadmin jika perlu menghapus data ini."
+        ]);
         exit;
     }
 
     $conn->begin_transaction();
     try {
+        // Ambil daftar klaim yang terhubung untuk di-update / dihapus jika kosong
+        $affectedClaims = [];
+        $qCl = $conn->query("SELECT DISTINCT id_claim FROM tiptok_kunjungan WHERE id_penitipan = $id_penitipan AND id_claim IS NOT NULL");
+        if ($qCl) {
+            while ($rc = $qCl->fetch_assoc()) {
+                if (!empty($rc['id_claim'])) $affectedClaims[] = intval($rc['id_claim']);
+            }
+        }
+        $qCl2 = $conn->query("SELECT DISTINCT id_claim FROM tiptok_claim_detail WHERE id_penitipan = $id_penitipan");
+        if ($qCl2) {
+            while ($rc = $qCl2->fetch_assoc()) {
+                if (!empty($rc['id_claim'])) $affectedClaims[] = intval($rc['id_claim']);
+            }
+        }
+        $affectedClaims = array_unique(array_filter($affectedClaims));
+
+        // 1. Hapus claim detail terkait penitipan ini
         $conn->query("DELETE FROM tiptok_claim_detail WHERE id_penitipan = $id_penitipan");
+
+        // 2. Periksa setiap klaim yang terpengaruh
+        foreach ($affectedClaims as $clId) {
+            $qCount = $conn->query("SELECT COUNT(*) as rem FROM tiptok_claim_detail WHERE id_claim = $clId");
+            $remCount = $qCount ? intval($qCount->fetch_assoc()['rem'] ?? 0) : 0;
+            if ($remCount === 0) {
+                // Hapus klaim jika seluruh itemnya sudah tidak ada
+                $conn->query("DELETE FROM tiptok_claim WHERE id = $clId");
+            } else {
+                // Rekalkulasi total klaim yang tersisa
+                $qRecalc = $conn->query("SELECT SUM(qty_terjual) as tot_u, SUM(subtotal_insentif) as tot_ins FROM tiptok_claim_detail WHERE id_claim = $clId");
+                if ($qRecalc && $rRec = $qRecalc->fetch_assoc()) {
+                    $totU = intval($rRec['tot_u'] ?? 0);
+                    $totIns = floatval($rRec['tot_ins'] ?? 0);
+                    $conn->query("UPDATE tiptok_claim SET total_unit_terjual = $totU, total_nominal_insentif = $totIns WHERE id = $clId");
+                }
+            }
+        }
+
+        // Hapus juga klaim yang id_penitipan langsung mengarah ke penitipan ini jika ada
+        $conn->query("DELETE FROM tiptok_claim WHERE id_penitipan = $id_penitipan");
+
+        // 3. Hapus foto kunjungan jika ada
+        $qFotos = $conn->query("SELECT foto_kunjungan FROM tiptok_kunjungan WHERE id_penitipan = $id_penitipan AND foto_kunjungan IS NOT NULL AND foto_kunjungan != ''");
+        if ($qFotos) {
+            while ($rf = $qFotos->fetch_assoc()) {
+                @unlink(__DIR__ . '/../uploads/tiptok/' . $rf['foto_kunjungan']);
+            }
+        }
+
+        // 4. Hapus log kunjungan & histori invoice
         $conn->query("DELETE FROM tiptok_kunjungan WHERE id_penitipan = $id_penitipan");
+
+        // 5. Hapus barang-barang titipan
         $conn->query("DELETE FROM tiptok_items WHERE id_penitipan = $id_penitipan");
+
+        // 6. Hapus master penitipan
         $conn->query("DELETE FROM tiptok_penitipan WHERE id = $id_penitipan");
+
         $conn->commit();
 
-        echo json_encode(['status' => 'success', 'message' => "Data penitipan [{$master['kode_titip']}] berhasil dihapus secara permanen."]);
+        echo json_encode([
+            'status' => 'success', 
+            'message' => "Data penitipan [{$master['kode_titip']}] beserta riwayat penjualan & invoice terkait berhasil dihapus secara bersih."
+        ]);
     } catch (Exception $e) {
         $conn->rollback();
         echo json_encode(['status' => 'error', 'message' => 'Gagal menghapus data: ' . $e->getMessage()]);
