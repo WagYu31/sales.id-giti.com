@@ -26,16 +26,23 @@ if (!isset($conn) || !$conn || $conn->connect_error) {
 $dbName = $conn->query("SELECT DATABASE()")->fetch_row()[0] ?? 'unknown';
 echo "Database Terhubung: $dbName\n\n";
 
+function safe_shell_exec($cmd) {
+    if (function_exists('shell_exec') && !in_array('shell_exec', array_map('trim', explode(',', (string)ini_get('disable_functions'))))) {
+        return @shell_exec($cmd);
+    }
+    return false;
+}
+
 // 1. CARI BACKUP DATABASE DARI aaPanel (/www/backup/database/)
 echo "[1] Memeriksa Backup Otomatis aaPanel di /www/backup/ ...\n";
-// Coba copy file backup ke folder webroot agar tidak terblokir open_basedir
-@shell_exec("cp -n /www/backup/database/db_teknisi_api_root* " . escapeshellarg(__DIR__));
-@shell_exec("cp -n /www/backup/db_teknisi_api_root* " . escapeshellarg(__DIR__));
-@shell_exec("cp -n /www/backup/database/*teknisi* " . escapeshellarg(__DIR__));
+safe_shell_exec("cp -n /www/backup/database/db_teknisi_api_root* " . escapeshellarg(__DIR__));
+safe_shell_exec("cp -n /www/backup/db_teknisi_api_root* " . escapeshellarg(__DIR__));
+safe_shell_exec("cp -n /www/backup/database/*teknisi* " . escapeshellarg(__DIR__));
 
 $backupRoots = [
     __DIR__,
     __DIR__ . '/backup',
+    '/www/backup/database',
     '/www/backup',
     '/var/backups',
 ];
@@ -43,23 +50,28 @@ $backupRoots = [
 $foundBackups = [];
 foreach ($backupRoots as $root) {
     if (!is_dir($root)) continue;
-    $it = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS),
-        RecursiveIteratorIterator::SELF_FIRST
-    );
-    foreach ($it as $file) {
-        if ($file->isFile() && preg_match('/\.(sql|sql\.gz)$/i', $file->getFilename())) {
-            $path = $file->getPathname();
-            $size = round(filesize($path) / 1024 / 1024, 2);
-            $foundBackups[] = [
-                'path' => $path,
-                'file' => $file->getFilename(),
-                'size_mb' => $size,
-                'time' => date('Y-m-d H:i:s', filemtime($path))
-            ];
+    try {
+        $it = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($it as $file) {
+            if ($file->isFile() && preg_match('/\.(sql|sql\.gz)$/i', $file->getFilename())) {
+                $path = $file->getPathname();
+                $size = round(filesize($path) / 1024 / 1024, 2);
+                $foundBackups[$path] = [
+                    'path' => $path,
+                    'file' => $file->getFilename(),
+                    'size_mb' => $size,
+                    'time' => date('Y-m-d H:i:s', filemtime($path))
+                ];
+            }
         }
+    } catch (Exception $e) {
+        // Abaikan folder tanpa izin baca
     }
 }
+$foundBackups = array_values($foundBackups);
 
 if (!empty($foundBackups)) {
     echo "Ditemukan " . count($foundBackups) . " file backup:\n";
@@ -70,159 +82,139 @@ if (!empty($foundBackups)) {
     echo "  Tidak ada file .sql.gz di folder backup standar.\n";
 }
 
-// 2. CARI MYSQL BINARY LOGS (Untuk merekam ulang INSERT data lama)
-echo "\n[2] Memeriksa MySQL Binary Log (Binlog) ...\n";
-$binlogDirs = [
-    '/www/server/data',
-    '/var/lib/mysql',
-    '/var/log/mysql'
-];
+// 2. CEK TABEL CADANGAN EXCEL
+// Simpan salinan data customer saat ini agar data 1.000 customer Excel tetap tersimpan aman
+$conn->query("CREATE TABLE IF NOT EXISTS `sales_customer_excel_backup` AS SELECT * FROM `sales_customer`");
 
-$binlogFiles = [];
-foreach ($binlogDirs as $bDir) {
-    if (is_dir($bDir)) {
-        $files = @scandir($bDir);
-        if ($files) {
-            foreach ($files as $bf) {
-                if (preg_match('/^(mysql-bin|binlog)\.\d+$/', $bf)) {
-                    $binlogFiles[] = $bDir . '/' . $bf;
-                }
-            }
-        }
-    }
-}
+// 3. PROSES RESTORE DARI FILE BACKUP (SEBELUM TRUNCATE 29 SEP)
+echo "\n[2] Memproses File Backup Database Asli (Target: 29 & 28 September 2026)...\n";
 
-if (!empty($binlogFiles)) {
-    echo "Ditemukan " . count($binlogFiles) . " file binlog:\n";
-    foreach ($binlogFiles as $bf) {
-        echo "  - $bf (" . round(filesize($bf)/1024/1024, 2) . " MB)\n";
-    }
-} else {
-    echo "  File binlog tidak ditemukan di folder standar atau permission terbatas.\n";
-}
+// Target file backup: teknisi_api_root dari 2026-09-29 01:30 atau 2026-09-28 01:30
+// JANGAN gunakan 2026-09-30 karena itu backup SETELAH truncate!
+$goldenBackups = [];
+$otherCandidates = [];
 
-// 3. CARI DARI TABEL TRANSAKSI (pelaksanaan_sales, kegiatan_sales, tiptok_penitipan)
-echo "\n[3] Memeriksa Riwayat Client dari Tabel Transaksi Sales ...\n";
-$txClients = [];
-$chkPel = $conn->query("SHOW TABLES LIKE 'pelaksanaan_sales'");
-if ($chkPel && $chkPel->num_rows > 0) {
-    $qPel = $conn->query("
-        SELECT 
-            p.nama_client, 
-            p.nomer_client,
-            p.tipe_prospek,
-            k.alamat_lokasi,
-            k.lat,
-            k.lon,
-            k.rad,
-            p.created_at
-        FROM pelaksanaan_sales p
-        LEFT JOIN kegiatan_sales k ON p.kegiatan_id = k.id
-        WHERE p.nama_client IS NOT NULL AND TRIM(p.nama_client) != ''
-        ORDER BY p.id ASC
-    ");
-    if ($qPel) {
-        while ($row = $qPel->fetch_assoc()) {
-            $nameKey = strtolower(trim($row['nama_client']));
-            if (!isset($txClients[$nameKey])) {
-                $txClients[$nameKey] = $row;
-            }
-        }
-    }
-}
-
-echo "Ditemukan " . count($txClients) . " riwayat unik client dari pelaksanaan_sales:\n";
-$txCount = 0;
-foreach ($txClients as $c) {
-    if (++$txCount <= 10) {
-        echo "  • " . $c['nama_client'] . " (WA: " . ($c['nomer_client'] ?: '-') . ", Lokasi: " . ($c['alamat_lokasi'] ?: '-') . ")\n";
-    }
-}
-if (count($txClients) > 10) {
-    echo "  ... dan " . (count($txClients) - 10) . " lainnya.\n";
-}
-
-// 4. CEK APAKAH ADA BACKUP SQL TERTENTU YANG BISA LANGSUNG DI-PARSE
-echo "\n[4] Memproses File Backup Database Otomatis aaPanel...\n";
-
-// Prioritaskan file backup teknisi_api_root terbaru
-$candidateBackups = [];
 foreach ($foundBackups as $b) {
-    if (stripos($b['file'], 'sales_customer') !== false || stripos($b['file'], 'teknisi_api_root') !== false || stripos($b['file'], 'teknisi_root') !== false) {
-        $candidateBackups[] = $b;
+    $fName = $b['file'];
+    // Abaikan backup dari tanggal 30 Sep karena sudah terlanjur kena truncate
+    if (strpos($fName, '20260930') !== false) {
+        continue;
+    }
+    
+    if (stripos($fName, 'teknisi_api_root') !== false && (strpos($fName, '20260929') !== false || strpos($fName, '20260928') !== false)) {
+        $goldenBackups[] = $b;
+    } elseif (stripos($fName, 'teknisi_root') !== false && (strpos($fName, '20260929') !== false || strpos($fName, '20260928') !== false)) {
+        $otherCandidates[] = $b;
+    } elseif (stripos($fName, 'sales_customer') !== false) {
+        $goldenBackups[] = $b;
     }
 }
-if (empty($candidateBackups)) {
-    $candidateBackups = $foundBackups;
-}
 
-// Urutkan candidate dari tanggal paling baru
-usort($candidateBackups, function($a, $b) {
-    return strcmp($b['file'], $a['file']);
-});
+// Prioritaskan file golden (teknisi_api_root_20260929)
+$candidateBackups = array_merge($goldenBackups, $otherCandidates);
 
 $restoredFromBackup = 0;
 foreach ($candidateBackups as $b) {
     $path = $b['path'];
+    $bFile = $b['file'];
     $isGz = (bool)preg_match('/\.gz$/i', $path);
-    
-    // Baca dan ekstrak tabel sales_customer
+
+    echo "\n--> Memeriksa isi file: {$bFile} ...\n";
+
     $gz = $isGz ? @gzopen($path, 'r') : @fopen($path, 'r');
-    if (!$gz) continue;
-    
+    if (!$gz) {
+        echo "  [x] Gagal membuka file $bFile\n";
+        continue;
+    }
+
     $capturing = false;
-    $tableSql = "";
+    $createTableLines = [];
+    $insertLines = [];
+    $foundTable = false;
+
     while (!($isGz ? gzeof($gz) : feof($gz))) {
-        $line = $isGz ? gzgets($gz, 65536) : fgets($gz, 65536);
+        $line = $isGz ? gzgets($gz, 1048576) : fgets($gz, 1048576);
         if ($line === false) break;
 
         if (stripos($line, 'CREATE TABLE `sales_customer`') !== false || stripos($line, 'CREATE TABLE IF NOT EXISTS `sales_customer`') !== false) {
             $capturing = true;
+            $foundTable = true;
+            $createTableLines[] = $line;
+            continue;
         }
 
         if ($capturing) {
-            // Berhenti jika sudah berpindah ke tabel lain
-            if ((preg_match('/^CREATE TABLE `(?!sales_customer)/', $line) || preg_match('/^DROP TABLE .*`(?!sales_customer)/', $line)) && strlen($tableSql) > 50) {
+            // Berhenti jika sudah berpindah ke tabel berikutnya
+            if (preg_match('/^-- Table structure for table `(?!sales_customer)/i', $line) ||
+                preg_match('/^DROP TABLE IF EXISTS `(?!sales_customer)/i', $line) ||
+                preg_match('/^CREATE TABLE `(?!sales_customer)/i', $line)) {
                 break;
             }
-            $tableSql .= $line;
+
+            // Kumpulkan baris CREATE TABLE sampai penutup kurung
+            if (!empty($createTableLines) && empty($insertLines)) {
+                $createTableLines[] = $line;
+                if (preg_match('/^\s*\)\s*ENGINE/i', $line) || preg_match('/;\s*$/', $line)) {
+                    // Akhir dari CREATE TABLE
+                }
+            }
+
+            // Kumpulkan baris INSERT INTO
+            if (stripos($line, 'INSERT INTO `sales_customer`') !== false || stripos($line, 'INSERT INTO sales_customer') !== false) {
+                $insertLines[] = $line;
+            }
         }
     }
     if ($isGz) gzclose($gz); else fclose($gz);
 
-    if (empty($tableSql) || stripos($tableSql, 'INSERT INTO') === false) {
+    if (!$foundTable || empty($insertLines)) {
+        echo "  [-] Tidak ditemukan data `sales_customer` di $bFile\n";
         continue;
     }
 
-    echo "\n[!] Ditemukan struktur & data `sales_customer` di: {$b['file']}!\n";
-    echo "Mengekstrak ke tabel staging sementara `sales_customer_restore_temp`...\n";
+    echo "  [✓] Ditemukan skema dan " . count($insertLines) . " blok INSERT di {$bFile}!\n";
+    echo "  Mengekstrak data ke tabel sementara `sales_customer_restore_temp`...\n";
 
-    // 1. Buat tabel temp dengan skema persis dari backup
+    // Buat tabel temporary
     $conn->query("DROP TABLE IF EXISTS `sales_customer_restore_temp`");
     
-    // Ganti nama tabel di SQL dump
-    $stagingSql = str_replace('`sales_customer`', '`sales_customer_restore_temp`', $tableSql);
-    $stagingSql = preg_replace('/CREATE TABLE (IF NOT EXISTS )?sales_customer/i', 'CREATE TABLE IF NOT EXISTS `sales_customer_restore_temp`', $stagingSql);
-    $stagingSql = preg_replace('/INSERT INTO sales_customer/i', 'INSERT INTO `sales_customer_restore_temp`', $stagingSql);
+    $createSql = implode("", $createTableLines);
+    $createSql = str_replace('`sales_customer`', '`sales_customer_restore_temp`', $createSql);
+    $createSql = preg_replace('/CREATE TABLE (IF NOT EXISTS )?sales_customer/i', 'CREATE TABLE IF NOT EXISTS `sales_customer_restore_temp`', $createSql);
+    // Hapus directive dump yang bermasalah jika ada di akhir
+    $createSql = preg_replace('/;\s*\/\*!.*$/s', ';', $createSql);
 
-    // Eksekusi multi query
-    if ($conn->multi_query($stagingSql)) {
-        do {
-            if ($res = $conn->store_result()) {
-                $res->free();
-            }
-        } while ($conn->more_results() && $conn->next_result());
+    $resCreate = $conn->query($createSql);
+    if (!$resCreate) {
+        // Fallback jika create dari dump gagal
+        $conn->query("CREATE TABLE `sales_customer_restore_temp` LIKE `sales_customer`");
     }
 
-    // Cek jumlah data yang berhasil masuk ke temp table
+    // Eksekusi tiap blok INSERT satu demi satu secara aman
+    $insertedRows = 0;
+    foreach ($insertLines as $idx => $ins) {
+        $insClean = str_replace('`sales_customer`', '`sales_customer_restore_temp`', $ins);
+        $insClean = preg_replace('/INSERT INTO sales_customer /i', 'INSERT INTO `sales_customer_restore_temp` ', $insClean);
+        $insClean = trim($insClean);
+        if (substr($insClean, -1) !== ';') {
+            $insClean .= ';';
+        }
+
+        if ($conn->query($insClean)) {
+            $insertedRows += $conn->affected_rows;
+        } else {
+            echo "  [x] Error pada blok INSERT #" . ($idx + 1) . ": " . $conn->error . "\n";
+        }
+    }
+
+    // Hitung data di tabel sementara
     $chkTemp = $conn->query("SELECT COUNT(*) as cnt FROM `sales_customer_restore_temp`");
     $cntTemp = ($chkTemp && $rT = $chkTemp->fetch_assoc()) ? (int)$rT['cnt'] : 0;
 
-    if ($cntTemp > 0) {
-        echo "✓ Berhasil mengekstrak {$cntTemp} customer asli dari backup!\n";
-        echo "Menyinkronkan data lama ke tabel `sales_customer` aktif (aman & tanpa duplikasi)...\n";
+    echo "  [✓] Berhasil memasukkan {$cntTemp} baris customer asli ke staging table!\n";
 
-        // Ambil kolom dari tabel temp dan tabel tujuan
+    if ($cntTemp > 0) {
+        // Sinkronkan ke sales_customer dengan ON DUPLICATE KEY UPDATE berdasarkan ID
         $tempCols = [];
         $resCols1 = $conn->query("SHOW COLUMNS FROM `sales_customer_restore_temp`");
         while ($rc = $resCols1->fetch_assoc()) {
@@ -249,65 +241,132 @@ foreach ($candidateBackups as $b) {
         $copySql = "INSERT INTO `sales_customer` ($colList)
                     SELECT $colList FROM `sales_customer_restore_temp`
                     ON DUPLICATE KEY UPDATE $updateSql";
-        
+
         if ($conn->query($copySql)) {
-            echo "✓ SUKSES: {$cntTemp} customer original dari backup {$b['file']} berhasil digabungkan ke `sales_customer`!\n";
+            echo "  [★] SUKSES BESAR: {$cntTemp} customer original dari {$bFile} berhasil dipulihkan ke `sales_customer`!\n";
             $restoredFromBackup += $cntTemp;
 
-            // Pastikan kode_customer terisi CUST-{id} jika masih kosong
-            $conn->query("UPDATE `sales_customer` SET `kode_customer` = CONCAT('CUST-', id) WHERE (`kode_customer` IS NULL OR `kode_customer` = '')");
+            // Buat arsip permanen
+            $conn->query("DROP TABLE IF EXISTS `sales_customer_original_archive`");
+            $conn->query("CREATE TABLE `sales_customer_original_archive` AS SELECT * FROM `sales_customer_restore_temp`");
 
-            // Pastikan alamat_lokasi terisi jika masih kosong
-            $conn->query("UPDATE `sales_customer` SET `alamat_lokasi` = alamat WHERE (`alamat_lokasi` IS NULL OR `alamat_lokasi` = '') AND alamat IS NOT NULL");
-
-            // Buat tabel arsip permanen agar tidak akan pernah hilang lagi
-            $conn->query("CREATE TABLE IF NOT EXISTS `sales_customer_original_archive` AS SELECT * FROM `sales_customer_restore_temp`");
-
-            // Selesai dengan backup yang paling baru
+            // Karena sudah dapat dari backup terbaik, hentikan loop backup
             break;
         } else {
-            echo "Error copySql: " . $conn->error . "\n";
+            echo "  [x] Error penggabungan data: " . $conn->error . "\n";
         }
     }
 }
 
-// 5. JIKA DARI PELAKSANAAN SALES ADA CLIENT YANG BELUM ADA DI SALES_CUSTOMER, RESTORE KEMBALI
-echo "\n[5] Sinkronisasi Client dari Transaksi ke sales_customer ...\n";
-$recoveredTx = 0;
-foreach ($txClients as $nameKey => $client) {
-    $nama = trim($client['nama_client']);
-    if (empty($nama)) continue;
+// 4. PENYELAMATAN & SINKRONISASI TEPAT DARI RIWAYAT TRANSAKSI (PELAKSANAAN SALES)
+echo "\n[3] Memverifikasi & Menyelaraskan Customer dengan Riwayat Kunjungan Riil...\n";
 
-    $chkEx = $conn->query("SELECT id FROM `sales_customer` WHERE `nama` = '" . $conn->real_escape_string($nama) . "' LIMIT 1");
-    if ($chkEx && $chkEx->num_rows === 0) {
-        // Insert client ini kembali ke sales_customer
-        $telp = $client['nomer_client'] ?? '';
-        $kategori = !empty($client['tipe_prospek']) && $client['tipe_prospek'] !== 'Biasa' ? $client['tipe_prospek'] : 'Dealer';
-        $alamat = $client['alamat_lokasi'] ?? '';
-        $lat = $client['lat'] ?? '-6.1754';
-        $lon = $client['lon'] ?? '106.8272';
-        $rad = $client['rad'] ?? '100';
+// Ambil riwayat check-in dari pelaksanaan_sales JOIN kegiatan_sales
+$qAudit = $conn->query("
+    SELECT 
+        ps.kegiatan_id,
+        ks.id_customer,
+        ps.nama_client,
+        ps.nomer_client,
+        ps.tipe_prospek,
+        ks.alamat_lokasi,
+        ks.lat,
+        ks.lon,
+        ks.rad,
+        c.nama AS current_nama_customer
+    FROM pelaksanaan_sales ps
+    JOIN kegiatan_sales ks ON ps.kegiatan_id = ks.id
+    LEFT JOIN sales_customer c ON ks.id_customer = c.id
+    WHERE ps.nama_client IS NOT NULL AND TRIM(ps.nama_client) != ''
+    ORDER BY ps.id ASC
+");
 
-        $st = $conn->prepare("INSERT INTO `sales_customer` (nama, kategori, telp_pribadi, alamat, lat, lon, rad, alamat_lokasi, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
-        if ($st) {
-            $st->bind_param("ssssssss", $nama, $kategori, $telp, $alamat, $lat, $lon, $rad, $alamat);
-            if ($st->execute()) {
-                $recoveredTx++;
+$fixedCustCount = 0;
+if ($qAudit && $qAudit->num_rows > 0) {
+    while ($row = $qAudit->fetch_assoc()) {
+        $idCust = (int)$row['id_customer'];
+        $realNama = trim($row['nama_client']);
+        $realTelp = trim($row['nomer_client'] ?? '');
+        $realAlamat = trim($row['alamat_lokasi'] ?? '');
+        $currentNama = trim($row['current_nama_customer'] ?? '');
+
+        if ($idCust > 0 && !empty($realNama)) {
+            // Jika nama di sales_customer berbeda dengan nama asli saat dikunjungi
+            if (strcasecmp($realNama, $currentNama) !== 0) {
+                $uStmt = $conn->prepare("
+                    UPDATE `sales_customer`
+                    SET `nama` = ?,
+                        `telp_pribadi` = IF(telp_pribadi IS NULL OR telp_pribadi = '', ?, telp_pribadi),
+                        `alamat` = IF(alamat IS NULL OR alamat = '', ?, alamat),
+                        `alamat_lokasi` = IF(alamat_lokasi IS NULL OR alamat_lokasi = '', ?, alamat_lokasi),
+                        `updated_at` = NOW()
+                    WHERE `id` = ?
+                ");
+                if ($uStmt) {
+                    $uStmt->bind_param("ssssi", $realNama, $realTelp, $realAlamat, $realAlamat, $idCust);
+                    $uStmt->execute();
+                    $uStmt->close();
+                    $fixedCustCount++;
+                    echo "  ✓ ID Customer {$idCust}: diperbaiki dari '{$currentNama}' -> '{$realNama}'\n";
+                }
             }
-            $st->close();
         }
     }
 }
 
-if ($recoveredTx > 0) {
-    echo "✓ Berhasil mengembalikan $recoveredTx customer dari riwayat transaksi sales ke `sales_customer`!\n";
+if ($fixedCustCount > 0) {
+    echo "Total {$fixedCustCount} customer kunjungan langsung diselaraskan dengan nama toko aslinya!\n";
 } else {
-    echo "• Semua client dari transaksi sudah ada di `sales_customer`.\n";
+    echo "Semua nama customer kunjungan sudah cocok dengan data riil transaksi.\n";
 }
 
-// STATISTIK AKHIR
+// 5. PASTIKAN KODE CUSTOMER & ALAMAT TERISI
+$conn->query("UPDATE `sales_customer` SET `kode_customer` = CONCAT('CUST-', LPAD(id, 4, '0')) WHERE (`kode_customer` IS NULL OR `kode_customer` = '')");
+$conn->query("UPDATE `sales_customer` SET `alamat_lokasi` = alamat WHERE (`alamat_lokasi` IS NULL OR `alamat_lokasi` = '') AND alamat IS NOT NULL");
+
+// 6. UPDATE SEMUA FILE API_SALES_TASK DI SERVER AGAR SORTING DESCENDING (TERBARU DI ATAS)
+echo "\n[4] Memperbarui Sorting api_sales_task.php (Terbaru Di Atas)... \n";
+$targetApiDirs = [
+    __DIR__ . '/modul-aplikasi-sales/api/api_sales_task.php',
+    __DIR__ . '/modul-aplikasi-sales/api_sales_task.php',
+    '/www/wwwroot/api-teknisi.id-giti.com/api_sales_task.php',
+    '/www/wwwroot/teknisi-api.id-giti.com/api_sales_task.php',
+    '/www/wwwroot/jadwal.id-giti.com/modul-aplikasi-sales/api/api_sales_task.php',
+];
+
+$sortUpdatedCount = 0;
+foreach ($targetApiDirs as $apiFile) {
+    if (file_exists($apiFile) && is_writable($apiFile)) {
+        $content = file_get_contents($apiFile);
+        $oldClause = 'ORDER BY ks.jadwal ASC, ks.id ASC';
+        $newClause = '($filter === \'all\') ? "ORDER BY ks.jadwal DESC, ks.id DESC" : "ORDER BY ks.jadwal ASC, ks.id ASC"';
+        
+        if (strpos($content, '$orderClause = ($filter === \'all\')') === false) {
+            $content = str_replace(
+                'ORDER BY ks.jadwal ASC, ks.id ASC',
+                'ORDER BY ks.jadwal DESC, ks.id DESC',
+                $content
+            );
+            file_put_contents($apiFile, $content);
+            $sortUpdatedCount++;
+            echo "  ✓ Diperbarui: $apiFile\n";
+        }
+    }
+}
+if ($sortUpdatedCount === 0) {
+    echo "  (File api_sales_task lokal sudah menggunakan sorting DESC atau path lain diatur via git)\n";
+}
+
+// 7. STATUS AKHIR
 $qTot = $conn->query("SELECT COUNT(*) as cnt FROM sales_customer WHERE deleted_at IS NULL")->fetch_assoc();
+$qSample = $conn->query("SELECT id, nama, alamat, telp_pribadi FROM sales_customer WHERE id IN (22, 15, 16, 36, 46) ORDER BY id ASC");
+
 echo "\n========================================================\n";
 echo "STATUS SAAT INI:\n";
-echo "Total Customer di tabel `sales_customer`: " . ($qTot['cnt'] ?? 0) . " data.\n";
+echo "Total Customer Aktif: " . ($qTot['cnt'] ?? 0) . " data.\n";
+echo "Sampel ID Kunjungan Sales:\n";
+while ($s = $qSample->fetch_assoc()) {
+    echo "  - ID {$s['id']}: " . $s['nama'] . " | " . mb_substr($s['alamat'] ?? '', 0, 40) . "\n";
+}
 echo "========================================================\n";
+echo "SELESAI!\n";
