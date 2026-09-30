@@ -199,7 +199,7 @@ if (!isset($_SESSION['categories_cache']) || isset($_GET['refresh_filter'])) {
 // Fetch list of sales for filter
 $all_sales = [];
 if ($_SESSION['role'] !== 'sales') {
-    $r_sales = $conn->query("SELECT id, nama_lengkap FROM sales WHERE role = 'sales' ORDER BY nama_lengkap ASC");
+    $r_sales = $conn->query("SELECT id, nama_lengkap FROM sales WHERE role = 'sales' AND deleted_at IS NULL ORDER BY nama_lengkap ASC");
     if ($r_sales) {
         while($row = $r_sales->fetch_assoc()) {
             $all_sales[] = $row;
