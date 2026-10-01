@@ -521,7 +521,7 @@ if ($action === 'create_penitipan') {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 4. AUDIT KUNJUNGAN & CEK SISA STOK TOKO
+// 4. AUDIT KUNJUNGAN & CEK SISA STOK TOKO (DENGAN DUKUNGAN RESTOCK)
 // ─────────────────────────────────────────────────────────────
 if ($action === 'audit_kunjungan') {
     $input = !empty($jsonInput) ? $jsonInput : $_POST;
@@ -546,6 +546,7 @@ if ($action === 'audit_kunjungan') {
     foreach ($items as $it) {
         $idItem = intval($it['id_item'] ?? 0);
         $stokSisa = intval($it['stok_sisa'] ?? ($it['qty_sisa'] ?? 0));
+        $tambahStok = max(0, intval($it['tambah_stok'] ?? 0));
         $noInv = trim($it['no_inv'] ?? '');
 
         $qCur = $conn->query("SELECT * FROM tiptok_items WHERE id = $idItem AND id_penitipan = $idPenitipan");
@@ -556,7 +557,7 @@ if ($action === 'audit_kunjungan') {
                 exit;
             }
             if ($stokSisa > $stokPrev) {
-                echo json_encode(['status' => 'error', 'message' => 'Stok sisa (' . $stokSisa . ') tidak boleh lebih besar dari stok sebelumnya (' . $stokPrev . ')!']);
+                echo json_encode(['status' => 'error', 'message' => 'Stok sisa fisik (' . $stokSisa . ') tidak boleh lebih besar dari stok sebelumnya (' . $stokPrev . ')! Gunakan Tambah Stok (Restock) jika menambah barang titipan baru.']);
                 exit;
             }
         }
@@ -572,10 +573,12 @@ if ($action === 'audit_kunjungan') {
 
     $totalInsentifDidapat = 0;
     $totalTerjualKunjungan = 0;
+    $totalRestockKunjungan = 0;
 
     foreach ($items as $it) {
         $idItem = intval($it['id_item'] ?? 0);
         $stokSisa = intval($it['stok_sisa'] ?? ($it['qty_sisa'] ?? 0));
+        $tambahStok = max(0, intval($it['tambah_stok'] ?? 0));
         $noInv = trim($it['no_inv'] ?? '');
         $tglInvoice = !empty($it['tgl_invoice']) ? trim($it['tgl_invoice']) : null;
 
@@ -592,41 +595,63 @@ if ($action === 'audit_kunjungan') {
             $lastVisNum++;
             $kodeKunjungan = $prefixVis . str_pad($lastVisNum, 3, '0', STR_PAD_LEFT);
 
+            // Susun log catatan bila ada restock
+            $logCatatan = $catatanKunjungan;
+            if ($tambahStok > 0) {
+                $noteRestock = "Restock: +{$tambahStok} unit (Stok akhir toko: " . ($stokSisa + $tambahStok) . ")";
+                $logCatatan = !empty($logCatatan) ? "$logCatatan | $noteRestock" : $noteRestock;
+            }
+
+            $stokSisaLog = $stokSisa + $tambahStok;
             $stmtLog = $conn->prepare("INSERT INTO tiptok_kunjungan (kode_kunjungan, id_penitipan, id_item, id_sales, nama_sales, tgl_kunjungan, stok_sebelumnya, stok_sisa, qty_terjual_kunjungan, no_inv, tgl_invoice, insentif_didapat, catatan_kunjungan, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
             if ($stmtLog) {
-                $stmtLog->bind_param("siiissiiissds", $kodeKunjungan, $idPenitipan, $idItem, $idSales, $namaSales, $tglKunjungan, $stokPrev, $stokSisa, $terjual, $noInv, $tglInvoice, $insentifKunjungan, $catatanKunjungan);
+                $stmtLog->bind_param("siiissiiissds", $kodeKunjungan, $idPenitipan, $idItem, $idSales, $namaSales, $tglKunjungan, $stokPrev, $stokSisaLog, $terjual, $noInv, $tglInvoice, $insentifKunjungan, $logCatatan);
                 $stmtLog->execute();
             }
 
-            // Update Master Item
+            // Update Master Item (stok akhir = sisa fisik saat audit + restock baru)
+            $stokAkhir = $stokSisa + $tambahStok;
+            $newQtyTitip = intval($cur['qty_titip']) + $tambahStok;
             $newTerjualTotal = intval($cur['qty_terjual']) + $terjual;
             $newInsentifTotal = floatval($cur['total_insentif']) + $insentifKunjungan;
-            $newItemStatus = ($stokSisa == 0) ? 'habis_terjual' : 'titip';
+            $newItemStatus = ($stokAkhir == 0) ? 'habis_terjual' : 'titip';
 
-            $stmtUpItem = $conn->prepare("UPDATE tiptok_items SET qty_sisa = ?, qty_terjual = ?, total_insentif = ?, status_item = ?, updated_at = NOW() WHERE id = ?");
+            $stmtUpItem = $conn->prepare("UPDATE tiptok_items SET qty_titip = ?, qty_sisa = ?, qty_terjual = ?, total_insentif = ?, status_item = ?, updated_at = NOW() WHERE id = ?");
             if ($stmtUpItem) {
-                $stmtUpItem->bind_param("iidsi", $stokSisa, $newTerjualTotal, $newInsentifTotal, $newItemStatus, $idItem);
+                $stmtUpItem->bind_param("iiidsi", $newQtyTitip, $stokAkhir, $newTerjualTotal, $newInsentifTotal, $newItemStatus, $idItem);
                 $stmtUpItem->execute();
             }
 
             $totalInsentifDidapat += $insentifKunjungan;
             $totalTerjualKunjungan += $terjual;
+            $totalRestockKunjungan += $tambahStok;
         }
     }
 
-    // Cek apakah seluruh item sudah habis terjual
+    // Cek apakah seluruh item sudah habis terjual / masih ada sisa
     $qCheckSisa = $conn->query("SELECT SUM(qty_sisa) as total_sisa FROM tiptok_items WHERE id_penitipan = $idPenitipan");
     $totalSisaPen = $qCheckSisa ? intval($qCheckSisa->fetch_assoc()['total_sisa'] ?? 0) : 0;
     if ($totalSisaPen == 0) {
         $conn->query("UPDATE tiptok_penitipan SET status = 'selesai', updated_at = NOW() WHERE id = $idPenitipan");
+    } else {
+        $conn->query("UPDATE tiptok_penitipan SET status = 'aktif', updated_at = NOW() WHERE id = $idPenitipan");
+    }
+
+    $msgFinal = 'Audit stok toko berhasil disimpan!';
+    if ($totalTerjualKunjungan > 0) {
+        $msgFinal .= " Terjual: $totalTerjualKunjungan unit (Insentif: Rp " . number_format($totalInsentifDidapat, 0, ',', '.') . ")";
+    }
+    if ($totalRestockKunjungan > 0) {
+        $msgFinal .= " | Restock Baru: +$totalRestockKunjungan unit";
     }
 
     echo json_encode([
         'status' => 'success',
-        'message' => 'Audit stok toko berhasil disimpan!' . ($totalTerjualKunjungan > 0 ? " Terjual: $totalTerjualKunjungan unit (Insentif: Rp " . number_format($totalInsentifDidapat, 0, ',', '.') . ")" : ""),
+        'message' => $msgFinal,
         'data' => [
             'total_terjual' => $totalTerjualKunjungan,
             'total_insentif' => $totalInsentifDidapat,
+            'total_restock' => $totalRestockKunjungan,
         ]
     ]);
     exit;
