@@ -266,22 +266,21 @@ $stat_belum_fu = (int)($stats_row['count_belum_fu'] ?? 0);
 $stat_kandidat = (int)($stats_row['count_kandidat'] ?? 0);
 $stat_deal     = (int)($stats_row['count_deal'] ?? 0);
 
-// Sync with Leaderboard Activity FU count
+// Hitung Total Kali Aktivitas FU (Berapa kali interaksi chat/telepon dilakukan)
+$stat_total_aktivitas = 0;
 if ($active_sales_id > 0) {
     $stmt_act = $conn->prepare("
-        SELECT COUNT(DISTINCT fu.id) AS total_fu
+        SELECT COUNT(fu.id) AS total_fu
         FROM follow_ups fu
-        JOIN customers c ON fu.customer_id = c.id
         WHERE fu.sales_id = ? AND fu.deleted_at IS NULL
-          AND fu.tgl_follow_up >= '2026-08-01 00:00:00' AND fu.tgl_follow_up <= '2026-10-31 23:59:59'
     ");
     $stmt_act->bind_param("i", $active_sales_id);
     $stmt_act->execute();
-    $act_res = (int)($stmt_act->get_result()->fetch_assoc()['total_fu'] ?? 0);
+    $stat_total_aktivitas = (int)($stmt_act->get_result()->fetch_assoc()['total_fu'] ?? 0);
     $stmt_act->close();
-    if ($act_res > 0) {
-        $stat_sudah_fu = $act_res;
-    }
+} else {
+    $res_all_act = $conn->query("SELECT COUNT(*) AS total_fu FROM follow_ups WHERE deleted_at IS NULL");
+    $stat_total_aktivitas = (int)($res_all_act->fetch_assoc()['total_fu'] ?? 0);
 }
 ?>
 
@@ -431,9 +430,14 @@ if ($active_sales_id > 0) {
 /* Status Filter Metrics Bar (Linear Segmented Style) */
 .taste-metrics-bar {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 12px;
     margin-bottom: 20px;
+}
+@media (max-width: 1280px) and (min-width: 992px) {
+    .taste-metrics-bar {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 @media (max-width: 991px) {
     .taste-metrics-bar {
@@ -504,6 +508,7 @@ if ($active_sales_id > 0) {
 .dot-all { background: #64748B; }
 .dot-pending { background: #F59E0B; box-shadow: 0 0 6px rgba(245, 158, 11, 0.6); }
 .dot-fu { background: #2563EB; box-shadow: 0 0 6px rgba(37, 99, 235, 0.6); }
+.dot-activity { background: #0284C7; box-shadow: 0 0 6px rgba(2, 132, 199, 0.6); }
 .dot-kandidat { background: #8B5CF6; box-shadow: 0 0 6px rgba(139, 92, 246, 0.6); }
 .dot-deal { background: #10B981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
 
@@ -1030,13 +1035,24 @@ if ($active_sales_id > 0) {
             </div>
         </a>
 
-        <!-- 3. Sudah Follow Up -->
-        <a href="index.php?filter_fu=sudah<?php echo $filter_sales ? '&filter_sales=' . $filter_sales : ''; ?>#customer-section" class="taste-metric-item <?php if ($filter_fu === 'sudah') echo 'active-metric'; ?>" title="Klik untuk memfilter customer sudah follow up">
+        <!-- 3. Toko Sudah Follow Up -->
+        <a href="index.php?filter_fu=sudah<?php echo $filter_sales ? '&filter_sales=' . $filter_sales : ''; ?>#customer-section" class="taste-metric-item <?php if ($filter_fu === 'sudah') echo 'active-metric'; ?>" title="Klik untuk memfilter customer yang sudah di-follow up">
             <div class="taste-metric-info">
-                <div class="taste-metric-label" style="color:#2563EB;"><span class="indicator-dot dot-fu"></span> Sudah FU</div>
+                <div class="taste-metric-label" style="color:#2563EB;"><span class="indicator-dot dot-fu"></span> Toko Sudah FU</div>
                 <div class="taste-metric-val" style="color:#1D4ED8;"><?php echo number_format($stat_sudah_fu); ?></div>
             </div>
             <div class="taste-metric-icon" style="background:#EFF6FF; color:#2563EB;">
+                <i class="bi bi-shop-window"></i>
+            </div>
+        </a>
+
+        <!-- 4. Total Kali Follow Up -->
+        <a href="followup_report.php<?php echo $filter_sales ? '?filter_sales=' . $filter_sales : ''; ?>" class="taste-metric-item" title="Lihat Riwayat Lengkap Semua Aktivitas Chat/Telepon Follow Up">
+            <div class="taste-metric-info">
+                <div class="taste-metric-label" style="color:#0284C7;"><span class="indicator-dot dot-activity"></span> Total Kali FU</div>
+                <div class="taste-metric-val" style="color:#0369A1;"><?php echo number_format($stat_total_aktivitas); ?></div>
+            </div>
+            <div class="taste-metric-icon" style="background:#F0F9FF; color:#0284C7;">
                 <i class="bi bi-chat-left-dots-fill"></i>
             </div>
         </a>
