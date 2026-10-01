@@ -191,4 +191,87 @@ if ($checkKeg && $checkKeg->num_rows > 0) {
         echo "   • Total Jadwal Kunjungan: {$rk['total_kegiatan']} (Selesai: {$rk['selesai']}, Dihapus: {$rk['terhapus']})\n";
     }
 }
+echo "\n";
+
+// 8. Rincian 3 Follow-Up Natalia yang Terhapus di September 2026
+echo "8. RINCIAN 3 FOLLOW UP NATALIA YANG BERSTATUS TERHAPUS (DELETED_AT):\n";
+$qDelFu = $conn->query("
+    SELECT fu.id, fu.customer_id, c.nama_toko, fu.tgl_follow_up, fu.deleted_at, fu.respon, fu.keterangan
+    FROM follow_ups fu
+    LEFT JOIN customers c ON fu.customer_id = c.id
+    WHERE fu.sales_id IN ({$idList})
+      AND DATE(fu.tgl_follow_up) BETWEEN '2026-09-01' AND '2026-09-30'
+      AND fu.deleted_at IS NOT NULL
+");
+if ($qDelFu && $qDelFu->num_rows > 0) {
+    while ($rd = $qDelFu->fetch_assoc()) {
+        echo "   • ID FU: {$rd['id']} | Toko: '{$rd['nama_toko']}'\n";
+        echo "     Tgl FU: {$rd['tgl_follow_up']} | Dihapus Pada: {$rd['deleted_at']}\n";
+        echo "     Respon: {$rd['respon']} | Ket: {$rd['keterangan']}\n\n";
+    }
+} else {
+    echo "   (Tidak ada rincian data terhapus)\n\n";
+}
+
+// 9. Perbandingan Aktivitas Follow Up Seluruh Sales di Bulan September 2026
+echo "9. PERBANDINGAN TOTAL FOLLOW UP SEMUA SALES DI BULAN SEPTEMBER 2026:\n";
+$qAllSalesSep = $conn->query("
+    SELECT s.id, s.nama_lengkap, COUNT(fu.id) as total_fu, COUNT(DISTINCT fu.customer_id) as cust_unik
+    FROM sales s
+    LEFT JOIN follow_ups fu ON s.id = fu.sales_id 
+        AND DATE(fu.tgl_follow_up) BETWEEN '2026-09-01' AND '2026-09-30'
+        AND fu.deleted_at IS NULL
+    WHERE s.role = 'sales' AND s.deleted_at IS NULL
+    GROUP BY s.id, s.nama_lengkap
+    ORDER BY total_fu DESC
+");
+while ($ras = $qAllSalesSep->fetch_assoc()) {
+    echo "   • {$ras['nama_lengkap']} (ID {$ras['id']}): {$ras['total_fu']} kali FU ({$ras['cust_unik']} toko unik)\n";
+}
+echo "\n";
+
+// 10. Cek Apakah Ada Follow Up di Bulan Oktober 2026 (Bulan Ini)
+echo "10. RIWAYAT FOLLOW UP NATALIA DI BULAN OKTOBER 2026 (BULAN INI):\n";
+$qOct = $conn->query("
+    SELECT COUNT(*) as total_oct, COUNT(DISTINCT customer_id) as cust_oct
+    FROM follow_ups
+    WHERE sales_id IN ({$idList})
+      AND DATE(tgl_follow_up) >= '2026-10-01'
+      AND deleted_at IS NULL
+");
+$oct = $qOct ? $qOct->fetch_assoc() : ['total_oct' => 0, 'cust_oct' => 0];
+echo "   • Total FU Bulan Oktober 2026: {$oct['total_oct']} kali ({$oct['cust_oct']} toko unik)\n\n";
+
+// 11. Cek Toko Wilayah Jawa Timur / Bali yang Di-FU Sales Lain di September 2026
+echo "11. CEK APAKAH ADA TOKO DI WILAYAH JAWA TIMUR YANG DI-FU SALES LAIN (SEPTEMBER 2026):\n";
+$jatimKeywords = ['surabaya', 'malang', 'sidoarjo', 'gresik', 'jember', 'banyuwangi', 'kediri', 'madiun', 'probolinggo', 'pasuruan', 'blitar', 'mojokerto', 'tuban', 'lamongan', 'bojonegoro', 'ngawi', 'magetan', 'ponorogo', 'pacitan', 'tulungagung', 'trenggalek', 'nganjuk', 'lumajang', 'bondowoso', 'situbondo', 'bangkalan', 'sampang', 'pamekasan', 'sumenep', 'jatim', 'jawa timur'];
+$condJatim = [];
+foreach ($jatimKeywords as $kw) {
+    $condJatim[] = "ca.kota LIKE '%$kw%'";
+}
+$whereJatim = "(" . implode(' OR ', $condJatim) . ")";
+
+$qJatimCross = $conn->query("
+    SELECT s.nama_lengkap, COUNT(fu.id) as total_fu, COUNT(DISTINCT fu.customer_id) as cust_unik
+    FROM follow_ups fu
+    JOIN customers c ON fu.customer_id = c.id
+    JOIN customer_addresses ca ON c.id = ca.customer_id
+    JOIN sales s ON fu.sales_id = s.id
+    WHERE {$whereJatim}
+      AND fu.sales_id NOT IN ({$idList})
+      AND DATE(fu.tgl_follow_up) BETWEEN '2026-09-01' AND '2026-09-30'
+      AND fu.deleted_at IS NULL
+      AND c.deleted_at IS NULL
+    GROUP BY s.nama_lengkap
+    ORDER BY total_fu DESC
+");
+if ($qJatimCross && $qJatimCross->num_rows > 0) {
+    while ($rjc = $qJatimCross->fetch_assoc()) {
+        echo "   • {$rjc['nama_lengkap']} melakukan {$rjc['total_fu']} FU ({$rjc['cust_unik']} toko di Jatim)\n";
+    }
+} else {
+    echo "   (Tidak ada sales lain yang mem-follow up toko di Jawa Timur di bulan September 2026)\n";
+}
+
 echo "\n=================================================================\n";
+
