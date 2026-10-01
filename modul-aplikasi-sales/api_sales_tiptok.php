@@ -580,7 +580,8 @@ if ($action === 'audit_kunjungan') {
         $stokSisa = intval($it['stok_sisa'] ?? ($it['qty_sisa'] ?? 0));
         $tambahStok = max(0, intval($it['tambah_stok'] ?? 0));
         $noInv = trim($it['no_inv'] ?? '');
-        $tglInvoice = !empty($it['tgl_invoice']) ? trim($it['tgl_invoice']) : null;
+        $tglInvoice = (!empty($it['tgl_invoice'])) ? trim($it['tgl_invoice']) : null;
+        $tglRestock = (!empty($it['tgl_restock'])) ? trim($it['tgl_restock']) : ($tambahStok > 0 ? $tglKunjungan : null);
 
         $qCur = $conn->query("SELECT * FROM tiptok_items WHERE id = $idItem AND id_penitipan = $idPenitipan");
         if ($qCur && $cur = $qCur->fetch_assoc()) {
@@ -598,15 +599,29 @@ if ($action === 'audit_kunjungan') {
             // Susun log catatan bila ada restock
             $logCatatan = $catatanKunjungan;
             if ($tambahStok > 0) {
-                $noteRestock = "Restock: +{$tambahStok} unit (Stok akhir toko: " . ($stokSisa + $tambahStok) . ")";
+                $noteRestock = "Restock: +{$tambahStok} unit (Tgl: " . ($tglRestock ?: $tglKunjungan) . ", Stok akhir: " . ($stokSisa + $tambahStok) . ")";
                 $logCatatan = !empty($logCatatan) ? "$logCatatan | $noteRestock" : $noteRestock;
             }
 
             $stokSisaLog = $stokSisa + $tambahStok;
-            $stmtLog = $conn->prepare("INSERT INTO tiptok_kunjungan (kode_kunjungan, id_penitipan, id_item, id_sales, nama_sales, tgl_kunjungan, stok_sebelumnya, stok_sisa, qty_terjual_kunjungan, no_inv, tgl_invoice, insentif_didapat, catatan_kunjungan, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-            if ($stmtLog) {
-                $stmtLog->bind_param("siiissiiissds", $kodeKunjungan, $idPenitipan, $idItem, $idSales, $namaSales, $tglKunjungan, $stokPrev, $stokSisaLog, $terjual, $noInv, $tglInvoice, $insentifKunjungan, $logCatatan);
-                $stmtLog->execute();
+            $hasRestockCol = false;
+            $chkColNow = @$conn->query("SHOW COLUMNS FROM `tiptok_kunjungan` LIKE 'tgl_restock'");
+            if ($chkColNow && mysqli_num_rows($chkColNow) > 0) {
+                $hasRestockCol = true;
+            }
+
+            if ($hasRestockCol) {
+                $stmtLog = $conn->prepare("INSERT INTO tiptok_kunjungan (kode_kunjungan, id_penitipan, id_item, id_sales, nama_sales, tgl_kunjungan, stok_sebelumnya, stok_sisa, qty_terjual_kunjungan, qty_restock, no_inv, tgl_invoice, tgl_restock, insentif_didapat, catatan_kunjungan, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+                if ($stmtLog) {
+                    $stmtLog->bind_param("siiissiiiisssds", $kodeKunjungan, $idPenitipan, $idItem, $idSales, $namaSales, $tglKunjungan, $stokPrev, $stokSisaLog, $terjual, $tambahStok, $noInv, $tglInvoice, $tglRestock, $insentifKunjungan, $logCatatan);
+                    $stmtLog->execute();
+                }
+            } else {
+                $stmtLog = $conn->prepare("INSERT INTO tiptok_kunjungan (kode_kunjungan, id_penitipan, id_item, id_sales, nama_sales, tgl_kunjungan, stok_sebelumnya, stok_sisa, qty_terjual_kunjungan, no_inv, tgl_invoice, insentif_didapat, catatan_kunjungan, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+                if ($stmtLog) {
+                    $stmtLog->bind_param("siiissiiissds", $kodeKunjungan, $idPenitipan, $idItem, $idSales, $namaSales, $tglKunjungan, $stokPrev, $stokSisaLog, $terjual, $noInv, $tglInvoice, $insentifKunjungan, $logCatatan);
+                    $stmtLog->execute();
+                }
             }
 
             // Update Master Item (stok akhir = sisa fisik saat audit + restock baru)
@@ -616,10 +631,19 @@ if ($action === 'audit_kunjungan') {
             $newInsentifTotal = floatval($cur['total_insentif']) + $insentifKunjungan;
             $newItemStatus = ($stokAkhir == 0) ? 'habis_terjual' : 'titip';
 
-            $stmtUpItem = $conn->prepare("UPDATE tiptok_items SET qty_titip = ?, qty_sisa = ?, qty_terjual = ?, total_insentif = ?, status_item = ?, updated_at = NOW() WHERE id = ?");
-            if ($stmtUpItem) {
-                $stmtUpItem->bind_param("iiidsi", $newQtyTitip, $stokAkhir, $newTerjualTotal, $newInsentifTotal, $newItemStatus, $idItem);
-                $stmtUpItem->execute();
+            $chkColItem = @$conn->query("SHOW COLUMNS FROM `tiptok_items` LIKE 'tgl_restock_terakhir'");
+            if ($chkColItem && mysqli_num_rows($chkColItem) > 0 && $tambahStok > 0) {
+                $stmtUpItem = $conn->prepare("UPDATE tiptok_items SET qty_titip = ?, qty_sisa = ?, qty_terjual = ?, total_insentif = ?, status_item = ?, tgl_restock_terakhir = ?, updated_at = NOW() WHERE id = ?");
+                if ($stmtUpItem) {
+                    $stmtUpItem->bind_param("iiidssi", $newQtyTitip, $stokAkhir, $newTerjualTotal, $newInsentifTotal, $newItemStatus, $tglRestock, $idItem);
+                    $stmtUpItem->execute();
+                }
+            } else {
+                $stmtUpItem = $conn->prepare("UPDATE tiptok_items SET qty_titip = ?, qty_sisa = ?, qty_terjual = ?, total_insentif = ?, status_item = ?, updated_at = NOW() WHERE id = ?");
+                if ($stmtUpItem) {
+                    $stmtUpItem->bind_param("iiidsi", $newQtyTitip, $stokAkhir, $newTerjualTotal, $newInsentifTotal, $newItemStatus, $idItem);
+                    $stmtUpItem->execute();
+                }
             }
 
             $totalInsentifDidapat += $insentifKunjungan;
