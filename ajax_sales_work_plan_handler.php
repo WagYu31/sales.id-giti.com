@@ -524,70 +524,116 @@ switch ($action) {
             $seen_keys = [];
 
             // -------------------------------------------------------------
-            // A. Search in sales_customer (Master Toko/Dealer list in customer.php)
+            // A. Search in sales_customer (Master Toko/Dealer from Canvas DB & Main DB)
             // -------------------------------------------------------------
-            $where_sc = ["deleted_at IS NULL"];
-            if (!empty($q)) {
-                $q_esc = $conn->real_escape_string($q);
-                $where_sc[] = "(
-                    nama LIKE '%{$q_esc}%'
-                    OR kode_customer LIKE '%{$q_esc}%'
-                    OR telp_pribadi LIKE '%{$q_esc}%'
-                    OR kota LIKE '%{$q_esc}%'
-                    OR alamat LIKE '%{$q_esc}%'
-                    OR email LIKE '%{$q_esc}%'
-                )";
+            // 1. Establish connection to Canvas DB (teknisi_api_root) where customer.php operates
+            $sc_databases = [];
+            
+            mysqli_report(MYSQLI_REPORT_OFF);
+            $host = 'localhost';
+            $cCanvas = @new mysqli($host, 'teknisi_api_root', 'OffOff@18', 'teknisi_api_root');
+            if ($cCanvas && $cCanvas->connect_error) {
+                $cCanvas = @new mysqli($host, 'teknisi_api_root', 'WagyuA531052002.', 'teknisi_api_root');
             }
-            $where_sc_sql = implode(' AND ', $where_sc);
-            $sql_sc = "
-                SELECT 
-                    id, 
-                    kode_customer, 
-                    nama, 
-                    kategori, 
-                    kota, 
-                    telp_pribadi, 
-                    alamat, 
-                    email 
-                FROM sales_customer 
-                WHERE {$where_sc_sql} 
-                ORDER BY nama ASC 
-                LIMIT 150
-            ";
-            $res_sc = $conn->query($sql_sc);
-            if ($res_sc) {
-                while ($r = $res_sc->fetch_assoc()) {
-                    $norm_key = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $r['nama']));
-                    $phone = !empty($r['telp_pribadi']) ? trim($r['telp_pribadi']) : '';
-                    $kota  = !empty($r['kota']) ? trim($r['kota']) : '';
-                    $kode  = !empty($r['kode_customer']) ? trim($r['kode_customer']) : '';
-                    $kat   = !empty($r['kategori']) ? trim($r['kategori']) : '';
-                    
-                    $extra_info = [];
-                    if ($kode) $extra_info[] = $kode;
-                    if ($kat) $extra_info[] = $kat;
-                    if ($kota) $extra_info[] = $kota;
-                    if ($phone) $extra_info[] = $phone;
-                    $info_str = !empty($extra_info) ? ' (' . implode(' • ', $extra_info) . ')' : '';
+            if ($cCanvas && $cCanvas->connect_error) {
+                $cCanvas = @new mysqli($host, 'u836263092_jadwaltest', 'Eddie@1819', 'u836263092_jadwalTest');
+            }
+            if ($cCanvas && $cCanvas->connect_error && file_exists(__DIR__ . '/modul-aplikasi-sales/conn.php')) {
+                $cCanvas = (function() {
+                    mysqli_report(MYSQLI_REPORT_OFF);
+                    include __DIR__ . '/modul-aplikasi-sales/conn.php';
+                    return (isset($conn) && $conn && !$conn->connect_error) ? $conn : null;
+                })();
+            }
 
-                    $item = [
-                        'id' => (int)$r['id'],
-                        'text' => $r['nama'] . $info_str,
-                        'nama_toko' => $r['nama'],
-                        'phone' => $phone,
-                        'kota' => $kota,
-                        'pic' => '',
-                        'kategori' => $kat,
-                        'kode_customer' => $kode,
-                        'alamat' => $r['alamat'] ?? '',
-                        'email' => $r['email'] ?? '',
-                        'source' => 'sales_customer',
-                        'is_own_sales' => 1
-                    ];
+            if ($cCanvas && !$cCanvas->connect_error) {
+                $cCanvas->set_charset("utf8mb4");
+                $sc_databases[] = $cCanvas;
+            }
 
-                    $raw_items[] = $item;
-                    if ($norm_key !== '') {
-                        $seen_keys[$norm_key] = true;
+            // 2. Also query main CRM DB ($conn) if different from Canvas DB
+            if ($conn && !$conn->connect_error) {
+                $is_same = false;
+                foreach ($sc_databases as $existingDb) {
+                    if (isset($existingDb->thread_id, $conn->thread_id) && $existingDb->thread_id === $conn->thread_id) {
+                        $is_same = true;
+                        break;
+                    }
+                }
+                if (!$is_same) {
+                    $sc_databases[] = $conn;
+                }
+            }
+
+            // 3. Query sales_customer across all available databases
+            foreach ($sc_databases as $db) {
+                $where_sc = ["deleted_at IS NULL"];
+                if (!empty($q)) {
+                    $q_esc = $db->real_escape_string($q);
+                    $where_sc[] = "(
+                        nama LIKE '%{$q_esc}%'
+                        OR kode_customer LIKE '%{$q_esc}%'
+                        OR telp_pribadi LIKE '%{$q_esc}%'
+                        OR kota LIKE '%{$q_esc}%'
+                        OR alamat LIKE '%{$q_esc}%'
+                        OR email LIKE '%{$q_esc}%'
+                    )";
+                }
+                $where_sc_sql = implode(' AND ', $where_sc);
+                $sql_sc = "
+                    SELECT 
+                        id, 
+                        kode_customer, 
+                        nama, 
+                        kategori, 
+                        kota, 
+                        telp_pribadi, 
+                        alamat, 
+                        email 
+                    FROM sales_customer 
+                    WHERE {$where_sc_sql} 
+                    ORDER BY nama ASC 
+                    LIMIT 150
+                ";
+                $res_sc = $db->query($sql_sc);
+                if ($res_sc) {
+                    while ($r = $res_sc->fetch_assoc()) {
+                        $norm_key = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $r['nama']));
+                        if ($norm_key !== '' && isset($seen_keys[$norm_key])) {
+                            continue;
+                        }
+
+                        $phone = !empty($r['telp_pribadi']) ? trim($r['telp_pribadi']) : '';
+                        $kota  = !empty($r['kota']) ? trim($r['kota']) : '';
+                        $kode  = !empty($r['kode_customer']) ? trim($r['kode_customer']) : '';
+                        $kat   = !empty($r['kategori']) ? trim($r['kategori']) : '';
+                        
+                        $extra_info = [];
+                        if ($kode) $extra_info[] = $kode;
+                        if ($kat) $extra_info[] = $kat;
+                        if ($kota) $extra_info[] = $kota;
+                        if ($phone) $extra_info[] = $phone;
+                        $info_str = !empty($extra_info) ? ' (' . implode(' • ', $extra_info) . ')' : '';
+
+                        $item = [
+                            'id' => (int)$r['id'],
+                            'text' => $r['nama'] . $info_str,
+                            'nama_toko' => $r['nama'],
+                            'phone' => $phone,
+                            'kota' => $kota,
+                            'pic' => '',
+                            'kategori' => $kat,
+                            'kode_customer' => $kode,
+                            'alamat' => $r['alamat'] ?? '',
+                            'email' => $r['email'] ?? '',
+                            'source' => 'sales_customer',
+                            'is_own_sales' => 1
+                        ];
+
+                        $raw_items[] = $item;
+                        if ($norm_key !== '') {
+                            $seen_keys[$norm_key] = true;
+                        }
                     }
                 }
             }
