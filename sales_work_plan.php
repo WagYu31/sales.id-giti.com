@@ -1258,15 +1258,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!item.nama_toko) {
                         return $(`<div><span class="badge bg-secondary me-1">Custom Baru</span> <strong>${escapeHtml(item.text)}</strong></div>`);
                     }
-                    const kotaBadge = item.kota ? `<span class="badge bg-light text-secondary border me-1">${escapeHtml(item.kota)}</span>` : '';
-                    const phoneBadge = item.phone ? `<span class="badge bg-success-subtle text-success border"><i class="bi bi-telephone"></i> ${escapeHtml(item.phone)}</span>` : '';
+                    const kodeBadge = item.kode_customer ? `<span class="badge bg-primary-subtle text-primary border me-1"><i class="bi bi-upc-scan me-1"></i>${escapeHtml(item.kode_customer)}</span>` : '';
+                    const katBadge = item.kategori ? `<span class="badge bg-info-subtle text-info border me-1">${escapeHtml(item.kategori)}</span>` : '';
+                    const kotaBadge = item.kota ? `<span class="badge bg-light text-secondary border me-1"><i class="bi bi-geo-alt me-1"></i>${escapeHtml(item.kota)}</span>` : '';
+                    const phoneBadge = item.phone ? `<span class="badge bg-success-subtle text-success border"><i class="bi bi-telephone me-1"></i>${escapeHtml(item.phone)}</span>` : '';
+                    const picBadge = item.pic ? `<span class="text-muted ms-1"><i class="bi bi-person me-1"></i>PIC: ${escapeHtml(item.pic)}</span>` : '';
                     return $(`
                         <div class="py-1">
-                            <div class="fw-bold text-dark">${escapeHtml(item.nama_toko)}</div>
-                            <div class="d-flex align-items-center gap-1 mt-1" style="font-size:11px;">
+                            <div class="fw-bold text-dark d-flex align-items-center flex-wrap gap-1">
+                                <span>${escapeHtml(item.nama_toko)}</span>
+                                ${kodeBadge}
+                                ${katBadge}
+                            </div>
+                            <div class="d-flex align-items-center flex-wrap gap-1 mt-1" style="font-size:11px;">
                                 ${kotaBadge}
                                 ${phoneBadge}
-                                ${item.pic ? `<span class="text-muted ms-1">PIC: ${escapeHtml(item.pic)}</span>` : ''}
+                                ${picBadge}
                             </div>
                         </div>
                     `);
@@ -1281,6 +1288,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('modal_nama_customer').value = data.nama_toko || data.text;
                     if (data.phone) {
                         document.getElementById('modal_kontak_customer').value = data.phone;
+                    }
+                    if (data.email && document.getElementById('modal_email_customer')) {
+                        document.getElementById('modal_email_customer').value = data.email;
                     }
                 } else {
                     document.getElementById('modal_customer_id').value = '';
@@ -1439,7 +1449,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     let opts = '';
                     res.results.forEach(c => {
-                        opts += `<option value="${escapeHtml(c.nama_toko)}" data-phone="${escapeHtml(c.phone || '')}">${c.kota ? '(' + escapeHtml(c.kota) + ')' : ''}</option>`;
+                        const codeStr = c.kode_customer ? ` [${escapeHtml(c.kode_customer)}]` : '';
+                        const kotaStr = c.kota ? ` (${escapeHtml(c.kota)})` : '';
+                        opts += `<option value="${escapeHtml(c.nama_toko)}" data-phone="${escapeHtml(c.phone || '')}">${codeStr}${kotaStr}</option>`;
                     });
                     dlist.innerHTML = opts;
                 }

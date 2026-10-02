@@ -503,87 +503,235 @@ switch ($action) {
         break;
 
     // -------------------------------------------------------------
-    // 9. SEARCH CUSTOMER AUTOCOMPLETE (SELECT2 COMPATIBLE - SCOPED TO SALES)
+    // 9. SEARCH CUSTOMER AUTOCOMPLETE (SELECT2 COMPATIBLE - UNIFIED SEARCH)
     // -------------------------------------------------------------
     case 'search_customer':
         try {
             $q = trim($_GET['q'] ?? $_GET['term'] ?? '');
             $page = max(1, intval($_GET['page'] ?? 1));
-            $limit = 30;
+            $limit = max(1, min(100, intval($_GET['limit'] ?? 30)));
             $offset = ($page - 1) * $limit;
             
-            // Strictly scope to sales_id:
-            // If user is sales, ONLY show their own assigned customers (c.sales_id = $user_id)
-            // If user is admin, allow filtering by requested sales_id
+            // Scope target sales if provided or if sales role
             $target_sales_id = 0;
             if ($user_role === 'sales') {
                 $target_sales_id = $user_id;
             } elseif (!empty($_GET['sales_id'])) {
                 $target_sales_id = intval($_GET['sales_id']);
             }
-            
-            $where = ["c.deleted_at IS NULL"];
-            if ($target_sales_id > 0) {
-                $where[] = "c.sales_id = {$target_sales_id}";
-            }
-            
+
+            $raw_items = [];
+            $seen_keys = [];
+
+            // -------------------------------------------------------------
+            // A. Search in sales_customer (Master Toko/Dealer list in customer.php)
+            // -------------------------------------------------------------
+            $where_sc = ["deleted_at IS NULL"];
             if (!empty($q)) {
                 $q_esc = $conn->real_escape_string($q);
-                $where[] = "(
-                    c.nama_toko LIKE '%{$q_esc}%' 
-                    OR c.id IN (SELECT cp2.customer_id FROM customer_pics cp2 WHERE (cp2.tlp_pic LIKE '%{$q_esc}%' OR cp2.nama_pic LIKE '%{$q_esc}%') AND cp2.deleted_at IS NULL)
-                    OR c.id IN (SELECT ca2.customer_id FROM customer_addresses ca2 WHERE ca2.kota LIKE '%{$q_esc}%' AND ca2.deleted_at IS NULL)
+                $where_sc[] = "(
+                    nama LIKE '%{$q_esc}%'
+                    OR kode_customer LIKE '%{$q_esc}%'
+                    OR telp_pribadi LIKE '%{$q_esc}%'
+                    OR kota LIKE '%{$q_esc}%'
+                    OR alamat LIKE '%{$q_esc}%'
+                    OR email LIKE '%{$q_esc}%'
                 )";
             }
+            $where_sc_sql = implode(' AND ', $where_sc);
+            $sql_sc = "
+                SELECT 
+                    id, 
+                    kode_customer, 
+                    nama, 
+                    kategori, 
+                    kota, 
+                    telp_pribadi, 
+                    alamat, 
+                    email 
+                FROM sales_customer 
+                WHERE {$where_sc_sql} 
+                ORDER BY nama ASC 
+                LIMIT 150
+            ";
+            $res_sc = $conn->query($sql_sc);
+            if ($res_sc) {
+                while ($r = $res_sc->fetch_assoc()) {
+                    $norm_key = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $r['nama']));
+                    $phone = !empty($r['telp_pribadi']) ? trim($r['telp_pribadi']) : '';
+                    $kota  = !empty($r['kota']) ? trim($r['kota']) : '';
+                    $kode  = !empty($r['kode_customer']) ? trim($r['kode_customer']) : '';
+                    $kat   = !empty($r['kategori']) ? trim($r['kategori']) : '';
+                    
+                    $extra_info = [];
+                    if ($kode) $extra_info[] = $kode;
+                    if ($kat) $extra_info[] = $kat;
+                    if ($kota) $extra_info[] = $kota;
+                    if ($phone) $extra_info[] = $phone;
+                    $info_str = !empty($extra_info) ? ' (' . implode(' • ', $extra_info) . ')' : '';
+
+                    $item = [
+                        'id' => (int)$r['id'],
+                        'text' => $r['nama'] . $info_str,
+                        'nama_toko' => $r['nama'],
+                        'phone' => $phone,
+                        'kota' => $kota,
+                        'pic' => '',
+                        'kategori' => $kat,
+                        'kode_customer' => $kode,
+                        'alamat' => $r['alamat'] ?? '',
+                        'email' => $r['email'] ?? '',
+                        'source' => 'sales_customer',
+                        'is_own_sales' => 1
+                    ];
+
+                    $raw_items[] = $item;
+                    if ($norm_key !== '') {
+                        $seen_keys[$norm_key] = true;
+                    }
+                }
+            }
+
+            // -------------------------------------------------------------
+            // B. Search in customers (Leads & Follow-up database)
+            // -------------------------------------------------------------
+            $where_c = ["c.deleted_at IS NULL"];
+            if (!empty($q)) {
+                $q_esc = $conn->real_escape_string($q);
+                $where_c[] = "(
+                    c.nama_toko LIKE '%{$q_esc}%'
+                    OR c.id IN (SELECT cp2.customer_id FROM customer_pics cp2 WHERE (cp2.tlp_pic LIKE '%{$q_esc}%' OR cp2.nama_pic LIKE '%{$q_esc}%') AND cp2.deleted_at IS NULL)
+                    OR c.id IN (SELECT ca2.customer_id FROM customer_addresses ca2 WHERE (ca2.kota LIKE '%{$q_esc}%' OR ca2.alamat LIKE '%{$q_esc}%') AND ca2.deleted_at IS NULL)
+                )";
+            }
+            $where_c_sql = implode(' AND ', $where_c);
             
-            $where_sql = implode(' AND ', $where);
-            
-            // Total count
-            $count_sql = "SELECT COUNT(*) as total FROM customers c WHERE {$where_sql}";
-            $c_res = $conn->query($count_sql);
-            $total_records = $c_res ? (int)$c_res->fetch_assoc()['total'] : 0;
-            
-            $sql = "
+            // Order: prioritize logged-in sales's own leads if target_sales_id > 0
+            $order_c = "c.nama_toko ASC";
+            if ($target_sales_id > 0) {
+                $order_c = "CASE WHEN c.sales_id = {$target_sales_id} THEN 0 ELSE 1 END, c.nama_toko ASC";
+            }
+
+            $sql_c = "
                 SELECT 
                     c.id, 
+                    c.sales_id,
                     c.nama_toko, 
                     c.kategori,
                     (SELECT cp.tlp_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL AND cp.tlp_pic IS NOT NULL AND cp.tlp_pic != '' LIMIT 1) as tlp_pic,
                     (SELECT cp.nama_pic FROM customer_pics cp WHERE cp.customer_id = c.id AND cp.deleted_at IS NULL AND cp.nama_pic != 'unknown' LIMIT 1) as nama_pic,
-                    (SELECT ca.kota FROM customer_addresses ca WHERE ca.customer_id = c.id AND ca.deleted_at IS NULL AND ca.kota IS NOT NULL LIMIT 1) as kota
+                    (SELECT ca.kota FROM customer_addresses ca WHERE ca.customer_id = c.id AND ca.deleted_at IS NULL AND ca.kota IS NOT NULL LIMIT 1) as kota,
+                    (SELECT ca.alamat FROM customer_addresses ca WHERE ca.customer_id = c.id AND ca.deleted_at IS NULL LIMIT 1) as alamat
                 FROM customers c
-                WHERE {$where_sql}
-                ORDER BY c.nama_toko ASC
-                LIMIT {$limit} OFFSET {$offset}
+                WHERE {$where_c_sql}
+                ORDER BY {$order_c}
+                LIMIT 150
             ";
-            
-            $res = $conn->query($sql);
-            $results = [];
-            if ($res) {
-                while ($r = $res->fetch_assoc()) {
-                    $phone = !empty($r['tlp_pic']) ? $r['tlp_pic'] : '';
-                    $kota  = !empty($r['kota']) ? $r['kota'] : '';
-                    $pic   = !empty($r['nama_pic']) && $r['nama_pic'] !== 'unknown' ? $r['nama_pic'] : '';
+            $res_c = $conn->query($sql_c);
+            if ($res_c) {
+                while ($r = $res_c->fetch_assoc()) {
+                    $norm_key = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $r['nama_toko']));
+                    
+                    // Deduplicate if already present from sales_customer
+                    if ($norm_key !== '' && isset($seen_keys[$norm_key])) {
+                        continue;
+                    }
+
+                    $phone = !empty($r['tlp_pic']) ? trim($r['tlp_pic']) : '';
+                    $kota  = !empty($r['kota']) ? trim($r['kota']) : '';
+                    $pic   = !empty($r['nama_pic']) && $r['nama_pic'] !== 'unknown' ? trim($r['nama_pic']) : '';
+                    $kat   = !empty($r['kategori']) ? trim($r['kategori']) : '';
                     
                     $extra_info = [];
+                    if ($kat) $extra_info[] = $kat;
                     if ($kota) $extra_info[] = $kota;
                     if ($phone) $extra_info[] = $phone;
                     if ($pic) $extra_info[] = "PIC: " . $pic;
-                    
                     $info_str = !empty($extra_info) ? ' (' . implode(' • ', $extra_info) . ')' : '';
-                    
-                    $results[] = [
+
+                    $is_own = ($target_sales_id > 0 && (int)$r['sales_id'] === $target_sales_id) ? 1 : 0;
+
+                    $item = [
                         'id' => (int)$r['id'],
                         'text' => $r['nama_toko'] . $info_str,
                         'nama_toko' => $r['nama_toko'],
                         'phone' => $phone,
                         'kota' => $kota,
                         'pic' => $pic,
-                        'kategori' => $r['kategori'] ?? ''
+                        'kategori' => $kat,
+                        'kode_customer' => '',
+                        'alamat' => $r['alamat'] ?? '',
+                        'email' => '',
+                        'source' => 'customers',
+                        'is_own_sales' => $is_own
                     ];
+
+                    $raw_items[] = $item;
+                    if ($norm_key !== '') {
+                        $seen_keys[$norm_key] = true;
+                    }
                 }
             }
-            
+
+            // -------------------------------------------------------------
+            // C. Smart Scoring & Sorting
+            // -------------------------------------------------------------
+            if (!empty($q)) {
+                $q_lower = strtolower($q);
+                usort($raw_items, function($a, $b) use ($q_lower) {
+                    $scoreA = 0;
+                    $scoreB = 0;
+                    
+                    $nameA = strtolower(trim($a['nama_toko']));
+                    $nameB = strtolower(trim($b['nama_toko']));
+                    $kodeA = strtolower(trim($a['kode_customer'] ?? ''));
+                    $kodeB = strtolower(trim($b['kode_customer'] ?? ''));
+
+                    // Exact match
+                    if ($nameA === $q_lower) $scoreA += 100;
+                    if ($nameB === $q_lower) $scoreB += 100;
+                    
+                    // Code match
+                    if ($kodeA !== '' && $kodeA === $q_lower) $scoreA += 90;
+                    if ($kodeB !== '' && $kodeB === $q_lower) $scoreB += 90;
+
+                    // Prefix match
+                    if (strpos($nameA, $q_lower) === 0) $scoreA += 80;
+                    if (strpos($nameB, $q_lower) === 0) $scoreB += 80;
+
+                    // Word boundary match
+                    if ($scoreA < 80 && preg_match('/\b' . preg_quote($q_lower, '/') . '\b/i', $nameA)) $scoreA += 70;
+                    if ($scoreB < 80 && preg_match('/\b' . preg_quote($q_lower, '/') . '\b/i', $nameB)) $scoreB += 70;
+
+                    // Substring match
+                    if ($scoreA < 70 && strpos($nameA, $q_lower) !== false) $scoreA += 60;
+                    if ($scoreB < 70 && strpos($nameB, $q_lower) !== false) $scoreB += 60;
+
+                    // Has customer code bonus (master verified store)
+                    if (!empty($a['kode_customer'])) $scoreA += 5;
+                    if (!empty($b['kode_customer'])) $scoreB += 5;
+
+                    // Sales's own customer bonus
+                    if (!empty($a['is_own_sales'])) $scoreA += 2;
+                    if (!empty($b['is_own_sales'])) $scoreB += 2;
+
+                    if ($scoreA !== $scoreB) {
+                        return $scoreB - $scoreA;
+                    }
+                    
+                    // Shorter store name first
+                    $lenDiff = strlen($a['nama_toko']) - strlen($b['nama_toko']);
+                    if ($lenDiff !== 0) {
+                        return $lenDiff;
+                    }
+
+                    return strcasecmp($a['nama_toko'], $b['nama_toko']);
+                });
+            }
+
+            $total_records = count($raw_items);
+            $results = array_slice($raw_items, $offset, $limit);
+
             echo json_encode([
                 'success' => true,
                 'results' => $results,
