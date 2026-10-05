@@ -491,10 +491,58 @@ if ($qSales) {
     border-color: #cbd5e1;
     color: #0f172a;
 }
+.btn-action-so.btn-view-so:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+}
 .btn-action-so.btn-delete:hover {
     background: var(--pastel-red-bg);
     border-color: var(--pastel-red-border);
     color: var(--pastel-red-text);
+}
+
+/* ── Modal Detail SO Styling ── */
+#modalDetailSo .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.25);
+}
+#modalDetailSo .detail-card-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    height: 100%;
+}
+#modalDetailSo .detail-card-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+#modalDetailSo .table-detail-items th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 10px 12px;
+}
+#modalDetailSo .table-detail-items td {
+    padding: 9px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+#modalDetailSo .row-subitem {
+    background-color: #fbfcfe;
 }
 </style>
 
@@ -704,7 +752,7 @@ if ($qSales) {
                     ?>
                         <tr id="row-so-<?php echo $row['id']; ?>">
                             <td>
-                                <a href="sales_order_print.php?id=<?php echo $row['id']; ?>" class="fw-bold font-monospace text-decoration-none text-dark" title="Klik untuk Cetak / Lihat Dokumen">
+                                <a href="javascript:void(0)" class="fw-bold font-monospace text-decoration-none text-dark btn-view-so" data-id="<?php echo $row['id']; ?>" title="Klik untuk Lihat Detail Pesanan">
                                     <?php if (!empty($row['so_number'])): ?>
                                         <?php echo htmlspecialchars($row['so_number']); ?>
                                     <?php else: ?>
@@ -771,9 +819,9 @@ if ($qSales) {
                                         <?php foreach ($optStatuses as $stOption): ?>
                                             <li>
                                                 <a class="dropdown-item btn-change-status py-1.5 <?php echo ($row['status'] === $stOption) ? 'active fw-bold' : ''; ?>" 
-                                                   href="javascript:void(0)" 
-                                                   data-id="<?php echo $row['id']; ?>" 
-                                                   data-status="<?php echo $stOption; ?>">
+                                                    href="javascript:void(0)" 
+                                                    data-id="<?php echo $row['id']; ?>" 
+                                                    data-status="<?php echo $stOption; ?>">
                                                     <span class="status-badge-so status-<?php echo $stOption; ?> py-0 px-2 me-1" style="font-size:10px;">●</span> 
                                                     <span><?php echo $stOption; ?></span>
                                                     <?php if ($row['status'] === $stOption): ?>
@@ -787,6 +835,9 @@ if ($qSales) {
                             </td>
                             <td style="text-align: center;">
                                 <div class="d-inline-flex align-items-center gap-1">
+                                    <button type="button" class="btn-action-so btn-view-so" data-id="<?php echo $row['id']; ?>" title="Lihat Detail Pesanan">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
                                     <a href="sales_order_print.php?id=<?php echo $row['id']; ?>" target="_blank" class="btn-action-so" title="Cetak Dokumen SO">
                                         <i class="bi bi-printer"></i>
                                     </a>
@@ -814,6 +865,200 @@ if ($qSales) {
                 <?php endif; ?>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Modal Detail Sales Order -->
+<div class="modal fade" id="modalDetailSo" tabindex="-1" aria-labelledby="modalDetailSoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-bottom px-4 py-3" style="background: #f8fafc;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 shadow-sm" style="width: 42px; height: 42px; background: #e0f2fe; color: #0284c7;">
+                        <i class="bi bi-receipt fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <h5 class="modal-title fw-bold text-dark mb-0" id="modalDetailSoLabel">Detail Pesanan Penjualan</h5>
+                            <span id="modalDetailSoNumBadge"></span>
+                        </div>
+                        <span class="text-muted" style="font-size: 12px;" id="modalDetailSoSubtitle">Memuat data pesanan...</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span id="modalDetailStatusBadge"></span>
+                    <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <div class="modal-body p-4" style="background: #ffffff;">
+                <!-- Loading State -->
+                <div id="modalDetailLoading" class="text-center py-5">
+                    <div class="spinner-border text-primary mb-2" role="status" style="width: 2.5rem; height: 2.5rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted small mb-0">Sedang memuat rincian pesanan penjualan...</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="modalDetailError" class="alert alert-danger d-none my-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span id="modalDetailErrorMessage">Gagal memuat detail pesanan.</span>
+                </div>
+
+                <!-- Content State -->
+                <div id="modalDetailBody" class="d-none">
+                    <!-- Top Info Cards -->
+                    <div class="row g-3 mb-4">
+                        <!-- Card 1: Data Pesanan -->
+                        <div class="col-md-4">
+                            <div class="detail-card-box">
+                                <div class="detail-card-label">
+                                    <i class="bi bi-file-earmark-text text-primary"></i> Data Pesanan
+                                </div>
+                                <div class="d-flex justify-content-between py-1 border-bottom" style="font-size: 12.5px;">
+                                    <span class="text-muted">No. Pesanan:</span>
+                                    <span class="fw-bold font-monospace text-dark" id="modalSoNumber">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between py-1 border-bottom" style="font-size: 12.5px;">
+                                    <span class="text-muted">Tanggal SO:</span>
+                                    <span class="fw-semibold text-dark" id="modalSoDate">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between py-1 border-bottom" style="font-size: 12.5px;">
+                                    <span class="text-muted">No. PO Cust:</span>
+                                    <span class="fw-semibold text-dark" id="modalSoPo">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between py-1" style="font-size: 12.5px;">
+                                    <span class="text-muted">Syarat Bayar:</span>
+                                    <span class="badge bg-white text-dark border" id="modalSoTerms">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Pelanggan / Toko -->
+                        <div class="col-md-4">
+                            <div class="detail-card-box">
+                                <div class="detail-card-label">
+                                    <i class="bi bi-shop text-info"></i> Pelanggan / Toko
+                                </div>
+                                <div class="fw-bold text-dark mb-1" style="font-size: 13.5px;" id="modalCustomerName">-</div>
+                                <div class="text-muted mb-2" style="font-size: 12px;">
+                                    <i class="bi bi-person me-1"></i> <span id="modalCustomerPic">-</span>
+                                    <span class="mx-1">•</span>
+                                    <span id="modalCustomerPhone">-</span>
+                                </div>
+                                <div class="text-secondary small pt-1 border-top" style="font-size: 11.5px; line-height: 1.4;" id="modalCustomerAddress">
+                                    -
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Pengiriman & Sales -->
+                        <div class="col-md-4">
+                            <div class="detail-card-box">
+                                <div class="detail-card-label">
+                                    <i class="bi bi-truck text-warning"></i> Pengiriman &amp; Sales
+                                </div>
+                                <div class="d-flex justify-content-between py-1 border-bottom" style="font-size: 12.5px;">
+                                    <span class="text-muted">Sales PIC:</span>
+                                    <span class="fw-semibold text-dark" id="modalSalesName">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between py-1 border-bottom" style="font-size: 12.5px;">
+                                    <span class="text-muted">Tgl Kirim:</span>
+                                    <span class="fw-semibold text-dark" id="modalShippingDate">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between py-1 border-bottom" style="font-size: 12.5px;">
+                                    <span class="text-muted">Metode Kirim:</span>
+                                    <span class="fw-semibold text-dark" id="modalShippingMethod">-</span>
+                                </div>
+                                <div class="py-1" style="font-size: 11.5px;">
+                                    <span class="text-muted d-block">Alamat Pengiriman:</span>
+                                    <span class="text-secondary" id="modalShippingAddress">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items Table -->
+                    <div class="card border rounded-3 overflow-hidden mb-3" style="border-color: #e2e8f0 !important;">
+                        <div class="card-header bg-light py-2 px-3 border-bottom d-flex align-items-center justify-content-between">
+                            <span class="fw-bold text-secondary text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">
+                                <i class="bi bi-box-seam me-1"></i> Rincian Barang / Produk
+                            </span>
+                            <span class="badge bg-white text-secondary border font-monospace" id="modalTotalItemsBadge">0 Item</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle table-detail-items mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px; text-align: center;">#</th>
+                                        <th style="width: 140px;">Kode Barang</th>
+                                        <th>Nama Barang &amp; Deskripsi</th>
+                                        <th style="width: 70px; text-align: center;">Qty</th>
+                                        <th style="width: 75px; text-align: center;">Satuan</th>
+                                        <th style="width: 130px; text-align: right;">Harga Satuan</th>
+                                        <th style="width: 95px; text-align: center;">Diskon (%)</th>
+                                        <th style="width: 140px; text-align: right;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalItemsTableBody">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Summary & Notes -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="detail-card-box">
+                                <div class="detail-card-label">
+                                    <i class="bi bi-card-text text-primary"></i> Catatan Khusus / Keterangan
+                                </div>
+                                <div class="text-muted" style="font-size: 12.5px; white-space: pre-wrap;" id="modalSpecialNotes">
+                                    <em>Tidak ada catatan khusus.</em>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-card-box">
+                                <div class="d-flex justify-content-between py-1 border-bottom" style="font-size: 13px;">
+                                    <span class="text-muted">Subtotal:</span>
+                                    <span class="fw-bold font-monospace text-dark" id="modalSubtotal">Rp 0</span>
+                                </div>
+                                <div class="d-flex justify-content-between py-1 border-bottom d-none" id="modalDiscountRow" style="font-size: 13px;">
+                                    <span class="text-muted">Potongan Diskon:</span>
+                                    <span class="fw-semibold font-monospace text-danger" id="modalDiscount">Rp 0</span>
+                                </div>
+                                <div class="d-flex justify-content-between py-1 border-bottom d-none" id="modalTaxRow" style="font-size: 13px;">
+                                    <span class="text-muted" id="modalTaxLabel">PPN (11%):</span>
+                                    <span class="fw-semibold font-monospace text-dark" id="modalTax">Rp 0</span>
+                                </div>
+                                <div class="d-flex justify-content-between pt-2 mt-1 align-items-center" style="font-size: 15px;">
+                                    <span class="fw-bold text-dark">Total Akhir:</span>
+                                    <span class="fw-bold font-monospace text-primary fs-5" id="modalGrandTotal">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer px-4 py-3 bg-light border-top d-flex justify-content-between align-items-center">
+                <span class="text-muted" style="font-size: 11.5px;" id="modalCreatedAtInfo"></span>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-size: 13px;">
+                        Tutup
+                    </button>
+                    <a href="#" id="modalBtnEdit" class="btn btn-outline-primary px-3" style="font-size: 13px;">
+                        <i class="bi bi-pencil me-1"></i> Edit Pesanan
+                    </a>
+                    <a href="#" id="modalBtnPrint" target="_blank" class="btn btn-primary px-3" style="font-size: 13px;">
+                        <i class="bi bi-printer me-1"></i> Cetak Dokumen
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -999,6 +1244,216 @@ if ($qSales) {
                 .then(r => r.json())
                 .then(r => { if (r.success) location.reload(); else alert(r.message); });
             }
+        }
+    });
+
+    // 4. Modal Detail SO (Lihat Detail Pesanan)
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function formatRp(val) {
+        const num = parseFloat(val) || 0;
+        return 'Rp ' + Math.round(num).toLocaleString('id-ID');
+    }
+
+    function openSoDetail(soId) {
+        const modalEl = document.getElementById('modalDetailSo');
+        if (!modalEl) return;
+
+        const loadingEl = document.getElementById('modalDetailLoading');
+        const bodyEl = document.getElementById('modalDetailBody');
+        const errorEl = document.getElementById('modalDetailError');
+
+        // Reset state
+        loadingEl.classList.remove('d-none');
+        bodyEl.classList.add('d-none');
+        errorEl.classList.add('d-none');
+        document.getElementById('modalDetailSoSubtitle').textContent = 'Memuat data pesanan...';
+        document.getElementById('modalDetailSoNumBadge').innerHTML = '';
+        document.getElementById('modalDetailStatusBadge').innerHTML = '';
+
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            bsModal.show();
+        }
+
+        fetch('ajax_sales_order.php?action=get_order_detail&id=' + encodeURIComponent(soId))
+            .then(function(res) { return res.json(); })
+            .then(function(res) {
+                if (!res || !res.success || !res.order) {
+                    loadingEl.classList.add('d-none');
+                    errorEl.classList.remove('d-none');
+                    document.getElementById('modalDetailErrorMessage').textContent = (res && res.message) ? res.message : 'Pesanan tidak ditemukan.';
+                    return;
+                }
+
+                const order = res.order;
+                const items = res.items || [];
+
+                // Header
+                document.getElementById('modalDetailSoSubtitle').textContent = 'Dibuat pada ' + (order.created_at_formatted || '-');
+                if (order.so_number) {
+                    document.getElementById('modalDetailSoNumBadge').innerHTML = '<span class="badge bg-dark-subtle text-dark border font-monospace px-2 py-1">' + escapeHtml(order.so_number) + '</span>';
+                } else {
+                    document.getElementById('modalDetailSoNumBadge').innerHTML = '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1"><i class="bi bi-hourglass-split me-1"></i>Menunggu No. SO</span>';
+                }
+
+                const statusClass = 'status-' + escapeHtml(order.status);
+                document.getElementById('modalDetailStatusBadge').innerHTML = '<span class="status-badge-so ' + statusClass + '">' + escapeHtml(order.status) + '</span>';
+
+                // Data Pesanan
+                document.getElementById('modalSoNumber').textContent = order.so_number || '(Belum Diterbitkan)';
+                document.getElementById('modalSoDate').textContent = order.so_date_formatted || '-';
+                document.getElementById('modalSoPo').textContent = order.po_number || '-';
+                document.getElementById('modalSoTerms').textContent = order.payment_terms || 'C.O.D';
+
+                // Pelanggan
+                let custTitle = escapeHtml(order.customer_name);
+                if (order.customer_code) {
+                    custTitle += ' <span class="badge bg-light text-muted border font-monospace ms-1" style="font-size:10px;">' + escapeHtml(order.customer_code) + '</span>';
+                }
+                document.getElementById('modalCustomerName').innerHTML = custTitle;
+                document.getElementById('modalCustomerPic').textContent = order.customer_pic || '-';
+                if (order.customer_phone) {
+                    const cleanPhone = order.customer_phone.replace(/[^0-9]/g, '');
+                    document.getElementById('modalCustomerPhone').innerHTML = '<a href="https://wa.me/' + cleanPhone + '" target="_blank" class="text-decoration-none text-success fw-semibold"><i class="bi bi-whatsapp me-1"></i>' + escapeHtml(order.customer_phone) + '</a>';
+                } else {
+                    document.getElementById('modalCustomerPhone').textContent = '-';
+                }
+                document.getElementById('modalCustomerAddress').textContent = order.customer_address || 'Tidak ada catatan alamat.';
+
+                // Pengiriman & Sales
+                document.getElementById('modalSalesName').textContent = order.sales_name || '-';
+                document.getElementById('modalShippingDate').textContent = order.shipping_date_formatted || '-';
+                document.getElementById('modalShippingMethod').textContent = order.shipping_method || 'Standar';
+                document.getElementById('modalShippingAddress').textContent = order.shipping_address || order.customer_address || '-';
+
+                // Table Items
+                let itemsHtml = '';
+                let totalQtyCount = 0;
+                let itemIndex = 0;
+
+                if (items.length === 0) {
+                    itemsHtml = '<tr><td colspan="8" class="text-center text-muted py-4">Belum ada barang dalam pesanan ini.</td></tr>';
+                } else {
+                    items.forEach(function(item) {
+                        const isSub = (item.item_name || '').trim().startsWith('--');
+                        if (!isSub) itemIndex++;
+                        totalQtyCount += parseInt(item.qty || 0);
+
+                        const cleanName = isSub ? item.item_name.trim().replace(/^--\s*/, '') : item.item_name;
+                        const rowClass = isSub ? 'row-subitem' : '';
+                        const noCol = isSub ? '<span class="text-muted" style="font-size:11px;">↳</span>' : itemIndex;
+                        const itemCode = item.item_code ? escapeHtml(item.item_code) : '-';
+
+                        let nameHtml = '';
+                        if (isSub) {
+                            nameHtml = '<div style="padding-left:14px;"><span class="badge bg-light text-secondary border me-1" style="font-size:10px;"><i class="bi bi-arrow-return-right me-1"></i>Paket</span> <span class="text-dark fw-medium">' + escapeHtml(cleanName) + '</span></div>';
+                        } else {
+                            nameHtml = '<div class="fw-bold text-dark">' + escapeHtml(cleanName) + '</div>';
+                        }
+                        if (item.item_description) {
+                            nameHtml += '<div class="text-muted small ' + (isSub ? 'ps-4' : '') + '" style="font-size:11.5px;">' + escapeHtml(item.item_description) + '</div>';
+                        }
+
+                        let unitPriceHtml = '';
+                        let totalPriceHtml = '';
+                        if (item.unit_price > 0) {
+                            unitPriceHtml = formatRp(item.unit_price);
+                        } else {
+                            unitPriceHtml = isSub ? '<span class="text-muted fst-italic" style="font-size:11px;">Termasuk Paket</span>' : 'Rp 0';
+                        }
+
+                        if (item.total_price > 0) {
+                            totalPriceHtml = formatRp(item.total_price);
+                        } else {
+                            totalPriceHtml = isSub ? '<span class="text-muted fst-italic" style="font-size:11px;">Termasuk Paket</span>' : 'Rp 0';
+                        }
+
+                        let discBadge = '-';
+                        if (item.discount_percent > 0) {
+                            discBadge = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">' + Number(item.discount_percent) + '%</span>';
+                        }
+
+                        itemsHtml += '<tr class="' + rowClass + '">' +
+                            '<td style="text-align:center;">' + noCol + '</td>' +
+                            '<td><span class="font-monospace text-secondary ' + (isSub ? 'small' : '') + '">' + itemCode + '</span></td>' +
+                            '<td>' + nameHtml + '</td>' +
+                            '<td style="text-align:center;"><span class="fw-bold font-monospace">' + item.qty + '</span></td>' +
+                            '<td style="text-align:center;"><span class="text-muted small">' + escapeHtml(item.unit) + '</span></td>' +
+                            '<td style="text-align:right;"><span class="font-monospace">' + unitPriceHtml + '</span></td>' +
+                            '<td style="text-align:center;">' + discBadge + '</td>' +
+                            '<td style="text-align:right;"><span class="fw-bold font-monospace text-dark">' + totalPriceHtml + '</span></td>' +
+                        '</tr>';
+                    });
+                }
+
+                document.getElementById('modalItemsTableBody').innerHTML = itemsHtml;
+                document.getElementById('modalTotalItemsBadge').textContent = totalQtyCount + ' Unit (' + items.length + ' Baris)';
+
+                // Special Notes
+                const notesEl = document.getElementById('modalSpecialNotes');
+                if (order.special_notes && order.special_notes.trim() !== '') {
+                    notesEl.innerHTML = escapeHtml(order.special_notes);
+                } else {
+                    notesEl.innerHTML = '<em class="text-muted">Tidak ada catatan khusus.</em>';
+                }
+
+                // Summary
+                document.getElementById('modalSubtotal').textContent = formatRp(order.subtotal);
+
+                const discRow = document.getElementById('modalDiscountRow');
+                const discAmt = parseFloat(order.discount_amount) || 0;
+                if (discAmt > 0) {
+                    discRow.classList.remove('d-none');
+                    document.getElementById('modalDiscount').textContent = '- ' + formatRp(discAmt);
+                } else {
+                    discRow.classList.add('d-none');
+                }
+
+                const taxRow = document.getElementById('modalTaxRow');
+                const taxAmt = parseFloat(order.tax_amount) || 0;
+                if (parseInt(order.is_taxable) === 1 && taxAmt > 0) {
+                    taxRow.classList.remove('d-none');
+                    document.getElementById('modalTaxLabel').textContent = 'PPN (' + Number(order.tax_percent || 11) + '%):';
+                    document.getElementById('modalTax').textContent = formatRp(taxAmt);
+                } else {
+                    taxRow.classList.add('d-none');
+                }
+
+                document.getElementById('modalGrandTotal').textContent = formatRp(order.grand_total);
+
+                // Footer
+                document.getElementById('modalCreatedAtInfo').textContent = 'Dibuat: ' + (order.created_at_formatted || '-');
+                document.getElementById('modalBtnPrint').href = 'sales_order_print.php?id=' + order.id;
+                document.getElementById('modalBtnEdit').href = 'sales_order_form.php?id=' + order.id;
+
+                loadingEl.classList.add('d-none');
+                bodyEl.classList.remove('d-none');
+            })
+            .catch(function(err) {
+                loadingEl.classList.add('d-none');
+                errorEl.classList.remove('d-none');
+                document.getElementById('modalDetailErrorMessage').textContent = 'Terjadi kesalahan saat memuat data: ' + (err.message || 'Network error');
+            });
+    }
+
+    // Trigger button view
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-view-so');
+        if (!btn) return;
+        e.preventDefault();
+
+        const soId = btn.getAttribute('data-id');
+        if (soId) {
+            openSoDetail(soId);
         }
     });
 })();

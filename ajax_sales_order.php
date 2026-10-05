@@ -524,6 +524,64 @@ if ($action === 'save_sales_order') {
 }
 
 // =========================================================================
+// ACTION: GET ORDER DETAIL
+// =========================================================================
+if ($action === 'get_order_detail') {
+    $so_id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
+    if ($so_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'ID pesanan tidak valid.']);
+        exit;
+    }
+    
+    $stmt = $conn->prepare("SELECT * FROM sales_orders WHERE id = ? AND deleted_at IS NULL");
+    $stmt->bind_param("i", $so_id);
+    $stmt->execute();
+    $order = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    
+    if (!$order) {
+        echo json_encode(['success' => false, 'message' => 'Pesanan Penjualan tidak ditemukan atau sudah dihapus.']);
+        exit;
+    }
+    
+    // Fetch items
+    $stmtItems = $conn->prepare("SELECT * FROM sales_order_items WHERE sales_order_id = ? ORDER BY id ASC");
+    $stmtItems->bind_param("i", $so_id);
+    $stmtItems->execute();
+    $resItems = $stmtItems->get_result();
+    $items = [];
+    while ($row = $resItems->fetch_assoc()) {
+        $items[] = [
+            'id' => (int)$row['id'],
+            'product_id' => (int)$row['product_id'],
+            'item_code' => $row['item_code'] ?? '',
+            'item_name' => $row['item_name'] ?? '',
+            'item_description' => $row['item_description'] ?? '',
+            'qty' => (int)$row['qty'],
+            'unit' => $row['unit'] ?? 'PCS',
+            'unit_price' => (float)$row['unit_price'],
+            'discount_percent' => (float)($row['discount_percent'] ?? 0),
+            'discount_item' => (float)($row['discount_item'] ?? 0),
+            'total_price' => (float)$row['total_price'],
+            'notes' => $row['notes'] ?? ''
+        ];
+    }
+    $stmtItems->close();
+    
+    $tglTime = strtotime($order['so_date'] ?? 'now');
+    $order['so_date_formatted'] = date('d/m/Y', $tglTime);
+    $order['shipping_date_formatted'] = !empty($order['shipping_date']) ? date('d/m/Y', strtotime($order['shipping_date'])) : '-';
+    $order['created_at_formatted'] = !empty($order['created_at']) ? date('d/m/Y H:i', strtotime($order['created_at'])) : '-';
+    
+    echo json_encode([
+        'success' => true,
+        'order' => $order,
+        'items' => $items
+    ]);
+    exit;
+}
+
+// =========================================================================
 // ACTION: UPDATE STATUS
 // =========================================================================
 if ($action === 'update_status') {
