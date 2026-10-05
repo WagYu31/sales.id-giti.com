@@ -131,11 +131,18 @@ if (!function_exists('ensureSalesOrderTables')) {
             `qty` int(11) NOT NULL DEFAULT 1,
             `unit` varchar(50) DEFAULT 'PCS',
             `unit_price` decimal(15,2) NOT NULL DEFAULT 0.00,
+            `discount_percent` decimal(5,2) DEFAULT 0.00,
             `discount_item` decimal(15,2) DEFAULT 0.00,
             `total_price` decimal(15,2) NOT NULL DEFAULT 0.00,
             `notes` varchar(255) DEFAULT NULL,
             PRIMARY KEY (`id`),
             KEY `idx_sales_order` (`sales_order_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+        // Ensure discount_percent exists in sales_order_items
+        $chkColDiscPct = $conn->query("SHOW COLUMNS FROM `sales_order_items` LIKE 'discount_percent'");
+        if ($chkColDiscPct && $chkColDiscPct->num_rows === 0) {
+            @$conn->query("ALTER TABLE `sales_order_items` ADD COLUMN `discount_percent` decimal(5,2) DEFAULT 0.00 AFTER `unit_price`");
+        }
     }
 }

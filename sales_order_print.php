@@ -675,7 +675,15 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
                             <?php echo number_format($item['unit_price'], 0, ',', '.'); ?>
                         </td>
                         <td style="text-align: right;">
-                            <?php echo number_format($item['discount_item'], 0, ',', '.'); ?>
+                            <?php 
+                            if (!empty($item['discount_percent']) && (float)$item['discount_percent'] > 0) {
+                                echo rtrim(rtrim(number_format((float)$item['discount_percent'], 2, ',', '.'), '0'), ',') . '%';
+                            } elseif (!empty($item['discount_item']) && (float)$item['discount_item'] > 0) {
+                                echo number_format((float)$item['discount_item'], 0, ',', '.');
+                            } else {
+                                echo '0';
+                            }
+                            ?>
                         </td>
                         <td style="text-align: right; font-weight: 600;">
                             <?php echo number_format($item['total_price'], 0, ',', '.'); ?>

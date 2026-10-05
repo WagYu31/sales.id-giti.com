@@ -30,6 +30,14 @@ if ($soId > 0) {
         $stmtItems->execute();
         $resItems = $stmtItems->get_result();
         while ($row = $resItems->fetch_assoc()) {
+            $uPrice = (float)($row['unit_price'] ?? 0);
+            if (isset($row['discount_percent']) && (float)$row['discount_percent'] > 0) {
+                $row['discount_percent'] = (float)$row['discount_percent'];
+            } elseif (!empty($row['discount_item']) && (float)$row['discount_item'] > 0 && $uPrice > 0) {
+                $row['discount_percent'] = round(((float)$row['discount_item'] / $uPrice) * 100, 2);
+            } else {
+                $row['discount_percent'] = (float)($row['discount_percent'] ?? 0);
+            }
             $orderItems[] = $row;
         }
         $stmtItems->close();
@@ -194,6 +202,19 @@ if ($qProd) {
     border-color: #0f172a;
     box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06);
     outline: none;
+}
+
+.input-group:focus-within .accurate-input {
+    border-color: #0f172a !important;
+    box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06);
+    z-index: 3;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #0f172a !important;
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    z-index: 3;
 }
 
 .nav-accurate-tabs {
@@ -563,12 +584,12 @@ if ($qProd) {
                                 <tr>
                                     <th style="width: 44px; text-align: center;">#</th>
                                     <th style="width: 28%;">Nama Barang &amp; Deskripsi</th>
-                                    <th style="width: 15%;">Kode / SKU #</th>
-                                    <th style="width: 10%; text-align: center;">Qty</th>
-                                    <th style="width: 9%; text-align: center;">Satuan</th>
+                                    <th style="width: 14%;">Kode / SKU #</th>
+                                    <th style="width: 8%; text-align: center;">Qty</th>
+                                    <th style="width: 8%; text-align: center;">Satuan</th>
                                     <th style="width: 14%; text-align: right;">@Harga (Rp)</th>
-                                    <th style="width: 10%; text-align: right;">Diskon (Rp)</th>
-                                    <th style="width: 14%; text-align: right;">Total Harga (Rp)</th>
+                                    <th style="width: 11%; text-align: right;">Diskon (%)</th>
+                                    <th style="width: 15%; text-align: right;">Total Harga (Rp)</th>
                                 </tr>
                             </thead>
                             <tbody id="itemsTableBody">
@@ -872,6 +893,7 @@ $(document).ready(function() {
             qty: 1,
             unit: prod.unit || 'UNIT',
             unit_price: prod.msrp || 0,
+            discount_percent: 0,
             discount_item: 0,
             total_price: prod.msrp || 0
         });
@@ -919,8 +941,19 @@ $(document).ready(function() {
         items.forEach((item, idx) => {
             const qty = Math.max(1, parseInt(item.qty) || 1);
             const uPrice = parseFloat(item.unit_price) || 0;
-            const discItem = parseFloat(item.discount_item) || 0;
-            const lineTotal = qty * Math.max(0, (uPrice - discItem));
+            
+            let discPct = 0;
+            if (item.discount_percent !== undefined && item.discount_percent !== null) {
+                discPct = parseFloat(item.discount_percent) || 0;
+            } else if (item.discount_item && uPrice > 0) {
+                discPct = Math.round(((parseFloat(item.discount_item) || 0) / uPrice) * 10000) / 100;
+            }
+            discPct = Math.min(100, Math.max(0, discPct));
+            
+            const discAmountPerUnit = uPrice * (discPct / 100);
+            const lineTotal = qty * Math.max(0, (uPrice - discAmountPerUnit));
+            item.discount_percent = discPct;
+            item.discount_item = discAmountPerUnit;
             item.total_price = lineTotal;
             totalQty += qty;
 
@@ -948,7 +981,10 @@ $(document).ready(function() {
                         <input type="number" min="0" step="any" class="form-control form-control-sm accurate-input text-end font-monospace item-field-price" data-index="${idx}" value="${uPrice}">
                     </td>
                     <td style="text-align: right;">
-                        <input type="number" min="0" step="any" class="form-control form-control-sm accurate-input text-end font-monospace item-field-disc" data-index="${idx}" value="${discItem}">
+                        <div class="input-group input-group-sm" style="min-width: 80px;">
+                            <input type="number" min="0" max="100" step="any" class="form-control form-control-sm accurate-input text-end font-monospace item-field-disc" data-index="${idx}" value="${discPct}" placeholder="0" style="border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; border-right: 0 !important;">
+                            <span class="input-group-text font-monospace fw-bold" style="background: #f8fafc; color: #475569; font-size: 11.5px; padding: 0 7px; border: 1px solid #cbd5e1; border-top-right-radius: 8px; border-bottom-right-radius: 8px;">%</span>
+                        </div>
                     </td>
                     <td style="text-align: right; font-weight: 700; font-family: 'JetBrains Mono', monospace;" class="line-total-cell">
                         ${formatRupiah(lineTotal)}
@@ -981,6 +1017,7 @@ $(document).ready(function() {
             qty: 1,
             unit: 'UNIT',
             unit_price: 0,
+            discount_percent: 0,
             discount_item: 0,
             total_price: 0
         });
@@ -1101,8 +1138,8 @@ $(document).ready(function() {
     });
     $(document).on('input change', '.item-field-disc', function() {
         const idx = $(this).data('index');
-        const val = Math.max(0, parseFloat($(this).val()) || 0);
-        items[idx].discount_item = val;
+        const val = Math.min(100, Math.max(0, parseFloat($(this).val()) || 0));
+        items[idx].discount_percent = val;
         recalculateRow(idx);
     });
 
@@ -1110,8 +1147,12 @@ $(document).ready(function() {
         const itm = items[idx];
         const qty = Math.max(1, parseInt(itm.qty) || 1);
         const price = Math.max(0, parseFloat(itm.unit_price) || 0);
-        const disc = Math.max(0, parseFloat(itm.discount_item) || 0);
-        const total = qty * Math.max(0, price - disc);
+        const discPct = Math.min(100, Math.max(0, parseFloat(itm.discount_percent) || 0));
+        const discAmountPerUnit = price * (discPct / 100);
+        const total = qty * Math.max(0, price - discAmountPerUnit);
+        
+        itm.discount_percent = discPct;
+        itm.discount_item = discAmountPerUnit;
         itm.total_price = total;
 
         $(`#itemsTableBody tr[data-index="${idx}"] .line-total-cell`).text(formatRupiah(total));

@@ -331,7 +331,15 @@ if ($action === 'save_sales_order') {
         $qty = max(1, (int)($itm['qty'] ?? 1));
         $unit = trim($itm['unit'] ?? 'PCS');
         $uPrice = (float)($itm['unit_price'] ?? 0);
-        $discItem = (float)($itm['discount_item'] ?? 0);
+        $discPercent = max(0, min(100, (float)($itm['discount_percent'] ?? 0)));
+        if ($discPercent > 0) {
+            $discItem = $uPrice * ($discPercent / 100);
+        } else {
+            $discItem = (float)($itm['discount_item'] ?? 0);
+            if ($uPrice > 0 && $discItem > 0) {
+                $discPercent = round(($discItem / $uPrice) * 100, 2);
+            }
+        }
         
         $lineTotal = $qty * max(0, ($uPrice - $discItem));
         $subtotal += $lineTotal;
@@ -344,6 +352,7 @@ if ($action === 'save_sales_order') {
             'qty' => $qty,
             'unit' => $unit ?: 'PCS',
             'unit_price' => $uPrice,
+            'discount_percent' => $discPercent,
             'discount_item' => $discItem,
             'total_price' => $lineTotal,
             'notes' => trim($itm['notes'] ?? '')
@@ -433,11 +442,11 @@ if ($action === 'save_sales_order') {
         // Insert items
         $ins = $conn->prepare("INSERT INTO sales_order_items (
             sales_order_id, product_id, item_code, item_name, item_description,
-            qty, unit, unit_price, discount_item, total_price, notes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            qty, unit, unit_price, discount_percent, discount_item, total_price, notes
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
         foreach ($processedItems as $rowItm) {
-            $ins->bind_param("iisssisddds",
+            $ins->bind_param("iisssisdddds",
                 $finalSoId,
                 $rowItm['product_id'],
                 $rowItm['item_code'],
@@ -446,6 +455,7 @@ if ($action === 'save_sales_order') {
                 $rowItm['qty'],
                 $rowItm['unit'],
                 $rowItm['unit_price'],
+                $rowItm['discount_percent'],
                 $rowItm['discount_item'],
                 $rowItm['total_price'],
                 $rowItm['notes']
