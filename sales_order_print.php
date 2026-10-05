@@ -116,30 +116,35 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
 
         /* Top Action Toolbar (Hidden When Printing) */
         .print-toolbar {
+            width: 820px;
             max-width: 820px;
             margin: 0 auto 16px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #0F172A;
-            padding: 10px 18px;
-            border-radius: 10px;
-            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.25);
+            padding: 8px 14px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.25);
             color: #FFFFFF;
-            gap: 12px;
+            box-sizing: border-box;
+            gap: 10px;
         }
 
         .toolbar-left, .toolbar-center, .toolbar-right {
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .btn-tb {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
-            padding: 5px 12px;
+            height: 34px;
+            padding: 0 12px;
             font-size: 11.5px;
             font-weight: 600;
             border-radius: 6px;
@@ -147,6 +152,10 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             cursor: pointer;
             transition: all 0.15s ease-in-out;
             border: 1px solid transparent;
+            white-space: nowrap;
+            flex-shrink: 0;
+            line-height: 1;
+            box-sizing: border-box;
         }
 
         .btn-tb-outline {
@@ -164,7 +173,7 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             background: #2563EB;
             color: #FFFFFF;
             border-color: #1D4ED8;
-            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
         }
 
         .btn-tb-primary:hover {
@@ -173,13 +182,15 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
         }
 
         .tb-control-group {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(255, 255, 255, 0.06);
-            padding: 3px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0 8px;
+            height: 34px;
             border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.12);
+            box-sizing: border-box;
         }
 
         .tb-control-group label {
@@ -195,11 +206,13 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             color: #F8FAFC;
             border: 1px solid #475569;
             border-radius: 4px;
-            padding: 2.5px 8px;
-            font-size: 11.5px;
+            height: 26px;
+            padding: 0 6px;
+            font-size: 11px;
             font-weight: 600;
             outline: none;
             cursor: pointer;
+            width: 145px;
         }
 
         .tb-select:focus {
@@ -517,7 +530,7 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
 <body>
 
     <!-- Top Action Toolbar (Hidden When Printed) -->
-    <div class="print-toolbar">
+    <div class="print-toolbar notranslate" translate="no">
         <div class="toolbar-left">
             <a href="sales_orders.php" class="btn-tb btn-tb-outline">
                 <i class="bi bi-arrow-left"></i> <span>Daftar SO</span>
@@ -532,10 +545,10 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             <div class="tb-control-group">
                 <label for="selectBrand">Kop:</label>
                 <select id="selectBrand" class="tb-select">
-                    <option value="GRAVITTI" <?php echo ($defaultBrand === 'GRAVITTI') ? 'selected' : ''; ?>>GRAVITTI (Sesuai PDF)</option>
+                    <option value="GRAVITTI" <?php echo ($defaultBrand === 'GRAVITTI') ? 'selected' : ''; ?>>GRAVITTI</option>
                     <option value="LOEWIX" <?php echo ($defaultBrand === 'LOEWIX') ? 'selected' : ''; ?>>LOEWIX</option>
                     <option value="LOEWIX CCTV" <?php echo ($defaultBrand === 'LOEWIX CCTV') ? 'selected' : ''; ?>>LOEWIX CCTV</option>
-                    <option value="PT. GITI CCTV INDONESIA" <?php echo ($defaultBrand === 'PT. GITI CCTV INDONESIA') ? 'selected' : ''; ?>>PT. GITI CCTV INDONESIA</option>
+                    <option value="PT. GITI CCTV INDONESIA" <?php echo ($defaultBrand === 'PT. GITI CCTV INDONESIA') ? 'selected' : ''; ?>>PT. GITI CCTV</option>
                 </select>
             </div>
 
@@ -543,7 +556,7 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             <div class="tb-control-group">
                 <label for="selectDocTitle">Judul:</label>
                 <select id="selectDocTitle" class="tb-select">
-                    <option value="PROFORMA INVOICE" <?php echo ($defaultTitle === 'PROFORMA INVOICE') ? 'selected' : ''; ?>>PROFORMA INVOICE (Sesuai PDF)</option>
+                    <option value="PROFORMA INVOICE" <?php echo ($defaultTitle === 'PROFORMA INVOICE') ? 'selected' : ''; ?>>PROFORMA INVOICE</option>
                     <option value="SALES ORDER" <?php echo ($defaultTitle === 'SALES ORDER') ? 'selected' : ''; ?>>SALES ORDER</option>
                     <option value="PESANAN PENJUALAN" <?php echo ($defaultTitle === 'PESANAN PENJUALAN') ? 'selected' : ''; ?>>PESANAN PENJUALAN</option>
                 </select>
@@ -552,7 +565,7 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
 
         <div class="toolbar-right">
             <button onclick="window.print()" class="btn-tb btn-tb-primary">
-                <i class="bi bi-printer-fill"></i> <span>Cetak Dokumen (PDF)</span>
+                <i class="bi bi-printer-fill"></i> <span>Cetak (PDF)</span>
             </button>
         </div>
     </div>
