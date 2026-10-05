@@ -1,8 +1,8 @@
 <?php
 /**
  * sales_order_print.php
- * Format Cetak Resmi Dokumen Pesanan Penjualan (Sales Order)
- * Siap cetak A4 / PDF dengan kop resmi PT. Giti / Loewix
+ * Format Cetak Resmi Dokumen Pesanan Penjualan (Sales Order / Proforma Invoice)
+ * Mengadopsi format resmi Accurate Online (Sesuai Dokumen PDF Referensi)
  */
 
 require_once 'includes/db.php';
@@ -35,14 +35,22 @@ while ($row = $itemsRes->fetch_assoc()) {
 }
 $stmtItems->close();
 
-// Fungsi Konversi Angka ke Terbilang Bahasa Indonesia
+// Format Tanggal Bahasa Indonesia (contoh: 01 Okt 2026)
+$bulanIndo = [
+    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
+    7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
+];
+$tglTime = strtotime($order['so_date'] ?? 'now');
+$tglFormatted = date('d', $tglTime) . ' ' . ($bulanIndo[(int)date('n', $tglTime)] ?? date('M', $tglTime)) . ' ' . date('Y', $tglTime);
+
+// Fungsi Terbilang Rupiah
 function penyebut($nilai) {
     $nilai = abs($nilai);
     $huruf = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
     $temp = "";
     if ($nilai < 12) {
         $temp = " ". $huruf[$nilai];
-    } else if ($nilai <20) {
+    } else if ($nilai < 20) {
         $temp = penyebut($nilai - 10). " Belas";
     } else if ($nilai < 100) {
         $temp = penyebut($nilai/10)." Puluh". penyebut($nilai % 10);
@@ -72,351 +80,492 @@ function terbilang($nilai) {
     }     
     return $hasil . " Rupiah";
 }
+
+$defaultBrand = $_GET['brand'] ?? 'GRAVITTI';
+$defaultTitle = $_GET['title'] ?? 'PROFORMA INVOICE';
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Order - <?php echo htmlspecialchars(!empty($order['so_number']) ? $order['so_number'] : 'Menunggu No. SO'); ?></title>
+    <title><?php echo htmlspecialchars($defaultTitle); ?> - <?php echo htmlspecialchars(!empty($order['so_number']) ? $order['so_number'] : ('ID #' . $order['id'])); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: #F1F5F9;
-            color: #0F172A;
-            margin: 0;
-            padding: 20px 0;
+        * {
+            box-sizing: border-box;
         }
 
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #E2E8F0;
+            color: #000000;
+            margin: 0;
+            padding: 20px 0;
+            font-size: 11px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top Action Bar (Hidden when printing) */
         .print-toolbar {
             max-width: 820px;
             margin: 0 auto 16px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: #0F172A;
+            padding: 10px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            color: #FFFFFF;
         }
 
+        /* Accurate Sheet Paper (A4 Proportion) */
         .invoice-paper {
             max-width: 820px;
+            min-height: 1060px;
             margin: 0 auto;
             background: #FFFFFF;
-            padding: 40px 48px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 38px 46px 60px 46px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
             box-sizing: border-box;
         }
 
-        .company-title {
+        /* Accurate Header Layout */
+        .accurate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .header-left {
+            width: 50%;
+        }
+
+        .company-logo-text {
+            font-size: 26px;
+            font-weight: 800;
+            color: #000000;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+            text-transform: uppercase;
+        }
+
+        .header-line-left {
+            border-bottom: 2px solid #000000;
+            width: 250px;
+            margin: 5px 0 8px 0;
+        }
+
+        .kepada-label {
+            font-size: 11px;
+            color: #000000;
+            margin-bottom: 2px;
+        }
+
+        .customer-name-heading {
+            font-size: 13px;
+            font-weight: 800;
+            color: #000000;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .customer-address-block {
+            font-size: 11px;
+            line-height: 1.4;
+            color: #000000;
+            max-width: 340px;
+        }
+
+        .header-right {
+            width: 44%;
+        }
+
+        .doc-main-title {
             font-size: 22px;
             font-weight: 800;
-            color: #0F172A;
-            letter-spacing: -0.02em;
-            line-height: 1.2;
-        }
-
-        .company-subtitle {
-            font-size: 11.5px;
-            color: #64748B;
-            line-height: 1.4;
-        }
-
-        .doc-title-badge {
-            text-align: right;
-        }
-
-        .doc-name {
-            font-size: 24px;
-            font-weight: 800;
-            color: #1D4ED8;
-            letter-spacing: 0.04em;
-            margin-bottom: 2px;
-        }
-
-        .doc-sub {
-            font-size: 12px;
-            font-weight: 700;
-            color: #475569;
-            letter-spacing: 0.06em;
+            color: #000000;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
+            line-height: 1.1;
         }
 
-        .info-grid {
-            margin-top: 24px;
-            border-top: 2px solid #E2E8F0;
-            border-bottom: 2px solid #E2E8F0;
-            padding: 16px 0;
-        }
-
-        .meta-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #64748B;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 2px;
-        }
-
-        .meta-val {
-            font-size: 13px;
-            font-weight: 700;
-            color: #0F172A;
-        }
-
-        .meta-val.code {
-            font-family: 'JetBrains Mono', monospace;
-            color: #1D4ED8;
-            font-size: 14px;
-        }
-
-        /* Invoice Table */
-        .table-invoice {
+        .header-line-right {
+            border-bottom: 2px solid #000000;
             width: 100%;
-            margin-top: 20px;
+            margin: 5px 0 8px 0;
+        }
+
+        /* Meta Box Grey Shaded (Accurate Style) */
+        .meta-card {
+            background: #E5E7EB;
+            border: 1px solid #D1D5DB;
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+
+        .meta-table {
+            width: 100%;
             border-collapse: collapse;
         }
 
-        .table-invoice thead th {
-            background: #F8FAFC;
-            color: #334155;
-            font-size: 11.5px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            padding: 10px 10px;
-            border-top: 1.5px solid #CBD5E1;
-            border-bottom: 1.5px solid #CBD5E1;
-        }
-
-        .table-invoice tbody td {
-            padding: 10px 10px;
-            font-size: 12.5px;
-            border-bottom: 1px solid #F1F5F9;
+        .meta-table td {
+            padding: 2.5px 0;
             vertical-align: top;
+            font-size: 11px;
         }
 
-        .table-invoice tbody tr:last-child td {
-            border-bottom: 1.5px solid #CBD5E1;
+        .meta-table td.col-lbl {
+            width: 90px;
+            color: #000000;
         }
 
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
+        .meta-table td.col-sep {
+            width: 14px;
+            text-align: center;
+            color: #000000;
         }
 
-        .summary-box {
-            margin-top: 16px;
+        .meta-table td.col-val {
+            font-weight: 600;
+            color: #000000;
         }
 
-        .summary-row {
+        /* Accurate Items Table (Solid Navy Blue Header) */
+        .table-accurate {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 11px;
+        }
+
+        .table-accurate thead th {
+            background: #0A2540 !important;
+            color: #FFFFFF !important;
+            font-weight: 700;
+            font-size: 11px;
+            padding: 6px 8px;
+            border: none;
+            letter-spacing: 0.2px;
+        }
+
+        .table-accurate tbody td {
+            padding: 5.5px 8px;
+            font-size: 11px;
+            border-bottom: 1px solid #E5E7EB;
+            vertical-align: top;
+            color: #000000;
+        }
+
+        .table-accurate tbody tr:last-child td {
+            border-bottom: 1.5px solid #000000;
+        }
+
+        /* Bottom Section: Notes & QRIS vs Totals */
+        .bottom-section {
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
-            font-size: 12.5px;
-        }
-
-        .grand-total-row {
-            border-top: 2px solid #0F172A;
-            padding-top: 8px;
-            margin-top: 6px;
-            font-size: 16px;
-            font-weight: 800;
-            color: #0F172A;
-        }
-
-        .terbilang-box {
-            background: #F8FAFC;
-            border-left: 3px solid #1D4ED8;
-            padding: 10px 14px;
-            font-size: 12px;
-            font-style: italic;
-            color: #334155;
-            border-radius: 0 6px 6px 0;
             margin-top: 12px;
         }
 
-        /* Signatures */
-        .signature-grid {
-            margin-top: 36px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+        .bottom-left {
+            width: 54%;
+        }
+
+        .keterangan-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 2px;
+        }
+
+        .keterangan-line {
+            border-bottom: 1.5px solid #000000;
+            width: 240px;
+            margin-bottom: 6px;
+        }
+
+        .keterangan-body {
+            font-size: 11px;
+            color: #000000;
+            line-height: 1.4;
+            min-height: 24px;
+        }
+
+        .dashed-divider {
+            border-top: 1.5px dashed #9CA3AF;
+            width: 240px;
+            margin: 10px 0 8px 0;
+        }
+
+        .qris-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 6px;
+        }
+
+        .qris-box {
+            border: 1px solid #000000;
+            background: #FFFFFF;
+            padding: 6px 8px;
+            display: inline-block;
             text-align: center;
         }
 
-        .sign-box {
-            border-top: 1px solid #CBD5E1;
-            padding-top: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #334155;
-            margin-top: 65px;
-        }
-
-        .sign-title {
-            font-size: 11.5px;
-            font-weight: 700;
-            color: #64748B;
+        .qris-brand-title {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            color: #000000;
             text-transform: uppercase;
         }
 
+        .bottom-right {
+            width: 40%;
+        }
+
+        /* Accurate Totals Table */
+        .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #E5E7EB;
+            border: 1px solid #D1D5DB;
+            font-size: 11px;
+        }
+
+        .totals-table td {
+            padding: 4px 8px;
+            font-size: 11px;
+            color: #000000;
+        }
+
+        .totals-table tr.row-grand-total td {
+            background: #0A2540 !important;
+            color: #FFFFFF !important;
+            font-weight: 700;
+            font-size: 11.5px;
+            padding: 6px 8px;
+            border-top: 1px solid #0A2540;
+        }
+
+        /* Signature Area */
+        .signature-area {
+            margin-top: 24px;
+            text-align: right;
+        }
+
+        .signature-box {
+            display: inline-block;
+            width: 180px;
+            text-align: center;
+            font-size: 11.5px;
+        }
+
+        .signature-line {
+            border-bottom: 1.5px solid #000000;
+            width: 100%;
+            margin: 55px auto 4px auto;
+        }
+
+        .page-footer-num {
+            position: absolute;
+            bottom: 20px;
+            right: 46px;
+            font-size: 10px;
+            font-style: italic;
+            color: #000000;
+        }
+
+        /* Print Media Styles */
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm 14mm 10mm 14mm;
+            }
             body {
-                background: #FFFFFF;
-                padding: 0;
+                background: #FFFFFF !important;
+                padding: 0 !important;
             }
             .print-toolbar {
                 display: none !important;
             }
             .invoice-paper {
-                box-shadow: none;
-                padding: 0;
-                max-width: 100%;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+                min-height: auto !important;
+            }
+            .table-accurate thead th {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .meta-card, .totals-table, .totals-table tr.row-grand-total td {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .page-footer-num {
+                position: fixed;
+                bottom: 8mm;
+                right: 14mm;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Print Action Bar (Hidden on print) -->
+    <!-- Top Action Toolbar (Hidden When Printed) -->
     <div class="print-toolbar">
         <div class="d-flex align-items-center gap-2">
-            <a href="sales_orders.php" class="btn btn-outline-secondary btn-sm fw-bold">
+            <a href="sales_orders.php" class="btn btn-outline-light btn-sm fw-bold">
                 <i class="bi bi-arrow-left me-1"></i> Daftar SO
             </a>
-            <a href="sales_order_form.php?id=<?php echo $order['id']; ?>" class="btn btn-outline-primary btn-sm fw-bold">
+            <a href="sales_order_form.php?id=<?php echo $order['id']; ?>" class="btn btn-outline-light btn-sm fw-bold">
                 <i class="bi bi-pencil me-1"></i> Edit Pesanan
             </a>
         </div>
-        <div>
-            <button onclick="window.print()" class="btn btn-primary btn-sm fw-bold px-3 shadow-sm">
-                <i class="bi bi-printer me-1"></i> Cetak Dokumen (Print / PDF)
+
+        <div class="d-flex align-items-center gap-2">
+            <!-- Kop / Brand Selector -->
+            <div class="d-flex align-items-center gap-1">
+                <span style="font-size:11px; color:#94A3B8;">Kop:</span>
+                <select id="selectBrand" class="form-select form-select-sm" style="width:auto; font-size:11.5px; font-weight:600; background:#1E293B; color:#fff; border-color:#475569;">
+                    <option value="GRAVITTI" <?php echo ($defaultBrand === 'GRAVITTI') ? 'selected' : ''; ?>>GRAVITTI (Sesuai PDF)</option>
+                    <option value="LOEWIX" <?php echo ($defaultBrand === 'LOEWIX') ? 'selected' : ''; ?>>LOEWIX</option>
+                    <option value="LOEWIX CCTV" <?php echo ($defaultBrand === 'LOEWIX CCTV') ? 'selected' : ''; ?>>LOEWIX CCTV</option>
+                    <option value="PT. GITI CCTV INDONESIA" <?php echo ($defaultBrand === 'PT. GITI CCTV INDONESIA') ? 'selected' : ''; ?>>PT. GITI CCTV INDONESIA</option>
+                </select>
+            </div>
+
+            <!-- Document Title Selector -->
+            <div class="d-flex align-items-center gap-1">
+                <span style="font-size:11px; color:#94A3B8;">Judul:</span>
+                <select id="selectDocTitle" class="form-select form-select-sm" style="width:auto; font-size:11.5px; font-weight:600; background:#1E293B; color:#fff; border-color:#475569;">
+                    <option value="PROFORMA INVOICE" <?php echo ($defaultTitle === 'PROFORMA INVOICE') ? 'selected' : ''; ?>>PROFORMA INVOICE (Sesuai PDF)</option>
+                    <option value="SALES ORDER" <?php echo ($defaultTitle === 'SALES ORDER') ? 'selected' : ''; ?>>SALES ORDER</option>
+                    <option value="PESANAN PENJUALAN" <?php echo ($defaultTitle === 'PESANAN PENJUALAN') ? 'selected' : ''; ?>>PESANAN PENJUALAN</option>
+                </select>
+            </div>
+
+            <button onclick="window.print()" class="btn btn-primary btn-sm fw-bold px-3">
+                <i class="bi bi-printer me-1"></i> Cetak Dokumen (PDF)
             </button>
         </div>
     </div>
 
-    <!-- Main Printable Invoice Paper -->
+    <!-- Main Printable Sheet -->
     <div class="invoice-paper">
         
-        <!-- Header: Logo & Company vs Document Title -->
-        <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <div class="d-flex align-items-center gap-2 mb-1">
-                    <div style="background:#1D4ED8; color:#fff; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:18px;">
-                        L
-                    </div>
-                    <span class="company-title">LOEWIX CCTV</span>
-                </div>
-                <div class="company-subtitle">
-                    <strong>PT. GITI CCTV INDONESIA</strong><br>
-                    Official Distributor of Loewix Surveillance &amp; Security Systems<br>
-                    Web: https://sales.id-giti.com &bull; Telp / WA: 0812-3456-7890
-                </div>
-            </div>
-            <div class="doc-title-badge">
-                <div class="doc-name">SALES ORDER</div>
-                <div class="doc-sub">PESANAN PENJUALAN</div>
-                <div class="meta-val code mt-1"><?php echo htmlspecialchars(!empty($order['so_number']) ? $order['so_number'] : '(Menunggu No. SO)'); ?></div>
-            </div>
-        </div>
+        <!-- Header (Accurate Style) -->
+        <div class="accurate-header">
+            <!-- Left: Brand / Logo & Customer Address -->
+            <div class="header-left">
+                <div class="company-logo-text" id="brandLogoText"><?php echo htmlspecialchars($defaultBrand); ?></div>
+                <div class="header-line-left"></div>
 
-        <!-- Meta Grid -->
-        <div class="info-grid">
-            <div class="row g-3">
-                <div class="col-6">
-                    <div class="meta-label">Pemesan / Customer (Toko)</div>
-                    <div class="meta-val" style="font-size:15px; color:#1D4ED8;"><?php echo htmlspecialchars($order['customer_name']); ?></div>
-                    <div style="font-size:12px; color:#475569; margin-top:2px;">
-                        <?php if (!empty($order['customer_address'])): ?>
-                            <?php echo nl2br(htmlspecialchars($order['customer_address'])); ?><br>
+                <div class="kepada-label">Kepada</div>
+                <div class="customer-name-heading"><?php echo htmlspecialchars($order['customer_name']); ?></div>
+                <div class="customer-address-block">
+                    <?php if (!empty($order['customer_address'])): ?>
+                        <?php echo nl2br(htmlspecialchars($order['customer_address'])); ?>
+                    <?php else: ?>
+                        -
+                    <?php endif; ?>
+                    <?php if (!empty($order['customer_pic']) || !empty($order['customer_phone'])): ?>
+                        <div style="margin-top:2px;">
+                            <?php if (!empty($order['customer_pic'])): ?>PIC: <?php echo htmlspecialchars($order['customer_pic']); ?><?php endif; ?>
+                            <?php if (!empty($order['customer_phone'])): ?> &bull; Telp: <?php echo htmlspecialchars($order['customer_phone']); ?><?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Right: Document Title & Meta Box -->
+            <div class="header-right">
+                <div class="doc-main-title" id="docMainTitle"><?php echo htmlspecialchars($defaultTitle); ?></div>
+                <div class="header-line-right"></div>
+
+                <div class="meta-card">
+                    <table class="meta-table">
+                        <tr>
+                            <td class="col-lbl">Nomor</td>
+                            <td class="col-sep">:</td>
+                            <td class="col-val"><?php echo htmlspecialchars(!empty($order['so_number']) ? $order['so_number'] : '(Menunggu No. SO)'); ?></td>
+                        </tr>
+                        <tr>
+                            <td class="col-lbl">Tanggal</td>
+                            <td class="col-sep">:</td>
+                            <td class="col-val"><?php echo $tglFormatted; ?></td>
+                        </tr>
+                        <tr>
+                            <td class="col-lbl">Pembayaran</td>
+                            <td class="col-sep">:</td>
+                            <td class="col-val"><?php echo htmlspecialchars($order['payment_terms'] ?: 'C.O.D'); ?></td>
+                        </tr>
+                        <?php if (!empty($order['po_number'])): ?>
+                        <tr>
+                            <td class="col-lbl">No. PO</td>
+                            <td class="col-sep">:</td>
+                            <td class="col-val"><?php echo htmlspecialchars($order['po_number']); ?></td>
+                        </tr>
                         <?php endif; ?>
-                        <strong>PIC:</strong> <?php echo htmlspecialchars($order['customer_pic'] ?: '-'); ?> &bull; 
-                        <strong>Telp:</strong> <?php echo htmlspecialchars($order['customer_phone'] ?: '-'); ?>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <div class="meta-label">Tanggal Pesanan</div>
-                            <div class="meta-val"><?php echo date('d F Y', strtotime($order['so_date'])); ?></div>
-                        </div>
-                        <div class="col-6">
-                            <div class="meta-label">Syarat Pembayaran</div>
-                            <div class="meta-val"><?php echo htmlspecialchars($order['payment_terms']); ?></div>
-                        </div>
-                        <div class="col-6">
-                            <div class="meta-label">Sales Representative</div>
-                            <div class="meta-val"><?php echo htmlspecialchars($order['sales_name'] ?: '-'); ?></div>
-                        </div>
-                        <div class="col-6">
-                            <div class="meta-label">No. PO Customer</div>
-                            <div class="meta-val"><?php echo htmlspecialchars($order['po_number'] ?: '-'); ?></div>
-                        </div>
-                    </div>
+                        <?php if (!empty($order['sales_name'])): ?>
+                        <tr>
+                            <td class="col-lbl">Sales</td>
+                            <td class="col-sep">:</td>
+                            <td class="col-val"><?php echo htmlspecialchars($order['sales_name']); ?></td>
+                        </tr>
+                        <?php endif; ?>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Optional Shipping Info -->
-        <?php if (!empty($order['shipping_method']) || !empty($order['shipping_date'])): ?>
-            <div class="d-flex justify-content-between p-2 mt-2 bg-light rounded" style="font-size:11.5px; color:#475569;">
-                <div>
-                    <strong>Pengiriman:</strong> <?php echo htmlspecialchars($order['shipping_method'] ?: 'Ambil Sendiri / Standar'); ?>
-                </div>
-                <div>
-                    <strong>Tgl Kirim:</strong> <?php echo !empty($order['shipping_date']) ? date('d/m/Y', strtotime($order['shipping_date'])) : '-'; ?>
-                </div>
-                <div>
-                    <strong>Cabang / Gudang:</strong> <?php echo htmlspecialchars($order['branch'] ?: 'Kantor Pusat'); ?>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <!-- Items Table -->
-        <table class="table-invoice">
+        <!-- Table of Items (Navy Blue Header Bar) -->
+        <table class="table-accurate">
             <thead>
                 <tr>
-                    <th style="width: 35px; text-align: center;">No.</th>
-                    <th style="width: 38%;">Nama Barang &amp; Deskripsi</th>
-                    <th style="width: 15%;">Kode #</th>
-                    <th style="width: 8%; text-align: center;">Qty</th>
-                    <th style="width: 8%; text-align: center;">Satuan</th>
-                    <th style="width: 15%; text-align: right;">Harga (Rp)</th>
-                    <th style="width: 16%; text-align: right;">Total (Rp)</th>
+                    <th style="width: 14%; text-align: left;">Kode Barang</th>
+                    <th style="width: 44%; text-align: left;">Nama Barang</th>
+                    <th style="width: 7%; text-align: right;">Qty</th>
+                    <th style="width: 15%; text-align: right;">@Harga</th>
+                    <th style="width: 7%; text-align: right;">Diskon</th>
+                    <th style="width: 13%; text-align: right;">Total Harga</th>
                 </tr>
             </thead>
             <tbody>
-                <?php 
-                $no = 1;
-                foreach ($items as $item): 
-                ?>
+                <?php foreach ($items as $item): ?>
                     <tr>
-                        <td style="text-align: center; color: #64748B;"><?php echo $no++; ?></td>
-                        <td>
-                            <div class="fw-bold text-dark"><?php echo htmlspecialchars($item['item_name']); ?></div>
+                        <td style="text-align: left;">
+                            <?php echo htmlspecialchars($item['item_code'] ?: '-'); ?>
+                        </td>
+                        <td style="text-align: left;">
+                            <div style="<?php echo (strpos($item['item_name'], '--') === 0) ? 'padding-left:8px; font-weight:500;' : 'font-weight:600;'; ?>">
+                                <?php echo htmlspecialchars($item['item_name']); ?>
+                            </div>
                             <?php if (!empty($item['item_description']) && $item['item_description'] !== $item['item_name']): ?>
-                                <div style="font-size: 11px; color: #64748B;"><?php echo htmlspecialchars($item['item_description']); ?></div>
+                                <div style="font-size: 10px; color: #4B5563; margin-top: 1px;">
+                                    <?php echo htmlspecialchars($item['item_description']); ?>
+                                </div>
                             <?php endif; ?>
                         </td>
-                        <td class="font-mono" style="font-size: 11.5px; color: #475569;">
-                            <?php echo htmlspecialchars($item['item_code']); ?>
-                        </td>
-                        <td style="text-align: center; font-weight: 700;">
+                        <td style="text-align: right; font-weight: 600;">
                             <?php echo (int)$item['qty']; ?>
                         </td>
-                        <td style="text-align: center; color: #64748B; font-size: 11.5px;">
-                            <?php echo htmlspecialchars($item['unit'] ?: 'PCS'); ?>
-                        </td>
-                        <td style="text-align: right;" class="font-mono">
+                        <td style="text-align: right;">
                             <?php echo number_format($item['unit_price'], 0, ',', '.'); ?>
-                            <?php if ($item['discount_item'] > 0): ?>
-                                <div style="font-size: 10px; color: #EF4444;">-<?php echo number_format($item['discount_item'], 0, ',', '.'); ?></div>
-                            <?php endif; ?>
                         </td>
-                        <td style="text-align: right; font-weight: 700;" class="font-mono text-dark">
+                        <td style="text-align: right;">
+                            <?php echo number_format($item['discount_item'], 0, ',', '.'); ?>
+                        </td>
+                        <td style="text-align: right; font-weight: 600;">
                             <?php echo number_format($item['total_price'], 0, ',', '.'); ?>
                         </td>
                     </tr>
@@ -424,72 +573,141 @@ function terbilang($nilai) {
             </tbody>
         </table>
 
-        <!-- Summary & Terbilang -->
-        <div class="row summary-box">
-            <div class="col-7">
-                <div class="terbilang-box">
-                    <strong>Terbilang:</strong><br>
-                    <?php echo terbilang($order['grand_total']); ?>
-                </div>
-
-                <?php if (!empty($order['special_notes'])): ?>
-                    <div class="mt-3 p-2 border rounded" style="font-size:11.5px; background:#FAFAFA;">
-                        <strong>Catatan Khusus:</strong><br>
+        <!-- Bottom Section: Notes & QRIS (Left) vs Summary & Signature (Right) -->
+        <div class="bottom-section">
+            
+            <!-- Left Side: Keterangan & QRIS -->
+            <div class="bottom-left">
+                <div class="keterangan-title">Keterangan</div>
+                <div class="keterangan-line"></div>
+                <div class="keterangan-body">
+                    <?php if (!empty($order['special_notes'])): ?>
                         <?php echo nl2br(htmlspecialchars($order['special_notes'])); ?>
+                    <?php else: ?>
+                        <i>-</i>
+                    <?php endif; ?>
+                    <div style="font-size:10.5px; color:#4B5563; margin-top:4px;">
+                        <strong>Terbilang:</strong> <em><?php echo terbilang($order['grand_total']); ?></em>
                     </div>
-                <?php endif; ?>
+                </div>
 
-                <div class="mt-3" style="font-size:11px; color:#64748B;">
-                    <strong>Rekening Pembayaran:</strong><br>
-                    Bank BCA: <strong>123-456-7890</strong> a/n PT. GITI CCTV INDONESIA<br>
-                    Bank Mandiri: <strong>987-654-3210</strong> a/n PT. GITI CCTV INDONESIA
+                <div class="dashed-divider"></div>
+
+                <div class="qris-label">Pembayaran melalui QRIS :</div>
+                <div class="qris-box">
+                    <div class="qris-brand-title" id="qrisBrandTitle"><?php echo htmlspecialchars($defaultBrand); ?> TECHNOLOGY</div>
+                    <!-- Real QR Code with inline SVG fallback -->
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=105x105&margin=0&data=<?php echo urlencode('SO-' . (!empty($order['so_number']) ? $order['so_number'] : $order['id']) . '-TOTAL-' . $order['grand_total']); ?>" 
+                         alt="QRIS Code" width="100" height="100" style="display:block; margin:0 auto;"
+                         onerror="this.style.display='none'; document.getElementById('qrFallback').style.display='block';">
+                    
+                    <div id="qrFallback" style="display:none; width:100px; height:100px; margin:0 auto; background:#F8FAFC; border:1px solid #CBD5E1; padding:10px;">
+                        <svg viewBox="0 0 24 24" width="80" height="80" fill="#000">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14 0h4v4h-4v-4zm-4-2h2v2h-2v-2zm-2 2h2v2h-2v-2zm4 4h2v2h-2v-2zm-2 2h2v2h-2v-2zm-4-4h2v2h-2v-2zm6-4h2v2h-2v-2zm2 2h2v2h-2v-2zm-4 4h2v2h-2v-2z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div style="font-size: 10px; color: #4B5563; margin-top: 6px; line-height: 1.4;">
+                    Transfer Bank BCA: <strong>123-456-7890</strong> a/n PT. GITI CCTV INDONESIA<br>
+                    Transfer Mandiri: <strong>987-654-3210</strong> a/n PT. GITI CCTV INDONESIA
                 </div>
             </div>
 
-            <div class="col-5">
-                <div class="summary-row">
-                    <span class="text-muted">Sub Total:</span>
-                    <span class="font-mono fw-bold">Rp <?php echo number_format($order['subtotal'], 0, ',', '.'); ?></span>
-                </div>
+            <!-- Right Side: Totals & Signature -->
+            <div class="bottom-right">
+                <table class="totals-table">
+                    <tr>
+                        <td style="width: 50%;">Sub Total</td>
+                        <td style="width: 50%; text-align: right; font-weight: 600;">
+                            <?php echo number_format($order['subtotal'], 0, ',', '.'); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Diskon</td>
+                        <td style="text-align: right; font-weight: 600;">
+                            <?php echo number_format($order['discount_amount'], 0, ',', '.'); ?>
+                        </td>
+                    </tr>
+                    <?php if (!empty($order['is_taxable'])): ?>
+                    <tr>
+                        <td>PPN (11%)</td>
+                        <td style="text-align: right; font-weight: 600;">
+                            <?php echo number_format($order['tax_amount'], 0, ',', '.'); ?>
+                        </td>
+                    </tr>
+                    <?php else: ?>
+                    <tr>
+                        <td>Biaya Lain-lain</td>
+                        <td style="text-align: right; font-weight: 600;">
+                            0
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                    <tr class="row-grand-total">
+                        <td>Total</td>
+                        <td style="text-align: right;">
+                            <?php echo number_format($order['grand_total'], 0, ',', '.'); ?>
+                        </td>
+                    </tr>
+                </table>
 
-                <?php if ($order['discount_amount'] > 0): ?>
-                    <div class="summary-row text-danger">
-                        <span>Diskon (<?php echo $order['discount_type'] === 'percent' ? $order['discount_val'].'%' : 'Potongan'; ?>):</span>
-                        <span class="font-mono fw-bold">- Rp <?php echo number_format($order['discount_amount'], 0, ',', '.'); ?></span>
+                <!-- Signature Section (Accurate Style) -->
+                <div class="signature-area">
+                    <div class="signature-box">
+                        <div style="font-weight: 600;">Bagian Penjualan,</div>
+                        <div class="signature-line"></div>
+                        <div style="text-align: left; font-size: 11px;">
+                            Tgl. <?php echo !empty($order['sales_name']) ? ('&bull; ' . htmlspecialchars($order['sales_name'])) : ''; ?>
+                        </div>
                     </div>
-                <?php endif; ?>
-
-                <?php if ($order['is_taxable']): ?>
-                    <div class="summary-row">
-                        <span class="text-muted">PPN (11%):</span>
-                        <span class="font-mono fw-bold">Rp <?php echo number_format($order['tax_amount'], 0, ',', '.'); ?></span>
-                    </div>
-                <?php endif; ?>
-
-                <div class="summary-row grand-total-row">
-                    <span>GRAND TOTAL:</span>
-                    <span class="font-mono text-primary">Rp <?php echo number_format($order['grand_total'], 0, ',', '.'); ?></span>
                 </div>
             </div>
+
         </div>
 
-        <!-- Signatures Grid -->
-        <div class="signature-grid">
-            <div>
-                <div class="sign-title">Dibuat Oleh (Sales)</div>
-                <div class="sign-box"><?php echo htmlspecialchars($order['sales_name'] ?: 'Staff Sales'); ?></div>
-            </div>
-            <div>
-                <div class="sign-title">Disetujui Oleh</div>
-                <div class="sign-box">Finance / Manager</div>
-            </div>
-            <div>
-                <div class="sign-title">Customer / Pemesan</div>
-                <div class="sign-box"><?php echo htmlspecialchars($order['customer_pic'] ?: $order['customer_name']); ?></div>
-            </div>
-        </div>
+        <!-- Accurate Page Number (Footer Bottom Right) -->
+        <div class="page-footer-num">Halaman 1 dari 1</div>
 
     </div>
 
+    <!-- Script to Handle Live Switcher & LocalStorage Memory -->
+    <script>
+        const brandSelect = document.getElementById('selectBrand');
+        const docTitleSelect = document.getElementById('selectDocTitle');
+        const brandText = document.getElementById('brandLogoText');
+        const docTitleText = document.getElementById('docMainTitle');
+        const qrisBrandText = document.getElementById('qrisBrandTitle');
+
+        // Restore saved preference if any
+        const savedBrand = localStorage.getItem('so_print_brand');
+        if (savedBrand && brandSelect) {
+            brandSelect.value = savedBrand;
+            brandText.innerText = savedBrand;
+            qrisBrandText.innerText = (savedBrand === 'GRAVITTI' ? 'GRAVITTI TECHNOLOGY' : savedBrand);
+        }
+
+        const savedTitle = localStorage.getItem('so_print_title');
+        if (savedTitle && docTitleSelect) {
+            docTitleSelect.value = savedTitle;
+            docTitleText.innerText = savedTitle;
+            document.title = savedTitle + " - <?php echo htmlspecialchars(!empty($order['so_number']) ? $order['so_number'] : ('ID #' . $order['id'])); ?>";
+        }
+
+        // Event listeners
+        brandSelect.addEventListener('change', function() {
+            const val = this.value;
+            brandText.innerText = val;
+            qrisBrandText.innerText = (val === 'GRAVITTI' ? 'GRAVITTI TECHNOLOGY' : val);
+            localStorage.setItem('so_print_brand', val);
+        });
+
+        docTitleSelect.addEventListener('change', function() {
+            const val = this.value;
+            docTitleText.innerText = val;
+            document.title = val + " - <?php echo htmlspecialchars(!empty($order['so_number']) ? $order['so_number'] : ('ID #' . $order['id'])); ?>";
+            localStorage.setItem('so_print_title', val);
+        });
+    </script>
 </body>
 </html>
