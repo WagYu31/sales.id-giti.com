@@ -72,7 +72,7 @@ if (!function_exists('ensureSalesOrderTables')) {
         // 2. Table sales_orders
         $conn->query("CREATE TABLE IF NOT EXISTS `sales_orders` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
-            `so_number` varchar(50) NOT NULL,
+            `so_number` varchar(50) DEFAULT NULL,
             `so_date` date NOT NULL,
             `customer_id` int(11) DEFAULT NULL,
             `customer_code` varchar(50) DEFAULT NULL,
@@ -111,6 +111,14 @@ if (!function_exists('ensureSalesOrderTables')) {
             KEY `idx_date` (`so_date`),
             KEY `idx_status` (`status`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+        // Ensure so_number allows NULL for orders where SO number from finance is pending/delayed
+        $chkColSo = $conn->query("SHOW COLUMNS FROM `sales_orders` LIKE 'so_number'");
+        if ($chkColSo && $rColSo = $chkColSo->fetch_assoc()) {
+            if (strtoupper($rColSo['Null']) === 'NO') {
+                @$conn->query("ALTER TABLE `sales_orders` MODIFY COLUMN `so_number` VARCHAR(50) NULL DEFAULT NULL");
+            }
+        }
 
         // 3. Table sales_order_items
         $conn->query("CREATE TABLE IF NOT EXISTS `sales_order_items` (

@@ -705,7 +705,13 @@ if ($qSales) {
                         <tr id="row-so-<?php echo $row['id']; ?>">
                             <td>
                                 <a href="sales_order_print.php?id=<?php echo $row['id']; ?>" class="fw-bold font-monospace text-decoration-none text-dark" title="Klik untuk Cetak / Lihat Dokumen">
-                                    <?php echo htmlspecialchars($row['so_number']); ?>
+                                    <?php if (!empty($row['so_number'])): ?>
+                                        <?php echo htmlspecialchars($row['so_number']); ?>
+                                    <?php else: ?>
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" style="font-size:11px; font-family:inherit; font-weight:600; padding:4px 8px;">
+                                            <i class="bi bi-hourglass-split me-1"></i>Menunggu No. SO
+                                        </span>
+                                    <?php endif; ?>
                                 </a>
                                 <?php if (!empty($row['po_number'])): ?>
                                     <div class="text-muted" style="font-size:11px;">PO: <?php echo htmlspecialchars($row['po_number']); ?></div>
@@ -787,7 +793,7 @@ if ($qSales) {
                                     <a href="sales_order_form.php?id=<?php echo $row['id']; ?>" class="btn-action-so" title="Edit Pesanan">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn-action-so btn-delete btn-delete-so" data-id="<?php echo $row['id']; ?>" data-num="<?php echo htmlspecialchars($row['so_number']); ?>" title="Hapus Pesanan">
+                                    <button type="button" class="btn-action-so btn-delete btn-delete-so" data-id="<?php echo $row['id']; ?>" data-num="<?php echo htmlspecialchars(!empty($row['so_number']) ? $row['so_number'] : ('ID #' . $row['id'])); ?>" title="Hapus Pesanan">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>

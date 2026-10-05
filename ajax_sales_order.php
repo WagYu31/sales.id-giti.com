@@ -289,10 +289,8 @@ if ($action === 'save_sales_order') {
     $itemsJson = $_POST['items'] ?? '[]';
     $items = json_decode($itemsJson, true);
     
-    if (empty($so_number)) {
-        echo json_encode(['success' => false, 'message' => 'Nomor Pesanan (No. SO) wajib diisi.']);
-        exit;
-    }
+    // SO Number is optional (can be left blank if Finance hasn't issued it yet)
+    $so_number = !empty($so_number) ? $so_number : null;
     
     if (empty($customer_name)) {
         echo json_encode(['success' => false, 'message' => 'Nama Customer / Toko wajib diisi.']);
@@ -304,20 +302,22 @@ if ($action === 'save_sales_order') {
         exit;
     }
     
-    // Cek duplikasi nomor SO jika baru atau ganti nomor
-    if ($so_id > 0) {
-        $chkSo = $conn->prepare("SELECT id FROM sales_orders WHERE so_number = ? AND id != ? AND deleted_at IS NULL");
-        $chkSo->bind_param("si", $so_number, $so_id);
-    } else {
-        $chkSo = $conn->prepare("SELECT id FROM sales_orders WHERE so_number = ? AND deleted_at IS NULL");
-        $chkSo->bind_param("s", $so_number);
+    // Cek duplikasi nomor SO HANYA jika nomor SO diisi
+    if (!empty($so_number)) {
+        if ($so_id > 0) {
+            $chkSo = $conn->prepare("SELECT id FROM sales_orders WHERE so_number = ? AND id != ? AND deleted_at IS NULL");
+            $chkSo->bind_param("si", $so_number, $so_id);
+        } else {
+            $chkSo = $conn->prepare("SELECT id FROM sales_orders WHERE so_number = ? AND deleted_at IS NULL");
+            $chkSo->bind_param("s", $so_number);
+        }
+        $chkSo->execute();
+        if ($chkSo->get_result()->num_rows > 0) {
+            echo json_encode(['success' => false, 'message' => "Nomor SO '{$so_number}' sudah digunakan. Silakan gunakan nomor lain atau klik perbarui."]);
+            exit;
+        }
+        $chkSo->close();
     }
-    $chkSo->execute();
-    if ($chkSo->get_result()->num_rows > 0) {
-        echo json_encode(['success' => false, 'message' => "Nomor SO '{$so_number}' sudah digunakan. Silakan gunakan nomor lain atau klik perbarui."]);
-        exit;
-    }
-    $chkSo->close();
     
     // Hitung Finansial (Subtotal, Diskon, Pajak, Grand Total)
     $subtotal = 0;

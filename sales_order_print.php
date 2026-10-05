@@ -78,7 +78,7 @@ function terbilang($nilai) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Order - <?php echo htmlspecialchars($order['so_number']); ?></title>
+    <title>Sales Order - <?php echo htmlspecialchars(!empty($order['so_number']) ? $order['so_number'] : 'Menunggu No. SO'); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -318,7 +318,7 @@ function terbilang($nilai) {
             <div class="doc-title-badge">
                 <div class="doc-name">SALES ORDER</div>
                 <div class="doc-sub">PESANAN PENJUALAN</div>
-                <div class="meta-val code mt-1"><?php echo htmlspecialchars($order['so_number']); ?></div>
+                <div class="meta-val code mt-1"><?php echo htmlspecialchars(!empty($order['so_number']) ? $order['so_number'] : '(Menunggu No. SO)'); ?></div>
             </div>
         </div>
 

@@ -423,7 +423,7 @@ if ($qProd) {
             <div class="d-flex align-items-center gap-2">
                 <span class="accurate-tab-badge">
                     <i class="bi bi-file-earmark-spreadsheet"></i>
-                    Pesanan Penjualan: <?php echo $isEdit ? htmlspecialchars($orderData['so_number']) : 'Data Baru'; ?>
+                    Pesanan Penjualan: <?php echo $isEdit ? htmlspecialchars(!empty($orderData['so_number']) ? $orderData['so_number'] : '(Belum ada No. SO)') : 'Data Baru'; ?>
                 </span>
                 <span class="badge" style="background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); font-size:11.5px; font-weight:600; padding:5px 12px; border-radius:6px;">
                     Mata Uang: IDR (Rupiah)
@@ -478,19 +478,20 @@ if ($qProd) {
                            value="<?php echo htmlspecialchars($orderData['so_date'] ?? date('Y-m-d')); ?>" required>
                 </div>
 
-                <!-- No Pesanan # * (Format: 2609.SOL.07025) -->
+                <!-- No Pesanan # (Opsional jika No. SO dari Finance belum terbit) -->
                 <div class="col-lg-3 col-md-3 col-6">
-                    <label class="accurate-label required">
+                    <label class="accurate-label">
                         <i class="bi bi-hash me-1"></i> No. Pesanan (SO #)
                     </label>
                     <div class="input-group">
                         <input type="text" name="so_number" id="so_number" class="form-control accurate-input font-monospace text-dark fw-bold" 
-                               value="<?php echo htmlspecialchars($isEdit ? $orderData['so_number'] : $defaultSoNumber); ?>" required>
-                        <button class="btn btn-outline-secondary" type="button" id="btnRefreshSoNum" title="Generate No. SO Baru" style="border-color:#cbd5e1;">
+                               placeholder="Bisa dikosongkan..."
+                               value="<?php echo htmlspecialchars($isEdit ? ($orderData['so_number'] ?? '') : ''); ?>">
+                        <button class="btn btn-outline-secondary" type="button" id="btnRefreshSoNum" title="Generate / Isi No. SO Otomatis" style="border-color:#cbd5e1;">
                             <i class="bi bi-arrow-clockwise"></i>
                         </button>
                     </div>
-                    <small class="text-muted" style="font-size:11px;">Format: <strong>YYMM.SOL.XXXXX</strong></small>
+                    <small class="text-muted" style="font-size:11px;">Opsional &bull; Format: <strong>YYMM.SOL.XXXXX</strong> (bisa dikosongkan jika dari Finance belum ada)</small>
                 </div>
 
                 <!-- Sales Representative -->
@@ -1178,11 +1179,6 @@ $(document).ready(function() {
     function submitSalesOrder() {
         const soNum = $.trim($('#so_number').val());
         const custName = $.trim($('#customer_name').val());
-
-        if (!soNum) {
-            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Nomor Pesanan (SO #) wajib diisi!' });
-            return;
-        }
 
         if (!custName) {
             Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Silakan pilih atau tentukan Customer terlebih dahulu!' });
