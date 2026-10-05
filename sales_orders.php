@@ -502,267 +502,182 @@ if ($qSales) {
     color: var(--pastel-red-text);
 }
 
-/* ── Next-Gen Executive Modal Detail SO Styling ── */
+/* ── Executive Clean Modal Detail SO Styling ── */
 #modalDetailSo .modal-content {
-    border-radius: 20px;
-    border: 1px solid rgba(226, 232, 240, 0.9);
-    box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35);
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25);
     overflow: hidden;
     background: #ffffff;
 }
 #modalDetailSo .modal-header {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: #0f172a;
     color: #ffffff;
-    padding: 18px 26px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px 24px;
+    border-bottom: 1px solid #1e293b;
 }
 #modalDetailSo .header-icon-box {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: rgba(56, 189, 248, 0.15);
-    border: 1px solid rgba(56, 189, 248, 0.3);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.25);
     color: #38bdf8;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 #modalDetailSo .modal-so-badge {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.1);
     color: #f8fafc;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    padding: 4px 10px;
-    border-radius: 8px;
-    letter-spacing: 0.03em;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 6px;
 }
 #modalDetailSo .btn-copy-header {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: #cbd5e1;
-    font-size: 11.5px;
+    font-size: 11px;
+    font-weight: 600;
     padding: 3px 8px;
     border-radius: 6px;
     transition: all 0.15s ease;
     cursor: pointer;
 }
 #modalDetailSo .btn-copy-header:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
 }
 
-/* Stepper Status Bar */
-.so-stepper {
+/* Compact Segmented Stepper */
+.so-stepper-compact {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative;
-    padding: 14px 20px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    margin-bottom: 22px;
+    border-radius: 10px;
+    padding: 9px 18px;
+    margin-bottom: 16px;
 }
-.so-stepper-progress-line {
-    position: absolute;
-    top: 28px;
-    left: 45px;
-    right: 45px;
-    height: 3px;
-    background: #e2e8f0;
-    z-index: 1;
-}
-.so-stepper-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #10b981 0%, #2563eb 100%);
-    transition: width 0.4s ease;
-    width: 0%;
-}
-.so-step-item {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    background: #f8fafc;
-    padding: 0 10px;
-}
-.so-step-circle {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 2px solid #cbd5e1;
-    color: #94a3b8;
+.so-step-seg {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    transition: all 0.2s ease;
-}
-.so-step-item.completed .so-step-circle {
-    background: #10b981;
-    border-color: #10b981;
-    color: #ffffff;
-}
-.so-step-item.active .so-step-circle {
-    background: #2563eb;
-    border-color: #2563eb;
-    color: #ffffff;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
-    animation: pulseStep 2s infinite;
-}
-@keyframes pulseStep {
-    0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
-    70% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
-}
-.so-step-label {
-    font-size: 11px;
+    gap: 8px;
+    font-size: 12px;
     font-weight: 600;
-    color: #64748b;
-    white-space: nowrap;
-}
-.so-step-item.completed .so-step-label,
-.so-step-item.active .so-step-label {
-    color: #0f172a;
-    font-weight: 700;
-}
-
-/* Info Cards */
-.so-info-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 16px 18px;
-    height: 100%;
-    box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+    color: #94a3b8;
     transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
 }
-.so-info-card:hover {
-    border-color: #cbd5e1;
-    box-shadow: 0 6px 16px -4px rgba(15, 23, 42, 0.08);
-}
-.so-info-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-}
-.so-info-card.card-blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-.so-info-card.card-emerald::before { background: linear-gradient(90deg, #10b981, #34d399); }
-.so-info-card.card-violet::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
-
-.so-card-header {
+.so-seg-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-.so-card-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 11px;
+    font-weight: 700;
 }
-.icon-blue { background: #eff6ff; color: #2563eb; }
-.icon-emerald { background: #ecfdf5; color: #059669; }
-.icon-violet { background: #f5f3ff; color: #7c3aed; }
+.so-seg-divider {
+    flex-grow: 1;
+    height: 2px;
+    background: #e2e8f0;
+    margin: 0 14px;
+    border-radius: 2px;
+    transition: background 0.25s ease;
+}
+.so-step-seg.completed {
+    color: #0f172a;
+}
+.so-step-seg.completed .so-seg-num {
+    background: #10b981;
+    color: #ffffff;
+}
+.so-step-seg.completed + .so-seg-divider {
+    background: #10b981;
+}
+.so-step-seg.active {
+    color: #0284c7;
+}
+.so-step-seg.active .so-seg-num {
+    background: #0284c7;
+    color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
 
-/* Enterprise Items Table */
+/* Unified Clean Cards */
+.so-info-panel-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 13px 15px;
+    height: 100%;
+}
+.so-panel-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding-bottom: 7px;
+    margin-bottom: 9px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.so-panel-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    padding: 3px 0;
+}
+
+/* Items Table */
 .so-items-container {
     border: 1px solid #e2e8f0;
-    border-radius: 14px;
+    border-radius: 10px;
     overflow: hidden;
     background: #ffffff;
-    box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+    margin-bottom: 18px;
 }
 .table-so-detail {
     font-size: 12.5px;
     margin-bottom: 0;
 }
 .table-so-detail th {
-    background: #f8fafc;
-    color: #475569;
+    background: #0f172a;
+    color: #f1f5f9;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 12px 14px;
-    border-bottom: 2px solid #e2e8f0;
+    letter-spacing: 0.04em;
+    padding: 10px 12px;
+    border: none;
     white-space: nowrap;
 }
 .table-so-detail td {
-    padding: 11px 14px;
+    padding: 9px 12px;
     vertical-align: middle;
     border-bottom: 1px solid #f1f5f9;
 }
-.row-parent-package {
-    background: #f8fafc !important;
-    border-left: 3px solid #2563eb !important;
-}
 .row-parent-package td {
-    font-weight: 600;
+    background: #f8fafc !important;
 }
-.row-bundle-subitem {
-    background: #fbfcfe !important;
+.row-parent-package td:first-child {
+    border-left: 3px solid #0284c7;
 }
 .row-bundle-subitem td {
-    padding-top: 8px;
-    padding-bottom: 8px;
-}
-
-/* Executive Financial Summary Card */
-.so-summary-box {
-    background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
-    border-radius: 16px;
-    padding: 20px 22px;
-    color: #ffffff;
-    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
-}
-.so-summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    font-size: 13px;
-    color: #cbd5e1;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-.so-summary-grand {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 14px;
-    margin-top: 6px;
-}
-.so-grand-val {
-    font-size: 24px;
-    font-weight: 800;
-    color: #38bdf8;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: -0.02em;
-}
-.so-terbilang-box {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 10px 14px;
-    margin-top: 14px;
-    font-size: 11.5px;
-    color: #94a3b8;
-    font-style: italic;
-    line-height: 1.4;
+    background: #ffffff !important;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #e2e8f0;
 }
 </style>
 
@@ -1137,129 +1052,115 @@ if ($qSales) {
 
                 <!-- Content State -->
                 <div id="modalDetailBody" class="d-none">
-                    <!-- 1. Interactive Order Stepper Progress Bar -->
-                    <div class="so-stepper" id="modalDetailStepper">
-                        <div class="so-stepper-progress-line">
-                            <div class="so-stepper-progress-fill" id="modalStepperFill"></div>
+                    <!-- 1. Sleek Compact Stepper -->
+                    <div class="so-stepper-compact mb-3" id="modalDetailStepper">
+                        <div class="so-step-seg" id="step-Draft">
+                            <span class="so-seg-num">1</span>
+                            <span class="so-seg-text">Draft</span>
                         </div>
-                        <div class="so-step-item" id="step-Draft">
-                            <div class="so-step-circle"><i class="bi bi-file-earmark-text"></i></div>
-                            <span class="so-step-label">Draft SO</span>
+                        <div class="so-seg-divider"></div>
+                        <div class="so-step-seg" id="step-Menunggu">
+                            <span class="so-seg-num">2</span>
+                            <span class="so-seg-text">Menunggu</span>
                         </div>
-                        <div class="so-step-item" id="step-Menunggu">
-                            <div class="so-step-circle"><i class="bi bi-hourglass-split"></i></div>
-                            <span class="so-step-label">Menunggu</span>
+                        <div class="so-seg-divider"></div>
+                        <div class="so-step-seg" id="step-Diproses">
+                            <span class="so-seg-num">3</span>
+                            <span class="so-seg-text">Diproses</span>
                         </div>
-                        <div class="so-step-item" id="step-Diproses">
-                            <div class="so-step-circle"><i class="bi bi-gear-wide-connected"></i></div>
-                            <span class="so-step-label">Diproses</span>
-                        </div>
-                        <div class="so-step-item" id="step-Selesai">
-                            <div class="so-step-circle"><i class="bi bi-check2-circle"></i></div>
-                            <span class="so-step-label">Selesai / Terkirim</span>
+                        <div class="so-seg-divider"></div>
+                        <div class="so-step-seg" id="step-Selesai">
+                            <span class="so-seg-num">4</span>
+                            <span class="so-seg-text">Selesai</span>
                         </div>
                     </div>
 
-                    <!-- 2. High-Contrast Executive Info Cards -->
-                    <div class="row g-3 mb-4">
+                    <!-- 2. Clean Balanced Info Cards -->
+                    <div class="row g-3 mb-3">
                         <!-- Card 1: Data Pesanan -->
                         <div class="col-md-4">
-                            <div class="so-info-card card-blue">
-                                <div class="so-card-header">
-                                    <div class="so-card-icon icon-blue">
-                                        <i class="bi bi-file-earmark-ruled"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 13px;">Data Pesanan</div>
-                                        <div class="text-muted" style="font-size: 11px;">Identitas &amp; Termin</div>
-                                    </div>
+                            <div class="so-info-panel-card">
+                                <div class="so-panel-title text-primary">
+                                    <i class="bi bi-file-earmark-text"></i> DATA PESANAN
                                 </div>
-                                <div class="d-flex justify-content-between py-1.5 border-bottom" style="font-size: 12.5px;">
+                                <div class="so-panel-row">
                                     <span class="text-muted">No. Pesanan:</span>
                                     <span class="fw-bold font-monospace text-dark" id="modalSoNumber">-</span>
                                 </div>
-                                <div class="d-flex justify-content-between py-1.5 border-bottom" style="font-size: 12.5px;">
+                                <div class="so-panel-row">
                                     <span class="text-muted">Tanggal SO:</span>
                                     <span class="fw-semibold text-dark" id="modalSoDate">-</span>
                                 </div>
-                                <div class="d-flex justify-content-between py-1.5 border-bottom" style="font-size: 12.5px;">
-                                    <span class="text-muted">No. PO Cust:</span>
-                                    <span class="fw-semibold text-dark" id="modalSoPo">-</span>
-                                </div>
-                                <div class="d-flex justify-content-between py-1.5" style="font-size: 12.5px;">
+                                <div class="so-panel-row">
                                     <span class="text-muted">Syarat Bayar:</span>
                                     <span id="modalSoTerms">-</span>
+                                </div>
+                                <div class="so-panel-row">
+                                    <span class="text-muted">No. PO Cust:</span>
+                                    <span class="text-dark" id="modalSoPo">-</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Card 2: Pelanggan / Toko -->
                         <div class="col-md-4">
-                            <div class="so-info-card card-emerald">
-                                <div class="so-card-header">
-                                    <div class="so-card-icon icon-emerald">
-                                        <i class="bi bi-shop"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 13px;">Pelanggan / Toko</div>
-                                        <div class="text-muted" style="font-size: 11px;">Kontak &amp; Alamat</div>
-                                    </div>
+                            <div class="so-info-panel-card">
+                                <div class="so-panel-title" style="color:#059669;">
+                                    <i class="bi bi-shop"></i> PELANGGAN / TOKO
                                 </div>
-                                <div class="fw-bold text-dark mb-1" style="font-size: 13.5px;" id="modalCustomerName">-</div>
-                                <div class="text-muted mb-2 d-flex flex-wrap align-items-center gap-1" style="font-size: 12px;">
-                                    <span><i class="bi bi-person me-1"></i><span id="modalCustomerPic">-</span></span>
-                                    <span class="mx-1 text-muted">•</span>
+                                <div class="fw-bold text-dark mb-1" style="font-size: 13px;" id="modalCustomerName">-</div>
+                                <div class="so-panel-row" id="modalCustomerPicRow">
+                                    <span class="text-muted">Kontak PIC:</span>
+                                    <span class="fw-medium text-dark" id="modalCustomerPic">-</span>
+                                </div>
+                                <div class="so-panel-row">
+                                    <span class="text-muted">No. Telepon:</span>
                                     <span id="modalCustomerPhone">-</span>
                                 </div>
-                                <div class="text-secondary small pt-1.5 border-top d-flex justify-content-between align-items-start" style="font-size: 11.5px; line-height: 1.4;">
-                                    <span id="modalCustomerAddress" class="text-truncate-2">-</span>
-                                    <span id="modalCustomerMapLink" class="ms-1 flex-shrink-0"></span>
+                                <div class="pt-1.5 mt-1 border-top" style="font-size: 11.5px; line-height: 1.4;">
+                                    <span class="text-muted">Alamat: </span>
+                                    <span class="text-secondary" id="modalCustomerAddress">-</span>
+                                    <span id="modalCustomerMapLink"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Card 3: Logistik & Sales PIC -->
+                        <!-- Card 3: Logistik & Sales -->
                         <div class="col-md-4">
-                            <div class="so-info-card card-violet">
-                                <div class="so-card-header">
-                                    <div class="so-card-icon icon-violet">
-                                        <i class="bi bi-truck"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 13px;">Logistik &amp; Sales</div>
-                                        <div class="text-muted" style="font-size: 11px;">Ekspedisi &amp; PIC</div>
-                                    </div>
+                            <div class="so-info-panel-card">
+                                <div class="so-panel-title" style="color:#7c3aed;">
+                                    <i class="bi bi-truck"></i> PENGIRIMAN &amp; SALES
                                 </div>
-                                <div class="d-flex justify-content-between py-1.5 border-bottom" style="font-size: 12.5px;">
+                                <div class="so-panel-row">
                                     <span class="text-muted">Sales PIC:</span>
                                     <span class="fw-semibold text-dark" id="modalSalesName">-</span>
                                 </div>
-                                <div class="d-flex justify-content-between py-1.5 border-bottom" style="font-size: 12.5px;">
+                                <div class="so-panel-row">
                                     <span class="text-muted">Tgl Kirim:</span>
                                     <span class="fw-semibold text-dark" id="modalShippingDate">-</span>
                                 </div>
-                                <div class="d-flex justify-content-between py-1.5 border-bottom" style="font-size: 12.5px;">
+                                <div class="so-panel-row">
                                     <span class="text-muted">Metode Kirim:</span>
                                     <span class="badge bg-light text-dark border" id="modalShippingMethod">-</span>
                                 </div>
-                                <div class="py-1.5" style="font-size: 11.5px;">
-                                    <span class="text-muted d-block">Alamat Pengiriman:</span>
+                                <div class="pt-1.5 mt-1 border-top" style="font-size: 11.5px; line-height: 1.4;">
+                                    <span class="text-muted">Alamat Kirim: </span>
                                     <span class="text-secondary" id="modalShippingAddress">-</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 3. Enterprise BOM Items Table (Hierarchical Breakdown) -->
-                    <div class="so-items-container mb-4">
-                        <div class="bg-light py-2.5 px-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <!-- 3. Rincian Barang Table -->
+                    <div class="so-items-container">
+                        <div class="bg-light py-2 px-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
                             <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold text-dark" style="font-size: 12.5px;">
-                                    <i class="bi bi-boxes text-primary me-1"></i> Rincian Produk &amp; Komponen
+                                <span class="fw-bold text-dark" style="font-size: 12px; letter-spacing: 0.02em;">
+                                    <i class="bi bi-boxes text-primary me-1"></i> RINCIAN BARANG &amp; KOMPONEN
                                 </span>
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 11px;" id="modalTotalItemsBadge">0 Item</span>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 10.5px;" id="modalTotalItemsBadge">0 Item</span>
                             </div>
-                            <div class="text-muted" style="font-size: 11.5px;">
+                            <div class="text-muted small" style="font-size: 11px;">
                                 <i class="bi bi-info-circle me-1"></i> Komponen paket otomatis ditandai <em>Termasuk Paket</em>
                             </div>
                         </div>
@@ -1267,14 +1168,14 @@ if ($qSales) {
                             <table class="table table-hover align-middle table-so-detail mb-0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 50px; text-align: center;">No</th>
-                                        <th style="width: 130px;">Kode / SKU</th>
+                                        <th style="width: 44px; text-align: center;">No</th>
+                                        <th style="width: 100px;">Kode / SKU</th>
                                         <th>Nama Barang &amp; Deskripsi Spesifikasi</th>
-                                        <th style="width: 75px; text-align: center;">Qty</th>
-                                        <th style="width: 75px; text-align: center;">Satuan</th>
-                                        <th style="width: 140px; text-align: right;">Harga Satuan</th>
-                                        <th style="width: 90px; text-align: center;">Diskon (%)</th>
-                                        <th style="width: 150px; text-align: right;">Total Harga</th>
+                                        <th style="width: 60px; text-align: center;">Qty</th>
+                                        <th style="width: 65px; text-align: center;">Satuan</th>
+                                        <th style="width: 130px; text-align: right;">Harga Satuan</th>
+                                        <th style="width: 75px; text-align: center;">Diskon</th>
+                                        <th style="width: 140px; text-align: right;">Total Harga</th>
                                     </tr>
                                 </thead>
                                 <tbody id="modalItemsTableBody">
@@ -1284,59 +1185,59 @@ if ($qSales) {
                         </div>
                     </div>
 
-                    <!-- 4. Modern Financial Summary Box & Special Notes -->
+                    <!-- 4. Clean Bottom Area (Catatan & Finansial) -->
                     <div class="row g-3">
-                        <!-- Notes Card -->
+                        <!-- Left: Notes Card -->
                         <div class="col-md-6">
-                            <div class="p-3 rounded-4 h-100" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                                <div class="text-uppercase fw-bold text-secondary mb-2" style="font-size: 11px; letter-spacing: 0.05em;">
-                                    <i class="bi bi-chat-left-quote text-primary me-1"></i> Catatan Khusus Pesanan
+                            <div class="card border rounded-3 p-3 h-100" style="background:#ffffff; border-color:#e2e8f0 !important;">
+                                <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
+                                    <span class="text-uppercase fw-bold text-secondary" style="font-size: 11px; letter-spacing: 0.04em;">
+                                        <i class="bi bi-chat-left-text text-primary me-1"></i> Catatan Khusus Pesanan
+                                    </span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 10px;">Resmi &amp; Valid</span>
                                 </div>
-                                <div class="text-dark p-2.5 rounded-3 bg-white border" style="font-size: 12.5px; min-height: 80px; white-space: pre-wrap;" id="modalSpecialNotes">
+                                <div class="p-2.5 rounded-2 bg-light border text-dark mb-2" style="font-size: 12px; min-height: 75px; white-space: pre-wrap; line-height: 1.5;" id="modalSpecialNotes">
                                     <em>Tidak ada catatan khusus.</em>
                                 </div>
-                                <div class="mt-3 pt-2 border-top d-flex align-items-center justify-content-between text-muted" style="font-size: 11px;">
-                                    <span>Status Dokumen: <strong>Resmi &amp; Valid</strong></span>
+                                <div class="text-muted mt-auto pt-1 d-flex align-items-center justify-content-between" style="font-size: 11px;">
+                                    <span>Loewix CCTV Official ERP</span>
                                     <span id="modalCreatedAtInfo"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Financial Summary Dark Card -->
+                        <!-- Right: Financial Summary Card -->
                         <div class="col-md-6">
-                            <div class="so-summary-box">
-                                <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom border-secondary border-opacity-25">
-                                    <span class="text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.05em; color: #94a3b8;">
-                                        <i class="bi bi-calculator me-1"></i> Ringkasan Finansial
+                            <div class="card border rounded-3 p-3 h-100" style="background:#ffffff; border-color:#e2e8f0 !important; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                                <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
+                                    <span class="text-uppercase fw-bold text-secondary" style="font-size: 11px; letter-spacing: 0.04em;">
+                                        <i class="bi bi-calculator text-primary me-1"></i> Ringkasan Finansial
                                     </span>
-                                    <span class="badge bg-white bg-opacity-10 text-white font-monospace" style="font-size: 10.5px;">Mata Uang: IDR</span>
+                                    <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10.5px;">IDR (Rupiah)</span>
                                 </div>
 
-                                <div class="so-summary-row">
-                                    <span>Subtotal Produk:</span>
-                                    <span class="font-monospace fw-semibold text-white" id="modalSubtotal">Rp 0</span>
+                                <div class="d-flex justify-content-between py-1" style="font-size: 12.5px;">
+                                    <span class="text-muted">Subtotal Produk:</span>
+                                    <span class="font-monospace fw-semibold text-dark" id="modalSubtotal">Rp 0</span>
                                 </div>
 
-                                <div class="so-summary-row d-none" id="modalDiscountRow">
-                                    <span class="text-warning"><i class="bi bi-tag-fill me-1"></i> Potongan Diskon:</span>
-                                    <span class="font-monospace fw-bold text-danger" id="modalDiscount">Rp 0</span>
+                                <div class="d-flex justify-content-between py-1 d-none" id="modalDiscountRow" style="font-size: 12.5px;">
+                                    <span class="text-danger"><i class="bi bi-tag me-1"></i> Potongan Diskon:</span>
+                                    <span class="font-monospace fw-semibold text-danger" id="modalDiscount">Rp 0</span>
                                 </div>
 
-                                <div class="so-summary-row d-none" id="modalTaxRow">
-                                    <span id="modalTaxLabel">PPN (11%):</span>
-                                    <span class="font-monospace fw-semibold text-white" id="modalTax">Rp 0</span>
+                                <div class="d-flex justify-content-between py-1 d-none" id="modalTaxRow" style="font-size: 12.5px;">
+                                    <span class="text-muted" id="modalTaxLabel">PPN (11%):</span>
+                                    <span class="font-monospace fw-semibold text-dark" id="modalTax">Rp 0</span>
                                 </div>
 
-                                <div class="so-summary-grand">
-                                    <div>
-                                        <span class="text-uppercase fw-bold text-white d-block" style="font-size: 12px; letter-spacing: 0.03em;">TOTAL AKHIR</span>
-                                        <span class="text-white-50" style="font-size: 11px;">Sudah termasuk PPN &amp; Diskon</span>
-                                    </div>
-                                    <div class="so-grand-val" id="modalGrandTotal">Rp 0</div>
+                                <div class="d-flex justify-content-between align-items-center pt-2 mt-2 border-top">
+                                    <span class="fw-bold text-dark" style="font-size: 13px;">TOTAL PEMBAYARAN:</span>
+                                    <span class="fw-bold font-monospace text-primary" style="font-size: 20px; letter-spacing: -0.5px;" id="modalGrandTotal">Rp 0</span>
                                 </div>
 
-                                <div class="so-terbilang-box" id="modalTerbilangBox">
-                                    <i class="bi bi-translate me-1 text-info"></i> <strong>Terbilang:</strong> <span id="modalTerbilangText">Nol Rupiah</span>
+                                <div class="mt-2 p-2 rounded-2" style="background: #f8fafc; border: 1px dashed #cbd5e1; font-size: 11.5px; color: #475569; font-style: italic;" id="modalTerbilangBox">
+                                    <i class="bi bi-chat-quote text-warning me-1"></i> <strong>Terbilang:</strong> <span id="modalTerbilangText">Nol Rupiah</span>
                                 </div>
                             </div>
                         </div>
@@ -1344,22 +1245,22 @@ if ($qSales) {
                 </div>
             </div>
 
-            <!-- Executive Footer with Quick Share -->
-            <div class="modal-footer px-4 py-3 bg-light border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-outline-success px-3" id="modalBtnCopyWa" title="Salin Ringkasan Pesanan untuk dikirim ke WhatsApp">
-                        <i class="bi bi-whatsapp me-1.5"></i> Salin Format WA
+            <!-- Clean Footer -->
+            <div class="modal-footer px-4 py-2.5 bg-light border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <button type="button" class="btn btn-outline-success btn-sm px-3 fw-semibold" id="modalBtnCopyWa" title="Salin Ringkasan Pesanan untuk dikirim ke WhatsApp">
+                        <i class="bi bi-whatsapp me-1"></i> Salin Format WA
                     </button>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-size: 13px;">
+                    <button type="button" class="btn btn-light border btn-sm px-3 text-secondary fw-semibold" data-bs-dismiss="modal">
                         Tutup
                     </button>
-                    <a href="#" id="modalBtnEdit" class="btn btn-outline-primary px-3" style="font-size: 13px;">
+                    <a href="#" id="modalBtnEdit" class="btn btn-outline-primary btn-sm px-3 fw-semibold">
                         <i class="bi bi-pencil-square me-1"></i> Edit Pesanan
                     </a>
-                    <a href="#" id="modalBtnPrint" target="_blank" class="btn btn-primary px-3" style="font-size: 13px; background: #0f172a; border-color: #0f172a;">
-                        <i class="bi bi-printer me-1"></i> Cetak Dokumen Resmi
+                    <a href="#" id="modalBtnPrint" target="_blank" class="btn btn-primary btn-sm px-3 fw-semibold" style="background: #0f172a; border-color: #0f172a;">
+                        <i class="bi bi-printer me-1"></i> Cetak Dokumen
                     </a>
                 </div>
             </div>
@@ -1664,33 +1565,30 @@ if ($qSales) {
                         <i class="bi ${stIcon} me-1"></i> ${escapeHtml(order.status)}
                     </span>`;
 
-                // 2. Stepper Status Update
+                // 2. Stepper Status Update (Executive Compact Segmented Bar)
                 const steps = ['Draft', 'Menunggu', 'Diproses', 'Selesai'];
                 const stIndex = steps.indexOf(order.status);
-                const fillPercent = [15, 45, 78, 100];
 
                 steps.forEach(function(sName, sIdx) {
                     const stepEl = document.getElementById('step-' + sName);
                     if (stepEl) {
                         stepEl.classList.remove('completed', 'active');
+                        stepEl.style.opacity = '1';
+                        const numEl = stepEl.querySelector('.so-seg-num');
                         if (order.status === 'Dibatalkan') {
-                            // Canceled state
+                            stepEl.style.opacity = '0.45';
+                            if (numEl) numEl.textContent = (sIdx + 1);
                         } else if (sIdx < stIndex) {
                             stepEl.classList.add('completed');
-                            stepEl.querySelector('.so-step-circle').innerHTML = '<i class="bi bi-check-lg"></i>';
+                            if (numEl) numEl.innerHTML = '<i class="bi bi-check-lg"></i>';
                         } else if (sIdx === stIndex) {
                             stepEl.classList.add('active');
-                            stepEl.querySelector('.so-step-circle').innerHTML = `<i class="bi ${stIcon}"></i>`;
+                            if (numEl) numEl.textContent = (sIdx + 1);
                         } else {
-                            stepEl.querySelector('.so-step-circle').innerHTML = (sIdx + 1);
+                            if (numEl) numEl.textContent = (sIdx + 1);
                         }
                     }
                 });
-
-                const stepperFill = document.getElementById('modalStepperFill');
-                if (stepperFill) {
-                    stepperFill.style.width = (stIndex >= 0 ? fillPercent[stIndex] : 0) + '%';
-                }
 
                 // 3. Info Cards
                 // Data Pesanan
@@ -1713,23 +1611,31 @@ if ($qSales) {
                     custTitle += ` <span class="badge bg-secondary-subtle text-secondary border font-monospace ms-1" style="font-size:10px;">${escapeHtml(order.customer_code)}</span>`;
                 }
                 document.getElementById('modalCustomerName').innerHTML = custTitle;
-                document.getElementById('modalCustomerPic').textContent = order.customer_pic || '-';
+                
+                // Clean PIC deduplication
+                let picDisplay = order.customer_pic ? escapeHtml(order.customer_pic).trim() : '';
+                if (!picDisplay || picDisplay.toLowerCase() === (order.customer_name || '').toLowerCase()) {
+                    picDisplay = '<span class="text-muted">-</span>';
+                }
+                document.getElementById('modalCustomerPic').innerHTML = picDisplay;
 
-                if (order.customer_phone) {
+                // Phone number: clean inline badge + link to WA
+                if (order.customer_phone && order.customer_phone.trim() !== '') {
                     const cleanPhone = order.customer_phone.replace(/[^0-9]/g, '');
                     document.getElementById('modalCustomerPhone').innerHTML = 
-                        `<a href="https://wa.me/${cleanPhone}" target="_blank" class="btn btn-sm btn-outline-success py-0 px-2 fw-semibold rounded-pill" style="font-size:11px;">
-                            <i class="bi bi-whatsapp me-1"></i> ${escapeHtml(order.customer_phone)}
+                        `<a href="https://wa.me/${cleanPhone}" target="_blank" class="text-decoration-none fw-semibold font-monospace text-dark d-inline-flex align-items-center gap-1" title="Chat via WhatsApp">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-1.5 py-0.5" style="font-size:10px;"><i class="bi bi-whatsapp"></i> WA</span>
+                            <span style="font-size:11.5px;">${escapeHtml(order.customer_phone)}</span>
                         </a>`;
                 } else {
-                    document.getElementById('modalCustomerPhone').textContent = '-';
+                    document.getElementById('modalCustomerPhone').innerHTML = '<span class="text-muted">-</span>';
                 }
 
                 document.getElementById('modalCustomerAddress').textContent = order.customer_address || 'Tidak ada catatan alamat.';
                 if (order.customer_address && order.customer_address.trim().length > 3) {
                     const mapsQuery = encodeURIComponent(order.customer_address);
                     document.getElementById('modalCustomerMapLink').innerHTML = 
-                        `<a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" class="badge bg-light text-primary border text-decoration-none" title="Buka di Google Maps" style="font-size:10.5px;">
+                        `<a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" class="badge bg-white text-primary border text-decoration-none ms-1" title="Buka di Google Maps" style="font-size:10px;">
                             <i class="bi bi-geo-alt-fill text-danger me-0.5"></i> Peta
                         </a>`;
                 } else {
@@ -1794,25 +1700,25 @@ if ($qSales) {
                             itemsHtml += `
                                 <tr class="row-parent-package">
                                     <td style="text-align:center;">
-                                        <span class="badge bg-primary text-white font-monospace px-2 py-1" style="font-size:11px;">#${currentParentNum}</span>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace fw-bold" style="font-size:11px; padding: 3px 6px;">#${currentParentNum}</span>
                                     </td>
                                     <td>
-                                        <span class="font-monospace fw-bold text-dark">${itemCode}</span>
+                                        <span class="font-monospace fw-bold text-dark small">${itemCode}</span>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center flex-wrap gap-1 mb-0.5">
-                                            <span class="fw-bold text-dark" style="font-size:13px;">${escapeHtml(cleanName)}</span>
-                                            <span class="badge bg-primary text-white rounded-pill px-2 py-0.5" style="font-size:9.5px; font-weight:700; letter-spacing:0.04em;">
+                                            <span class="fw-bold text-dark" style="font-size:12.5px;">${escapeHtml(cleanName)}</span>
+                                            <span class="badge bg-primary text-white rounded-pill px-2 py-0.5" style="font-size:9.5px; font-weight:600; letter-spacing:0.02em;">
                                                 <i class="bi bi-box-seam me-1"></i>PAKET BUNDLE
                                             </span>
                                         </div>
-                                        ${item.item_description ? `<div class="text-muted small" style="font-size:11.5px;">${escapeHtml(item.item_description)}</div>` : ''}
+                                        ${item.item_description ? `<div class="text-muted small" style="font-size:11px;">${escapeHtml(item.item_description)}</div>` : ''}
                                     </td>
-                                    <td style="text-align:center;"><span class="fw-bold font-monospace fs-6">${qty}</span></td>
-                                    <td style="text-align:center;"><span class="badge bg-white text-dark border small">${escapeHtml(item.unit || 'SET')}</span></td>
-                                    <td style="text-align:right;"><span class="font-monospace fw-semibold">${formatRp(item.unit_price)}</span></td>
-                                    <td style="text-align:center;">${item.discount_percent > 0 ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle">${Number(item.discount_percent)}%</span>` : '-'}</td>
-                                    <td style="text-align:right;"><span class="font-monospace fw-bold text-primary fs-6">${formatRp(item.total_price)}</span></td>
+                                    <td style="text-align:center;"><span class="fw-bold font-monospace text-dark">${qty}</span></td>
+                                    <td style="text-align:center;"><span class="badge bg-light text-secondary border small">${escapeHtml(item.unit || 'SET')}</span></td>
+                                    <td style="text-align:right;"><span class="font-monospace text-dark">${formatRp(item.unit_price)}</span></td>
+                                    <td style="text-align:center;">${item.discount_percent > 0 ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle">${Number(item.discount_percent)}%</span>` : '<span class="text-muted small">-</span>'}</td>
+                                    <td style="text-align:right;"><span class="font-monospace fw-bold text-primary">${formatRp(item.total_price)}</span></td>
                                 </tr>
                             `;
                         } else if (isSub) {
@@ -1826,28 +1732,22 @@ if ($qSales) {
                                     <td>
                                         <span class="font-monospace text-secondary small">${itemCode}</span>
                                     </td>
-                                    <td class="subitem-tree-col">
-                                        <span class="subitem-tree-branch"></span>
-                                        <div class="ps-2">
-                                            <div class="d-flex align-items-center gap-1.5">
-                                                <span class="badge bg-light text-secondary border px-1.5 py-0.5" style="font-size:9.5px;">
-                                                    <i class="bi bi-diagram-2 text-primary me-0.5"></i>Komponen
-                                                </span>
-                                                <span class="text-dark fw-medium" style="font-size:12.5px;">${escapeHtml(cleanName)}</span>
-                                            </div>
-                                            ${item.item_description ? `<div class="text-muted small ps-3 mt-0.5" style="font-size:11px;">${escapeHtml(item.item_description)}</div>` : ''}
+                                    <td style="padding-left: 20px;">
+                                        <div class="d-flex align-items-baseline gap-1.5 flex-wrap">
+                                            <span class="text-muted small me-1" style="font-family: monospace; font-size: 13px; line-height: 1;">↳</span>
+                                            <span class="text-dark fw-medium" style="font-size: 12.5px;">${escapeHtml(cleanName)}</span>
+                                            <span class="badge bg-light text-secondary border ms-1" style="font-size: 9.5px; font-weight: 500; vertical-align: middle; padding: 2px 6px;">
+                                                <i class="bi bi-diagram-2 text-primary me-0.5"></i>Komponen
+                                            </span>
                                         </div>
+                                        ${item.item_description ? `<div class="text-muted small ps-3 mt-0.5" style="font-size: 11px;">${escapeHtml(item.item_description)}</div>` : ''}
                                     </td>
                                     <td style="text-align:center;"><span class="font-monospace text-secondary fw-semibold">${qty}</span></td>
                                     <td style="text-align:center;"><span class="text-muted small">${escapeHtml(item.unit || 'UNIT')}</span></td>
-                                    <td style="text-align:right;">
-                                        <span class="badge" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-size:10.5px; font-weight:600;">
-                                            <i class="bi bi-check2 me-1"></i>Termasuk Paket
-                                        </span>
-                                    </td>
+                                    <td style="text-align:right;"><span class="text-muted small">-</span></td>
                                     <td style="text-align:center;"><span class="text-muted small">-</span></td>
                                     <td style="text-align:right;">
-                                        <span class="badge" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-size:10.5px; font-weight:600;">
+                                        <span class="badge" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-size:10px; font-weight:600; padding:3px 7px;">
                                             <i class="bi bi-check2 me-1"></i>Termasuk Paket
                                         </span>
                                     </td>
@@ -1857,16 +1757,16 @@ if ($qSales) {
                             // Standalone Regular Product
                             itemsHtml += `
                                 <tr>
-                                    <td style="text-align:center;"><span class="fw-bold font-monospace text-dark" style="font-size:11.5px;">${currentParentNum}</span></td>
-                                    <td><span class="font-monospace text-dark">${itemCode}</span></td>
+                                    <td style="text-align:center;"><span class="fw-semibold font-monospace text-dark" style="font-size:11px;">${currentParentNum}</span></td>
+                                    <td><span class="font-monospace text-dark small">${itemCode}</span></td>
                                     <td>
-                                        <div class="fw-bold text-dark" style="font-size:13px;">${escapeHtml(cleanName)}</div>
-                                        ${item.item_description ? `<div class="text-muted small" style="font-size:11.5px;">${escapeHtml(item.item_description)}</div>` : ''}
+                                        <div class="fw-bold text-dark" style="font-size:12.5px;">${escapeHtml(cleanName)}</div>
+                                        ${item.item_description ? `<div class="text-muted small" style="font-size:11px;">${escapeHtml(item.item_description)}</div>` : ''}
                                     </td>
-                                    <td style="text-align:center;"><span class="fw-bold font-monospace">${qty}</span></td>
+                                    <td style="text-align:center;"><span class="fw-bold font-monospace text-dark">${qty}</span></td>
                                     <td style="text-align:center;"><span class="text-muted small">${escapeHtml(item.unit || 'UNIT')}</span></td>
-                                    <td style="text-align:right;"><span class="font-monospace">${formatRp(item.unit_price)}</span></td>
-                                    <td style="text-align:center;">${item.discount_percent > 0 ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle">${Number(item.discount_percent)}%</span>` : '-'}</td>
+                                    <td style="text-align:right;"><span class="font-monospace text-dark">${formatRp(item.unit_price)}</span></td>
+                                    <td style="text-align:center;">${item.discount_percent > 0 ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle">${Number(item.discount_percent)}%</span>` : '<span class="text-muted small">-</span>'}</td>
                                     <td style="text-align:right;"><span class="font-monospace fw-bold text-dark">${formatRp(item.total_price)}</span></td>
                                 </tr>
                             `;
