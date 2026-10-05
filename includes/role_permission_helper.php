@@ -61,6 +61,15 @@ if (!function_exists('getAllSystemMenus')) {
                         'has_actions' => ['access', 'create', 'edit', 'delete', 'export']
                     ],
                     [
+                        'key'         => 'sales_orders',
+                        'label'       => 'Pesanan Penjualan (SO)',
+                        'url'         => 'sales_orders.php',
+                        'icon'        => 'bi bi-cart3',
+                        'color'       => '#2563eb',
+                        'description' => 'Manajemen pesanan penjualan (Sales Order), pembuatan SO baru, approval diskon, dan cetak dokumen resmi / PDF',
+                        'has_actions' => ['access', 'create', 'edit', 'delete', 'export']
+                    ],
+                    [
                         'key'         => 'followup_report',
                         'label'       => 'Follow Up Report',
                         'url'         => 'followup_report.php',
@@ -128,6 +137,15 @@ if (!function_exists('getAllSystemMenus')) {
                         'icon'        => 'bi bi-box-seam-fill',
                         'color'       => '#f59e0b',
                         'description' => 'Manajemen titip produk konsinyasi ke toko, stok opname, dan retur',
+                        'has_actions' => ['access', 'create', 'edit', 'delete', 'export']
+                    ],
+                    [
+                        'key'         => 'tiptok_invoice',
+                        'label'       => 'No. Invoice TIP TOK',
+                        'url'         => 'modul-aplikasi-sales/tiptok-invoice.php',
+                        'icon'        => 'bi bi-receipt-cutoff',
+                        'color'       => '#0ea5e9',
+                        'description' => 'Daftar nomor faktur / invoice konsinyasi TIP TOK dan pelacakan pembayaran',
                         'has_actions' => ['access', 'create', 'edit', 'delete', 'export']
                     ],
                     [
@@ -376,10 +394,10 @@ if (!function_exists('getRolePermissions')) {
                     } elseif ($roleName === 'admin') {
                         $perms[$mk] = ['is_accessible'=>($mk !== 'role_menu_access' ? 1 : 0), 'can_create'=>1, 'can_edit'=>1, 'can_delete'=>1, 'can_export'=>1];
                     } elseif ($roleName === 'adminsales') {
-                        $isAcc = in_array($mk, ['promosi', 'ads_report', 'sales_work_plan', 'kegiatan_canvas', 'kegiatan_baru', 'laporan_kegiatan', 'tiptok', 'customer_dealer', 'announcements', 'broadcast', 'price_list', 'calculator_sales', 'online_tools']) ? 1 : 0;
+                        $isAcc = in_array($mk, ['sales_orders', 'promosi', 'ads_report', 'sales_work_plan', 'kegiatan_canvas', 'kegiatan_baru', 'laporan_kegiatan', 'tiptok', 'tiptok_invoice', 'customer_dealer', 'announcements', 'broadcast', 'price_list', 'calculator_sales', 'online_tools']) ? 1 : 0;
                         $perms[$mk] = ['is_accessible'=>$isAcc, 'can_create'=>$isAcc, 'can_edit'=>$isAcc, 'can_delete'=>0, 'can_export'=>0];
                     } elseif ($roleName === 'sales') {
-                        $isAcc = in_array($mk, ['dashboard_sales', 'sales_work_plan', 'kegiatan_canvas', 'kegiatan_baru', 'laporan_kegiatan', 'tiptok', 'customer_dealer', 'announcements', 'price_list', 'calculator_sales', 'online_tools']) ? 1 : 0;
+                        $isAcc = in_array($mk, ['sales_orders', 'dashboard_sales', 'sales_work_plan', 'kegiatan_canvas', 'kegiatan_baru', 'laporan_kegiatan', 'tiptok', 'tiptok_invoice', 'customer_dealer', 'announcements', 'price_list', 'calculator_sales', 'online_tools']) ? 1 : 0;
                         $perms[$mk] = ['is_accessible'=>$isAcc, 'can_create'=>$isAcc, 'can_edit'=>$isAcc, 'can_delete'=>0, 'can_export'=>0];
                     } else {
                         $perms[$mk] = ['is_accessible'=>1, 'can_create'=>0, 'can_edit'=>0, 'can_delete'=>0, 'can_export'=>0];
@@ -415,3 +433,23 @@ if (!function_exists('saveRoleMenuPermission')) {
         return $ok;
     }
 }
+
+if (!function_exists('isUserPermittedMenu')) {
+    function isUserPermittedMenu($conn, $menuKey, $action = 'access') {
+        if (!isset($_SESSION['role'])) return true;
+        $role = strtolower(trim($_SESSION['role']));
+        if ($role === 'superadmin') return true;
+        
+        $perms = getRolePermissions($conn, $role);
+        $p = $perms[$menuKey] ?? null;
+        if (!$p) return true;
+        
+        if ($action === 'access') return !empty($p['is_accessible']);
+        if ($action === 'create') return !empty($p['can_create']);
+        if ($action === 'edit') return !empty($p['can_edit']);
+        if ($action === 'delete') return !empty($p['can_delete']);
+        if ($action === 'export') return !empty($p['can_export']);
+        return true;
+    }
+}
+

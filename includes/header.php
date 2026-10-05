@@ -581,12 +581,17 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-link-text">Rencana Kerja Sales</span>
             </a>
 
+            <?php 
+            require_once __DIR__ . '/role_permission_helper.php';
+            if (isUserPermittedMenu($conn, 'sales_orders', 'access')): 
+            ?>
             <a href="sales_orders.php" class="sidebar-link <?php echo in_array($currentPage,['sales_orders.php','sales_order_form.php','sales_order_print.php'])?'active':''; ?>">
                 <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
                     <i class="bi bi-cart3"></i>
                 </span>
                 <span class="nav-link-text">Pesanan Penjualan (SO)</span>
             </a>
+            <?php endif; ?>
 
             <!-- APLIKASI SALES (MOBILE) -->
             <div class="nav-section-title" style="margin-top: 14px;">
@@ -622,19 +627,23 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-link-text">TIP TOK (Konsinyasi)</span>
             </a>
 
+            <?php if (isUserPermittedMenu($conn, 'tiptok_invoice', 'access')): ?>
             <a href="modul-aplikasi-sales/tiptok-invoice.php" class="sidebar-link <?php echo $currentPage=='tiptok-invoice.php'?'active':''; ?>">
                 <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
                     <i class="bi bi-receipt-cutoff"></i>
                 </span>
                 <span class="nav-link-text">No. Invoice TIP TOK</span>
             </a>
+            <?php endif; ?>
 
+            <?php if (isUserPermittedMenu($conn, 'sales_orders', 'access')): ?>
             <a href="sales_orders.php" class="sidebar-link <?php echo in_array($currentPage,['sales_orders.php','sales_order_form.php','sales_order_print.php'])?'active':''; ?>">
                 <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
                     <i class="bi bi-cart3"></i>
                 </span>
                 <span class="nav-link-text">Pesanan Penjualan (SO)</span>
             </a>
+            <?php endif; ?>
 
             <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>">
                 <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
