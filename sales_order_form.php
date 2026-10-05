@@ -228,26 +228,122 @@ if ($qProd) {
     z-index: 3;
 }
 
-/* Sub-item bundle styling (Accurate style) */
-.table-accurate tbody tr.tr-bundle-subitem td {
+/* Executive Sub-item & Package Styling */
+.table-accurate tbody tr.tr-bundle-package td {
     background-color: #f8fafc;
+    border-top: 1px solid #cbd5e1;
+    border-bottom: 1px solid #cbd5e1;
+    font-weight: 600;
+}
+.table-accurate tbody tr.tr-bundle-package td:first-child {
+    border-left: 3px solid #0284c7;
+}
+.table-accurate tbody tr.tr-bundle-subitem td {
+    background-color: #ffffff;
     border-bottom: 1px dashed #e2e8f0;
 }
+.table-accurate tbody tr.tr-bundle-subitem td:first-child {
+    border-left: 3px solid #e2e8f0;
+}
 .table-accurate tbody tr.tr-bundle-subitem:hover td {
-    background-color: #f1f5f9;
+    background-color: #f8fafc;
 }
 .item-subitem-name {
-    padding-left: 20px !important;
+    padding-left: 12px !important;
     font-weight: 500 !important;
     color: #334155 !important;
     background-color: #f8fafc !important;
+    border-left: 2px solid #bae6fd !important;
 }
 .item-subitem-name:focus {
     background-color: #ffffff !important;
+    border-left-color: #0284c7 !important;
 }
-.tr-bundle-package td {
-    background-color: #ffffff;
+
+/* Executive Stepper in Form */
+.so-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 10px 0;
+}
+.so-stepper-line {
+    position: absolute;
+    top: 24px;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: #e2e8f0;
+    z-index: 1;
+}
+.so-stepper-line-active {
+    position: absolute;
+    top: 24px;
+    left: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, #10b981, #0284c7);
+    z-index: 2;
+    transition: width 0.4s ease;
+}
+.so-step-item {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+.so-step-item:hover {
+    transform: translateY(-2px);
+}
+.so-step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.so-step-item.completed .so-step-circle {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+}
+.so-step-item.active .so-step-circle {
+    background: #0284c7;
+    border-color: #0284c7;
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.2);
+    animation: pulseStep 2s infinite;
+}
+.so-step-label {
+    margin-top: 6px;
+    font-size: 11px;
     font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.so-step-item.completed .so-step-label {
+    color: #0f172a;
+}
+.so-step-item.active .so-step-label {
+    color: #0284c7;
+    font-weight: 700;
+}
+@keyframes pulseStep {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
 }
 
 .nav-accurate-tabs {
@@ -460,6 +556,9 @@ if ($qProd) {
             <i class="bi bi-check2 me-1"></i> <?php echo $isEdit ? 'Perbarui Pesanan' : 'Simpan Pesanan'; ?>
         </button>
         <?php if ($isEdit): ?>
+        <button type="button" class="btn-secondary-so" id="btnCopyWaFormTop" title="Salin Ringkasan Format WhatsApp">
+            <i class="bi bi-whatsapp text-success me-1"></i> Format WA
+        </button>
         <a href="sales_order_print.php?id=<?php echo $orderData['id']; ?>" target="_blank" class="btn-secondary-so">
             <i class="bi bi-printer me-1"></i> Cetak SO
         </a>
@@ -497,6 +596,31 @@ if ($qProd) {
             </div>
         </div>
 
+        <!-- Executive Workflow Stepper Tracker -->
+        <div class="px-4 py-2 border-bottom d-none d-md-block" style="background:#f8fafc;" id="formStepperContainer">
+            <div class="so-stepper" style="max-width: 650px; margin: 0 auto;">
+                <div class="so-stepper-line"></div>
+                <div class="so-stepper-line-active" id="formStepperProgress" style="width: 33%;"></div>
+                
+                <div class="so-step-item" data-step="Draft">
+                    <div class="so-step-circle">1</div>
+                    <div class="so-step-label">Draft</div>
+                </div>
+                <div class="so-step-item" data-step="Menunggu">
+                    <div class="so-step-circle">2</div>
+                    <div class="so-step-label">Menunggu</div>
+                </div>
+                <div class="so-step-item" data-step="Diproses">
+                    <div class="so-step-circle">3</div>
+                    <div class="so-step-label">Diproses</div>
+                </div>
+                <div class="so-step-item" data-step="Selesai">
+                    <div class="so-step-circle">4</div>
+                    <div class="so-step-label">Selesai</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Accurate Header Panel: Customer, Tanggal, No SO -->
         <div class="accurate-header-panel">
             <div class="row g-3">
@@ -517,9 +641,17 @@ if ($qProd) {
                         </select>
                     </div>
                     <input type="hidden" name="customer_name" id="customer_name" value="<?php echo htmlspecialchars($orderData['customer_name'] ?? ''); ?>">
-                    <div id="customerQuickMeta" class="mt-2 text-muted small fw-semibold" style="display: <?php echo $isEdit ? 'block' : 'none'; ?>;">
-                        <span id="txtCustPic"><i class="bi bi-person me-1"></i><?php echo htmlspecialchars($orderData['customer_pic'] ?? '-'); ?></span> | 
+                    <div id="customerQuickMeta" class="mt-2 text-muted small fw-semibold d-flex flex-wrap align-items-center gap-2" style="display: <?php echo $isEdit ? 'flex !important' : 'none'; ?>;">
+                        <span id="txtCustPic"><i class="bi bi-person me-1"></i><?php echo htmlspecialchars($orderData['customer_pic'] ?? '-'); ?></span> &bull; 
                         <span id="txtCustPhone"><i class="bi bi-telephone me-1"></i><?php echo htmlspecialchars($orderData['customer_phone'] ?? '-'); ?></span>
+                        <?php if ($isEdit && !empty($orderData['customer_phone'])): 
+                            $cleanCustPhone = preg_replace('/[^0-9]/', '', $orderData['customer_phone']);
+                            if (substr($cleanCustPhone, 0, 1) === '0') $cleanCustPhone = '62' . substr($cleanCustPhone, 1);
+                        ?>
+                            <a id="btnCustWaLink" href="https://wa.me/<?php echo $cleanCustPhone; ?>" target="_blank" class="badge bg-success-subtle text-success border border-success-subtle text-decoration-none" style="font-size:11px; padding:3px 8px; border-radius:5px;">
+                                <i class="bi bi-whatsapp me-1"></i> Chat WA
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -654,20 +786,39 @@ if ($qProd) {
                     </div>
                 </div>
 
-                <!-- Financial Summary Footer (Subtotal, Diskon, PPN, Grand Total) -->
+                <!-- Financial Summary Footer (Subtotal, Diskon, PPN, Grand Total & Terbilang) -->
                 <div class="summary-container">
-                    <div class="row justify-content-end">
+                    <div class="row justify-content-between align-items-start g-4">
+                        <!-- Kolom Kiri: Live Terbilang Rupiah & Ringkasan Dokumen -->
+                        <div class="col-lg-6 col-md-5">
+                            <div class="p-3 rounded-3" style="background:#ffffff; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="p-1 px-2 rounded-2" style="background:#fef3c7; color:#d97706; font-size:12px; font-weight:700;">
+                                        <i class="bi bi-cash-stack me-1"></i> TERBILANG RESMI
+                                    </div>
+                                    <span class="text-muted small" style="font-size:11px;">(Sesuai Standar Faktur Pajak)</span>
+                                </div>
+                                <div class="p-2 px-3 rounded-2" style="background:#f8fafc; border:1px dashed #cbd5e1; font-size:13px; font-weight:600; color:#0f172a; font-style:italic; line-height:1.5;" id="lblFormTerbilangWord">
+                                    Nol Rupiah
+                                </div>
+                                <div class="mt-2 text-muted small d-flex align-items-center gap-1" style="font-size:11px;">
+                                    <i class="bi bi-shield-check text-success"></i> Kalimat terbilang otomatis tersinkronisasi secara real-time dan tercetak pada SO resmi.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kolom Kanan: Executive Financial Summary Card -->
                         <div class="col-lg-5 col-md-7">
-                            <div class="summary-card">
+                            <div class="summary-card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);">
                                 <div class="summary-row">
-                                    <span class="fw-semibold">Sub Total:</span>
+                                    <span class="fw-semibold text-secondary">Sub Total:</span>
                                     <span class="fw-bold font-monospace text-dark" id="lblSubtotal">Rp 0</span>
                                     <input type="hidden" name="subtotal" id="inputSubtotal" value="0">
                                 </div>
 
                                 <div class="summary-row align-items-center">
                                     <div class="d-flex align-items-center gap-2">
-                                        <span class="fw-semibold">Diskon Tambahan:</span>
+                                        <span class="fw-semibold text-secondary">Diskon Tambahan:</span>
                                         <select name="discount_type" id="discount_type" class="form-select form-select-sm" style="width: 75px; font-size:12px; border-color:#cbd5e1;">
                                             <option value="rp" <?php echo (($orderData['discount_type'] ?? '') === 'rp') ? 'selected' : ''; ?>>Rp</option>
                                             <option value="percent" <?php echo (($orderData['discount_type'] ?? '') === 'percent') ? 'selected' : ''; ?>>%</option>
@@ -679,7 +830,7 @@ if ($qProd) {
                                                value="<?php echo htmlspecialchars($orderData['discount_val'] ?? '0'); ?>" style="border-color:#cbd5e1;">
                                     </div>
                                 </div>
-                                <div class="text-end text-muted small pe-1 pb-1" id="lblDiscountDeduction" style="display:none; font-size:11.5px; color:var(--pastel-red-text) !important;">
+                                <div class="text-end small pe-1 pb-1" id="lblDiscountDeduction" style="display:none; font-size:11.5px; color:#ef4444 !important; font-weight:600;">
                                     - Rp 0
                                 </div>
 
@@ -687,16 +838,16 @@ if ($qProd) {
                                     <div class="form-check form-switch m-0">
                                         <input class="form-check-input" type="checkbox" role="switch" name="is_taxable" id="is_taxable" value="1" 
                                                <?php echo (!empty($orderData['is_taxable'])) ? 'checked' : ''; ?>>
-                                        <label class="form-check-label fw-semibold" for="is_taxable">
+                                        <label class="form-check-label fw-semibold text-secondary" for="is_taxable">
                                             Kena Pajak PPN (11%)
                                         </label>
                                     </div>
                                     <span class="fw-bold font-monospace text-dark" id="lblTaxAmount">Rp 0</span>
                                 </div>
 
-                                <div class="summary-row total-row">
-                                    <span>Total (Grand Total):</span>
-                                    <span class="fw-bold font-monospace text-dark" id="lblGrandTotal" style="font-size:20px;">Rp 0</span>
+                                <div class="summary-row total-row" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-top: 12px;">
+                                    <span style="color:#e2e8f0; font-size:13px; font-weight:600;">Total (Grand Total):</span>
+                                    <span class="fw-bold font-monospace" id="lblGrandTotal" style="font-size:22px; color:#38bdf8; letter-spacing:-0.5px;">Rp 0</span>
                                     <input type="hidden" name="grand_total" id="inputGrandTotal" value="0">
                                 </div>
                             </div>
@@ -830,6 +981,11 @@ if ($qProd) {
             <a href="sales_orders.php" class="btn-secondary-so">
                 Batal
             </a>
+            <?php if ($isEdit): ?>
+            <button type="button" class="btn-secondary-so" id="btnCopyWaFormBottom" title="Salin Ringkasan Format WhatsApp">
+                <i class="bi bi-whatsapp text-success me-1"></i> Format WA
+            </button>
+            <?php endif; ?>
             <button type="button" class="btn-primary-so" id="btnSaveSoBottom">
                 <i class="bi bi-check2 me-1"></i> <?php echo $isEdit ? 'Simpan Perubahan' : 'Simpan Pesanan'; ?>
             </button>
@@ -847,6 +1003,40 @@ $(document).ready(function() {
     // Initial Item State
     let items = <?php echo json_encode($orderItems, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?> || [];
     const packageBundles = <?php echo json_encode($packageBundles, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?> || {};
+
+    // Intelligent Pass: Deteksi & normalisasi paket dan komponen sub-item pada pesanan yang dibuka
+    let activeInitBundleId = null;
+    items.forEach((item, idx) => {
+        const nameLower = (item.item_name || '').toLowerCase();
+        const descLower = (item.item_description || '').toLowerCase();
+        const price = parseFloat(item.unit_price) || 0;
+
+        const isExplicitSub = (item.item_name && item.item_name.startsWith('--')) ||
+                              descLower.includes('komponen paket') ||
+                              descLower.includes('komponen dari') ||
+                              (item.is_subitem === true);
+
+        const isExplicitPkg = item.is_package ||
+                              !!item.bundle_id ||
+                              nameLower.includes('paket') ||
+                              (packageBundles && (packageBundles[item.item_code] || packageBundles[item.item_name])) ||
+                              (item.item_code && (item.item_code.startsWith('88003') || item.item_code === '8800513'));
+
+        if (isExplicitPkg && price > 0) {
+            item.is_package = true;
+            if (!item.bundle_id) {
+                item.bundle_id = 'bndl_init_' + idx + '_' + Date.now();
+            }
+            activeInitBundleId = item.bundle_id;
+        } else if (isExplicitSub || (price === 0 && activeInitBundleId !== null)) {
+            item.is_subitem = true;
+            if (!item.parent_bundle_id && activeInitBundleId) {
+                item.parent_bundle_id = activeInitBundleId;
+            }
+        } else {
+            activeInitBundleId = null;
+        }
+    });
 
     // Helper: Tambahkan produk ke tabel (Otomatis pecah menjadi paket + rincian sub-items jika barang grup/paket)
     function addSelectedProduct(prod) {
@@ -914,6 +1104,60 @@ $(document).ready(function() {
     function formatRupiah(num) {
         return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(num || 0));
     }
+
+    // Indonesian Terbilang Rupiah Helper
+    function terbilangRupiah(angka) {
+        angka = Math.floor(Math.abs(Number(angka) || 0));
+        if (angka === 0) return 'Nol Rupiah';
+        const bilangan = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
+        function sebut(n) {
+            n = Math.floor(n);
+            if (n < 12) return bilangan[n];
+            if (n < 20) return sebut(n - 10) + ' Belas';
+            if (n < 100) return sebut(Math.floor(n / 10)) + ' Puluh ' + sebut(n % 10);
+            if (n < 200) return 'Seratus ' + sebut(n - 100);
+            if (n < 1000) return sebut(Math.floor(n / 100)) + ' Ratus ' + sebut(n % 100);
+            if (n < 2000) return 'Seribu ' + sebut(n - 1000);
+            if (n < 1000000) return sebut(Math.floor(n / 1000)) + ' Ribu ' + sebut(n % 1000);
+            if (n < 1000000000) return sebut(Math.floor(n / 1000000)) + ' Juta ' + sebut(n % 1000000);
+            if (n < 1000000000000) return sebut(Math.floor(n / 1000000000)) + ' Miliar ' + sebut(n % 1000000000);
+            return sebut(Math.floor(n / 1000000000000)) + ' Triliun ' + sebut(n % 1000000000000);
+        }
+        return (sebut(angka).replace(/\s+/g, ' ').trim()) + ' Rupiah';
+    }
+
+    // Stepper Synchronization Helper
+    function updateFormStepper(status) {
+        const steps = ['Draft', 'Menunggu', 'Diproses', 'Selesai'];
+        const curIdx = steps.indexOf(status);
+        const pct = curIdx >= 0 ? (curIdx / (steps.length - 1)) * 100 : 0;
+        $('#formStepperProgress').css('width', pct + '%');
+
+        $('#formStepperContainer .so-step-item').each(function(i) {
+            $(this).removeClass('active completed');
+            if (i < curIdx) {
+                $(this).addClass('completed');
+                $(this).find('.so-step-circle').html('<i class="bi bi-check-lg"></i>');
+            } else if (i === curIdx) {
+                $(this).addClass('active');
+                $(this).find('.so-step-circle').text(i + 1);
+            } else {
+                $(this).find('.so-step-circle').text(i + 1);
+            }
+        });
+    }
+
+    // Sync Stepper on status change & click
+    $('#status').on('change', function() {
+        updateFormStepper($(this).val());
+    });
+    $(document).on('click', '#formStepperContainer .so-step-item', function() {
+        const stepName = $(this).data('step');
+        if (stepName) {
+            $('#status').val(stepName).trigger('change');
+        }
+    });
+    updateFormStepper($('#status').val());
 
     // 1. SELECT2 FOR CUSTOMERS
     $('#customer_id').select2({
@@ -1001,7 +1245,7 @@ $(document).ready(function() {
         });
     });
 
-    // 4. RENDER ITEMS TABLE
+    // 4. RENDER ITEMS TABLE (Executive BOM Hierarchy Standard)
     function renderItemsTable() {
         const tbody = $('#itemsTableBody');
         tbody.empty();
@@ -1016,18 +1260,54 @@ $(document).ready(function() {
                     </td>
                 </tr>
             `);
-            $('#txtTotalItemsCount').text('0 Barang (0 Kuantitas)');
+            $('#txtTotalItemsCount').text('0 Baris (0 Kuantitas)');
             recalculateSummary();
             return;
         }
 
         let totalQty = 0;
+        let packageIndex = 0;
+        let subIndex = 0;
+        let activeParentPkg = null;
 
         items.forEach((item, idx) => {
-            const isSub = (item.is_subitem || (item.item_name && item.item_name.startsWith('--')));
-            const isPkg = (item.is_package || !!item.bundle_id);
-            const qty = Math.max(1, parseInt(item.qty) || 1);
+            const nameLower = (item.item_name || '').toLowerCase();
+            const descLower = (item.item_description || '').toLowerCase();
             const uPrice = parseFloat(item.unit_price) || 0;
+
+            const isExplicitSub = item.is_subitem === true ||
+                                  (item.item_name && item.item_name.startsWith('--')) ||
+                                  descLower.includes('komponen paket') ||
+                                  descLower.includes('komponen dari');
+
+            const isPkg = !isExplicitSub && (
+                item.is_package === true ||
+                !!item.bundle_id ||
+                nameLower.includes('paket') ||
+                (packageBundles && (packageBundles[item.item_code] || packageBundles[item.item_name])) ||
+                (item.item_code && (item.item_code.startsWith('88003') || item.item_code === '8800513'))
+            );
+
+            if (isPkg) {
+                activeParentPkg = item;
+                packageIndex++;
+                subIndex = 0;
+                item.is_package = true;
+            }
+
+            const isSub = isExplicitSub || (!isPkg && uPrice === 0 && activeParentPkg !== null);
+            if (isSub) {
+                subIndex++;
+                item.is_subitem = true;
+            } else if (!isPkg) {
+                activeParentPkg = null;
+                packageIndex++;
+                subIndex = 0;
+                item.is_subitem = false;
+                item.is_package = false;
+            }
+
+            const qty = Math.max(1, parseInt(item.qty) || 1);
             
             let discPct = 0;
             if (item.discount_percent !== undefined && item.discount_percent !== null) {
@@ -1038,57 +1318,124 @@ $(document).ready(function() {
             discPct = Math.min(100, Math.max(0, discPct));
             
             const discAmountPerUnit = uPrice * (discPct / 100);
-            const lineTotal = qty * Math.max(0, (uPrice - discAmountPerUnit));
-            item.discount_percent = discPct;
-            item.discount_item = discAmountPerUnit;
+            const lineTotal = isSub ? 0 : (qty * Math.max(0, (uPrice - discAmountPerUnit)));
+            item.discount_percent = isSub ? 0 : discPct;
+            item.discount_item = isSub ? 0 : discAmountPerUnit;
             item.total_price = lineTotal;
             totalQty += qty;
 
             const trClass = isSub ? 'tr-bundle-subitem' : (isPkg ? 'tr-bundle-package' : '');
-            const subPrefix = isSub ? '<span class="text-muted fw-bold me-1" title="Komponen Paket" style="font-size:12px;">↳</span>' : '';
-            const nameInputClass = isSub ? 'form-control form-control-sm accurate-input item-field-name item-subitem-name' : 'form-control form-control-sm accurate-input fw-semibold item-field-name';
+            const cleanName = (item.item_name || '').replace(/^--\s*/, '').trim();
+
+            let noColHtml = '';
+            if (isPkg) {
+                noColHtml = `<span class="badge" style="background:#0f172a; color:#f8fafc; font-size:11px; font-weight:700; border-radius:5px; padding:3px 7px;">${packageIndex}</span>`;
+            } else if (isSub) {
+                noColHtml = `
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                        <span style="color:#94a3b8; font-family:monospace; font-size:13px; font-weight:700;">↳</span>
+                        <span class="badge" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:10px; font-weight:700; padding:2px 5px; border-radius:4px;">${packageIndex}.${subIndex}</span>
+                    </div>
+                `;
+            } else {
+                noColHtml = `<span class="badge" style="background:#f1f5f9; color:#334155; border:1px solid #e2e8f0; font-size:11px; font-weight:700; border-radius:5px; padding:3px 7px;">${packageIndex}</span>`;
+            }
+
+            let badgeHeader = '';
+            if (isPkg) {
+                badgeHeader = `
+                    <div class="d-flex align-items-center gap-1 mb-1">
+                        <span class="badge" style="background:linear-gradient(135deg, #0f172a, #1e293b); color:#38bdf8; border:1px solid #334155; font-size:9.5px; font-weight:700; padding:2.5px 7px; border-radius:4px; letter-spacing:0.5px;">
+                            <i class="bi bi-box-seam me-1"></i>PAKET BUNDLE
+                        </span>
+                    </div>
+                `;
+            } else if (isSub) {
+                badgeHeader = `
+                    <div class="d-flex align-items-center gap-1 mb-1">
+                        <span class="badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-size:9.5px; font-weight:600; padding:2px 6px; border-radius:4px;">
+                            <i class="bi bi-diagram-3 me-1"></i>Komponen Paket
+                        </span>
+                    </div>
+                `;
+            }
+
+            const nameInputClass = isSub ? 'form-control form-control-sm accurate-input item-field-name item-subitem-name' : 'form-control form-control-sm accurate-input fw-semibold item-field-name text-dark';
+
+            let priceColHtml = '';
+            let discColHtml = '';
+            let totalColHtml = '';
+
+            if (isSub) {
+                priceColHtml = `
+                    <div class="position-relative">
+                        <input type="number" min="0" step="any" class="form-control form-control-sm accurate-input text-end font-monospace item-field-price" style="background:#f8fafc; color:#94a3b8; font-size:12px;" data-index="${idx}" value="0" readonly title="Harga sudah termasuk dalam paket">
+                        <span style="position:absolute; right:8px; top:6px; font-size:10px; font-weight:600; color:#059669; pointer-events:none; background:#ecfdf5; padding:1px 5px; border-radius:3px;">Termasuk</span>
+                    </div>
+                `;
+                discColHtml = `
+                    <div class="text-center text-muted small py-1" style="font-size:12px;">-</div>
+                    <input type="hidden" class="item-field-disc" data-index="${idx}" value="0">
+                `;
+                totalColHtml = `
+                    <span class="badge" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-size:11px; font-weight:700; padding:4px 8px; border-radius:6px; white-space:nowrap;">
+                        <i class="bi bi-check2-circle me-1"></i>Termasuk Paket
+                    </span>
+                `;
+            } else {
+                priceColHtml = `
+                    <input type="number" min="0" step="any" class="form-control form-control-sm accurate-input text-end font-monospace item-field-price ${isPkg ? 'fw-bold text-dark' : ''}" data-index="${idx}" value="${uPrice}">
+                `;
+                discColHtml = `
+                    <div class="input-group input-group-sm" style="min-width: 80px;">
+                        <input type="number" min="0" max="100" step="any" class="form-control form-control-sm accurate-input text-end font-monospace item-field-disc" data-index="${idx}" value="${discPct}" placeholder="0" style="border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; border-right: 0 !important;">
+                        <span class="input-group-text font-monospace fw-bold" style="background: #f8fafc; color: #475569; font-size: 11.5px; padding: 0 7px; border: 1px solid #cbd5e1; border-top-right-radius: 8px; border-bottom-right-radius: 8px;">%</span>
+                    </div>
+                `;
+                totalColHtml = `
+                    <span class="fw-bold font-monospace ${isPkg ? 'text-primary' : 'text-dark'}" style="font-size:13.5px;">${formatRupiah(lineTotal)}</span>
+                `;
+            }
 
             const tr = $(`
                 <tr data-index="${idx}" class="${trClass}">
-                    <td style="text-align: center;">
-                        <div class="d-flex align-items-center justify-content-center">
-                            ${subPrefix}
-                            <button type="button" class="btn-row-delete btn-remove-item" data-index="${idx}" title="${isPkg ? 'Hapus Paket & Seluruh Komponennya' : 'Hapus Baris'}">
-                                <i class="bi bi-trash"></i>
+                    <td style="text-align: center; vertical-align: top; padding-top: 12px;">
+                        <div class="d-flex flex-column align-items-center justify-content-center gap-1">
+                            ${noColHtml}
+                            <button type="button" class="btn-row-delete btn-remove-item mt-1" data-index="${idx}" title="${isPkg ? 'Hapus Paket & Seluruh Komponennya' : 'Hapus Baris'}">
+                                <i class="bi bi-trash" style="font-size:12px;"></i>
                             </button>
                         </div>
                     </td>
                     <td>
-                        <input type="text" list="catalogProductsDatalist" class="${nameInputClass}" data-index="${idx}" value="${escapeHtml(item.item_name || '')}" placeholder="Ketik / Pilih Nama Barang">
+                        ${badgeHeader}
+                        <input type="text" list="catalogProductsDatalist" class="${nameInputClass}" data-index="${idx}" value="${escapeHtml(cleanName)}" placeholder="Ketik / Pilih Nama Barang">
                         <input type="text" class="form-control form-control-sm accurate-input text-muted item-field-desc mt-1" style="font-size: 11px; padding: 3px 8px; background: #fafafa;" data-index="${idx}" value="${escapeHtml(item.item_description || '')}" placeholder="+ Deskripsi / Catatan Tambahan (opsional)">
                     </td>
-                    <td>
+                    <td style="vertical-align: top; padding-top: ${badgeHeader ? '32px' : '10px'};">
                         <input type="text" list="catalogCodesDatalist" class="form-control form-control-sm accurate-input font-monospace item-field-code" data-index="${idx}" value="${escapeHtml(item.item_code || '')}" placeholder="Kode / SKU">
                     </td>
-                    <td style="text-align: center;">
+                    <td style="text-align: center; vertical-align: top; padding-top: ${badgeHeader ? '32px' : '10px'};">
                         <input type="number" min="1" step="1" class="form-control form-control-sm accurate-input text-center fw-bold item-field-qty" data-index="${idx}" value="${qty}">
                     </td>
-                    <td style="text-align: center;">
+                    <td style="text-align: center; vertical-align: top; padding-top: ${badgeHeader ? '32px' : '10px'};">
                         <input type="text" class="form-control form-control-sm accurate-input text-center item-field-unit" data-index="${idx}" value="${escapeHtml(item.unit || 'UNIT')}" placeholder="UNIT">
                     </td>
-                    <td style="text-align: right;">
-                        <input type="number" min="0" step="any" class="form-control form-control-sm accurate-input text-end font-monospace item-field-price" data-index="${idx}" value="${uPrice}">
+                    <td style="text-align: right; vertical-align: top; padding-top: ${badgeHeader ? '32px' : '10px'};">
+                        ${priceColHtml}
                     </td>
-                    <td style="text-align: right;">
-                        <div class="input-group input-group-sm" style="min-width: 80px;">
-                            <input type="number" min="0" max="100" step="any" class="form-control form-control-sm accurate-input text-end font-monospace item-field-disc" data-index="${idx}" value="${discPct}" placeholder="0" style="border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; border-right: 0 !important;">
-                            <span class="input-group-text font-monospace fw-bold" style="background: #f8fafc; color: #475569; font-size: 11.5px; padding: 0 7px; border: 1px solid #cbd5e1; border-top-right-radius: 8px; border-bottom-right-radius: 8px;">%</span>
-                        </div>
+                    <td style="text-align: right; vertical-align: top; padding-top: ${badgeHeader ? '32px' : '10px'};">
+                        ${discColHtml}
                     </td>
-                    <td style="text-align: right; font-weight: 700; font-family: 'JetBrains Mono', monospace;" class="line-total-cell">
-                        ${formatRupiah(lineTotal)}
+                    <td style="text-align: right; vertical-align: middle;" class="line-total-cell">
+                        ${totalColHtml}
                     </td>
                 </tr>
             `);
             tbody.append(tr);
         });
 
-        $('#txtTotalItemsCount').text(`${items.length} Barang (${totalQty} Kuantitas)`);
+        $('#txtTotalItemsCount').text(`${items.length} Baris (${totalQty} Kuantitas)`);
         recalculateSummary();
     }
 
@@ -1330,13 +1677,23 @@ $(document).ready(function() {
         const price = Math.max(0, parseFloat(itm.unit_price) || 0);
         const discPct = Math.min(100, Math.max(0, parseFloat(itm.discount_percent) || 0));
         const discAmountPerUnit = price * (discPct / 100);
-        const total = qty * Math.max(0, price - discAmountPerUnit);
+        const total = itm.is_subitem ? 0 : qty * Math.max(0, price - discAmountPerUnit);
         
-        itm.discount_percent = discPct;
-        itm.discount_item = discAmountPerUnit;
+        itm.discount_percent = itm.is_subitem ? 0 : discPct;
+        itm.discount_item = itm.is_subitem ? 0 : discAmountPerUnit;
         itm.total_price = total;
 
-        $(`#itemsTableBody tr[data-index="${idx}"] .line-total-cell`).text(formatRupiah(total));
+        if (itm.is_subitem) {
+            $(`#itemsTableBody tr[data-index="${idx}"] .line-total-cell`).html(`
+                <span class="badge" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-size:11px; font-weight:700; padding:4px 8px; border-radius:6px; white-space:nowrap;">
+                    <i class="bi bi-check2-circle me-1"></i>Termasuk Paket
+                </span>
+            `);
+        } else {
+            $(`#itemsTableBody tr[data-index="${idx}"] .line-total-cell`).html(`
+                <span class="fw-bold font-monospace ${itm.is_package ? 'text-primary' : 'text-dark'}" style="font-size:13.5px;">${formatRupiah(total)}</span>
+            `);
+        }
         recalculateSummary();
     }
 
@@ -1391,10 +1748,82 @@ $(document).ready(function() {
 
         $('#inputGrandTotal').val(grandTotal);
         $('#lblGrandTotal').text(formatRupiah(grandTotal));
+
+        // Live Terbilang Rupiah Synchronization
+        const terbilangText = terbilangRupiah(grandTotal);
+        $('#lblFormTerbilangWord').text(terbilangText);
     }
 
     $('#discount_type, #discount_val, #is_taxable, #tax_inclusive').on('input change', function() {
         recalculateSummary();
+    });
+
+    // WhatsApp Summary Copy Handler in Form
+    $('#btnCopyWaFormTop, #btnCopyWaFormBottom').on('click', function(e) {
+        e.preventDefault();
+        const soNum = $.trim($('#so_number').val()) || '(Draft / Menunggu)';
+        const custName = $.trim($('#customer_name').val()) || '-';
+        const salesName = $('#sales_id option:selected').text().trim() || '-';
+        const grandTotal = parseFloat($('#inputGrandTotal').val()) || 0;
+        const status = $('#status').val() || 'Menunggu';
+        const payTerms = $('#payment_terms').val() || 'C.O.D';
+        const specialNotes = $.trim($('#special_notes').val());
+
+        let text = `*PESANAN PENJUALAN - LOEWIX CCTV*\n`;
+        text += `No. Pesanan: ${soNum}\n`;
+        text += `Pelanggan: ${custName}\n`;
+        text += `Sales PIC: ${salesName}\n`;
+        text += `Status: ${status}\n`;
+        text += `-------------------------------------------\n`;
+        text += `*RINCIAN BARANG:*\n`;
+
+        let pNum = 0;
+        let sNum = 0;
+        let activeParent = null;
+
+        items.forEach(function(item) {
+            const nameLower = (item.item_name || '').toLowerCase();
+            const descLower = (item.item_description || '').toLowerCase();
+            const isExplicitSub = (item.item_name || '').trim().startsWith('--') || descLower.includes('komponen paket') || item.is_subitem === true;
+            const isPkg = !isExplicitSub && (nameLower.includes('paket') || item.is_package === true || (item.item_code && (item.item_code.startsWith('88003') || item.item_code === '8800513')));
+
+            if (isPkg) {
+                activeParent = item;
+                pNum++;
+                sNum = 0;
+            }
+
+            const isSub = isExplicitSub || (!isPkg && parseFloat(item.unit_price) === 0 && activeParent !== null);
+            const cleanName = (item.item_name || '').replace(/^--\s*/, '').trim();
+
+            if (isPkg) {
+                text += `\n📦 *${pNum}. [PAKET] ${cleanName}* (${item.qty} ${item.unit || 'SET'}) - ${formatRupiah(item.total_price)}\n`;
+            } else if (isSub) {
+                sNum++;
+                text += `   ↳ ${pNum}.${sNum} ${cleanName} (${item.qty} ${item.unit || 'UNIT'}) [Termasuk Paket]\n`;
+            } else {
+                activeParent = null;
+                pNum++;
+                sNum = 0;
+                text += `${pNum}. ${cleanName} (${item.qty} ${item.unit || 'UNIT'}) - ${formatRupiah(item.total_price)}\n`;
+            }
+        });
+
+        text += `-------------------------------------------\n`;
+        text += `*TOTAL PEMBAYARAN: ${formatRupiah(grandTotal)}*\n`;
+        text += `_Terbilang: ${terbilangRupiah(grandTotal)}_\n`;
+        text += `Syarat Bayar: ${payTerms}\n`;
+        if (specialNotes) text += `Catatan: ${specialNotes}\n`;
+
+        navigator.clipboard.writeText(text).then(function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Format WhatsApp Disalin!',
+                text: 'Rincian pesanan berhasil disalin ke clipboard.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        });
     });
 
     // 6. SAVE SALES ORDER HANDLER
