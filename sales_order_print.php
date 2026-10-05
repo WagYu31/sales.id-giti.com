@@ -105,15 +105,15 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background: #E2E8F0;
+            background: #F1F5F9;
             color: #000000;
             margin: 0;
-            padding: 20px 0;
+            padding: 24px 0 40px 0;
             font-size: 11px;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Top Action Bar (Hidden when printing) */
+        /* Top Action Toolbar (Hidden When Printing) */
         .print-toolbar {
             max-width: 820px;
             margin: 0 auto 16px auto;
@@ -121,22 +121,101 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             justify-content: space-between;
             align-items: center;
             background: #0F172A;
-            padding: 10px 16px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 10px 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.25);
             color: #FFFFFF;
+            gap: 12px;
+        }
+
+        .toolbar-left, .toolbar-center, .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-tb {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            border: 1px solid transparent;
+        }
+
+        .btn-tb-outline {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #F8FAFC;
+        }
+
+        .btn-tb-outline:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #FFFFFF;
+        }
+
+        .btn-tb-primary {
+            background: #2563EB;
+            color: #FFFFFF;
+            border-color: #1D4ED8;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-tb-primary:hover {
+            background: #1D4ED8;
+            color: #FFFFFF;
+        }
+
+        .tb-control-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .tb-control-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94A3B8;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .tb-select {
+            background: #1E293B;
+            color: #F8FAFC;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            padding: 2.5px 8px;
+            font-size: 11.5px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .tb-select:focus {
+            border-color: #38BDF8;
         }
 
         /* Accurate Sheet Paper (A4 Proportion) */
         .invoice-paper {
-            max-width: 820px;
-            min-height: 1060px;
+            width: 820px;
+            min-height: 1080px;
             margin: 0 auto;
             background: #FFFFFF;
-            padding: 38px 46px 60px 46px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 36px 44px 50px 44px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
             position: relative;
             box-sizing: border-box;
+            border: 1px solid #E2E8F0;
         }
 
         /* Accurate Header Layout */
@@ -147,71 +226,70 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             margin-bottom: 12px;
         }
 
-        .header-left {
-            width: 50%;
+        .header-col {
+            width: 47%;
         }
 
         .company-logo-text {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 800;
             color: #000000;
             letter-spacing: 0.5px;
             line-height: 1.1;
             text-transform: uppercase;
+            min-height: 28px;
+            display: flex;
+            align-items: flex-end;
         }
 
-        .header-line-left {
-            border-bottom: 2px solid #000000;
-            width: 250px;
-            margin: 5px 0 8px 0;
-        }
-
-        .kepada-label {
-            font-size: 11px;
+        .doc-main-title {
+            font-size: 20px;
+            font-weight: 800;
             color: #000000;
-            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            line-height: 1.1;
+            min-height: 28px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .header-line {
+            border-bottom: 2px solid #000000;
+            width: 100%;
+            margin: 5px 0 7px 0;
+        }
+
+        .header-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 3px;
+            min-height: 16px;
+        }
+
+        /* Shaded Card (Accurate Style for Customer & Metadata) */
+        .meta-card {
+            background: #E5E7EB;
+            border: 1px solid #CBD5E1;
+            padding: 7px 12px;
+            font-size: 11px;
+            min-height: 82px;
         }
 
         .customer-name-heading {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 800;
             color: #000000;
             text-transform: uppercase;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
+            line-height: 1.2;
         }
 
         .customer-address-block {
             font-size: 11px;
-            line-height: 1.4;
-            color: #000000;
-            max-width: 340px;
-        }
-
-        .header-right {
-            width: 44%;
-        }
-
-        .doc-main-title {
-            font-size: 22px;
-            font-weight: 800;
-            color: #000000;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            line-height: 1.1;
-        }
-
-        .header-line-right {
-            border-bottom: 2px solid #000000;
-            width: 100%;
-            margin: 5px 0 8px 0;
-        }
-
-        /* Meta Box Grey Shaded (Accurate Style) */
-        .meta-card {
-            background: #E5E7EB;
-            border: 1px solid #D1D5DB;
-            padding: 6px 12px;
-            font-size: 11px;
+            line-height: 1.35;
+            color: #111827;
         }
 
         .meta-table {
@@ -220,24 +298,24 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
         }
 
         .meta-table td {
-            padding: 2.5px 0;
+            padding: 2px 0;
             vertical-align: top;
             font-size: 11px;
         }
 
         .meta-table td.col-lbl {
-            width: 90px;
+            width: 82px;
             color: #000000;
         }
 
         .meta-table td.col-sep {
-            width: 14px;
+            width: 12px;
             text-align: center;
             color: #000000;
         }
 
         .meta-table td.col-val {
-            font-weight: 600;
+            font-weight: 700;
             color: #000000;
         }
 
@@ -250,7 +328,7 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
         }
 
         .table-accurate thead th {
-            background: #0A2540 !important;
+            background: #123B61 !important;
             color: #FFFFFF !important;
             font-weight: 700;
             font-size: 11px;
@@ -260,7 +338,7 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
         }
 
         .table-accurate tbody td {
-            padding: 5.5px 8px;
+            padding: 6px 8px;
             font-size: 11px;
             border-bottom: 1px solid #E5E7EB;
             vertical-align: top;
@@ -271,40 +349,39 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             border-bottom: 1.5px solid #000000;
         }
 
-        /* Bottom Section: Notes & QRIS vs Totals */
+        /* Bottom Section: Notes & QRIS vs Totals & Signature */
         .bottom-section {
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
             margin-top: 12px;
         }
 
         .bottom-left {
-            width: 54%;
+            width: 52%;
         }
 
-        .keterangan-title {
+        .keterangan-header {
+            border-top: 1.5px solid #000000;
+            border-bottom: 1.5px solid #000000;
+            width: 230px;
+            padding: 2.5px 0;
             font-size: 11px;
             font-weight: 700;
             color: #000000;
-            margin-bottom: 2px;
-        }
-
-        .keterangan-line {
-            border-bottom: 1.5px solid #000000;
-            width: 240px;
             margin-bottom: 6px;
         }
 
         .keterangan-body {
             font-size: 11px;
-            color: #000000;
+            color: #111827;
             line-height: 1.4;
-            min-height: 24px;
+            min-height: 20px;
         }
 
         .dashed-divider {
             border-top: 1.5px dashed #9CA3AF;
-            width: 240px;
+            width: 230px;
             margin: 10px 0 8px 0;
         }
 
@@ -317,11 +394,11 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
 
         .qris-img-container {
             display: inline-block;
-            margin-top: 2px;
+            margin-left: 20px;
         }
 
         .qris-accurate-img {
-            width: 122px;
+            width: 120px;
             height: auto;
             display: block;
             image-rendering: -webkit-optimize-contrast;
@@ -337,7 +414,7 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             width: 100%;
             border-collapse: collapse;
             background: #E5E7EB;
-            border: 1px solid #D1D5DB;
+            border: 1px solid #CBD5E1;
             font-size: 11px;
         }
 
@@ -348,37 +425,51 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
         }
 
         .totals-table tr.row-grand-total td {
-            background: #0A2540 !important;
+            background: #123B61 !important;
             color: #FFFFFF !important;
             font-weight: 700;
             font-size: 11.5px;
-            padding: 6px 8px;
-            border-top: 1px solid #0A2540;
+            padding: 5.5px 8px;
+            border-top: 1px solid #123B61;
         }
 
-        /* Signature Area */
+        /* Signature Section (Accurate Style) */
         .signature-area {
-            margin-top: 24px;
-            text-align: right;
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
         }
 
         .signature-box {
-            display: inline-block;
             width: 180px;
             text-align: center;
-            font-size: 11.5px;
         }
 
-        .signature-line {
+        .sig-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #000000;
+            text-align: center;
+        }
+
+        .sig-line {
             border-bottom: 1.5px solid #000000;
-            width: 100%;
-            margin: 55px auto 4px auto;
+            width: 140px;
+            margin: 44px auto 4px auto;
+        }
+
+        .sig-name {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #000000;
+            text-align: center;
+            line-height: 1.2;
         }
 
         .page-footer-num {
             position: absolute;
             bottom: 20px;
-            right: 46px;
+            right: 44px;
             font-size: 10px;
             font-style: italic;
             color: #000000;
@@ -388,7 +479,7 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 10mm 14mm 10mm 14mm;
+                margin: 12mm 14mm 12mm 14mm;
             }
             body {
                 background: #FFFFFF !important;
@@ -399,8 +490,10 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             }
             .invoice-paper {
                 box-shadow: none !important;
+                border: none !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                width: 100% !important;
                 max-width: 100% !important;
                 min-height: auto !important;
             }
@@ -424,20 +517,20 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
 
     <!-- Top Action Toolbar (Hidden When Printed) -->
     <div class="print-toolbar">
-        <div class="d-flex align-items-center gap-2">
-            <a href="sales_orders.php" class="btn btn-outline-light btn-sm fw-bold">
-                <i class="bi bi-arrow-left me-1"></i> Daftar SO
+        <div class="toolbar-left">
+            <a href="sales_orders.php" class="btn-tb btn-tb-outline">
+                <i class="bi bi-arrow-left"></i> <span>Daftar SO</span>
             </a>
-            <a href="sales_order_form.php?id=<?php echo $order['id']; ?>" class="btn btn-outline-light btn-sm fw-bold">
-                <i class="bi bi-pencil me-1"></i> Edit Pesanan
+            <a href="sales_order_form.php?id=<?php echo $order['id']; ?>" class="btn-tb btn-tb-outline">
+                <i class="bi bi-pencil"></i> <span>Edit Pesanan</span>
             </a>
         </div>
 
-        <div class="d-flex align-items-center gap-2">
+        <div class="toolbar-center">
             <!-- Kop / Brand Selector -->
-            <div class="d-flex align-items-center gap-1">
-                <span style="font-size:11px; color:#94A3B8;">Kop:</span>
-                <select id="selectBrand" class="form-select form-select-sm" style="width:auto; font-size:11.5px; font-weight:600; background:#1E293B; color:#fff; border-color:#475569;">
+            <div class="tb-control-group">
+                <label for="selectBrand">Kop:</label>
+                <select id="selectBrand" class="tb-select">
                     <option value="GRAVITTI" <?php echo ($defaultBrand === 'GRAVITTI') ? 'selected' : ''; ?>>GRAVITTI (Sesuai PDF)</option>
                     <option value="LOEWIX" <?php echo ($defaultBrand === 'LOEWIX') ? 'selected' : ''; ?>>LOEWIX</option>
                     <option value="LOEWIX CCTV" <?php echo ($defaultBrand === 'LOEWIX CCTV') ? 'selected' : ''; ?>>LOEWIX CCTV</option>
@@ -446,17 +539,19 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             </div>
 
             <!-- Document Title Selector -->
-            <div class="d-flex align-items-center gap-1">
-                <span style="font-size:11px; color:#94A3B8;">Judul:</span>
-                <select id="selectDocTitle" class="form-select form-select-sm" style="width:auto; font-size:11.5px; font-weight:600; background:#1E293B; color:#fff; border-color:#475569;">
+            <div class="tb-control-group">
+                <label for="selectDocTitle">Judul:</label>
+                <select id="selectDocTitle" class="tb-select">
                     <option value="PROFORMA INVOICE" <?php echo ($defaultTitle === 'PROFORMA INVOICE') ? 'selected' : ''; ?>>PROFORMA INVOICE (Sesuai PDF)</option>
                     <option value="SALES ORDER" <?php echo ($defaultTitle === 'SALES ORDER') ? 'selected' : ''; ?>>SALES ORDER</option>
                     <option value="PESANAN PENJUALAN" <?php echo ($defaultTitle === 'PESANAN PENJUALAN') ? 'selected' : ''; ?>>PESANAN PENJUALAN</option>
                 </select>
             </div>
+        </div>
 
-            <button onclick="window.print()" class="btn btn-primary btn-sm fw-bold px-3">
-                <i class="bi bi-printer me-1"></i> Cetak Dokumen (PDF)
+        <div class="toolbar-right">
+            <button onclick="window.print()" class="btn-tb btn-tb-primary">
+                <i class="bi bi-printer-fill"></i> <span>Cetak Dokumen (PDF)</span>
             </button>
         </div>
     </div>
@@ -467,32 +562,35 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
         <!-- Header (Accurate Style) -->
         <div class="accurate-header">
             <!-- Left: Brand / Logo & Customer Address -->
-            <div class="header-left">
+            <div class="header-col">
                 <div class="company-logo-text" id="brandLogoText"><?php echo htmlspecialchars($defaultBrand); ?></div>
-                <div class="header-line-left"></div>
+                <div class="header-line"></div>
 
-                <div class="kepada-label">Kepada</div>
-                <div class="customer-name-heading"><?php echo htmlspecialchars($order['customer_name']); ?></div>
-                <div class="customer-address-block">
-                    <?php if (!empty($order['customer_address'])): ?>
-                        <?php echo nl2br(htmlspecialchars($order['customer_address'])); ?>
-                    <?php else: ?>
-                        -
-                    <?php endif; ?>
-                    <?php if (!empty($order['customer_pic']) || !empty($order['customer_phone'])): ?>
-                        <div style="margin-top:2px;">
-                            <?php if (!empty($order['customer_pic'])): ?>PIC: <?php echo htmlspecialchars($order['customer_pic']); ?><?php endif; ?>
-                            <?php if (!empty($order['customer_phone'])): ?> &bull; Telp: <?php echo htmlspecialchars($order['customer_phone']); ?><?php endif; ?>
-                        </div>
-                    <?php endif; ?>
+                <div class="header-label">Kepada</div>
+                <div class="meta-card">
+                    <div class="customer-name-heading"><?php echo htmlspecialchars($order['customer_name']); ?></div>
+                    <div class="customer-address-block">
+                        <?php if (!empty($order['customer_address'])): ?>
+                            <?php echo nl2br(htmlspecialchars($order['customer_address'])); ?>
+                        <?php else: ?>
+                            -
+                        <?php endif; ?>
+                        <?php if (!empty($order['customer_pic']) || !empty($order['customer_phone'])): ?>
+                            <div style="margin-top: 3px; font-size: 10.5px; color: #374151;">
+                                <?php if (!empty($order['customer_pic'])): ?>PIC: <strong><?php echo htmlspecialchars($order['customer_pic']); ?></strong><?php endif; ?>
+                                <?php if (!empty($order['customer_phone'])): ?> &bull; Telp: <strong><?php echo htmlspecialchars($order['customer_phone']); ?></strong><?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
 
             <!-- Right: Document Title & Meta Box -->
-            <div class="header-right">
+            <div class="header-col">
                 <div class="doc-main-title" id="docMainTitle"><?php echo htmlspecialchars($defaultTitle); ?></div>
-                <div class="header-line-right"></div>
+                <div class="header-line"></div>
 
+                <div class="header-label">&nbsp;</div>
                 <div class="meta-card">
                     <table class="meta-table">
                         <tr>
@@ -517,13 +615,6 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
                             <td class="col-val"><?php echo htmlspecialchars($order['po_number']); ?></td>
                         </tr>
                         <?php endif; ?>
-                        <?php if (!empty($order['sales_name'])): ?>
-                        <tr>
-                            <td class="col-lbl">Sales</td>
-                            <td class="col-sep">:</td>
-                            <td class="col-val"><?php echo htmlspecialchars($order['sales_name']); ?></td>
-                        </tr>
-                        <?php endif; ?>
                     </table>
                 </div>
             </div>
@@ -533,16 +624,22 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
         <table class="table-accurate">
             <thead>
                 <tr>
-                    <th style="width: 14%; text-align: left;">Kode Barang</th>
-                    <th style="width: 44%; text-align: left;">Nama Barang</th>
+                    <th style="width: 13%; text-align: left;">Kode Barang</th>
+                    <th style="width: 45%; text-align: left;">Nama Barang</th>
                     <th style="width: 7%; text-align: right;">Qty</th>
-                    <th style="width: 15%; text-align: right;">@Harga</th>
-                    <th style="width: 7%; text-align: right;">Diskon</th>
-                    <th style="width: 13%; text-align: right;">Total Harga</th>
+                    <th style="width: 13%; text-align: right;">@Harga</th>
+                    <th style="width: 8%; text-align: right;">Diskon</th>
+                    <th style="width: 14%; text-align: right;">Total Harga</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($items as $item): ?>
+                <?php foreach ($items as $item): 
+                    // Bersihkan deskripsi jika merupakan string metadata internal (Kode / Satuan)
+                    $itemDesc = $item['item_description'] ?? '';
+                    if (strpos($itemDesc, 'Kode: ') === 0 && strpos($itemDesc, 'Satuan: ') !== false) {
+                        $itemDesc = '';
+                    }
+                ?>
                     <tr>
                         <td style="text-align: left;">
                             <?php echo htmlspecialchars($item['item_code'] ?: '-'); ?>
@@ -551,9 +648,9 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
                             <div style="<?php echo (strpos($item['item_name'], '--') === 0) ? 'padding-left:8px; font-weight:500;' : 'font-weight:600;'; ?>">
                                 <?php echo htmlspecialchars($item['item_name']); ?>
                             </div>
-                            <?php if (!empty($item['item_description']) && $item['item_description'] !== $item['item_name']): ?>
+                            <?php if (!empty($itemDesc) && $itemDesc !== $item['item_name']): ?>
                                 <div style="font-size: 10px; color: #4B5563; margin-top: 1px;">
-                                    <?php echo htmlspecialchars($item['item_description']); ?>
+                                    <?php echo htmlspecialchars($itemDesc); ?>
                                 </div>
                             <?php endif; ?>
                         </td>
@@ -579,15 +676,12 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
             
             <!-- Left Side: Keterangan & QRIS -->
             <div class="bottom-left">
-                <div class="keterangan-title">Keterangan</div>
-                <div class="keterangan-line"></div>
+                <div class="keterangan-header">Keterangan</div>
                 <div class="keterangan-body">
                     <?php if (!empty($order['special_notes'])): ?>
                         <?php echo nl2br(htmlspecialchars($order['special_notes'])); ?>
-                    <?php else: ?>
-                        <i>-</i>
                     <?php endif; ?>
-                    <div style="font-size:10.5px; color:#4B5563; margin-top:4px;">
+                    <div style="font-size:10.5px; color:#374151; <?php echo !empty($order['special_notes']) ? 'margin-top:4px;' : ''; ?>">
                         <strong>Terbilang:</strong> <em><?php echo terbilang($order['grand_total']); ?></em>
                     </div>
                 </div>
@@ -643,9 +737,9 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
                 <!-- Signature Section (Accurate Style) -->
                 <div class="signature-area">
                     <div class="signature-box">
-                        <div style="font-weight: 600;">Bagian Penjualan,</div>
-                        <div class="signature-line"></div>
-                        <div style="text-align: center; font-size: 11.5px; font-weight: 600;">
+                        <div class="sig-title">Bagian Penjualan,</div>
+                        <div class="sig-line"></div>
+                        <div class="sig-name">
                             <?php echo htmlspecialchars($order['sales_name'] ?? ''); ?>
                         </div>
                     </div>
