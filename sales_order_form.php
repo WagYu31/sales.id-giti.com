@@ -78,12 +78,22 @@ if ($qSales) {
 
 // Ambil daftar produk katalog Loewix untuk autokomplit instan di baris tabel
 $catalogProducts = [];
+$packageBundles = [];
+$pbJsonFile = __DIR__ . '/includes/package_bundles.json';
+if (file_exists($pbJsonFile)) {
+    $packageBundles = json_decode(file_get_contents($pbJsonFile), true) ?: [];
+}
+
 $qProd = $conn->query("SELECT id, category, type, item_code, description, unit, msrp FROM product_prices ORDER BY category ASC, type ASC");
 if ($qProd) {
     while ($p = $qProd->fetch_assoc()) {
         $rawDesc = trim($p['description'] ?? '');
+        if (strpos($rawDesc, 'Kode: ') === 0 && strpos($rawDesc, 'Satuan: ') !== false) {
+            $rawDesc = '';
+        }
         $code = !empty($p['item_code']) ? $p['item_code'] : $p['type'];
         $unit = !empty($p['unit']) ? $p['unit'] : 'UNIT';
+        $isPkg = isset($packageBundles[$code]) || (strpos($p['category'], 'PAKET') !== false) || (strpos($p['description'] ?? '', 'GROUP') !== false);
         $catalogProducts[] = [
             'id' => (int)$p['id'],
             'category' => $p['category'],
@@ -92,7 +102,8 @@ if ($qProd) {
             'name' => $p['type'],
             'description' => $rawDesc,
             'msrp' => (float)$p['msrp'],
-            'unit' => $unit
+            'unit' => $unit,
+            'is_package' => $isPkg
         ];
     }
 }
@@ -215,6 +226,28 @@ if ($qProd) {
     background: #f1f5f9 !important;
     color: #0f172a !important;
     z-index: 3;
+}
+
+/* Sub-item bundle styling (Accurate style) */
+.table-accurate tbody tr.tr-bundle-subitem td {
+    background-color: #f8fafc;
+    border-bottom: 1px dashed #e2e8f0;
+}
+.table-accurate tbody tr.tr-bundle-subitem:hover td {
+    background-color: #f1f5f9;
+}
+.item-subitem-name {
+    padding-left: 20px !important;
+    font-weight: 500 !important;
+    color: #334155 !important;
+    background-color: #f8fafc !important;
+}
+.item-subitem-name:focus {
+    background-color: #ffffff !important;
+}
+.tr-bundle-package td {
+    background-color: #ffffff;
+    font-weight: 600;
 }
 
 .nav-accurate-tabs {
@@ -813,6 +846,69 @@ if ($qProd) {
 $(document).ready(function() {
     // Initial Item State
     let items = <?php echo json_encode($orderItems, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?> || [];
+    const packageBundles = <?php echo json_encode($packageBundles, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?> || {};
+
+    // Helper: Tambahkan produk ke tabel (Otomatis pecah menjadi paket + rincian sub-items jika barang grup/paket)
+    function addSelectedProduct(prod) {
+        const code = (prod.code || prod.item_code || '').trim();
+        const name = (prod.name || prod.type || '').trim();
+        const pkg = packageBundles[code] || packageBundles[name];
+
+        if (pkg && pkg.items && pkg.items.length > 0) {
+            const bundleId = 'bndl_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            
+            // 1. Tambah baris induk paket (Harga penuh paket)
+            items.push({
+                product_id: prod.id || null,
+                item_code: code,
+                item_name: name,
+                item_description: prod.description || '',
+                qty: 1,
+                unit: prod.unit || 'SET',
+                unit_price: prod.msrp || 0,
+                discount_percent: 0,
+                discount_item: 0,
+                total_price: prod.msrp || 0,
+                is_package: true,
+                bundle_id: bundleId
+            });
+
+            // 2. Tambah otomatis rincian barang grup (komponen paket) dengan harga 0
+            pkg.items.forEach(sub => {
+                const subName = sub.name.startsWith('--') ? sub.name : ('--' + sub.name);
+                items.push({
+                    product_id: null,
+                    item_code: sub.code,
+                    item_name: subName,
+                    item_description: sub.description || ('Komponen dari ' + name),
+                    qty: sub.qty,
+                    base_qty: sub.qty,
+                    unit: sub.unit || 'UNIT',
+                    unit_price: 0,
+                    discount_percent: 0,
+                    discount_item: 0,
+                    total_price: 0,
+                    is_subitem: true,
+                    parent_bundle_id: bundleId
+                });
+            });
+            renderItemsTable();
+        } else {
+            // Barang satuan biasa
+            addItemRow({
+                product_id: prod.id || null,
+                item_code: code,
+                item_name: name,
+                item_description: prod.description || '',
+                qty: 1,
+                unit: prod.unit || 'UNIT',
+                unit_price: prod.msrp || 0,
+                discount_percent: 0,
+                discount_item: 0,
+                total_price: prod.msrp || 0
+            });
+        }
+    }
 
     // Format Rupiah Helper
     function formatRupiah(num) {
@@ -885,18 +981,7 @@ $(document).ready(function() {
         }
     }).on('select2:select', function(e) {
         const prod = e.params.data;
-        addItemRow({
-            product_id: prod.id,
-            item_code: prod.code || prod.item_code || '',
-            item_name: prod.name || prod.type || '',
-            item_description: prod.description || '',
-            qty: 1,
-            unit: prod.unit || 'UNIT',
-            unit_price: prod.msrp || 0,
-            discount_percent: 0,
-            discount_item: 0,
-            total_price: prod.msrp || 0
-        });
+        addSelectedProduct(prod);
 
         // Reset dropdown after adding
         $('#catalogProductPicker').val(null).trigger('change');
@@ -939,6 +1024,8 @@ $(document).ready(function() {
         let totalQty = 0;
 
         items.forEach((item, idx) => {
+            const isSub = (item.is_subitem || (item.item_name && item.item_name.startsWith('--')));
+            const isPkg = (item.is_package || !!item.bundle_id);
             const qty = Math.max(1, parseInt(item.qty) || 1);
             const uPrice = parseFloat(item.unit_price) || 0;
             
@@ -957,15 +1044,22 @@ $(document).ready(function() {
             item.total_price = lineTotal;
             totalQty += qty;
 
+            const trClass = isSub ? 'tr-bundle-subitem' : (isPkg ? 'tr-bundle-package' : '');
+            const subPrefix = isSub ? '<span class="text-muted fw-bold me-1" title="Komponen Paket" style="font-size:12px;">↳</span>' : '';
+            const nameInputClass = isSub ? 'form-control form-control-sm accurate-input item-field-name item-subitem-name' : 'form-control form-control-sm accurate-input fw-semibold item-field-name';
+
             const tr = $(`
-                <tr data-index="${idx}">
+                <tr data-index="${idx}" class="${trClass}">
                     <td style="text-align: center;">
-                        <button type="button" class="btn-row-delete btn-remove-item" data-index="${idx}" title="Hapus Baris">
-                            <i class="bi bi-trash"></i>
-                        </button>
+                        <div class="d-flex align-items-center justify-content-center">
+                            ${subPrefix}
+                            <button type="button" class="btn-row-delete btn-remove-item" data-index="${idx}" title="${isPkg ? 'Hapus Paket & Seluruh Komponennya' : 'Hapus Baris'}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
                     </td>
                     <td>
-                        <input type="text" list="catalogProductsDatalist" class="form-control form-control-sm accurate-input fw-semibold item-field-name" data-index="${idx}" value="${escapeHtml(item.item_name || '')}" placeholder="Ketik / Pilih Nama Barang">
+                        <input type="text" list="catalogProductsDatalist" class="${nameInputClass}" data-index="${idx}" value="${escapeHtml(item.item_name || '')}" placeholder="Ketik / Pilih Nama Barang">
                         <input type="text" class="form-control form-control-sm accurate-input text-muted item-field-desc mt-1" style="font-size: 11px; padding: 3px 8px; background: #fafafa;" data-index="${idx}" value="${escapeHtml(item.item_description || '')}" placeholder="+ Deskripsi / Catatan Tambahan (opsional)">
                     </td>
                     <td>
@@ -1026,7 +1120,14 @@ $(document).ready(function() {
     // Remove Item
     $(document).on('click', '.btn-remove-item', function() {
         const idx = $(this).data('index');
-        items.splice(idx, 1);
+        const target = items[idx];
+        if (target && target.bundle_id) {
+            // Hapus paket induk beserta seluruh rincian komponen sub-itemnya
+            const bId = target.bundle_id;
+            items = items.filter(it => it !== target && it.parent_bundle_id !== bId);
+        } else {
+            items.splice(idx, 1);
+        }
         renderItemsTable();
     });
 
@@ -1083,6 +1184,40 @@ $(document).ready(function() {
                 items[idx].item_description = matched.description;
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-desc`).val(matched.description);
             }
+
+            // Cek apakah produk yang dipilih adalah paket bundle
+            const pkg = packageBundles[matched.code] || packageBundles[matched.name];
+            if (pkg && pkg.items && pkg.items.length > 0 && !items[idx].has_expanded_bundle) {
+                items[idx].has_expanded_bundle = true;
+                items[idx].is_package = true;
+                const bundleId = 'bndl_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+                items[idx].bundle_id = bundleId;
+                const pQty = items[idx].qty || 1;
+
+                const subRows = pkg.items.map(sub => {
+                    const subName = sub.name.startsWith('--') ? sub.name : ('--' + sub.name);
+                    return {
+                        product_id: null,
+                        item_code: sub.code,
+                        item_name: subName,
+                        item_description: sub.description || ('Komponen dari ' + matched.name),
+                        qty: sub.qty * pQty,
+                        base_qty: sub.qty,
+                        unit: sub.unit || 'UNIT',
+                        unit_price: 0,
+                        discount_percent: 0,
+                        discount_item: 0,
+                        total_price: 0,
+                        is_subitem: true,
+                        parent_bundle_id: bundleId
+                    };
+                });
+
+                items.splice(idx + 1, 0, ...subRows);
+                renderItemsTable();
+                return;
+            }
+
             recalculateRow(idx);
         }
     });
@@ -1117,6 +1252,40 @@ $(document).ready(function() {
                 items[idx].item_description = matched.description;
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-desc`).val(matched.description);
             }
+
+            // Cek apakah kode yang dipilih adalah paket bundle
+            const pkg = packageBundles[matched.code] || packageBundles[matched.name];
+            if (pkg && pkg.items && pkg.items.length > 0 && !items[idx].has_expanded_bundle) {
+                items[idx].has_expanded_bundle = true;
+                items[idx].is_package = true;
+                const bundleId = 'bndl_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+                items[idx].bundle_id = bundleId;
+                const pQty = items[idx].qty || 1;
+
+                const subRows = pkg.items.map(sub => {
+                    const subName = sub.name.startsWith('--') ? sub.name : ('--' + sub.name);
+                    return {
+                        product_id: null,
+                        item_code: sub.code,
+                        item_name: subName,
+                        item_description: sub.description || ('Komponen dari ' + matched.name),
+                        qty: sub.qty * pQty,
+                        base_qty: sub.qty,
+                        unit: sub.unit || 'UNIT',
+                        unit_price: 0,
+                        discount_percent: 0,
+                        discount_item: 0,
+                        total_price: 0,
+                        is_subitem: true,
+                        parent_bundle_id: bundleId
+                    };
+                });
+
+                items.splice(idx + 1, 0, ...subRows);
+                renderItemsTable();
+                return;
+            }
+
             recalculateRow(idx);
         }
     });
@@ -1124,6 +1293,18 @@ $(document).ready(function() {
         const idx = $(this).data('index');
         const val = Math.max(1, parseInt($(this).val()) || 1);
         items[idx].qty = val;
+
+        // Jika baris ini adalah paket induk, perbarui kuantitas seluruh rincian komponen sub-item
+        if (items[idx].bundle_id) {
+            const bId = items[idx].bundle_id;
+            items.forEach((child, cIdx) => {
+                if (child.parent_bundle_id === bId) {
+                    const baseQ = child.base_qty || 1;
+                    child.qty = baseQ * val;
+                    $(`#itemsTableBody tr[data-index="${cIdx}"] .item-field-qty`).val(child.qty);
+                }
+            });
+        }
         recalculateRow(idx);
     });
     $(document).on('input change', '.item-field-unit', function() {

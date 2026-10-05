@@ -1,0 +1,715 @@
+{
+  "8800376": {
+    "package_code": "8800376",
+    "package_name": "PAKET HEMAT 8 CHANNEL LOEWIX BY DAHUA",
+    "items": [
+      {
+        "code": "8800455",
+        "name": "--LOEWIX #LX-4F320CM AHD CAMERA INDOOR 2MP CATEYES AUDIO",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Komponen Paket 8CH Dahua (Kamera Indoor)"
+      },
+      {
+        "code": "8800456",
+        "name": "--LOEWIX #LX-50F320CM AHD CAMERA OUTDOOR 2MP CATEYES AUDIO",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Komponen Paket 8CH Dahua (Kamera Outdoor)"
+      },
+      {
+        "code": "8800062",
+        "name": "--LOEWIX XVR #LX-XVR08-I 2MP 8CH BY DAHUA",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket 8CH Dahua (XVR 8CH)"
+      },
+      {
+        "code": "8800100",
+        "name": "--LOEWIX PSU 12V-96W 8CH",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket 8CH Dahua (Power Supply)"
+      },
+      {
+        "code": "8800081",
+        "name": "--LOEWIX KABEL RG59 + POWER 50M (WHITE)",
+        "qty": 2,
+        "unit": "ROLL",
+        "description": "Komponen Paket 8CH Dahua (Kabel RG59)"
+      },
+      {
+        "code": "8800107",
+        "name": "--LOEWIX CONNECTOR BNC HIGH QUALITY",
+        "qty": 16,
+        "unit": "PCS",
+        "description": "Komponen Paket 8CH Dahua (Konektor BNC)"
+      },
+      {
+        "code": "8800109",
+        "name": "--LOEWIX CONNECTOR MALE DC POWER",
+        "qty": 8,
+        "unit": "PCS",
+        "description": "Komponen Paket 8CH Dahua (Konektor DC)"
+      }
+    ]
+  },
+  "8800361": {
+    "package_code": "8800361",
+    "package_name": "PAKET HEMAT 4 CHANNEL LOEWIX BY DAHUA",
+    "items": [
+      {
+        "code": "8800455",
+        "name": "--LOEWIX #LX-4F320CM AHD CAMERA INDOOR 2MP CATEYES AUDIO",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket 4CH Dahua (Kamera Indoor)"
+      },
+      {
+        "code": "8800456",
+        "name": "--LOEWIX #LX-50F320CM AHD CAMERA OUTDOOR 2MP CATEYES AUDIO",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket 4CH Dahua (Kamera Outdoor)"
+      },
+      {
+        "code": "8800061",
+        "name": "--LOEWIX XVR #LX-XVR04-I 2MP 4CH BY DAHUA",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket 4CH Dahua (XVR 4CH)"
+      },
+      {
+        "code": "8800099",
+        "name": "--LOEWIX PSU 12V-60W 4CH",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket 4CH Dahua (Power Supply)"
+      },
+      {
+        "code": "8800081",
+        "name": "--LOEWIX KABEL RG59 + POWER 50M (WHITE)",
+        "qty": 1,
+        "unit": "ROLL",
+        "description": "Komponen Paket 4CH Dahua (Kabel RG59)"
+      },
+      {
+        "code": "8800107",
+        "name": "--LOEWIX CONNECTOR BNC HIGH QUALITY",
+        "qty": 8,
+        "unit": "PCS",
+        "description": "Komponen Paket 4CH Dahua (Konektor BNC)"
+      },
+      {
+        "code": "8800109",
+        "name": "--LOEWIX CONNECTOR MALE DC POWER",
+        "qty": 4,
+        "unit": "PCS",
+        "description": "Komponen Paket 4CH Dahua (Konektor DC)"
+      }
+    ]
+  },
+  "8800391": {
+    "package_code": "8800391",
+    "package_name": "PAKET HEMAT IPCAM 4MP 8 CHANNEL",
+    "items": [
+      {
+        "code": "8800026",
+        "name": "--LOEWIX #LX-2230 IP CAMERA INDOOR 5MP CAT EYES, BUILT IN MIC",
+        "qty": 8,
+        "unit": "UNIT",
+        "description": "Komponen Paket IPCAM 8CH (IP Camera)"
+      },
+      {
+        "code": "8800063",
+        "name": "--LOEWIX NVR 5MP 10CH #LX-NVR1908",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket IPCAM 8CH (NVR)"
+      },
+      {
+        "code": "8800072",
+        "name": "--LOEWIX #LX-2108N POE SWITCH 8 PORT + 2 10/100",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket IPCAM 8CH (PoE Switch)"
+      },
+      {
+        "code": "8800281",
+        "name": "--HDD TOSHIBA 3,5\" SURVEILLANCE 2 TB",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket IPCAM 8CH (Harddisk 2TB)"
+      },
+      {
+        "code": "8800220",
+        "name": "--CONNECTOR RJ-45 LAN @50 PCS / PACK",
+        "qty": 20,
+        "unit": "PCS",
+        "description": "Komponen Paket IPCAM 8CH (Konektor RJ45)"
+      },
+      {
+        "code": "8800146",
+        "name": "--BIAYA INSTALASI",
+        "qty": 8,
+        "unit": "NODE",
+        "description": "Komponen Paket IPCAM 8CH (Instalasi Node)"
+      }
+    ]
+  },
+  "8800389": {
+    "package_code": "8800389",
+    "package_name": "PAKET HEMAT IPCAM 4MP 16 CHANNEL",
+    "items": [
+      {
+        "code": "8800026",
+        "name": "--LOEWIX #LX-2230 IP CAMERA INDOOR 5MP CAT EYES, BUILT IN MIC",
+        "qty": 16,
+        "unit": "UNIT",
+        "description": "Komponen Paket IPCAM 16CH (IP Camera)"
+      },
+      {
+        "code": "8800066",
+        "name": "--LOEWIX NVR 4K 16CH #LX-NVR217165A",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket IPCAM 16CH (NVR)"
+      },
+      {
+        "code": "8800072",
+        "name": "--LOEWIX #LX-2108N POE SWITCH 8 PORT + 2 10/100",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket IPCAM 16CH (PoE Switch)"
+      },
+      {
+        "code": "8800281",
+        "name": "--HDD TOSHIBA 3,5\" SURVEILLANCE 2 TB",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket IPCAM 16CH (Harddisk 2TB)"
+      },
+      {
+        "code": "8800220",
+        "name": "--CONNECTOR RJ-45 LAN @50 PCS / PACK",
+        "qty": 40,
+        "unit": "PCS",
+        "description": "Komponen Paket IPCAM 16CH (Konektor RJ45)"
+      },
+      {
+        "code": "8800146",
+        "name": "--BIAYA INSTALASI",
+        "qty": 16,
+        "unit": "NODE",
+        "description": "Komponen Paket IPCAM 16CH (Instalasi Node)"
+      }
+    ]
+  },
+  "8800349": {
+    "package_code": "8800349",
+    "package_name": "PAKET PROMO SPESIAL 2MP AHD 4 CHANNEL",
+    "items": [
+      {
+        "code": "8800455",
+        "name": "--LOEWIX #LX-4F320CM AHD CAMERA INDOOR 2MP CATEYES AUDIO",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo 4CH (Kamera Indoor)"
+      },
+      {
+        "code": "8800456",
+        "name": "--LOEWIX #LX-50F320CM AHD CAMERA OUTDOOR 2MP CATEYES AUDIO",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo 4CH (Kamera Outdoor)"
+      },
+      {
+        "code": "8800061",
+        "name": "--LOEWIX XVR #LX-XVR04-I 2MP 4CH BY DAHUA",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo 4CH (XVR)"
+      },
+      {
+        "code": "8800099",
+        "name": "--LOEWIX PSU 12V-60W 4CH",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo 4CH (Power Supply)"
+      }
+    ]
+  },
+  "8800502": {
+    "package_code": "8800502",
+    "package_name": "PAKET PROMO SPESIAL 2MP AHD 8 CHANNEL",
+    "items": [
+      {
+        "code": "8800455",
+        "name": "--LOEWIX #LX-4F320CM AHD CAMERA INDOOR 2MP CATEYES AUDIO",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo 8CH (Kamera Indoor)"
+      },
+      {
+        "code": "8800456",
+        "name": "--LOEWIX #LX-50F320CM AHD CAMERA OUTDOOR 2MP CATEYES AUDIO",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo 8CH (Kamera Outdoor)"
+      },
+      {
+        "code": "8800062",
+        "name": "--LOEWIX XVR #LX-XVR08-I 2MP 8CH BY DAHUA",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo 8CH (XVR)"
+      },
+      {
+        "code": "8800100",
+        "name": "--LOEWIX PSU 12V-96W 8CH",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo 8CH (Power Supply)"
+      }
+    ]
+  },
+  "8800383": {
+    "package_code": "8800383",
+    "package_name": "PAKET HEMAT LOEWIX 8 KAMERA 2MP",
+    "items": [
+      {
+        "code": "8800056",
+        "name": "--LOEWIX DVR #LX-2208CH 2MP 8CH AUDIO",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket 8 Kamera 2MP (DVR)"
+      },
+      {
+        "code": "8800100",
+        "name": "--LOEWIX PSU 12V-96W 8CH",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket 8 Kamera 2MP (PSU)"
+      },
+      {
+        "code": "8800107",
+        "name": "--LOEWIX CONNECTOR BNC HIGH QUALITY",
+        "qty": 16,
+        "unit": "PCS",
+        "description": "Komponen Paket 8 Kamera 2MP (BNC)"
+      },
+      {
+        "code": "8800109",
+        "name": "--LOEWIX CONNECTOR MALE DC POWER",
+        "qty": 8,
+        "unit": "PCS",
+        "description": "Komponen Paket 8 Kamera 2MP (DC)"
+      },
+      {
+        "code": "8800455",
+        "name": "--LOEWIX #LX-4F320CM AHD CAMERA INDOOR 2MP CATEYES AUDIO",
+        "qty": 8,
+        "unit": "UNIT",
+        "description": "Komponen Paket 8 Kamera 2MP (Kamera)"
+      },
+      {
+        "code": "8800081",
+        "name": "--LOEWIX KABEL RG59 + POWER 50M (WHITE)",
+        "qty": 1,
+        "unit": "ROLL",
+        "description": "Komponen Paket 8 Kamera 2MP (Kabel)"
+      }
+    ]
+  },
+  "8800351": {
+    "package_code": "8800351",
+    "package_name": "PAKET LOEWIX 4 KAMERA 2MP AHD FULLCOLOR + MIC FREE XVR 4CH BY DAHUA",
+    "items": [
+      {
+        "code": "8800001",
+        "name": "--LOEWIX #LWX-HDW1200CLQ 2MP INDOOR AHD FULLCOLOR + MIC BY DAHUA",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket Fullcolor 4CH (Indoor)"
+      },
+      {
+        "code": "8800002",
+        "name": "--LOEWIX #LWX-HFW1200CLQ 2MP OUTDOOR AHD FULLCOLOR + MIC BY DAHUA",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket Fullcolor 4CH (Outdoor)"
+      },
+      {
+        "code": "8800061",
+        "name": "--LOEWIX XVR #LX-XVR04-I 2MP 4CH BY DAHUA",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Fullcolor 4CH (XVR)"
+      },
+      {
+        "code": "8800099",
+        "name": "--LOEWIX PSU 12V-60W 4CH",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Fullcolor 4CH (PSU)"
+      }
+    ]
+  },
+  "8800352": {
+    "package_code": "8800352",
+    "package_name": "PAKET INSTALASI LOEWIX 8 KAMERA 2MP AHD FULLCOLOR + MIC FREE XVR 8CH BY DAHUA",
+    "items": [
+      {
+        "code": "8800001",
+        "name": "--LOEWIX #LWX-HDW1200CLQ 2MP INDOOR AHD FULLCOLOR + MIC BY DAHUA",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Komponen Paket Fullcolor 8CH (Indoor)"
+      },
+      {
+        "code": "8800002",
+        "name": "--LOEWIX #LWX-HFW1200CLQ 2MP OUTDOOR AHD FULLCOLOR + MIC BY DAHUA",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Komponen Paket Fullcolor 8CH (Outdoor)"
+      },
+      {
+        "code": "8800062",
+        "name": "--LOEWIX XVR #LX-XVR08-I 2MP 8CH BY DAHUA",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Fullcolor 8CH (XVR)"
+      },
+      {
+        "code": "8800100",
+        "name": "--LOEWIX PSU 12V-96W 8CH",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Fullcolor 8CH (PSU)"
+      },
+      {
+        "code": "8800146",
+        "name": "--BIAYA INSTALASI",
+        "qty": 8,
+        "unit": "NODE",
+        "description": "Komponen Paket Fullcolor 8CH (Instalasi)"
+      }
+    ]
+  },
+  "8800513": {
+    "package_code": "8800513",
+    "package_name": "PAKET PROMO IPCAM 4MP 4 CHANNEL",
+    "items": [
+      {
+        "code": "8800026",
+        "name": "--LOEWIX #LX-2230 IP CAMERA INDOOR 4MP CAT EYES, BUILT IN MIC",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo IPCAM 4CH (IP Camera)"
+      },
+      {
+        "code": "8800063",
+        "name": "--LOEWIX NVR 4K 10CH #LX-NVR1908",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo IPCAM 4CH (NVR)"
+      },
+      {
+        "code": "8800072",
+        "name": "--LOEWIX #LX-2108N POE SWITCH 8 PORT + 2 10/100",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo IPCAM 4CH (PoE Switch)"
+      }
+    ]
+  },
+  "8800514": {
+    "package_code": "8800514",
+    "package_name": "PAKET PROMO IPCAM 4MP 8 CHANNEL",
+    "items": [
+      {
+        "code": "8800026",
+        "name": "--LOEWIX #LX-2230 IP CAMERA INDOOR 4MP CAT EYES, BUILT IN MIC",
+        "qty": 8,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo IPCAM 8CH (IP Camera)"
+      },
+      {
+        "code": "8800063",
+        "name": "--LOEWIX NVR 4K 10CH #LX-NVR1908",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo IPCAM 8CH (NVR)"
+      },
+      {
+        "code": "8800072",
+        "name": "--LOEWIX #LX-2108N POE SWITCH 8 PORT + 2 10/100",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Promo IPCAM 8CH (PoE Switch)"
+      }
+    ]
+  },
+  "8800515": {
+    "package_code": "8800515",
+    "package_name": "PAKET SPESIAL 2MP AHD 4 CHANNEL FULL COLOR",
+    "items": [
+      {
+        "code": "8800001",
+        "name": "--LOEWIX #LWX-HDW1200CLQ 2MP INDOOR AHD FULLCOLOR + MIC BY DAHUA",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket Spesial 4CH (Indoor)"
+      },
+      {
+        "code": "8800002",
+        "name": "--LOEWIX #LWX-HFW1200CLQ 2MP OUTDOOR AHD FULLCOLOR + MIC BY DAHUA",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Komponen Paket Spesial 4CH (Outdoor)"
+      },
+      {
+        "code": "8800061",
+        "name": "--LOEWIX XVR #LX-XVR04-I 2MP 4CH BY DAHUA",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Spesial 4CH (XVR)"
+      },
+      {
+        "code": "8800099",
+        "name": "--LOEWIX PSU 12V-60W 4CH",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Spesial 4CH (PSU)"
+      }
+    ]
+  },
+  "8800516": {
+    "package_code": "8800516",
+    "package_name": "PAKET SPESIAL 2MP AHD 8 CHANNEL FULL COLOR",
+    "items": [
+      {
+        "code": "8800001",
+        "name": "--LOEWIX #LWX-HDW1200CLQ 2MP INDOOR AHD FULLCOLOR + MIC BY DAHUA",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Komponen Paket Spesial 8CH (Indoor)"
+      },
+      {
+        "code": "8800002",
+        "name": "--LOEWIX #LWX-HFW1200CLQ 2MP OUTDOOR AHD FULLCOLOR + MIC BY DAHUA",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Komponen Paket Spesial 8CH (Outdoor)"
+      },
+      {
+        "code": "8800062",
+        "name": "--LOEWIX XVR #LX-XVR08-I 2MP 8CH BY DAHUA",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Spesial 8CH (XVR)"
+      },
+      {
+        "code": "8800100",
+        "name": "--LOEWIX PSU 12V-96W 8CH",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Komponen Paket Spesial 8CH (PSU)"
+      }
+    ]
+  },
+  "8800333": {
+    "package_code": "8800333",
+    "package_name": "PAKET BNC + DC CONNECTOR MALE FEMALE",
+    "items": [
+      {
+        "code": "8800107",
+        "name": "--LOEWIX CONNECTOR BNC HIGH QUALITY",
+        "qty": 2,
+        "unit": "PCS",
+        "description": "Komponen Paket BNC + DC"
+      },
+      {
+        "code": "8800109",
+        "name": "--LOEWIX CONNECTOR MALE DC POWER",
+        "qty": 1,
+        "unit": "PCS",
+        "description": "Komponen Paket BNC + DC"
+      }
+    ]
+  },
+  "8800064": {
+    "package_code": "8800064",
+    "package_name": "LOEWIX NVR 4K 10CH #LX-NVR217085A + 2TB HDD",
+    "items": [
+      {
+        "code": "8800063",
+        "name": "--LOEWIX NVR 4K 10CH #LX-NVR1908",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "NVR 10CH Unit"
+      },
+      {
+        "code": "8800281",
+        "name": "--HDD TOSHIBA 3,5\" SURVEILLANCE 2 TB",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Harddisk 2TB Surveillance"
+      }
+    ]
+  },
+  "8800066": {
+    "package_code": "8800066",
+    "package_name": "LOEWIX NVR 4K 16CH #LX-NVR217165A + 4TB HDD",
+    "items": [
+      {
+        "code": "8800066",
+        "name": "--LOEWIX NVR 4K 16CH #LX-NVR217165A",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "NVR 16CH Unit"
+      },
+      {
+        "code": "8800281",
+        "name": "--HDD TOSHIBA 3,5\" SURVEILLANCE 2 TB",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Harddisk 2TB x 2 Unit"
+      }
+    ]
+  },
+  "8800504": {
+    "package_code": "8800504",
+    "package_name": "LOEWIX NVR 4K 36CH 2 HDD #LX-21936 + 8TB HDD",
+    "items": [
+      {
+        "code": "8800504",
+        "name": "--LOEWIX NVR 4K 36CH 2 HDD #LX-21936",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "NVR 36CH Unit"
+      },
+      {
+        "code": "8800281",
+        "name": "--HDD TOSHIBA 3,5\" SURVEILLANCE 2 TB",
+        "qty": 4,
+        "unit": "UNIT",
+        "description": "Harddisk 2TB x 4 Unit"
+      }
+    ]
+  },
+  "8800406": {
+    "package_code": "8800406",
+    "package_name": "LOEWIX IP CAMERA INDOOR 4MP +ADAPTOR",
+    "items": [
+      {
+        "code": "8800026",
+        "name": "--LOEWIX #LX-2230 IP CAMERA INDOOR 4MP CAT EYES, BUILT IN MIC",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Kamera IP Indoor"
+      },
+      {
+        "code": "8800142",
+        "name": "--PARTS ADAPTOR 12V-2A",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "Adaptor 12V-2A"
+      }
+    ]
+  },
+  "8800436": {
+    "package_code": "8800436",
+    "package_name": "PAKET LOEWIX KABEL LAN UTP CAT 6 CCA 305M (GRAY) BELI 10 ROLL DAPAT 18 ROLL",
+    "items": [
+      {
+        "code": "8800438",
+        "name": "--LOEWIX KABEL LAN UTP CAT 6 CCA 305M (GRAY)",
+        "qty": 18,
+        "unit": "ROLL",
+        "description": "Kabel LAN Promo 18 Roll"
+      }
+    ]
+  },
+  "8800444": {
+    "package_code": "8800444",
+    "package_name": "PAKET LOEWIX KABEL LAN UTP CAT 6 CCA 305M (GRAY) BELI 5 ROLL DAPAT 8 ROLL",
+    "items": [
+      {
+        "code": "8800438",
+        "name": "--LOEWIX KABEL LAN UTP CAT 6 CCA 305M (GRAY)",
+        "qty": 8,
+        "unit": "ROLL",
+        "description": "Kabel LAN Promo 8 Roll"
+      }
+    ]
+  },
+  "8800423": {
+    "package_code": "8800423",
+    "package_name": "PAKET NEW DEALER KAMERA ANALOG 2MP CATEYES",
+    "items": [
+      {
+        "code": "8800455",
+        "name": "--LOEWIX #LX-4F320CM AHD CAMERA INDOOR 2MP CATEYES AUDIO",
+        "qty": 10,
+        "unit": "UNIT",
+        "description": "Kamera Indoor 10 Unit"
+      },
+      {
+        "code": "8800456",
+        "name": "--LOEWIX #LX-50F320CM AHD CAMERA OUTDOOR 2MP CATEYES AUDIO",
+        "qty": 10,
+        "unit": "UNIT",
+        "description": "Kamera Outdoor 10 Unit"
+      },
+      {
+        "code": "8800061",
+        "name": "--LOEWIX XVR #LX-XVR04-I 2MP 4CH BY DAHUA",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "XVR 4CH 2 Unit"
+      },
+      {
+        "code": "8800062",
+        "name": "--LOEWIX XVR #LX-XVR08-I 2MP 8CH BY DAHUA",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "XVR 8CH 2 Unit"
+      }
+    ]
+  },
+  "8800416": {
+    "package_code": "8800416",
+    "package_name": "PAKET HEMAT DEALER",
+    "items": [
+      {
+        "code": "8800455",
+        "name": "--LOEWIX #LX-4F320CM AHD CAMERA INDOOR 2MP CATEYES AUDIO",
+        "qty": 20,
+        "unit": "UNIT",
+        "description": "Kamera Indoor 20 Unit"
+      },
+      {
+        "code": "8800456",
+        "name": "--LOEWIX #LX-50F320CM AHD CAMERA OUTDOOR 2MP CATEYES AUDIO",
+        "qty": 20,
+        "unit": "UNIT",
+        "description": "Kamera Outdoor 20 Unit"
+      },
+      {
+        "code": "8800061",
+        "name": "--LOEWIX XVR #LX-XVR04-I 2MP 4CH BY DAHUA",
+        "qty": 5,
+        "unit": "UNIT",
+        "description": "XVR 4CH 5 Unit"
+      },
+      {
+        "code": "8800062",
+        "name": "--LOEWIX XVR #LX-XVR08-I 2MP 8CH BY DAHUA",
+        "qty": 3,
+        "unit": "UNIT",
+        "description": "XVR 8CH 3 Unit"
+      }
+    ]
+  }
+}

@@ -205,10 +205,15 @@ if ($action === 'search_products') {
     
     $results = [];
     while ($row = $res->fetch_assoc()) {
-        $rawDesc = trim($row['description'] ?? '');
+        // Bersihkan deskripsi jika merupakan string metadata internal (Kode / Satuan / GROUP)
+        if (strpos($rawDesc, 'Kode: ') === 0 && strpos($rawDesc, 'Satuan: ') !== false) {
+            $rawDesc = '';
+        }
         $code = !empty($row['item_code']) ? $row['item_code'] : $row['type'];
         $unit = !empty($row['unit']) ? $row['unit'] : 'UNIT';
-        $displayText = "[{$row['category']}] {$row['type']}" . (!empty($row['item_code']) ? " ({$row['item_code']})" : "") . ($row['msrp'] > 0 ? " — Rp " . number_format($row['msrp'], 0, ',', '.') : "");
+        $isPkg = (strpos($row['category'], 'PAKET') !== false || strpos($row['description'] ?? '', 'GROUP') !== false);
+        $badgePkg = $isPkg ? " [PAKET BUNDLE]" : "";
+        $displayText = "[{$row['category']}] {$row['type']}" . (!empty($row['item_code']) ? " ({$row['item_code']})" : "") . $badgePkg . ($row['msrp'] > 0 ? " — Rp " . number_format($row['msrp'], 0, ',', '.') : "");
 
         $results[] = [
             'id' => (int)$row['id'],
@@ -219,11 +224,49 @@ if ($action === 'search_products') {
             'description' => $rawDesc,
             'msrp' => (float)$row['msrp'],
             'unit' => $unit,
+            'is_package' => $isPkg,
             'text' => $displayText
         ];
     }
     
     echo json_encode(['results' => $results]);
+    exit;
+}
+
+// =========================================================================
+// ACTION: GET PACKAGE BUNDLE ITEMS
+// =========================================================================
+if ($action === 'get_package_bundle') {
+    $code = trim($_GET['code'] ?? '');
+    $items = [];
+    if (!empty($code)) {
+        $stmt = $conn->prepare("SELECT item_code, item_name, qty, unit FROM product_package_bundles WHERE package_code = ? ORDER BY sort_order ASC, id ASC");
+        if ($stmt) {
+            $stmt->bind_param("s", $code);
+            $stmt->execute();
+            $items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+        }
+        
+        // Fallback to json file if DB table empty
+        if (empty($items)) {
+            $jsonFile = __DIR__ . '/includes/package_bundles.json';
+            if (file_exists($jsonFile)) {
+                $bundles = json_decode(file_get_contents($jsonFile), true) ?: [];
+                if (isset($bundles[$code]['items'])) {
+                    foreach ($bundles[$code]['items'] as $it) {
+                        $items[] = [
+                            'item_code' => $it['code'],
+                            'item_name' => $it['name'],
+                            'qty' => (int)$it['qty'],
+                            'unit' => $it['unit'] ?? 'UNIT'
+                        ];
+                    }
+                }
+            }
+        }
+    }
+    echo json_encode(['success' => true, 'package_code' => $code, 'items' => $items]);
     exit;
 }
 

@@ -144,5 +144,42 @@ if (!function_exists('ensureSalesOrderTables')) {
         if ($chkColDiscPct && $chkColDiscPct->num_rows === 0) {
             @$conn->query("ALTER TABLE `sales_order_items` ADD COLUMN `discount_percent` decimal(5,2) DEFAULT 0.00 AFTER `unit_price`");
         }
+
+        // 4. Table product_package_bundles
+        $conn->query("CREATE TABLE IF NOT EXISTS `product_package_bundles` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `package_code` varchar(50) NOT NULL,
+            `package_name` varchar(255) NOT NULL,
+            `item_code` varchar(50) NOT NULL,
+            `item_name` varchar(255) NOT NULL,
+            `qty` int(11) NOT NULL DEFAULT 1,
+            `unit` varchar(20) DEFAULT 'UNIT',
+            `sort_order` int(11) DEFAULT 0,
+            PRIMARY KEY (`id`),
+            INDEX (`package_code`),
+            INDEX (`item_code`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $chkBundle = $conn->query("SELECT COUNT(*) as cnt FROM `product_package_bundles`");
+        if ($chkBundle && ($rB = $chkBundle->fetch_assoc()) && (int)$rB['cnt'] === 0) {
+            $jsonFile = __DIR__ . '/package_bundles.json';
+            if (file_exists($jsonFile)) {
+                $bundles = json_decode(file_get_contents($jsonFile), true);
+                if (is_array($bundles)) {
+                    $st = $conn->prepare("INSERT INTO `product_package_bundles` (package_code, package_name, item_code, item_name, qty, unit, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    if ($st) {
+                        foreach ($bundles as $pkgCode => $pkg) {
+                            $pkgName = $pkg['package_name'] ?? '';
+                            foreach (($pkg['items'] ?? []) as $sIdx => $it) {
+                                $sort = $sIdx + 1;
+                                $st->bind_param("ssssisi", $pkgCode, $pkgName, $it['code'], $it['name'], $it['qty'], $it['unit'], $sort);
+                                $st->execute();
+                            }
+                        }
+                        $st->close();
+                    }
+                }
+            }
+        }
     }
 }
