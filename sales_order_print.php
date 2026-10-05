@@ -83,6 +83,11 @@ function terbilang($nilai) {
 
 $defaultBrand = $_GET['brand'] ?? 'GRAVITTI';
 $defaultTitle = $_GET['title'] ?? 'PROFORMA INVOICE';
+
+// Barcode Resmi QRIS BCA (GRAVITTI TECHNOLOGY) sesuai dokumen PDF referensi
+$qrisImgPath = __DIR__ . '/assets/images/qris_bca.png';
+$qrisBase64 = file_exists($qrisImgPath) ? base64_encode(file_get_contents($qrisImgPath)) : '';
+$qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'assets/images/qris_bca.png';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -310,21 +315,17 @@ $defaultTitle = $_GET['title'] ?? 'PROFORMA INVOICE';
             margin-bottom: 6px;
         }
 
-        .qris-box {
-            border: 1px solid #000000;
-            background: #FFFFFF;
-            padding: 6px 8px;
+        .qris-img-container {
             display: inline-block;
-            text-align: center;
+            margin-top: 2px;
         }
 
-        .qris-brand-title {
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-            color: #000000;
-            text-transform: uppercase;
+        .qris-accurate-img {
+            width: 122px;
+            height: auto;
+            display: block;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
         }
 
         .bottom-right {
@@ -594,23 +595,10 @@ $defaultTitle = $_GET['title'] ?? 'PROFORMA INVOICE';
                 <div class="dashed-divider"></div>
 
                 <div class="qris-label">Pembayaran melalui QRIS :</div>
-                <div class="qris-box">
-                    <div class="qris-brand-title" id="qrisBrandTitle"><?php echo htmlspecialchars($defaultBrand); ?> TECHNOLOGY</div>
-                    <!-- Real QR Code with inline SVG fallback -->
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=105x105&margin=0&data=<?php echo urlencode('SO-' . (!empty($order['so_number']) ? $order['so_number'] : $order['id']) . '-TOTAL-' . $order['grand_total']); ?>" 
-                         alt="QRIS Code" width="100" height="100" style="display:block; margin:0 auto;"
-                         onerror="this.style.display='none'; document.getElementById('qrFallback').style.display='block';">
-                    
-                    <div id="qrFallback" style="display:none; width:100px; height:100px; margin:0 auto; background:#F8FAFC; border:1px solid #CBD5E1; padding:10px;">
-                        <svg viewBox="0 0 24 24" width="80" height="80" fill="#000">
-                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14 0h4v4h-4v-4zm-4-2h2v2h-2v-2zm-2 2h2v2h-2v-2zm4 4h2v2h-2v-2zm-2 2h2v2h-2v-2zm-4-4h2v2h-2v-2zm6-4h2v2h-2v-2zm2 2h2v2h-2v-2zm-4 4h2v2h-2v-2z"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <div style="font-size: 10px; color: #4B5563; margin-top: 6px; line-height: 1.4;">
-                    Transfer Bank BCA: <strong>123-456-7890</strong> a/n PT. GITI CCTV INDONESIA<br>
-                    Transfer Mandiri: <strong>987-654-3210</strong> a/n PT. GITI CCTV INDONESIA
+                <div class="qris-img-container">
+                    <img src="<?php echo $qrisSrc; ?>" 
+                         alt="QRIS BCA - GRAVITTI TECHNOLOGY" 
+                         class="qris-accurate-img">
                 </div>
             </div>
 
@@ -677,14 +665,12 @@ $defaultTitle = $_GET['title'] ?? 'PROFORMA INVOICE';
         const docTitleSelect = document.getElementById('selectDocTitle');
         const brandText = document.getElementById('brandLogoText');
         const docTitleText = document.getElementById('docMainTitle');
-        const qrisBrandText = document.getElementById('qrisBrandTitle');
 
         // Restore saved preference if any
         const savedBrand = localStorage.getItem('so_print_brand');
         if (savedBrand && brandSelect) {
             brandSelect.value = savedBrand;
             brandText.innerText = savedBrand;
-            qrisBrandText.innerText = (savedBrand === 'GRAVITTI' ? 'GRAVITTI TECHNOLOGY' : savedBrand);
         }
 
         const savedTitle = localStorage.getItem('so_print_title');
@@ -698,7 +684,6 @@ $defaultTitle = $_GET['title'] ?? 'PROFORMA INVOICE';
         brandSelect.addEventListener('change', function() {
             const val = this.value;
             brandText.innerText = val;
-            qrisBrandText.innerText = (val === 'GRAVITTI' ? 'GRAVITTI TECHNOLOGY' : val);
             localStorage.setItem('so_print_brand', val);
         });
 
