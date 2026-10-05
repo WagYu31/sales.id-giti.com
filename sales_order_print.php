@@ -645,8 +645,8 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
                     <div class="signature-box">
                         <div style="font-weight: 600;">Bagian Penjualan,</div>
                         <div class="signature-line"></div>
-                        <div style="text-align: left; font-size: 11px;">
-                            Tgl. <?php echo !empty($order['sales_name']) ? ('&bull; ' . htmlspecialchars($order['sales_name'])) : ''; ?>
+                        <div style="text-align: center; font-size: 11.5px; font-weight: 600;">
+                            <?php echo htmlspecialchars($order['sales_name'] ?? ''); ?>
                         </div>
                     </div>
                 </div>
