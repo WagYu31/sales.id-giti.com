@@ -43,9 +43,9 @@ $bulanIndo = [
 $tglTime = strtotime($order['so_date'] ?? 'now');
 $tglFormatted = date('d', $tglTime) . ' ' . ($bulanIndo[(int)date('n', $tglTime)] ?? date('M', $tglTime)) . ' ' . date('Y', $tglTime);
 
-// Fungsi Terbilang Rupiah
+// Fungsi Terbilang Rupiah (PHP 8.1+ Type Safe)
 function penyebut($nilai) {
-    $nilai = abs($nilai);
+    $nilai = (int)round(abs((float)$nilai));
     $huruf = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
     $temp = "";
     if ($nilai < 12) {
@@ -53,21 +53,21 @@ function penyebut($nilai) {
     } else if ($nilai < 20) {
         $temp = penyebut($nilai - 10). " Belas";
     } else if ($nilai < 100) {
-        $temp = penyebut($nilai/10)." Puluh". penyebut($nilai % 10);
+        $temp = penyebut((int)($nilai/10))." Puluh". penyebut($nilai % 10);
     } else if ($nilai < 200) {
         $temp = " Seratus" . penyebut($nilai - 100);
     } else if ($nilai < 1000) {
-        $temp = penyebut($nilai/100) . " Ratus" . penyebut($nilai % 100);
+        $temp = penyebut((int)($nilai/100)) . " Ratus" . penyebut($nilai % 100);
     } else if ($nilai < 2000) {
         $temp = " Seribu" . penyebut($nilai - 1000);
     } else if ($nilai < 1000000) {
-        $temp = penyebut($nilai/1000) . " Ribu" . penyebut($nilai % 1000);
+        $temp = penyebut((int)($nilai/1000)) . " Ribu" . penyebut($nilai % 1000);
     } else if ($nilai < 1000000000) {
-        $temp = penyebut($nilai/1000000) . " Juta" . penyebut($nilai % 1000000);
+        $temp = penyebut((int)($nilai/1000000)) . " Juta" . penyebut(fmod($nilai,1000000));
     } else if ($nilai < 1000000000000) {
-        $temp = penyebut($nilai/1000000000) . " Milyar" . penyebut(fmod($nilai,1000000000));
+        $temp = penyebut((int)($nilai/1000000000)) . " Milyar" . penyebut(fmod($nilai,1000000000));
     } else if ($nilai < 1000000000000000) {
-        $temp = penyebut($nilai/1000000000000) . " Trilyun" . penyebut(fmod($nilai,1000000000000));
+        $temp = penyebut((int)($nilai/1000000000000)) . " Trilyun" . penyebut(fmod($nilai,1000000000000));
     }     
     return $temp;
 }
@@ -90,10 +90,11 @@ $qrisBase64 = file_exists($qrisImgPath) ? base64_encode(file_get_contents($qrisI
 $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'assets/images/qris_bca.png';
 ?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="notranslate" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
     <title><?php echo htmlspecialchars($defaultTitle); ?> - <?php echo htmlspecialchars(!empty($order['so_number']) ? $order['so_number'] : ('ID #' . $order['id'])); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
