@@ -35,6 +35,59 @@ while ($row = $itemsRes->fetch_assoc()) {
 }
 $stmtItems->close();
 
+// Intelligent Sub-item Normalization & Financial Auto-Correction
+// Memastikan semua komponen paket bernilai 0 dan tidak menduplikasi perhitungan subtotal
+$recalcSubtotal = 0;
+$hasCorrectedSubitems = false;
+
+foreach ($items as &$itm) {
+    $descLower = strtolower($itm['item_description'] ?? '');
+    $nameTrim = trim($itm['item_name'] ?? '');
+    $isSub = strpos($nameTrim, '--') === 0 || 
+             strpos($descLower, 'komponen paket') !== false || 
+             strpos($descLower, 'komponen dari') !== false ||
+             (!empty($itm['notes']) && strpos(strtolower($itm['notes']), 'komponen') !== false);
+
+    if ($isSub) {
+        if ((float)$itm['unit_price'] > 0 || (float)$itm['total_price'] > 0) {
+            $hasCorrectedSubitems = true;
+        }
+        $itm['unit_price'] = 0;
+        $itm['discount_percent'] = 0;
+        $itm['discount_item'] = 0;
+        $itm['total_price'] = 0;
+    } else {
+        $recalcSubtotal += (float)$itm['total_price'];
+    }
+}
+unset($itm);
+
+// Jika terdapat subitem paket yang sebelumnya salah tersimpan dengan harga nominal > 0
+if ($hasCorrectedSubitems || abs((float)$order['subtotal'] - $recalcSubtotal) > 1) {
+    $order['subtotal'] = $recalcSubtotal;
+    
+    $discAmount = (float)($order['discount_amount'] ?? 0);
+    if ($discAmount > $order['subtotal']) {
+        $discAmount = $order['subtotal'];
+        $order['discount_amount'] = $discAmount;
+    }
+    
+    $totalBeforeTax = max(0, $order['subtotal'] - $discAmount);
+    
+    if (!empty($order['is_taxable'])) {
+        if (!empty($order['tax_inclusive'])) {
+            $order['tax_amount'] = $totalBeforeTax - ($totalBeforeTax / 1.11);
+            $order['grand_total'] = $totalBeforeTax;
+        } else {
+            $order['tax_amount'] = $totalBeforeTax * 0.11;
+            $order['grand_total'] = $totalBeforeTax + $order['tax_amount'];
+        }
+    } else {
+        $order['tax_amount'] = 0;
+        $order['grand_total'] = $totalBeforeTax;
+    }
+}
+
 // Format Tanggal Bahasa Indonesia (contoh: 01 Okt 2026)
 $bulanIndo = [
     1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',

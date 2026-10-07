@@ -374,17 +374,34 @@ if ($action === 'save_sales_order') {
         $qty = max(1, (int)($itm['qty'] ?? 1));
         $unit = trim($itm['unit'] ?? 'PCS');
         $uPrice = (float)($itm['unit_price'] ?? 0);
-        $discPercent = max(0, min(100, (float)($itm['discount_percent'] ?? 0)));
-        if ($discPercent > 0) {
-            $discItem = $uPrice * ($discPercent / 100);
+
+        // Deteksi apakah item merupakan komponen sub-item dari paket bundle
+        $descLower = strtolower($iDesc);
+        $nameTrim = trim($iName);
+        $isSubItem = !empty($itm['is_subitem']) || 
+                     str_starts_with($nameTrim, '--') || 
+                     str_contains($descLower, 'komponen paket') || 
+                     str_contains($descLower, 'komponen dari') ||
+                     (!empty($itm['notes']) && str_contains(strtolower($itm['notes']), 'komponen'));
+
+        if ($isSubItem) {
+            $uPrice = 0;
+            $discPercent = 0;
+            $discItem = 0;
+            $lineTotal = 0;
         } else {
-            $discItem = (float)($itm['discount_item'] ?? 0);
-            if ($uPrice > 0 && $discItem > 0) {
-                $discPercent = round(($discItem / $uPrice) * 100, 2);
+            $discPercent = max(0, min(100, (float)($itm['discount_percent'] ?? 0)));
+            if ($discPercent > 0) {
+                $discItem = $uPrice * ($discPercent / 100);
+            } else {
+                $discItem = (float)($itm['discount_item'] ?? 0);
+                if ($uPrice > 0 && $discItem > 0) {
+                    $discPercent = round(($discItem / $uPrice) * 100, 2);
+                }
             }
+            $lineTotal = $qty * max(0, ($uPrice - $discItem));
         }
         
-        $lineTotal = $qty * max(0, ($uPrice - $discItem));
         $subtotal += $lineTotal;
         
         $processedItems[] = [

@@ -1030,6 +1030,10 @@ $(document).ready(function() {
             activeInitBundleId = item.bundle_id;
         } else if (isExplicitSub || (price === 0 && activeInitBundleId !== null)) {
             item.is_subitem = true;
+            item.unit_price = 0;
+            item.discount_percent = 0;
+            item.discount_item = 0;
+            item.total_price = 0;
             if (!item.parent_bundle_id && activeInitBundleId) {
                 item.parent_bundle_id = activeInitBundleId;
             }
@@ -1299,6 +1303,10 @@ $(document).ready(function() {
             if (isSub) {
                 subIndex++;
                 item.is_subitem = true;
+                item.unit_price = 0;
+                item.discount_percent = 0;
+                item.discount_item = 0;
+                item.total_price = 0;
             } else if (!isPkg) {
                 activeParentPkg = null;
                 packageIndex++;
@@ -1519,7 +1527,7 @@ $(document).ready(function() {
                 items[idx].item_code = matched.code;
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-code`).val(matched.code);
             }
-            if (!items[idx].unit_price || items[idx].unit_price == 0) {
+            if (!items[idx].is_subitem && (!items[idx].unit_price || items[idx].unit_price == 0)) {
                 items[idx].unit_price = matched.msrp;
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-price`).val(matched.msrp);
             }
@@ -1587,7 +1595,7 @@ $(document).ready(function() {
                 items[idx].item_name = matched.name;
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-name`).val(matched.name);
             }
-            if (!items[idx].unit_price || items[idx].unit_price == 0) {
+            if (!items[idx].is_subitem && (!items[idx].unit_price || items[idx].unit_price == 0)) {
                 items[idx].unit_price = matched.msrp;
                 $(`#itemsTableBody tr[data-index="${idx}"] .item-field-price`).val(matched.msrp);
             }
@@ -1679,9 +1687,16 @@ $(document).ready(function() {
         const discAmountPerUnit = price * (discPct / 100);
         const total = itm.is_subitem ? 0 : qty * Math.max(0, price - discAmountPerUnit);
         
-        itm.discount_percent = itm.is_subitem ? 0 : discPct;
-        itm.discount_item = itm.is_subitem ? 0 : discAmountPerUnit;
-        itm.total_price = total;
+        if (itm.is_subitem) {
+            itm.unit_price = 0;
+            itm.discount_percent = 0;
+            itm.discount_item = 0;
+            itm.total_price = 0;
+        } else {
+            itm.discount_percent = discPct;
+            itm.discount_item = discAmountPerUnit;
+            itm.total_price = total;
+        }
 
         if (itm.is_subitem) {
             $(`#itemsTableBody tr[data-index="${idx}"] .line-total-cell`).html(`
@@ -1850,6 +1865,23 @@ $(document).ready(function() {
             Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Setiap baris barang harus memiliki Nama atau Kode barang.' });
             return;
         }
+
+        // Ensure all sub-items strictly maintain 0 price and 0 total
+        items.forEach(itm => {
+            const descLower = (itm.item_description || '').toLowerCase();
+            const nameTrim = (itm.item_name || '').trim();
+            const isSub = itm.is_subitem === true || 
+                          nameTrim.startsWith('--') || 
+                          descLower.includes('komponen paket') || 
+                          descLower.includes('komponen dari');
+            if (isSub) {
+                itm.is_subitem = true;
+                itm.unit_price = 0;
+                itm.discount_percent = 0;
+                itm.discount_item = 0;
+                itm.total_price = 0;
+            }
+        });
 
         // Prepare FormData
         const formData = new FormData($('#formSalesOrder')[0]);
