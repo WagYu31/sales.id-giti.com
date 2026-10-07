@@ -52,8 +52,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $file_key = 'media' . $i;
             if (isset($_FILES[$file_key]) && $_FILES[$file_key]['error'] == 0) {
                 if (in_array($_FILES[$file_key]['type'], $allowed_types) && $_FILES[$file_key]['size'] < 30000000) {
-                    $target_dir = "assets/uploads/";
-                    if (!is_dir($target_dir)) mkdir($target_dir, 0755, true);
+                    $target_dir = __DIR__ . "/assets/uploads/";
+                    if (!is_dir($target_dir)) {
+                        @mkdir($target_dir, 0777, true);
+                    }
+                    if (!is_writable($target_dir)) {
+                        @chmod($target_dir, 0777);
+                    }
                     
                     $original_filename = $_FILES[$file_key]["name"];
                     $extension = strtolower(pathinfo($original_filename, PATHINFO_EXTENSION));
@@ -61,12 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $filename = "{$sales_id_fu}_{$customer_id}_{$random_code}.{$extension}";
 
                     $target_file = $target_dir . $filename;
-                    if (move_uploaded_file($_FILES[$file_key]["tmp_name"], $target_file)) {
+                    if (@move_uploaded_file($_FILES[$file_key]["tmp_name"], $target_file)) {
                         // Server-side Automatic Image WebP Optimization & Compression
                         $finalFilename = optimizeUploadedImage($target_file, 80, 1920);
                         $media_paths[$i-1] = $finalFilename;
                     } else {
-                        $error .= "Gagal mengunggah {$file_key}. ";
+                        $error .= "Gagal mengunggah {$file_key} karena folder uploads di server tidak memiliki izin tulis (Permission Denied). ";
                     }
                 } else {
                      $error .= "File {$file_key} tidak valid atau terlalu besar. ";
