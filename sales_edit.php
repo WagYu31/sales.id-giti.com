@@ -64,8 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         
         if ($stmt_update->execute()) {
-            $_SESSION['flash_message'] = "Data sales '".htmlspecialchars($nama_lengkap)."' berhasil diperbarui.";
-            header("Location: sales_management.php");
+            $_SESSION['flash_message'] = "Data pengguna '".htmlspecialchars($nama_lengkap)."' berhasil diperbarui.";
+            if ($role === 'sales') {
+                header("Location: sales_management.php");
+            } else {
+                header("Location: role_menu_access.php?role=" . urlencode($role));
+            }
             exit();
         } else {
             $error = "Gagal memperbarui data.";
@@ -83,8 +87,8 @@ require_once 'includes/header.php';
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="bi bi-pencil-square"></i> Edit Data Sales</h1>
-    <a href="sales_management.php" class="btn btn-secondary">Kembali</a>
+    <h1><i class="bi bi-pencil-square"></i> Edit Data Pengguna / Sales</h1>
+    <a href="javascript:history.back()" class="btn btn-secondary"><i class="bi bi-arrow-left me-1"></i> Kembali</a>
 </div>
 
 <?php if ($error): ?>
@@ -104,18 +108,33 @@ require_once 'includes/header.php';
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password Baru (Opsional)</label>
-                <input type="password" class="form-control" id="password" name="password">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Kosongkan jika tidak diubah">
                 <small class="form-text text-muted">Kosongkan kolom ini jika Anda tidak ingin mengubah password.</small>
             </div>
             <div class="mb-3">
                 <label for="role" class="form-label">Role</label>
                 <select class="form-select" id="role" name="role">
-                    <option value="sales" <?php if($sales['role'] == 'sales') echo 'selected'; ?>>Sales</option>
-                    <option value="superadmin" <?php if($sales['role'] == 'superadmin') echo 'selected'; ?>>Superadmin</option>
+                    <?php
+                    $availableRoles = [
+                        'superadmin' => 'Super Admin',
+                        'admin'      => 'Admin Operasional',
+                        'adminsales' => 'Admin Sales',
+                        'sales'      => 'Sales',
+                        'manager'    => 'Sales Manager',
+                        'finance'    => 'Finance',
+                        'gudang'     => 'Gudang'
+                    ];
+                    $currentRole = strtolower($sales['role']);
+                    if (!array_key_exists($currentRole, $availableRoles) && !empty($currentRole)) {
+                        $availableRoles[$currentRole] = ucfirst($currentRole);
+                    }
+                    foreach ($availableRoles as $roleKey => $roleLabel): ?>
+                        <option value="<?= $roleKey ?>" <?= ($currentRole === $roleKey) ? 'selected' : '' ?>><?= $roleLabel ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <hr>
-            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Simpan Perubahan</button>
         </form>
     </div>
 </div>

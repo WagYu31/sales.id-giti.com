@@ -706,7 +706,7 @@ foreach ($allModules as $mod) {
                                     <th>Email</th>
                                     <th>Terdaftar Sejak</th>
                                     <th>Role Saat Ini</th>
-                                    <th class="text-center" style="width: 120px;">Aksi</th>
+                                    <th class="text-center" style="width: 160px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="roleUsersTbody">
@@ -953,6 +953,12 @@ function showRoleUsersModal(role, roleLabel) {
                     <td><span class="badge bg-light text-dark border px-2.5 py-1.5 fw-bold text-uppercase" style="font-size:10.5px;">${u.role || '-'}</span></td>
                     <td class="text-center">
                         <div class="d-inline-flex gap-1.5 align-items-center">
+                            <button type="button" class="btn btn-sm btn-outline-warning rounded-2 px-2 py-1 text-dark" title="Reset Kata Sandi" onclick="resetUserPassword(${u.id}, '${escapeHtml(u.nama)}', '${escapeHtml(u.email)}')">
+                                <i class="bi bi-key-fill text-warning"></i>
+                            </button>
+                            <a href="sales_edit.php?id=${u.id}" class="btn btn-sm btn-outline-secondary rounded-2 px-2 py-1" title="Edit Profil Pengguna" target="_blank">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
                             <button type="button" class="btn btn-sm btn-outline-primary rounded-2 px-2 py-1" title="Ubah Role Pengguna" onclick="changeUserRole(${u.id}, '${escapeHtml(u.nama)}', '${u.role}', '${role}', '${escapeHtml(roleLabel)}')">
                                 <i class="bi bi-arrow-left-right"></i>
                             </button>
@@ -1090,6 +1096,87 @@ function changeUserRole(userId, userName, currentRole, activeTabRole, roleLabel)
             })
             .catch(() => {
                 Swal.fire('Error', 'Gagal memproses perubahan role.', 'error');
+            });
+        }
+    });
+}
+
+// Handler Reset Kata Sandi Pengguna Langsung
+function resetUserPassword(userId, userName, userEmail) {
+    Swal.fire({
+        title: 'Reset Kata Sandi',
+        html: `
+            <div class="text-start mb-3">
+                <div class="alert alert-light border small text-muted mb-3 py-2">
+                    <div><strong>Nama:</strong> ${userName}</div>
+                    <div><strong>Email:</strong> ${userEmail || '-'}</div>
+                </div>
+                <label class="form-label small fw-bold text-dark mb-1">Kata Sandi Baru:</label>
+                <div class="input-group">
+                    <input type="password" id="swalNewPasswordInput" class="form-control" placeholder="Minimal 5 karakter" style="font-size: 13.5px; border-radius: 8px 0 0 8px;">
+                    <button class="btn btn-outline-secondary" type="button" id="toggleSwalPassBtn" onclick="
+                        const inp = document.getElementById('swalNewPasswordInput');
+                        const icon = this.querySelector('i');
+                        if (inp.type === 'password') {
+                            inp.type = 'text';
+                            icon.className = 'bi bi-eye-slash';
+                        } else {
+                            inp.type = 'password';
+                            icon.className = 'bi bi-eye';
+                        }
+                    " style="border-radius: 0 8px 8px 0;" title="Tampilkan/Sembunyikan Sandi">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <small class="text-muted" style="font-size: 11px;">Kata sandi baru akan dienkripsi secara aman dan langsung dapat digunakan login.</small>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#F59E0B',
+        cancelButtonColor: '#64748B',
+        confirmButtonText: '<i class="bi bi-key-fill me-1"></i> Simpan Sandi Baru',
+        cancelButtonText: 'Batal',
+        preConfirm: () => {
+            const pass = document.getElementById('swalNewPasswordInput').value.trim();
+            if (!pass) {
+                Swal.showValidationMessage('Silakan masukkan kata sandi baru!');
+                return false;
+            }
+            if (pass.length < 5) {
+                Swal.showValidationMessage('Kata sandi minimal harus 5 karakter!');
+                return false;
+            }
+            return pass;
+        }
+    }).then(result => {
+        if (result.isConfirmed) {
+            Swal.showLoading();
+            const formData = new URLSearchParams();
+            formData.append('action', 'reset_user_password');
+            formData.append('user_id', userId);
+            formData.append('new_password', result.value);
+
+            fetch('ajax_role_permission_handler.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Berhasil Diperbarui',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#2563EB'
+                    });
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            })
+            .catch(() => {
+                Swal.fire('Error', 'Gagal memproses penggantian kata sandi.', 'error');
             });
         }
     });

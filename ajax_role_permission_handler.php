@@ -296,6 +296,46 @@ switch ($action) {
         $stmt_role->close();
         break;
 
+    case 'reset_user_password':
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $newPassword = trim($_POST['new_password'] ?? '');
+
+        if ($userId <= 0) {
+            echo json_encode(['success' => false, 'message' => 'ID pengguna tidak valid.']);
+            exit();
+        }
+
+        if (empty($newPassword) || strlen($newPassword) < 5) {
+            echo json_encode(['success' => false, 'message' => 'Kata sandi baru minimal harus 5 karakter!']);
+            exit();
+        }
+
+        // Cek pengguna
+        $stmt_chk = $conn->prepare("SELECT id, nama_lengkap, email FROM sales WHERE id = ? AND deleted_at IS NULL");
+        $stmt_chk->bind_param("i", $userId);
+        $stmt_chk->execute();
+        $res_chk = $stmt_chk->get_result();
+        if ($res_chk->num_rows === 0) {
+            echo json_encode(['success' => false, 'message' => 'Pengguna tidak ditemukan atau telah dinonaktifkan.']);
+            exit();
+        }
+        $targetUser = $res_chk->fetch_assoc();
+        $stmt_chk->close();
+
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt_pass = $conn->prepare("UPDATE sales SET password = ? WHERE id = ?");
+        $stmt_pass->bind_param("si", $hashedPassword, $userId);
+        if ($stmt_pass->execute()) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Kata sandi untuk pengguna ' . htmlspecialchars($targetUser['nama_lengkap']) . ' (' . htmlspecialchars($targetUser['email']) . ') berhasil diubah!'
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Gagal memperbarui kata sandi: ' . $conn->error]);
+        }
+        $stmt_pass->close();
+        break;
+
     default:
         echo json_encode(['success' => false, 'message' => 'Action tidak dikenali.']);
         break;
