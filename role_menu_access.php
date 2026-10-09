@@ -682,7 +682,7 @@ foreach ($allModules as $mod) {
 </div>
 
 <!-- ── MODAL DAFTAR USER ROLE ──────────────────────────────────────────────── -->
-<div class="modal fade" id="roleUsersModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="roleUsersModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content rounded-4 border-0 shadow">
             <div class="modal-header border-0 pb-0 px-4 pt-4">
@@ -917,7 +917,12 @@ function resetDefaultPermissions(role) {
 // Show Users Modal
 function showRoleUsersModal(role, roleLabel) {
     const modalEl = document.getElementById('roleUsersModal');
-    const modal = new bootstrap.Modal(modalEl);
+    modalEl.removeAttribute('tabindex');
+    let modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) {
+        modal.dispose();
+    }
+    modal = new bootstrap.Modal(modalEl, { focus: false, backdrop: 'static', keyboard: true });
     document.getElementById('modalRoleTitle').textContent = `Daftar Pengguna Role: ${roleLabel}`;
     document.getElementById('roleUsersLoading').style.display = 'block';
     document.getElementById('roleUsersContent').style.display = 'none';
@@ -1103,8 +1108,31 @@ function changeUserRole(userId, userName, currentRole, activeTabRole, roleLabel)
 
 // Handler Reset Kata Sandi Pengguna Langsung
 function resetUserPassword(userId, userName, userEmail) {
+    const modalEl = document.getElementById('roleUsersModal');
+    if (modalEl) modalEl.removeAttribute('tabindex');
+
+    // Hentikan penangkapan fokus oleh Bootstrap modal di background
+    const stopFocusTrap = (e) => {
+        if (e.target && (e.target.id === 'swalNewPasswordInput' || e.target.closest('.swal2-container'))) {
+            e.stopImmediatePropagation();
+        }
+    };
+    document.addEventListener('focusin', stopFocusTrap, true);
+
     Swal.fire({
         title: 'Reset Kata Sandi',
+        keydownListenerCapture: true,
+        didOpen: () => {
+            setTimeout(() => {
+                const inp = document.getElementById('swalNewPasswordInput');
+                if (inp) {
+                    inp.focus();
+                }
+            }, 100);
+        },
+        willClose: () => {
+            document.removeEventListener('focusin', stopFocusTrap, true);
+        },
         html: `
             <div class="text-start mb-3">
                 <div class="alert alert-light border small text-muted mb-3 py-2">
@@ -1113,7 +1141,7 @@ function resetUserPassword(userId, userName, userEmail) {
                 </div>
                 <label class="form-label small fw-bold text-dark mb-1">Kata Sandi Baru:</label>
                 <div class="input-group">
-                    <input type="password" id="swalNewPasswordInput" class="form-control" placeholder="Minimal 5 karakter" style="font-size: 13.5px; border-radius: 8px 0 0 8px;">
+                    <input type="password" id="swalNewPasswordInput" class="form-control" placeholder="Minimal 5 karakter" style="font-size: 13.5px; border-radius: 8px 0 0 8px;" autofocus>
                     <button class="btn btn-outline-secondary" type="button" id="toggleSwalPassBtn" onclick="
                         const inp = document.getElementById('swalNewPasswordInput');
                         const icon = this.querySelector('i');
@@ -1150,6 +1178,7 @@ function resetUserPassword(userId, userName, userEmail) {
             return pass;
         }
     }).then(result => {
+        document.removeEventListener('focusin', stopFocusTrap, true);
         if (result.isConfirmed) {
             Swal.showLoading();
             const formData = new URLSearchParams();
