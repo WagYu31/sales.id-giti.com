@@ -57,53 +57,53 @@
   </div>
 </div>
 
-<!-- GLOBAL FLOATING AI ASSISTANT LIVE CHAT WIDGET -->
+<!-- GLOBAL FLOATING WHATSAPP HELP & SUPPORT WIDGET -->
 <style>
-.ai-floating-btn {
+.wa-floating-btn {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    width: 58px;
-    height: 58px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1E40AF 0%, #2563EB 50%, #38BDF8 100%);
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
     color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
-    box-shadow: 0 10px 28px rgba(37, 99, 235, 0.45);
+    font-size: 32px;
+    box-shadow: 0 10px 28px rgba(37, 211, 102, 0.45);
     cursor: pointer;
     z-index: 99999;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.6);
 }
 
-.ai-floating-btn:hover {
+.wa-floating-btn:hover {
     transform: scale(1.1) rotate(6deg);
-    box-shadow: 0 14px 36px rgba(37, 99, 235, 0.6);
+    box-shadow: 0 14px 36px rgba(37, 211, 102, 0.65);
 }
 
-.ai-floating-btn .online-ping {
+.wa-floating-btn .online-ping {
     position: absolute;
     top: 2px;
     right: 2px;
-    width: 13px;
-    height: 13px;
-    background: #34D399;
+    width: 14px;
+    height: 14px;
+    background: #10B981;
     border-radius: 50%;
     border: 2.5px solid #0F172A;
-    box-shadow: 0 0 8px #34D399;
+    box-shadow: 0 0 8px #10B981;
 }
 
-.ai-chat-drawer {
+.wa-chat-drawer {
     position: fixed;
-    bottom: 92px;
+    bottom: 96px;
     right: 24px;
     width: 410px;
     max-width: calc(100vw - 32px);
-    height: 560px;
-    max-height: calc(100vh - 110px);
+    height: 570px;
+    max-height: calc(100vh - 115px);
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(20px);
     border-radius: 24px;
@@ -121,69 +121,90 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.ai-drawer-card {
+.wa-drawer-card {
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
     border-radius: 14px;
-    padding: 10px 12px;
+    padding: 12px 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
 
-.btn-drawer-copy {
-    background: #F1F5F9;
+.wa-quick-chip {
+    background: #F8FAFC;
     border: 1px solid #CBD5E1;
     color: #334155;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 10.5px;
-    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
 }
-.btn-drawer-copy:hover {
-    background: #2563EB; color: #FFF; border-color: #2563EB;
+.wa-quick-chip:hover {
+    background: #25D366;
+    color: #FFFFFF;
+    border-color: #25D366;
 }
 </style>
 
-<div class="ai-floating-btn" id="aiFloatingBtn" title="Tanya Asisten Sales Loewix AI">
-    <i class="bi bi-robot"></i>
+<div class="wa-floating-btn" id="waFloatingBtn" title="Bantuan Langsung WhatsApp (0857-7159-3522)">
+    <i class="bi bi-whatsapp"></i>
     <span class="online-ping"></span>
 </div>
 
-<div class="ai-chat-drawer" id="aiChatDrawer">
+<div class="wa-chat-drawer" id="waChatDrawer">
     <!-- Header -->
-    <div class="d-flex align-items-center justify-content-between px-3 py-2.5" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border-bottom: 1px solid rgba(255,255,255,0.1);">
+    <div class="d-flex align-items-center justify-content-between px-3 py-2.5" style="background: linear-gradient(135deg, #075E54 0%, #128C7E 100%); border-bottom: 1px solid rgba(255,255,255,0.15);">
         <div class="d-flex align-items-center gap-2">
-            <div class="rounded-circle bg-primary bg-gradient d-flex align-items-center justify-content-center text-white fw-bold" style="width:34px; height:34px; font-size:18px;">
-                <i class="bi bi-robot"></i>
+            <div class="rounded-circle bg-white d-flex align-items-center justify-content-center text-success fw-bold shadow-sm" style="width:36px; height:36px; font-size:21px;">
+                <i class="bi bi-whatsapp"></i>
             </div>
             <div>
-                <h6 class="text-white fw-bold m-0" style="font-size:13.5px; font-family:'Plus Jakarta Sans', sans-serif;">Asisten Sales Loewix AI</h6>
-                <small class="text-success fw-bold" style="font-size:10.5px;">🟢 Real-Time Sales & Negotiation Coach</small>
+                <h6 class="text-white fw-bold m-0" style="font-size:14px; font-family:'Plus Jakarta Sans', sans-serif;">Pusat Bantuan WhatsApp</h6>
+                <small class="text-white-50 fw-semibold" style="font-size:10.5px;">🟢 0857-7159-3522 • Siap Membantu Kendala</small>
             </div>
         </div>
-        <button type="button" class="btn-close btn-close-white btn-sm opacity-100" id="aiChatDrawerClose"></button>
+        <button type="button" class="btn-close btn-close-white btn-sm opacity-100" id="waChatDrawerClose" aria-label="Tutup"></button>
     </div>
 
     <!-- Chat Canvas -->
-    <div class="p-3 overflow-y-auto flex-grow-1 bg-light d-flex flex-column gap-2" id="aiDrawerCanvas" style="font-size:12.5px;">
-        <div class="ai-drawer-card border-start border-4 border-primary">
-            <strong class="text-dark">👋 Halo Sales Loewix!</strong><br>
-            Ada pertanyaan customer, penolakan harga, atau konsultasi prospek? Ketik di bawah untuk 3 taktik skrip WA & upsell otomatis.
+    <div class="p-3 overflow-y-auto flex-grow-1 bg-light d-flex flex-column gap-2.5" id="waDrawerCanvas" style="font-size:12.5px;">
+        <div class="wa-drawer-card border-start border-4 border-success">
+            <div class="d-flex align-items-center justify-content-between mb-1.5">
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5 rounded-pill fw-bold" style="font-size:10px;">
+                    <i class="bi bi-headset me-1"></i> Bantuan &amp; Helpdesk
+                </span>
+                <small class="text-muted" style="font-size:10px;"><?= date('H:i') ?></small>
+            </div>
+            <strong class="text-dark">👋 Halo <?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Bapak/Ibu') ?>!</strong><br>
+            Ada kendala atau masalah di sistem? Ketik pesan Anda di bawah ini. Pesan akan langsung diteruskan ke WhatsApp Admin / IT (<strong>0857-7159-3522</strong>).
+        </div>
+
+        <div class="p-2.5 rounded-3 bg-white border border-slate-200 small">
+            <div class="text-muted mb-2" style="font-size:11px;">
+                <strong>Pengirim:</strong> <?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'User') ?> (<?= strtoupper(htmlspecialchars($_SESSION['role'] ?? 'Sales')) ?>)<br>
+                <strong>Halaman:</strong> <span class="badge bg-light text-dark border"><?= basename($_SERVER['PHP_SELF'] ?? 'Dashboard') ?></span>
+            </div>
+            <a href="https://wa.me/6285771593522?text=Halo%20Admin%20Loewix%2C%20saya%20<?= urlencode($_SESSION['nama_lengkap'] ?? 'User') ?>%20(<?= urlencode($_SESSION['role'] ?? 'Sales') ?>)%20butuh%20bantuan%20terkait%20sistem." target="_blank" class="btn btn-sm btn-success w-100 rounded-pill py-1.5 d-flex align-items-center justify-content-center gap-1.5 fw-bold" style="font-size:12px;">
+                <i class="bi bi-whatsapp"></i> Chat Langsung via WhatsApp
+            </a>
         </div>
     </div>
 
     <!-- Quick Prompts Bar -->
     <div class="px-2 py-1.5 bg-white border-top border-slate-200 d-flex gap-1 overflow-x-auto" style="white-space:nowrap;">
-        <span class="badge bg-light text-dark border px-2 py-1 rounded-pill cursor-pointer" onclick="sendDrawerPrompt('Customer minta diskon 20%, cara negosiasi agar margin aman?')">🤝 Nego Diskon</span>
-        <span class="badge bg-light text-dark border px-2 py-1 rounded-pill cursor-pointer" onclick="sendDrawerPrompt('Customer membandingkan harga Loewix dengan merek murah lain')">⚖️ Nego Merek</span>
-        <span class="badge bg-light text-dark border px-2 py-1 rounded-pill cursor-pointer" onclick="sendDrawerPrompt('Saya dapat customer Kepala Sekolah, skrip penawarannya gimana?')">🎓 Kepala Sekolah</span>
+        <span class="wa-quick-chip" onclick="sendWaDrawerPrompt('Kendala Data Toko / Customer: ')">🏪 Data Toko</span>
+        <span class="wa-quick-chip" onclick="sendWaDrawerPrompt('Kendala Invoice / Tagihan / TIP TOK: ')">📑 Masalah Invoice</span>
+        <span class="wa-quick-chip" onclick="sendWaDrawerPrompt('Kendala Akun / Password / Hak Akses: ')">🔑 Akun &amp; Sandi</span>
+        <span class="wa-quick-chip" onclick="sendWaDrawerPrompt('Laporan Bug / Error Sistem di halaman: ')">⚠️ Error Sistem</span>
     </div>
 
     <!-- Input Form -->
-    <form class="p-2 bg-white border-top border-slate-200 d-flex gap-1.5" id="aiDrawerForm">
-        <input type="text" id="aiDrawerInput" class="form-control form-control-sm rounded-pill px-3" placeholder="Ketik pertanyaan / konsultasi..." autocomplete="off">
-        <button type="submit" class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width:34px; height:34px; flex-shrink:0;">
-            <i class="bi bi-send-fill" style="font-size:12px;"></i>
+    <form class="p-2 bg-white border-top border-slate-200 d-flex gap-1.5" id="waDrawerForm">
+        <input type="text" id="waDrawerInput" class="form-control form-control-sm rounded-pill px-3" placeholder="Ketik kendala / pesan ke WA..." autocomplete="off">
+        <button type="submit" class="btn btn-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width:36px; height:36px; flex-shrink:0;" title="Kirim Pesan ke WhatsApp 0857-7159-3522">
+            <i class="bi bi-send-fill" style="font-size:13px;"></i>
         </button>
     </form>
 </div>
@@ -338,108 +359,81 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- GLOBAL FLOATING AI CHAT WIDGET ENGINE ---
-    const floatBtn = document.getElementById('aiFloatingBtn');
-    const drawer = document.getElementById('aiChatDrawer');
-    const closeBtn = document.getElementById('aiChatDrawerClose');
-    const drawerForm = document.getElementById('aiDrawerForm');
-    const drawerInput = document.getElementById('aiDrawerInput');
-    const drawerCanvas = document.getElementById('aiDrawerCanvas');
+    // --- GLOBAL FLOATING WHATSAPP HELP & SUPPORT ENGINE ---
+    const waFloatBtn = document.getElementById('waFloatingBtn');
+    const waDrawer = document.getElementById('waChatDrawer');
+    const waCloseBtn = document.getElementById('waChatDrawerClose');
+    const waDrawerForm = document.getElementById('waDrawerForm');
+    const waDrawerInput = document.getElementById('waDrawerInput');
+    const waDrawerCanvas = document.getElementById('waDrawerCanvas');
 
-    if (floatBtn && drawer) {
-        floatBtn.addEventListener('click', () => {
-            drawer.style.display = (drawer.style.display === 'flex') ? 'none' : 'flex';
-            if (drawer.style.display === 'flex') drawerInput?.focus();
+    if (waFloatBtn && waDrawer) {
+        waFloatBtn.addEventListener('click', () => {
+            waDrawer.style.display = (waDrawer.style.display === 'flex') ? 'none' : 'flex';
+            if (waDrawer.style.display === 'flex') waDrawerInput?.focus();
         });
 
-        closeBtn?.addEventListener('click', () => {
-            drawer.style.display = 'none';
+        waCloseBtn?.addEventListener('click', () => {
+            waDrawer.style.display = 'none';
         });
 
-        window.sendDrawerPrompt = function(promptText) {
-            if (drawerInput) {
-                drawerInput.value = promptText;
-                drawerForm.dispatchEvent(new Event('submit'));
+        window.sendWaDrawerPrompt = function(promptText) {
+            if (waDrawerInput) {
+                waDrawerInput.value = promptText;
+                waDrawerInput.focus();
             }
         };
 
-        drawerForm?.addEventListener('submit', function(e) {
+        waDrawerForm?.addEventListener('submit', function(e) {
             e.preventDefault();
-            const text = drawerInput.value.trim();
+            const text = waDrawerInput.value.trim();
             if (!text) return;
 
-            // User Bubble
+            const senderName = <?= json_encode($_SESSION['nama_lengkap'] ?? 'Pengguna Loewix') ?>;
+            const senderRole = <?= json_encode(strtoupper($_SESSION['role'] ?? 'Sales')) ?>;
+            const currentPage = <?= json_encode(basename($_SERVER['PHP_SELF'] ?? 'Dashboard')) ?>;
+            const targetNumber = '6285771593522';
+
+            // Format Pesan WhatsApp yang Rapi dan Profesional
+            const waMessage = `*LAPORAN KENDALA / BANTUAN SISTEM LOEWIX*
+👤 *Pengirim:* ${senderName} (${senderRole})
+📄 *Halaman:* ${currentPage}
+📅 *Waktu:* ${new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+
+💬 *Kendala / Pertanyaan:*
+${text}
+
+_Pesan dikirim via Tombol Bantuan Web Loewix Sales_`;
+
+            // Tampilkan Pesan di Chat Canvas
             const userMsg = document.createElement('div');
             userMsg.className = 'text-end mb-2';
-            userMsg.innerHTML = `<span class="bg-primary text-white p-2 px-3 rounded-pill d-inline-block fw-bold">${escapeHtml(text)}</span>`;
-            drawerCanvas.appendChild(userMsg);
-            drawerInput.value = '';
-            drawerCanvas.scrollTop = drawerCanvas.scrollHeight;
+            userMsg.innerHTML = `<span class="bg-success text-white p-2 px-3 rounded-3 d-inline-block fw-semibold text-start shadow-sm" style="max-width:85%; font-size:12px;">${escapeHtml(text)}</span>`;
+            waDrawerCanvas.appendChild(userMsg);
+            waDrawerInput.value = '';
 
-            // Thinking Indicator
-            const thinkDiv = document.createElement('div');
-            thinkDiv.className = 'ai-drawer-card mb-2 text-primary fw-bold';
-            thinkDiv.id = 'drawerThinking';
-            thinkDiv.innerHTML = '<i class="bi bi-cpu spinner-border spinner-border-sm me-1"></i> Asisten Loewix AI sedang menyusun 3 taktik...';
-            drawerCanvas.appendChild(thinkDiv);
-            drawerCanvas.scrollTop = drawerCanvas.scrollHeight;
+            // Tampilkan Kartu Konfirmasi Pengalihan ke WhatsApp
+            const waUrl = `https://wa.me/${targetNumber}?text=${encodeURIComponent(waMessage)}`;
+            const responseCard = document.createElement('div');
+            responseCard.className = 'wa-drawer-card mb-2 border-start border-4 border-success';
+            responseCard.innerHTML = `
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="badge bg-success text-white px-2 py-0.5 rounded-pill" style="font-size:10px;"><i class="bi bi-whatsapp me-1"></i> Terhubung ke WA</span>
+                    <small class="text-muted" style="font-size:10px;">${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}</small>
+                </div>
+                <div class="text-dark small mb-2">
+                    Pesan Anda sedang dibuka ke WhatsApp Admin / IT (<strong>0857-7159-3522</strong>).
+                </div>
+                <a href="${waUrl}" target="_blank" class="btn btn-sm btn-success w-100 rounded-pill py-1.5 fw-bold d-flex align-items-center justify-content-center gap-1.5">
+                    <i class="bi bi-whatsapp"></i> Buka WhatsApp Sekarang
+                </a>
+            `;
+            waDrawerCanvas.appendChild(responseCard);
+            waDrawerCanvas.scrollTop = waDrawerCanvas.scrollHeight;
 
-            fetch('ai_handler.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: text })
-            })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('drawerThinking')?.remove();
-                if (data.answers && data.answers.length > 0) {
-                    data.answers.forEach((ans, idx) => {
-                        let itemType = (typeof ans === 'object' && ans.type) ? ans.type : `Opsi ${idx+1}`;
-                        let itemStrategy = (typeof ans === 'object' && ans.strategy) ? ans.strategy : '';
-                        let itemText = (typeof ans === 'object' && ans.text) ? ans.text : (typeof ans === 'string' ? ans : '');
-                        let itemProduct = (typeof ans === 'object' && ans.product_recommendation) ? ans.product_recommendation : '';
-
-                        const escapedText = escapeHtml(itemText);
-                        const card = document.createElement('div');
-                        card.className = 'ai-drawer-card mb-2';
-                        card.innerHTML = `
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0.5 rounded-pill fw-bold" style="font-size:10px;">${escapeHtml(itemType)}</span>
-                                <button type="button" class="btn-drawer-copy" onclick="copyDrawerText(this, \`${escapedText.replace(/`/g, '\\`')}\`)">📋 Salin</button>
-                            </div>
-                            ${itemStrategy ? `<div class="text-muted mb-1" style="font-size:11px;"><strong>💡 Tips:</strong> ${escapeHtml(itemStrategy)}</div>` : ''}
-                            <div class="text-dark fw-normal mb-1"><strong>💬 Teks WA:</strong><br>${escapedText}</div>
-                            ${itemProduct ? `<div class="badge bg-light text-primary border" style="font-size:10px;">📦 ${escapeHtml(itemProduct)}</div>` : ''}
-                        `;
-                        drawerCanvas.appendChild(card);
-                    });
-                } else {
-                    const errCard = document.createElement('div');
-                    errCard.className = 'ai-drawer-card mb-2 text-danger';
-                    errCard.textContent = 'Gagal mendapatkan jawaban dari server.';
-                    drawerCanvas.appendChild(errCard);
-                }
-                drawerCanvas.scrollTop = drawerCanvas.scrollHeight;
-            })
-            .catch(err => {
-                document.getElementById('drawerThinking')?.remove();
-                console.error(err);
-            });
+            // Buka WhatsApp di tab baru
+            window.open(waUrl, '_blank');
         });
-
-        window.copyDrawerText = function(btnEl, text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const orig = btnEl.innerHTML;
-                btnEl.innerHTML = '✓ Disalin!';
-                btnEl.style.background = '#10B981';
-                btnEl.style.color = '#FFF';
-                setTimeout(() => {
-                    btnEl.innerHTML = orig;
-                    btnEl.style.background = '#F1F5F9';
-                    btnEl.style.color = '#334155';
-                }, 2000);
-            });
-        };
 
         function escapeHtml(text) {
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
