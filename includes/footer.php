@@ -182,13 +182,13 @@
         </div>
 
         <div class="p-2.5 rounded-3 bg-white border border-slate-200 small">
-            <div class="text-muted mb-2" style="font-size:11px;">
+            <div class="text-muted mb-1" style="font-size:11px;">
                 <strong>Pengirim:</strong> <?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'User') ?> (<?= strtoupper(htmlspecialchars($_SESSION['role'] ?? 'Sales')) ?>)<br>
                 <strong>Halaman:</strong> <span class="badge bg-light text-dark border"><?= basename($_SERVER['PHP_SELF'] ?? 'Dashboard') ?></span>
             </div>
-            <a href="https://wa.me/6285771593522?text=Halo%20Admin%20Loewix%2C%20saya%20<?= urlencode($_SESSION['nama_lengkap'] ?? 'User') ?>%20(<?= urlencode($_SESSION['role'] ?? 'Sales') ?>)%20butuh%20bantuan%20terkait%20sistem." target="_blank" class="btn btn-sm btn-success w-100 rounded-pill py-1.5 d-flex align-items-center justify-content-center gap-1.5 fw-bold" style="font-size:12px;">
-                <i class="bi bi-whatsapp"></i> Chat Langsung via WhatsApp
-            </a>
+            <div class="text-success small fw-semibold" style="font-size:11px;">
+                <i class="bi bi-shield-check me-1"></i> Pesan terkirim langsung dari bot ini ke WA Admin (0857-7159-3522) tanpa membuka WhatsApp.
+            </div>
         </div>
     </div>
 
@@ -412,27 +412,57 @@ _Pesan dikirim via Tombol Bantuan Web Loewix Sales_`;
             waDrawerCanvas.appendChild(userMsg);
             waDrawerInput.value = '';
 
-            // Tampilkan Kartu Konfirmasi Pengalihan ke WhatsApp
-            const waUrl = `https://wa.me/${targetNumber}?text=${encodeURIComponent(waMessage)}`;
-            const responseCard = document.createElement('div');
-            responseCard.className = 'wa-drawer-card mb-2 border-start border-4 border-success';
-            responseCard.innerHTML = `
-                <div class="d-flex align-items-center justify-content-between mb-1">
-                    <span class="badge bg-success text-white px-2 py-0.5 rounded-pill" style="font-size:10px;"><i class="bi bi-whatsapp me-1"></i> Terhubung ke WA</span>
-                    <small class="text-muted" style="font-size:10px;">${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}</small>
-                </div>
-                <div class="text-dark small mb-2">
-                    Pesan Anda sedang dibuka ke WhatsApp Admin / IT (<strong>0857-7159-3522</strong>).
-                </div>
-                <a href="${waUrl}" target="_blank" class="btn btn-sm btn-success w-100 rounded-pill py-1.5 fw-bold d-flex align-items-center justify-content-center gap-1.5">
-                    <i class="bi bi-whatsapp"></i> Buka WhatsApp Sekarang
-                </a>
+            // Tampilkan Indikator Loading Pengiriman
+            const sendingDiv = document.createElement('div');
+            sendingDiv.id = 'waSendingBubble';
+            sendingDiv.className = 'wa-drawer-card mb-2 text-muted small d-flex align-items-center gap-2';
+            sendingDiv.innerHTML = `
+                <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                <span>Sedang mengirim pesan ke WhatsApp Admin (0857-7159-3522)...</span>
             `;
-            waDrawerCanvas.appendChild(responseCard);
+            waDrawerCanvas.appendChild(sendingDiv);
             waDrawerCanvas.scrollTop = waDrawerCanvas.scrollHeight;
 
-            // Buka WhatsApp di tab baru
-            window.open(waUrl, '_blank');
+            // Kirim via Background AJAX ke Endpoint Server
+            const formData = new URLSearchParams();
+            formData.append('message', text);
+            formData.append('page', currentPage);
+
+            fetch('ajax_send_wa_support.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('waSendingBubble')?.remove();
+                const responseCard = document.createElement('div');
+                responseCard.className = 'wa-drawer-card mb-2 border-start border-4 border-success';
+                responseCard.innerHTML = `
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="badge bg-success text-white px-2 py-0.5 rounded-pill" style="font-size:10px;">
+                            <i class="bi bi-check2-all me-1"></i> Terkirim ke WA
+                        </span>
+                        <small class="text-muted" style="font-size:10px;">${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}</small>
+                    </div>
+                    <div class="text-dark small fw-semibold">
+                        ${escapeHtml(data.message || 'Pesan Anda telah berhasil dikirim ke WhatsApp Admin (0857-7159-3522)!')}
+                    </div>
+                    <small class="text-muted d-block mt-1" style="font-size:10.5px;">
+                        Pesan Anda tersimpan di server dan diteruskan langsung ke Admin.
+                    </small>
+                `;
+                waDrawerCanvas.appendChild(responseCard);
+                waDrawerCanvas.scrollTop = waDrawerCanvas.scrollHeight;
+            })
+            .catch(err => {
+                document.getElementById('waSendingBubble')?.remove();
+                const errCard = document.createElement('div');
+                errCard.className = 'wa-drawer-card mb-2 border-start border-4 border-danger text-danger small';
+                errCard.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Gagal menghubungkan ke server. Silakan coba kembali.`;
+                waDrawerCanvas.appendChild(errCard);
+                waDrawerCanvas.scrollTop = waDrawerCanvas.scrollHeight;
+            });
         });
 
         function escapeHtml(text) {

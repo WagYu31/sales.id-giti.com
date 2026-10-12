@@ -870,6 +870,12 @@ table tr td { font-size: 0.85em; }
                 </span>
                 <span class="nav-link-text" style="font-weight: 700;">Akses Role Menu</span>
             </a>
+            <a href="wa_support_settings.php" class="sidebar-link <?php echo $currentPage=='wa_support_settings.php'?'active':''; ?>">
+                <span class="nav-icon-badge" style="background: rgba(37, 211, 102, 0.22); color: #25D366;">
+                    <i class="bi bi-whatsapp"></i>
+                </span>
+                <span class="nav-link-text" style="font-weight: 700;">Pesan Masuk WA</span>
+            </a>
             <?php endif; ?>
 
         <?php endif; ?>
