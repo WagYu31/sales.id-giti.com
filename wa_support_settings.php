@@ -53,6 +53,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
     $msg_success = "Pengaturan WhatsApp Gateway berhasil diperbarui!";
 }
 
+// Proses Tes Kirim WA
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['test_send_wa'])) {
+    $test_target = trim($_POST['test_target'] ?? '085771593522');
+    $test_token = trim($_POST['test_token'] ?? '');
+
+    if (empty($test_token)) {
+        $msg_error = "Token Fonnte belum diisi. Masukkan token terlebih dahulu untuk melakukan tes pengiriman!";
+    } else {
+        $testMsg = "*TES KONEKSI WHATSAPP GATEWAY*\n\nHalo Admin Loewix! Ini adalah pesan tes dari sistem *sales.id-giti.com*.\nWhatsApp Gateway Fonnte Anda telah *BERHASIL TERHUBUNG* dan siap menerima laporan kendala sales!";
+
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 20,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => [
+                'target' => $test_target,
+                'message' => $testMsg,
+                'countryCode' => '62'
+            ],
+            CURLOPT_HTTPHEADER => [
+                "Authorization: {$test_token}"
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+        $curlErr = curl_error($curl);
+        curl_close($curl);
+
+        if ($curlErr) {
+            $msg_error = "Gagal terhubung ke server Fonnte: " . $curlErr;
+        } else {
+            $respJson = json_decode($response, true);
+            if (isset($respJson['status']) && $respJson['status'] == true) {
+                $msg_success = "✅ SUKSES! Pesan tes WhatsApp telah berhasil terkirim ke nomor " . htmlspecialchars($test_target) . "!";
+            } else {
+                $errDetail = $respJson['reason'] ?? ($respJson['message'] ?? $response);
+                $msg_error = "Gateway Fonnte merespon error: " . htmlspecialchars($errDetail) . ". Pastikan device di Fonnte sudah berstatus 'Connect' (Scan QR).";
+            }
+        }
+    }
+}
+
 // Ambil Pengaturan Saat Ini
 $current_wa = '085771593522';
 $current_token = '';
@@ -91,12 +135,44 @@ require_once 'includes/header.php';
     </div>
 <?php endif; ?>
 
+<?php if (!empty($msg_error)): ?>
+    <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+        <i class="bi bi-exclamation-circle-fill me-2"></i><?= htmlspecialchars($msg_error) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
 <div class="row g-4 mb-4">
     <!-- Pengaturan Gateway -->
     <div class="col-lg-4 col-12">
         <div class="card border-0 shadow-sm rounded-4 h-100">
             <div class="card-body p-4">
-                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-sliders2 text-primary me-2"></i>Konfigurasi WA Gateway</h6>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-dark m-0"><i class="bi bi-sliders2 text-primary me-2"></i>Konfigurasi WA Gateway</h6>
+                    <?php if (!empty($current_token)): ?>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Aktif</span>
+                    <?php else: ?>
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>Belum Ada Token</span>
+                    <?php endif; ?>
+                </div>
+
+                <?php if (!empty($current_token)): ?>
+                    <div class="p-2.5 bg-light rounded-3 border mb-3 small d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-check text-success fs-5"></i>
+                        <div>
+                            <div class="fw-bold text-dark" style="font-size: 12px;">Token Fonnte Terpasang</div>
+                            <div class="text-muted" style="font-size: 11px;">Pesan kendala akan diteruskan otomatis ke WA HP Anda.</div>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="p-2.5 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3 mb-3 small d-flex align-items-start gap-2">
+                        <i class="bi bi-info-circle-fill text-warning fs-6 mt-0.5"></i>
+                        <div style="font-size: 11px;" class="text-secondary">
+                            <strong>Token Fonnte belum tersimpan di kolom bawah.</strong> Silakan salin (copy) kode token dari Fonnte, lalu tempel (paste) ke kolom token di bawah dan klik Simpan.
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <form method="POST" action="wa_support_settings.php">
                     <input type="hidden" name="save_settings" value="1">
                     
@@ -110,24 +186,32 @@ require_once 'includes/header.php';
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-dark">Token API Fonnte (Opsional):</label>
+                        <label class="form-label small fw-bold text-dark">Token API Fonnte:</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="bi bi-key text-warning"></i></span>
-                            <input type="password" name="fonnte_token" id="fonnteTokenInput" class="form-control" value="<?= htmlspecialchars($current_token) ?>" placeholder="Contoh: a1b2c3d4e5f6...">
-                            <button class="btn btn-outline-secondary" type="button" onclick="
-                                const inp = document.getElementById('fonnteTokenInput');
-                                inp.type = (inp.type === 'password') ? 'text' : 'password';
-                            "><i class="bi bi-eye"></i></button>
+                            <input type="text" name="fonnte_token" id="fonnteTokenInput" class="form-control font-monospace" value="<?= htmlspecialchars($current_token) ?>" placeholder="Tempel token di sini (contoh: a1b2c3d...)">
                         </div>
                         <small class="text-muted" style="font-size: 11px;">
-                            Jika diisi Token Fonnte (dari <a href="https://fonnte.com" target="_blank" class="fw-bold">fonnte.com</a>), server akan otomatis mengirim pesan WA ke HP Anda di background tanpa membuka browser WA!
+                            Buka <a href="https://fonnte.com" target="_blank" class="fw-bold text-primary">fonnte.com</a> > klik tombol <strong>Token</strong> > salin kodenya &amp; tempel di atas.
                         </small>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 fw-bold shadow-sm">
+                    <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 fw-bold shadow-sm mb-2">
                         <i class="bi bi-save me-1"></i> Simpan Konfigurasi
                     </button>
                 </form>
+
+                <?php if (!empty($current_token)): ?>
+                    <hr class="my-3">
+                    <form method="POST" action="wa_support_settings.php">
+                        <input type="hidden" name="test_send_wa" value="1">
+                        <input type="hidden" name="test_target" value="<?= htmlspecialchars($current_wa) ?>">
+                        <input type="hidden" name="test_token" value="<?= htmlspecialchars($current_token) ?>">
+                        <button type="submit" class="btn btn-outline-success w-100 rounded-3 py-2 fw-bold btn-sm shadow-sm">
+                            <i class="bi bi-whatsapp me-1"></i> Tes Kirim Pesan WA Sekarang
+                        </button>
+                    </form>
+                <?php endif; ?>
             </div>
         </div>
     </div>
