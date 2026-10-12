@@ -131,20 +131,23 @@
 
 .wa-quick-chip {
     background: #F8FAFC;
-    border: 1px solid #CBD5E1;
+    border: 1px solid #E2E8F0;
     color: #334155;
-    padding: 4px 10px;
-    border-radius: 16px;
+    padding: 5px 12px;
+    border-radius: 9999px;
     font-size: 11px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 }
 .wa-quick-chip:hover {
-    background: #25D366;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     color: #FFFFFF;
-    border-color: #25D366;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 </style>
 
