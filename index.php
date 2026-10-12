@@ -105,10 +105,35 @@ if ($filter_fu === 'sudah') {
 }
 
 if (!empty($search_keyword)) {
-    $sql_where_conditions[] = "(c.nama_toko LIKE ? OR c.id IN (SELECT customer_id FROM customer_pics WHERE deleted_at IS NULL AND (nama_pic LIKE ? OR tlp_pic LIKE ?)))";
-    $like_kw = '%' . $search_keyword . '%';
-    array_push($params, $like_kw, $like_kw, $like_kw);
-    $types .= 'sss';
+    // Normalisasi keyword: hilangkan tanda hubung & tanda baca berlebih untuk pencarian multi-kata yang fleksibel
+    $clean_kw = trim(preg_replace('/[\-_,]+/u', ' ', $search_keyword));
+    $words = array_values(array_filter(explode(' ', $clean_kw), function($w) { 
+        return mb_strlen(trim($w)) >= 2; 
+    }));
+    
+    if (count($words) > 1) {
+        $word_conditions = [];
+        foreach ($words as $word) {
+            $word_like = '%' . $word . '%';
+            $word_conditions[] = "(
+                c.nama_toko LIKE ? 
+                OR c.id IN (SELECT customer_id FROM customer_pics WHERE deleted_at IS NULL AND (nama_pic LIKE ? OR tlp_pic LIKE ?))
+                OR c.id IN (SELECT customer_id FROM customer_addresses WHERE deleted_at IS NULL AND (alamat LIKE ? OR kota LIKE ?))
+            )";
+            array_push($params, $word_like, $word_like, $word_like, $word_like, $word_like);
+            $types .= 'sssss';
+        }
+        $sql_where_conditions[] = "(" . implode(' AND ', $word_conditions) . ")";
+    } else {
+        $like_kw = '%' . $search_keyword . '%';
+        $sql_where_conditions[] = "(
+            c.nama_toko LIKE ? 
+            OR c.id IN (SELECT customer_id FROM customer_pics WHERE deleted_at IS NULL AND (nama_pic LIKE ? OR tlp_pic LIKE ?))
+            OR c.id IN (SELECT customer_id FROM customer_addresses WHERE deleted_at IS NULL AND (alamat LIKE ? OR kota LIKE ?))
+        )";
+        array_push($params, $like_kw, $like_kw, $like_kw, $like_kw, $like_kw);
+        $types .= 'sssss';
+    }
 }
 
 $where_clause = "WHERE " . implode(' AND ', $sql_where_conditions);
