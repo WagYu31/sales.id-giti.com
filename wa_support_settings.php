@@ -217,7 +217,11 @@ require_once 'includes/header.php';
                         <label class="form-label small fw-bold text-dark">Token API Fonnte:</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="bi bi-key text-warning"></i></span>
-                            <input type="text" name="fonnte_token" id="fonnteTokenInput" class="form-control font-monospace" value="<?= htmlspecialchars($current_token) ?>" placeholder="Tempel token di sini (contoh: a1b2c3d...)">
+                            <input type="password" name="fonnte_token" id="fonnteTokenInput" class="form-control font-monospace" value="<?= htmlspecialchars($current_token) ?>" placeholder="Tempel token di sini (contoh: a1b2c3d...)">
+                            <button class="btn btn-outline-secondary" type="button" onclick="
+                                const inp = document.getElementById('fonnteTokenInput');
+                                inp.type = (inp.type === 'password') ? 'text' : 'password';
+                            "><i class="bi bi-eye"></i></button>
                         </div>
                         <small class="text-muted" style="font-size: 11px;">
                             Buka <a href="https://fonnte.com" target="_blank" class="fw-bold text-primary">fonnte.com</a> > klik tombol <strong>Token</strong> > salin kodenya &amp; tempel di atas.
