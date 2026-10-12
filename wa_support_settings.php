@@ -38,19 +38,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
     $wa_target = trim($_POST['wa_support_number'] ?? '085771593522');
     $fonnte_token = trim($_POST['fonnte_token'] ?? '');
 
-    // Simpan nomor WA
-    $stmt1 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('wa_support_number', ?) ON DUPLICATE KEY UPDATE setting_value = ?");
-    $stmt1->bind_param("ss", $wa_target, $wa_target);
-    $stmt1->execute();
-    $stmt1->close();
+    // 1. Simpan ke JSON file (paling aman & persisten tanpa terpengaruh schema database)
+    $configFile = __DIR__ . '/includes/wa_gateway_config.json';
+    $configData = [
+        'wa_support_number' => $wa_target,
+        'fonnte_token' => $fonnte_token,
+        'updated_at' => date('Y-m-d H:i:s')
+    ];
+    @file_put_contents($configFile, json_encode($configData, JSON_PRETTY_PRINT));
 
-    // Simpan token Fonnte
-    $stmt2 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('fonnte_token', ?) ON DUPLICATE KEY UPDATE setting_value = ?");
-    $stmt2->bind_param("ss", $fonnte_token, $fonnte_token);
-    $stmt2->execute();
-    $stmt2->close();
+    // 2. Pastikan kolom setting_value di DB support TEXT panjang
+    @$conn->query("ALTER TABLE settings MODIFY COLUMN setting_value TEXT NULL");
 
-    $msg_success = "Pengaturan WhatsApp Gateway berhasil diperbarui!";
+    // 3. Simpan ke database settings
+    @$conn->query("DELETE FROM settings WHERE setting_key IN ('wa_support_number', 'fonnte_token')");
+
+    $stmt1 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('wa_support_number', ?)");
+    if ($stmt1) {
+        $stmt1->bind_param("s", $wa_target);
+        $stmt1->execute();
+        $stmt1->close();
+    }
+
+    $stmt2 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('fonnte_token', ?)");
+    if ($stmt2) {
+        $stmt2->bind_param("s", $fonnte_token);
+        $stmt2->execute();
+        $stmt2->close();
+    }
+
+    $msg_success = "Pengaturan WhatsApp Gateway & Token Fonnte berhasil disimpan!";
 }
 
 // Proses Tes Kirim WA
@@ -101,11 +118,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['test_send_wa'])) {
 $current_wa = '085771593522';
 $current_token = '';
 
-$resSettings = $conn->query("SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('wa_support_number', 'fonnte_token')");
-if ($resSettings) {
-    while ($r = $resSettings->fetch_assoc()) {
-        if ($r['setting_key'] === 'wa_support_number' && !empty($r['setting_value'])) $current_wa = $r['setting_value'];
-        if ($r['setting_key'] === 'fonnte_token') $current_token = $r['setting_value'];
+// Baca dari JSON file terlebih dahulu
+$configFile = __DIR__ . '/includes/wa_gateway_config.json';
+if (file_exists($configFile)) {
+    $cfg = json_decode(@file_get_contents($configFile), true);
+    if (!empty($cfg['wa_support_number'])) $current_wa = trim($cfg['wa_support_number']);
+    if (!empty($cfg['fonnte_token'])) $current_token = trim($cfg['fonnte_token']);
+}
+
+// Fallback ke database jika di JSON belum ada
+if (empty($current_token)) {
+    $resSettings = $conn->query("SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('wa_support_number', 'fonnte_token')");
+    if ($resSettings) {
+        while ($r = $resSettings->fetch_assoc()) {
+            if ($r['setting_key'] === 'wa_support_number' && !empty($r['setting_value'])) $current_wa = $r['setting_value'];
+            if ($r['setting_key'] === 'fonnte_token' && !empty($r['setting_value'])) $current_token = $r['setting_value'];
+        }
     }
 }
 

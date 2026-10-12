@@ -41,18 +41,29 @@ $conn->query("
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ");
 
-// 2. Ambil Nomor Target & Token Gateway dari DB settings
+// 2. Ambil Nomor Target & Token Gateway
 $targetNumber = '085771593522';
 $tokenGateway = '';
 
-$resSettings = $conn->query("SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('wa_support_number', 'fonnte_token', 'wa_gateway_token')");
-if ($resSettings) {
-    while ($row = $resSettings->fetch_assoc()) {
-        if ($row['setting_key'] === 'wa_support_number' && !empty($row['setting_value'])) {
-            $targetNumber = trim($row['setting_value']);
-        }
-        if (in_array($row['setting_key'], ['fonnte_token', 'wa_gateway_token']) && !empty($row['setting_value'])) {
-            $tokenGateway = trim($row['setting_value']);
+// Prioritas 1: Baca dari JSON config file
+$configFile = __DIR__ . '/includes/wa_gateway_config.json';
+if (file_exists($configFile)) {
+    $cfg = json_decode(@file_get_contents($configFile), true);
+    if (!empty($cfg['wa_support_number'])) $targetNumber = trim($cfg['wa_support_number']);
+    if (!empty($cfg['fonnte_token'])) $tokenGateway = trim($cfg['fonnte_token']);
+}
+
+// Prioritas 2: Baca dari database settings jika di JSON belum ada
+if (empty($tokenGateway)) {
+    $resSettings = $conn->query("SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('wa_support_number', 'fonnte_token', 'wa_gateway_token')");
+    if ($resSettings) {
+        while ($row = $resSettings->fetch_assoc()) {
+            if ($row['setting_key'] === 'wa_support_number' && !empty($row['setting_value'])) {
+                $targetNumber = trim($row['setting_value']);
+            }
+            if (in_array($row['setting_key'], ['fonnte_token', 'wa_gateway_token']) && !empty($row['setting_value'])) {
+                $tokenGateway = trim($row['setting_value']);
+            }
         }
     }
 }
