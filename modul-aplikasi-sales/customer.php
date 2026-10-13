@@ -137,7 +137,7 @@ if (!empty($_SESSION['flash_success'])) {
     unset($_SESSION['flash_success']);
 }
 $errorMsg = "";
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['update_id'])) {
     $id = $_POST['update_id'];
     $nama = $_POST['edit_nama'];
     $kategori = $_POST['edit_kategori'];
@@ -237,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'])) {
 }
 
 // INSERT
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_id'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && !isset($_POST['update_id'])) {
     $nama = $_POST['nama'];
     $kategori = $_POST['kategori'];
     $is_tiptok = isset($_POST['is_tiptok']) ? 1 : 0;
@@ -356,20 +356,62 @@ $filterSearch = isset($_GET['search']) ? trim($_GET['search']) : '';
 $filterWilayah = isset($_GET['wilayah']) ? trim($_GET['wilayah']) : 'all';
 $filterKategori = isset($_GET['kategori']) ? trim($_GET['kategori']) : 'all';
 
-// Check if tiptok_penitipan exists
+// Auto-ensure tiptok tables exist
+@$conn->query("CREATE TABLE IF NOT EXISTS `tiptok_penitipan` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `kode_titip` VARCHAR(50) NOT NULL UNIQUE,
+    `id_customer` INT NOT NULL,
+    `id_sales` INT NULL,
+    `nama_sales` VARCHAR(100) NULL,
+    `tgl_titip` DATE NOT NULL,
+    `status` ENUM('aktif', 'selesai', 'ditarik') DEFAULT 'aktif',
+    `catatan` TEXT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX (`id_customer`),
+    INDEX (`id_sales`),
+    INDEX (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+@$conn->query("CREATE TABLE IF NOT EXISTS `tiptok_items` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `id_penitipan` INT NOT NULL,
+    `kode_titip` VARCHAR(50) NOT NULL,
+    `nama_barang` VARCHAR(255) NOT NULL,
+    `tipe_barang` VARCHAR(100) NULL,
+    `qty_titip` INT NOT NULL DEFAULT 0,
+    `qty_sisa` INT NOT NULL DEFAULT 0,
+    `qty_terjual` INT NOT NULL DEFAULT 0,
+    `insentif_per_unit` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    `total_insentif` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    `status_item` ENUM('titip', 'habis_terjual', 'ditarik') DEFAULT 'titip',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX (`id_penitipan`),
+    INDEX (`kode_titip`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+// Check if tiptok tables exist
 $hasTiptokTbl = false;
+$hasTiptokItems = false;
 $chkTiptok = @$conn->query("SHOW TABLES LIKE 'tiptok_penitipan'");
 if ($chkTiptok && $chkTiptok->num_rows > 0) {
     $hasTiptokTbl = true;
 }
+$chkItems = @$conn->query("SHOW TABLES LIKE 'tiptok_items'");
+if ($chkItems && $chkItems->num_rows > 0) {
+    $hasTiptokItems = true;
+}
 
-$tiptokSelect = "";
-if ($hasTiptokTbl) {
+$tiptokSelect = ", 0 AS tiptok_aktif_count, 0 AS tiptok_sisa_qty, 0 AS tiptok_total_count ";
+if ($hasTiptokTbl && $hasTiptokItems) {
     $tiptokSelect = ", (SELECT COUNT(*) FROM tiptok_penitipan tp WHERE tp.id_customer = c.id AND tp.status = 'aktif') AS tiptok_aktif_count,
                        (SELECT SUM(ti.qty_sisa) FROM tiptok_items ti JOIN tiptok_penitipan tp ON ti.id_penitipan = tp.id WHERE tp.id_customer = c.id AND tp.status = 'aktif') AS tiptok_sisa_qty,
                        (SELECT COUNT(*) FROM tiptok_penitipan tp WHERE tp.id_customer = c.id) AS tiptok_total_count ";
-} else {
-    $tiptokSelect = ", 0 AS tiptok_aktif_count, 0 AS tiptok_sisa_qty, 0 AS tiptok_total_count ";
+} elseif ($hasTiptokTbl) {
+    $tiptokSelect = ", (SELECT COUNT(*) FROM tiptok_penitipan tp WHERE tp.id_customer = c.id AND tp.status = 'aktif') AS tiptok_aktif_count,
+                       0 AS tiptok_sisa_qty,
+                       (SELECT COUNT(*) FROM tiptok_penitipan tp WHERE tp.id_customer = c.id) AS tiptok_total_count ";
 }
 
 // Build the query
@@ -390,7 +432,7 @@ if ($filterWilayah !== 'all') {
 
 if ($filterKategori === 'tiptok') {
     if ($hasTiptokTbl) {
-        $queryStr .= " AND (c.is_tiptok = 1 OR c.id IN (SELECT DISTINCT id_customer FROM tiptok_penitipan WHERE status = 'aktif' OR deleted_at IS NULL)) ";
+        $queryStr .= " AND (c.is_tiptok = 1 OR c.id IN (SELECT DISTINCT id_customer FROM tiptok_penitipan WHERE status = 'aktif')) ";
     } else {
         $queryStr .= " AND c.is_tiptok = 1 ";
     }
@@ -401,6 +443,31 @@ if ($filterKategori === 'tiptok') {
 
 $queryStr .= " ORDER BY c.id DESC";
 $salesData = mysqli_query($conn, $queryStr);
+
+// Fallback safeguard if query failed
+if (!$salesData) {
+    error_log("Customer query error: " . mysqli_error($conn) . " | Query: " . $queryStr);
+    $fallbackQuery = "SELECT c.*, w.nama AS nama_wilayah, 0 AS tiptok_aktif_count, 0 AS tiptok_sisa_qty, 0 AS tiptok_total_count 
+                      FROM sales_customer c 
+                      LEFT JOIN wilayah w ON c.id_wilayah = w.id 
+                      WHERE c.deleted_at IS NULL ";
+    if ($filterSearch !== '') {
+        $safeSearch = mysqli_real_escape_string($conn, $filterSearch);
+        $fallbackQuery .= " AND (c.nama LIKE '%$safeSearch%' OR c.kode_customer LIKE '%$safeSearch%' OR c.telp_pribadi LIKE '%$safeSearch%' OR c.alamat LIKE '%$safeSearch%') ";
+    }
+    if ($filterWilayah !== 'all') {
+        $safeWilayah = mysqli_real_escape_string($conn, $filterWilayah);
+        $fallbackQuery .= " AND c.id_wilayah = '$safeWilayah' ";
+    }
+    if ($filterKategori !== 'all' && $filterKategori !== 'tiptok') {
+        $safeKategori = mysqli_real_escape_string($conn, $filterKategori);
+        $fallbackQuery .= " AND c.kategori = '$safeKategori' ";
+    }
+    $fallbackQuery .= " ORDER BY c.id DESC";
+    $salesData = mysqli_query($conn, $fallbackQuery);
+}
+
+$totalCustomerDisplayed = ($salesData && $salesData instanceof mysqli_result) ? mysqli_num_rows($salesData) : 0;
 
 // Calculate statistics for vibrant stat counters
 $statTotalCust = 0;
@@ -415,7 +482,7 @@ $qStats = mysqli_query($conn, "SELECT
     SUM(CASE WHEN kategori = 'Dealer' THEN 1 ELSE 0 END) AS count_dealer,
     SUM(CASE WHEN kategori = 'Installer' THEN 1 ELSE 0 END) AS count_installer,
     SUM(CASE WHEN kategori = 'User' THEN 1 ELSE 0 END) AS count_user,
-    SUM(CASE WHEN (is_tiptok = 1 " . ($hasTiptokTbl ? "OR id IN (SELECT DISTINCT id_customer FROM tiptok_penitipan WHERE deleted_at IS NULL)" : "") . ") THEN 1 ELSE 0 END) AS count_tiptok,
+    SUM(CASE WHEN (is_tiptok = 1 " . ($hasTiptokTbl ? "OR id IN (SELECT DISTINCT id_customer FROM tiptok_penitipan WHERE status = 'aktif')" : "") . ") THEN 1 ELSE 0 END) AS count_tiptok,
     SUM(CASE WHEN lat IS NOT NULL AND lat != '' AND lon IS NOT NULL AND lon != '' THEN 1 ELSE 0 END) AS count_mapped
 FROM sales_customer 
 WHERE deleted_at IS NULL");
@@ -1744,7 +1811,7 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
                       <span style="color:rgba(255,255,255,0.7); font-size:11.5px; font-weight:600;">Kelola data toko mitra, dealer, konsinyasi, dan lokasi geofence</span>
                   </div>
               </div>
-              <span class="badge bg-white text-dark font-weight-bold" style="font-size: 11.5px; padding: 7px 16px; border-radius: 30px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><?= mysqli_num_rows($salesData); ?> Customer Ditampilkan</span>
+              <span class="badge bg-white text-dark font-weight-bold" style="font-size: 11.5px; padding: 7px 16px; border-radius: 30px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><?= $totalCustomerDisplayed; ?> Customer Ditampilkan</span>
           </div>
       </div>
       
@@ -1848,7 +1915,7 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
             $filterQueryString = $_GET;
             unset($filterQueryString['delete_id']);
             $no = 1; 
-            while ($row = mysqli_fetch_assoc($salesData)): 
+            while ($salesData && $row = mysqli_fetch_assoc($salesData)): 
               $kat = htmlspecialchars($row['kategori'] ?? '');
               $badgeClass = match($kat) {
                 'Dealer' => 'badge-dealer',
@@ -2077,7 +2144,7 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
               </td>
             </tr>
             <?php endwhile; ?>
-            <?php if (mysqli_num_rows($salesData) == 0): ?>
+            <?php if ($totalCustomerDisplayed == 0): ?>
               <tr>
                 <td colspan="7" class="text-center text-muted" style="padding: 40px;">Belum ada customer terdaftar.</td>
               </tr>
