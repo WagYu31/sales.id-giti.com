@@ -820,40 +820,114 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
       margin-left: 2px;
     }
 
-    /* ── Table Styling ── */
+    /* ── Table Styling & Sticky Header (21st.dev Style) ── */
+    .table-scroll-container {
+      max-height: max(380px, calc(100vh - 280px));
+      min-height: 200px;
+      overflow-y: auto;
+      overflow-x: auto;
+      position: relative;
+      border-radius: 0 0 20px 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 #f8fafc;
+      overscroll-behavior: contain;
+    }
+
+    .table-scroll-container::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .table-scroll-container::-webkit-scrollbar-track {
+      background: #f8fafc;
+    }
+    .table-scroll-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    .table-scroll-container::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
     .premium-table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
     }
 
+    .premium-table thead {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+    }
+
     .premium-table th {
-      background: #f8fafc;
-      border-bottom: 2px solid #e2e8f0;
-      color: #475569;
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      background: #f8fafc !important;
+      border-bottom: 2px solid #cbd5e1;
+      color: #1e293b;
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      padding: 18px 20px;
+      padding: 16px 20px;
       text-align: left;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
     }
 
     .premium-table td {
-      padding: 18px 20px;
+      padding: 16px 20px;
       border-bottom: 1px solid #f1f5f9;
       color: #334155;
       font-size: 13.5px;
       vertical-align: middle;
+      background: #ffffff;
     }
 
     .premium-table tbody tr {
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
     }
 
-    .premium-table tbody tr:hover {
-      background-color: #f8fafc;
+    .premium-table tbody tr:hover td {
+      background-color: #f8fafc !important;
       box-shadow: inset 3px 0 0 0 #2563eb;
+    }
+
+    /* Floating Scroll To Top Button */
+    .btn-table-scroll-top {
+      position: absolute;
+      bottom: 24px;
+      right: 28px;
+      z-index: 30;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 45%, #2563eb 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25), 0 2px 6px rgba(37, 99, 235, 0.3);
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(12px) scale(0.95);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(8px);
+    }
+    .btn-table-scroll-top.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+    .btn-table-scroll-top:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.35), 0 4px 12px rgba(37, 99, 235, 0.4);
+      color: #ffffff;
     }
 
     /* ── Solid WhatsApp Button ── */
@@ -1743,8 +1817,10 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
           </form>
       </div>
       
-      <div class="table-responsive">
-        <table class="premium-table">
+      <!-- Scrollable Table Container with Sticky Thead (Gambar 2 stays visible when scrolling) -->
+      <div class="position-relative">
+        <div class="table-responsive table-scroll-container" id="customerTableScroll">
+          <table class="premium-table">
           <thead>
             <tr>
               <th style="width: 50px; text-align: center;">No</th>
@@ -1985,13 +2061,20 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
             <?php endwhile; ?>
             <?php if (mysqli_num_rows($salesData) == 0): ?>
               <tr>
-                <td colspan="6" class="text-center text-muted" style="padding: 40px;">Belum ada customer terdaftar.</td>
+                <td colspan="7" class="text-center text-muted" style="padding: 40px;">Belum ada customer terdaftar.</td>
               </tr>
             <?php endif; ?>
           </tbody>
         </table>
       </div>
+
+      <!-- Floating Scroll to Top Button for Table -->
+      <button type="button" id="btnTableScrollTop" class="btn-table-scroll-top" onclick="scrollTableToTop()" title="Kembali ke baris pertama">
+        <span class="material-symbols-outlined" style="font-size: 16px;">arrow_upward</span>
+        <span>Ke Atas</span>
+      </button>
     </div>
+  </div>
 
     <!-- Modal View Detail Customer -->
     <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
@@ -3585,6 +3668,26 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
   makeModalDraggable('detailModal');
   makeModalDraggable('visitsDetailModal');
   makeModalDraggable('editModal');
+
+  // Handle Customer Table Scroll & Floating "Ke Atas" Button (Gambar 2 sticky preservation)
+  const custTableScroll = document.getElementById('customerTableScroll');
+  const btnScrollTop = document.getElementById('btnTableScrollTop');
+
+  if (custTableScroll && btnScrollTop) {
+    custTableScroll.addEventListener('scroll', () => {
+      if (custTableScroll.scrollTop > 180) {
+        btnScrollTop.classList.add('show');
+      } else {
+        btnScrollTop.classList.remove('show');
+      }
+    });
+  }
+
+  function scrollTableToTop() {
+    if (custTableScroll) {
+      custTableScroll.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 </script>
 </body>
 </html>
