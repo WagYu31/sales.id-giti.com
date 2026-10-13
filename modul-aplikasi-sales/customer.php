@@ -9,7 +9,7 @@ date_default_timezone_set('Asia/Jakarta');
 
 // Soft Delete
 if (isset($_GET['delete_id'])) {
-    $id = $_GET['delete_id'];
+    $id = intval($_GET['delete_id']);
     
     // Get current photos and delete files
     $getFoto = $conn->prepare("SELECT foto FROM sales_customer WHERE id = ?");
@@ -29,7 +29,14 @@ if (isset($_GET['delete_id'])) {
     }
 
     $conn->query("UPDATE sales_customer SET deleted_at = NOW() WHERE id = '$id'");
-    header("Location: " . $_SERVER['PHP_SELF']);
+    $_SESSION['flash_success'] = "Data Customer berhasil dihapus!";
+
+    // Preserve current query parameters (kategori, wilayah, search, etc.)
+    $redirectParams = $_GET;
+    unset($redirectParams['delete_id']);
+    $redirectUrl = 'customer.php' . (!empty($redirectParams) ? '?' . http_build_query($redirectParams) : '');
+    
+    header("Location: " . $redirectUrl);
     exit();
 }
 
@@ -125,6 +132,10 @@ if (file_exists($jsonCustFile)) {
 
 // UPDATE
 $successMsg = "";
+if (!empty($_SESSION['flash_success'])) {
+    $successMsg = $_SESSION['flash_success'];
+    unset($_SESSION['flash_success']);
+}
 $errorMsg = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id'])) {
     $id = $_POST['update_id'];
@@ -1833,7 +1844,11 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
             </tr>
           </thead>
           <tbody>
-            <?php $no = 1; while ($row = mysqli_fetch_assoc($salesData)): 
+            <?php 
+            $filterQueryString = $_GET;
+            unset($filterQueryString['delete_id']);
+            $no = 1; 
+            while ($row = mysqli_fetch_assoc($salesData)): 
               $kat = htmlspecialchars($row['kategori'] ?? '');
               $badgeClass = match($kat) {
                 'Dealer' => 'badge-dealer',
@@ -2052,8 +2067,11 @@ if ($qStats && $rStats = mysqli_fetch_assoc($qStats)) {
                   <span class="material-symbols-outlined">edit</span>
                 </button>
 
-                <!-- DELETE BUTTON -->
-                <a href="?delete_id=<?= $row['id']; ?>" class="btn-act btn-act-delete" onclick="return confirm('Yakin ingin menghapus customer ini?')" title="Hapus Customer">
+                <!-- DELETE BUTTON (Preserves current filters: kategori, wilayah, search) -->
+                <?php 
+                $deleteUrl = 'customer.php?' . http_build_query(array_merge($filterQueryString, ['delete_id' => $row['id']])); 
+                ?>
+                <a href="<?= htmlspecialchars($deleteUrl); ?>" class="btn-act btn-act-delete" onclick="return confirm('Yakin ingin menghapus customer ini?')" title="Hapus Customer">
                   <span class="material-symbols-outlined">delete</span>
                 </a>
               </td>
