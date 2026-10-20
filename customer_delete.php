@@ -45,6 +45,12 @@ if ($result_check->num_rows > 0) {
             if (!$stmt_addresses->execute()) throw new Exception("Gagal menghapus data alamat.");
             $stmt_addresses->close();
 
+            // 4. Soft delete di tabel `follow_ups` (mencegah data yatim piatu / orphaned records)
+            $stmt_fu = $conn->prepare("UPDATE follow_ups SET deleted_at = ? WHERE customer_id = ? AND deleted_at IS NULL");
+            $stmt_fu->bind_param("si", $now, $customer_id);
+            $stmt_fu->execute();
+            $stmt_fu->close();
+
             $conn->commit();
             $_SESSION['flash_message'] = "Customer '" . htmlspecialchars($customer['nama_toko']) . "' berhasil dihapus.";
 

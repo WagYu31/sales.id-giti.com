@@ -43,6 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $customer_id = $conn->insert_id;
         $stmt_customer->close();
 
+        // Pastikan toko baru benar-benar bersih dari data riwayat follow up lama yang tertinggal (orphaned records)
+        $conn->query("UPDATE follow_ups SET deleted_at = NOW() WHERE customer_id = " . (int)$customer_id . " AND deleted_at IS NULL");
+
         // Insert data PICs dan teleponnya ke tabel `customer_pics`
         if (isset($_POST['nama_pic']) && is_array($_POST['nama_pic'])) {
             $stmt_pic = $conn->prepare("INSERT INTO customer_pics (customer_id, nama_pic, tlp_pic) VALUES (?, ?, ?)");

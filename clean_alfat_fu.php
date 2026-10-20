@@ -28,10 +28,55 @@ $qCust = $conn->query("SELECT c.*, s.nama_lengkap as nama_sales
                        ORDER BY c.id DESC");
 
 if (!$qCust || $qCust->num_rows === 0) {
+    if ($is_cli) {
+        die("Customer ALFAT tidak ditemukan di database.\n");
+    }
     die("<div style='font-family:sans-serif;padding:20px;'>Customer ALFAT tidak ditemukan di database.</div>");
 }
 
 $customers = $qCust->fetch_all(MYSQLI_ASSOC);
+
+// Jika dijalankan via Terminal CLI
+if ($is_cli) {
+    echo "=====================================================\n";
+    echo "  PEMERIKSAAN & PEMBERSIHAN DATA FOLLOW UP ALFAT\n";
+    echo "=====================================================\n\n";
+    foreach ($customers as $cust) {
+        $cid = (int)$cust['id'];
+        echo "Customer: [ID: {$cust['id']}] {$cust['nama_toko']}\n";
+        echo "Sales   : {$cust['nama_sales']} (ID: {$cust['sales_id']}) | Tanggal Input: {$cust['tgl_input']}\n\n";
+        
+        $qFu = $conn->query("SELECT fu.*, s.nama_lengkap as nama_sales_fu 
+                             FROM follow_ups fu 
+                             LEFT JOIN sales s ON fu.sales_id = s.id 
+                             WHERE fu.customer_id = $cid AND fu.deleted_at IS NULL 
+                             ORDER BY fu.tgl_follow_up DESC");
+        $fus = $qFu ? $qFu->fetch_all(MYSQLI_ASSOC) : [];
+        echo "Daftar Follow Up Terhubung (" . count($fus) . " catatan):\n";
+        foreach ($fus as $f) {
+            $isMatch = ($f['sales_id'] == $cust['sales_id']);
+            $status = $isMatch ? "[SESUAI (PRISKA)]" : "[⚠️ SALAH / EDI SUPRIANTO]";
+            echo " • FU #{$f['id']} | {$f['tgl_follow_up']} | Sales: {$f['nama_sales_fu']} | Inv: {$f['no_inv']} | {$status}\n";
+        }
+        
+        if (isset($argv[1]) && $argv[1] === '--clean') {
+            $stmtClean = $conn->prepare("UPDATE follow_ups fu 
+                                         JOIN customers c ON fu.customer_id = c.id 
+                                         SET fu.deleted_at = NOW() 
+                                         WHERE fu.customer_id = ? 
+                                           AND fu.sales_id != c.sales_id 
+                                           AND fu.deleted_at IS NULL");
+            $stmtClean->bind_param("i", $cid);
+            $stmtClean->execute();
+            $aff = $stmtClean->affected_rows;
+            $stmtClean->close();
+            echo "\n>>> HASIL: {$aff} catatan follow-up Edi Suprianto BERHASIL DIBERSIHKAN! <<<\n";
+        } else {
+            echo "\nKetik 'php clean_alfat_fu.php --clean' untuk langsung membersihkan via CLI.\n";
+        }
+    }
+    exit(0);
+}
 
 // Handle Action Clean
 $msg = '';
