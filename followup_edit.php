@@ -62,22 +62,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $tgl_follow_up = $_POST['tgl_follow_up'];
     }
 
+    $target_customer_id = $customer_id;
+    if ($_SESSION['role'] === 'superadmin' && !empty($_POST['target_customer_id']) && is_numeric($_POST['target_customer_id'])) {
+        $target_customer_id = (int)$_POST['target_customer_id'];
+    }
+
     $stmt_up = $conn->prepare("
         UPDATE follow_ups 
-        SET no_inv = ?, nominal_invoice = ?, respon = ?, keterangan = ?, tgl_follow_up = ?
+        SET customer_id = ?, no_inv = ?, nominal_invoice = ?, respon = ?, keterangan = ?, tgl_follow_up = ?
         WHERE id = ?
     ");
     
     if (!$stmt_up) {
         $error = "Database error: " . $conn->error;
     } else {
-        $stmt_up->bind_param("sdsssi", $no_inv, $nominal_invoice, $respon, $keterangan, $tgl_follow_up, $fu_id);
+        $stmt_up->bind_param("isdsssi", $target_customer_id, $no_inv, $nominal_invoice, $respon, $keterangan, $tgl_follow_up, $fu_id);
 
         if ($stmt_up->execute()) {
-            $_SESSION['flash_message'] = "Data Follow Up & Nominal Invoice berhasil diperbarui!";
-            $redirect_to = $_POST['redirect'] ?? ($_GET['redirect'] ?? ('followup_view.php?customer_id=' . $customer_id));
+            $_SESSION['flash_message'] = "Data Follow Up berhasil diperbarui!";
+            $redirect_to = $_POST['redirect'] ?? ($_GET['redirect'] ?? ('followup_view.php?customer_id=' . $target_customer_id));
             if (empty($redirect_to)) {
-                $redirect_to = 'followup_view.php?customer_id=' . $customer_id;
+                $redirect_to = 'followup_view.php?customer_id=' . $target_customer_id;
             }
             if (!headers_sent()) {
                 header("Location: " . $redirect_to);
@@ -158,6 +163,34 @@ require_once 'includes/header.php';
                 <div class="mb-4">
                     <label for="tgl_follow_up" class="form-label fw-bold text-dark">Tanggal Follow Up (Superadmin Only)</label>
                     <input type="datetime-local" class="form-control" id="tgl_follow_up" name="tgl_follow_up" value="<?php echo date('Y-m-d\TH:i', strtotime($fu['tgl_follow_up'])); ?>" style="border-radius:14px; padding: 12px 16px;">
+                </div>
+
+                <!-- Alihkan / Pindahkan ke Customer Lain (Superadmin Only) -->
+                <div class="mb-4 p-3 bg-light rounded-4 border">
+                    <label for="target_customer_id" class="form-label fw-bold text-dark d-flex align-items-center justify-content-between">
+                        <span>🏢 Alihkan / Pindahkan Relasi ke Customer Lain:</span>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2.5 py-1">Superadmin Only</span>
+                    </label>
+                    <select name="target_customer_id" id="target_customer_id" class="form-select" style="border-radius:12px; padding: 10px 14px;">
+                        <option value="<?php echo $fu['customer_id']; ?>" selected>
+                            Tetap di toko saat ini: <?php echo htmlspecialchars($fu['nama_toko']); ?> (ID: <?php echo $fu['customer_id']; ?>)
+                        </option>
+                        <optgroup label="Pindahkan ke Customer Lain:">
+                        <?php
+                        $qOtherCust = $conn->query("SELECT id, nama_toko FROM customers WHERE deleted_at IS NULL ORDER BY nama_toko ASC");
+                        if ($qOtherCust) {
+                            while ($oc = $qOtherCust->fetch_assoc()) {
+                                if ($oc['id'] == $fu['customer_id']) continue;
+                                $isBudi = (stripos($oc['nama_toko'], 'BUDI LUHUR') !== false) ? ' 🌟 [BUDI LUHUR ABADI]' : '';
+                                echo '<option value="' . $oc['id'] . '">Pindahkan ke: ' . htmlspecialchars($oc['nama_toko']) . $isBudi . ' (ID: ' . $oc['id'] . ')</option>';
+                            }
+                        }
+                        ?>
+                        </optgroup>
+                    </select>
+                    <div class="form-text text-muted" style="font-size: 12px; margin-top: 6px;">
+                        💡 <strong>Catatan:</strong> Jika catatan follow-up ini salah masuk toko dan sebenarnya milik toko lain (misal <strong>BUDI LUHUR ABADI</strong>), pilih toko tujuan di sini lalu klik Simpan. Catatan ini akan <strong>dipindahkan secara utuh tanpa dihapus</strong>.
+                    </div>
                 </div>
                 <?php endif; ?>
 

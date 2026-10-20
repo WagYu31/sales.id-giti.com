@@ -83,8 +83,6 @@ if (isset($_FILES['customer_file']) && $_FILES['customer_file']['error'] == 0) {
             $customer_id = $conn->insert_id;
             $stmt_customer->close();
 
-            $conn->query("UPDATE follow_ups SET deleted_at = NOW() WHERE customer_id = " . (int)$customer_id . " AND deleted_at IS NULL");
-
             $stmt_pic = $conn->prepare("INSERT INTO customer_pics (customer_id, nama_pic, tlp_pic) VALUES (?, ?, ?)");
             $stmt_pic->bind_param("iss", $customer_id, $nama_pic, $processed_tlp);
             $stmt_pic->execute();
