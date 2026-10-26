@@ -289,13 +289,64 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     padding: 22px 24px;
 }
 
-.col-span-5 { grid-column: span 5; }
-.col-span-7 { grid-column: span 7; }
+/* Balanced 6 & 6 columns on top row; 7 & 5 on bottom row */
+.col-span-top-left { grid-column: span 6; }
+.col-span-top-right { grid-column: span 6; }
+.col-span-bottom-left { grid-column: span 7; }
+.col-span-bottom-right { grid-column: span 5; }
 
-@media (max-width: 1080px) {
-    .col-span-5, .col-span-7 { grid-column: span 12; }
+/* Backward compatibility for legacy col-span classes */
+.col-span-5 { grid-column: span 6; }
+.col-span-7 { grid-column: span 6; }
+
+@media (min-width: 1200px) {
+    .bento-card-bottom.col-span-bottom-left { grid-column: span 7; }
+    .bento-card-bottom.col-span-bottom-right { grid-column: span 5; }
+}
+
+@media (max-width: 1199px) {
+    .col-span-bottom-left, .col-span-bottom-right { grid-column: span 12; }
+    .bento-card-bottom { min-height: auto; }
+}
+
+@media (max-width: 991px) {
+    .col-span-top-left, .col-span-top-right, .col-span-5, .col-span-7 { grid-column: span 12; }
     .bento-card-top { height: auto; min-height: 180px; }
     .bento-card-bottom { min-height: auto; }
+}
+
+@media (max-width: 639px) {
+    .bento-grid { gap: 12px; }
+    .bento-card { border-radius: 18px; }
+    .bento-card-top { padding: 16px; height: auto; }
+    .bento-card-bottom { padding: 16px; }
+    .bento-top-row { flex-direction: column; align-items: stretch; gap: 12px; height: auto; }
+    .bento-stat-col { min-width: 100%; }
+    .bento-chart-container { height: 100px !important; width: 100% !important; }
+    .bento-radar-box { max-width: 220px; height: 200px; }
+    .bento-header-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+
+.bento-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    gap: 16px;
+}
+
+.bento-stat-col {
+    flex: 0 0 auto;
+    min-width: 185px;
+    max-width: 100%;
+}
+
+.bento-curr {
+    font-size: 0.65em;
+    font-weight: 700;
+    color: #64748B;
+    margin-right: 4px;
+    letter-spacing: -0.01em;
 }
 
 .bento-label {
@@ -307,18 +358,17 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
 }
 
 .bento-big-num {
-    font-size: 30px;
+    font-size: clamp(22px, 2.2vw, 29px);
     font-weight: 700;
-    line-height: 1.1;
-    margin-top: 6px;
+    line-height: 1.15;
+    margin-top: 5px;
     font-family: 'Geist Mono', monospace;
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.03em;
     color: #0F172A;
     display: flex;
     align-items: baseline;
-    gap: 8px;
-    flex-wrap: wrap;
+    white-space: nowrap;
 }
 
 .bento-delta {
@@ -413,10 +463,26 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     position: relative;
 }
 
+.bento-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 14px;
+}
+
+.bento-table-wrap::-webkit-scrollbar {
+    height: 4px;
+}
+
+.bento-table-wrap::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+
 .bento-table {
     width: 100%;
+    min-width: 380px;
     border-collapse: collapse;
-    margin-top: 14px;
     font-size: 12px;
 }
 
@@ -428,6 +494,7 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
+    white-space: nowrap;
 }
 
 .bento-table td {
@@ -435,6 +502,7 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     border-bottom: 1px solid #F1F5F9;
     font-family: 'Geist Mono', monospace;
     font-size: 12px;
+    white-space: nowrap;
 }
 
 .bento-tooltip {
@@ -474,19 +542,17 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
 
     <!-- Grid Container -->
     <div class="bento-grid">
-        <!-- ================= CARD 1: REVENUE / OMSET PENJUALAN (col-span-5) ================= -->
-        <div class="bento-card bento-card-top col-span-5">
-            <div class="d-flex align-items-center justify-content-between h-100 gap-3">
-                <div style="flex: 0 0 165px;">
+        <!-- ================= CARD 1: REVENUE / OMSET PENJUALAN (col-span-top-left) ================= -->
+        <div class="bento-card bento-card-top col-span-top-left">
+            <div class="bento-top-row">
+                <div class="bento-stat-col">
                     <div class="bento-label">Omset Penjualan (Real)</div>
                     <div class="bento-big-num">
-                        <span id="bentoRevVal">
-                            <?php if ($real_omset > 0): ?>
-                                Rp <?= number_format($real_omset, 0, ',', '.') ?>
-                            <?php else: ?>
-                                Rp 0
-                            <?php endif; ?>
-                        </span>
+                        <?php if ($real_omset > 0): ?>
+                            <span class="bento-curr">Rp</span><span id="bentoRevVal"><?= number_format($real_omset, 0, ',', '.') ?></span>
+                        <?php else: ?>
+                            <span class="bento-curr">Rp</span><span id="bentoRevVal">0</span>
+                        <?php endif; ?>
                     </div>
                     <div class="d-flex align-items-center gap-1.5 mt-1">
                         <span class="bento-delta">
@@ -506,10 +572,10 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
             </div>
         </div>
 
-        <!-- ================= CARD 2: TOTAL CUSTOMER & SESSIONS (col-span-7) ================= -->
-        <div class="bento-card bento-card-top col-span-7">
-            <div class="d-flex align-items-center justify-content-between h-100 gap-3">
-                <div style="flex: 0 0 185px;">
+        <!-- ================= CARD 2: TOTAL CUSTOMER & SESSIONS (col-span-top-right) ================= -->
+        <div class="bento-card bento-card-top col-span-top-right">
+            <div class="bento-top-row">
+                <div class="bento-stat-col">
                     <div class="bento-label">Total Customer Terdaftar</div>
                     <div class="bento-big-num">
                         <span id="bentoSessVal"><?= number_format($total_cust_val, 0, ',', '.') ?></span>
@@ -543,8 +609,8 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
             </div>
         </div>
 
-        <!-- ================= CARD 3: KATEGORI CUSTOMER (TREEMAP) (col-span-7) ================= -->
-        <div class="bento-card bento-card-bottom col-span-7">
+        <!-- ================= CARD 3: KATEGORI CUSTOMER (TREEMAP) (col-span-bottom-left) ================= -->
+        <div class="bento-card bento-card-bottom col-span-bottom-left">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
                 <div>
                     <h5 class="fw-bold mb-0" style="font-size: 15.5px; letter-spacing: -0.02em; color: #0F172A;">
@@ -571,31 +637,33 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
             <!-- Squarified Treemap Area -->
             <div class="bento-treemap-box" id="bentoTreemapContainer"></div>
 
-            <!-- Regional Table (Real from DB) -->
-            <table class="bento-table">
-                <thead>
-                    <tr>
-                        <th style="text-align: left;">Wilayah Terbesar (Database)</th>
-                        <th style="text-align: right;">Total Toko</th>
-                        <th style="text-align: right;">Follow Up</th>
-                        <th style="text-align: right;">Penetrasi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($regions_table as $reg): ?>
+            <!-- Regional Table (Real from DB in Responsive Scroller) -->
+            <div class="bento-table-wrap">
+                <table class="bento-table">
+                    <thead>
                         <tr>
-                            <td class="text-secondary fw-semibold"><?= htmlspecialchars($reg['wilayah']) ?></td>
-                            <td style="text-align: right;" class="text-dark fw-bold"><?= $reg['toko'] ?></td>
-                            <td style="text-align: right;" class="text-dark"><?= $reg['fu'] ?></td>
-                            <td style="text-align: right;"><span class="badge bg-light text-success border px-2 py-0.5 rounded-pill fw-bold"><?= $reg['ratio'] ?></span></td>
+                            <th style="text-align: left;">Wilayah Terbesar (Database)</th>
+                            <th style="text-align: right;">Total Toko</th>
+                            <th style="text-align: right;">Follow Up</th>
+                            <th style="text-align: right;">Penetrasi</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($regions_table as $reg): ?>
+                            <tr>
+                                <td class="text-secondary fw-semibold"><?= htmlspecialchars($reg['wilayah']) ?></td>
+                                <td style="text-align: right;" class="text-dark fw-bold"><?= $reg['toko'] ?></td>
+                                <td style="text-align: right;" class="text-dark"><?= $reg['fu'] ?></td>
+                                <td style="text-align: right;"><span class="badge bg-light text-success border px-2 py-0.5 rounded-pill fw-bold"><?= $reg['ratio'] ?></span></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- ================= CARD 4: RADAR SEASONALITY & TARGET (col-span-5) ================= -->
-        <div class="bento-card bento-card-bottom col-span-5">
+        <!-- ================= CARD 4: RADAR SEASONALITY & TARGET (col-span-bottom-right) ================= -->
+        <div class="bento-card bento-card-bottom col-span-bottom-right">
             <div class="d-flex align-items-center justify-content-between mb-1">
                 <h5 class="fw-bold mb-0" style="font-size: 15.5px; letter-spacing: -0.02em; color: #0F172A;">
                     Tren Musiman (Seasonality Radar)
@@ -912,7 +980,7 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
         if (!container) return;
 
         const W = container.clientWidth || 550;
-        const H = 200;
+        const H = container.clientHeight || 200;
         const items = categoriesData.map(c => ({
             name: c.name,
             color: c.color,
@@ -926,26 +994,45 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
         container.innerHTML = rects.map(r => {
             const share = ((r.v / total) * 100).toFixed(1) + '%';
             const textColor = r.ink === 'light' ? '#FFFFFF' : '#0F172A';
+            const tileW = Math.max(10, Math.round(r.w) - 6);
+            const tileH = Math.max(10, Math.round(r.h) - 6);
+            const isCompact = tileW < 80 || tileH < 65;
+            const isMicro = tileW < 45 || tileH < 45;
+
             return `
                 <div class="bento-treemap-tile" style="
                     left: ${Math.round(r.x)}px;
                     top: ${Math.round(r.y)}px;
-                    width: ${Math.max(10, Math.round(r.w) - 6)}px;
-                    height: ${Math.max(10, Math.round(r.h) - 6)}px;
+                    width: ${tileW}px;
+                    height: ${tileH}px;
                     background: ${r.color};
                     color: ${textColor};
+                    padding: ${isCompact ? '6px 8px' : '10px 12px'};
                 " onmousemove="window.bentoTipHover(event, '${r.name}', '${r.v.toLocaleString('id-ID')} Toko', '${share}', '${r.color}')" onmouseleave="window.bentoTipLeave()">
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;">
+                    <div style="
+                        font-size: ${isCompact ? '9.5px' : '11px'};
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.02em;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        width: 100%;
+                    ">
                         ${r.name}
                     </div>
-                    <div class="d-flex align-items-end justify-content-between">
-                        <span style="font-family:'Geist Mono', monospace; font-size: 17px; font-weight: 700; line-height: 1;">
-                            ${r.v.toLocaleString('id-ID')}
-                        </span>
-                        <span style="font-size: 9.5px; background: rgba(0,0,0,0.45); color:#fff; padding: 2px 5px; border-radius: 5px; font-weight: 600;">
-                            ${share}
-                        </span>
-                    </div>
+                    ${!isMicro ? `
+                        <div class="d-flex align-items-end justify-content-between gap-1" style="overflow: hidden; width: 100%;">
+                            <span style="font-family:'Geist Mono', monospace; font-size: ${isCompact ? '13px' : '17px'}; font-weight: 700; line-height: 1; white-space: nowrap;">
+                                ${r.v.toLocaleString('id-ID')}
+                            </span>
+                            ${!isCompact ? `
+                                <span style="font-size: 9.5px; background: rgba(0,0,0,0.45); color:#fff; padding: 2px 5px; border-radius: 5px; font-weight: 600; white-space: nowrap;">
+                                    ${share}
+                                </span>
+                            ` : ''}
+                        </div>
+                    ` : ''}
                 </div>
             `;
         }).join('');
@@ -1040,12 +1127,12 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
 
     function initAllBento() {
         if (realRevenueTotal > 0) {
-            runCountUp('bentoRevVal', realRevenueTotal, 'Rp ');
+            runCountUp('bentoRevVal', realRevenueTotal, '');
         }
         initRevenueChart();
         initSessionsChart();
-        renderTreemap(0);
-        renderRadar(<?= $default_year_idx ?>);
+        renderTreemap(activeTreemapPeriod);
+        renderRadar(activeRadarYear);
     }
 
     window.addEventListener('load', initAllBento);
@@ -1055,6 +1142,17 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
         renderTreemap(activeTreemapPeriod);
         renderRadar(activeRadarYear);
     });
+
+    if (window.ResizeObserver) {
+        const ro = new ResizeObserver(() => {
+            initRevenueChart();
+            initSessionsChart();
+            renderTreemap(activeTreemapPeriod);
+            renderRadar(activeRadarYear);
+        });
+        const root = document.querySelector('.bento-root');
+        if (root) ro.observe(root);
+    }
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         setTimeout(initAllBento, 80);
