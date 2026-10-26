@@ -57,126 +57,195 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 .animate-in:nth-child(7) { animation-delay: 0.35s; }
 .animate-in:nth-child(8) { animation-delay: 0.4s; }
 
-/* ============ HERO WELCOME BANNER ============ */
-.welcome-banner {
-    background: linear-gradient(135deg, #060B18 0%, #0F172A 40%, #1E3A8A 85%, #2563EB 100%);
-    border-radius: 28px;
-    padding: 42px 48px;
-    margin-bottom: 34px;
+/* ============ EXECUTIVE COMMAND BAR (TASTE-SKILL COMPLIANT) ============ */
+.exec-command-bar {
+    background: #0B1120;
+    border-radius: 20px;
+    padding: 22px 28px;
+    margin-bottom: 24px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
-    border: 1.5px solid rgba(255, 255, 255, 0.18);
-    animation: fadeInScale3D 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    transform-style: preserve-3d;
-    perspective: 1200px;
+    box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.35);
+    border: 1px solid #1E293B;
 }
 
-.welcome-banner::before {
+.exec-command-bar::before {
     content: '';
     position: absolute;
-    top: -80px; right: -60px;
-    width: 450px; height: 450px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, rgba(37, 99, 235, 0.05) 65%, transparent 80%);
-    animation: floatGlow3D 8s ease-in-out infinite;
+    top: 0; right: 0;
+    width: 320px; height: 100%;
+    background: radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 70%);
+    pointer-events: none;
 }
 
-.welcome-banner::after {
-    content: '';
-    position: absolute;
-    bottom: -100px; left: 15%;
-    width: 380px; height: 380px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
-    animation: floatGlow3D 10s ease-in-out infinite reverse;
+.exec-bar-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
 }
 
-.welcome-content { position: relative; z-index: 2; }
-
-.status-pill-badge {
+.exec-status-pill {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    padding: 6px 16px;
-    border-radius: 30px;
-    font-size: 12px;
-    font-weight: 700;
-    color: #93C5FD;
-    margin-bottom: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4);
+    gap: 7px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #94A3B8;
+    letter-spacing: 0.02em;
 }
 
-.status-dot-pulse {
-    width: 8px; height: 8px;
+.exec-pulse-dot {
+    width: 6.5px;
+    height: 6.5px;
     border-radius: 50%;
-    background: #34D399;
-    animation: pulseGlow3D 2s infinite;
+    background: #10B981;
+    box-shadow: 0 0 8px #10B981;
+    animation: execPulse 2s infinite ease-in-out;
 }
 
-.welcome-title {
-    font-size: 36px;
+@keyframes execPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.exec-bar-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.exec-title-area {
+    min-width: 260px;
+}
+
+.exec-title {
+    font-size: 22px;
     font-weight: 800;
-    color: #FFFFFF;
-    letter-spacing: -0.035em;
-    margin: 0 0 10px 0;
-    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
-    line-height: 1.18;
-    text-shadow: 0 4px 14px rgba(0,0,0,0.25);
-    -webkit-font-smoothing: antialiased;
+    color: #F8FAFC;
+    letter-spacing: -0.025em;
+    margin: 0 0 4px 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1.2;
 }
 
-.welcome-subtitle {
-    font-size: 15px;
-    color: rgba(241, 245, 249, 0.92);
-    font-weight: 500;
-    line-height: 1.65;
-    margin: 0 0 24px 0;
-    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-    letter-spacing: -0.01em;
-    max-width: 640px;
+.exec-subtitle {
+    font-size: 13px;
+    color: #94A3B8;
+    font-weight: 400;
+    line-height: 1.5;
+    margin: 0;
 }
 
-.banner-action-btn {
+.exec-controls-area {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Omni-Search Input (Cmd+K style) */
+.exec-search-form {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.exec-search-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 13px;
+    color: #64748B;
+    pointer-events: none;
+}
+
+.exec-search-input {
+    background: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 8px 48px 8px 34px;
+    font-size: 12.5px;
+    color: #F8FAFC;
+    width: 250px;
+    transition: all 0.2s ease;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.exec-search-input:focus {
+    outline: none;
+    border-color: #0EA5E9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+    width: 280px;
+    background: #0F172A;
+}
+
+.exec-search-input::placeholder {
+    color: #64748B;
+    font-size: 12px;
+}
+
+.exec-search-kbd {
+    position: absolute;
+    right: 8px;
+    background: #334155;
+    border: 1px solid #475569;
+    border-radius: 5px;
+    padding: 1.5px 5px;
+    font-size: 10px;
+    color: #94A3B8;
+    font-family: monospace;
+    pointer-events: none;
+}
+
+.exec-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(12px);
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
-    color: #FFFFFF;
-    padding: 11px 26px;
-    border-radius: 30px;
-    font-size: 14px;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 12.5px;
     font-weight: 700;
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: 'Plus Jakarta Sans', sans-serif;
     letter-spacing: -0.01em;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.4);
+    white-space: nowrap;
+    cursor: pointer;
 }
 
-.banner-action-btn:hover {
-    background: #FFFFFF;
-    color: #1E40AF;
-    transform: translateY(-3px) translateZ(10px);
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
+.exec-btn-primary {
+    background: #0EA5E9;
+    color: #FFFFFF;
+    border: 1px solid #0284C7;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.35);
 }
 
-.banner-action-btn.primary-white {
-    background: #FFFFFF;
-    color: #0F172A;
-    border-color: #FFFFFF;
-    box-shadow: 0 10px 25px rgba(255,255,255,0.25), inset 0 1px 0 rgba(255,255,255,1);
+.exec-btn-primary:hover {
+    background: #0284C7;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.45);
 }
 
-.banner-action-btn.primary-white:hover {
-    background: #F8FAFC;
-    color: #2563EB;
-    box-shadow: 0 14px 32px rgba(255,255,255,0.4);
+.exec-btn-secondary {
+    background: #1E293B;
+    color: #F8FAFC;
+    border: 1px solid #334155;
+}
+
+.exec-btn-secondary:hover {
+    background: #334155;
+    color: #FFFFFF;
+    border-color: #475569;
+    transform: translateY(-1px);
 }
 
 /* ============ 3D STAT CARDS ============ */
@@ -320,163 +389,195 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
     font-family: 'Inter', sans-serif;
 }
 
-/* ============ 3D QUICK ACCESS FEATURE CARDS ============ */
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+/* ============ OPERATIONAL CLUSTERS (TASTE-SKILL COMPLIANT) ============ */
+.exec-cluster-wrap {
+    margin-top: 10px;
     margin-bottom: 40px;
-    perspective: 1200px;
 }
 
-.mc-link { text-decoration: none; color: inherit; display: block; }
-
-.mc {
-    background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
-    border-radius: 24px;
-    padding: 30px 26px;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
-    transform-style: preserve-3d;
-}
-
-/* Permanently visible top glowing accent line */
-.mc::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--mc-color, #2563EB), var(--mc-color-end, #38BDF8));
-    box-shadow: 0 2px 8px var(--mc-shadow);
-}
-
-.mc:hover {
-    transform: translateY(-8px) rotateX(3deg) scale(1.02);
-    border-color: var(--mc-color, #2563EB);
-    box-shadow: 0 22px 45px -10px var(--mc-shadow, rgba(37,99,235,0.3));
-}
-
-/* Vibrant Dual-Tone Gradient 3D Icons */
-.mc-icon {
-    width: 58px; height: 58px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    margin-bottom: 22px;
-    flex-shrink: 0;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    color: #FFFFFF !important;
-    transform: translateZ(14px);
-}
-
-.mc:hover .mc-icon {
-    transform: translateZ(24px) scale(1.12) rotate(6deg);
-}
-
-.i-red    { background: linear-gradient(135deg, #EF4444 0%, #F43F5E 100%); box-shadow: 0 10px 24px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(255,255,255,0.4); }
-.i-blue   { background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%); box-shadow: 0 10px 24px rgba(37, 99, 235, 0.4), inset 0 2px 4px rgba(255,255,255,0.4); }
-.i-cyan   { background: linear-gradient(135deg, #06B6D4 0%, #0EA5E9 100%); box-shadow: 0 10px 24px rgba(6, 182, 212, 0.4), inset 0 2px 4px rgba(255,255,255,0.4); }
-.i-sky    { background: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%); box-shadow: 0 10px 24px rgba(2, 132, 199, 0.4), inset 0 2px 4px rgba(255,255,255,0.4); }
-.i-green  { background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 10px 24px rgba(16, 185, 129, 0.4), inset 0 2px 4px rgba(255,255,255,0.4); }
-.i-amber  { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); box-shadow: 0 10px 24px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(255,255,255,0.4); }
-.i-violet { background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); box-shadow: 0 10px 24px rgba(139, 92, 246, 0.4), inset 0 2px 4px rgba(255,255,255,0.4); }
-.i-slate  { background: linear-gradient(135deg, #475569 0%, #0F172A 100%); box-shadow: 0 10px 24px rgba(71, 85, 105, 0.4), inset 0 2px 4px rgba(255,255,255,0.4); }
-
-/* Accent Shadow per Link */
-.mc-link:nth-child(1) .mc { --mc-color: #EF4444; --mc-color-end: #F43F5E; --mc-shadow: rgba(239, 68, 68, 0.35); }
-.mc-link:nth-child(2) .mc { --mc-color: #2563EB; --mc-color-end: #3B82F6; --mc-shadow: rgba(37, 99, 235, 0.35); }
-.mc-link:nth-child(3) .mc { --mc-color: #06B6D4; --mc-color-end: #0EA5E9; --mc-shadow: rgba(6, 182, 212, 0.35); }
-.mc-link:nth-child(4) .mc { --mc-color: #0284C7; --mc-color-end: #38BDF8; --mc-shadow: rgba(2, 132, 199, 0.35); }
-.mc-link:nth-child(5) .mc { --mc-color: #10B981; --mc-color-end: #059669; --mc-shadow: rgba(16, 185, 129, 0.35); }
-.mc-link:nth-child(6) .mc { --mc-color: #F59E0B; --mc-color-end: #D97706; --mc-shadow: rgba(245, 158, 11, 0.35); }
-.mc-link:nth-child(7) .mc { --mc-color: #8B5CF6; --mc-color-end: #6D28D9; --mc-shadow: rgba(139, 92, 246, 0.35); }
-.mc-link:nth-child(8) .mc { --mc-color: #3B82F6; --mc-color-end: #1D4ED8; --mc-shadow: rgba(59, 130, 246, 0.35); }
-
-.mc-title {
-    font-size: 16.5px;
-    font-weight: 800;
-    color: #0F172A;
-    margin-bottom: 8px;
-    letter-spacing: -0.3px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+.exec-cluster-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 14px;
+    padding: 0 4px;
 }
 
-.mc-desc {
-    font-size: 13.5px;
+.exec-cluster-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.exec-cluster-tag {
+    font-size: 12px;
     color: #64748B;
-    line-height: 1.55;
-    margin-bottom: 24px;
-    flex-grow: 1;
-    font-family: 'Inter', sans-serif;
+    font-weight: 500;
 }
 
-.mc-btn-pill {
-    display: inline-flex;
+.exec-card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 26px;
+}
+
+.exec-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.exec-card {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 20px 22px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+}
+
+.exec-card:hover {
+    transform: translateY(-3px);
+    border-color: #CBD5E1;
+    box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.08);
+}
+
+.exec-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.exec-card-icon-wrap {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    background: #EFF6FF;
-    color: var(--mc-color, #2563EB);
-    padding: 8px 18px;
-    border-radius: 30px;
-    font-size: 13px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(37, 99, 235, 0.15);
+    font-size: 17px;
+    color: #0F172A;
+    transition: all 0.2s ease;
 }
 
-.mc:hover .mc-btn-pill {
-    background: var(--mc-color, #2563EB);
+.exec-card:hover .exec-card-icon-wrap {
+    background: #0F172A;
     color: #FFFFFF;
-    box-shadow: 0 6px 16px var(--mc-shadow);
+    border-color: #0F172A;
 }
 
-@media (max-width: 1200px) {
-    .menu-grid { grid-template-columns: repeat(2, 1fr); }
-    .stats-grid { grid-template-columns: repeat(1, 1fr); }
+.exec-card-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2.5px 8px;
+    border-radius: 999px;
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+    font-family: 'Geist Mono', monospace;
+    white-space: nowrap;
 }
 
-@media (max-width: 768px) {
-    .menu-grid { grid-template-columns: repeat(1, 1fr); }
-    .welcome-banner { padding: 28px 22px; }
-    .welcome-title { font-size: 26px; }
+.exec-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.015em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.exec-card-desc {
+    font-size: 12.5px;
+    color: #64748B;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    flex-grow: 1;
+}
+
+.exec-card-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0F172A;
+    transition: gap 0.2s ease, color 0.2s ease;
+}
+
+.exec-card:hover .exec-card-action {
+    gap: 8px;
+    color: #0EA5E9;
+}
+
+@media (max-width: 1199px) {
+    .exec-card-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+}
+
+@media (max-width: 640px) {
+    .exec-card-grid { grid-template-columns: 1fr; gap: 12px; }
+    .exec-command-bar { padding: 18px 16px; }
+    .exec-search-input { width: 100%; }
+    .exec-controls-area { width: 100%; }
 }
 </style>
 
-<!-- Welcome Hero Banner -->
-<div class="welcome-banner">
-    <div class="welcome-content">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <div>
-                <div class="status-pill-badge">
-                    <span class="status-dot-pulse"></span>
-                    <span>Live Data Analytics Active</span>
-                </div>
-                <h1 class="welcome-title">Selamat Datang, <?php echo htmlspecialchars($firstName); ?> 👋</h1>
-                <p class="welcome-subtitle">Kelola seluruh database customer, prospek, penugasan sales, dan laporan analytics tim dalam satu dashboard terpusat yang realtime.</p>
-                <div class="d-flex flex-wrap align-items-center gap-3">
-                    <a href="customer_add.php" class="banner-action-btn primary-white">
-                        <i class="bi bi-person-plus-fill text-primary"></i>
-                        <span>+ Tambah Customer</span>
-                    </a>
-                    <a href="sales_assignment.php" class="banner-action-btn">
-                        <i class="bi bi-person-gear"></i>
-                        <span>Penugasan Sales Cepat</span>
-                    </a>
-                </div>
-            </div>
+<!-- Executive Command Bar (Taste-Skill Compliant) -->
+<div class="exec-command-bar">
+    <div class="exec-bar-meta">
+        <div class="exec-status-pill">
+            <span class="exec-pulse-dot"></span>
+            <span>LOEWIX SALES INTELLIGENCE</span>
+            <span style="opacity: 0.5;">·</span>
+            <span class="text-white">Live MySQL Sync</span>
+            <span style="opacity: 0.5;">·</span>
+            <span><?php echo number_format($totalCustomers, 0, ',', '.'); ?> Basis Toko</span>
+        </div>
+        <div class="d-none d-md-flex align-items-center gap-2 text-muted" style="font-size: 11px;">
+            <span><i class="bi bi-shield-check text-success me-1"></i>Server Terverifikasi</span>
+            <span style="opacity: 0.4;">|</span>
+            <span>Ping Realtime Database</span>
+        </div>
+    </div>
+    <div class="exec-bar-main">
+        <div class="exec-title-area">
+            <h1 class="exec-title">Executive Command Center</h1>
+            <p class="exec-subtitle">
+                Halo, <strong class="text-white"><?php echo htmlspecialchars($firstName); ?></strong>. Pantau pipeline, analitik penetrasi wilayah, dan kelola operasional sales terpadu.
+            </p>
+        </div>
+        <div class="exec-controls-area">
+            <!-- Omni-Search (Cmd+K style) -->
+            <form action="index.php" method="GET" class="exec-search-form" id="execSearchForm">
+                <i class="bi bi-search exec-search-icon"></i>
+                <input type="text" name="search" id="execOmniInput" class="exec-search-input" placeholder="Cari toko, kota, kategori... (Enter)" autocomplete="off">
+                <kbd class="exec-search-kbd">⌘K</kbd>
+            </form>
+            <a href="customer_add.php" class="exec-btn exec-btn-primary">
+                <i class="bi bi-plus-lg"></i>
+                <span>Tambah Customer</span>
+            </a>
+            <a href="sales_assignment.php" class="exec-btn exec-btn-secondary">
+                <i class="bi bi-person-gear"></i>
+                <span>Penugasan Sales</span>
+            </a>
         </div>
     </div>
 </div>
@@ -526,87 +627,152 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 </div>
 */ ?>
 
-<!-- Section Header -->
-<div class="section-header">
-    <div>
-        <h3 class="section-title">Akses Cepat Fitur Utama 🚀</h3>
-        <p class="section-subtitle">Pilih menu untuk mengelola data customer dan fitur sales tools</p>
+<!-- Operational Clusters (Taste-Skill Compliant) -->
+<div class="exec-cluster-wrap">
+    <!-- Cluster 1: Manajemen Toko & Pelanggan -->
+    <div class="exec-cluster-header">
+        <h4 class="exec-cluster-title">
+            <i class="bi bi-shop text-primary"></i>
+            <span>Operasional Toko &amp; Pelanggan</span>
+        </h4>
+        <span class="exec-cluster-tag">4 Modul Terintegrasi</span>
+    </div>
+    <div class="exec-card-grid">
+        <a href="index.php" class="exec-card-link">
+            <div class="exec-card">
+                <div>
+                    <div class="exec-card-top">
+                        <div class="exec-card-icon-wrap"><i class="bi bi-people"></i></div>
+                        <span class="exec-card-badge"><?php echo number_format($totalCustomers, 0, ',', '.'); ?> Toko</span>
+                    </div>
+                    <h5 class="exec-card-title">Daftar Customer</h5>
+                    <p class="exec-card-desc">Database seluruh toko, verifikasi alamat, dan status relasi kemitraan.</p>
+                </div>
+                <div class="exec-card-action">Buka Direktori <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+
+        <a href="kandidat_customer.php" class="exec-card-link">
+            <div class="exec-card">
+                <div>
+                    <div class="exec-card-top">
+                        <div class="exec-card-icon-wrap"><i class="bi bi-person-badge"></i></div>
+                        <span class="exec-card-badge text-primary bg-primary-subtle border-primary-subtle">Prioritas Closing</span>
+                    </div>
+                    <h5 class="exec-card-title">Prospek &amp; Potensial</h5>
+                    <p class="exec-card-desc">Kandidat toko prospektif dengan estimasi peluang transaksi tinggi.</p>
+                </div>
+                <div class="exec-card-action">Tinjau Prospek <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+
+        <a href="customer_add.php" class="exec-card-link">
+            <div class="exec-card">
+                <div>
+                    <div class="exec-card-top">
+                        <div class="exec-card-icon-wrap"><i class="bi bi-person-plus"></i></div>
+                        <span class="exec-card-badge">Formulir Cepat</span>
+                    </div>
+                    <h5 class="exec-card-title">Registrasi Toko Baru</h5>
+                    <p class="exec-card-desc">Input data identitas mitra, kategori harga, dan penetapan wilayah sales.</p>
+                </div>
+                <div class="exec-card-action">Registrasi Baru <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+
+        <a href="customer_io.php" class="exec-card-link">
+            <div class="exec-card">
+                <div>
+                    <div class="exec-card-top">
+                        <div class="exec-card-icon-wrap"><i class="bi bi-cloud-arrow-up"></i></div>
+                        <span class="exec-card-badge">Format .XLSX</span>
+                    </div>
+                    <h5 class="exec-card-title">Import Massal Toko</h5>
+                    <p class="exec-card-desc">Unggah file spreadsheet Excel untuk update atau penambahan database massal.</p>
+                </div>
+                <div class="exec-card-action">Mulai Import <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Cluster 2: Intelijen Penjualan & Sales Tools -->
+    <div class="exec-cluster-header mt-4">
+        <h4 class="exec-cluster-title">
+            <i class="bi bi-graph-up-arrow text-info"></i>
+            <span>Intelijen Penjualan &amp; Alat Bantu</span>
+        </h4>
+        <span class="exec-cluster-tag">4 Modul Terintegrasi</span>
+    </div>
+    <div class="exec-card-grid">
+        <a href="customer_bulk_download_process.php" class="exec-card-link">
+            <div class="exec-card">
+                <div>
+                    <div class="exec-card-top">
+                        <div class="exec-card-icon-wrap"><i class="bi bi-cloud-arrow-down"></i></div>
+                        <span class="exec-card-badge">Cadangan Data</span>
+                    </div>
+                    <h5 class="exec-card-title">Export Data Pelanggan</h5>
+                    <p class="exec-card-desc">Unduh rekapitulasi data toko dan histori aktivitas ke format Excel.</p>
+                </div>
+                <div class="exec-card-action">Unduh File <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+
+        <a href="customer_quality_check.php" class="exec-card-link">
+            <div class="exec-card">
+                <div>
+                    <div class="exec-card-top">
+                        <div class="exec-card-icon-wrap"><i class="bi bi-clipboard2-check"></i></div>
+                        <span class="exec-card-badge">Audit Integritas</span>
+                    </div>
+                    <h5 class="exec-card-title">Audit Kualitas Data</h5>
+                    <p class="exec-card-desc">Validasi nomor kontak WhatsApp, kelengkapan alamat, dan cegah duplikasi.</p>
+                </div>
+                <div class="exec-card-action">Mulai Audit <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+
+        <a href="invoice_followup_report.php" class="exec-card-link">
+            <div class="exec-card">
+                <div>
+                    <div class="exec-card-top">
+                        <div class="exec-card-icon-wrap"><i class="bi bi-receipt"></i></div>
+                        <span class="exec-card-badge text-success bg-success-subtle border-success-subtle">173 Terverifikasi</span>
+                    </div>
+                    <h5 class="exec-card-title">Rekap Tagihan &amp; Invoice</h5>
+                    <p class="exec-card-desc">Laporan invoice penjualan riil, realisasi omset, dan log status penagihan.</p>
+                </div>
+                <div class="exec-card-action">Tinjau Rekap <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+
+        <a href="sales_qa.php" class="exec-card-link">
+            <div class="exec-card">
+                <div>
+                    <div class="exec-card-top">
+                        <div class="exec-card-icon-wrap"><i class="bi bi-cpu"></i></div>
+                        <span class="exec-card-badge">AI Copilot</span>
+                    </div>
+                    <h5 class="exec-card-title">Asisten Loewix AI</h5>
+                    <p class="exec-card-desc">Konsultasi taktik negosiasi sales, kalkulasi margin, dan rekomendasi produk.</p>
+                </div>
+                <div class="exec-card-action">Buka Asisten AI <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
     </div>
 </div>
 
-<!-- 8 Vibrant Dual-Tone Quick Access Menu Cards -->
-<div class="menu-grid">
-    <a href="index.php" class="mc-link animate-in">
-        <div class="mc">
-            <div class="mc-icon i-red"><i class="bi bi-people-fill"></i></div>
-            <div class="mc-title"><span>Daftar Customer</span></div>
-            <div class="mc-desc">Lihat daftar customer dan detail informasi lengkap.</div>
-            <div class="mt-auto"><span class="mc-btn-pill">Buka Menu <i class="bi bi-arrow-right"></i></span></div>
-        </div>
-    </a>
-
-    <a href="kandidat_customer.php" class="mc-link animate-in">
-        <div class="mc">
-            <div class="mc-icon i-blue"><i class="bi bi-person-badge-fill"></i></div>
-            <div class="mc-title"><span>Potensial Customer</span></div>
-            <div class="mc-desc">Customer potensial dengan peluang konversi tinggi.</div>
-            <div class="mt-auto"><span class="mc-btn-pill">Buka Menu <i class="bi bi-arrow-right"></i></span></div>
-        </div>
-    </a>
-
-    <a href="customer_add.php" class="mc-link animate-in">
-        <div class="mc">
-            <div class="mc-icon i-cyan"><i class="bi bi-person-plus-fill"></i></div>
-            <div class="mc-title"><span>Tambah Customer</span></div>
-            <div class="mc-desc">Tambah customer baru ke dalam sistem database.</div>
-            <div class="mt-auto"><span class="mc-btn-pill">Buka Menu <i class="bi bi-arrow-right"></i></span></div>
-        </div>
-    </a>
-
-    <a href="customer_io.php" class="mc-link animate-in">
-        <div class="mc">
-            <div class="mc-icon i-sky"><i class="bi bi-cloud-upload-fill"></i></div>
-            <div class="mc-title"><span>Unggah Data Customer</span></div>
-            <div class="mc-desc">Import data customer dari file Excel (.XLSX).</div>
-            <div class="mt-auto"><span class="mc-btn-pill">Buka Menu <i class="bi bi-arrow-right"></i></span></div>
-        </div>
-    </a>
-
-    <a href="customer_bulk_download_process.php" class="mc-link animate-in">
-        <div class="mc">
-            <div class="mc-icon i-green"><i class="bi bi-cloud-download-fill"></i></div>
-            <div class="mc-title"><span>Unduh Data Customer</span></div>
-            <div class="mc-desc">Export data customer ke format file Excel.</div>
-            <div class="mt-auto"><span class="mc-btn-pill">Buka Menu <i class="bi bi-arrow-right"></i></span></div>
-        </div>
-    </a>
-
-    <a href="customer_quality_check.php" class="mc-link animate-in">
-        <div class="mc">
-            <div class="mc-icon i-amber"><i class="bi bi-clipboard-check-fill"></i></div>
-            <div class="mc-title"><span>Kualitas Data Customer</span></div>
-            <div class="mc-desc">Audit kualitas data dan validasi format.</div>
-            <div class="mt-auto"><span class="mc-btn-pill">Buka Menu <i class="bi bi-arrow-right"></i></span></div>
-        </div>
-    </a>
-
-    <a href="invoice_followup_report.php" class="mc-link animate-in">
-        <div class="mc">
-            <div class="mc-icon i-violet"><i class="bi bi-file-earmark-spreadsheet-fill"></i></div>
-            <div class="mc-title"><span>Laporan Invoice FU</span></div>
-            <div class="mc-desc">Laporan invoice dan riwayat follow up.</div>
-            <div class="mt-auto"><span class="mc-btn-pill">Buka Menu <i class="bi bi-arrow-right"></i></span></div>
-        </div>
-    </a>
-
-    <a href="sales_qa.php" class="mc-link animate-in">
-        <div class="mc">
-            <div class="mc-icon i-slate"><i class="bi bi-robot"></i></div>
-            <div class="mc-title"><span>Asisten Loewix AI</span></div>
-            <div class="mc-desc">Konsultasi sales & taktik negosiasi realtime.</div>
-            <div class="mt-auto"><span class="mc-btn-pill">Buka Chat AI <i class="bi bi-arrow-right"></i></span></div>
-        </div>
-    </a>
-</div>
+<script>
+document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const input = document.getElementById('execOmniInput');
+        if (input) {
+            input.focus();
+            input.select();
+        }
+    }
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>

@@ -44,6 +44,7 @@ if (isset($conn)) {
         }
     }
 }
+$aov_val = $total_inv_count > 0 ? round($real_omset / $total_inv_count) : 0;
 
 // 3. Real 30-day Daily Trend from follow_ups
 $daily_series = [];
@@ -651,12 +652,123 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     }
 }
 
+.bento-aov-pill {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0F172A;
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    padding: 2.5px 8px;
+    border-radius: 999px;
+    font-family: 'Geist Mono', monospace;
+    white-space: nowrap;
+}
+
+.bento-channel-stack {
+    display: flex;
+    align-items: center;
+    height: 6px;
+    width: 100%;
+    border-radius: 999px;
+    overflow: hidden;
+    gap: 2px;
+    margin-top: 9px;
+    background: #F1F5F9;
+}
+
+.bento-channel-seg {
+    height: 100%;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.bento-channel-seg:hover {
+    opacity: 0.85;
+    transform: scaleY(1.3);
+}
+
+.bento-pen-track {
+    width: 48px;
+    height: 4px;
+    background: #E2E8F0;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bento-pen-fill {
+    height: 100%;
+    background: #10B981;
+    border-radius: 999px;
+}
+
+.bento-reg-link {
+    color: #0F172A;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.bento-reg-link:hover {
+    color: #0EA5E9;
+    text-decoration: underline;
+}
+
 .bento-radar-box {
     width: 100%;
     max-width: 250px;
     height: 230px;
     margin: 4px auto 0;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bento-month-bar-wrap {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 180px;
+    width: 100%;
+    padding: 10px 4px 0;
+    gap: 3px;
+    box-sizing: border-box;
+}
+
+.bento-month-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    cursor: pointer;
+}
+
+.bento-month-bar {
+    width: 100%;
+    max-width: 15px;
+    background: #CBD5E1;
+    border-radius: 3px 3px 0 0;
+    transition: all 0.2s ease;
+    min-height: 4px;
+}
+
+.bento-month-bar.peak {
+    background: #10B981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.bento-month-col:hover .bento-month-bar {
+    background: #0EA5E9;
+    transform: scaleY(1.05);
+}
+
+.bento-month-lbl {
+    font-size: 9px;
+    font-family: 'Geist Mono', monospace;
+    color: #64748B;
+    margin-top: 5px;
+    font-weight: 600;
 }
 
 .bento-table-wrap {
@@ -750,11 +862,12 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
                             <span class="bento-curr">Rp</span><span id="bentoRevVal">0</span>
                         <?php endif; ?>
                     </div>
-                    <div class="d-flex align-items-center gap-1.5 mt-1">
+                    <div class="d-flex align-items-center gap-1.5 mt-1 flex-wrap">
                         <span class="bento-delta">
                             <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 10.5V1.5M2 5.5l4-4 4 4"/></svg>
                             Terverifikasi
                         </span>
+                        <span class="bento-aov-pill" title="Average Order Value: Rata-rata Nilai Omset per Invoice">AOV: Rp <?= number_format($aov_val, 0, ',', '.') ?></span>
                     </div>
                     <div class="bento-note">
                         <b class="text-dark"><?= number_format($total_inv_count, 0, ',', '.') ?></b> Invoice Tercatat
@@ -795,6 +908,23 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
                         <span class="d-inline-flex align-items-center gap-1 text-muted" title="Customer kategori USER">
                             <i style="width: 8px; height: 3px; background: #EC4899; border-radius: 2px;"></i> User (<?= number_format($user_cnt, 0, ',', '.') ?>)
                         </span>
+                    </div>
+                    <!-- Proportional 100% Channel Stack Bar -->
+                    <?php
+                    $cat_grand_total = 0;
+                    foreach ($categories_treemap as $c_t) {
+                        $cat_grand_total += $c_t['values'][2];
+                    }
+                    if ($cat_grand_total === 0) $cat_grand_total = 1;
+                    ?>
+                    <div class="bento-channel-stack" title="Distribusi Proporsi Channel & Kategori Pelanggan">
+                        <?php foreach ($categories_treemap as $c_t): 
+                            $c_pct = round(($c_t['values'][2] / $cat_grand_total) * 100, 1);
+                            if ($c_pct < 0.3) continue;
+                        ?>
+                            <div class="bento-channel-seg" style="width: <?= $c_pct ?>%; background: <?= $c_t['color'] ?>;" 
+                                 title="<?= htmlspecialchars($c_t['name']) ?>: <?= number_format($c_t['values'][2], 0, ',', '.') ?> Toko (<?= $c_pct ?>%)"></div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
 
@@ -847,10 +977,21 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
                     <tbody>
                         <?php foreach ($regions_table as $reg): ?>
                             <tr>
-                                <td class="text-secondary fw-semibold"><?= htmlspecialchars($reg['wilayah']) ?></td>
+                                <td class="text-secondary fw-semibold">
+                                    <a href="index.php?provinsi=<?= urlencode($reg['wilayah']) ?>" class="bento-reg-link" title="Buka daftar toko wilayah <?= htmlspecialchars($reg['wilayah']) ?>">
+                                        <?= htmlspecialchars($reg['wilayah']) ?>
+                                    </a>
+                                </td>
                                 <td style="text-align: right;" class="text-dark fw-bold"><?= $reg['toko'] ?></td>
                                 <td style="text-align: right;" class="text-dark"><?= $reg['fu'] ?></td>
-                                <td style="text-align: right;"><span class="badge bg-light text-success border px-2 py-0.5 rounded-pill fw-bold"><?= $reg['ratio'] ?></span></td>
+                                <td style="text-align: right;">
+                                    <div class="d-inline-flex align-items-center justify-content-end gap-1.5" style="min-width: 100px;">
+                                        <div class="bento-pen-track" title="Tingkat Penetrasi Follow Up: <?= $reg['ratio'] ?>">
+                                            <div class="bento-pen-fill" style="width: <?= min(100, floatval(str_replace('%', '', $reg['ratio']))) ?>%;"></div>
+                                        </div>
+                                        <span class="badge bg-light text-success border px-2 py-0.5 rounded-pill fw-bold" style="font-size: 10.5px;"><?= $reg['ratio'] ?></span>
+                                    </div>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -860,13 +1001,19 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
 
         <!-- ================= CARD 4: RADAR SEASONALITY & TARGET (col-span-bottom-right) ================= -->
         <div class="bento-card bento-card-bottom col-span-bottom-right">
-            <div class="d-flex align-items-center justify-content-between mb-1">
+            <div class="d-flex align-items-center justify-content-between mb-1 flex-wrap gap-2">
                 <h5 class="fw-bold mb-0" style="font-size: 15.5px; letter-spacing: -0.02em; color: #0F172A;">
-                    Tren Musiman (Seasonality Radar)
+                    Tren Musiman (Seasonality)
                 </h5>
-                <div class="bento-segmented">
-                    <button type="button" class="bento-seg-btn <?= ($default_year_idx === 0 ? 'active' : '') ?>" onclick="switchRadarYear(0, this)"><?= $year1 ?></button>
-                    <button type="button" class="bento-seg-btn <?= ($default_year_idx === 1 ? 'active' : '') ?>" onclick="switchRadarYear(1, this)"><?= $year2 ?></button>
+                <div class="d-flex align-items-center gap-1.5">
+                    <div class="bento-segmented" id="bentoSeasonalityModeSeg">
+                        <button type="button" class="bento-seg-btn active" onclick="switchSeasonalityMode('radar', this)" title="Tampilan Radar 360°">Radar</button>
+                        <button type="button" class="bento-seg-btn" onclick="switchSeasonalityMode('bars', this)" title="Tampilan Batang Bulanan">Bar</button>
+                    </div>
+                    <div class="bento-segmented" id="bentoYearSeg">
+                        <button type="button" class="bento-seg-btn <?= ($default_year_idx === 0 ? 'active' : '') ?>" onclick="switchRadarYear(0, this)"><?= $year1 ?></button>
+                        <button type="button" class="bento-seg-btn <?= ($default_year_idx === 1 ? 'active' : '') ?>" onclick="switchRadarYear(1, this)"><?= $year2 ?></button>
+                    </div>
                 </div>
             </div>
 
@@ -874,6 +1021,9 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
             <div class="bento-radar-box" id="bentoRadarContainer">
                 <svg id="svgRadarChart" width="100%" height="100%" style="display: block;"></svg>
             </div>
+
+            <!-- Monthly Bar Chart Container (Alternative view) -->
+            <div id="bentoMonthlyBarWrap" style="display: none; width: 100%; padding: 4px 0;"></div>
 
             <!-- Performance Stats -->
             <div class="row g-2 mt-auto pt-2 border-top">
@@ -1183,16 +1333,75 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     };
     window.bentoTipLeave = function() { hideTooltip(); };
 
-    /* 4. Radar Seasonality */
+    /* 4. Radar & Monthly Bar Seasonality (Dual-View) */
     let activeRadarYear = <?= $default_year_idx ?>;
+    let currentSeasonalityMode = 'radar';
+
+    window.switchSeasonalityMode = function(mode, btn) {
+        document.querySelectorAll('#bentoSeasonalityModeSeg .bento-seg-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSeasonalityMode = mode;
+        const radarBox = document.getElementById('bentoRadarContainer');
+        const barBox = document.getElementById('bentoMonthlyBarWrap');
+        if (mode === 'radar') {
+            if (radarBox) radarBox.style.display = 'flex';
+            if (barBox) barBox.style.display = 'none';
+            renderRadar(activeRadarYear);
+        } else {
+            if (radarBox) radarBox.style.display = 'none';
+            if (barBox) barBox.style.display = 'block';
+            renderMonthlyBars(activeRadarYear);
+        }
+    };
+
     window.switchRadarYear = function(idx, btn) {
-        document.querySelectorAll('.bento-card-bottom:last-child .bento-seg-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#bentoYearSeg .bento-seg-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         activeRadarYear = idx;
-        renderRadar(idx);
+        if (currentSeasonalityMode === 'radar') {
+            renderRadar(idx);
+        } else {
+            renderMonthlyBars(idx);
+        }
         document.getElementById('bentoRadarAvg').textContent = radarData.years[idx].avg;
         document.getElementById('bentoRadarTotal').textContent = radarData.years[idx].total;
     };
+
+    function renderMonthlyBars(yearIdx = 0) {
+        const barBox = document.getElementById('bentoMonthlyBarWrap');
+        if (!barBox) return;
+        const vals = radarData.years[yearIdx].values;
+        const maxVal = Math.max(...vals, 1);
+
+        // Identify peak month
+        let peakIdx = 0;
+        vals.forEach((v, i) => { if (v > vals[peakIdx]) peakIdx = i; });
+
+        let html = '<div class="bento-month-bar-wrap">';
+        vals.forEach((val, i) => {
+            const hPct = Math.max(5, Math.round((val / maxVal) * 100));
+            const isPeak = (i === peakIdx && val > 0);
+            const mName = radarData.months[i];
+            const yrLabel = radarData.years[yearIdx].label;
+            html += `
+                <div class="bento-month-col" onmousemove="window.bentoTipHover(event, '${mName} ${yrLabel}', '${val.toLocaleString('id-ID')} Aktivitas', '${isPeak ? 'Puncak Tertinggi' : ''}', '#10B981')" onmouseleave="window.bentoTipLeave()">
+                    <div class="bento-month-bar ${isPeak ? 'peak' : ''}" style="height: ${hPct}%;"></div>
+                    <div class="bento-month-lbl" style="${isPeak ? 'color: #10B981; font-weight: 700;' : ''}">${mName}</div>
+                </div>
+            `;
+        });
+        html += '</div>';
+
+        const peakMonthName = radarData.months[peakIdx];
+        const peakVal = vals[peakIdx];
+        html += `
+            <div class="d-flex align-items-center justify-content-between px-2 pt-2 border-top mt-1" style="font-size: 11px; color: #64748B;">
+                <span>Bulan Puncak: <strong class="text-dark">${peakMonthName} (${peakVal.toLocaleString('id-ID')} kegiatan)</strong></span>
+                <span class="badge border px-2 py-0.5 rounded-pill" style="font-size: 10px; background: #ECFDF5; color: #059669; border-color: #A7F3D0;">🔥 High Activity</span>
+            </div>
+        `;
+        barBox.innerHTML = html;
+    }
 
     function renderRadar(yearIdx = 0) {
         const box = document.getElementById('bentoRadarContainer');
@@ -1262,6 +1471,14 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
         `;
     }
 
+    function renderCurrentSeasonality() {
+        if (currentSeasonalityMode === 'radar') {
+            renderRadar(activeRadarYear);
+        } else {
+            renderMonthlyBars(activeRadarYear);
+        }
+    }
+
     function initAllBento() {
         if (realRevenueTotal > 0) {
             runCountUp('bentoRevVal', realRevenueTotal, '');
@@ -1269,7 +1486,7 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
         initRevenueChart();
         initSessionsChart();
         renderTreemap(activeTreemapPeriod);
-        renderRadar(activeRadarYear);
+        renderCurrentSeasonality();
     }
 
     window.addEventListener('load', initAllBento);
@@ -1277,7 +1494,7 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
         initRevenueChart();
         initSessionsChart();
         renderTreemap(activeTreemapPeriod);
-        renderRadar(activeRadarYear);
+        renderCurrentSeasonality();
     });
 
     if (window.ResizeObserver) {
@@ -1285,7 +1502,7 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
             initRevenueChart();
             initSessionsChart();
             renderTreemap(activeTreemapPeriod);
-            renderRadar(activeRadarYear);
+            renderCurrentSeasonality();
         });
         const root = document.querySelector('.bento-root');
         if (root) ro.observe(root);
