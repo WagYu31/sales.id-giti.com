@@ -189,7 +189,7 @@ if ($action === 'get_product_suggestions') {
             $stmt->close();
         }
     } else {
-        $res = $conn->query("SELECT item_code, type, unit, msrp FROM product_prices WHERE item_code IS NOT NULL AND item_code != '' ORDER BY type ASC LIMIT 150");
+        $res = $conn->query("SELECT item_code, type, unit, msrp FROM product_prices WHERE (item_code IS NOT NULL AND item_code != '') OR (type IS NOT NULL AND type != '') ORDER BY type ASC");
         if ($res) {
             $items = $res->fetch_all(MYSQLI_ASSOC);
         }

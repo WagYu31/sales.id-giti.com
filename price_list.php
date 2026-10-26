@@ -293,6 +293,34 @@ require_once 'includes/header.php';
     border-radius: 14px;
     padding: 14px 16px;
 }
+
+/* Live Autocomplete Dropdown Styling */
+#productLiveDropdown {
+    box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3), 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+    border-radius: 12px !important;
+    border: none !important;
+    background: #ffffff !important;
+    overflow: hidden;
+    scrollbar-width: thin;
+}
+#productLiveDropdown::-webkit-scrollbar {
+    width: 6px;
+}
+#productLiveDropdown::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+.live-suggestion-item {
+    transition: all 0.12s ease;
+    cursor: pointer;
+    background: #ffffff;
+}
+.live-suggestion-item:hover, .live-suggestion-item.active {
+    background-color: #eff6ff !important;
+}
+.live-suggestion-item:last-child {
+    border-bottom: none !important;
+}
 </style>
 
 <!-- Hero Header -->
@@ -804,6 +832,15 @@ require_once 'includes/header.php';
             </div>
         </div>
     </div>
+</div>
+
+<!-- Floating Live Product Autocomplete Menu -->
+<div id="productLiveDropdown" class="dropdown-menu shadow-lg p-0" style="display:none; position: fixed; z-index: 2000; max-height: 290px; overflow-y: auto; width: 380px;">
+    <div class="px-3 py-2 bg-light border-bottom d-flex align-items-center justify-content-between text-muted" style="font-size: 11px;">
+        <span class="fw-bold text-uppercase"><i class="bi bi-database-check text-primary me-1"></i> Rekomendasi Produk Katalog</span>
+        <span class="text-xs" id="productLiveDropdownCount">0 item</span>
+    </div>
+    <div id="productLiveDropdownList"></div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -1353,13 +1390,15 @@ $(document).ready(function() {
     });
 
     // =========================================================================
-    // DEDICATED PACKAGE BUNDLE COMPONENT EDITOR
+    // DEDICATED PACKAGE BUNDLE COMPONENT EDITOR WITH LIVE AUTOCOMPLETE
     // =========================================================================
     const bundleEditorModal = new bootstrap.Modal(document.getElementById('bundleEditorModal'));
     let currentBundleEditing = { code: '', type: '', items: [] };
     let productSuggestionsList = [];
+    let activeDropdownTarget = null;
+    let activeDropdownCallback = null;
 
-    function loadProductSuggestions() {
+    function loadProductSuggestions(cb) {
         if (productSuggestionsList.length === 0) {
             $.getJSON('ajax_price_handler.php', { action: 'get_product_suggestions' }, function(res) {
                 if (res && res.success && res.items) {
@@ -1371,9 +1410,102 @@ $(document).ready(function() {
                         optHtml += `<option value="${sku} - ${escapeHtml(name)}">`;
                     });
                     $('#bundleProductDatalist').html(optHtml);
+                    if (typeof cb === 'function') cb();
                 }
             });
+        } else {
+            if (typeof cb === 'function') cb();
         }
+    }
+
+    // Pre-cache product catalog immediately in background
+    loadProductSuggestions();
+
+    function showProductDropdown(inputElem, query, onSelect) {
+        activeDropdownTarget = inputElem;
+        activeDropdownCallback = onSelect;
+
+        if (productSuggestionsList.length === 0) {
+            loadProductSuggestions(function() {
+                showProductDropdown(inputElem, query, onSelect);
+            });
+            return;
+        }
+
+        const q = (query || '').toLowerCase().trim();
+        let matches = [];
+
+        if (!q) {
+            matches = productSuggestionsList.slice(0, 30);
+        } else {
+            matches = productSuggestionsList.filter(p => {
+                const code = (p.item_code || '').toLowerCase();
+                const name = (p.type || '').toLowerCase();
+                return code.includes(q) || name.includes(q);
+            }).slice(0, 40);
+        }
+
+        $('#productLiveDropdownCount').text(matches.length + ' item ditemukan');
+
+        if (matches.length === 0) {
+            $('#productLiveDropdownList').html(`
+                <div class="p-3 text-center text-muted" style="font-size: 12px;">
+                    <i class="bi bi-search me-1"></i> Tidak ditemukan produk dengan kata kunci "<strong>${escapeHtml(query)}</strong>"
+                </div>
+            `);
+        } else {
+            let html = '';
+            matches.forEach(m => {
+                let cleanName = (m.type || '').trim();
+                if (cleanName.startsWith('--')) {
+                    cleanName = cleanName.substring(2).trim();
+                }
+                const code = m.item_code || '';
+                const unit = m.unit || 'UNIT';
+                const price = m.msrp ? ('Rp ' + Number(m.msrp).toLocaleString('id-ID')) : '';
+
+                html += `
+                    <div class="px-3 py-2 border-bottom live-suggestion-item" 
+                         data-code="${escapeHtml(code)}" 
+                         data-name="${escapeHtml(cleanName)}" 
+                         data-unit="${escapeHtml(unit)}">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="badge font-monospace" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:11px; padding: 2px 7px;">
+                                ${escapeHtml(code || 'NO-SKU')}
+                            </span>
+                            <div class="d-flex align-items-center gap-1.5">
+                                <span class="badge bg-light text-secondary border font-monospace text-uppercase" style="font-size:10px; padding: 2px 6px;">
+                                    ${escapeHtml(unit)}
+                                </span>
+                                ${price ? `<span class="text-muted font-monospace" style="font-size:11px;">${price}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="fw-bold text-dark" style="font-size: 12.5px; line-height: 1.35;">${escapeHtml(cleanName)}</div>
+                    </div>
+                `;
+            });
+            $('#productLiveDropdownList').html(html);
+        }
+
+        // Positioning dropdown under target input
+        const rect = inputElem.getBoundingClientRect();
+        const dropdownWidth = Math.max(rect.width, 360);
+        let leftPos = rect.left;
+        if (leftPos + dropdownWidth > window.innerWidth - 15) {
+            leftPos = window.innerWidth - dropdownWidth - 15;
+        }
+        if (leftPos < 10) leftPos = 10;
+
+        let topPos = rect.bottom + 4;
+        if (topPos + 290 > window.innerHeight && rect.top > 300) {
+            topPos = rect.top - 295;
+        }
+
+        $('#productLiveDropdown').css({
+            top: topPos + 'px',
+            left: leftPos + 'px',
+            width: dropdownWidth + 'px'
+        }).show();
     }
 
     function openBundleEditor(code, type) {
@@ -1446,10 +1578,10 @@ $(document).ready(function() {
                 <tr data-index="${idx}">
                     <td class="text-center font-monospace text-muted fw-semibold ps-3">${idx + 1}</td>
                     <td>
-                        <input type="text" class="form-control form-control-sm font-monospace fw-bold comp-input-code" value="${escapeHtml(it.item_code)}" style="border-radius: 6px; font-size: 11.5px; padding: 3px 6px;">
+                        <input type="text" class="form-control form-control-sm font-monospace fw-bold comp-input-code" value="${escapeHtml(it.item_code)}" placeholder="8800xxx" style="border-radius: 6px; font-size: 11.5px; padding: 3px 6px;">
                     </td>
                     <td>
-                        <input type="text" class="form-control form-control-sm comp-input-name" value="${escapeHtml(cleanName)}" style="border-radius: 6px; font-size: 12px; padding: 3px 8px;">
+                        <input type="text" class="form-control form-control-sm comp-input-name" value="${escapeHtml(cleanName)}" placeholder="Ketik untuk mencari produk..." style="border-radius: 6px; font-size: 12.5px; padding: 3px 8px;">
                     </td>
                     <td class="text-center">
                         <input type="number" class="form-control form-control-sm text-center font-monospace fw-bold comp-input-qty" value="${it.qty}" min="1" style="border-radius: 6px; font-size: 12px; padding: 3px 4px; width: 65px; margin: 0 auto;">
@@ -1469,15 +1601,87 @@ $(document).ready(function() {
         $('#bundleEditTableBody').html(html);
     }
 
-    // Auto-fill when selecting from datalist
-    $('#bundleSearchInput').on('input change', function() {
-        const val = $(this).val();
-        const match = productSuggestionsList.find(p => (p.item_code + ' - ' + p.type) === val || p.item_code === val);
-        if (match) {
-            $('#newCompCode').val(match.item_code);
-            $('#newCompName').val(match.type);
-            $('#newCompUnit').val(match.unit || 'UNIT');
+    // Attach Live Autocomplete to Table Inputs
+    $('#bundleEditTableBody').on('focus input', '.comp-input-name', function() {
+        const self = this;
+        const tr = $(this).closest('tr');
+        const idx = tr.data('index');
+        const query = $(this).val();
+
+        showProductDropdown(self, query, function(selected) {
+            $(self).val(selected.name);
+            tr.find('.comp-input-code').val(selected.code);
+            tr.find('.comp-input-unit').val(selected.unit);
+
+            if (currentBundleEditing.items[idx]) {
+                currentBundleEditing.items[idx].item_code = selected.code;
+                currentBundleEditing.items[idx].item_name = selected.name;
+                currentBundleEditing.items[idx].unit = selected.unit;
+            }
+        });
+    });
+
+    $('#bundleEditTableBody').on('focus input', '.comp-input-code', function() {
+        const self = this;
+        const tr = $(this).closest('tr');
+        const idx = tr.data('index');
+        const query = $(this).val();
+
+        showProductDropdown(self, query, function(selected) {
+            $(self).val(selected.code);
+            tr.find('.comp-input-name').val(selected.name);
+            tr.find('.comp-input-unit').val(selected.unit);
+
+            if (currentBundleEditing.items[idx]) {
+                currentBundleEditing.items[idx].item_code = selected.code;
+                currentBundleEditing.items[idx].item_name = selected.name;
+                currentBundleEditing.items[idx].unit = selected.unit;
+            }
+        });
+    });
+
+    // Attach Live Autocomplete to Top Search Add Input
+    $('#bundleSearchInput').on('focus input', function() {
+        const self = this;
+        const query = $(this).val();
+
+        showProductDropdown(self, query, function(selected) {
+            $(self).val(selected.code + ' - ' + selected.name);
+            $('#newCompCode').val(selected.code);
+            $('#newCompName').val(selected.name);
+            $('#newCompUnit').val(selected.unit);
+            $('#newCompQty').focus().select();
+        });
+    });
+
+    // Selecting an item from dropdown
+    $(document).on('mousedown', '.live-suggestion-item', function(e) {
+        e.preventDefault();
+        const code = $(this).data('code') || '';
+        const name = $(this).data('name') || '';
+        const unit = $(this).data('unit') || 'UNIT';
+
+        if (typeof activeDropdownCallback === 'function') {
+            activeDropdownCallback({ code: code, name: name, unit: unit });
         }
+        $('#productLiveDropdown').hide();
+    });
+
+    // Close live dropdown on outside click or escape
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#productLiveDropdown, .comp-input-name, .comp-input-code, #bundleSearchInput').length) {
+            $('#productLiveDropdown').hide();
+        }
+    });
+
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('#productLiveDropdown').hide();
+        }
+    });
+
+    $('#bundleEditorModal .modal-body, #bundleEditorModal').on('scroll', function() {
+        $('#productLiveDropdown').hide();
     });
 
     // Add Component button
@@ -1524,25 +1728,14 @@ $(document).ready(function() {
         renderBundleEditorRows();
     });
 
-    // Input updates inside table
-    $('#bundleEditTableBody').on('change input', '.comp-input-code', function() {
-        const idx = $(this).closest('tr').data('index');
-        if (currentBundleEditing.items[idx]) {
-            currentBundleEditing.items[idx].item_code = $.trim($(this).val());
-        }
-    });
-    $('#bundleEditTableBody').on('change input', '.comp-input-name', function() {
-        const idx = $(this).closest('tr').data('index');
-        if (currentBundleEditing.items[idx]) {
-            currentBundleEditing.items[idx].item_name = $.trim($(this).val());
-        }
-    });
+    // Manual input updates inside table
     $('#bundleEditTableBody').on('change input', '.comp-input-qty', function() {
         const idx = $(this).closest('tr').data('index');
         if (currentBundleEditing.items[idx]) {
             currentBundleEditing.items[idx].qty = parseInt($(this).val(), 10) || 1;
         }
     });
+
     $('#bundleEditTableBody').on('change input', '.comp-input-unit', function() {
         const idx = $(this).closest('tr').data('index');
         if (currentBundleEditing.items[idx]) {
