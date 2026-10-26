@@ -1720,9 +1720,14 @@ $total_top_omset = array_sum(array_column($init_top_products, 'omset'));
         if (items.length === 0) {
             container.innerHTML = `
                 <div class="text-center py-4 text-muted">
-                    <i class="bi bi-inbox" style="font-size: 26px; opacity: 0.5;"></i>
-                    <div class="small fw-semibold mt-1">Tidak ada transaksi pada periode ini</div>
-                    <div style="font-size: 10px;">Coba pilih bulan atau tahun lain</div>
+                    <i class="bi bi-inbox" style="font-size: 26px; opacity: 0.45; color: #94A3B8;"></i>
+                    <div class="small fw-semibold mt-1 text-dark">Tidak ada transaksi pada ${badgeText}</div>
+                    <div style="font-size: 11px; color: #64748B; max-width: 340px; margin: 4px auto 0;">
+                        Belum ada orderan atau penawaran penjualan yang tercatat di database pada periode ini.
+                    </div>
+                    <button type="button" class="btn btn-sm btn-light border mt-2.5 py-1 px-3 rounded-pill shadow-xs" style="font-size: 11px; color: #0F172A;" onclick="setProductQuickPeriod('month', document.querySelector('#bentoProdQuickPeriodSeg .bento-seg-btn'))">
+                        <i class="bi bi-arrow-counterclockwise me-1 text-primary"></i> Kembali ke Bulan Ini (Oktober 2026)
+                    </button>
                 </div>
             `;
             const elTotalQty = document.getElementById('bentoTopProdTotalQty');
