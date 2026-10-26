@@ -200,6 +200,99 @@ require_once 'includes/header.php';
 .product-row:hover {
     background-color: #f8fafc;
 }
+
+/* =========================================================================
+   SPEC & BUNDLE MODAL STYLES (EXECUTIVE POLISHED REDESIGN)
+   ========================================================================= */
+#specModal .modal-content {
+    border-radius: 22px !important;
+    border: none !important;
+    overflow: hidden !important;
+    box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.4) !important;
+}
+#specModal .modal-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%) !important;
+    padding: 16px 24px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+#specModal .modal-header-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(147, 197, 253, 0.3);
+    color: #60a5fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+#specModal .spec-product-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 18px;
+}
+#specModal .bundle-card {
+    border: 1.5px solid #bfdbfe !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    background: #ffffff;
+    box-shadow: 0 4px 16px -4px rgba(37, 99, 235, 0.08);
+}
+#specModal .bundle-card-header {
+    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+    border-bottom: 1.5px solid #dbeafe;
+    padding: 11px 16px;
+}
+/* Crucial: override global style.css table thead rules */
+#specModal table.spec-bundle-table {
+    margin-bottom: 0 !important;
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    background: #ffffff !important;
+}
+#specModal table.spec-bundle-table thead,
+#specModal table.spec-bundle-table thead tr,
+#specModal table.spec-bundle-table thead th {
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-family: inherit !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    padding: 9px 12px !important;
+    border-top: none !important;
+    border-bottom: 1.5px solid #e2e8f0 !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+}
+#specModal table.spec-bundle-table tbody tr {
+    background: #ffffff !important;
+    transition: background 0.15s ease !important;
+}
+#specModal table.spec-bundle-table tbody tr:hover {
+    background: #f0f7ff !important;
+}
+#specModal table.spec-bundle-table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+#specModal table.spec-bundle-table td {
+    padding: 10px 12px !important;
+    font-size: 12.5px !important;
+    color: #1e293b !important;
+    vertical-align: middle !important;
+    border-top: none !important;
+}
+#specModal .desc-card {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 16px;
+}
 </style>
 
 <!-- Hero Header -->
@@ -454,18 +547,19 @@ require_once 'includes/header.php';
 </div>
 
 <!-- Modal Detail Spesifikasi Produk (Accurate Style) -->
+<!-- Modal Detail Spesifikasi Produk (Executive Redesign) -->
 <div class="modal fade" id="specModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 18px; border: none; overflow: hidden; box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
             <!-- Modal Header -->
-            <div class="modal-header d-flex align-items-center justify-content-between px-4 py-3" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
-                <div class="d-flex align-items-center gap-2.5">
-                    <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.2); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 18px;">
-                        <i class="bi bi-info-circle-fill"></i>
+            <div class="modal-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="modal-header-icon">
+                        <i class="bi bi-box-seam-fill" id="specModalHeaderIcon"></i>
                     </div>
                     <div>
-                        <h6 class="modal-title fw-bold text-white mb-0" style="font-size: 15px;">Detail Spesifikasi Barang</h6>
-                        <span class="text-muted small" style="font-size: 11px; color: #94a3b8 !important;">Informasi teknis dan deskripsi fitur produk</span>
+                        <h6 class="modal-title fw-bold text-white mb-0" id="specModalTitle" style="font-size: 16px; letter-spacing: -0.01em;">Detail &amp; Rincian Produk</h6>
+                        <span class="text-white-50 small" style="font-size: 11.5px;">Katalog resmi produk Loewix • Komponen, harga, dan fitur</span>
                     </div>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -473,58 +567,85 @@ require_once 'includes/header.php';
             
             <!-- Modal Body -->
             <div class="modal-body p-4 bg-white">
-                <!-- Product Badges & Type -->
-                <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-                    <span class="badge" id="specModalCategory" style="background: rgba(37,99,235,0.08); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.25); font-size: 11px; padding: 4px 8px; font-weight: 700; border-radius: 6px;">
-                        KATEGORI
-                    </span>
-                    <span class="font-monospace fw-bold text-dark" id="specModalPrice" style="font-size: 14px;">
-                        Rp 0
-                    </span>
+                <!-- Product Overview Card -->
+                <div class="spec-product-card mb-3">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge" id="specModalCategory" style="background: rgba(37,99,235,0.08); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.25); font-size: 11px; padding: 5px 10px; font-weight: 700; border-radius: 8px;">
+                                KATEGORI
+                            </span>
+                            <span class="badge bg-light text-secondary border font-monospace" id="specModalCodeBadge" style="font-size: 11px; padding: 5px 9px;">
+                                SKU: -
+                            </span>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-xs text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.05em;">Harga MSRP</span>
+                            <span class="font-monospace fw-bold text-dark" id="specModalPrice" style="font-size: 17px; color: #0f172a;">
+                                Rp 0
+                            </span>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-0" id="specModalType" style="font-size: 17px; line-height: 1.4;">
+                        Tipe Produk
+                    </h5>
                 </div>
-
-                <h5 class="fw-bold text-dark mb-3" id="specModalType" style="font-size: 18px; line-height: 1.3;">
-                    Tipe Produk
-                </h5>
 
                 <!-- Rincian Komponen Isi Paket (Bundle Package Items) -->
                 <div id="specModalBundleWrapper" class="mb-3" style="display:none;">
-                    <div class="card border-0 rounded-3 shadow-xs" style="border: 1.5px solid #bfdbfe !important; background: #ffffff;">
-                        <div class="card-header bg-white py-2 px-3 d-flex align-items-center justify-content-between border-bottom" style="border-color: #e2e8f0 !important;">
-                            <span class="fw-bold text-primary d-flex align-items-center gap-1.5" style="font-size: 13px;">
-                                <i class="bi bi-box-seam-fill text-primary"></i> 📦 Daftar Rincian Komponen Isi Paket:
-                            </span>
-                            <span class="badge bg-primary rounded-pill px-2.5 py-1 font-monospace" id="specModalBundleCount" style="font-size: 11px;">0 Item</span>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-sm table-hover table-striped align-middle mb-0" style="font-size: 12.5px;">
-                                    <thead class="table-light text-muted font-monospace" style="font-size: 11px;">
-                                        <tr>
-                                            <th class="ps-3 text-center" style="width: 40px;">NO</th>
-                                            <th style="width: 95px;">KODE</th>
-                                            <th>NAMA BARANG / KOMPONEN</th>
-                                            <th class="text-center" style="width: 60px;">QTY</th>
-                                            <th class="pe-3" style="width: 70px;">SATUAN</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="specModalBundleBody">
-                                        <!-- Dynamic bundle rows injected here -->
-                                    </tbody>
-                                </table>
+                    <div class="bundle-card">
+                        <div class="bundle-card-header d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="d-inline-flex align-items-center justify-content-center text-primary" style="width: 24px; height: 24px; border-radius: 6px; background: rgba(37,99,235,0.1);">
+                                    <i class="bi bi-box-seam-fill" style="font-size: 13px;"></i>
+                                </span>
+                                <span class="fw-bold text-dark" style="font-size: 13px;">Daftar Komponen Isi Paket</span>
                             </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge rounded-pill font-monospace" id="specModalBundleCount" style="font-size: 11px; padding: 4px 10px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;">
+                                    0 Item
+                                </span>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="spec-bundle-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 45px; text-align: center;">NO</th>
+                                        <th style="width: 105px;">KODE SKU</th>
+                                        <th>NAMA BARANG / KOMPONEN</th>
+                                        <th style="width: 70px; text-align: center;">QTY</th>
+                                        <th style="width: 75px; text-align: center;">SATUAN</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="specModalBundleBody">
+                                    <!-- Dynamic bundle rows injected here -->
+                                </tbody>
+                                <tfoot id="specModalBundleFoot" style="background: #f8fafc; border-top: 1.5px solid #e2e8f0;">
+                                    <tr>
+                                        <td colspan="3" class="ps-3 text-uppercase fw-bold text-muted font-monospace" style="font-size: 11px;">
+                                            Total Unit Komponen
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge rounded-pill font-monospace fw-bold" id="specModalBundleTotalQty" style="background: #1e293b; color: #ffffff; font-size: 11.5px; padding: 3px 9px;">0</span>
+                                        </td>
+                                        <td class="text-center text-muted font-monospace fw-semibold" style="font-size: 11px;">
+                                            UNIT
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>
 
                 <!-- Spesifikasi Box -->
-                <div class="p-3 rounded-3" id="specModalDescBox" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
-                    <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom" style="border-color: #e2e8f0 !important;">
-                        <span class="text-xs text-muted fw-bold text-uppercase d-flex align-items-center gap-1.5">
+                <div class="desc-card" id="specModalDescBox">
+                    <div class="d-flex align-items-center justify-content-between mb-2 pb-1.5 border-bottom" style="border-color: #e2e8f0 !important;">
+                        <span class="text-xs text-muted fw-bold text-uppercase d-flex align-items-center gap-1.5" style="letter-spacing: 0.04em;">
                             <i class="bi bi-file-text-fill text-primary"></i> Rincian Spesifikasi &amp; Fitur
                         </span>
-                        <button type="button" class="btn btn-sm btn-link text-primary p-0 text-decoration-none fw-bold" style="font-size: 11px;" id="btnCopySpec" title="Salin Spesifikasi">
-                            <i class="bi bi-clipboard me-1"></i> Salin
+                        <button type="button" class="btn btn-sm btn-link text-primary p-0 text-decoration-none fw-bold d-inline-flex align-items-center gap-1" style="font-size: 11px;" id="btnCopySpec" title="Salin Spesifikasi">
+                            <i class="bi bi-clipboard"></i> <span>Salin</span>
                         </button>
                     </div>
                     <div id="specModalDesc" class="text-dark" style="font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;">
@@ -534,8 +655,11 @@ require_once 'includes/header.php';
             </div>
 
             <!-- Modal Footer -->
-            <div class="modal-footer border-top-0 px-4 pb-3 pt-0 bg-white">
-                <button type="button" class="btn btn-secondary w-100 rounded-pill fw-bold" data-bs-dismiss="modal" style="font-size: 13px; height: 38px;">
+            <div class="modal-footer border-top px-4 py-2.5 bg-light d-flex align-items-center justify-content-between" style="border-color: #f1f5f9 !important;">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1.5" id="btnCopyAllDetails" style="font-size: 12px; height: 36px;">
+                    <i class="bi bi-copy"></i> Salin Semua Rincian
+                </button>
+                <button type="button" class="btn btn-sm btn-dark rounded-pill px-4 fw-bold" data-bs-dismiss="modal" style="font-size: 12px; height: 36px;">
                     Tutup
                 </button>
             </div>
@@ -941,17 +1065,26 @@ $(document).ready(function() {
         $('#specModalPrice').text(price);
         $('#specModalDesc').text(desc);
 
+        if (code) {
+            $('#specModalCodeBadge').text('SKU: ' + code).show();
+        } else {
+            $('#specModalCodeBadge').hide();
+        }
+
         // Reset bundle view
         $('#specModalBundleWrapper').hide();
         $('#specModalBundleBody').empty();
+        $('#specModalBundleFoot').hide();
         $('#specModalBundleCount').text('0 Item');
 
         currentSpecText = `${type}\nKategori: ${category}\nHarga: ${price}\n\nSpesifikasi:\n${desc}`;
 
         // Jika merupakan produk paket, panggil AJAX untuk mengambil rincian isi paket
         if (isPkg || category.toUpperCase().includes('PAKET') || type.toUpperCase().includes('PAKET')) {
+            $('#specModalHeaderIcon').attr('class', 'bi bi-box-seam-fill');
+            $('#specModalTitle').text('Rincian Paket & Spesifikasi Produk');
             $('#specModalBundleWrapper').show();
-            $('#specModalBundleBody').html('<tr><td colspan="5" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat rincian paket...</td></tr>');
+            $('#specModalBundleBody').html('<tr><td colspan="5" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat rincian komponen paket...</td></tr>');
 
             $.getJSON('ajax_price_handler.php', {
                 action: 'get_bundle_items',
@@ -961,31 +1094,55 @@ $(document).ready(function() {
                 if (res && res.has_bundle && res.items && res.items.length > 0) {
                     $('#specModalBundleCount').text(res.items.length + ' Item');
                     let bundleRowsHtml = '';
+                    let totalQty = 0;
                     let bundleText = `\n\n--- RINCIAN KOMPONEN ISI PAKET (${res.items.length} ITEM) ---`;
 
                     res.items.forEach((item, idx) => {
                         const itemCode = escapeHtml(item.item_code || '-');
-                        const itemName = escapeHtml(item.item_name || '-');
-                        const itemQty = item.qty || 1;
+                        let cleanName = (item.item_name || '').trim();
+                        if (cleanName.startsWith('--')) {
+                            cleanName = cleanName.substring(2).trim();
+                        }
+                        cleanName = escapeHtml(cleanName);
+
+                        const itemQty = parseInt(item.qty, 10) || 1;
                         const itemUnit = escapeHtml(item.unit || 'UNIT');
+                        totalQty += itemQty;
 
                         bundleText += `\n${idx + 1}. [${item.item_code}] ${item.item_name} (${itemQty} ${itemUnit})`;
 
                         bundleRowsHtml += `
                             <tr>
-                                <td class="ps-3 text-center fw-semibold text-muted font-monospace">${idx + 1}</td>
-                                <td class="font-monospace text-primary fw-bold">${itemCode}</td>
-                                <td class="fw-semibold text-dark">${itemName}</td>
-                                <td class="text-center fw-bold text-dark font-monospace">${itemQty}</td>
-                                <td class="pe-3 text-secondary font-monospace">${itemUnit}</td>
+                                <td class="text-center font-monospace fw-semibold text-muted" style="font-size: 11.5px;">${idx + 1}</td>
+                                <td>
+                                    <span class="badge font-monospace fw-bold" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 11px; padding: 4px 8px; border-radius: 6px;">
+                                        ${itemCode}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark" style="font-size: 13px; line-height: 1.4;">${cleanName}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill font-monospace fw-bold" style="background: #dbeafe; color: #1e40af; font-size: 12px; padding: 4px 10px;">
+                                        ${itemQty}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-secondary border font-monospace text-uppercase" style="font-size: 10.5px; padding: 4px 8px;">
+                                        ${itemUnit}
+                                    </span>
+                                </td>
                             </tr>
                         `;
                     });
 
                     $('#specModalBundleBody').html(bundleRowsHtml);
+                    $('#specModalBundleTotalQty').text(totalQty);
+                    $('#specModalBundleFoot').show();
                     currentSpecText += bundleText;
                 } else {
                     $('#specModalBundleCount').text('0 Item');
+                    $('#specModalBundleFoot').hide();
                     $('#specModalBundleBody').html(`
                         <tr>
                             <td colspan="5" class="text-center py-3 text-muted" style="font-size: 12px;">
@@ -995,6 +1152,7 @@ $(document).ready(function() {
                     `);
                 }
             }).fail(function() {
+                $('#specModalBundleFoot').hide();
                 $('#specModalBundleBody').html(`
                     <tr>
                         <td colspan="5" class="text-center py-3 text-danger" style="font-size: 12px;">
@@ -1003,6 +1161,9 @@ $(document).ready(function() {
                     </tr>
                 `);
             });
+        } else {
+            $('#specModalHeaderIcon').attr('class', 'bi bi-info-circle-fill');
+            $('#specModalTitle').text('Detail Spesifikasi Barang');
         }
 
         specModal.show();
@@ -1014,6 +1175,16 @@ $(document).ready(function() {
             const btn = $(this);
             const orig = btn.html();
             btn.html('<i class="bi bi-check-lg text-success me-1"></i> Tersalin!');
+            setTimeout(() => btn.html(orig), 2000);
+        });
+    });
+
+    // Copy all details button in footer
+    $('#btnCopyAllDetails').on('click', function() {
+        navigator.clipboard.writeText(currentSpecText).then(() => {
+            const btn = $(this);
+            const orig = btn.html();
+            btn.html('<i class="bi bi-check-lg text-success me-1"></i> Rincian Lengkap Tersalin!');
             setTimeout(() => btn.html(orig), 2000);
         });
     });
