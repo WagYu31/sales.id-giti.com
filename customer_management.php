@@ -537,6 +537,50 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
     .exec-search-input { width: 100%; }
     .exec-controls-area { width: 100%; }
 }
+
+/* ============ ENTRANCE CHOREOGRAPHY (TASTE-SKILL STANDARD) ============ */
+@keyframes choreoFadeDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-16px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes choreoFadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.99);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.exec-command-bar {
+    animation: choreoFadeDown 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.exec-cluster-wrap {
+    animation: choreoFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
+}
+
+.exec-card-grid .exec-card-link:nth-child(1) .exec-card { animation: choreoFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.36s both; }
+.exec-card-grid .exec-card-link:nth-child(2) .exec-card { animation: choreoFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.40s both; }
+.exec-card-grid .exec-card-link:nth-child(3) .exec-card { animation: choreoFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.44s both; }
+.exec-card-grid .exec-card-link:nth-child(4) .exec-card { animation: choreoFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.48s both; }
+
+@media (prefers-reduced-motion: reduce) {
+    .exec-command-bar, .exec-cluster-wrap, .exec-card {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
 </style>
 
 <!-- Executive Command Bar (Taste-Skill Compliant) -->

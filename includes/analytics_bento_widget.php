@@ -1024,14 +1024,127 @@ $total_top_omset = array_sum(array_column($init_top_products, 'omset'));
     opacity: 0;
 }
 
-.bento-tooltip.visible { opacity: 1; }
-.bento-tooltip-title { font-size: 10.5px; color: #94A3B8; margin-bottom: 3px; font-weight: 600; }
-.bento-tooltip-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: 'Geist Mono', monospace; }
+/* ============ BENTO ENTRANCE CHOREOGRAPHY ============ */
+@keyframes choreoSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-16px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes choreoCardEnter {
+    0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.975);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes choreoSlideRight {
+    0% {
+        opacity: 0;
+        transform: translateX(-16px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes choreoBarGrow {
+    0% {
+        transform: scaleX(0);
+        transform-origin: left;
+    }
+    100% {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+}
+
+.choreo-bento-header {
+    animation: choreoSlideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.10s both;
+    will-change: transform, opacity;
+}
+
+.choreo-card-1 {
+    animation: choreoCardEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+    will-change: transform, opacity;
+}
+
+.choreo-card-2 {
+    animation: choreoCardEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+    will-change: transform, opacity;
+}
+
+.choreo-card-3 {
+    animation: choreoCardEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
+    will-change: transform, opacity;
+}
+
+.choreo-card-4 {
+    animation: choreoCardEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.40s both;
+    will-change: transform, opacity;
+}
+
+.bento-channel-stack {
+    animation: choreoBarGrow 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+.bento-pen-fill {
+    animation: choreoBarGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+}
+
+.bento-prod-fill {
+    animation: choreoBarGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+.bento-prod-item {
+    animation: choreoSlideRight 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.bento-prod-item:nth-child(1) { animation-delay: 0.42s; }
+.bento-prod-item:nth-child(2) { animation-delay: 0.48s; }
+.bento-prod-item:nth-child(3) { animation-delay: 0.54s; }
+.bento-prod-item:nth-child(4) { animation-delay: 0.60s; }
+.bento-prod-item:nth-child(5) { animation-delay: 0.66s; }
+
+.bento-reg-table tbody tr {
+    animation: choreoSlideRight 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.bento-reg-table tbody tr:nth-child(1) { animation-delay: 0.36s; }
+.bento-reg-table tbody tr:nth-child(2) { animation-delay: 0.42s; }
+.bento-reg-table tbody tr:nth-child(3) { animation-delay: 0.48s; }
+.bento-reg-table tbody tr:nth-child(4) { animation-delay: 0.54s; }
+
+.bento-tm-block {
+    animation: choreoCardEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.30s both;
+}
+
+.bento-aov-pill {
+    animation: choreoCardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .choreo-bento-header, .choreo-card-1, .choreo-card-2, .choreo-card-3, .choreo-card-4,
+    .bento-channel-stack, .bento-pen-fill, .bento-prod-fill, .bento-prod-item,
+    .bento-reg-table tbody tr, .bento-tm-block, .bento-aov-pill {
+        animation: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+    }
+}
 </style>
 
 <div class="bento-root">
     <!-- Header Controls -->
-    <div class="bento-header-bar">
+    <div class="bento-header-bar choreo-bento-header">
         <h4 class="bento-header-title">
             <span>⚡</span>
             <span>Loewix Executive Analytics</span>
@@ -1045,7 +1158,7 @@ $total_top_omset = array_sum(array_column($init_top_products, 'omset'));
     <!-- Grid Container -->
     <div class="bento-grid">
         <!-- ================= CARD 1: REVENUE / OMSET PENJUALAN (col-span-top-left) ================= -->
-        <div class="bento-card bento-card-top col-span-top-left">
+        <div class="bento-card bento-card-top col-span-top-left choreo-card-1">
             <div class="bento-top-row">
                 <div class="bento-stat-col">
                     <div class="bento-label">Omset Penjualan (Real)</div>
@@ -1076,7 +1189,7 @@ $total_top_omset = array_sum(array_column($init_top_products, 'omset'));
         </div>
 
         <!-- ================= CARD 2: TOTAL CUSTOMER & SESSIONS (col-span-top-right) ================= -->
-        <div class="bento-card bento-card-top col-span-top-right">
+        <div class="bento-card bento-card-top col-span-top-right choreo-card-2">
             <div class="bento-top-row">
                 <div class="bento-stat-col">
                     <div class="bento-label">Total Customer Terdaftar</div>
@@ -1130,7 +1243,7 @@ $total_top_omset = array_sum(array_column($init_top_products, 'omset'));
         </div>
 
         <!-- ================= CARD 3: KATEGORI CUSTOMER (TREEMAP) (col-span-bottom-left) ================= -->
-        <div class="bento-card bento-card-bottom col-span-bottom-left">
+        <div class="bento-card bento-card-bottom col-span-bottom-left choreo-card-3">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
                 <div>
                     <h5 class="fw-bold mb-0" style="font-size: 15.5px; letter-spacing: -0.02em; color: #0F172A;">
@@ -1194,7 +1307,7 @@ $total_top_omset = array_sum(array_column($init_top_products, 'omset'));
         </div>
 
         <!-- ================= CARD 4: TOP SELLING PRODUCTS (col-span-bottom-right) ================= -->
-        <div class="bento-card bento-card-bottom col-span-bottom-right">
+        <div class="bento-card bento-card-bottom col-span-bottom-right choreo-card-4">
             <!-- Header Row: Title & Metric Sort -->
             <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
                 <div>
@@ -1349,16 +1462,15 @@ $total_top_omset = array_sum(array_column($init_top_products, 'omset'));
     }
 
     const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
-    function runCountUp(elId, targetVal, prefix = '') {
+    function runCountUp(elId, targetVal, prefix = '', suffix = '', duration = 1000) {
         const el = document.getElementById(elId);
         if (!el || targetVal <= 0) return;
         const start = 0;
         const t0 = performance.now();
-        const duration = 1000;
         function step(now) {
             const t = Math.min(1, (now - t0) / duration);
             const v = Math.round(start + (targetVal - start) * easeOutCubic(t));
-            el.textContent = prefix + v.toLocaleString('id-ID');
+            el.textContent = prefix + v.toLocaleString('id-ID') + suffix;
             if (t < 1) requestAnimationFrame(step);
         }
         requestAnimationFrame(step);
@@ -1408,15 +1520,44 @@ $total_top_omset = array_sum(array_column($init_top_products, 'omset'));
                     <stop offset="100%" stop-color="#10B981" stop-opacity="0.0" />
                 </linearGradient>
             </defs>
-            <path d="${d} L${lastP[0]},${H} L${P[0][0]},${H} Z" fill="url(#bentoRevGradArea)" />
-            <path d="${d}" fill="none" stroke="url(#bentoRevGradLine)" stroke-width="2.2" stroke-linecap="round" />
-            <circle cx="${lastP[0]}" cy="${lastP[1]}" r="4" fill="#059669" stroke="#FFFFFF" stroke-width="1.8" />
+            <path d="${d} L${lastP[0]},${H} L${P[0][0]},${H} Z" fill="url(#bentoRevGradArea)" id="bentoRevGradAreaPath" />
+            <path d="${d}" fill="none" stroke="url(#bentoRevGradLine)" stroke-width="2.2" stroke-linecap="round" id="bentoRevLinePath" />
+            <circle cx="${lastP[0]}" cy="${lastP[1]}" r="4" fill="#059669" stroke="#FFFFFF" stroke-width="1.8" id="bentoRevDot" />
             <rect id="bentoRevHoverHit" width="${W}" height="${H}" fill="transparent" style="cursor:crosshair;" />
             <g id="bentoRevHoverGroup" style="display:none;">
                 <line id="bentoRevHoverLine" x1="0" y1="0" x2="0" y2="${H}" stroke="#94A3B8" stroke-dasharray="3 3" stroke-width="1" />
                 <circle id="bentoRevHoverDot" cx="0" cy="0" r="4" fill="#059669" stroke="#FFFFFF" stroke-width="1.8" />
             </g>
         `;
+
+        // Entrance Choreography for Chart Line
+        const linePath = document.getElementById('bentoRevLinePath');
+        if (linePath && linePath.getTotalLength) {
+            const len = Math.ceil(linePath.getTotalLength());
+            linePath.style.strokeDasharray = len;
+            linePath.style.strokeDashoffset = len;
+            linePath.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s';
+            requestAnimationFrame(() => {
+                linePath.style.strokeDashoffset = '0';
+            });
+        }
+        const areaPath = document.getElementById('bentoRevGradAreaPath');
+        if (areaPath) {
+            areaPath.style.opacity = '0';
+            areaPath.style.transition = 'opacity 0.8s ease 0.6s';
+            requestAnimationFrame(() => {
+                areaPath.style.opacity = '1';
+            });
+        }
+        const revDot = document.getElementById('bentoRevDot');
+        if (revDot) {
+            revDot.style.transformOrigin = `${lastP[0]}px ${lastP[1]}px`;
+            revDot.style.transform = 'scale(0)';
+            revDot.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 1.1s';
+            requestAnimationFrame(() => {
+                revDot.style.transform = 'scale(1)';
+            });
+        }
 
         const hit = document.getElementById('bentoRevHoverHit');
         const hGroup = document.getElementById('bentoRevHoverGroup');
@@ -1797,16 +1938,22 @@ $total_top_omset = array_sum(array_column($init_top_products, 'omset'));
         container.innerHTML = html;
 
         const elTotalQty = document.getElementById('bentoTopProdTotalQty');
-        if (elTotalQty) elTotalQty.textContent = `${totalQty.toLocaleString('id-ID')} Unit`;
-
         const elTotalOmset = document.getElementById('bentoTopProdTotalOmset');
-        if (elTotalOmset) elTotalOmset.textContent = `Rp ${totalOmset.toLocaleString('id-ID')}`;
+        if (window._hasBentoAnimated) {
+            if (elTotalQty) elTotalQty.textContent = `${totalQty.toLocaleString('id-ID')} Unit`;
+            if (elTotalOmset) elTotalOmset.textContent = `Rp ${totalOmset.toLocaleString('id-ID')}`;
+        } else {
+            runCountUp('bentoTopProdTotalQty', totalQty, '', ' Unit', 900);
+            runCountUp('bentoTopProdTotalOmset', totalOmset, 'Rp ', '', 1000);
+            window._hasBentoAnimated = true;
+        }
     }
 
     function initAllBento() {
         if (realRevenueTotal > 0) {
             runCountUp('bentoRevVal', realRevenueTotal, '');
         }
+        runCountUp('bentoSessVal', <?= (int)$total_cust_val ?>, '');
         initRevenueChart();
         initSessionsChart();
         renderTreemap(activeTreemapPeriod);
