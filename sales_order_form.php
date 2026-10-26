@@ -16,6 +16,10 @@ $isEdit = false;
 $orderData = null;
 $orderItems = [];
 
+$userRoleClean = strtolower(trim($_SESSION['role'] ?? ''));
+$userId = (int)($_SESSION['user_id'] ?? 0);
+$isSales = ($userRoleClean === 'sales');
+
 if ($soId > 0) {
     $stmt = $conn->prepare("SELECT * FROM sales_orders WHERE id = ? AND deleted_at IS NULL");
     $stmt->bind_param("i", $soId);
@@ -24,6 +28,12 @@ if ($soId > 0) {
     $stmt->close();
     
     if ($orderData) {
+        // Scoping: Sales cannot edit another sales' order
+        if ($isSales && (int)$orderData['sales_id'] !== $userId) {
+            echo "<script>alert('Akses ditolak: Anda tidak memiliki izin untuk mengedit penawaran penjualan milik sales lain.'); window.location.href='sales_orders.php';</script>";
+            exit();
+        }
+
         $isEdit = true;
         $stmtItems = $conn->prepare("SELECT * FROM sales_order_items WHERE sales_order_id = ? ORDER BY id ASC");
         $stmtItems->bind_param("i", $soId);
@@ -685,19 +695,25 @@ if ($qProd) {
                     <label class="accurate-label">
                         <i class="bi bi-briefcase me-1"></i> Sales PIC
                     </label>
-                    <select name="sales_id" id="sales_id" class="form-select accurate-input">
-                        <option value="">-- Pilih Sales --</option>
-                        <?php 
-                        $curSalesId = $orderData['sales_id'] ?? ($_SESSION['user_id'] ?? 0);
-                        foreach ($salesList as $s): 
-                            $sel = ($curSalesId == $s['id']) ? 'selected' : '';
-                        ?>
-                            <option value="<?php echo $s['id']; ?>" <?php echo $sel; ?>>
-                                <?php echo htmlspecialchars($s['nama_lengkap']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <input type="hidden" name="sales_name" id="sales_name" value="<?php echo htmlspecialchars($orderData['sales_name'] ?? ($_SESSION['nama_lengkap'] ?? '')); ?>">
+                    <?php if ($isSales): ?>
+                        <input type="text" class="form-control accurate-input" value="<?php echo htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Saya'); ?>" readonly style="background:#f1f5f9; cursor:not-allowed;" title="Terkunci untuk akun Anda">
+                        <input type="hidden" name="sales_id" id="sales_id" value="<?php echo $userId; ?>">
+                        <input type="hidden" name="sales_name" id="sales_name" value="<?php echo htmlspecialchars($_SESSION['nama_lengkap'] ?? ''); ?>">
+                    <?php else: ?>
+                        <select name="sales_id" id="sales_id" class="form-select accurate-input">
+                            <option value="">-- Pilih Sales --</option>
+                            <?php 
+                            $curSalesId = $orderData['sales_id'] ?? ($_SESSION['user_id'] ?? 0);
+                            foreach ($salesList as $s): 
+                                $sel = ($curSalesId == $s['id']) ? 'selected' : '';
+                            ?>
+                                <option value="<?php echo $s['id']; ?>" <?php echo $sel; ?>>
+                                    <?php echo htmlspecialchars($s['nama_lengkap']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <input type="hidden" name="sales_name" id="sales_name" value="<?php echo htmlspecialchars($orderData['sales_name'] ?? ($_SESSION['nama_lengkap'] ?? '')); ?>">
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

@@ -10,6 +10,11 @@ require_once 'includes/sales_order_helper.php';
 ensureSalesOrderTables($conn);
 require_once 'includes/header.php';
 
+// User & Role Access Scoping
+$userRoleClean = strtolower(trim($_SESSION['role'] ?? ''));
+$userId = (int)($_SESSION['user_id'] ?? 0);
+$isSales = ($userRoleClean === 'sales');
+
 // Filter Parameters
 $search = trim($_GET['search'] ?? '');
 $statusFilter = trim($_GET['status'] ?? '');
@@ -34,7 +39,13 @@ if (!empty($statusFilter)) {
     $types .= "s";
 }
 
-if ($salesFilter > 0) {
+// Scoping: Sesama sales tidak bisa melihat orderan sales lain
+if ($isSales) {
+    $where .= " AND so.sales_id = ?";
+    $params[] = $userId;
+    $types .= "i";
+    $salesFilter = $userId;
+} elseif ($salesFilter > 0) {
     $where .= " AND so.sales_id = ?";
     $params[] = $salesFilter;
     $types .= "i";
@@ -71,7 +82,7 @@ $stats = $statsRes ? $statsRes->fetch_assoc() : [
     'total_orders' => 0, 'total_amount' => 0, 'total_waiting' => 0, 'total_processing' => 0, 'total_completed' => 0
 ];
 
-$isFiltered = (!empty($search) || !empty($statusFilter) || $salesFilter > 0 || !empty($startDate) || !empty($endDate));
+$isFiltered = (!empty($search) || !empty($statusFilter) || (!$isSales && $salesFilter > 0) || !empty($startDate) || !empty($endDate));
 
 // Fetch Orders
 $sqlOrders = "SELECT so.*, 
@@ -806,7 +817,7 @@ if ($qSales) {
 <!-- 3. Minimalist Filter Bar -->
 <div class="filter-card-so">
     <form method="GET" action="sales_orders.php" class="row g-2 align-items-center">
-        <div class="col-lg-3 col-md-6">
+        <div class="<?php echo $isSales ? 'col-lg-4 col-md-6' : 'col-lg-3 col-md-6'; ?>">
             <div class="input-group input-group-sm">
                 <span class="input-group-text filter-addon-so"><i class="bi bi-search"></i></span>
                 <input type="text" name="search" class="form-control filter-input-so" placeholder="Cari No. SO, Toko, PIC..." value="<?php echo htmlspecialchars($search); ?>">
@@ -826,6 +837,7 @@ if ($qSales) {
             </select>
         </div>
 
+        <?php if (!$isSales): ?>
         <div class="col-lg-2 col-md-3 col-6">
             <select name="sales_id" class="form-select form-select-sm filter-input-so">
                 <option value="">-- Semua Sales --</option>
@@ -836,8 +848,9 @@ if ($qSales) {
                 <?php endforeach; ?>
             </select>
         </div>
+        <?php endif; ?>
 
-        <div class="col-lg-3 col-md-6">
+        <div class="<?php echo $isSales ? 'col-lg-4 col-md-6' : 'col-lg-3 col-md-6'; ?>">
             <div class="input-group input-group-sm">
                 <input type="date" name="start_date" class="form-control filter-input-so" title="Dari Tanggal" value="<?php echo htmlspecialchars($startDate); ?>">
                 <span class="input-group-text filter-addon-so">s/d</span>

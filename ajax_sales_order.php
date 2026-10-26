@@ -18,6 +18,10 @@ header('Content-Type: application/json; charset=utf-8');
 require_once 'includes/sales_order_helper.php';
 ensureSalesOrderTables($conn);
 
+$userRoleClean = strtolower(trim($_SESSION['role'] ?? ''));
+$userId = (int)($_SESSION['user_id'] ?? 0);
+$isSales = ($userRoleClean === 'sales');
+
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 // =========================================================================
@@ -298,8 +302,35 @@ if ($action === 'save_sales_order') {
     $customer_pic = trim($_POST['customer_pic'] ?? '');
     $customer_phone = trim($_POST['customer_phone'] ?? '');
     
-    $sales_id = !empty($_POST['sales_id']) ? (int)$_POST['sales_id'] : (isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null);
-    $sales_name = trim($_POST['sales_name'] ?? ($_SESSION['nama_lengkap'] ?? ''));
+    // Scoping Check: If updating existing order and user is sales, ensure order belongs to them
+    if ($so_id > 0) {
+        $chkStmt = $conn->prepare("SELECT sales_id FROM sales_orders WHERE id = ? AND deleted_at IS NULL");
+        $chkStmt->bind_param("i", $so_id);
+        $chkStmt->execute();
+        $curOrder = $chkStmt->get_result()->fetch_assoc();
+        $chkStmt->close();
+        if (!$curOrder) {
+            echo json_encode(['success' => false, 'message' => 'Penawaran tidak ditemukan atau sudah dihapus.']);
+            exit;
+        }
+        if ($isSales && (int)$curOrder['sales_id'] !== $userId) {
+            echo json_encode(['success' => false, 'message' => 'Akses ditolak: Anda tidak memiliki hak untuk mengubah penawaran milik sales lain.']);
+            exit;
+        }
+    }
+
+    if ($isSales) {
+        $sales_id = $userId;
+        $qMyName = $conn->prepare("SELECT nama_lengkap FROM sales WHERE id = ? LIMIT 1");
+        $qMyName->bind_param("i", $userId);
+        $qMyName->execute();
+        $rowMy = $qMyName->get_result()->fetch_assoc();
+        $qMyName->close();
+        $sales_name = (!empty($rowMy['nama_lengkap'])) ? $rowMy['nama_lengkap'] : ($_SESSION['nama_lengkap'] ?? '');
+    } else {
+        $sales_id = !empty($_POST['sales_id']) ? (int)$_POST['sales_id'] : ($userId ?: null);
+        $sales_name = trim($_POST['sales_name'] ?? ($_SESSION['nama_lengkap'] ?? ''));
+    }
     
     $payment_terms = trim($_POST['payment_terms'] ?? 'C.O.D');
     $po_number = trim($_POST['po_number'] ?? '');
@@ -560,6 +591,12 @@ if ($action === 'get_order_detail') {
         echo json_encode(['success' => false, 'message' => 'Penawaran Penjualan tidak ditemukan atau sudah dihapus.']);
         exit;
     }
+
+    // Scoping: Sales cannot view another sales' order
+    if ($isSales && (int)$order['sales_id'] !== $userId) {
+        echo json_encode(['success' => false, 'message' => 'Akses ditolak: Anda tidak memiliki izin untuk melihat rincian penawaran milik sales lain.']);
+        exit;
+    }
     
     // Fetch items
     $stmtItems = $conn->prepare("SELECT * FROM sales_order_items WHERE sales_order_id = ? ORDER BY id ASC");
@@ -610,13 +647,25 @@ if ($action === 'update_status') {
         echo json_encode(['success' => false, 'message' => 'Status tidak valid.']);
         exit;
     }
+
+    if ($isSales) {
+        $chkStmt = $conn->prepare("SELECT sales_id FROM sales_orders WHERE id = ? AND deleted_at IS NULL");
+        $chkStmt->bind_param("i", $so_id);
+        $chkStmt->execute();
+        $curOrder = $chkStmt->get_result()->fetch_assoc();
+        $chkStmt->close();
+        if (!$curOrder || (int)$curOrder['sales_id'] !== $userId) {
+            echo json_encode(['success' => false, 'message' => 'Akses ditolak: Anda tidak memiliki izin untuk mengubah status penawaran sales lain.']);
+            exit;
+        }
+    }
     
     $stmt = $conn->prepare("UPDATE sales_orders SET status = ? WHERE id = ?");
     $stmt->bind_param("si", $status, $so_id);
     $res = $stmt->execute();
     $stmt->close();
     
-    echo json_encode(['success' => $res, 'message' => $res ? 'Status pesanan berhasil diperbarui.' : 'Gagal memperbarui status.']);
+    echo json_encode(['success' => $res, 'message' => $res ? 'Status penawaran berhasil diperbarui.' : 'Gagal memperbarui status.']);
     exit;
 }
 
@@ -626,8 +675,20 @@ if ($action === 'update_status') {
 if ($action === 'delete_sales_order') {
     $so_id = (int)($_POST['id'] ?? 0);
     if ($so_id <= 0) {
-        echo json_encode(['success' => false, 'message' => 'ID pesanan tidak valid.']);
+        echo json_encode(['success' => false, 'message' => 'ID penawaran tidak valid.']);
         exit;
+    }
+
+    if ($isSales) {
+        $chkStmt = $conn->prepare("SELECT sales_id FROM sales_orders WHERE id = ? AND deleted_at IS NULL");
+        $chkStmt->bind_param("i", $so_id);
+        $chkStmt->execute();
+        $curOrder = $chkStmt->get_result()->fetch_assoc();
+        $chkStmt->close();
+        if (!$curOrder || (int)$curOrder['sales_id'] !== $userId) {
+            echo json_encode(['success' => false, 'message' => 'Akses ditolak: Anda tidak memiliki izin untuk menghapus penawaran sales lain.']);
+            exit;
+        }
     }
     
     $now = date('Y-m-d H:i:s');
@@ -636,7 +697,7 @@ if ($action === 'delete_sales_order') {
     $res = $stmt->execute();
     $stmt->close();
     
-    echo json_encode(['success' => $res, 'message' => $res ? 'Pesanan berhasil dihapus.' : 'Gagal menghapus pesanan.']);
+    echo json_encode(['success' => $res, 'message' => $res ? 'Penawaran berhasil dihapus.' : 'Gagal menghapus penawaran.']);
     exit;
 }
 

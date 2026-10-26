@@ -24,6 +24,14 @@ if (!$order) {
     die("Penawaran Penjualan tidak ditemukan atau sudah dihapus.");
 }
 
+$userRoleClean = strtolower(trim($_SESSION['role'] ?? ''));
+$userId = (int)($_SESSION['user_id'] ?? 0);
+$isSales = ($userRoleClean === 'sales');
+
+if ($isSales && (int)$order['sales_id'] !== $userId) {
+    die("Akses ditolak: Anda tidak memiliki izin untuk melihat atau mencetak penawaran penjualan milik sales lain.");
+}
+
 // Fetch Items
 $stmtItems = $conn->prepare("SELECT * FROM sales_order_items WHERE sales_order_id = ? ORDER BY id ASC");
 $stmtItems->bind_param("i", $soId);
