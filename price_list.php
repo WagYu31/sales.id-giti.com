@@ -487,8 +487,38 @@ require_once 'includes/header.php';
                     Tipe Produk
                 </h5>
 
+                <!-- Rincian Komponen Isi Paket (Bundle Package Items) -->
+                <div id="specModalBundleWrapper" class="mb-3" style="display:none;">
+                    <div class="card border-0 rounded-3 shadow-xs" style="border: 1.5px solid #bfdbfe !important; background: #ffffff;">
+                        <div class="card-header bg-white py-2 px-3 d-flex align-items-center justify-content-between border-bottom" style="border-color: #e2e8f0 !important;">
+                            <span class="fw-bold text-primary d-flex align-items-center gap-1.5" style="font-size: 13px;">
+                                <i class="bi bi-box-seam-fill text-primary"></i> 📦 Daftar Rincian Komponen Isi Paket:
+                            </span>
+                            <span class="badge bg-primary rounded-pill px-2.5 py-1 font-monospace" id="specModalBundleCount" style="font-size: 11px;">0 Item</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover table-striped align-middle mb-0" style="font-size: 12.5px;">
+                                    <thead class="table-light text-muted font-monospace" style="font-size: 11px;">
+                                        <tr>
+                                            <th class="ps-3 text-center" style="width: 40px;">NO</th>
+                                            <th style="width: 95px;">KODE</th>
+                                            <th>NAMA BARANG / KOMPONEN</th>
+                                            <th class="text-center" style="width: 60px;">QTY</th>
+                                            <th class="pe-3" style="width: 70px;">SATUAN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="specModalBundleBody">
+                                        <!-- Dynamic bundle rows injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Spesifikasi Box -->
-                <div class="p-3 rounded-3" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
+                <div class="p-3 rounded-3" id="specModalDescBox" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
                     <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom" style="border-color: #e2e8f0 !important;">
                         <span class="text-xs text-muted fw-bold text-uppercase d-flex align-items-center gap-1.5">
                             <i class="bi bi-file-text-fill text-primary"></i> Rincian Spesifikasi &amp; Fitur
@@ -903,12 +933,77 @@ $(document).ready(function() {
         const category = $(this).data('category') || '-';
         const price = $(this).data('price') || '-';
         const desc = $(this).data('desc') || 'Tidak ada catatan spesifikasi tambahan untuk produk ini.';
-        currentSpecText = `${type}\n${desc}`;
+        const code = $(this).data('code') || '';
+        const isPkg = $(this).data('is-pkg') == '1';
 
         $('#specModalType').text(type);
         $('#specModalCategory').html('<i class="bi bi-tag-fill me-1 opacity-75"></i>' + escapeHtml(category));
         $('#specModalPrice').text(price);
         $('#specModalDesc').text(desc);
+
+        // Reset bundle view
+        $('#specModalBundleWrapper').hide();
+        $('#specModalBundleBody').empty();
+        $('#specModalBundleCount').text('0 Item');
+
+        currentSpecText = `${type}\nKategori: ${category}\nHarga: ${price}\n\nSpesifikasi:\n${desc}`;
+
+        // Jika merupakan produk paket, panggil AJAX untuk mengambil rincian isi paket
+        if (isPkg || category.toUpperCase().includes('PAKET') || type.toUpperCase().includes('PAKET')) {
+            $('#specModalBundleWrapper').show();
+            $('#specModalBundleBody').html('<tr><td colspan="5" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat rincian paket...</td></tr>');
+
+            $.getJSON('ajax_price_handler.php', {
+                action: 'get_bundle_items',
+                code: code,
+                type: type
+            }, function(res) {
+                if (res && res.has_bundle && res.items && res.items.length > 0) {
+                    $('#specModalBundleCount').text(res.items.length + ' Item');
+                    let bundleRowsHtml = '';
+                    let bundleText = `\n\n--- RINCIAN KOMPONEN ISI PAKET (${res.items.length} ITEM) ---`;
+
+                    res.items.forEach((item, idx) => {
+                        const itemCode = escapeHtml(item.item_code || '-');
+                        const itemName = escapeHtml(item.item_name || '-');
+                        const itemQty = item.qty || 1;
+                        const itemUnit = escapeHtml(item.unit || 'UNIT');
+
+                        bundleText += `\n${idx + 1}. [${item.item_code}] ${item.item_name} (${itemQty} ${itemUnit})`;
+
+                        bundleRowsHtml += `
+                            <tr>
+                                <td class="ps-3 text-center fw-semibold text-muted font-monospace">${idx + 1}</td>
+                                <td class="font-monospace text-primary fw-bold">${itemCode}</td>
+                                <td class="fw-semibold text-dark">${itemName}</td>
+                                <td class="text-center fw-bold text-dark font-monospace">${itemQty}</td>
+                                <td class="pe-3 text-secondary font-monospace">${itemUnit}</td>
+                            </tr>
+                        `;
+                    });
+
+                    $('#specModalBundleBody').html(bundleRowsHtml);
+                    currentSpecText += bundleText;
+                } else {
+                    $('#specModalBundleCount').text('0 Item');
+                    $('#specModalBundleBody').html(`
+                        <tr>
+                            <td colspan="5" class="text-center py-3 text-muted" style="font-size: 12px;">
+                                <i class="bi bi-info-circle me-1"></i> Rincian komponen isi paket belum didefinisikan secara khusus untuk kode produk ini.
+                            </td>
+                        </tr>
+                    `);
+                }
+            }).fail(function() {
+                $('#specModalBundleBody').html(`
+                    <tr>
+                        <td colspan="5" class="text-center py-3 text-danger" style="font-size: 12px;">
+                            <i class="bi bi-exclamation-triangle me-1"></i> Gagal memuat rincian isi paket.
+                        </td>
+                    </tr>
+                `);
+            });
+        }
 
         specModal.show();
     });

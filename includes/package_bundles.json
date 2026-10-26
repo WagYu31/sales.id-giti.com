@@ -711,5 +711,46 @@
         "description": "XVR 8CH 3 Unit"
       }
     ]
+  },
+  "8800430": {
+    "package_code": "8800430",
+    "package_name": "PAKET 2MP IPCAM LOEWIX 16 CH",
+    "items": [
+      {
+        "code": "8800400",
+        "name": "--LOEWIX #LX-IPF20CM303 IP CAMERA INDOOR 2MP",
+        "qty": 8,
+        "unit": "UNIT",
+        "description": "Komponen Kamera IP Indoor 2MP"
+      },
+      {
+        "code": "8800401",
+        "name": "--LOEWIX #LX-IPF20CM608 IP CAMERA OUTDOOR 2MP",
+        "qty": 8,
+        "unit": "UNIT",
+        "description": "Komponen Kamera IP Outdoor 2MP"
+      },
+      {
+        "code": "8800066",
+        "name": "--LOEWIX NVR 4K 16CH #LX-NVR217165A",
+        "qty": 1,
+        "unit": "UNIT",
+        "description": "NVR 16 Channel 4K"
+      },
+      {
+        "code": "8800072",
+        "name": "--LOEWIX #LX-2108N POE SWITCH 8 PORT + 2 10/100",
+        "qty": 2,
+        "unit": "UNIT",
+        "description": "Switch PoE 8 Port"
+      },
+      {
+        "code": "8800220",
+        "name": "--CONNECTOR RJ-45 LAN @50 PCS / PACK",
+        "qty": 40,
+        "unit": "PCS",
+        "description": "Konektor RJ-45"
+      }
+    ]
   }
 }

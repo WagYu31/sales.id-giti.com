@@ -13,6 +13,62 @@ header('Content-Type: application/json');
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
+// =========================================================================
+// ACTION: GET BUNDLE PACKAGE ITEMS
+// =========================================================================
+if ($action === 'get_bundle_items') {
+    $code = trim($_GET['code'] ?? '');
+    $type = trim($_GET['type'] ?? '');
+    
+    $items = [];
+    if (!empty($code) || !empty($type)) {
+        $stmt = $conn->prepare("SELECT item_code, item_name, qty, unit, sort_order FROM product_package_bundles WHERE package_code = ? OR package_name = ? ORDER BY sort_order ASC, id ASC");
+        if ($stmt) {
+            $stmt->bind_param("ss", $code, $type);
+            $stmt->execute();
+            $items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+        }
+    }
+    
+    // Fallback to json file if DB table empty
+    if (empty($items)) {
+        $jsonFile = __DIR__ . '/includes/package_bundles.json';
+        if (file_exists($jsonFile)) {
+            $bundles = json_decode(file_get_contents($jsonFile), true) ?: [];
+            $pkg = $bundles[$code] ?? null;
+            if (!$pkg && !empty($type)) {
+                foreach ($bundles as $b) {
+                    if (strcasecmp($b['package_name'] ?? '', $type) === 0) {
+                        $pkg = $b;
+                        break;
+                    }
+                }
+            }
+            if ($pkg && !empty($pkg['items'])) {
+                foreach ($pkg['items'] as $sIdx => $it) {
+                    $items[] = [
+                        'item_code' => $it['code'] ?? '',
+                        'item_name' => $it['name'] ?? '',
+                        'qty' => (int)($it['qty'] ?? 1),
+                        'unit' => $it['unit'] ?? 'UNIT',
+                        'sort_order' => $sIdx + 1
+                    ];
+                }
+            }
+        }
+    }
+    
+    echo json_encode([
+        'status' => 'success',
+        'has_bundle' => !empty($items),
+        'items' => $items,
+        'package_code' => $code,
+        'package_name' => $type
+    ]);
+    exit;
+}
+
 if ($action == 'get_prices') {
     $search = trim($_GET['search'] ?? '');
     $category = trim($_GET['category'] ?? '');
@@ -140,6 +196,27 @@ if ($action == 'get_prices') {
                 ? "<div class='text-muted font-monospace mt-1' style='font-size: 11.5px;'><span class='badge bg-light text-secondary border me-1' style='font-size:10px;'>".htmlspecialchars($p['item_code'])."</span>Satuan: <span class='text-dark fw-semibold'>".htmlspecialchars($p['unit'] ?: 'UNIT')."</span></div>" 
                 : "";
 
+            $isPackage = (stripos($p['category'], 'PAKET') !== false) 
+                      || (stripos($p['type'], 'PAKET') !== false) 
+                      || (stripos($p['description'] ?? '', 'GROUP') !== false);
+
+            $packageBtn = '';
+            if ($isPackage) {
+                $packageBtn = "<div class='mt-1.5'>
+                    <button type='button' class='btn btn-xs btn-outline-primary btn-desc-info rounded-pill d-inline-flex align-items-center gap-1.5' 
+                            data-id='{$p['id']}' 
+                            data-code='".htmlspecialchars($p['item_code'] ?? '', ENT_QUOTES)."' 
+                            data-type='".htmlspecialchars($p['type'], ENT_QUOTES)."' 
+                            data-category='".htmlspecialchars($p['category'], ENT_QUOTES)."' 
+                            data-price='Rp ".number_format($msrp, 0, ',', '.')."' 
+                            data-desc='".htmlspecialchars($p['description'] ?? '', ENT_QUOTES)."' 
+                            data-is-pkg='1'
+                            style='font-size: 11px; padding: 2.5px 10px; font-weight: 700; background: #eff6ff; border-color: #93c5fd; color: #1d4ed8;'>
+                        <i class='bi bi-box-seam-fill'></i> 📦 Rincian Isi Paket
+                    </button>
+                </div>";
+            }
+
             $priceDisplay = $msrp > 0 
                 ? "Rp " . number_format($msrp, 0, ',', '.') 
                 : "<span class='text-muted small fw-normal' style='font-size:12px;'>Hubungi Sales</span>";
@@ -153,6 +230,7 @@ if ($action == 'get_prices') {
                         <td style='vertical-align: middle;'>
                             <div class='fw-bold text-dark' style='font-size: 14px;'>".htmlspecialchars($p['type'])."</div>
                             {$codeUnitBadge}
+                            {$packageBtn}
                         </td>
                         <td class='text-end' style='vertical-align: middle;'>
                             <div class='font-monospace fw-bold text-dark' style='font-size: 14px;'>{$priceDisplay}</div>
@@ -161,11 +239,13 @@ if ($action == 'get_prices') {
                             <div class='btn-group btn-group-sm' style='box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden;'>
                                 <button type='button' class='btn btn-outline-info btn-desc-info' 
                                         data-id='{$p['id']}' 
+                                        data-code='".htmlspecialchars($p['item_code'] ?? '', ENT_QUOTES)."' 
                                         data-type='".htmlspecialchars($p['type'], ENT_QUOTES)."' 
                                         data-category='".htmlspecialchars($p['category'], ENT_QUOTES)."' 
                                         data-price='Rp ".number_format($msrp, 0, ',', '.')."' 
                                         data-desc='".htmlspecialchars($p['description'] ?? '', ENT_QUOTES)."' 
-                                        title='Lihat Deskripsi Spesifikasi' style='padding: 5px 9px;'>
+                                        data-is-pkg='".($isPackage ? '1' : '0')."' 
+                                        title='Lihat Deskripsi Spesifikasi & Isi Paket' style='padding: 5px 9px;'>
                                     <i class='bi bi-info-circle-fill'></i>
                                 </button>
                                 <button type='button' class='btn btn-outline-warning btn-edit' data-id='{$p['id']}' title='Edit Produk' style='padding: 5px 9px;'><i class='bi bi-pencil-square'></i></button>
