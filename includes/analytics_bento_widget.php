@@ -1,104 +1,131 @@
 <?php
 /**
- * WIDGET ANALYTICS BENTO - 4 LIVE CARDS
- * Inspired by AnalyticsBento template (SVG-only, high-performance, dynamic animations)
- * Integrasi langsung ke Dashboard PHP Loewix Sales
+ * WIDGET ANALYTICS BENTO - EXECUTIVE REFINED EDITION
+ * Precision aspect ratios, compact modern KPI heights, pure SVG zero-dependency charts.
  *
  * Cards:
- * 1. Revenue & Omset Bulanan (Catmull-Rom SVG Gradient Curve)
- * 2. Aktivitas Sales Canvas vs Web (Dual-Wave Harmonic Sine Curve)
- * 3. Kategori & Channel Pelanggan (Squarified Dynamic Treemap)
- * 4. Seasonality Radar & Target Bulanan (Fourier Smoothing Radar Polygon)
+ * 1. Revenue & Customer Growth (Catmull-Rom Smooth SVG Gradient Curve)
+ * 2. Total Customer & Follow Up Waves (Harmonic Breathing Dual Sine Waves)
+ * 3. Kategori Customer (Proportional Squarified Treemap + Regional Table)
+ * 4. Seasonality Radar (Fourier Smoothed Radial Polygon + Annual KPIs)
  */
 
-// Query data dasar dari database jika tersedia
-$total_customers_bento = $totalCustomers ?? 4671;
-$pending_fu_bento = $pendingFU ?? 0;
-$new_cust_bento = $thisMonthNew ?? 0;
-
-// Query real follow-ups count if available
-$total_fu_count = 0;
-$q_fu = $conn->query("SELECT COUNT(*) as cnt FROM follow_ups WHERE deleted_at IS NULL");
-if ($q_fu) {
-    $total_fu_count = (int)$q_fu->fetch_assoc()['cnt'];
-}
-if ($total_fu_count === 0) $total_fu_count = 1420;
+$total_cust_val = isset($totalCustomers) ? (int)$totalCustomers : 4671;
+$pending_fu_val = isset($pendingFU) ? (int)$pendingFU : 0;
+$new_cust_val   = isset($thisMonthNew) ? (int)$thisMonthNew : 0;
 ?>
 
-<!-- Google Fonts: Geist & Geist Mono untuk estetika template Bento -->
+<!-- Google Fonts: Geist & Geist Mono & Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* ================= BENTO GRID CONTAINER & THEME ================= */
+/* ================= REFINED BENTO GRID SYSTEM ================= */
 .bento-root {
     --b-bg-card: #FFFFFF;
     --b-border: #E2E8F0;
+    --b-border-subtle: #F1F5F9;
     --b-fg: #0F172A;
     --b-muted: #64748B;
-    --b-muted-bg: #F8FAFC;
     --b-emerald: #10B981;
-    --b-radar: #12b863;
-    --b-rev-a: #10B981;
-    --b-rev-b: #059669;
-    --b-desktop-a: #06B6D4;
-    --b-desktop-b: #3B82F6;
-    --b-mobile-a: #F59E0B;
-    --b-mobile-b: #EC4899;
+    --b-blue: #3B82F6;
     font-family: 'Geist', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     color: var(--b-fg);
-    margin-bottom: 34px;
+    margin-bottom: 30px;
+}
+
+.bento-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 0 4px;
+}
+
+.bento-header-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.bento-header-badge {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: #FFFFFF;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
 }
 
 .bento-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 20px;
+    gap: 16px;
 }
 
-/* Bento Card Base */
+/* Card Base */
 .bento-card {
     background: var(--b-bg-card);
     border: 1.5px solid var(--b-border);
-    border-radius: 28px;
-    padding: 24px 28px;
-    box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
+    border-radius: 24px;
+    box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .bento-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.09), 0 2px 6px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 10px 28px -6px rgba(15, 23, 42, 0.08);
 }
 
-/* Grid Column Spans */
+/* Specific Row Heights for Balance */
+.bento-card-top {
+    height: 195px;
+    padding: 20px 22px;
+}
+
+.bento-card-bottom {
+    min-height: 410px;
+    padding: 22px 24px;
+}
+
+/* Grid Spans */
 .col-span-5 { grid-column: span 5; }
 .col-span-7 { grid-column: span 7; }
-.col-span-12 { grid-column: span 12; }
 
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
     .col-span-5, .col-span-7 { grid-column: span 12; }
-    .bento-card { padding: 20px; }
+    .bento-card-top { height: auto; min-height: 180px; }
+    .bento-card-bottom { min-height: auto; }
 }
 
-/* Typography & Badges */
+/* Typography */
 .bento-label {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12.5px;
+    font-weight: 700;
     color: var(--b-muted);
     letter-spacing: -0.01em;
+    text-transform: uppercase;
 }
 
 .bento-big-num {
-    font-size: 40px;
+    font-size: 32px;
     font-weight: 700;
-    line-height: 1;
-    margin-top: 10px;
+    line-height: 1.1;
+    margin-top: 6px;
     font-family: 'Geist Mono', monospace;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.04em;
@@ -112,18 +139,17 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
 .bento-delta {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    font-size: 13.5px;
+    gap: 2.5px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--b-emerald);
     letter-spacing: -0.02em;
-    vertical-align: 4px;
 }
 
 .bento-note {
-    font-size: 12.5px;
+    font-size: 12px;
     color: #64748B;
-    margin-top: 8px;
+    margin-top: 6px;
     letter-spacing: -0.01em;
 }
 
@@ -134,17 +160,17 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
     grid-auto-columns: 1fr;
     background: #F1F5F9;
     padding: 3px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #E2E8F0;
-    gap: 4px;
+    gap: 3px;
 }
 
 .bento-seg-btn {
     border: none;
     background: transparent;
-    padding: 6px 14px;
-    border-radius: 9px;
-    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
     color: #64748B;
     cursor: pointer;
@@ -156,7 +182,77 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
 .bento-seg-btn.active {
     background: #FFFFFF;
     color: #0F172A;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+/* Chart Canvas Boxes */
+.bento-chart-container {
+    position: relative;
+    border-radius: 14px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    overflow: hidden;
+    height: 125px;
+    width: 100%;
+    align-self: center;
+}
+
+.bento-treemap-box {
+    position: relative;
+    height: 200px;
+    margin-top: 12px;
+    width: 100%;
+}
+
+.bento-treemap-tile {
+    position: absolute;
+    border-radius: 12px;
+    padding: 10px 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+.bento-treemap-tile:hover {
+    filter: brightness(1.08);
+    transform: scale(0.99);
+}
+
+.bento-radar-box {
+    width: 100%;
+    max-width: 250px;
+    height: 230px;
+    margin: 4px auto 0;
+    position: relative;
+}
+
+/* Compact Regional Table */
+.bento-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    font-size: 12px;
+}
+
+.bento-table th {
+    padding-bottom: 6px;
+    color: #64748B;
+    font-weight: 600;
+    border-bottom: 1.5px solid #E2E8F0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.bento-table td {
+    padding: 7px 0;
+    border-bottom: 1px solid #F1F5F9;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
 }
 
 /* Tooltip */
@@ -167,196 +263,115 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
     background: rgba(15, 23, 42, 0.95);
     color: #FFFFFF;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 8px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    padding: 7px 11px;
+    border-radius: 10px;
+    font-size: 11.5px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(8px);
     transition: opacity 0.15s ease;
     white-space: nowrap;
     opacity: 0;
 }
 
-.bento-tooltip.visible {
-    opacity: 1;
-}
-
-.bento-tooltip-title {
-    font-size: 11px;
-    color: #94A3B8;
-    margin-bottom: 4px;
-    font-weight: 600;
-}
-
-.bento-tooltip-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    font-family: 'Geist Mono', monospace;
-}
-
-/* Chart Canvas / SVG Boxes */
-.bento-svg-box {
-    position: relative;
-    border-radius: 18px;
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    overflow: hidden;
-    width: 100%;
-}
-
-.bento-treemap-box {
-    position: relative;
-    height: 310px;
-    margin-top: 14px;
-    width: 100%;
-}
-
-.bento-treemap-tile {
-    position: absolute;
-    border-radius: 14px;
-    padding: 12px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box;
-    cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.2, 0.9, 0.25, 1);
-}
-
-.bento-treemap-tile:hover {
-    filter: brightness(1.08);
-    transform: scale(0.99);
-}
-
-.bento-radar-box {
-    width: 100%;
-    max-width: 380px;
-    height: 310px;
-    margin: 10px auto 0;
-    position: relative;
-}
-
-/* Table Style */
-.bento-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
-    font-size: 12.5px;
-}
-
-.bento-table th {
-    padding-bottom: 8px;
-    color: #64748B;
-    font-weight: 600;
-    border-bottom: 1.5px solid #E2E8F0;
-}
-
-.bento-table td {
-    padding: 9px 0;
-    border-bottom: 1px solid #F1F5F9;
-    font-family: 'Geist Mono', monospace;
-}
+.bento-tooltip.visible { opacity: 1; }
+.bento-tooltip-title { font-size: 10.5px; color: #94A3B8; margin-bottom: 3px; font-weight: 600; }
+.bento-tooltip-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: 'Geist Mono', monospace; }
 </style>
 
 <div class="bento-root">
-    <!-- Header Section Title -->
-    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-2">
-            <span style="font-size: 20px;">⚡</span>
-            <h4 class="mb-0 fw-bold" style="font-size: 18px; letter-spacing: -0.02em; color: #0F172A;">
-                Loewix Executive Analytics Bento
-            </h4>
-            <span class="badge bg-primary text-white rounded-pill px-2.5 py-1" style="font-size: 11px;">Live Realtime</span>
-        </div>
-        <div class="text-muted" style="font-size: 12.5px; font-weight: 600;">
-            <i class="bi bi-clock-history me-1"></i> Data diperbarui otomatis
+    <!-- Header Controls -->
+    <div class="bento-header-bar">
+        <h4 class="bento-header-title">
+            <span>⚡</span>
+            <span>Loewix Executive Analytics</span>
+            <span class="bento-header-badge">Live Realtime</span>
+        </h4>
+        <div style="font-size: 12px; color: #64748B; font-weight: 600;">
+            <i class="bi bi-clock-history me-1"></i> Terakhir diperbarui otomatis
         </div>
     </div>
 
-    <!-- 12-Column Responsive Bento Grid -->
+    <!-- Grid Container -->
     <div class="bento-grid">
         <!-- ================= CARD 1: REVENUE / OMSET PENJUALAN (col-span-5) ================= -->
-        <div class="bento-card col-span-5">
-            <div class="d-flex flex-column flex-sm-row gap-4 h-100">
-                <div style="min-width: 170px;" class="d-flex flex-column justify-content-between">
-                    <div>
-                        <div class="bento-label">Omset Penjualan (Revenue)</div>
-                        <div class="bento-big-num">
-                            <span id="bentoRevVal">Rp 0</span>
-                            <span class="bento-delta">
-                                <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 10.5V1.5M2 5.5l4-4 4 4"/></svg>
-                                8.4%
-                            </span>
-                        </div>
-                        <div class="bento-note">Rata-rata invoice <b class="text-dark">Rp 3.850.000</b></div>
+        <div class="bento-card bento-card-top col-span-5">
+            <div class="d-flex align-items-center justify-content-between h-100 gap-3">
+                <div style="flex: 0 0 160px;">
+                    <div class="bento-label">Omset Penjualan</div>
+                    <div class="bento-big-num">
+                        <span id="bentoRevVal">Rp 0</span>
                     </div>
-                    <div class="mt-3">
-                        <span class="badge bg-light text-secondary border rounded-pill px-2.5 py-1" style="font-size: 11px;">
-                            📅 30 Hari Terakhir
+                    <div class="d-flex align-items-center gap-1.5 mt-1">
+                        <span class="bento-delta">
+                            <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 10.5V1.5M2 5.5l4-4 4 4"/></svg>
+                            +8.4%
                         </span>
+                        <span style="font-size: 11px; color: #94A3B8;">vs bln lalu</span>
                     </div>
+                    <div class="bento-note">Rata-rata: <b class="text-dark">Rp 3.85M</b></div>
                 </div>
 
-                <!-- SVG Smooth Bezier Curve Chart -->
-                <div class="bento-svg-box flex-grow-1" id="boxRevenueChart" style="min-height: 140px;">
+                <!-- SVG Compact Spline Curve -->
+                <div class="bento-chart-container flex-grow-1" id="boxRevenueChart">
                     <svg id="svgRevenueChart" width="100%" height="100%" style="display: block; overflow: visible;"></svg>
                 </div>
             </div>
         </div>
 
-        <!-- ================= CARD 2: SESSIONS / AKTIVITAS FOLLOW UP (col-span-7) ================= -->
-        <div class="bento-card col-span-7">
-            <div class="d-flex flex-column flex-sm-row gap-4 h-100">
-                <div style="min-width: 200px;" class="d-flex flex-column justify-content-between">
-                    <div>
-                        <div class="bento-label">Aktivitas Follow Up &amp; Canvas</div>
-                        <div class="bento-big-num">
-                            <span id="bentoSessVal">0</span>
-                            <span class="bento-delta">
-                                <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 10.5V1.5M2 5.5l4-4 4 4"/></svg>
-                                14.2%
-                            </span>
-                        </div>
-                        <div class="bento-note">Interaksi sales lapangan &amp; Web CRM</div>
+        <!-- ================= CARD 2: TOTAL CUSTOMER & SESSIONS (col-span-7) ================= -->
+        <div class="bento-card bento-card-top col-span-7">
+            <div class="d-flex align-items-center justify-content-between h-100 gap-3">
+                <div style="flex: 0 0 185px;">
+                    <div class="bento-label">Total Customer Terdaftar</div>
+                    <div class="bento-big-num">
+                        <span id="bentoSessVal"><?= number_format($total_cust_val, 0, ',', '.') ?></span>
                     </div>
-                    <div class="d-flex flex-wrap gap-2 mt-3" style="font-size: 11.5px;">
-                        <span class="d-inline-flex align-items-center gap-1.5 text-muted">
-                            <i style="width: 14px; height: 3px; background: linear-gradient(90deg, #06B6D4, #3B82F6); border-radius: 2px;"></i>
-                            Canvas GPS
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                        <span class="bento-delta">
+                            <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 10.5V1.5M2 5.5l4-4 4 4"/></svg>
+                            +12%
                         </span>
-                        <span class="d-inline-flex align-items-center gap-1.5 text-muted">
-                            <i style="width: 14px; height: 3px; background: linear-gradient(90deg, #F59E0B, #EC4899); border-radius: 2px;"></i>
-                            Web Follow Up
+                        <span style="font-size: 11px; color: #64748B;">
+                            (<?= number_format($new_cust_val, 0, ',', '.') ?> baru bln ini)
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mt-1.5 flex-wrap" style="font-size: 11px;">
+                        <span class="badge bg-light text-dark border px-2 py-0.5 rounded-pill" style="font-size: 10.5px; font-weight: 600;">
+                            ⏳ <?= number_format($pending_fu_val, 0, ',', '.') ?> Pending FU
+                        </span>
+                        <span class="d-inline-flex align-items-center gap-1 text-muted">
+                            <i style="width: 8px; height: 3px; background: #06B6D4; border-radius: 2px;"></i> Canvas
+                        </span>
+                        <span class="d-inline-flex align-items-center gap-1 text-muted">
+                            <i style="width: 8px; height: 3px; background: #EC4899; border-radius: 2px;"></i> Web CRM
                         </span>
                     </div>
                 </div>
 
-                <!-- SVG Breathing Dual Waves Chart -->
-                <div class="bento-svg-box flex-grow-1" id="boxSessionsChart" style="min-height: 140px;">
+                <!-- SVG Breathing Dual Sine Waves -->
+                <div class="bento-chart-container flex-grow-1" id="boxSessionsChart">
                     <svg id="svgSessionsChart" width="100%" height="100%" style="display: block;"></svg>
                 </div>
             </div>
         </div>
 
         <!-- ================= CARD 3: KATEGORI CUSTOMER (TREEMAP) (col-span-7) ================= -->
-        <div class="bento-card col-span-7">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+        <div class="bento-card bento-card-bottom col-span-7">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
                 <div>
-                    <h5 class="fw-bold mb-1" style="font-size: 16.5px; letter-spacing: -0.02em; color: #0F172A;">
+                    <h5 class="fw-bold mb-0" style="font-size: 15.5px; letter-spacing: -0.02em; color: #0F172A;">
                         Distribusi Channel &amp; Kategori Customer
                     </h5>
-                    <div class="d-flex flex-wrap gap-2" style="font-size: 11.5px;">
-                        <span class="d-inline-flex align-items-center gap-1"><i style="width: 8px; height: 8px; border-radius: 2px; background: #10B981;"></i> Toko CCTV</span>
-                        <span class="d-inline-flex align-items-center gap-1"><i style="width: 8px; height: 8px; border-radius: 2px; background: #8B5CF6;"></i> Dealer/Grosir</span>
-                        <span class="d-inline-flex align-items-center gap-1"><i style="width: 8px; height: 8px; border-radius: 2px; background: #F59E0B;"></i> Retail / End-User</span>
-                        <span class="d-inline-flex align-items-center gap-1"><i style="width: 8px; height: 8px; border-radius: 2px; background: #EF4444;"></i> Project Integrator</span>
+                    <div class="d-flex flex-wrap gap-2 mt-1" style="font-size: 11px;">
+                        <span class="d-inline-flex align-items-center gap-1"><i style="width: 7px; height: 7px; border-radius: 2px; background: #10B981;"></i> CCTV</span>
+                        <span class="d-inline-flex align-items-center gap-1"><i style="width: 7px; height: 7px; border-radius: 2px; background: #8B5CF6;"></i> Grosir</span>
+                        <span class="d-inline-flex align-items-center gap-1"><i style="width: 7px; height: 7px; border-radius: 2px; background: #3B82F6;"></i> IT/Komputer</span>
+                        <span class="d-inline-flex align-items-center gap-1"><i style="width: 7px; height: 7px; border-radius: 2px; background: #F59E0B;"></i> Retail</span>
+                        <span class="d-inline-flex align-items-center gap-1"><i style="width: 7px; height: 7px; border-radius: 2px; background: #EF4444;"></i> Project</span>
                     </div>
                 </div>
 
-                <!-- Period Switcher Buttons -->
+                <!-- Period Segmented Buttons -->
                 <div class="bento-segmented" role="tablist">
                     <button type="button" class="bento-seg-btn active" onclick="switchBentoPeriod(0, this)">Mingguan</button>
                     <button type="button" class="bento-seg-btn" onclick="switchBentoPeriod(1, this)">Bulanan</button>
@@ -364,12 +379,10 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
                 </div>
             </div>
 
-            <!-- Dynamic Squarified Treemap Canvas -->
-            <div class="bento-treemap-box" id="bentoTreemapContainer">
-                <!-- Tiles rendered via JS -->
-            </div>
+            <!-- Squarified Treemap Area -->
+            <div class="bento-treemap-box" id="bentoTreemapContainer"></div>
 
-            <!-- City / Region Distribution Table -->
+            <!-- Regional Table -->
             <table class="bento-table">
                 <thead>
                     <tr>
@@ -403,9 +416,9 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         </div>
 
         <!-- ================= CARD 4: RADAR SEASONALITY & TARGET (col-span-5) ================= -->
-        <div class="bento-card col-span-5">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <h5 class="fw-bold mb-0" style="font-size: 16.5px; letter-spacing: -0.02em; color: #0F172A;">
+        <div class="bento-card bento-card-bottom col-span-5">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+                <h5 class="fw-bold mb-0" style="font-size: 15.5px; letter-spacing: -0.02em; color: #0F172A;">
                     Tren Musiman (Seasonality Radar)
                 </h5>
                 <div class="bento-segmented">
@@ -414,28 +427,28 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
                 </div>
             </div>
 
-            <!-- SVG Radar Canvas -->
+            <!-- SVG Radar Canvas (Centered) -->
             <div class="bento-radar-box" id="bentoRadarContainer">
                 <svg id="svgRadarChart" width="100%" height="100%" style="display: block;"></svg>
             </div>
 
-            <!-- Radar Stats Cards -->
-            <div class="row g-3 mt-1">
+            <!-- Performance Stats -->
+            <div class="row g-2 mt-auto pt-2 border-top">
                 <div class="col-6">
-                    <div class="bento-label">Rata-rata Bulanan</div>
-                    <div class="bento-big-num" style="font-size: 26px;">
+                    <div class="bento-label" style="font-size: 11px;">Rata-rata Bulanan</div>
+                    <div class="bento-big-num" style="font-size: 22px; margin-top: 2px;">
                         <span id="bentoRadarAvg">Rp 82.5M</span>
                     </div>
-                    <div class="bento-note text-success fw-bold">
+                    <div class="bento-note text-success fw-bold" style="font-size: 11px; margin-top: 2px;">
                         <i class="bi bi-arrow-up-short"></i> +19.6% performa
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="bento-label">Target Tahunan</div>
-                    <div class="bento-big-num" style="font-size: 26px;">
+                    <div class="bento-label" style="font-size: 11px;">Target Tahunan</div>
+                    <div class="bento-big-num" style="font-size: 22px; margin-top: 2px;">
                         <span id="bentoRadarTotal">Rp 980M</span>
                     </div>
-                    <div class="bento-note text-muted">
+                    <div class="bento-note text-muted" style="font-size: 11px; margin-top: 2px;">
                         Capai 88.4% target
                     </div>
                 </div>
@@ -444,7 +457,7 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
     </div>
 </div>
 
-<!-- Floating Bento Tooltip Popover -->
+<!-- Floating Tooltip -->
 <div class="bento-tooltip" id="bentoGlobalTooltip">
     <div class="bento-tooltip-title" id="bentoTipTitle">Detail</div>
     <div id="bentoTipContent"></div>
@@ -452,8 +465,7 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
 
 <script>
 /**
- * PURE VANILLA JS ENGINE FOR BENTO SVG CHARTS & ANIMATIONS
- * Implements Catmull-Rom Bezier, Fourier Radar & Squarified Treemap
+ * VANILLA JS BENTO ENGINE - COMPACT & PRECISE RATIOS
  */
 (function() {
     const tipEl = document.getElementById('bentoGlobalTooltip');
@@ -465,14 +477,14 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         tipTitle.textContent = title;
         tipContent.innerHTML = rows.map(r => `
             <div class="bento-tooltip-row">
-                <span style="color: #94A3B8; display: inline-flex; align-items: center; gap: 6px;">
-                    ${r.color ? `<i style="display:inline-block; width:8px; height:8px; border-radius:2px; background:${r.color};"></i>` : ''}
+                <span style="color: #94A3B8; display: inline-flex; align-items: center; gap: 5px;">
+                    ${r.color ? `<i style="display:inline-block; width:7px; height:7px; border-radius:2px; background:${r.color};"></i>` : ''}
                     ${r.label}
                 </span>
                 <b style="color: #FFFFFF; font-weight:600;">${r.value}</b>
             </div>
         `).join('');
-        tipEl.style.left = (x + 14) + 'px';
+        tipEl.style.left = (x + 12) + 'px';
         tipEl.style.top = (y - 12) + 'px';
         tipEl.classList.add('visible');
     }
@@ -482,24 +494,22 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         tipEl.classList.remove('visible');
     }
 
-    /* 1. CountUp Helper */
     const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
-    function runCountUp(elId, targetVal, prefix = '', suffix = '') {
+    function runCountUp(elId, targetVal, prefix = '') {
         const el = document.getElementById(elId);
         if (!el) return;
         const start = 0;
         const t0 = performance.now();
-        const duration = 1200;
+        const duration = 1000;
         function step(now) {
             const t = Math.min(1, (now - t0) / duration);
             const v = Math.round(start + (targetVal - start) * easeOutCubic(t));
-            el.textContent = prefix + v.toLocaleString('id-ID') + suffix;
+            el.textContent = prefix + v.toLocaleString('id-ID');
             if (t < 1) requestAnimationFrame(step);
         }
         requestAnimationFrame(step);
     }
 
-    /* 2. Catmull-Rom Smooth Spline Path */
     function smoothPath(P) {
         const n = P.length;
         if (n < 2) return "";
@@ -512,14 +522,14 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         return d;
     }
 
-    /* 3. Render Card 1: Revenue Line Curve */
+    /* 1. Revenue Chart */
     function initRevenueChart() {
         const box = document.getElementById('boxRevenueChart');
         const svg = document.getElementById('svgRevenueChart');
         if (!box || !svg) return;
 
-        const W = box.clientWidth || 280;
-        const H = box.clientHeight || 140;
+        const W = box.clientWidth || 240;
+        const H = 125;
         svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
 
         const series = [
@@ -531,9 +541,9 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         const maxV = Math.max(...series) * 1.05;
         const span = maxV - minV || 1;
 
-        const topPad = 20, botPad = 15;
+        const topPad = 15, botPad = 10;
         const Y = v => topPad + (1 - (v - minV) / span) * (H - topPad - botPad);
-        const P = series.map((v, i) => [12 + (i / (series.length - 1)) * (W - 24), Y(v)]);
+        const P = series.map((v, i) => [10 + (i / (series.length - 1)) * (W - 20), Y(v)]);
         const d = smoothPath(P);
         const lastP = P[P.length - 1];
 
@@ -549,12 +559,12 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
                 </linearGradient>
             </defs>
             <path d="${d} L${lastP[0]},${H} L${P[0][0]},${H} Z" fill="url(#bentoRevGradArea)" />
-            <path d="${d}" fill="none" stroke="url(#bentoRevGradLine)" stroke-width="2.5" stroke-linecap="round" />
-            <circle cx="${lastP[0]}" cy="${lastP[1]}" r="4.5" fill="#059669" stroke="#FFFFFF" stroke-width="2" />
+            <path d="${d}" fill="none" stroke="url(#bentoRevGradLine)" stroke-width="2.2" stroke-linecap="round" />
+            <circle cx="${lastP[0]}" cy="${lastP[1]}" r="4" fill="#059669" stroke="#FFFFFF" stroke-width="1.8" />
             <rect id="bentoRevHoverHit" width="${W}" height="${H}" fill="transparent" style="cursor:crosshair;" />
             <g id="bentoRevHoverGroup" style="display:none;">
                 <line id="bentoRevHoverLine" x1="0" y1="0" x2="0" y2="${H}" stroke="#94A3B8" stroke-dasharray="3 3" stroke-width="1" />
-                <circle id="bentoRevHoverDot" cx="0" cy="0" r="4.5" fill="#059669" stroke="#FFFFFF" stroke-width="2" />
+                <circle id="bentoRevHoverDot" cx="0" cy="0" r="4" fill="#059669" stroke="#FFFFFF" stroke-width="1.8" />
             </g>
         `;
 
@@ -566,7 +576,7 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         hit.addEventListener('mousemove', e => {
             const r = svg.getBoundingClientRect();
             const mouseX = e.clientX - r.left;
-            const idx = Math.max(0, Math.min(series.length - 1, Math.round(((mouseX - 12) / (W - 24)) * (series.length - 1))));
+            const idx = Math.max(0, Math.min(series.length - 1, Math.round(((mouseX - 10) / (W - 20)) * (series.length - 1))));
             const pt = P[idx];
             hGroup.style.display = 'block';
             hLine.setAttribute('x1', pt[0]);
@@ -585,20 +595,20 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         });
     }
 
-    /* 4. Render Card 2: Dual Wave Follow Up Activity */
+    /* 2. Sessions Dual Wave Chart */
     let waveRaf = 0;
     function initSessionsChart() {
         const box = document.getElementById('boxSessionsChart');
         const svg = document.getElementById('svgSessionsChart');
         if (!box || !svg) return;
 
-        const W = box.clientWidth || 380;
-        const H = box.clientHeight || 140;
+        const W = box.clientWidth || 320;
+        const H = 125;
         svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
 
         const N = 24;
         const midY = H / 2;
-        const amp = H / 2 - 16;
+        const amp = 30; // Controlled elegant amplitude
 
         svg.innerHTML = `
             <defs>
@@ -611,9 +621,9 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
                     <stop offset="100%" stop-color="#EC4899" />
                 </linearGradient>
             </defs>
-            <line x1="16" y1="${midY}" x2="${W - 16}" y2="${midY}" stroke="#E2E8F0" stroke-width="1" />
-            <path id="bentoWaveDesk" fill="none" stroke="url(#bentoDeskGrad)" stroke-width="2.5" stroke-linecap="round" />
-            <path id="bentoWaveMob" fill="none" stroke="url(#bentoMobGrad)" stroke-width="2.2" stroke-linecap="round" />
+            <line x1="12" y1="${midY}" x2="${W - 12}" y2="${midY}" stroke="#E2E8F0" stroke-width="1" />
+            <path id="bentoWaveDesk" fill="none" stroke="url(#bentoDeskGrad)" stroke-width="2.2" stroke-linecap="round" />
+            <path id="bentoWaveMob" fill="none" stroke="url(#bentoMobGrad)" stroke-width="2" stroke-linecap="round" />
         `;
 
         const pathDesk = document.getElementById('bentoWaveDesk');
@@ -626,9 +636,9 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
             const ptsMob = [];
 
             for (let i = 0; i < N; i++) {
-                const x = 16 + (i / (N - 1)) * (W - 32);
-                const breath1 = Math.sin(t * 1.4 + i * 0.4) * 0.35 + 0.65;
-                const breath2 = Math.cos(t * 1.2 + i * 0.45) * 0.35 + 0.65;
+                const x = 12 + (i / (N - 1)) * (W - 24);
+                const breath1 = Math.sin(t * 1.5 + i * 0.4) * 0.28 + 0.72;
+                const breath2 = Math.cos(t * 1.3 + i * 0.45) * 0.28 + 0.72;
                 const y1 = midY - (Math.sin((i / N) * Math.PI) * amp * breath1);
                 const y2 = midY + (Math.sin((i / N) * Math.PI) * amp * breath2);
                 ptsDesk.push([x, y1]);
@@ -643,7 +653,7 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         waveRaf = requestAnimationFrame(renderWave);
     }
 
-    /* 5. Squarified Treemap for Customer Categories */
+    /* 3. Treemap Customer Categories */
     const categoriesData = [
         { name: "Toko CCTV", color: "#10B981", ink: "light", values: [420, 1850, 24500] },
         { name: "Dealer / Grosir", color: "#8B5CF6", ink: "light", values: [280, 1120, 14200] },
@@ -653,7 +663,7 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
     ];
 
     window.switchBentoPeriod = function(periodIdx, btn) {
-        document.querySelectorAll('.bento-segmented .bento-seg-btn').forEach(b => {
+        document.querySelectorAll('.bento-card-bottom .bento-seg-btn').forEach(b => {
             if (b.parentElement === btn.parentElement) b.classList.remove('active');
         });
         btn.classList.add('active');
@@ -693,7 +703,7 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
                 let cx = x;
                 for (const r of row) {
                     const rw = r.a / rh;
-                    out.push({ ...r, x: cx, y, w: rw, h: rh });
+                    out.push({ ...r, x, y: cy, w: rw, h: rh });
                     cx += rw;
                 }
                 y += rh;
@@ -707,8 +717,8 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         const container = document.getElementById('bentoTreemapContainer');
         if (!container) return;
 
-        const W = container.clientWidth || 600;
-        const H = container.clientHeight || 310;
+        const W = container.clientWidth || 550;
+        const H = 200;
         const items = categoriesData.map(c => ({
             name: c.name,
             color: c.color,
@@ -731,14 +741,14 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
                     background: ${r.color};
                     color: ${textColor};
                 " onmousemove="window.bentoTipHover(event, '${r.name}', '${r.v.toLocaleString('id-ID')} Toko', '${share}', '${r.color}')" onmouseleave="window.bentoTipLeave()">
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">
+                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;">
                         ${r.name}
                     </div>
                     <div class="d-flex align-items-end justify-content-between">
-                        <span style="font-family:'Geist Mono', monospace; font-size: 20px; font-weight: 700; line-height: 1;">
+                        <span style="font-family:'Geist Mono', monospace; font-size: 17px; font-weight: 700; line-height: 1;">
                             ${r.v.toLocaleString('id-ID')}
                         </span>
-                        <span style="font-size: 10px; background: rgba(0,0,0,0.5); color:#fff; padding: 2px 6px; border-radius: 6px; font-weight: 600;">
+                        <span style="font-size: 9.5px; background: rgba(0,0,0,0.45); color:#fff; padding: 2px 5px; border-radius: 5px; font-weight: 600;">
                             ${share}
                         </span>
                     </div>
@@ -753,11 +763,9 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
             { label: 'Pangsa', value: share }
         ]);
     };
-    window.bentoTipLeave = function() {
-        hideTooltip();
-    };
+    window.bentoTipLeave = function() { hideTooltip(); };
 
-    /* 6. Seasonality Radar with Fourier Smoothing */
+    /* 4. Radar Seasonality */
     const radarData = {
         years: [
             { label: "2026", values: [16, 20, 24, 18, 28, 21, 17, 25, 30, 22, 32, 23], avg: "Rp 82.5M", total: "Rp 980M" },
@@ -768,7 +776,7 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
 
     let activeRadarYear = 0;
     window.switchRadarYear = function(idx, btn) {
-        document.querySelectorAll('.bento-card:last-child .bento-seg-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.bento-card-bottom:last-child .bento-seg-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         activeRadarYear = idx;
         renderRadar(idx);
@@ -781,9 +789,9 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         const svg = document.getElementById('svgRadarChart');
         if (!box || !svg) return;
 
-        const S = Math.min(box.clientWidth || 340, 340);
+        const S = 230;
         const C = S / 2;
-        const R = S / 2 - 36;
+        const R = S / 2 - 28;
         svg.setAttribute('viewBox', `0 0 ${S} ${S}`);
 
         const vals = radarData.years[yearIdx].values;
@@ -791,10 +799,8 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
         const minV = Math.min(...vals);
         const maxV = Math.max(...vals);
 
-        // Normalized Fourier lobes
-        const norm = vals.map(v => 0.4 + ((v - minV) / (maxV - minV || 1)) * 0.6);
+        const norm = vals.map(v => 0.38 + ((v - minV) / (maxV - minV || 1)) * 0.62);
 
-        // Low-order Fourier fit
         const K = 3;
         const co = [];
         for (let k = 0; k <= K; k++) {
@@ -829,27 +835,25 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
             const y1 = C + Math.sin(a) * (R * 0.2);
             const x2 = C + Math.cos(a) * R;
             const y2 = C + Math.sin(a) * R;
-            const tx = C + Math.cos(a) * (R + 18);
-            const ty = C + Math.sin(a) * (R + 18);
+            const tx = C + Math.cos(a) * (R + 14);
+            const ty = C + Math.sin(a) * (R + 14);
             return `
                 <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#E2E8F0" stroke-width="1" />
-                <text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="10.5" fill="#64748B" font-family="'Geist Mono', monospace" font-weight="600">${m}</text>
+                <text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#64748B" font-family="'Geist Mono', monospace" font-weight="600">${m}</text>
             `;
         }).join('');
 
         svg.innerHTML = `
             ${circles}
             ${axes}
-            <path d="${pathD}" fill="rgba(16, 185, 129, 0.18)" stroke="#10B981" stroke-width="2.5" stroke-linejoin="round" />
-            <circle cx="${C}" cy="${C}" r="${R * 0.2}" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" />
-            <text x="${C}" y="${C}" text-anchor="middle" dominant-baseline="central" font-size="14">🎯</text>
+            <path d="${pathD}" fill="rgba(16, 185, 129, 0.16)" stroke="#10B981" stroke-width="2.2" stroke-linejoin="round" />
+            <circle cx="${C}" cy="${C}" r="${R * 0.2}" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" />
+            <text x="${C}" y="${C}" text-anchor="middle" dominant-baseline="central" font-size="12">🎯</text>
         `;
     }
 
-    // Initialize on Load and Window Resize
     function initAllBento() {
         runCountUp('bentoRevVal', 9134000, 'Rp ');
-        runCountUp('bentoSessVal', 48210);
         initRevenueChart();
         initSessionsChart();
         renderTreemap(0);
@@ -865,7 +869,7 @@ if ($total_fu_count === 0) $total_fu_count = 1420;
     });
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(initAllBento, 100);
+        setTimeout(initAllBento, 80);
     }
 })();
 </script>

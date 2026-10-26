@@ -485,7 +485,8 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 <?php // include 'includes/competition_unified_tabs.php'; // Dinonaktifkan: Program kompetisi per semester & bonus sultan telah selesai ?>
 <?php include 'includes/analytics_bento_widget.php'; ?>
 
-<!-- 3 Stat Cards -->
+<!-- 3 Stat Cards (Integrated into Analytics Bento above) -->
+<?php /*
 <div class="stats-grid">
     <div class="stat-card blue animate-in">
         <div class="stat-card-header">
@@ -523,6 +524,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
         </div>
     </div>
 </div>
+*/ ?>
 
 <!-- Section Header -->
 <div class="section-header">
