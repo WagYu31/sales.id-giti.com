@@ -160,15 +160,20 @@ if (!function_exists('ensureSalesOrderTables')) {
             INDEX (`item_code`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-        $chkBundle = $conn->query("SELECT COUNT(*) as cnt FROM `product_package_bundles`");
-        if ($chkBundle && ($rB = $chkBundle->fetch_assoc()) && (int)$rB['cnt'] === 0) {
-            $jsonFile = __DIR__ . '/package_bundles.json';
-            if (file_exists($jsonFile)) {
-                $bundles = json_decode(file_get_contents($jsonFile), true);
-                if (is_array($bundles)) {
-                    $st = $conn->prepare("INSERT INTO `product_package_bundles` (package_code, package_name, item_code, item_name, qty, unit, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                    if ($st) {
-                        foreach ($bundles as $pkgCode => $pkg) {
+        // Check and seed missing package bundles into DB table
+        $jsonFile = __DIR__ . '/package_bundles.json';
+        if (file_exists($jsonFile)) {
+            $bundles = json_decode(file_get_contents($jsonFile), true);
+            if (is_array($bundles)) {
+                $chk = $conn->prepare("SELECT id FROM `product_package_bundles` WHERE package_code = ? LIMIT 1");
+                $st = $conn->prepare("INSERT INTO `product_package_bundles` (package_code, package_name, item_code, item_name, qty, unit, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                
+                if ($chk && $st) {
+                    foreach ($bundles as $pkgCode => $pkg) {
+                        $chk->bind_param("s", $pkgCode);
+                        $chk->execute();
+                        $resChk = $chk->get_result();
+                        if ($resChk->num_rows === 0) {
                             $pkgName = $pkg['package_name'] ?? '';
                             foreach (($pkg['items'] ?? []) as $sIdx => $it) {
                                 $sort = $sIdx + 1;
@@ -176,8 +181,9 @@ if (!function_exists('ensureSalesOrderTables')) {
                                 $st->execute();
                             }
                         }
-                        $st->close();
                     }
+                    $chk->close();
+                    $st->close();
                 }
             }
         }
