@@ -534,6 +534,23 @@ require_once 'includes/header.php';
                             <input type="number" name="msrp" id="msrp" class="form-control font-monospace fw-bold" required placeholder="0" style="border-radius: 0 9px 9px 0;">
                         </div>
                     </div>
+
+                    <!-- Banner / Shortcut Kelola Komponen Paket di Modal Edit Produk -->
+                    <div id="productModalBundleSection" class="p-3 rounded-3 mt-3" style="background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%); border: 1.5px solid #bfdbfe; display: none;">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div>
+                                <div class="fw-bold text-primary d-flex align-items-center gap-1.5" style="font-size: 13px;">
+                                    <i class="bi bi-box-seam-fill"></i> Komponen Isi Paket Terdaftar
+                                </div>
+                                <div class="text-muted small" style="font-size: 11.5px;">
+                                    Produk ini merupakan paket. Anda dapat mengedit daftar isi barang di dalamnya.
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1" id="btnEditBundleFromProductModal" style="font-size: 11.5px;">
+                                <i class="bi bi-pencil-square"></i> Kelola Komponen Paket
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer border-top-0 px-4 pb-4 pt-0">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 9px; font-weight: 600;">Batal</button>
@@ -546,7 +563,6 @@ require_once 'includes/header.php';
     </div>
 </div>
 
-<!-- Modal Detail Spesifikasi Produk (Accurate Style) -->
 <!-- Modal Detail Spesifikasi Produk (Executive Redesign) -->
 <div class="modal fade" id="specModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -604,6 +620,9 @@ require_once 'includes/header.php';
                                 <span class="badge rounded-pill font-monospace" id="specModalBundleCount" style="font-size: 11px; padding: 4px 10px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;">
                                     0 Item
                                 </span>
+                                <button type="button" class="btn btn-xs btn-primary fw-bold rounded-pill d-inline-flex align-items-center gap-1" id="btnEditBundleFromSpec" style="font-size: 11px; padding: 2.5px 10px;">
+                                    <i class="bi bi-pencil-square"></i> Edit Komponen
+                                </button>
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -656,11 +675,131 @@ require_once 'includes/header.php';
 
             <!-- Modal Footer -->
             <div class="modal-footer border-top px-4 py-2.5 bg-light d-flex align-items-center justify-content-between" style="border-color: #f1f5f9 !important;">
-                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1.5" id="btnCopyAllDetails" style="font-size: 12px; height: 36px;">
-                    <i class="bi bi-copy"></i> Salin Semua Rincian
-                </button>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1.5" id="btnCopyAllDetails" style="font-size: 12px; height: 36px;">
+                        <i class="bi bi-copy"></i> Salin Semua Rincian
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1.5" id="btnEditBundleFooter" style="font-size: 12px; height: 36px; display: none;">
+                        <i class="bi bi-pencil-square"></i> Edit Komponen Paket
+                    </button>
+                </div>
                 <button type="button" class="btn btn-sm btn-dark rounded-pill px-4 fw-bold" data-bs-dismiss="modal" style="font-size: 12px; height: 36px;">
                     Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editor Komponen Paket (Dedicated Bundle Manager) -->
+<div class="modal fade" id="bundleEditorModal" tabindex="-1" aria-hidden="true" style="z-index: 1070;">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.45);">
+            <!-- Header -->
+            <div class="modal-header d-flex align-items-center justify-content-between px-4 py-3" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #ffffff;">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                        <i class="bi bi-box-seam-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="modal-title fw-bold text-white mb-0" style="font-size: 16px;">Kelola Komponen Isi Paket</h6>
+                        <span class="text-white-50 small" id="bundleEditorSubtitle" style="font-size: 11.5px;">Atur daftar produk dan kuantitas unit yang termasuk dalam paket</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4 bg-white">
+                <input type="hidden" id="bundleEditPkgCode">
+                <input type="hidden" id="bundleEditPkgName">
+
+                <!-- Target Package Info Card -->
+                <div class="p-3 rounded-3 mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2" style="background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); border: 1.5px solid #bfdbfe;">
+                    <div>
+                        <div class="text-xs text-muted fw-bold text-uppercase" style="font-size: 10px; letter-spacing: 0.04em;">Paket Produk:</div>
+                        <h6 class="fw-bold text-dark mb-0" id="bundleEditDisplayTitle" style="font-size: 15px;">-</h6>
+                    </div>
+                    <div>
+                        <span class="badge font-monospace fw-bold" id="bundleEditDisplayCode" style="font-size: 12px; padding: 6px 12px; background: #ffffff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 8px;">
+                            SKU: -
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Add New Item Row Card -->
+                <div class="card border-0 rounded-3 mb-3" style="background: #f8fafc; border: 1.5px solid #e2e8f0 !important;">
+                    <div class="card-body p-3">
+                        <div class="fw-bold text-dark mb-2 d-flex align-items-center gap-1.5" style="font-size: 12px;">
+                            <i class="bi bi-plus-circle-fill text-primary"></i> Tambahkan Barang ke Komponen Paket:
+                        </div>
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-5">
+                                <label class="text-xs text-muted fw-bold mb-1" style="font-size: 11px;">Pilih Produk Dari Katalog:</label>
+                                <input type="text" class="form-control form-control-sm" id="bundleSearchInput" placeholder="Ketik SKU atau nama produk..." list="bundleProductDatalist" style="border-radius: 8px; font-size: 12.5px;">
+                                <datalist id="bundleProductDatalist">
+                                    <!-- Populated dynamically -->
+                                </datalist>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <label class="text-xs text-muted fw-bold mb-1" style="font-size: 11px;">Kode SKU:</label>
+                                <input type="text" class="form-control form-control-sm font-monospace fw-bold" id="newCompCode" placeholder="8800xxx" style="border-radius: 8px; font-size: 12px;">
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <label class="text-xs text-muted fw-bold mb-1" style="font-size: 11px;">Qty:</label>
+                                <input type="number" class="form-control form-control-sm font-monospace fw-bold text-center" id="newCompQty" value="1" min="1" style="border-radius: 8px; font-size: 12.5px;">
+                            </div>
+                            <div class="col-md-1 col-4">
+                                <label class="text-xs text-muted fw-bold mb-1" style="font-size: 11px;">Satuan:</label>
+                                <input type="text" class="form-control form-control-sm text-center font-monospace" id="newCompUnit" value="UNIT" style="border-radius: 8px; font-size: 12px;">
+                            </div>
+                            <div class="col-md-2 col-12">
+                                <button type="button" class="btn btn-sm btn-primary w-100 fw-bold d-inline-flex align-items-center justify-content-center gap-1" id="btnAddNewComponent" style="border-radius: 8px; height: 32px; font-size: 12px;">
+                                    <i class="bi bi-plus-lg"></i> Tambah
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="newCompName">
+                    </div>
+                </div>
+
+                <!-- Existing Items Table -->
+                <div class="card border-0 rounded-3 overflow-hidden" style="border: 1.5px solid #bfdbfe !important;">
+                    <div class="card-header py-2 px-3 d-flex align-items-center justify-content-between border-bottom" style="background: #eff6ff; border-color: #dbeafe !important;">
+                        <span class="fw-bold text-primary" style="font-size: 12.5px;">
+                            <i class="bi bi-list-check me-1"></i> Daftar Komponen Paket Saat Ini
+                        </span>
+                        <span class="badge rounded-pill font-monospace" id="bundleEditCountBadge" style="font-size: 11px; padding: 4px 10px; background: #ffffff; color: #1d4ed8; border: 1px solid #bfdbfe;">
+                            0 Item
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle mb-0" id="bundleEditTable" style="font-size: 12.5px;">
+                            <thead class="table-light text-muted font-monospace" style="font-size: 11px;">
+                                <tr>
+                                    <th class="ps-3 text-center" style="width: 45px;">NO</th>
+                                    <th style="width: 115px;">KODE SKU</th>
+                                    <th>NAMA BARANG / KOMPONEN</th>
+                                    <th class="text-center" style="width: 85px;">QTY</th>
+                                    <th class="text-center" style="width: 80px;">SATUAN</th>
+                                    <th class="pe-3 text-center" style="width: 55px;">HAPUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bundleEditTableBody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-top px-4 py-2.5 bg-light d-flex align-items-center justify-content-between" style="border-color: #f1f5f9 !important;">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold" data-bs-dismiss="modal" style="font-size: 12.5px; height: 36px;">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold d-inline-flex align-items-center gap-1.5" id="btnSaveBundleChanges" style="font-size: 12.5px; height: 36px;">
+                    <i class="bi bi-check2-circle fs-6"></i> Simpan Komponen Paket
                 </button>
             </div>
         </div>
@@ -1019,6 +1158,19 @@ $(document).ready(function() {
                 $('#form_action').val('update_product');
                 $('#modalTitle').text('Edit Produk: ' + d.type);
                 $('#btn-submit').attr('class', 'btn btn-primary').html('<i class="bi bi-save-fill me-1"></i> Update Produk');
+
+                // Check if this product is a package
+                const isPackage = (d.category && d.category.toUpperCase().includes('PAKET')) 
+                               || (d.type && d.type.toUpperCase().includes('PAKET'))
+                               || (d.description && d.description.toUpperCase().includes('GROUP'));
+
+                if (isPackage) {
+                    $('#productModalBundleSection').show();
+                    $('#btnEditBundleFromProductModal').data('code', d.item_code || '').data('type', d.type || '');
+                } else {
+                    $('#productModalBundleSection').hide();
+                }
+
                 pModal.show();
             }
         });
@@ -1048,9 +1200,92 @@ $(document).ready(function() {
         });
     });
 
-    // Accurate-Style Info Icon Click
+    // Accurate-Style Info & Spec Modal
     let currentSpecText = '';
+    let currentSpecCode = '';
+    let currentSpecType = '';
     const specModal = new bootstrap.Modal(document.getElementById('specModal'));
+
+    function reloadSpecBundle(code, type) {
+        $('#specModalBundleWrapper').show();
+        $('#specModalBundleBody').html('<tr><td colspan="5" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat rincian komponen paket...</td></tr>');
+
+        $.getJSON('ajax_price_handler.php', {
+            action: 'get_bundle_items',
+            code: code,
+            type: type
+        }, function(res) {
+            if (res && res.has_bundle && res.items && res.items.length > 0) {
+                $('#specModalBundleCount').text(res.items.length + ' Item');
+                let bundleRowsHtml = '';
+                let totalQty = 0;
+                let bundleText = `\n\n--- RINCIAN KOMPONEN ISI PAKET (${res.items.length} ITEM) ---`;
+
+                res.items.forEach((item, idx) => {
+                    const itemCode = escapeHtml(item.item_code || '-');
+                    let cleanName = (item.item_name || '').trim();
+                    if (cleanName.startsWith('--')) {
+                        cleanName = cleanName.substring(2).trim();
+                    }
+                    cleanName = escapeHtml(cleanName);
+
+                    const itemQty = parseInt(item.qty, 10) || 1;
+                    const itemUnit = escapeHtml(item.unit || 'UNIT');
+                    totalQty += itemQty;
+
+                    bundleText += `\n${idx + 1}. [${item.item_code}] ${item.item_name} (${itemQty} ${itemUnit})`;
+
+                    bundleRowsHtml += `
+                        <tr>
+                            <td class="text-center font-monospace fw-semibold text-muted" style="font-size: 11.5px;">${idx + 1}</td>
+                            <td>
+                                <span class="badge font-monospace fw-bold" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 11px; padding: 4px 8px; border-radius: 6px;">
+                                    ${itemCode}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark" style="font-size: 13px; line-height: 1.4;">${cleanName}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill font-monospace fw-bold" style="background: #dbeafe; color: #1e40af; font-size: 12px; padding: 4px 10px;">
+                                    ${itemQty}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-secondary border font-monospace text-uppercase" style="font-size: 10.5px; padding: 4px 8px;">
+                                    ${itemUnit}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                $('#specModalBundleBody').html(bundleRowsHtml);
+                $('#specModalBundleTotalQty').text(totalQty);
+                $('#specModalBundleFoot').show();
+                currentSpecText += bundleText;
+            } else {
+                $('#specModalBundleCount').text('0 Item');
+                $('#specModalBundleFoot').hide();
+                $('#specModalBundleBody').html(`
+                    <tr>
+                        <td colspan="5" class="text-center py-3 text-muted" style="font-size: 12px;">
+                            <i class="bi bi-info-circle me-1"></i> Rincian komponen isi paket belum didefinisikan secara khusus untuk kode produk ini.
+                        </td>
+                    </tr>
+                `);
+            }
+        }).fail(function() {
+            $('#specModalBundleFoot').hide();
+            $('#specModalBundleBody').html(`
+                <tr>
+                    <td colspan="5" class="text-center py-3 text-danger" style="font-size: 12px;">
+                        <i class="bi bi-exclamation-triangle me-1"></i> Gagal memuat rincian isi paket.
+                    </td>
+                </tr>
+            `);
+        });
+    }
 
     $('#priceTableBody').on('click', '.btn-desc-info', function() {
         const type = $(this).data('type') || '-';
@@ -1059,6 +1294,9 @@ $(document).ready(function() {
         const desc = $(this).data('desc') || 'Tidak ada catatan spesifikasi tambahan untuk produk ini.';
         const code = $(this).data('code') || '';
         const isPkg = $(this).data('is-pkg') == '1';
+
+        currentSpecCode = code;
+        currentSpecType = type;
 
         $('#specModalType').text(type);
         $('#specModalCategory').html('<i class="bi bi-tag-fill me-1 opacity-75"></i>' + escapeHtml(category));
@@ -1076,6 +1314,7 @@ $(document).ready(function() {
         $('#specModalBundleBody').empty();
         $('#specModalBundleFoot').hide();
         $('#specModalBundleCount').text('0 Item');
+        $('#btnEditBundleFooter').hide();
 
         currentSpecText = `${type}\nKategori: ${category}\nHarga: ${price}\n\nSpesifikasi:\n${desc}`;
 
@@ -1083,84 +1322,8 @@ $(document).ready(function() {
         if (isPkg || category.toUpperCase().includes('PAKET') || type.toUpperCase().includes('PAKET')) {
             $('#specModalHeaderIcon').attr('class', 'bi bi-box-seam-fill');
             $('#specModalTitle').text('Rincian Paket & Spesifikasi Produk');
-            $('#specModalBundleWrapper').show();
-            $('#specModalBundleBody').html('<tr><td colspan="5" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat rincian komponen paket...</td></tr>');
-
-            $.getJSON('ajax_price_handler.php', {
-                action: 'get_bundle_items',
-                code: code,
-                type: type
-            }, function(res) {
-                if (res && res.has_bundle && res.items && res.items.length > 0) {
-                    $('#specModalBundleCount').text(res.items.length + ' Item');
-                    let bundleRowsHtml = '';
-                    let totalQty = 0;
-                    let bundleText = `\n\n--- RINCIAN KOMPONEN ISI PAKET (${res.items.length} ITEM) ---`;
-
-                    res.items.forEach((item, idx) => {
-                        const itemCode = escapeHtml(item.item_code || '-');
-                        let cleanName = (item.item_name || '').trim();
-                        if (cleanName.startsWith('--')) {
-                            cleanName = cleanName.substring(2).trim();
-                        }
-                        cleanName = escapeHtml(cleanName);
-
-                        const itemQty = parseInt(item.qty, 10) || 1;
-                        const itemUnit = escapeHtml(item.unit || 'UNIT');
-                        totalQty += itemQty;
-
-                        bundleText += `\n${idx + 1}. [${item.item_code}] ${item.item_name} (${itemQty} ${itemUnit})`;
-
-                        bundleRowsHtml += `
-                            <tr>
-                                <td class="text-center font-monospace fw-semibold text-muted" style="font-size: 11.5px;">${idx + 1}</td>
-                                <td>
-                                    <span class="badge font-monospace fw-bold" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 11px; padding: 4px 8px; border-radius: 6px;">
-                                        ${itemCode}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="fw-semibold text-dark" style="font-size: 13px; line-height: 1.4;">${cleanName}</span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge rounded-pill font-monospace fw-bold" style="background: #dbeafe; color: #1e40af; font-size: 12px; padding: 4px 10px;">
-                                        ${itemQty}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-light text-secondary border font-monospace text-uppercase" style="font-size: 10.5px; padding: 4px 8px;">
-                                        ${itemUnit}
-                                    </span>
-                                </td>
-                            </tr>
-                        `;
-                    });
-
-                    $('#specModalBundleBody').html(bundleRowsHtml);
-                    $('#specModalBundleTotalQty').text(totalQty);
-                    $('#specModalBundleFoot').show();
-                    currentSpecText += bundleText;
-                } else {
-                    $('#specModalBundleCount').text('0 Item');
-                    $('#specModalBundleFoot').hide();
-                    $('#specModalBundleBody').html(`
-                        <tr>
-                            <td colspan="5" class="text-center py-3 text-muted" style="font-size: 12px;">
-                                <i class="bi bi-info-circle me-1"></i> Rincian komponen isi paket belum didefinisikan secara khusus untuk kode produk ini.
-                            </td>
-                        </tr>
-                    `);
-                }
-            }).fail(function() {
-                $('#specModalBundleFoot').hide();
-                $('#specModalBundleBody').html(`
-                    <tr>
-                        <td colspan="5" class="text-center py-3 text-danger" style="font-size: 12px;">
-                            <i class="bi bi-exclamation-triangle me-1"></i> Gagal memuat rincian isi paket.
-                        </td>
-                    </tr>
-                `);
-            });
+            $('#btnEditBundleFooter').show();
+            reloadSpecBundle(code, type);
         } else {
             $('#specModalHeaderIcon').attr('class', 'bi bi-info-circle-fill');
             $('#specModalTitle').text('Detail Spesifikasi Barang');
@@ -1187,6 +1350,255 @@ $(document).ready(function() {
             btn.html('<i class="bi bi-check-lg text-success me-1"></i> Rincian Lengkap Tersalin!');
             setTimeout(() => btn.html(orig), 2000);
         });
+    });
+
+    // =========================================================================
+    // DEDICATED PACKAGE BUNDLE COMPONENT EDITOR
+    // =========================================================================
+    const bundleEditorModal = new bootstrap.Modal(document.getElementById('bundleEditorModal'));
+    let currentBundleEditing = { code: '', type: '', items: [] };
+    let productSuggestionsList = [];
+
+    function loadProductSuggestions() {
+        if (productSuggestionsList.length === 0) {
+            $.getJSON('ajax_price_handler.php', { action: 'get_product_suggestions' }, function(res) {
+                if (res && res.success && res.items) {
+                    productSuggestionsList = res.items;
+                    let optHtml = '';
+                    res.items.forEach(p => {
+                        const sku = p.item_code || '';
+                        const name = p.type || '';
+                        optHtml += `<option value="${sku} - ${escapeHtml(name)}">`;
+                    });
+                    $('#bundleProductDatalist').html(optHtml);
+                }
+            });
+        }
+    }
+
+    function openBundleEditor(code, type) {
+        currentBundleEditing.code = code;
+        currentBundleEditing.type = type;
+        currentBundleEditing.items = [];
+
+        $('#bundleEditPkgCode').val(code);
+        $('#bundleEditPkgName').val(type);
+        $('#bundleEditDisplayTitle').text(type || 'Paket Produk');
+        $('#bundleEditDisplayCode').text(code ? ('SKU: ' + code) : 'SKU: -');
+
+        $('#bundleEditTableBody').html('<tr><td colspan="6" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat komponen paket...</td></tr>');
+        $('#bundleEditCountBadge').text('Memuat...');
+
+        loadProductSuggestions();
+
+        // Reset add inputs
+        $('#bundleSearchInput').val('');
+        $('#newCompCode').val('');
+        $('#newCompName').val('');
+        $('#newCompQty').val('1');
+        $('#newCompUnit').val('UNIT');
+
+        $.getJSON('ajax_price_handler.php', { action: 'get_bundle_items', code: code, type: type }, function(res) {
+            if (res && res.items && res.items.length > 0) {
+                currentBundleEditing.items = res.items.map(it => ({
+                    item_code: it.item_code || '',
+                    item_name: it.item_name || '',
+                    qty: parseInt(it.qty, 10) || 1,
+                    unit: it.unit || 'UNIT'
+                }));
+            } else {
+                currentBundleEditing.items = [];
+            }
+            renderBundleEditorRows();
+        }).fail(function() {
+            currentBundleEditing.items = [];
+            renderBundleEditorRows();
+        });
+
+        bundleEditorModal.show();
+    }
+
+    function renderBundleEditorRows() {
+        const items = currentBundleEditing.items;
+        $('#bundleEditCountBadge').text(items.length + ' Item');
+
+        if (items.length === 0) {
+            $('#bundleEditTableBody').html(`
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted" style="font-size: 12.5px;">
+                        <i class="bi bi-box-seam fs-3 d-block text-secondary mb-1"></i>
+                        Belum ada komponen di dalam paket ini.<br>
+                        <span class="small text-muted">Gunakan form di atas untuk menambahkan barang ke dalam paket.</span>
+                    </td>
+                </tr>
+            `);
+            return;
+        }
+
+        let html = '';
+        items.forEach((it, idx) => {
+            let cleanName = (it.item_name || '').trim();
+            if (cleanName.startsWith('--')) {
+                cleanName = cleanName.substring(2).trim();
+            }
+
+            html += `
+                <tr data-index="${idx}">
+                    <td class="text-center font-monospace text-muted fw-semibold ps-3">${idx + 1}</td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm font-monospace fw-bold comp-input-code" value="${escapeHtml(it.item_code)}" style="border-radius: 6px; font-size: 11.5px; padding: 3px 6px;">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm comp-input-name" value="${escapeHtml(cleanName)}" style="border-radius: 6px; font-size: 12px; padding: 3px 8px;">
+                    </td>
+                    <td class="text-center">
+                        <input type="number" class="form-control form-control-sm text-center font-monospace fw-bold comp-input-qty" value="${it.qty}" min="1" style="border-radius: 6px; font-size: 12px; padding: 3px 4px; width: 65px; margin: 0 auto;">
+                    </td>
+                    <td class="text-center">
+                        <input type="text" class="form-control form-control-sm text-center font-monospace text-uppercase comp-input-unit" value="${escapeHtml(it.unit)}" style="border-radius: 6px; font-size: 11.5px; padding: 3px 4px; width: 65px; margin: 0 auto;">
+                    </td>
+                    <td class="text-center pe-3">
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-comp p-1" data-index="${idx}" title="Hapus Komponen" style="border-radius: 6px; width: 28px; height: 28px;">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        $('#bundleEditTableBody').html(html);
+    }
+
+    // Auto-fill when selecting from datalist
+    $('#bundleSearchInput').on('input change', function() {
+        const val = $(this).val();
+        const match = productSuggestionsList.find(p => (p.item_code + ' - ' + p.type) === val || p.item_code === val);
+        if (match) {
+            $('#newCompCode').val(match.item_code);
+            $('#newCompName').val(match.type);
+            $('#newCompUnit').val(match.unit || 'UNIT');
+        }
+    });
+
+    // Add Component button
+    $('#btnAddNewComponent').on('click', function() {
+        const code = $.trim($('#newCompCode').val());
+        let name = $.trim($('#newCompName').val());
+        if (!name) {
+            const rawSearch = $.trim($('#bundleSearchInput').val());
+            if (rawSearch.includes(' - ')) {
+                name = rawSearch.split(' - ').slice(1).join(' - ');
+            } else {
+                name = rawSearch || (code ? ('Barang ' + code) : '');
+            }
+        }
+        const qty = parseInt($('#newCompQty').val(), 10) || 1;
+        const unit = $.trim($('#newCompUnit').val()) || 'UNIT';
+
+        if (!code && !name) {
+            Swal.fire('Perhatian', 'Harap isi Kode SKU atau Nama Barang yang ingin ditambahkan.', 'warning');
+            return;
+        }
+
+        currentBundleEditing.items.push({
+            item_code: code,
+            item_name: name,
+            qty: qty,
+            unit: unit
+        });
+
+        // Reset inputs
+        $('#bundleSearchInput').val('');
+        $('#newCompCode').val('');
+        $('#newCompName').val('');
+        $('#newCompQty').val('1');
+        $('#newCompUnit').val('UNIT');
+
+        renderBundleEditorRows();
+    });
+
+    // Remove Component button
+    $('#bundleEditTableBody').on('click', '.btn-remove-comp', function() {
+        const idx = $(this).data('index');
+        currentBundleEditing.items.splice(idx, 1);
+        renderBundleEditorRows();
+    });
+
+    // Input updates inside table
+    $('#bundleEditTableBody').on('change input', '.comp-input-code', function() {
+        const idx = $(this).closest('tr').data('index');
+        if (currentBundleEditing.items[idx]) {
+            currentBundleEditing.items[idx].item_code = $.trim($(this).val());
+        }
+    });
+    $('#bundleEditTableBody').on('change input', '.comp-input-name', function() {
+        const idx = $(this).closest('tr').data('index');
+        if (currentBundleEditing.items[idx]) {
+            currentBundleEditing.items[idx].item_name = $.trim($(this).val());
+        }
+    });
+    $('#bundleEditTableBody').on('change input', '.comp-input-qty', function() {
+        const idx = $(this).closest('tr').data('index');
+        if (currentBundleEditing.items[idx]) {
+            currentBundleEditing.items[idx].qty = parseInt($(this).val(), 10) || 1;
+        }
+    });
+    $('#bundleEditTableBody').on('change input', '.comp-input-unit', function() {
+        const idx = $(this).closest('tr').data('index');
+        if (currentBundleEditing.items[idx]) {
+            currentBundleEditing.items[idx].unit = $.trim($(this).val());
+        }
+    });
+
+    // Save Bundle Changes
+    $('#btnSaveBundleChanges').on('click', function() {
+        const btn = $(this);
+        const origHtml = btn.html();
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...');
+
+        $.post('ajax_price_handler.php', {
+            action: 'save_bundle_items',
+            code: currentBundleEditing.code,
+            type: currentBundleEditing.type,
+            items: JSON.stringify(currentBundleEditing.items)
+        }, function(res) {
+            btn.prop('disabled', false).html(origHtml);
+            if (res && res.success) {
+                bundleEditorModal.hide();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: res.message || 'Komponen paket berhasil diperbarui.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                // If specModal was active for this product, refresh its bundle view
+                if ($('#specModal').hasClass('show') || (currentSpecCode === currentBundleEditing.code)) {
+                    reloadSpecBundle(currentBundleEditing.code, currentBundleEditing.type);
+                }
+
+                loadTable();
+            } else {
+                Swal.fire('Gagal!', res.message || 'Gagal menyimpan perubahan komponen.', 'error');
+            }
+        }, 'json').fail(function() {
+            btn.prop('disabled', false).html(origHtml);
+            Swal.fire('Error!', 'Terjadi kendala jaringan saat menyimpan.', 'error');
+        });
+    });
+
+    // Triggers to open Bundle Editor:
+    $('#btnEditBundleFromSpec, #btnEditBundleFooter').on('click', function() {
+        specModal.hide();
+        openBundleEditor(currentSpecCode, currentSpecType);
+    });
+
+    $('#btnEditBundleFromProductModal').on('click', function() {
+        const code = $(this).data('code') || $('#item_code').val();
+        const type = $(this).data('type') || $('#type').val();
+        pModal.hide();
+        openBundleEditor(code, type);
     });
 
     // Submit Product Form

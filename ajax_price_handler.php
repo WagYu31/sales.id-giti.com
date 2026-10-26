@@ -69,6 +69,136 @@ if ($action === 'get_bundle_items') {
     exit;
 }
 
+// =========================================================================
+// ACTION: SAVE BUNDLE PACKAGE ITEMS
+// =========================================================================
+if ($action === 'save_bundle_items') {
+    $code = trim($_POST['code'] ?? '');
+    $type = trim($_POST['type'] ?? '');
+    $itemsJson = $_POST['items'] ?? '[]';
+    $items = json_decode($itemsJson, true);
+
+    if (empty($code) && empty($type)) {
+        echo json_encode(['success' => false, 'message' => 'Kode SKU atau Nama Paket tidak valid.']);
+        exit;
+    }
+
+    if (!is_array($items)) {
+        echo json_encode(['success' => false, 'message' => 'Format daftar komponen tidak valid.']);
+        exit;
+    }
+
+    // Update MySQL table product_package_bundles
+    $conn->begin_transaction();
+    try {
+        // Delete existing items for this package
+        if (!empty($code)) {
+            $del = $conn->prepare("DELETE FROM product_package_bundles WHERE package_code = ?");
+            if ($del) {
+                $del->bind_param("s", $code);
+                $del->execute();
+                $del->close();
+            }
+        } elseif (!empty($type)) {
+            $del = $conn->prepare("DELETE FROM product_package_bundles WHERE package_name = ?");
+            if ($del) {
+                $del->bind_param("s", $type);
+                $del->execute();
+                $del->close();
+            }
+        }
+
+        // Insert updated components
+        $ins = $conn->prepare("INSERT INTO product_package_bundles (package_code, package_name, item_code, item_name, qty, unit, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        if ($ins) {
+            foreach ($items as $sIdx => $it) {
+                $itCode = trim($it['item_code'] ?? '');
+                $itName = trim($it['item_name'] ?? '');
+                $itQty = max(1, (int)($it['qty'] ?? 1));
+                $itUnit = trim($it['unit'] ?? 'UNIT');
+                $sort = $sIdx + 1;
+
+                if (!empty($itCode) || !empty($itName)) {
+                    $ins->bind_param("ssssisi", $code, $type, $itCode, $itName, $itQty, $itUnit, $sort);
+                    $ins->execute();
+                }
+            }
+            $ins->close();
+        }
+
+        $conn->commit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+        exit;
+    }
+
+    // Sync to package_bundles.json
+    $jsonFile = __DIR__ . '/includes/package_bundles.json';
+    if (file_exists($jsonFile)) {
+        $bundles = json_decode(file_get_contents($jsonFile), true) ?: [];
+        $key = !empty($code) ? $code : $type;
+
+        $jsonItems = [];
+        foreach ($items as $it) {
+            $itCode = trim($it['item_code'] ?? '');
+            $itName = trim($it['item_name'] ?? '');
+            $itQty = max(1, (int)($it['qty'] ?? 1));
+            $itUnit = trim($it['unit'] ?? 'UNIT');
+            if (!empty($itCode) || !empty($itName)) {
+                $jsonItems[] = [
+                    'code' => $itCode,
+                    'name' => $itName,
+                    'qty' => $itQty,
+                    'unit' => $itUnit,
+                    'description' => ''
+                ];
+            }
+        }
+
+        $bundles[$key] = [
+            'package_code' => $code,
+            'package_name' => $type,
+            'items' => $jsonItems
+        ];
+
+        @file_put_contents($jsonFile, json_encode($bundles, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    }
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Komponen isi paket berhasil disimpan dan diperbarui!',
+        'count' => count($items)
+    ]);
+    exit;
+}
+
+// =========================================================================
+// ACTION: GET PRODUCT SUGGESTIONS (FOR BUNDLE COMPONENT PICKER)
+// =========================================================================
+if ($action === 'get_product_suggestions') {
+    $q = trim($_GET['q'] ?? '');
+    $items = [];
+    if (!empty($q)) {
+        $stmt = $conn->prepare("SELECT item_code, type, unit, msrp FROM product_prices WHERE item_code LIKE ? OR type LIKE ? LIMIT 30");
+        if ($stmt) {
+            $param = "%$q%";
+            $stmt->bind_param("ss", $param, $param);
+            $stmt->execute();
+            $items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+        }
+    } else {
+        $res = $conn->query("SELECT item_code, type, unit, msrp FROM product_prices WHERE item_code IS NOT NULL AND item_code != '' ORDER BY type ASC LIMIT 150");
+        if ($res) {
+            $items = $res->fetch_all(MYSQLI_ASSOC);
+        }
+    }
+
+    echo json_encode(['success' => true, 'items' => $items]);
+    exit;
+}
+
 if ($action == 'get_prices') {
     $search = trim($_GET['search'] ?? '');
     $category = trim($_GET['category'] ?? '');
