@@ -1,7 +1,7 @@
 <?php
 /**
  * ajax_sales_order.php
- * Backend Handler untuk Modul Pesanan Penjualan (Sales Order)
+ * Backend Handler untuk Modul Penawaran Penjualan (Sales Order)
  * Format No SO: 2609.SOL.07025
  */
 
@@ -528,7 +528,7 @@ if ($action === 'save_sales_order') {
         
         echo json_encode([
             'success' => true,
-            'message' => 'Pesanan Penjualan berhasil disimpan!',
+            'message' => 'Penawaran Penjualan berhasil disimpan!',
             'so_id' => $finalSoId,
             'so_number' => $so_number
         ]);
@@ -546,7 +546,7 @@ if ($action === 'save_sales_order') {
 if ($action === 'get_order_detail') {
     $so_id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
     if ($so_id <= 0) {
-        echo json_encode(['success' => false, 'message' => 'ID pesanan tidak valid.']);
+        echo json_encode(['success' => false, 'message' => 'ID penawaran tidak valid.']);
         exit;
     }
     
@@ -557,7 +557,7 @@ if ($action === 'get_order_detail') {
     $stmt->close();
     
     if (!$order) {
-        echo json_encode(['success' => false, 'message' => 'Pesanan Penjualan tidak ditemukan atau sudah dihapus.']);
+        echo json_encode(['success' => false, 'message' => 'Penawaran Penjualan tidak ditemukan atau sudah dihapus.']);
         exit;
     }
     

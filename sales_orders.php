@@ -1,10 +1,10 @@
 <?php
 /**
  * sales_orders.php
- * Daftar Riwayat Pesanan Penjualan (Sales Order List)
+ * Daftar Riwayat Penawaran Penjualan (Sales Order List)
  */
 
-$page_title = 'Daftar Pesanan Penjualan (Sales Order)';
+$page_title = 'Daftar Penawaran Penjualan (Sales Order)';
 require_once 'includes/db.php';
 require_once 'includes/sales_order_helper.php';
 ensureSalesOrderTables($conn);
@@ -686,13 +686,13 @@ if ($qSales) {
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
         <div>
             <div class="hero-tag">
-                <i class="bi bi-box-seam me-1"></i> APLIKASI SALES &amp; PESANAN
+                <i class="bi bi-box-seam me-1"></i> APLIKASI SALES &amp; PENAWARAN
             </div>
             <h1 class="hero-title">
-                Pesanan Penjualan
+                Penawaran Penjualan
             </h1>
             <p class="hero-desc">
-                Manajemen Sales Order, penawaran harga, dan pembuatan dokumen cetak resmi CCTV Loewix.
+                Manajemen Penawaran Penjualan, penawaran harga, dan pembuatan dokumen cetak resmi CCTV Loewix.
             </p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -706,7 +706,7 @@ if ($qSales) {
             </a>
             <a href="sales_order_form.php" class="btn-hero-primary">
                 <i class="bi bi-plus-lg"></i>
-                <span>Buat Pesanan Baru</span>
+                <span>Buat Penawaran Baru</span>
             </a>
             <a href="modul-aplikasi-sales/tiptok.php" class="btn-hero-outline">
                 <i class="bi bi-cash-coin"></i>
@@ -718,11 +718,11 @@ if ($qSales) {
 
 <!-- 2. Minimalist Bento Metrics Grid -->
 <div class="metrics-grid-so">
-    <!-- Metric 1: Total Pesanan -->
+    <!-- Metric 1: Total Penawaran -->
     <div class="metric-card-so">
         <div>
             <div class="metric-card-header">
-                <span class="metric-card-label">Total Pesanan</span>
+                <span class="metric-card-label">Total Penawaran</span>
                 <div class="metric-card-icon">
                     <i class="bi bi-cart-check"></i>
                 </div>
@@ -733,7 +733,7 @@ if ($qSales) {
         </div>
         <div class="metric-card-footer">
             <span class="badge" style="background:var(--pastel-slate-bg); color:var(--pastel-slate-text); border:1px solid var(--pastel-slate-border); font-weight:600;">
-                <?php echo $isFiltered ? 'Sesuai Filter' : 'Semua Pesanan'; ?>
+                <?php echo $isFiltered ? 'Sesuai Filter' : 'Semua Penawaran'; ?>
             </span>
             <span>transaksi terdaftar</span>
         </div>
@@ -865,7 +865,7 @@ if ($qSales) {
         <table class="table table-so mb-0">
             <thead>
                 <tr>
-                    <th style="width: 150px;">No. Pesanan (SO)</th>
+                    <th style="width: 150px;">No. Penawaran (SO)</th>
                     <th style="width: 110px;">Tanggal</th>
                     <th>Customer / Toko</th>
                     <th style="width: 140px;">Sales PIC</th>
@@ -887,7 +887,7 @@ if ($qSales) {
                     ?>
                         <tr id="row-so-<?php echo $row['id']; ?>">
                             <td>
-                                <a href="javascript:void(0)" class="fw-bold font-monospace text-decoration-none text-dark btn-view-so" data-id="<?php echo $row['id']; ?>" title="Klik untuk Lihat Detail Pesanan">
+                                <a href="javascript:void(0)" class="fw-bold font-monospace text-decoration-none text-dark btn-view-so" data-id="<?php echo $row['id']; ?>" title="Klik untuk Lihat Detail Penawaran">
                                     <?php if (!empty($row['so_number'])): ?>
                                         <?php echo htmlspecialchars($row['so_number']); ?>
                                     <?php else: ?>
@@ -979,7 +979,7 @@ if ($qSales) {
                                     <a href="sales_order_form.php?id=<?php echo $row['id']; ?>" class="btn-action-so" title="Edit Pesanan">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn-action-so btn-delete btn-delete-so" data-id="<?php echo $row['id']; ?>" data-num="<?php echo htmlspecialchars(!empty($row['so_number']) ? $row['so_number'] : ('ID #' . $row['id'])); ?>" title="Hapus Pesanan">
+                                    <button type="button" class="btn-action-so btn-delete btn-delete-so" data-id="<?php echo $row['id']; ?>" data-num="<?php echo htmlspecialchars(!empty($row['so_number']) ? $row['so_number'] : ('ID #' . $row['id'])); ?>" title="Hapus Penawaran">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -990,10 +990,10 @@ if ($qSales) {
                     <tr>
                         <td colspan="9" class="text-center py-5 text-muted">
                             <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
-                            <h6 class="fw-bold mb-1 text-dark">Belum Ada Pesanan Penjualan</h6>
-                            <p class="small text-muted mb-3">Mulai buat pesanan penjualan pertama untuk toko atau customer Anda.</p>
+                            <h6 class="fw-bold mb-1 text-dark">Belum Ada Penawaran Penjualan</h6>
+                            <p class="small text-muted mb-3">Mulai buat penawaran penjualan pertama untuk toko atau customer Anda.</p>
                             <a href="sales_order_form.php" class="btn-filter-submit px-3 py-2 text-decoration-none">
-                                <i class="bi bi-plus-lg me-1"></i> Buat Pesanan Sekarang
+                                <i class="bi bi-plus-lg me-1"></i> Buat Penawaran Sekarang
                             </a>
                         </td>
                     </tr>
@@ -1015,7 +1015,7 @@ if ($qSales) {
                     </div>
                     <div>
                         <div class="d-flex flex-wrap align-items-center gap-2">
-                            <h5 class="modal-title fw-bold text-white mb-0" id="modalDetailSoLabel" style="letter-spacing: -0.01em;">Pesanan Penjualan</h5>
+                            <h5 class="modal-title fw-bold text-white mb-0" id="modalDetailSoLabel" style="letter-spacing: -0.01em;">Penawaran Penjualan</h5>
                             <span id="modalDetailSoNumBadge" class="modal-so-badge"></span>
                             <button type="button" class="btn btn-copy-header" id="btnCopySoNum" title="Salin Nomor SO">
                                 <i class="bi bi-copy me-1"></i> Salin
@@ -1837,8 +1837,8 @@ if ($qSales) {
         const order = currentLoadedOrder;
         const items = currentLoadedItems || [];
 
-        let text = `*PESANAN PENJUALAN - LOEWIX CCTV*\n`;
-        text += `No. Pesanan: ${order.so_number || '(Draft / Menunggu)'}\n`;
+        let text = `*PENAWARAN PENJUALAN - LOEWIX CCTV*\n`;
+        text += `No. Penawaran: ${order.so_number || '(Draft / Menunggu)'}\n`;
         text += `Tanggal SO: ${order.so_date_formatted || '-'}\n`;
         text += `Pelanggan: ${order.customer_name}\n`;
         if (order.customer_pic) text += `PIC Toko: ${order.customer_pic} (${order.customer_phone || '-'})\n`;

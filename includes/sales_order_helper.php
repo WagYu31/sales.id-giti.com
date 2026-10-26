@@ -1,7 +1,7 @@
 <?php
 /**
  * includes/sales_order_helper.php
- * Helper & Schema Migration for Modul Pesanan Penjualan (Sales Order)
+ * Helper & Schema Migration for Modul Penawaran Penjualan (Sales Order)
  */
 
 if (!function_exists('ensureSalesOrderTables')) {

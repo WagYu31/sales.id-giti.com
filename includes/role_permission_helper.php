@@ -62,11 +62,11 @@ if (!function_exists('getAllSystemMenus')) {
                     ],
                     [
                         'key'         => 'sales_orders',
-                        'label'       => 'Pesanan Penjualan (SO)',
+                        'label'       => 'Penawaran Penjualan (SO)',
                         'url'         => 'sales_orders.php',
                         'icon'        => 'bi bi-cart3',
                         'color'       => '#2563eb',
-                        'description' => 'Manajemen pesanan penjualan (Sales Order), pembuatan SO baru, approval diskon, dan cetak dokumen resmi / PDF',
+                        'description' => 'Manajemen penawaran penjualan (Sales Order), pembuatan penawaran baru, approval diskon, dan cetak dokumen resmi / PDF',
                         'has_actions' => ['access', 'create', 'edit', 'delete', 'export']
                     ],
                     [

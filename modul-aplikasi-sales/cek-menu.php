@@ -64,7 +64,7 @@ $roleBadgeBg = match($userRole) {
             <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
                 <i class="bi bi-cart3"></i>
             </span>
-            <span class="nav-link-text">Pesanan Penjualan (SO)</span>
+            <span class="nav-link-text">Penawaran Penjualan (SO)</span>
         </a>
 
         <?php if ($userRole === 'superadmin'): ?>
@@ -130,7 +130,7 @@ $roleBadgeBg = match($userRole) {
             <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
                 <i class="bi bi-cart3"></i>
             </span>
-            <span class="nav-link-text">Pesanan Penjualan (SO)</span>
+            <span class="nav-link-text">Penawaran Penjualan (SO)</span>
         </a>
 
         <a href="customer.php" class="sidebar-link <?php echo in_array($currFile, ['customer.php', 'customer-detail.php', 'tambah-customer.php', 'edit-customer.php']) ? 'active' : ''; ?>">

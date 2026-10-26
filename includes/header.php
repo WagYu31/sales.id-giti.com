@@ -589,7 +589,7 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
                     <i class="bi bi-cart3"></i>
                 </span>
-                <span class="nav-link-text">Pesanan Penjualan (SO)</span>
+                <span class="nav-link-text">Penawaran Penjualan (SO)</span>
             </a>
             <?php endif; ?>
 
@@ -641,7 +641,7 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
                     <i class="bi bi-cart3"></i>
                 </span>
-                <span class="nav-link-text">Pesanan Penjualan (SO)</span>
+                <span class="nav-link-text">Penawaran Penjualan (SO)</span>
             </a>
             <?php endif; ?>
 
@@ -687,7 +687,7 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
                     <i class="bi bi-cart3"></i>
                 </span>
-                <span class="nav-link-text">Pesanan Penjualan (SO)</span>
+                <span class="nav-link-text">Penawaran Penjualan (SO)</span>
             </a>
 
             <?php if ($userRoleClean === 'superadmin'): ?>
@@ -762,7 +762,7 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
                     <i class="bi bi-cart3"></i>
                 </span>
-                <span class="nav-link-text">Pesanan Penjualan (SO)</span>
+                <span class="nav-link-text">Penawaran Penjualan (SO)</span>
             </a>
 
             <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>">

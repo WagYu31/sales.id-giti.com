@@ -1,7 +1,7 @@
 <?php
 /**
  * sales_order_print.php
- * Format Cetak Resmi Dokumen Pesanan Penjualan (Sales Order / Proforma Invoice)
+ * Format Cetak Resmi Dokumen Penawaran Penjualan (Sales Order / Proforma Invoice)
  * Mengadopsi format resmi Accurate Online (Sesuai Dokumen PDF Referensi)
  */
 
@@ -11,7 +11,7 @@ ensureSalesOrderTables($conn);
 
 $soId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($soId <= 0) {
-    die("ID Pesanan tidak valid.");
+    die("ID Penawaran tidak valid.");
 }
 
 $stmt = $conn->prepare("SELECT * FROM sales_orders WHERE id = ? AND deleted_at IS NULL");
@@ -21,7 +21,7 @@ $order = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 if (!$order) {
-    die("Pesanan Penjualan tidak ditemukan atau sudah dihapus.");
+    die("Penawaran Penjualan tidak ditemukan atau sudah dihapus.");
 }
 
 // Fetch Items
@@ -611,7 +611,7 @@ $qrisSrc = !empty($qrisBase64) ? ('data:image/png;base64,' . $qrisBase64) : 'ass
                 <select id="selectDocTitle" class="tb-select">
                     <option value="PROFORMA INVOICE" <?php echo ($defaultTitle === 'PROFORMA INVOICE') ? 'selected' : ''; ?>>PROFORMA INVOICE</option>
                     <option value="SALES ORDER" <?php echo ($defaultTitle === 'SALES ORDER') ? 'selected' : ''; ?>>SALES ORDER</option>
-                    <option value="PESANAN PENJUALAN" <?php echo ($defaultTitle === 'PESANAN PENJUALAN') ? 'selected' : ''; ?>>PESANAN PENJUALAN</option>
+                    <option value="PENAWARAN PENJUALAN" <?php echo ($defaultTitle === 'PENAWARAN PENJUALAN' || $defaultTitle === 'PESANAN PENJUALAN') ? 'selected' : ''; ?>>PENAWARAN PENJUALAN</option>
                 </select>
             </div>
         </div>

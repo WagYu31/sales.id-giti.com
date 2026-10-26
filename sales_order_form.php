@@ -1,11 +1,11 @@
 <?php
 /**
  * sales_order_form.php
- * Form Pembuatan & Edit Pesanan Penjualan (Sales Order)
+ * Form Pembuatan & Edit Penawaran Penjualan (Sales Order)
  * Desain terinspirasi Accurate Online dengan estetika modern Loewix
  */
 
-$page_title = 'Pesanan Penjualan (Sales Order)';
+$page_title = 'Penawaran Penjualan (Sales Order)';
 require_once 'includes/db.php';
 require_once 'includes/sales_order_helper.php';
 ensureSalesOrderTables($conn);
@@ -540,12 +540,12 @@ if ($qProd) {
         <div class="d-flex align-items-center gap-2 mb-1" style="font-size:12.5px; color:#64748B; font-weight:600;">
             <a href="customer_management.php" class="text-decoration-none text-muted">Dashboard</a>
             <span>›</span>
-            <a href="sales_orders.php" class="text-decoration-none text-dark">Pesanan Penjualan</a>
+            <a href="sales_orders.php" class="text-decoration-none text-dark">Penawaran Penjualan</a>
             <span>›</span>
-            <span class="text-secondary"><?php echo $isEdit ? 'Edit Pesanan' : 'Data Baru'; ?></span>
+            <span class="text-secondary"><?php echo $isEdit ? 'Edit Penawaran' : 'Data Baru'; ?></span>
         </div>
         <h2 class="fw-bold mb-0 text-dark" style="font-family:'Outfit', sans-serif; font-size:24px; letter-spacing:-0.02em;">
-            <i class="bi bi-receipt me-2 text-dark"></i><?php echo $isEdit ? 'Edit Pesanan Penjualan' : 'Buat Pesanan Penjualan Baru'; ?>
+            <i class="bi bi-receipt me-2 text-dark"></i><?php echo $isEdit ? 'Edit Penawaran Penjualan' : 'Buat Penawaran Penjualan Baru'; ?>
         </h2>
     </div>
     <div class="mt-3 mt-md-0 d-flex gap-2">
@@ -553,7 +553,7 @@ if ($qProd) {
             <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
         </a>
         <button type="button" class="btn-primary-so" id="btnSaveSo">
-            <i class="bi bi-check2 me-1"></i> <?php echo $isEdit ? 'Perbarui Pesanan' : 'Simpan Pesanan'; ?>
+            <i class="bi bi-check2 me-1"></i> <?php echo $isEdit ? 'Perbarui Penawaran' : 'Simpan Penawaran'; ?>
         </button>
         <?php if ($isEdit): ?>
         <button type="button" class="btn-secondary-so" id="btnCopyWaFormTop" title="Salin Ringkasan Format WhatsApp">
@@ -576,7 +576,7 @@ if ($qProd) {
             <div class="d-flex align-items-center gap-2">
                 <span class="accurate-tab-badge">
                     <i class="bi bi-file-earmark-spreadsheet"></i>
-                    Pesanan Penjualan: <?php echo $isEdit ? htmlspecialchars(!empty($orderData['so_number']) ? $orderData['so_number'] : '(Belum ada No. SO)') : 'Data Baru'; ?>
+                    Penawaran Penjualan: <?php echo $isEdit ? htmlspecialchars(!empty($orderData['so_number']) ? $orderData['so_number'] : '(Belum ada No. SO)') : 'Data Baru'; ?>
                 </span>
                 <span class="badge" style="background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); font-size:11.5px; font-weight:600; padding:5px 12px; border-radius:6px;">
                     Mata Uang: IDR (Rupiah)
@@ -664,10 +664,10 @@ if ($qProd) {
                            value="<?php echo htmlspecialchars($orderData['so_date'] ?? date('Y-m-d')); ?>" required>
                 </div>
 
-                <!-- No Pesanan # (Opsional jika No. SO dari Finance belum terbit) -->
+                <!-- No Penawaran # (Opsional jika No. SO dari Finance belum terbit) -->
                 <div class="col-lg-3 col-md-3 col-6">
                     <label class="accurate-label">
-                        <i class="bi bi-hash me-1"></i> No. Pesanan (SO #)
+                        <i class="bi bi-hash me-1"></i> No. Penawaran (SO #)
                     </label>
                     <div class="input-group">
                         <input type="text" name="so_number" id="so_number" class="form-control accurate-input font-monospace text-dark fw-bold" 
@@ -987,7 +987,7 @@ if ($qProd) {
             </button>
             <?php endif; ?>
             <button type="button" class="btn-primary-so" id="btnSaveSoBottom">
-                <i class="bi bi-check2 me-1"></i> <?php echo $isEdit ? 'Simpan Perubahan' : 'Simpan Pesanan'; ?>
+                <i class="bi bi-check2 me-1"></i> <?php echo $isEdit ? 'Simpan Perubahan' : 'Simpan Penawaran'; ?>
             </button>
         </div>
     </div>
@@ -1259,7 +1259,7 @@ $(document).ready(function() {
                 <tr>
                     <td colspan="8" class="text-center py-5 text-muted">
                         <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary opacity-50"></i>
-                        <span class="fw-semibold text-dark d-block mb-1" style="font-size:13px;">Belum ada barang dalam pesanan ini</span>
+                        <span class="fw-semibold text-dark d-block mb-1" style="font-size:13px;">Belum ada barang dalam penawaran ini</span>
                         <small class="text-muted">Gunakan pencarian di atas atau klik tombol <strong>+ Baris Manual</strong> untuk menambahkan barang.</small>
                     </td>
                 </tr>
@@ -1491,7 +1491,7 @@ $(document).ready(function() {
         if (items.length === 0) return;
         Swal.fire({
             title: 'Kosongkan Barang?',
-            text: 'Semua baris barang dalam pesanan ini akan dihapus.',
+            text: 'Semua baris barang dalam penawaran ini akan dihapus.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Ya, Kosongkan',
@@ -1784,8 +1784,8 @@ $(document).ready(function() {
         const payTerms = $('#payment_terms').val() || 'C.O.D';
         const specialNotes = $.trim($('#special_notes').val());
 
-        let text = `*PESANAN PENJUALAN - LOEWIX CCTV*\n`;
-        text += `No. Pesanan: ${soNum}\n`;
+        let text = `*PENAWARAN PENJUALAN - LOEWIX CCTV*\n`;
+        text += `No. Penawaran: ${soNum}\n`;
         text += `Pelanggan: ${custName}\n`;
         text += `Sales PIC: ${salesName}\n`;
         text += `Status: ${status}\n`;
@@ -1834,7 +1834,7 @@ $(document).ready(function() {
             Swal.fire({
                 icon: 'success',
                 title: 'Format WhatsApp Disalin!',
-                text: 'Rincian pesanan berhasil disalin ke clipboard.',
+                text: 'Rincian penawaran berhasil disalin ke clipboard.',
                 timer: 2000,
                 showConfirmButton: false
             });
@@ -1852,7 +1852,7 @@ $(document).ready(function() {
         }
 
         if (items.length === 0) {
-            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Minimal tambahkan 1 baris barang ke dalam pesanan!' });
+            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Minimal tambahkan 1 baris barang ke dalam penawaran!' });
             return;
         }
 
@@ -1899,15 +1899,15 @@ $(document).ready(function() {
             processData: false,
             dataType: 'json',
             success: function(res) {
-                btnSave.prop('disabled', false).html('<i class="bi bi-check2-circle me-1"></i> Simpan Pesanan');
+                btnSave.prop('disabled', false).html('<i class="bi bi-check2-circle me-1"></i> Simpan Penawaran');
                 if (res.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Sukses!',
-                        text: res.message || 'Pesanan Penjualan berhasil disimpan.',
+                        text: res.message || 'Penawaran Penjualan berhasil disimpan.',
                         showDenyButton: true,
                         confirmButtonText: '<i class="bi bi-printer me-1"></i> Cetak SO Sekarang',
-                        denyButtonText: '<i class="bi bi-list-check me-1"></i> Ke Daftar Pesanan',
+                        denyButtonText: '<i class="bi bi-list-check me-1"></i> Ke Daftar Penawaran',
                         confirmButtonColor: '#0F172A',
                         denyButtonColor: '#64748B'
                     }).then((result) => {
@@ -1918,11 +1918,11 @@ $(document).ready(function() {
                         }
                     });
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal', text: res.message || 'Terjadi kesalahan saat menyimpan pesanan.' });
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: res.message || 'Terjadi kesalahan saat menyimpan penawaran.' });
                 }
             },
             error: function(xhr) {
-                btnSave.prop('disabled', false).html('<i class="bi bi-check2 me-1"></i> Simpan Pesanan');
+                btnSave.prop('disabled', false).html('<i class="bi bi-check2 me-1"></i> Simpan Penawaran');
                 let errMsg = 'Terjadi gangguan jaringan atau server saat menyimpan data.';
                 if (xhr && xhr.responseText) {
                     try {
