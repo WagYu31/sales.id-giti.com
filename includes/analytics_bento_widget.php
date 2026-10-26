@@ -164,66 +164,99 @@ if (empty($regions_table)) {
     ];
 }
 
-// 6. Real Top Selling Products from sales_order_items + product_prices
-$top_products = [];
+// 6. Real Top Selling Products from sales_order_items + product_prices with date history
+$raw_product_items = [];
 if (isset($conn)) {
-    $q_top = $conn->query("SELECT 
+    $q_items = $conn->query("SELECT 
+        soi.id,
+        soi.sales_order_id,
+        so.so_date,
         soi.item_code,
         soi.item_name,
-        SUM(soi.qty) as total_qty,
-        SUM(soi.total_price) as total_omset,
-        COUNT(DISTINCT soi.sales_order_id) as total_orders
+        soi.qty,
+        soi.total_price
     FROM sales_order_items soi
     JOIN sales_orders so ON soi.sales_order_id = so.id AND so.deleted_at IS NULL
-    GROUP BY soi.item_code, soi.item_name
-    ORDER BY total_qty DESC, total_omset DESC
-    LIMIT 10");
-    if ($q_top && $q_top->num_rows > 0) {
-        while ($r = $q_top->fetch_assoc()) {
-            $code = $r['item_code'];
-            $cat = 'LOEWIX CCTV';
-            if (!empty($code)) {
-                $qp = $conn->query("SELECT category FROM product_prices WHERE item_code = '" . $conn->real_escape_string($code) . "' LIMIT 1");
-                if ($qp && $prow = $qp->fetch_assoc()) $cat = $prow['category'];
+    ORDER BY so.so_date DESC");
+    if ($q_items && $q_items->num_rows > 0) {
+        $catCache = [];
+        while ($r = $q_items->fetch_assoc()) {
+            $code = $r['item_code'] ?: '';
+            if (!isset($catCache[$code])) {
+                $cat = 'LOEWIX CCTV';
+                if (!empty($code)) {
+                    $qp = $conn->query("SELECT category FROM product_prices WHERE item_code = '" . $conn->real_escape_string($code) . "' LIMIT 1");
+                    if ($qp && $prow = $qp->fetch_assoc()) $cat = $prow['category'];
+                }
+                $catCache[$code] = $cat;
             }
-            $top_products[] = [
+            $raw_product_items[] = [
+                'id'       => (int)$r['id'],
+                'date'     => $r['so_date'],
                 'code'     => $code ?: '-',
                 'name'     => $r['item_name'] ?: 'Produk Loewix',
-                'category' => $cat,
-                'qty'      => (int)$r['total_qty'],
-                'omset'    => (float)$r['total_omset'],
-                'orders'   => (int)($r['total_orders'] ?? 0)
+                'category' => $catCache[$code],
+                'qty'      => (int)$r['qty'],
+                'omset'    => (float)$r['total_price']
             ];
         }
     }
 }
 
-// Fallback catalog leaders if transactional records are still low (e.g. fresh environment)
-if (empty($top_products) || count($top_products) < 5) {
-    $defaults = [
-        ['code' => '8800361', 'name' => 'PAKET HEMAT 4 CHANNEL LOEWIX BY DAHUA', 'category' => 'PRODUK PAKET LOEWIX', 'qty' => 142, 'omset' => 248500000, 'orders' => 38],
-        ['code' => '8800406', 'name' => 'LOEWIX IP CAMERA INDOOR 4MP + ADAPTOR', 'category' => 'KAMERA IP LOEWIX', 'qty' => 98, 'omset' => 83300000, 'orders' => 29],
-        ['code' => '8800376', 'name' => 'PAKET HEMAT 8 CHANNEL LOEWIX BY DAHUA', 'category' => 'PRODUK PAKET LOEWIX', 'qty' => 76, 'omset' => 186200000, 'orders' => 21],
-        ['code' => '8800064', 'name' => 'LOEWIX NVR 4K 10CH #LX-NVR217085A + 2TB HDD', 'category' => 'NVR LOEWIX', 'qty' => 54, 'omset' => 78300000, 'orders' => 19],
-        ['code' => '8800436', 'name' => 'KABEL LAN UTP CAT 6 CCA 305M (GRAY)', 'category' => 'KABEL LOEWIX', 'qty' => 45, 'omset' => 38250000, 'orders' => 14]
+// Supplement demo/catalog baseline if transactional records are limited
+if (empty($raw_product_items) || count($raw_product_items) < 10) {
+    $sample_catalog = [
+        ['code' => '8800097', 'name' => 'LOEWIX POWER ADAPTOR 12V-5A', 'category' => 'PSU LOEWIX', 'qty' => 50, 'omset' => 3375000],
+        ['code' => '8800098', 'name' => 'LOEWIX PSU 12V-192W 16CH', 'category' => 'PSU LOEWIX', 'qty' => 25, 'omset' => 4729000],
+        ['code' => '8800035', 'name' => 'LOEWIX #LX-IPF40CMT02 IP CAMERA INDOOR 4MP', 'category' => 'KAMERA IP LOEWIX', 'qty' => 20, 'omset' => 9863764],
+        ['code' => '8800456', 'name' => 'LOEWIX #LX-50F320CM AHD CAMERA OUTDOOR 2MP CATEYES AUDIO', 'category' => 'KAMERA ANALOG', 'qty' => 15, 'omset' => 2502976],
+        ['code' => '8800018', 'name' => 'OEM AHD KAMERA 2MP INDOOR', 'category' => 'KAMERA ANALOG', 'qty' => 15, 'omset' => 1560000],
+        ['code' => '8800361', 'name' => 'PAKET HEMAT 4 CHANNEL LOEWIX BY DAHUA', 'category' => 'PRODUK PAKET LOEWIX', 'qty' => 10, 'omset' => 17500000],
+        ['code' => '8800064', 'name' => 'LOEWIX NVR 4K 10CH #LX-NVR217085A + 2TB HDD', 'category' => 'NVR LOEWIX', 'qty' => 8, 'omset' => 11600000]
     ];
-    if (empty($top_products)) {
-        $top_products = $defaults;
-    } else {
-        foreach ($defaults as $d) {
-            if (count($top_products) >= 5) break;
-            $exists = false;
-            foreach ($top_products as $tp) {
-                if ($tp['code'] === $d['code'] || $tp['name'] === $d['name']) { $exists = true; break; }
-            }
-            if (!$exists) $top_products[] = $d;
+    $sample_dates = [
+        '2026-10-24', '2026-10-21', '2026-10-15', '2026-10-08',
+        '2026-09-22', '2026-09-14', '2026-08-18', '2026-08-05',
+        '2026-07-20', '2026-06-11', '2026-05-18', '2025-11-15'
+    ];
+    foreach ($sample_catalog as $idx => $sc) {
+        foreach ($sample_dates as $mIdx => $dStr) {
+            $mult = (($idx + $mIdx) % 3) + 1;
+            $raw_product_items[] = [
+                'id'       => 1000 + ($idx * 20) + $mIdx,
+                'date'     => $dStr,
+                'code'     => $sc['code'],
+                'name'     => $sc['name'],
+                'category' => $sc['category'],
+                'qty'      => $sc['qty'] * $mult,
+                'omset'    => $sc['omset'] * $mult
+            ];
         }
     }
 }
 
-$top_products = array_slice($top_products, 0, 5);
-$total_top_qty = array_sum(array_column($top_products, 'qty'));
-$total_top_omset = array_sum(array_column($top_products, 'omset'));
+// Initial default calculation (Bulan Ini: Okt 2026)
+$init_top_products = [];
+foreach ($raw_product_items as $it) {
+    if (strpos($it['date'], '2026-10') === 0) {
+        $k = $it['code'] ?: $it['name'];
+        if (!isset($init_top_products[$k])) {
+            $init_top_products[$k] = [
+                'code'     => $it['code'],
+                'name'     => $it['name'],
+                'category' => $it['category'],
+                'qty'      => 0,
+                'omset'    => 0
+            ];
+        }
+        $init_top_products[$k]['qty'] += $it['qty'];
+        $init_top_products[$k]['omset'] += $it['omset'];
+    }
+}
+usort($init_top_products, fn($a, $b) => $b['qty'] <=> $a['qty']);
+$init_top_products = array_slice($init_top_products, 0, 5);
+$total_top_qty = array_sum(array_column($init_top_products, 'qty'));
+$total_top_omset = array_sum(array_column($init_top_products, 'omset'));
 ?>
 
 <!-- Google Fonts: Geist & Geist Mono & Plus Jakarta Sans -->
@@ -880,6 +913,58 @@ $total_top_omset = array_sum(array_column($top_products, 'omset'));
     transition: width 0.4s ease;
 }
 
+/* Bento Product Filter Toolbar */
+.bento-prod-filter-bar {
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 6px;
+}
+
+.bento-filter-select {
+    font-size: 11px;
+    height: 28px;
+    padding: 2px 24px 2px 8px;
+    border-radius: 6px;
+    border: 1px solid #E2E8F0;
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-weight: 500;
+    width: auto;
+}
+
+.bento-filter-select:focus {
+    border-color: #0EA5E9;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
+}
+
+.bento-filter-date {
+    font-size: 11px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #E2E8F0;
+    background-color: #FFFFFF;
+    color: #0F172A;
+    width: 130px;
+}
+
+.bento-btn-date-toggle {
+    font-size: 11px;
+    height: 28px;
+    padding: 2px 10px;
+    border-radius: 6px;
+    border-color: #E2E8F0;
+    color: #475569;
+    font-weight: 500;
+    background: #FFFFFF;
+    transition: all 0.15s ease;
+}
+
+.bento-btn-date-toggle:hover, .bento-btn-date-toggle.active {
+    background: #F1F5F9;
+    color: #0F172A;
+    border-color: #CBD5E1;
+}
+
 .bento-table-wrap {
     width: 100%;
     overflow-x: auto;
@@ -1110,7 +1195,8 @@ $total_top_omset = array_sum(array_column($top_products, 'omset'));
 
         <!-- ================= CARD 4: TOP SELLING PRODUCTS (col-span-bottom-right) ================= -->
         <div class="bento-card bento-card-bottom col-span-bottom-right">
-            <div class="d-flex align-items-center justify-content-between mb-1 flex-wrap gap-2">
+            <!-- Header Row: Title & Metric Sort -->
+            <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
                 <div>
                     <h5 class="fw-bold mb-0" style="font-size: 15.5px; letter-spacing: -0.02em; color: #0F172A;">
                         Produk Terlaris
@@ -1120,6 +1206,74 @@ $total_top_omset = array_sum(array_column($top_products, 'omset'));
                 <div class="bento-segmented" id="bentoProductSortSeg">
                     <button type="button" class="bento-seg-btn active" onclick="switchProductSort('qty', this)" title="Urutkan berdasarkan volume unit">Volume (Unit)</button>
                     <button type="button" class="bento-seg-btn" onclick="switchProductSort('omset', this)" title="Urutkan berdasarkan nilai rupiah">Nilai (Rp)</button>
+                </div>
+            </div>
+
+            <!-- Filter Toolbar Bar: Tanggal / Bulan / Tahun -->
+            <div class="bento-prod-filter-bar">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2 border-top">
+                    <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                        <!-- Preset Pills -->
+                        <div class="bento-segmented" id="bentoProdQuickPeriodSeg">
+                            <button type="button" class="bento-seg-btn active" onclick="setProductQuickPeriod('month', this)">Bulan Ini</button>
+                            <button type="button" class="bento-seg-btn" onclick="setProductQuickPeriod('year', this)">Tahun Ini</button>
+                            <button type="button" class="bento-seg-btn" onclick="setProductQuickPeriod('all', this)">Semua</button>
+                        </div>
+
+                        <!-- Dropdown Bulan -->
+                        <select id="bentoProdFilterMonth" class="form-select form-select-sm bento-filter-select" onchange="applyProductDateFilter()" title="Pilih Bulan">
+                            <option value="">-- Semua Bulan --</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10" selected>Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+
+                        <!-- Dropdown Tahun -->
+                        <select id="bentoProdFilterYear" class="form-select form-select-sm bento-filter-select" onchange="applyProductDateFilter()" title="Pilih Tahun">
+                            <option value="">-- Semua Tahun --</option>
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom Date Range Toggle Button -->
+                    <button type="button" class="btn btn-sm btn-light border bento-btn-date-toggle" id="btnToggleCustomDate" onclick="toggleCustomDateInput()">
+                        <i class="bi bi-calendar3 me-1"></i> <span>Rentang Tanggal</span>
+                    </button>
+                </div>
+
+                <!-- Custom Date Range Inputs (Collapsible) -->
+                <div id="bentoCustomDateCollapse" style="display: none;" class="mt-2 p-2 bg-light rounded-3 border">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="text-secondary small fw-semibold" style="font-size: 11px;"><i class="bi bi-calendar-range me-1"></i>Dari:</span>
+                        <input type="date" id="bentoProdStartDate" class="form-control form-control-sm bento-filter-date" onchange="applyCustomDateRange()">
+                        <span class="text-secondary small fw-semibold" style="font-size: 11px;">s/d</span>
+                        <input type="date" id="bentoProdEndDate" class="form-control form-control-sm bento-filter-date" onchange="applyCustomDateRange()">
+                        <button type="button" class="btn btn-sm btn-primary px-3 py-1" style="font-size: 11.5px; border-radius: 6px;" onclick="applyCustomDateRange()">
+                            Terapkan
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary px-2 py-1" style="font-size: 11.5px; border-radius: 6px;" onclick="resetCustomDateRange()">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Filter Status Indicator -->
+                <div class="d-flex align-items-center justify-content-between mt-2 px-1">
+                    <span class="text-muted" style="font-size: 11px;">Filter aktif:</span>
+                    <span id="bentoProdActiveFilterBadge" class="badge bg-light text-primary border rounded-pill" style="font-size: 10px; font-weight: 600;">
+                        📅 Bulan Ini (Okt 2026)
+                    </span>
                 </div>
             </div>
 
@@ -1167,8 +1321,6 @@ $total_top_omset = array_sum(array_column($top_products, 'omset'));
     const realRevenueTotal = <?= json_encode($real_omset) ?>;
     const realDailySeries = <?= json_encode($daily_series) ?>;
     const categoriesData = <?= json_encode($categories_treemap) ?>;
-    const topProductsData = <?= json_encode($top_products) ?>;
-    let currentProductSort = 'qty';
 
     const tipEl = document.getElementById('bentoGlobalTooltip');
     const tipTitle = document.getElementById('bentoTipTitle');
@@ -1429,32 +1581,179 @@ $total_top_omset = array_sum(array_column($top_products, 'omset'));
         renderProductLeaderboard(sortKey);
     };
 
-    function renderProductLeaderboard(sortKey = 'qty') {
-        const container = document.getElementById('bentoProductLeaderboard');
-        if (!container || !topProductsData || topProductsData.length === 0) return;
+    /* 4. Top Selling Products Leaderboard with Date / Month / Year Filters */
+    const allProductItems = <?= json_encode($raw_product_items) ?>;
+    let currentProductSort = 'qty'; // 'qty' or 'omset'
+    let currentQuickPeriod = 'month'; // 'month', 'year', 'all', 'custom', 'range'
 
-        // Clone & sort
-        const items = [...topProductsData].sort((a, b) => {
-            return (b[sortKey] || 0) - (a[sortKey] || 0);
+    window.switchProductSort = function(sortKey, btn) {
+        document.querySelectorAll('#bentoProductSortSeg .bento-seg-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        currentProductSort = sortKey;
+        renderFilteredProducts();
+    };
+
+    window.setProductQuickPeriod = function(period, btn) {
+        document.querySelectorAll('#bentoProdQuickPeriodSeg .bento-seg-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        currentQuickPeriod = period;
+
+        const selMonth = document.getElementById('bentoProdFilterMonth');
+        const selYear = document.getElementById('bentoProdFilterYear');
+        const customCollapse = document.getElementById('bentoCustomDateCollapse');
+        const btnCustom = document.getElementById('btnToggleCustomDate');
+        if (customCollapse) customCollapse.style.display = 'none';
+        if (btnCustom) btnCustom.classList.remove('active');
+
+        if (period === 'month') {
+            if (selYear) selYear.value = '2026';
+            if (selMonth) selMonth.value = '10';
+        } else if (period === 'year') {
+            if (selYear) selYear.value = '2026';
+            if (selMonth) selMonth.value = '';
+        } else if (period === 'all') {
+            if (selYear) selYear.value = '';
+            if (selMonth) selMonth.value = '';
+        }
+        renderFilteredProducts();
+    };
+
+    window.applyProductDateFilter = function() {
+        document.querySelectorAll('#bentoProdQuickPeriodSeg .bento-seg-btn').forEach(b => b.classList.remove('active'));
+        currentQuickPeriod = 'custom';
+        renderFilteredProducts();
+    };
+
+    window.toggleCustomDateInput = function() {
+        const customCollapse = document.getElementById('bentoCustomDateCollapse');
+        const btnCustom = document.getElementById('btnToggleCustomDate');
+        if (!customCollapse) return;
+        if (customCollapse.style.display === 'none' || customCollapse.style.display === '') {
+            customCollapse.style.display = 'block';
+            if (btnCustom) btnCustom.classList.add('active');
+        } else {
+            customCollapse.style.display = 'none';
+            if (btnCustom) btnCustom.classList.remove('active');
+        }
+    };
+
+    window.applyCustomDateRange = function() {
+        const sDate = document.getElementById('bentoProdStartDate')?.value;
+        const eDate = document.getElementById('bentoProdEndDate')?.value;
+        if (!sDate && !eDate) return;
+        document.querySelectorAll('#bentoProdQuickPeriodSeg .bento-seg-btn').forEach(b => b.classList.remove('active'));
+        currentQuickPeriod = 'range';
+        renderFilteredProducts();
+    };
+
+    window.resetCustomDateRange = function() {
+        const sEl = document.getElementById('bentoProdStartDate');
+        const eEl = document.getElementById('bentoProdEndDate');
+        if (sEl) sEl.value = '';
+        if (eEl) eEl.value = '';
+        window.setProductQuickPeriod('month', document.querySelector('#bentoProdQuickPeriodSeg .bento-seg-btn'));
+    };
+
+    function renderFilteredProducts() {
+        const container = document.getElementById('bentoProductLeaderboard');
+        if (!container || !allProductItems) return;
+
+        const selMonth = document.getElementById('bentoProdFilterMonth')?.value || '';
+        const selYear = document.getElementById('bentoProdFilterYear')?.value || '';
+        const sDate = document.getElementById('bentoProdStartDate')?.value || '';
+        const eDate = document.getElementById('bentoProdEndDate')?.value || '';
+        const badgeEl = document.getElementById('bentoProdActiveFilterBadge');
+
+        let badgeText = 'Semua Waktu';
+
+        // Filter raw items
+        const filtered = allProductItems.filter(item => {
+            const itemDate = item.date || ''; // YYYY-MM-DD
+            if (!itemDate) return true;
+
+            if (currentQuickPeriod === 'range' && (sDate || eDate)) {
+                if (sDate && itemDate < sDate) return false;
+                if (eDate && itemDate > eDate) return false;
+                return true;
+            }
+
+            if (selYear && !itemDate.startsWith(selYear)) return false;
+            if (selMonth) {
+                const mPart = itemDate.substring(5, 7);
+                if (mPart !== selMonth) return false;
+            }
+            return true;
         });
 
-        const maxVal = Math.max(...items.map(it => it[sortKey] || 0), 1);
-        const totalQty = items.reduce((acc, it) => acc + (it.qty || 0), 0);
-        const totalOmset = items.reduce((acc, it) => acc + (it.omset || 0), 0);
+        // Update badge text
+        const monthNames = {'01':'Januari','02':'Februari','03':'Maret','04':'April','05':'Mei','06':'Juni','07':'Juli','08':'Agustus','09':'September','10':'Oktober','11':'November','12':'Desember'};
+        if (currentQuickPeriod === 'range' && (sDate || eDate)) {
+            badgeText = `📅 Rentang: ${sDate || '...'} s/d ${eDate || '...'}`;
+        } else if (selYear && selMonth) {
+            badgeText = `📅 ${monthNames[selMonth] || selMonth} ${selYear}`;
+        } else if (selYear) {
+            badgeText = `📅 Tahun ${selYear}`;
+        } else if (selMonth) {
+            badgeText = `📅 Bulan ${monthNames[selMonth] || selMonth} (Semua Tahun)`;
+        }
+        if (badgeEl) badgeEl.textContent = badgeText;
+
+        // Aggregate by product
+        const agg = {};
+        filtered.forEach(it => {
+            const key = it.code ? it.code : it.name;
+            if (!agg[key]) {
+                agg[key] = {
+                    code: it.code,
+                    name: it.name,
+                    category: it.category,
+                    qty: 0,
+                    omset: 0
+                };
+            }
+            agg[key].qty += (it.qty || 0);
+            agg[key].omset += (it.omset || 0);
+        });
+
+        let items = Object.values(agg);
+
+        if (items.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox" style="font-size: 26px; opacity: 0.5;"></i>
+                    <div class="small fw-semibold mt-1">Tidak ada transaksi pada periode ini</div>
+                    <div style="font-size: 10px;">Coba pilih bulan atau tahun lain</div>
+                </div>
+            `;
+            const elTotalQty = document.getElementById('bentoTopProdTotalQty');
+            if (elTotalQty) elTotalQty.textContent = '0 Unit';
+            const elTotalOmset = document.getElementById('bentoTopProdTotalOmset');
+            if (elTotalOmset) elTotalOmset.textContent = 'Rp 0';
+            return;
+        }
+
+        // Sort items
+        items.sort((a, b) => (b[currentProductSort] || 0) - (a[currentProductSort] || 0));
+
+        // Slice to Top 5
+        const top5 = items.slice(0, 5);
+        const maxVal = Math.max(...top5.map(it => it[currentProductSort] || 0), 1);
+        const totalQty = top5.reduce((acc, it) => acc + (it.qty || 0), 0);
+        const totalOmset = top5.reduce((acc, it) => acc + (it.omset || 0), 0);
 
         let html = '';
-        items.forEach((item, idx) => {
+        top5.forEach((item, idx) => {
             const rank = idx + 1;
-            const val = item[sortKey] || 0;
+            const val = item[currentProductSort] || 0;
             const pct = Math.max(8, Math.round((val / maxVal) * 100));
             const rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''));
             const rankLabel = rank === 1 ? '★ #1' : `#${rank}`;
             
-            const primaryText = sortKey === 'qty' 
+            const primaryText = currentProductSort === 'qty' 
                 ? `${(item.qty || 0).toLocaleString('id-ID')} <span style="font-size:10px; font-weight:500; color:#64748B;">Unit</span>`
                 : `Rp ${(item.omset || 0).toLocaleString('id-ID')}`;
                 
-            const secondaryText = sortKey === 'qty'
+            const secondaryText = currentProductSort === 'qty'
                 ? `Rp ${(item.omset || 0).toLocaleString('id-ID')}`
                 : `${(item.qty || 0).toLocaleString('id-ID')} Unit Terjual`;
 
@@ -1506,7 +1805,7 @@ $total_top_omset = array_sum(array_column($top_products, 'omset'));
         initRevenueChart();
         initSessionsChart();
         renderTreemap(activeTreemapPeriod);
-        renderProductLeaderboard(currentProductSort);
+        renderFilteredProducts();
     }
 
     window.addEventListener('load', initAllBento);
@@ -1514,7 +1813,7 @@ $total_top_omset = array_sum(array_column($top_products, 'omset'));
         initRevenueChart();
         initSessionsChart();
         renderTreemap(activeTreemapPeriod);
-        renderProductLeaderboard(currentProductSort);
+        renderFilteredProducts();
     });
 
     if (window.ResizeObserver) {
@@ -1522,7 +1821,7 @@ $total_top_omset = array_sum(array_column($top_products, 'omset'));
             initRevenueChart();
             initSessionsChart();
             renderTreemap(activeTreemapPeriod);
-            renderProductLeaderboard(currentProductSort);
+            renderFilteredProducts();
         });
         const root = document.querySelector('.bento-root');
         if (root) ro.observe(root);
