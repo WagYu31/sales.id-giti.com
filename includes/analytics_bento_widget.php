@@ -76,14 +76,14 @@ if (count($daily_series) < 5) {
 }
 
 // 4. Real Customer Categories for Treemap & Card 2 Legend
-$categories_treemap = [];
 $colors_map = [
-    'DEALER'    => '#06B6D4', // Cyan
-    'USER'      => '#3B82F6', // Blue
-    'INSTALLER' => '#8B5CF6', // Purple
-    'PROJECT'   => '#EF4444', // Red
-    'RETAIL'    => '#F59E0B', // Amber
-    'UMUM'      => '#10B981'  // Emerald
+    'UMUM'          => '#10B981', // Emerald Green
+    'DEALER'        => '#06B6D4', // Cyan
+    'USER'          => '#3B82F6', // Blue
+    'INSTALLER'     => '#8B5CF6', // Purple
+    'MASTER DEALER' => '#0EA5E9', // Sky Blue
+    'PROJECT'       => '#EF4444', // Red
+    'RETAIL'        => '#F59E0B'  // Amber
 ];
 $dealer_cnt = 0; $user_cnt = 0; $installer_cnt = 0;
 if (isset($conn)) {
@@ -430,29 +430,225 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     align-self: center;
 }
 
+/* Bento Customer Category Tiles (ISO 9241 Ergonomic Standardized Layout) */
 .bento-treemap-box {
-    position: relative;
-    height: 200px;
-    margin-top: 12px;
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
     width: 100%;
+    height: 220px;
+    box-sizing: border-box;
+    position: relative;
 }
 
+/* 5 categories grid (Default Live Production Layout) */
+.bento-treemap-box.grid-5 {
+    grid-template-columns: 1.65fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+.bento-treemap-box.grid-5 .bento-tile-0 {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+}
+
+/* 4 categories grid */
+.bento-treemap-box.grid-4 {
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+}
+.bento-treemap-box.grid-4 .bento-tile-0 {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+}
+
+/* 3 categories grid */
+.bento-treemap-box.grid-3 {
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+.bento-treemap-box.grid-3 .bento-tile-0 {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+}
+
+/* 2 categories grid */
+.bento-treemap-box.grid-2 {
+    grid-template-columns: 1.4fr 1fr;
+    grid-template-rows: 1fr;
+}
+
+/* 1 category grid */
+.bento-treemap-box.grid-1 {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+}
+
+/* 6+ categories grid */
+.bento-treemap-box.grid-more {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-rows: auto;
+    height: auto;
+    min-height: 220px;
+}
+
+/* Tile Base */
 .bento-treemap-tile {
-    position: absolute;
-    border-radius: 12px;
-    padding: 10px 12px;
+    position: relative;
+    border-radius: 14px;
+    padding: 12px 14px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     box-sizing: border-box;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.25, 1);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    min-width: 0;
+}
+
+.bento-treemap-tile::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 70%);
+    pointer-events: none;
 }
 
 .bento-treemap-tile:hover {
-    filter: brightness(1.08);
-    transform: scale(0.99);
+    filter: brightness(1.06);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+    z-index: 5;
+}
+
+.bento-tile-hero {
+    padding: 18px 20px;
+}
+
+.bento-tile-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+}
+
+.bento-tile-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+.bento-tile-hero .bento-tile-title {
+    font-size: 13px;
+    letter-spacing: 0.05em;
+}
+
+.bento-tile-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.32);
+    color: #FFFFFF;
+    padding: 2px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+    flex-shrink: 0;
+}
+
+.bento-tile-hero .bento-tile-badge {
+    font-size: 11px;
+    padding: 3px 9px;
+    background: rgba(0, 0, 0, 0.38);
+}
+
+.bento-tile-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.bento-tile-val-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.bento-hero-val {
+    font-family: 'Geist Mono', monospace;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.bento-sub-val {
+    font-family: 'Geist Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.01em;
+}
+
+.bento-tile-unit {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+.bento-hero-sub {
+    font-size: 10.5px;
+    opacity: 0.78;
+    margin-top: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Mobile Responsiveness (ISO Ergonomics: guaranteed touch & readability standards) */
+@media (max-width: 640px) {
+    .bento-treemap-box {
+        height: auto !important;
+        min-height: 280px;
+        gap: 8px;
+    }
+    .bento-treemap-box.grid-5,
+    .bento-treemap-box.grid-4,
+    .bento-treemap-box.grid-3 {
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-rows: auto !important;
+    }
+    .bento-treemap-box .bento-tile-0 {
+        grid-column: 1 / span 2 !important;
+        grid-row: auto !important;
+        min-height: 95px;
+        padding: 14px 16px;
+    }
+    .bento-treemap-tile:not(.bento-tile-0) {
+        min-height: 80px;
+        padding: 10px 12px;
+    }
+    .bento-hero-val {
+        font-size: 26px;
+    }
+    .bento-sub-val {
+        font-size: 18px;
+    }
 }
 
 .bento-radar-box {
@@ -932,55 +1128,10 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
         renderTreemap(periodIdx);
     };
 
-    function squarifyTreemap(items, x, y, w, h) {
-        const total = items.reduce((a, b) => a + b.v, 0) || 1;
-        const scale = (w * h) / total;
-        const out = [];
-        let rest = items.map(i => ({ ...i, a: i.v * scale }));
-        const worst = (row, len) => {
-            const s = row.reduce((a, b) => a + b.a, 0);
-            const mx = Math.max(...row.map(r => r.a));
-            const mn = Math.min(...row.map(r => r.a));
-            return Math.max((len * len * mx) / (s * s), (s * s) / (len * len * mn));
-        };
-        while (rest.length) {
-            const len = Math.min(w, h);
-            const row = [rest[0]];
-            let i = 1;
-            while (i < rest.length && worst([...row, rest[i]], len) <= worst(row, len)) row.push(rest[i++]);
-            rest = rest.slice(i);
-            const s = row.reduce((a, b) => a + b.a, 0);
-            if (w >= h) {
-                const cw = s / h;
-                let cy = y;
-                for (const r of row) {
-                    const rh = r.a / cw;
-                    out.push({ ...r, x, y: cy, w: cw, h: rh });
-                    cy += rh;
-                }
-                x += cw;
-                w -= cw;
-            } else {
-                const rh = s / w;
-                let cx = x;
-                for (const r of row) {
-                    const rw = r.a / rh;
-                    out.push({ ...r, x: cx, y: y, w: rw, h: rh });
-                    cx += rw;
-                }
-                y += rh;
-                h -= rh;
-            }
-        }
-        return out;
-    }
-
     function renderTreemap(periodIdx = 0) {
         const container = document.getElementById('bentoTreemapContainer');
         if (!container) return;
 
-        const W = container.clientWidth || 550;
-        const H = container.clientHeight || 200;
         const items = categoriesData.map(c => ({
             name: c.name,
             color: c.color,
@@ -988,51 +1139,37 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
             v: c.values[periodIdx]
         })).sort((a, b) => b.v - a.v);
 
-        const total = items.reduce((a, b) => a + b.v, 0);
-        const rects = squarifyTreemap(items, 0, 0, W, H);
+        const total = items.reduce((a, b) => a + b.v, 0) || 1;
+        const count = items.length;
 
-        container.innerHTML = rects.map(r => {
+        // Apply ISO 9241 layout grid class
+        container.className = 'bento-treemap-box ' + (count <= 5 ? ('grid-' + count) : 'grid-more');
+
+        container.innerHTML = items.map((r, idx) => {
             const share = ((r.v / total) * 100).toFixed(1) + '%';
             const textColor = r.ink === 'light' ? '#FFFFFF' : '#0F172A';
-            const tileW = Math.max(10, Math.round(r.w) - 6);
-            const tileH = Math.max(10, Math.round(r.h) - 6);
-            const isCompact = tileW < 80 || tileH < 65;
-            const isMicro = tileW < 45 || tileH < 45;
+            const isHero = (idx === 0);
 
             return `
-                <div class="bento-treemap-tile" style="
-                    left: ${Math.round(r.x)}px;
-                    top: ${Math.round(r.y)}px;
-                    width: ${tileW}px;
-                    height: ${tileH}px;
+                <div class="bento-treemap-tile bento-tile-${idx} ${isHero ? 'bento-tile-hero' : ''}" style="
                     background: ${r.color};
                     color: ${textColor};
-                    padding: ${isCompact ? '6px 8px' : '10px 12px'};
                 " onmousemove="window.bentoTipHover(event, '${r.name}', '${r.v.toLocaleString('id-ID')} Toko', '${share}', '${r.color}')" onmouseleave="window.bentoTipLeave()">
-                    <div style="
-                        font-size: ${isCompact ? '9.5px' : '11px'};
-                        font-weight: 700;
-                        text-transform: uppercase;
-                        letter-spacing: 0.02em;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        width: 100%;
-                    ">
-                        ${r.name}
+                    <div class="bento-tile-top">
+                        <div class="bento-tile-title" title="${r.name}">
+                            ${isHero ? '<span style="opacity:0.85; margin-right:4px;">★</span>' : ''}${r.name}
+                        </div>
+                        <div class="bento-tile-badge">${share}</div>
                     </div>
-                    ${!isMicro ? `
-                        <div class="d-flex align-items-end justify-content-between gap-1" style="overflow: hidden; width: 100%;">
-                            <span style="font-family:'Geist Mono', monospace; font-size: ${isCompact ? '13px' : '17px'}; font-weight: 700; line-height: 1; white-space: nowrap;">
+                    <div class="bento-tile-bottom">
+                        <div class="bento-tile-val-wrap">
+                            <span class="${isHero ? 'bento-hero-val' : 'bento-sub-val'}">
                                 ${r.v.toLocaleString('id-ID')}
                             </span>
-                            ${!isCompact ? `
-                                <span style="font-size: 9.5px; background: rgba(0,0,0,0.45); color:#fff; padding: 2px 5px; border-radius: 5px; font-weight: 600; white-space: nowrap;">
-                                    ${share}
-                                </span>
-                            ` : ''}
+                            <span class="bento-tile-unit">Toko</span>
                         </div>
-                    ` : ''}
+                        ${isHero ? '<div class="bento-hero-sub d-none d-sm-block">Kategori Terbesar (Pangsa Pasar Utama)</div>' : ''}
+                    </div>
                 </div>
             `;
         }).join('');
