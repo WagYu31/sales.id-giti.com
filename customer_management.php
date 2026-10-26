@@ -483,6 +483,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 
 <?php include 'includes/announcement_widget.php'; ?>
 <?php // include 'includes/competition_unified_tabs.php'; // Dinonaktifkan: Program kompetisi per semester & bonus sultan telah selesai ?>
+<?php include 'includes/analytics_bento_widget.php'; ?>
 
 <!-- 3 Stat Cards -->
 <div class="stats-grid">
