@@ -5,7 +5,16 @@
  * 1. Bonus Sultan Loewix (Kompetisi 1 Bulan)
  * 2. Program Per Semester (Sirkuit Lari 3 Bulan)
  * Menjadi satu panel kontrol yang rapi, compact, dan modern.
+ *
+ * STATUS: NONAKTIF (Program kompetisi telah selesai)
+ * Ubah $IS_COMPETITION_ACTIVE = true jika ingin mengaktifkan kembali atau memulai kompetisi baru.
  */
+
+$IS_COMPETITION_ACTIVE = false;
+
+if (!$IS_COMPETITION_ACTIVE) {
+    return;
+}
 ?>
 <style>
 /* Competition Unified Tab Navigation */

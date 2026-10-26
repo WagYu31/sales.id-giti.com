@@ -482,7 +482,7 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
 </div>
 
 <?php include 'includes/announcement_widget.php'; ?>
-<?php include 'includes/competition_unified_tabs.php'; ?>
+<?php // include 'includes/competition_unified_tabs.php'; // Dinonaktifkan: Program kompetisi per semester & bonus sultan telah selesai ?>
 
 <!-- 3 Stat Cards -->
 <div class="stats-grid">
