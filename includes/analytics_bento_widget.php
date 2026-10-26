@@ -662,7 +662,9 @@ $new_cust_val   = isset($thisMonthNew) ? (int)$thisMonthNew : 0;
         { name: "Project Integrator", color: "#EF4444", ink: "light", values: [120, 510, 6200] }
     ];
 
+    let activeTreemapPeriod = 0;
     window.switchBentoPeriod = function(periodIdx, btn) {
+        activeTreemapPeriod = periodIdx;
         document.querySelectorAll('.bento-card-bottom .bento-seg-btn').forEach(b => {
             if (b.parentElement === btn.parentElement) b.classList.remove('active');
         });
@@ -703,7 +705,7 @@ $new_cust_val   = isset($thisMonthNew) ? (int)$thisMonthNew : 0;
                 let cx = x;
                 for (const r of row) {
                     const rw = r.a / rh;
-                    out.push({ ...r, x, y: cy, w: rw, h: rh });
+                    out.push({ ...r, x: cx, y: y, w: rw, h: rh });
                     cx += rw;
                 }
                 y += rh;
@@ -864,7 +866,7 @@ $new_cust_val   = isset($thisMonthNew) ? (int)$thisMonthNew : 0;
     window.addEventListener('resize', () => {
         initRevenueChart();
         initSessionsChart();
-        renderTreemap(0);
+        renderTreemap(activeTreemapPeriod);
         renderRadar(activeRadarYear);
     });
 
