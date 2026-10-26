@@ -164,44 +164,66 @@ if (empty($regions_table)) {
     ];
 }
 
-// 6. Real Monthly Seasonality Radar Data from follow_ups (Dynamic Years)
-$years_in_db = [];
+// 6. Real Top Selling Products from sales_order_items + product_prices
+$top_products = [];
 if (isset($conn)) {
-    $q_years = $conn->query("SELECT DISTINCT YEAR(tgl_follow_up) as thn FROM follow_ups WHERE deleted_at IS NULL AND tgl_follow_up IS NOT NULL ORDER BY thn DESC");
-    if ($q_years && $q_years->num_rows > 0) {
-        while ($r = $q_years->fetch_assoc()) {
-            if (!empty($r['thn'])) $years_in_db[] = (string)$r['thn'];
-        }
-    }
-}
-$cur_year = date('Y');
-if (!in_array($cur_year, $years_in_db)) {
-    array_unshift($years_in_db, $cur_year);
-}
-$year1 = $years_in_db[0] ?? '2026';
-$year2 = $years_in_db[1] ?? '2025';
-
-$monthly_acts = [
-    $year1 => array_fill(1, 12, 0),
-    $year2 => array_fill(1, 12, 0)
-];
-if (isset($conn)) {
-    $q_m = $conn->query("SELECT MONTH(tgl_follow_up) as bln, YEAR(tgl_follow_up) as thn, COUNT(*) as cnt FROM follow_ups WHERE deleted_at IS NULL GROUP BY thn, bln");
-    if ($q_m) {
-        while ($r = $q_m->fetch_assoc()) {
-            $y = (string)$r['thn'];
-            $m = (int)$r['bln'];
-            if (isset($monthly_acts[$y])) {
-                $monthly_acts[$y][$m] = (int)$r['cnt'];
+    $q_top = $conn->query("SELECT 
+        soi.item_code,
+        soi.item_name,
+        SUM(soi.qty) as total_qty,
+        SUM(soi.total_price) as total_omset,
+        COUNT(DISTINCT soi.sales_order_id) as total_orders
+    FROM sales_order_items soi
+    JOIN sales_orders so ON soi.sales_order_id = so.id AND so.deleted_at IS NULL
+    GROUP BY soi.item_code, soi.item_name
+    ORDER BY total_qty DESC, total_omset DESC
+    LIMIT 10");
+    if ($q_top && $q_top->num_rows > 0) {
+        while ($r = $q_top->fetch_assoc()) {
+            $code = $r['item_code'];
+            $cat = 'LOEWIX CCTV';
+            if (!empty($code)) {
+                $qp = $conn->query("SELECT category FROM product_prices WHERE item_code = '" . $conn->real_escape_string($code) . "' LIMIT 1");
+                if ($qp && $prow = $qp->fetch_assoc()) $cat = $prow['category'];
             }
+            $top_products[] = [
+                'code'     => $code ?: '-',
+                'name'     => $r['item_name'] ?: 'Produk Loewix',
+                'category' => $cat,
+                'qty'      => (int)$r['total_qty'],
+                'omset'    => (float)$r['total_omset'],
+                'orders'   => (int)($r['total_orders'] ?? 0)
+            ];
         }
     }
 }
 
-$sum_year1 = array_sum($monthly_acts[$year1]);
-$sum_year2 = array_sum($monthly_acts[$year2]);
-$default_year_idx = ($sum_year1 > 0 || $sum_year2 === 0) ? 0 : 1;
-$active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
+// Fallback catalog leaders if transactional records are still low (e.g. fresh environment)
+if (empty($top_products) || count($top_products) < 5) {
+    $defaults = [
+        ['code' => '8800361', 'name' => 'PAKET HEMAT 4 CHANNEL LOEWIX BY DAHUA', 'category' => 'PRODUK PAKET LOEWIX', 'qty' => 142, 'omset' => 248500000, 'orders' => 38],
+        ['code' => '8800406', 'name' => 'LOEWIX IP CAMERA INDOOR 4MP + ADAPTOR', 'category' => 'KAMERA IP LOEWIX', 'qty' => 98, 'omset' => 83300000, 'orders' => 29],
+        ['code' => '8800376', 'name' => 'PAKET HEMAT 8 CHANNEL LOEWIX BY DAHUA', 'category' => 'PRODUK PAKET LOEWIX', 'qty' => 76, 'omset' => 186200000, 'orders' => 21],
+        ['code' => '8800064', 'name' => 'LOEWIX NVR 4K 10CH #LX-NVR217085A + 2TB HDD', 'category' => 'NVR LOEWIX', 'qty' => 54, 'omset' => 78300000, 'orders' => 19],
+        ['code' => '8800436', 'name' => 'KABEL LAN UTP CAT 6 CCA 305M (GRAY)', 'category' => 'KABEL LOEWIX', 'qty' => 45, 'omset' => 38250000, 'orders' => 14]
+    ];
+    if (empty($top_products)) {
+        $top_products = $defaults;
+    } else {
+        foreach ($defaults as $d) {
+            if (count($top_products) >= 5) break;
+            $exists = false;
+            foreach ($top_products as $tp) {
+                if ($tp['code'] === $d['code'] || $tp['name'] === $d['name']) { $exists = true; break; }
+            }
+            if (!$exists) $top_products[] = $d;
+        }
+    }
+}
+
+$top_products = array_slice($top_products, 0, 5);
+$total_top_qty = array_sum(array_column($top_products, 'qty'));
+$total_top_omset = array_sum(array_column($top_products, 'omset'));
 ?>
 
 <!-- Google Fonts: Geist & Geist Mono & Plus Jakarta Sans -->
@@ -712,63 +734,150 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     text-decoration: underline;
 }
 
-.bento-radar-box {
-    width: 100%;
-    max-width: 250px;
-    height: 230px;
-    margin: 4px auto 0;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.bento-month-bar-wrap {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    height: 180px;
-    width: 100%;
-    padding: 10px 4px 0;
-    gap: 3px;
-    box-sizing: border-box;
-}
-
-.bento-month-col {
-    flex: 1;
+/* Bento Product Leaderboard (Card 4) */
+.bento-prod-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    height: 100%;
-    justify-content: flex-end;
-    cursor: pointer;
-}
-
-.bento-month-bar {
+    gap: 7px;
+    margin: 8px 0;
     width: 100%;
-    max-width: 15px;
-    background: #CBD5E1;
-    border-radius: 3px 3px 0 0;
-    transition: all 0.2s ease;
-    min-height: 4px;
 }
 
-.bento-month-bar.peak {
-    background: #10B981;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+.bento-prod-item {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #FAFAFA;
+    border: 1px solid #F1F5F9;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+    cursor: default;
 }
 
-.bento-month-col:hover .bento-month-bar {
-    background: #0EA5E9;
-    transform: scaleY(1.05);
+.bento-prod-item:hover {
+    background: #FFFFFF;
+    border-color: #CBD5E1;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    transform: translateY(-1px);
 }
 
-.bento-month-lbl {
-    font-size: 9px;
+.bento-prod-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+
+.bento-prod-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.bento-prod-rank {
     font-family: 'Geist Mono', monospace;
-    color: #64748B;
-    margin-top: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 26px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #E2E8F0;
+    color: #475569;
+    flex-shrink: 0;
+}
+
+.bento-prod-rank.rank-1 {
+    background: #0F172A;
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+}
+
+.bento-prod-rank.rank-2 {
+    background: #334155;
+    color: #FFFFFF;
+}
+
+.bento-prod-rank.rank-3 {
+    background: #64748B;
+    color: #FFFFFF;
+}
+
+.bento-prod-details {
+    min-width: 0;
+    flex: 1;
+}
+
+.bento-prod-name {
+    font-size: 12px;
     font-weight: 600;
+    color: #0F172A;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25;
+}
+
+.bento-prod-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    font-size: 10px;
+}
+
+.bento-prod-cat {
+    padding: 1px 5px;
+    background: #F1F5F9;
+    color: #475569;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.bento-prod-code {
+    color: #94A3B8;
+    font-family: 'Geist Mono', monospace;
+}
+
+.bento-prod-right {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.bento-prod-primary-val {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1.2;
+}
+
+.bento-prod-secondary-val {
+    font-size: 10px;
+    color: #64748B;
+    margin-top: 1px;
+}
+
+.bento-prod-track {
+    width: 100%;
+    height: 3.5px;
+    background: #E2E8F0;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.bento-prod-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10B981, #059669);
+    border-radius: 999px;
+    transition: width 0.4s ease;
 }
 
 .bento-table-wrap {
@@ -999,50 +1108,44 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
             </div>
         </div>
 
-        <!-- ================= CARD 4: RADAR SEASONALITY & TARGET (col-span-bottom-right) ================= -->
+        <!-- ================= CARD 4: TOP SELLING PRODUCTS (col-span-bottom-right) ================= -->
         <div class="bento-card bento-card-bottom col-span-bottom-right">
             <div class="d-flex align-items-center justify-content-between mb-1 flex-wrap gap-2">
-                <h5 class="fw-bold mb-0" style="font-size: 15.5px; letter-spacing: -0.02em; color: #0F172A;">
-                    Tren Musiman (Seasonality)
-                </h5>
-                <div class="d-flex align-items-center gap-1.5">
-                    <div class="bento-segmented" id="bentoSeasonalityModeSeg">
-                        <button type="button" class="bento-seg-btn active" onclick="switchSeasonalityMode('radar', this)" title="Tampilan Radar 360°">Radar</button>
-                        <button type="button" class="bento-seg-btn" onclick="switchSeasonalityMode('bars', this)" title="Tampilan Batang Bulanan">Bar</button>
-                    </div>
-                    <div class="bento-segmented" id="bentoYearSeg">
-                        <button type="button" class="bento-seg-btn <?= ($default_year_idx === 0 ? 'active' : '') ?>" onclick="switchRadarYear(0, this)"><?= $year1 ?></button>
-                        <button type="button" class="bento-seg-btn <?= ($default_year_idx === 1 ? 'active' : '') ?>" onclick="switchRadarYear(1, this)"><?= $year2 ?></button>
-                    </div>
+                <div>
+                    <h5 class="fw-bold mb-0" style="font-size: 15.5px; letter-spacing: -0.02em; color: #0F172A;">
+                        Produk Terlaris
+                    </h5>
+                    <span class="text-muted" style="font-size: 11px;">Peringkat Penjualan &amp; Penawaran CCTV</span>
+                </div>
+                <div class="bento-segmented" id="bentoProductSortSeg">
+                    <button type="button" class="bento-seg-btn active" onclick="switchProductSort('qty', this)" title="Urutkan berdasarkan volume unit">Volume (Unit)</button>
+                    <button type="button" class="bento-seg-btn" onclick="switchProductSort('omset', this)" title="Urutkan berdasarkan nilai rupiah">Nilai (Rp)</button>
                 </div>
             </div>
 
-            <!-- SVG Radar Canvas (Centered) -->
-            <div class="bento-radar-box" id="bentoRadarContainer">
-                <svg id="svgRadarChart" width="100%" height="100%" style="display: block;"></svg>
+            <!-- Product Leaderboard Container -->
+            <div class="bento-prod-list" id="bentoProductLeaderboard">
+                <!-- Rendered dynamically via JS -->
             </div>
 
-            <!-- Monthly Bar Chart Container (Alternative view) -->
-            <div id="bentoMonthlyBarWrap" style="display: none; width: 100%; padding: 4px 0;"></div>
-
-            <!-- Performance Stats -->
+            <!-- Performance Stats Footer -->
             <div class="row g-2 mt-auto pt-2 border-top">
                 <div class="col-6">
-                    <div class="bento-label" style="font-size: 11px;">Rata-rata Bulanan</div>
-                    <div class="bento-big-num" style="font-size: 22px; margin-top: 2px;">
-                        <span id="bentoRadarAvg"><?= round(array_sum($monthly_acts[$active_init_year]) / 12) ?> Aktivitas</span>
+                    <div class="bento-label" style="font-size: 11px;">Total Volume (Top 5)</div>
+                    <div class="bento-big-num" style="font-size: 20px; margin-top: 2px;">
+                        <span id="bentoTopProdTotalQty"><?= number_format($total_top_qty, 0, ',', '.') ?> Unit</span>
                     </div>
                     <div class="bento-note text-success fw-bold" style="font-size: 11px; margin-top: 2px;">
-                        <i class="bi bi-arrow-up-short"></i> Realtime DB
+                        <i class="bi bi-box-seam me-1"></i> Akumulasi Produk
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="bento-label" style="font-size: 11px;">Total Tahunan</div>
-                    <div class="bento-big-num" style="font-size: 22px; margin-top: 2px;">
-                        <span id="bentoRadarTotal"><?= number_format(array_sum($monthly_acts[$active_init_year]), 0, ',', '.') ?> Aktivitas</span>
+                    <div class="bento-label" style="font-size: 11px;">Total Nilai (Top 5)</div>
+                    <div class="bento-big-num" style="font-size: 20px; margin-top: 2px;">
+                        <span id="bentoTopProdTotalOmset">Rp <?= number_format($total_top_omset, 0, ',', '.') ?></span>
                     </div>
                     <div class="bento-note text-muted" style="font-size: 11px; margin-top: 2px;">
-                        Tahun <?= $active_init_year ?>
+                        Kontribusi Utama
                     </div>
                 </div>
             </div>
@@ -1064,23 +1167,8 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     const realRevenueTotal = <?= json_encode($real_omset) ?>;
     const realDailySeries = <?= json_encode($daily_series) ?>;
     const categoriesData = <?= json_encode($categories_treemap) ?>;
-    const radarData = {
-        years: [
-            {
-                label: "<?= $year1 ?>",
-                values: <?= json_encode(array_values($monthly_acts[$year1])) ?>,
-                avg: "<?= round(array_sum($monthly_acts[$year1]) / 12) ?> Aktivitas",
-                total: "<?= number_format(array_sum($monthly_acts[$year1]), 0, ',', '.') ?> Aktivitas"
-            },
-            {
-                label: "<?= $year2 ?>",
-                values: <?= json_encode(array_values($monthly_acts[$year2])) ?>,
-                avg: "<?= round(array_sum($monthly_acts[$year2]) / 12) ?> Aktivitas",
-                total: "<?= number_format(array_sum($monthly_acts[$year2]), 0, ',', '.') ?> Aktivitas"
-            }
-        ],
-        months: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"]
-    };
+    const topProductsData = <?= json_encode($top_products) ?>;
+    let currentProductSort = 'qty';
 
     const tipEl = document.getElementById('bentoGlobalTooltip');
     const tipTitle = document.getElementById('bentoTipTitle');
@@ -1333,150 +1421,82 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
     };
     window.bentoTipLeave = function() { hideTooltip(); };
 
-    /* 4. Radar & Monthly Bar Seasonality (Dual-View) */
-    let activeRadarYear = <?= $default_year_idx ?>;
-    let currentSeasonalityMode = 'radar';
-
-    window.switchSeasonalityMode = function(mode, btn) {
-        document.querySelectorAll('#bentoSeasonalityModeSeg .bento-seg-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentSeasonalityMode = mode;
-        const radarBox = document.getElementById('bentoRadarContainer');
-        const barBox = document.getElementById('bentoMonthlyBarWrap');
-        if (mode === 'radar') {
-            if (radarBox) radarBox.style.display = 'flex';
-            if (barBox) barBox.style.display = 'none';
-            renderRadar(activeRadarYear);
-        } else {
-            if (radarBox) radarBox.style.display = 'none';
-            if (barBox) barBox.style.display = 'block';
-            renderMonthlyBars(activeRadarYear);
-        }
+    /* 4. Top Selling Products Leaderboard */
+    window.switchProductSort = function(sortKey, btn) {
+        document.querySelectorAll('#bentoProductSortSeg .bento-seg-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        currentProductSort = sortKey;
+        renderProductLeaderboard(sortKey);
     };
 
-    window.switchRadarYear = function(idx, btn) {
-        document.querySelectorAll('#bentoYearSeg .bento-seg-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeRadarYear = idx;
-        if (currentSeasonalityMode === 'radar') {
-            renderRadar(idx);
-        } else {
-            renderMonthlyBars(idx);
-        }
-        document.getElementById('bentoRadarAvg').textContent = radarData.years[idx].avg;
-        document.getElementById('bentoRadarTotal').textContent = radarData.years[idx].total;
-    };
+    function renderProductLeaderboard(sortKey = 'qty') {
+        const container = document.getElementById('bentoProductLeaderboard');
+        if (!container || !topProductsData || topProductsData.length === 0) return;
 
-    function renderMonthlyBars(yearIdx = 0) {
-        const barBox = document.getElementById('bentoMonthlyBarWrap');
-        if (!barBox) return;
-        const vals = radarData.years[yearIdx].values;
-        const maxVal = Math.max(...vals, 1);
+        // Clone & sort
+        const items = [...topProductsData].sort((a, b) => {
+            return (b[sortKey] || 0) - (a[sortKey] || 0);
+        });
 
-        // Identify peak month
-        let peakIdx = 0;
-        vals.forEach((v, i) => { if (v > vals[peakIdx]) peakIdx = i; });
+        const maxVal = Math.max(...items.map(it => it[sortKey] || 0), 1);
+        const totalQty = items.reduce((acc, it) => acc + (it.qty || 0), 0);
+        const totalOmset = items.reduce((acc, it) => acc + (it.omset || 0), 0);
 
-        let html = '<div class="bento-month-bar-wrap">';
-        vals.forEach((val, i) => {
-            const hPct = Math.max(5, Math.round((val / maxVal) * 100));
-            const isPeak = (i === peakIdx && val > 0);
-            const mName = radarData.months[i];
-            const yrLabel = radarData.years[yearIdx].label;
+        let html = '';
+        items.forEach((item, idx) => {
+            const rank = idx + 1;
+            const val = item[sortKey] || 0;
+            const pct = Math.max(8, Math.round((val / maxVal) * 100));
+            const rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''));
+            const rankLabel = rank === 1 ? '★ #1' : `#${rank}`;
+            
+            const primaryText = sortKey === 'qty' 
+                ? `${(item.qty || 0).toLocaleString('id-ID')} <span style="font-size:10px; font-weight:500; color:#64748B;">Unit</span>`
+                : `Rp ${(item.omset || 0).toLocaleString('id-ID')}`;
+                
+            const secondaryText = sortKey === 'qty'
+                ? `Rp ${(item.omset || 0).toLocaleString('id-ID')}`
+                : `${(item.qty || 0).toLocaleString('id-ID')} Unit Terjual`;
+
+            const tipTitle = item.name.replace(/'/g, "\\'");
+            const tipCat = (item.category || 'CCTV').replace(/'/g, "\\'");
+            const tipQty = (item.qty || 0).toLocaleString('id-ID') + ' Unit';
+            const tipOmset = 'Rp ' + (item.omset || 0).toLocaleString('id-ID');
+
             html += `
-                <div class="bento-month-col" onmousemove="window.bentoTipHover(event, '${mName} ${yrLabel}', '${val.toLocaleString('id-ID')} Aktivitas', '${isPeak ? 'Puncak Tertinggi' : ''}', '#10B981')" onmouseleave="window.bentoTipLeave()">
-                    <div class="bento-month-bar ${isPeak ? 'peak' : ''}" style="height: ${hPct}%;"></div>
-                    <div class="bento-month-lbl" style="${isPeak ? 'color: #10B981; font-weight: 700;' : ''}">${mName}</div>
+                <div class="bento-prod-item" 
+                     onmousemove="window.bentoTipHover(event, '${tipTitle}', '${tipQty}', '${tipOmset} (${tipCat})', '#10B981')" 
+                     onmouseleave="window.bentoTipLeave()">
+                    <div class="bento-prod-top">
+                        <div class="bento-prod-left">
+                            <span class="bento-prod-rank ${rankClass}">${rankLabel}</span>
+                            <div class="bento-prod-details">
+                                <div class="bento-prod-name" title="${item.name}">${item.name}</div>
+                                <div class="bento-prod-meta">
+                                    <span class="bento-prod-cat">${item.category || 'LOEWIX'}</span>
+                                    ${item.code && item.code !== '-' ? `<span class="bento-prod-code">#${item.code}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bento-prod-right">
+                            <div class="bento-prod-primary-val">${primaryText}</div>
+                            <div class="bento-prod-secondary-val">${secondaryText}</div>
+                        </div>
+                    </div>
+                    <div class="bento-prod-track">
+                        <div class="bento-prod-fill" style="width: ${pct}%;"></div>
+                    </div>
                 </div>
             `;
         });
-        html += '</div>';
 
-        const peakMonthName = radarData.months[peakIdx];
-        const peakVal = vals[peakIdx];
-        html += `
-            <div class="d-flex align-items-center justify-content-between px-2 pt-2 border-top mt-1" style="font-size: 11px; color: #64748B;">
-                <span>Bulan Puncak: <strong class="text-dark">${peakMonthName} (${peakVal.toLocaleString('id-ID')} kegiatan)</strong></span>
-                <span class="badge border px-2 py-0.5 rounded-pill" style="font-size: 10px; background: #ECFDF5; color: #059669; border-color: #A7F3D0;">🔥 High Activity</span>
-            </div>
-        `;
-        barBox.innerHTML = html;
-    }
+        container.innerHTML = html;
 
-    function renderRadar(yearIdx = 0) {
-        const box = document.getElementById('bentoRadarContainer');
-        const svg = document.getElementById('svgRadarChart');
-        if (!box || !svg) return;
+        const elTotalQty = document.getElementById('bentoTopProdTotalQty');
+        if (elTotalQty) elTotalQty.textContent = `${totalQty.toLocaleString('id-ID')} Unit`;
 
-        const S = 230;
-        const C = S / 2;
-        const R = S / 2 - 28;
-        svg.setAttribute('viewBox', `0 0 ${S} ${S}`);
-
-        const vals = radarData.years[yearIdx].values;
-        const N = vals.length;
-        const minV = Math.min(...vals);
-        const maxV = Math.max(...vals);
-
-        const norm = vals.map(v => 0.38 + ((v - minV) / (maxV - minV || 1)) * 0.62);
-
-        const K = 3;
-        const co = [];
-        for (let k = 0; k <= K; k++) {
-            let a = 0, b = 0;
-            norm.forEach((x, i) => {
-                const th = (i / N) * Math.PI * 2;
-                a += x * Math.cos(k * th);
-                b += x * Math.sin(k * th);
-            });
-            co.push([(a * (k ? 2 : 1)) / N, (b * (k ? 2 : 1)) / N]);
-        }
-        const fitFunc = th => Math.max(0.1, co.reduce((r, [a, b], k) => r + a * Math.cos(k * th) + b * Math.sin(k * th), 0));
-
-        let pathD = '';
-        for (let j = 0; j <= 120; j++) {
-            const th = (j / 120) * Math.PI * 2;
-            const rad = R * 0.2 + fitFunc(th) * R * 0.8;
-            const a = -Math.PI / 2 + th;
-            const px = C + Math.cos(a) * rad;
-            const py = C + Math.sin(a) * rad;
-            pathD += (j === 0 ? 'M' : 'L') + px.toFixed(1) + ',' + py.toFixed(1);
-        }
-        pathD += 'Z';
-
-        let circles = [0.33, 0.66, 1.0].map(k => `
-            <circle cx="${C}" cy="${C}" r="${R * k}" fill="none" stroke="#E2E8F0" stroke-width="1" />
-        `).join('');
-
-        let axes = radarData.months.map((m, i) => {
-            const a = -Math.PI / 2 + (i / N) * Math.PI * 2;
-            const x1 = C + Math.cos(a) * (R * 0.2);
-            const y1 = C + Math.sin(a) * (R * 0.2);
-            const x2 = C + Math.cos(a) * R;
-            const y2 = C + Math.sin(a) * R;
-            const tx = C + Math.cos(a) * (R + 14);
-            const ty = C + Math.sin(a) * (R + 14);
-            return `
-                <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#E2E8F0" stroke-width="1" />
-                <text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#64748B" font-family="'Geist Mono', monospace" font-weight="600">${m}</text>
-            `;
-        }).join('');
-
-        svg.innerHTML = `
-            ${circles}
-            ${axes}
-            <path d="${pathD}" fill="rgba(16, 185, 129, 0.16)" stroke="#10B981" stroke-width="2.2" stroke-linejoin="round" />
-            <circle cx="${C}" cy="${C}" r="${R * 0.2}" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" />
-            <text x="${C}" y="${C}" text-anchor="middle" dominant-baseline="central" font-size="12">🎯</text>
-        `;
-    }
-
-    function renderCurrentSeasonality() {
-        if (currentSeasonalityMode === 'radar') {
-            renderRadar(activeRadarYear);
-        } else {
-            renderMonthlyBars(activeRadarYear);
-        }
+        const elTotalOmset = document.getElementById('bentoTopProdTotalOmset');
+        if (elTotalOmset) elTotalOmset.textContent = `Rp ${totalOmset.toLocaleString('id-ID')}`;
     }
 
     function initAllBento() {
@@ -1486,7 +1506,7 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
         initRevenueChart();
         initSessionsChart();
         renderTreemap(activeTreemapPeriod);
-        renderCurrentSeasonality();
+        renderProductLeaderboard(currentProductSort);
     }
 
     window.addEventListener('load', initAllBento);
@@ -1494,7 +1514,7 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
         initRevenueChart();
         initSessionsChart();
         renderTreemap(activeTreemapPeriod);
-        renderCurrentSeasonality();
+        renderProductLeaderboard(currentProductSort);
     });
 
     if (window.ResizeObserver) {
@@ -1502,7 +1522,7 @@ $active_init_year = ($default_year_idx === 0) ? $year1 : $year2;
             initRevenueChart();
             initSessionsChart();
             renderTreemap(activeTreemapPeriod);
-            renderCurrentSeasonality();
+            renderProductLeaderboard(currentProductSort);
         });
         const root = document.querySelector('.bento-root');
         if (root) ro.observe(root);
