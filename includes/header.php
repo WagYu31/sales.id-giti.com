@@ -597,7 +597,7 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
                     <i class="bi bi-buildings-fill"></i>
                 </span>
-                <span class="nav-link-text">Scraper Krista Interfood</span>
+                <span class="nav-link-text">Scraper Database Pameran</span>
             </a>
 
             <!-- APLIKASI SALES (MOBILE) -->
@@ -656,7 +656,7 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
                     <i class="bi bi-buildings-fill"></i>
                 </span>
-                <span class="nav-link-text">Scraper Krista Interfood</span>
+                <span class="nav-link-text">Scraper Database Pameran</span>
             </a>
 
             <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>">
@@ -804,7 +804,7 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
                     <i class="bi bi-buildings-fill"></i>
                 </span>
-                <span class="nav-link-text">Scraper Krista Interfood</span>
+                <span class="nav-link-text">Scraper Database Pameran</span>
             </a>
 
             <!-- ═════════════════════════════════════════════════════════ -->
