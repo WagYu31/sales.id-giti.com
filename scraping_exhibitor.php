@@ -53,6 +53,22 @@ if ($idx_check && $idx_check->num_rows > 0) {
     $conn->query("ALTER TABLE `krista_exhibitors` DROP INDEX `idx_exhibitor_id`");
 }
 
+// Self-healing migration for contact columns (Phone, Email, Website, Address, City, Province)
+$contact_cols = [
+    'phone' => 'varchar(100) DEFAULT NULL AFTER `booth_number`',
+    'email' => 'varchar(150) DEFAULT NULL AFTER `phone`',
+    'website' => 'varchar(255) DEFAULT NULL AFTER `email`',
+    'address' => 'text DEFAULT NULL AFTER `website`',
+    'city' => 'varchar(100) DEFAULT NULL AFTER `address`',
+    'province' => 'varchar(100) DEFAULT NULL AFTER `city`'
+];
+foreach ($contact_cols as $cname => $cdef) {
+    $chk = $conn->query("SHOW COLUMNS FROM `krista_exhibitors` LIKE '$cname'");
+    if ($chk && $chk->num_rows == 0) {
+        $conn->query("ALTER TABLE `krista_exhibitors` ADD COLUMN `$cname` $cdef");
+    }
+}
+
 // Auto-seed missing records from JSON if count is less than 858
 $curr_cnt = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors WHERE event_name = 'Krista Interfood 2026'")->fetch_assoc()['t'] ?? 0;
 if ($curr_cnt < 858 && file_exists(__DIR__ . '/krista_interfood_exhibitors.json')) {
@@ -61,14 +77,20 @@ if ($curr_cnt < 858 && file_exists(__DIR__ . '/krista_interfood_exhibitors.json'
     if (!empty($json_data)) {
         $stmt_seed = $conn->prepare("
             INSERT INTO `krista_exhibitors` 
-            (`event_name`, `source_url`, `exhibitor_id`, `company_name`, `country`, `booth_number`, `business_activity`, `products`, `lead_type`, `detail_url`, `logo_url`)
-            VALUES ('Krista Interfood 2026', 'https://sialinterfood.com', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (`event_name`, `source_url`, `exhibitor_id`, `company_name`, `country`, `booth_number`, `phone`, `email`, `website`, `address`, `city`, `province`, `business_activity`, `products`, `lead_type`, `detail_url`, `logo_url`)
+            VALUES ('Krista Interfood 2026', 'https://sialinterfood.com', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         foreach ($json_data as $d) {
             $ex_id = $d['id'] ?? null;
             $name = trim($d['company_name'] ?? '');
             $country = trim($d['country'] ?? '');
             $booth = trim($d['booth_number'] ?? '');
+            $phone = trim($d['phone'] ?? '');
+            $email = trim($d['email'] ?? '');
+            $web = trim($d['website'] ?? '');
+            $addr = trim($d['address'] ?? '');
+            $city = trim($d['city'] ?? '');
+            $prov = trim($d['province'] ?? '');
             $activity = trim($d['business_activity'] ?? '');
             $lead_type = trim($d['lead_type'] ?? '');
             $detail_url = trim($d['detail_url'] ?? '');
@@ -80,8 +102,36 @@ if ($curr_cnt < 858 && file_exists(__DIR__ . '/krista_interfood_exhibitors.json'
             $chk->bind_param("i", $ex_id);
             $chk->execute();
             if ($chk->get_result()->num_rows == 0) {
-                $stmt_seed->bind_param("issssssss", $ex_id, $name, $country, $booth, $activity, $prods, $lead_type, $detail_url, $logo);
+                $stmt_seed->bind_param("issssssssssssssss", $ex_id, $name, $country, $booth, $phone, $email, $web, $addr, $city, $prov, $activity, $prods, $lead_type, $detail_url, $logo);
                 $stmt_seed->execute();
+            }
+        }
+    }
+}
+
+// Auto-sync contact details into existing database records if not yet enriched
+$chk_contacts = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors WHERE (phone IS NOT NULL AND phone != '') OR (email IS NOT NULL AND email != '')")->fetch_assoc()['t'] ?? 0;
+if ($chk_contacts < 100 && file_exists(__DIR__ . '/krista_interfood_exhibitors.json')) {
+    $json_raw = file_get_contents(__DIR__ . '/krista_interfood_exhibitors.json');
+    $json_data = json_decode($json_raw, true);
+    if (!empty($json_data)) {
+        $stmt_upd = $conn->prepare("
+            UPDATE `krista_exhibitors` 
+            SET `phone` = ?, `email` = ?, `website` = ?, `address` = ?, `city` = ?, `province` = ?
+            WHERE `exhibitor_id` = ? OR `company_name` = ?
+        ");
+        foreach ($json_data as $d) {
+            $ex_id = $d['id'] ?? 0;
+            $cname = trim($d['company_name'] ?? '');
+            $phone = trim($d['phone'] ?? '');
+            $email = trim($d['email'] ?? '');
+            $web = trim($d['website'] ?? '');
+            $addr = trim($d['address'] ?? '');
+            $city = trim($d['city'] ?? '');
+            $prov = trim($d['province'] ?? '');
+            if ($phone || $email || $web || $addr) {
+                $stmt_upd->bind_param("ssssssis", $phone, $email, $web, $addr, $city, $prov, $ex_id, $cname);
+                $stmt_upd->execute();
             }
         }
     }
@@ -120,6 +170,57 @@ function getCountryFlagBadge($country) {
     return '<span class="country-pill">' . $flag . ' ' . htmlspecialchars($c ?: 'Lainnya') . '</span>';
 }
 
+// Helper: Format Contacts (Phone, WhatsApp, Email, Web, Address)
+function formatContactBadges($phone, $email, $website, $address, $city) {
+    $html = '<div class="d-flex flex-column gap-1 align-items-start">';
+    $has_any = false;
+
+    if (!empty($phone)) {
+        $has_any = true;
+        $clean_num = preg_replace('/[^0-9]/', '', $phone);
+        $is_wa = false;
+        $wa_link = '';
+        if (substr($clean_num, 0, 2) === '08') {
+            $is_wa = true;
+            $wa_link = 'https://wa.me/62' . substr($clean_num, 1);
+        } elseif (substr($clean_num, 0, 3) === '628') {
+            $is_wa = true;
+            $wa_link = 'https://wa.me/' . $clean_num;
+        }
+
+        if ($is_wa) {
+            $html .= '<a href="' . $wa_link . '" target="_blank" class="contact-chip contact-wa" title="Chat WhatsApp (' . htmlspecialchars($phone) . ')"><i class="bi bi-whatsapp"></i> ' . htmlspecialchars($phone) . '</a>';
+        } else {
+            $html .= '<a href="tel:' . htmlspecialchars($clean_num) . '" class="contact-chip contact-phone" title="Telepon (' . htmlspecialchars($phone) . ')"><i class="bi bi-telephone-fill"></i> ' . htmlspecialchars($phone) . '</a>';
+        }
+    }
+
+    if (!empty($email)) {
+        $has_any = true;
+        $html .= '<a href="mailto:' . htmlspecialchars($email) . '" class="contact-chip contact-email" title="Kirim Email (' . htmlspecialchars($email) . ')"><i class="bi bi-envelope-fill"></i> ' . htmlspecialchars($email) . '</a>';
+    }
+
+    if (!empty($website)) {
+        $has_any = true;
+        $clean_web = preg_replace('/^https?:\/\//i', '', rtrim($website, '/'));
+        $web_href = (strpos($website, 'http') === 0) ? $website : 'https://' . $website;
+        $html .= '<a href="' . htmlspecialchars($web_href) . '" target="_blank" class="contact-chip contact-web" title="Kunjungi Website (' . htmlspecialchars($website) . ')"><i class="bi bi-globe"></i> ' . htmlspecialchars($clean_web) . '</a>';
+    }
+
+    if (!empty($address)) {
+        $has_any = true;
+        $loc_text = !empty($city) ? $city : (strlen($address) > 30 ? mb_substr($address, 0, 30) . '...' : $address);
+        $html .= '<span class="contact-chip contact-addr" title="' . htmlspecialchars($address) . '"><i class="bi bi-geo-alt-fill"></i> ' . htmlspecialchars($loc_text) . '</span>';
+    }
+
+    if (!$has_any) {
+        $html .= '<span class="text-muted small" style="font-size: 11.5px;">-</span>';
+    }
+
+    $html .= '</div>';
+    return $html;
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // 1. AJAX / API HANDLERS
 // ════════════════════════════════════════════════════════════════════════════
@@ -151,7 +252,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_table_data') {
     }
     if (!empty($search_query)) {
         $q_esc = $conn->real_escape_string($search_query);
-        $where[] = "(company_name LIKE '%$q_esc%' OR booth_number LIKE '%$q_esc%' OR business_activity LIKE '%$q_esc%' OR products LIKE '%$q_esc%')";
+        $where[] = "(company_name LIKE '%$q_esc%' OR booth_number LIKE '%$q_esc%' OR business_activity LIKE '%$q_esc%' OR products LIKE '%$q_esc%' OR phone LIKE '%$q_esc%' OR email LIKE '%$q_esc%' OR website LIKE '%$q_esc%' OR address LIKE '%$q_esc%' OR city LIKE '%$q_esc%')";
     }
 
     $where_sql = implode(" AND ", $where);
@@ -181,6 +282,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_table_data') {
                 'country' => $r['country'],
                 'country_flag' => getCountryFlagBadge($r['country']),
                 'booth_number' => $r['booth_number'] ?: '-',
+                'phone' => $r['phone'] ?? '',
+                'email' => $r['email'] ?? '',
+                'website' => $r['website'] ?? '',
+                'address' => $r['address'] ?? '',
+                'city' => $r['city'] ?? '',
+                'province' => $r['province'] ?? '',
+                'contacts_html' => formatContactBadges($r['phone'] ?? '', $r['email'] ?? '', $r['website'] ?? '', $r['address'] ?? '', $r['city'] ?? ''),
                 'business_activity' => $r['business_activity'] ?: '-',
                 'products' => mb_substr($r['products'] ?: '-', 0, 200),
                 'status_prospek' => $r['status_prospek'],
@@ -233,11 +341,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
     }
     if (!empty($search_query)) {
         $q_esc = $conn->real_escape_string($search_query);
-        $where[] = "(company_name LIKE '%$q_esc%' OR booth_number LIKE '%$q_esc%' OR business_activity LIKE '%$q_esc%' OR products LIKE '%$q_esc%')";
+        $where[] = "(company_name LIKE '%$q_esc%' OR booth_number LIKE '%$q_esc%' OR business_activity LIKE '%$q_esc%' OR products LIKE '%$q_esc%' OR phone LIKE '%$q_esc%' OR email LIKE '%$q_esc%' OR website LIKE '%$q_esc%' OR address LIKE '%$q_esc%' OR city LIKE '%$q_esc%')";
     }
 
     $where_sql = implode(" AND ", $where);
-    $sql = "SELECT id, event_name, exhibitor_id, company_name, country, booth_number, business_activity, products, detail_url, status_prospek, created_at FROM krista_exhibitors WHERE $where_sql ORDER BY id ASC";
+    $sql = "SELECT id, event_name, exhibitor_id, company_name, country, booth_number, phone, email, website, address, city, business_activity, products, detail_url, status_prospek, created_at FROM krista_exhibitors WHERE $where_sql ORDER BY id ASC";
     $result = $conn->query($sql);
 
     $fn_suffix = !empty($event_filter) ? preg_replace('/[^a-zA-Z0-9_\-]/', '_', $event_filter) : 'Semua_Event';
@@ -246,7 +354,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
 
     $output = fopen('php://output', 'w');
     fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
-    fputcsv($output, ['No', 'Event/Pameran', 'ID Pameran', 'Nama Perusahaan', 'Negara', 'Nomor Booth', 'Kategori Bisnis', 'Produk', 'Status Prospek', 'Link Detail'], ',', '"', "\\");
+    fputcsv($output, ['No', 'Event/Pameran', 'ID Pameran', 'Nama Perusahaan', 'Negara', 'Nomor Booth', 'No. Telepon / WA', 'Email', 'Website', 'Alamat Lengkap', 'Kota', 'Kategori Bisnis', 'Produk', 'Status Prospek', 'Link Detail'], ',', '"', "\\");
 
     $no = 1;
     if ($result) {
@@ -258,6 +366,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
                 $row['company_name'],
                 $row['country'],
                 $row['booth_number'],
+                $row['phone'],
+                $row['email'],
+                $row['website'],
+                $row['address'],
+                $row['city'],
                 $row['business_activity'],
                 $row['products'],
                 $row['status_prospek'],
@@ -304,7 +417,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'add_to_crm') {
     $kandidat = 'Y';
     $potensial = 'Y';
     $acc_boss = 'N';
-    $acc_note = $conn->real_escape_string("Lead otomatis dari Scraper ({$exhibitor['event_name']}, Asal: {$exhibitor['country']}, Booth: {$exhibitor['booth_number']})");
+    
+    $notes_parts = ["Lead otomatis dari Scraper ({$exhibitor['event_name']}, Asal: {$exhibitor['country']}, Booth: {$exhibitor['booth_number']})"];
+    if (!empty($exhibitor['phone'])) $notes_parts[] = "Telp/WA: {$exhibitor['phone']}";
+    if (!empty($exhibitor['email'])) $notes_parts[] = "Email: {$exhibitor['email']}";
+    if (!empty($exhibitor['website'])) $notes_parts[] = "Web: {$exhibitor['website']}";
+    $acc_note = $conn->real_escape_string(implode(" | ", $notes_parts));
 
     $ins_sql = "
         INSERT INTO customers (sales_id, tgl_input, nama_toko, kategori, deal, kandidat, potensial, acc_boss, acc_boss_note)
@@ -314,6 +432,20 @@ if (isset($_POST['action']) && $_POST['action'] === 'add_to_crm') {
     if ($conn->query($ins_sql)) {
         $new_cust_id = $conn->insert_id;
         $conn->query("UPDATE krista_exhibitors SET customer_id = $new_cust_id, status_prospek = 'Tersimpan di CRM' WHERE id = $ex_id");
+
+        // Auto insert PIC if phone exists
+        if (!empty($exhibitor['phone'])) {
+            $phone_esc = $conn->real_escape_string($exhibitor['phone']);
+            $conn->query("INSERT INTO customer_pics (customer_id, nama_pic, tlp_pic) VALUES ($new_cust_id, 'Official / PIC', '$phone_esc')");
+        }
+
+        // Auto insert Address if address exists
+        if (!empty($exhibitor['address'])) {
+            $addr_esc = $conn->real_escape_string($exhibitor['address']);
+            $city_esc = $conn->real_escape_string($exhibitor['city'] ?? '');
+            $prov_esc = $conn->real_escape_string($exhibitor['province'] ?? '');
+            $conn->query("INSERT INTO customer_addresses (customer_id, alamat, kota, provinsi) VALUES ($new_cust_id, '$addr_esc', '$city_esc', '$prov_esc')");
+        }
 
         echo json_encode([
             'status' => true, 
@@ -747,6 +879,7 @@ $stat_total = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors")->fetch
 $stat_indo = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors WHERE country = 'Indonesia'")->fetch_assoc()['t'] ?? 0;
 $stat_intl = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors WHERE country != 'Indonesia' AND country != ''")->fetch_assoc()['t'] ?? 0;
 $stat_crm = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors WHERE customer_id IS NOT NULL")->fetch_assoc()['t'] ?? 0;
+$stat_contacts = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors WHERE (phone IS NOT NULL AND phone != '') OR (email IS NOT NULL AND email != '')")->fetch_assoc()['t'] ?? 0;
 
 // Events list for filter
 $events_res = $conn->query("SELECT event_name, COUNT(*) as cnt FROM krista_exhibitors GROUP BY event_name ORDER BY cnt DESC");
@@ -938,6 +1071,63 @@ include "includes/header.php";
     text-overflow: ellipsis;
 }
 
+/* Contact Badges & Quick Action Chips */
+.contact-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 2.5px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    max-width: 100%;
+}
+.contact-wa {
+    background: #DCFCE7;
+    color: #15803D;
+    border: 1px solid #86EFAC;
+}
+.contact-wa:hover {
+    background: #16A34A;
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+.contact-phone {
+    background: #E0F2FE;
+    color: #0369A1;
+    border: 1px solid #BAE6FD;
+}
+.contact-phone:hover {
+    background: #0284C7;
+    color: #FFFFFF;
+}
+.contact-email {
+    background: #EEF2FF;
+    color: #4338CA;
+    border: 1px solid #C7D2FE;
+}
+.contact-email:hover {
+    background: #4F46E5;
+    color: #FFFFFF;
+}
+.contact-web {
+    background: #F1F5F9;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+}
+.contact-web:hover {
+    background: #475569;
+    color: #FFFFFF;
+}
+.contact-addr {
+    background: #F8FAFC;
+    color: #64748B;
+    border: 1px solid #E2E8F0;
+    cursor: default;
+}
+
 /* Pagination Pills */
 .pagination-modern .page-link {
     border-radius: 10px;
@@ -1033,19 +1223,19 @@ include "includes/header.php";
             </div>
         </div>
 
-        <!-- Card 2: Event Terdata -->
+        <!-- Card 2: Kontak Siap Follow Up -->
         <div class="col-xl-3 col-sm-6">
             <div class="stat-card-executive">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Event Pameran</span>
-                    <div class="stat-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #D97706;">
-                        <i class="bi bi-calendar2-event-fill"></i>
+                    <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Kontak HP &amp; Email</span>
+                    <div class="stat-icon-wrapper" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
+                        <i class="bi bi-telephone-inbound-fill"></i>
                     </div>
                 </div>
-                <div class="stat-value"><?php echo count($events_list); ?> <span style="font-size: 18px; font-weight: 600; color: #64748B;">Event</span></div>
+                <div class="stat-value text-success"><?php echo number_format($stat_contacts); ?> <span style="font-size: 16px; font-weight: 500; color: #64748B;">/ <?php echo number_format($stat_total); ?></span></div>
                 <div class="small text-muted mt-1 d-flex align-items-center gap-1">
-                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-0.5" style="font-size: 11px;">
-                        Krista, ALLPACK, &amp; Lainnya
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size: 11px;">
+                        <i class="bi bi-whatsapp me-1"></i><?php echo round(($stat_contacts / max(1, $stat_total)) * 100); ?>% Siap Hubungi Langsung
                     </span>
                 </div>
             </div>
@@ -1176,11 +1366,12 @@ include "includes/header.php";
                     <tr>
                         <th class="ps-4" style="width: 50px;">No</th>
                         <th>Perusahaan / Exhibitor</th>
-                        <th style="width: 140px;">Event</th>
-                        <th style="width: 130px;">Asal Negara</th>
-                        <th style="width: 120px;">Nomor Booth</th>
+                        <th style="width: 130px;">Event</th>
+                        <th style="width: 120px;">Asal Negara</th>
+                        <th style="width: 100px;">Nomor Booth</th>
+                        <th style="width: 220px;">Kontak &amp; Komunikasi</th>
                         <th>Aktivitas &amp; Kategori Produk</th>
-                        <th style="width: 130px;">Status CRM</th>
+                        <th style="width: 120px;">Status CRM</th>
                         <th class="text-end pe-4" style="width: 170px;">Aksi Sales</th>
                     </tr>
                 </thead>
@@ -1216,11 +1407,12 @@ include "includes/header.php";
                         <td><span class="event-badge" title="<?php echo htmlspecialchars($r['event_name']); ?>"><?php echo htmlspecialchars($r['event_name']); ?></span></td>
                         <td><?php echo getCountryFlagBadge($r['country']); ?></td>
                         <td><span class="booth-chip"><?php echo htmlspecialchars($r['booth_number'] ?: '-'); ?></span></td>
+                        <td><?php echo formatContactBadges($r['phone'] ?? '', $r['email'] ?? '', $r['website'] ?? '', $r['address'] ?? '', $r['city'] ?? ''); ?></td>
                         <td class="small">
                             <?php if (!empty($r['business_activity']) && $r['business_activity'] !== '-'): ?>
                                 <div class="fw-semibold text-dark mb-0.5"><?php echo htmlspecialchars($r['business_activity']); ?></div>
                             <?php endif; ?>
-                            <div class="text-muted text-truncate" style="max-width: 320px;" title="<?php echo htmlspecialchars($r['products']); ?>">
+                            <div class="text-muted text-truncate" style="max-width: 300px;" title="<?php echo htmlspecialchars($r['products']); ?>">
                                 <?php echo htmlspecialchars($r['products'] ?: '-'); ?>
                             </div>
                         </td>
@@ -1545,11 +1737,61 @@ async function loadTableData(page = 1) {
     }
 }
 
+function formatContactBadgesJs(phone, email, website, address, city) {
+    let out = '<div class="d-flex flex-column gap-1 align-items-start">';
+    let hasAny = false;
+
+    if (phone && phone.trim()) {
+        hasAny = true;
+        const cleanNum = phone.replace(/[^0-9]/g, '');
+        let isWa = false;
+        let waLink = '';
+        if (cleanNum.startsWith('08')) {
+            isWa = true;
+            waLink = 'https://wa.me/62' + cleanNum.substring(1);
+        } else if (cleanNum.startsWith('628')) {
+            isWa = true;
+            waLink = 'https://wa.me/' + cleanNum;
+        }
+
+        if (isWa) {
+            out += `<a href="${waLink}" target="_blank" class="contact-chip contact-wa" title="Chat WhatsApp (${escapeHtml(phone)})"><i class="bi bi-whatsapp"></i> ${escapeHtml(phone)}</a>`;
+        } else {
+            out += `<a href="tel:${cleanNum}" class="contact-chip contact-phone" title="Telepon (${escapeHtml(phone)})"><i class="bi bi-telephone-fill"></i> ${escapeHtml(phone)}</a>`;
+        }
+    }
+
+    if (email && email.trim()) {
+        hasAny = true;
+        out += `<a href="mailto:${escapeHtml(email)}" class="contact-chip contact-email" title="Kirim Email (${escapeHtml(email)})"><i class="bi bi-envelope-fill"></i> ${escapeHtml(email)}</a>`;
+    }
+
+    if (website && website.trim()) {
+        hasAny = true;
+        let cleanWeb = website.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+        let webHref = website.startsWith('http') ? website : 'https://' + website;
+        out += `<a href="${escapeHtml(webHref)}" target="_blank" class="contact-chip contact-web" title="Kunjungi Website (${escapeHtml(website)})"><i class="bi bi-globe"></i> ${escapeHtml(cleanWeb)}</a>`;
+    }
+
+    if (address && address.trim()) {
+        hasAny = true;
+        let locText = city && city.trim() ? city.trim() : (address.length > 30 ? address.substring(0, 30) + '...' : address);
+        out += `<span class="contact-chip contact-addr" title="${escapeHtml(address)}"><i class="bi bi-geo-alt-fill"></i> ${escapeHtml(locText)}</span>`;
+    }
+
+    if (!hasAny) {
+        out += `<span class="text-muted small" style="font-size: 11.5px;">-</span>`;
+    }
+
+    out += '</div>';
+    return out;
+}
+
 function renderTableRows(rows) {
     if (!rows || rows.length === 0) {
         $('#tableBody').html(`
             <tr>
-                <td colspan="8" class="text-center py-5">
+                <td colspan="9" class="text-center py-5">
                     <div class="text-muted mb-2"><i class="bi bi-inbox" style="font-size: 32px;"></i></div>
                     <div class="fw-bold text-dark">Tidak ada perusahaan ditemukan</div>
                     <div class="small text-muted">Coba ubah kata kunci pencarian atau reset filter.</div>
@@ -1594,6 +1836,8 @@ function renderTableRows(rows) {
             <i class="bi bi-google"></i>
         </a>`;
 
+        const contactCol = r.contacts_html || formatContactBadgesJs(r.phone, r.email, r.website, r.address, r.city);
+
         html += `
             <tr id="row-${r.id}" class="${trClass}">
                 <td class="ps-4 text-muted small fw-semibold">${r.no}</td>
@@ -1609,9 +1853,10 @@ function renderTableRows(rows) {
                 <td><span class="event-badge" title="${escapeHtml(r.event_name)}">${escapeHtml(r.event_name)}</span></td>
                 <td>${r.country_flag}</td>
                 <td><span class="booth-chip">${escapeHtml(r.booth_number)}</span></td>
+                <td>${contactCol}</td>
                 <td class="small">
                     ${r.business_activity && r.business_activity !== '-' ? `<div class="fw-semibold text-dark mb-0.5">${escapeHtml(r.business_activity)}</div>` : ''}
-                    <div class="text-muted text-truncate" style="max-width: 320px;" title="${escapeHtml(r.products)}">
+                    <div class="text-muted text-truncate" style="max-width: 300px;" title="${escapeHtml(r.products)}">
                         ${escapeHtml(r.products)}
                     </div>
                 </td>
