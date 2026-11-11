@@ -88,7 +88,7 @@ if ($curr_cnt < 858 && file_exists(__DIR__ . '/krista_interfood_exhibitors.json'
 
 // Country flag badge helper
 function getCountryFlagBadge($country) {
-    $c = trim($country);
+    $c = trim($country ?? '');
     $flags = [
         'Indonesia' => '🇮🇩',
         'China' => '🇨🇳',
@@ -123,9 +123,11 @@ function getCountryFlagBadge($country) {
 // 1. AJAX / API HANDLERS
 // ════════════════════════════════════════════════════════════════════════════
 
-// Handle AJAX Table Data & Pagination
+// Handle AJAX Table Data & Pagination (Ultra Robust Direct Query)
 if (isset($_GET['action']) && $_GET['action'] === 'get_table_data') {
-    header('Content-Type: application/json');
+    while (ob_get_level()) { ob_end_clean(); }
+    header('Content-Type: application/json; charset=utf-8');
+
     $page = max(1, intval($_GET['page'] ?? 1));
     $limit = intval($_GET['limit'] ?? 50);
     if ($limit < 1 || $limit > 1000) $limit = 50;
@@ -136,81 +138,57 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_table_data') {
     $search_query = trim($_GET['q'] ?? '');
 
     $where = ["1=1"];
-    $params = [];
-    $types = "";
 
     if (!empty($event_filter)) {
-        $where[] = "event_name = ?";
-        $params[] = $event_filter;
-        $types .= "s";
+        $where[] = "event_name = '" . $conn->real_escape_string($event_filter) . "'";
     }
     if (!empty($country_filter)) {
-        $where[] = "country = ?";
-        $params[] = $country_filter;
-        $types .= "s";
+        $where[] = "country = '" . $conn->real_escape_string($country_filter) . "'";
     }
     if (!empty($status_filter)) {
-        $where[] = "status_prospek = ?";
-        $params[] = $status_filter;
-        $types .= "s";
+        $where[] = "status_prospek = '" . $conn->real_escape_string($status_filter) . "'";
     }
     if (!empty($search_query)) {
-        $where[] = "(company_name LIKE ? OR booth_number LIKE ? OR business_activity LIKE ? OR products LIKE ?)";
-        $search_like = "%$search_query%";
-        $params[] = $search_like;
-        $params[] = $search_like;
-        $params[] = $search_like;
-        $params[] = $search_like;
-        $types .= "ssss";
+        $q_esc = $conn->real_escape_string($search_query);
+        $where[] = "(company_name LIKE '%$q_esc%' OR booth_number LIKE '%$q_esc%' OR business_activity LIKE '%$q_esc%' OR products LIKE '%$q_esc%')";
     }
 
     $where_sql = implode(" AND ", $where);
 
     // Total filtered count
-    $count_sql = "SELECT COUNT(*) as t FROM krista_exhibitors WHERE $where_sql";
-    $c_stmt = $conn->prepare($count_sql);
-    if (!empty($params)) {
-        $c_stmt->bind_param($types, ...$params);
-    }
-    $c_stmt->execute();
-    $total_rows = $c_stmt->get_result()->fetch_assoc()['t'] ?? 0;
+    $count_res = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors WHERE $where_sql");
+    $total_rows = $count_res ? intval($count_res->fetch_assoc()['t'] ?? 0) : 0;
 
     $total_pages = max(1, ceil($total_rows / $limit));
     if ($page > $total_pages && $total_pages > 0) $page = $total_pages;
     $offset = ($page - 1) * $limit;
 
-    // Fetch page items
-    $data_sql = "SELECT * FROM krista_exhibitors WHERE $where_sql ORDER BY (customer_id IS NOT NULL) DESC, id ASC LIMIT ? OFFSET ?";
-    $params_data = $params;
-    $params_data[] = $limit;
-    $params_data[] = $offset;
-    $types_data = $types . "ii";
+    // Fetch page items with direct safe LIMIT offset, limit
+    $data_sql = "SELECT * FROM krista_exhibitors WHERE $where_sql ORDER BY (customer_id IS NOT NULL) DESC, id ASC LIMIT $offset, $limit";
+    $d_res = $conn->query($data_sql);
 
-    $d_stmt = $conn->prepare($data_sql);
-    $d_stmt->bind_param($types_data, ...$params_data);
-    $d_stmt->execute();
-    $rows = $d_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
-    $start_no = $offset + 1;
     $formatted_rows = [];
-    foreach ($rows as $r) {
-        $formatted_rows[] = [
-            'no' => $start_no++,
-            'id' => $r['id'],
-            'exhibitor_id' => $r['exhibitor_id'],
-            'event_name' => $r['event_name'] ?: 'Krista Interfood 2026',
-            'company_name' => $r['company_name'],
-            'country' => $r['country'],
-            'country_flag' => getCountryFlagBadge($r['country']),
-            'booth_number' => $r['booth_number'] ?: '-',
-            'business_activity' => $r['business_activity'] ?: '-',
-            'products' => $r['products'] ?: '-',
-            'status_prospek' => $r['status_prospek'],
-            'customer_id' => $r['customer_id'],
-            'detail_url' => $r['detail_url'],
-            'logo_url' => $r['logo_url'],
-            'initials' => strtoupper(substr($r['company_name'], 0, 2))
-        ];
+    $start_no = $offset + 1;
+    if ($d_res) {
+        while ($r = $d_res->fetch_assoc()) {
+            $formatted_rows[] = [
+                'no' => $start_no++,
+                'id' => $r['id'],
+                'exhibitor_id' => $r['exhibitor_id'],
+                'event_name' => $r['event_name'] ?: 'Krista Interfood 2026',
+                'company_name' => $r['company_name'],
+                'country' => $r['country'],
+                'country_flag' => getCountryFlagBadge($r['country']),
+                'booth_number' => $r['booth_number'] ?: '-',
+                'business_activity' => $r['business_activity'] ?: '-',
+                'products' => $r['products'] ?: '-',
+                'status_prospek' => $r['status_prospek'],
+                'customer_id' => $r['customer_id'],
+                'detail_url' => $r['detail_url'],
+                'logo_url' => $r['logo_url'],
+                'initials' => strtoupper(substr($r['company_name'], 0, 2))
+            ];
+        }
     }
 
     echo json_encode([
@@ -236,42 +214,24 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
     $search_query = trim($_GET['q'] ?? '');
 
     $where = ["1=1"];
-    $params = [];
-    $types = "";
 
     if (!empty($event_filter)) {
-        $where[] = "event_name = ?";
-        $params[] = $event_filter;
-        $types .= "s";
+        $where[] = "event_name = '" . $conn->real_escape_string($event_filter) . "'";
     }
     if (!empty($country_filter)) {
-        $where[] = "country = ?";
-        $params[] = $country_filter;
-        $types .= "s";
+        $where[] = "country = '" . $conn->real_escape_string($country_filter) . "'";
     }
     if (!empty($status_filter)) {
-        $where[] = "status_prospek = ?";
-        $params[] = $status_filter;
-        $types .= "s";
+        $where[] = "status_prospek = '" . $conn->real_escape_string($status_filter) . "'";
     }
     if (!empty($search_query)) {
-        $where[] = "(company_name LIKE ? OR booth_number LIKE ? OR business_activity LIKE ? OR products LIKE ?)";
-        $search_like = "%$search_query%";
-        $params[] = $search_like;
-        $params[] = $search_like;
-        $params[] = $search_like;
-        $params[] = $search_like;
-        $types .= "ssss";
+        $q_esc = $conn->real_escape_string($search_query);
+        $where[] = "(company_name LIKE '%$q_esc%' OR booth_number LIKE '%$q_esc%' OR business_activity LIKE '%$q_esc%' OR products LIKE '%$q_esc%')";
     }
 
-    $sql = "SELECT id, event_name, exhibitor_id, company_name, country, booth_number, business_activity, products, detail_url, status_prospek, created_at FROM krista_exhibitors WHERE " . implode(" AND ", $where) . " ORDER BY id ASC";
-    
-    $stmt = $conn->prepare($sql);
-    if (!empty($params)) {
-        $stmt->bind_param($types, ...$params);
-    }
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $where_sql = implode(" AND ", $where);
+    $sql = "SELECT id, event_name, exhibitor_id, company_name, country, booth_number, business_activity, products, detail_url, status_prospek, created_at FROM krista_exhibitors WHERE $where_sql ORDER BY id ASC";
+    $result = $conn->query($sql);
 
     $fn_suffix = !empty($event_filter) ? preg_replace('/[^a-zA-Z0-9_\-]/', '_', $event_filter) : 'Semua_Event';
     header('Content-Type: text/csv; charset=utf-8');
@@ -282,19 +242,21 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
     fputcsv($output, ['No', 'Event/Pameran', 'ID Pameran', 'Nama Perusahaan', 'Negara', 'Nomor Booth', 'Kategori Bisnis', 'Produk', 'Status Prospek', 'Link Detail'], ',', '"', "\\");
 
     $no = 1;
-    while ($row = $result->fetch_assoc()) {
-        fputcsv($output, [
-            $no++,
-            $row['event_name'],
-            $row['exhibitor_id'],
-            $row['company_name'],
-            $row['country'],
-            $row['booth_number'],
-            $row['business_activity'],
-            $row['products'],
-            $row['status_prospek'],
-            $row['detail_url']
-        ], ',', '"', "\\");
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            fputcsv($output, [
+                $no++,
+                $row['event_name'],
+                $row['exhibitor_id'],
+                $row['company_name'],
+                $row['country'],
+                $row['booth_number'],
+                $row['business_activity'],
+                $row['products'],
+                $row['status_prospek'],
+                $row['detail_url']
+            ], ',', '"', "\\");
+        }
     }
     fclose($output);
     exit;
@@ -302,7 +264,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
 
 // Handle Add to CRM (Customer Lead)
 if (isset($_POST['action']) && $_POST['action'] === 'add_to_crm') {
-    header('Content-Type: application/json');
+    while (ob_get_level()) { ob_end_clean(); }
+    header('Content-Type: application/json; charset=utf-8');
     $ex_id = intval($_POST['id'] ?? 0);
 
     if ($ex_id <= 0) {
@@ -310,10 +273,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'add_to_crm') {
         exit;
     }
 
-    $q = $conn->prepare("SELECT * FROM krista_exhibitors WHERE id = ?");
-    $q->bind_param("i", $ex_id);
-    $q->execute();
-    $exhibitor = $q->get_result()->fetch_assoc();
+    $q = $conn->query("SELECT * FROM krista_exhibitors WHERE id = $ex_id");
+    $exhibitor = $q ? $q->fetch_assoc() : null;
 
     if (!$exhibitor) {
         echo json_encode(['status' => false, 'message' => 'Data exhibitor tidak ditemukan.']);
@@ -328,33 +289,30 @@ if (isset($_POST['action']) && $_POST['action'] === 'add_to_crm') {
     // Insert into customers table
     $sales_id = intval($_SESSION['id_user'] ?? $_SESSION['user_id'] ?? 1);
     $tgl_input = date('Y-m-d');
-    $nama_toko = $exhibitor['company_name'];
+    $nama_toko = $conn->real_escape_string($exhibitor['company_name']);
     $kategori = !empty($exhibitor['business_activity']) && $exhibitor['business_activity'] !== '-' 
-        ? "Exhibitor: " . $exhibitor['business_activity'] 
-        : "Exhibitor " . $exhibitor['event_name'] . " (Booth: " . $exhibitor['booth_number'] . ")";
+        ? "Exhibitor: " . $conn->real_escape_string($exhibitor['business_activity']) 
+        : "Exhibitor " . $conn->real_escape_string($exhibitor['event_name']) . " (Booth: " . $conn->real_escape_string($exhibitor['booth_number']) . ")";
     $deal = 'N';
     $kandidat = 'Y';
     $potensial = 'Y';
     $acc_boss = 'N';
-    $acc_note = "Lead otomatis dari Scraper ({$exhibitor['event_name']}, Asal: {$exhibitor['country']}, Booth: {$exhibitor['booth_number']})";
+    $acc_note = $conn->real_escape_string("Lead otomatis dari Scraper ({$exhibitor['event_name']}, Asal: {$exhibitor['country']}, Booth: {$exhibitor['booth_number']})");
 
-    $ins = $conn->prepare("
+    $ins_sql = "
         INSERT INTO customers (sales_id, tgl_input, nama_toko, kategori, deal, kandidat, potensial, acc_boss, acc_boss_note)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    $ins->bind_param("issssssss", $sales_id, $tgl_input, $nama_toko, $kategori, $deal, $kandidat, $potensial, $acc_boss, $acc_note);
+        VALUES ($sales_id, '$tgl_input', '$nama_toko', '$kategori', '$deal', '$kandidat', '$potensial', '$acc_boss', '$acc_note')
+    ";
 
-    if ($ins->execute()) {
+    if ($conn->query($ins_sql)) {
         $new_cust_id = $conn->insert_id;
-        $up = $conn->prepare("UPDATE krista_exhibitors SET customer_id = ?, status_prospek = 'Tersimpan di CRM' WHERE id = ?");
-        $up->bind_param("ii", $new_cust_id, $ex_id);
-        $up->execute();
+        $conn->query("UPDATE krista_exhibitors SET customer_id = $new_cust_id, status_prospek = 'Tersimpan di CRM' WHERE id = $ex_id");
 
         echo json_encode([
             'status' => true, 
             'message' => 'Berhasil menambahkan perusahaan ke database CRM sebagai Kandidat Customer!',
             'customer_id' => $new_cust_id,
-            'company_name' => $nama_toko
+            'company_name' => $exhibitor['company_name']
         ]);
     } else {
         echo json_encode(['status' => false, 'message' => 'Gagal menyimpan ke CRM: ' . $conn->error]);
@@ -364,7 +322,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'add_to_crm') {
 
 // Handle Live Scraping Batch for Krista Media / SIAL Network
 if (isset($_POST['action']) && $_POST['action'] === 'run_scrape_page') {
-    header('Content-Type: application/json');
+    while (ob_get_level()) { ob_end_clean(); }
+    header('Content-Type: application/json; charset=utf-8');
     $page = intval($_POST['page'] ?? 1);
     if ($page < 1 || $page > 100) $page = 1;
 
@@ -461,7 +420,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'run_scrape_page') {
 
 // Handle Universal URL Scraper (HTML Table / Card Parser)
 if (isset($_POST['action']) && $_POST['action'] === 'universal_scrape_url') {
-    header('Content-Type: application/json');
+    while (ob_get_level()) { ob_end_clean(); }
+    header('Content-Type: application/json; charset=utf-8');
     $target_url = trim($_POST['target_url'] ?? '');
     $event_name = trim($_POST['event_name'] ?? '');
     $scrape_mode = trim($_POST['scrape_mode'] ?? 'auto');
@@ -570,7 +530,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'universal_scrape_url') {
 
 // Handle Save Scraped / Preview Items
 if (isset($_POST['action']) && $_POST['action'] === 'save_scraped_items') {
-    header('Content-Type: application/json');
+    while (ob_get_level()) { ob_end_clean(); }
+    header('Content-Type: application/json; charset=utf-8');
     $event_name = trim($_POST['event_name'] ?? 'Pameran Baru');
     $source_url = trim($_POST['source_url'] ?? '');
     $items = json_decode($_POST['items'] ?? '[]', true);
@@ -617,7 +578,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_scraped_items') {
 
 // Handle Smart Paste Import (Text / Table from Clipboard)
 if (isset($_POST['action']) && $_POST['action'] === 'smart_paste') {
-    header('Content-Type: application/json');
+    while (ob_get_level()) { ob_end_clean(); }
+    header('Content-Type: application/json; charset=utf-8');
     $event_name = trim($_POST['event_name'] ?? '');
     $default_country = trim($_POST['default_country'] ?? 'Indonesia');
     $raw_text = trim($_POST['raw_text'] ?? '');
@@ -696,7 +658,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'smart_paste') {
 
 // Handle Import CSV File
 if (isset($_POST['action']) && $_POST['action'] === 'import_csv') {
-    header('Content-Type: application/json');
+    while (ob_get_level()) { ob_end_clean(); }
+    header('Content-Type: application/json; charset=utf-8');
     $event_name = trim($_POST['event_name'] ?? '');
 
     if (empty($event_name)) {
@@ -771,7 +734,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'import_csv') {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// 2. STATS & FILTER DATA (INITIAL LOAD)
+// 2. STATS & SSR INITIAL DATA (ZERO BLANK FLASH)
 // ════════════════════════════════════════════════════════════════════════════
 $stat_total = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors")->fetch_assoc()['t'] ?? 0;
 $stat_indo = $conn->query("SELECT COUNT(*) as t FROM krista_exhibitors WHERE country = 'Indonesia'")->fetch_assoc()['t'] ?? 0;
@@ -787,6 +750,16 @@ while ($ev = $events_res->fetch_assoc()) {
 
 // Countries list for filter
 $countries_res = $conn->query("SELECT country, COUNT(*) as c FROM krista_exhibitors WHERE country != '' GROUP BY country ORDER BY c DESC");
+
+// Pre-fetch Page 1 (50 items) for instant HTML render
+$ssr_initial_query = $conn->query("SELECT * FROM krista_exhibitors ORDER BY (customer_id IS NOT NULL) DESC, id ASC LIMIT 50");
+$ssr_rows = [];
+if ($ssr_initial_query) {
+    while ($r = $ssr_initial_query->fetch_assoc()) {
+        $ssr_rows[] = $r;
+    }
+}
+$ssr_total_pages = max(1, ceil($stat_total / 50));
 
 include "includes/header.php";
 ?>
@@ -1180,7 +1153,7 @@ include "includes/header.php";
             </div>
         </div>
 
-        <!-- Table Responsive -->
+        <!-- Table Responsive (Pre-rendered by PHP, zero blank screen) -->
         <div class="table-responsive" style="min-height: 380px; position: relative;">
             
             <!-- Loading Overlay -->
@@ -1205,7 +1178,74 @@ include "includes/header.php";
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <!-- Populated dynamically via AJAX -->
+                    <?php
+                    $no = 1;
+                    foreach ($ssr_rows as $r):
+                        $is_crm = !empty($r['customer_id']);
+                        $tr_class = $is_crm ? 'table-light' : '';
+                        $initials = strtoupper(substr($r['company_name'], 0, 2));
+                        $has_logo = !empty($r['logo_url']) && strpos($r['logo_url'], 'pinpng.com') === false;
+                    ?>
+                    <tr id="row-<?php echo $r['id']; ?>" class="<?php echo $tr_class; ?>">
+                        <td class="ps-4 text-muted small fw-semibold"><?php echo $no++; ?></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <?php if ($has_logo): ?>
+                                    <img src="<?php echo htmlspecialchars($r['logo_url']); ?>" class="exhibitor-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="avatar-fallback" style="display:none;"><?php echo $initials; ?></div>
+                                <?php else: ?>
+                                    <div class="avatar-fallback"><?php echo $initials; ?></div>
+                                <?php endif; ?>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 14px;"><?php echo htmlspecialchars($r['company_name']); ?></div>
+                                    <?php if (!empty($r['detail_url'])): ?>
+                                        <a href="<?php echo htmlspecialchars($r['detail_url']); ?>" target="_blank" class="small text-muted text-decoration-none">
+                                            <i class="bi bi-box-arrow-up-right" style="font-size: 11px;"></i> Profil Web
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="event-badge" title="<?php echo htmlspecialchars($r['event_name']); ?>"><?php echo htmlspecialchars($r['event_name']); ?></span></td>
+                        <td><?php echo getCountryFlagBadge($r['country']); ?></td>
+                        <td><span class="booth-chip"><?php echo htmlspecialchars($r['booth_number'] ?: '-'); ?></span></td>
+                        <td class="small">
+                            <?php if (!empty($r['business_activity']) && $r['business_activity'] !== '-'): ?>
+                                <div class="fw-semibold text-dark mb-0.5"><?php echo htmlspecialchars($r['business_activity']); ?></div>
+                            <?php endif; ?>
+                            <div class="text-muted text-truncate" style="max-width: 320px;" title="<?php echo htmlspecialchars($r['products']); ?>">
+                                <?php echo htmlspecialchars($r['products'] ?: '-'); ?>
+                            </div>
+                        </td>
+                        <td>
+                            <?php if ($is_crm): ?>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill" style="font-size: 12px;">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Di CRM
+                                </span>
+                            <?php else: ?>
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 rounded-pill" style="font-size: 12px;">
+                                    Belum di CRM
+                                </span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-inline-flex gap-1">
+                                <?php if (!$is_crm): ?>
+                                    <button class="btn btn-sm btn-success rounded-3 btn-add-crm px-2 py-1" onclick="addToCrm(<?php echo $r['id']; ?>, '<?php echo addslashes($r['company_name']); ?>')" title="Masukkan ke CRM sebagai Prospek">
+                                        <i class="bi bi-person-plus-fill me-1"></i> + CRM
+                                    </button>
+                                <?php else: ?>
+                                    <a href="customer_management.php?search=<?php echo urlencode($r['company_name']); ?>" class="btn btn-sm btn-outline-success rounded-3 px-2 py-1" title="Buka di CRM">
+                                        <i class="bi bi-box-arrow-right"></i> CRM
+                                    </a>
+                                <?php endif; ?>
+                                <a href="https://www.google.com/search?q=<?php echo urlencode($r['company_name'] . ' ' . ($r['country'] ?? '')); ?>" target="_blank" class="btn btn-sm btn-outline-secondary rounded-3 px-2 py-1" title="Cari di Google">
+                                    <i class="bi bi-google"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
@@ -1214,7 +1254,7 @@ include "includes/header.php";
         <div class="bg-white py-3 px-4 border-top d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div class="d-flex align-items-center gap-3 flex-wrap">
                 <span class="small text-muted fw-semibold" id="paginationSummary">
-                    Menampilkan 0 - 0 dari 0 perusahaan
+                    Menampilkan <b>1</b> - <b><?php echo min(50, $stat_total); ?></b> dari <b><?php echo number_format($stat_total); ?></b> perusahaan
                 </span>
                 <div class="d-flex align-items-center gap-1">
                     <span class="small text-muted">Tampilkan:</span>
@@ -1231,7 +1271,23 @@ include "includes/header.php";
             <div class="d-flex align-items-center gap-3 flex-wrap">
                 <nav aria-label="Page navigation">
                     <ul class="pagination pagination-sm pagination-modern mb-0" id="paginationNav">
-                        <!-- Populated dynamically via JS -->
+                        <li class="page-item disabled"><span class="page-link">«</span></li>
+                        <li class="page-item disabled"><span class="page-link">‹</span></li>
+                        <li class="page-item active"><a class="page-link" href="javascript:void(0)" onclick="loadTableData(1)">1</a></li>
+                        <?php for ($p = 2; $p <= min(5, $ssr_total_pages); $p++): ?>
+                            <li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadTableData(<?php echo $p; ?>)"><?php echo $p; ?></a></li>
+                        <?php endfor; ?>
+                        <?php if ($ssr_total_pages > 5): ?>
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                            <li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadTableData(<?php echo $ssr_total_pages; ?>)"><?php echo $ssr_total_pages; ?></a></li>
+                        <?php endif; ?>
+                        <?php if ($ssr_total_pages > 1): ?>
+                            <li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadTableData(2)" title="Berikutnya">›</a></li>
+                            <li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadTableData(<?php echo $ssr_total_pages; ?>)" title="Halaman Terakhir">»</a></li>
+                        <?php else: ?>
+                            <li class="page-item disabled"><span class="page-link">›</span></li>
+                            <li class="page-item disabled"><span class="page-link">»</span></li>
+                        <?php endif; ?>
                     </ul>
                 </nav>
 
@@ -1404,11 +1460,6 @@ let currentPage = 1;
 let currentLimit = 50;
 let searchTimer = null;
 
-// Initial Load on Document Ready
-$(document).ready(function() {
-    loadTableData(1);
-});
-
 function debounceSearch() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
@@ -1437,10 +1488,10 @@ function resetAllFilters() {
 
 async function loadTableData(page = 1) {
     currentPage = page;
-    const eventVal = $('#filterEvent').val();
-    const countryVal = $('#filterCountry').val();
-    const statusVal = $('#filterStatus').val();
-    const queryVal = $('#filterSearch').val().trim();
+    const eventVal = $('#filterEvent').val() || '';
+    const countryVal = $('#filterCountry').val() || '';
+    const statusVal = $('#filterStatus').val() || '';
+    const queryVal = ($('#filterSearch').val() || '').trim();
 
     // Update export button URLs
     const exportUrl = `scraping_exhibitor.php?action=export_csv&event=${encodeURIComponent(eventVal)}&country=${encodeURIComponent(countryVal)}&status=${encodeURIComponent(statusVal)}&q=${encodeURIComponent(queryVal)}`;
@@ -1462,12 +1513,15 @@ async function loadTableData(page = 1) {
         });
 
         const res = await fetch(`scraping_exhibitor.php?${params.toString()}`);
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
         const data = await res.json();
 
         $('#tableLoadingOverlay').addClass('d-none');
 
         if (!data.status) {
-            $('#tableBody').html(`<tr><td colspan="8" class="text-center py-5 text-muted">Gagal memuat data.</td></tr>`);
+            Swal.fire('Info', data.message || 'Gagal memuat data.', 'warning');
             return;
         }
 
@@ -1477,7 +1531,14 @@ async function loadTableData(page = 1) {
     } catch (err) {
         console.error('Error fetching data:', err);
         $('#tableLoadingOverlay').addClass('d-none');
-        $('#tableBody').html(`<tr><td colspan="8" class="text-center py-5 text-danger"><i class="bi bi-exclamation-triangle me-1"></i> Terjadi kesalahan saat memuat data.</td></tr>`);
+        // Do not blank out the table if there is an error, just notify
+        Swal.fire({
+            title: 'Koneksi Terganggu',
+            text: 'Gagal memuat data dari server. Data saat ini tetap ditampilkan.',
+            icon: 'warning',
+            timer: 2500,
+            showConfirmButton: false
+        });
     }
 }
 
@@ -1566,7 +1627,6 @@ function renderTableRows(rows) {
 }
 
 function renderPagination(p) {
-    // Update summary text
     if (p.total_rows > 0) {
         $('#paginationSummary').html(`Menampilkan <b>${p.from}</b> - <b>${p.to}</b> dari <b>${p.total_rows.toLocaleString()}</b> perusahaan`);
     } else {
