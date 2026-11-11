@@ -154,6 +154,13 @@ $roleBadgeBg = match($userRole) {
             <span class="nav-link-text">Scraper Leads Maps</span>
         </a>
 
+        <a href="../scraping_exhibitor.php" class="sidebar-link <?php echo ($currFile === 'scraping_exhibitor.php') ? 'active' : ''; ?>">
+            <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                <i class="bi bi-buildings-fill"></i>
+            </span>
+            <span class="nav-link-text">Scraper Krista Interfood</span>
+        </a>
+
         <!-- ═════════════════════════════════════════════════════════ -->
         <!-- 3. TOOLS & UTILITIES                                      -->
         <!-- ═════════════════════════════════════════════════════════ -->

@@ -593,6 +593,13 @@ table tr td { font-size: 0.85em; }
             </a>
             <?php endif; ?>
 
+            <a href="scraping_exhibitor.php" class="sidebar-link <?php echo $currentPage=='scraping_exhibitor.php'?'active':''; ?>">
+                <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                    <i class="bi bi-buildings-fill"></i>
+                </span>
+                <span class="nav-link-text">Scraper Krista Interfood</span>
+            </a>
+
             <!-- APLIKASI SALES (MOBILE) -->
             <div class="nav-section-title" style="margin-top: 14px;">
                 <span class="nav-section-dot dot-cyan"></span>
@@ -644,6 +651,13 @@ table tr td { font-size: 0.85em; }
                 <span class="nav-link-text">Penawaran Penjualan (SO)</span>
             </a>
             <?php endif; ?>
+
+            <a href="scraping_exhibitor.php" class="sidebar-link <?php echo $currentPage=='scraping_exhibitor.php'?'active':''; ?>">
+                <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                    <i class="bi bi-buildings-fill"></i>
+                </span>
+                <span class="nav-link-text">Scraper Krista Interfood</span>
+            </a>
 
             <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>">
                 <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
@@ -784,6 +798,13 @@ table tr td { font-size: 0.85em; }
                     <i class="bi bi-crosshair2"></i>
                 </span>
                 <span class="nav-link-text">Scraper Leads Maps</span>
+            </a>
+
+            <a href="scraping_exhibitor.php" class="sidebar-link <?php echo $currentPage=='scraping_exhibitor.php'?'active':''; ?>">
+                <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                    <i class="bi bi-buildings-fill"></i>
+                </span>
+                <span class="nav-link-text">Scraper Krista Interfood</span>
             </a>
 
             <!-- ═════════════════════════════════════════════════════════ -->
