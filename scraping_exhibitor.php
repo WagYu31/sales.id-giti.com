@@ -14,6 +14,7 @@ date_default_timezone_set('Asia/Jakarta');
 // ════════════════════════════════════════════════════════════════════════════
 // DATABASE SCHEMA & AUTO-MIGRATION
 // ════════════════════════════════════════════════════════════════════════════
+$conn->set_charset("utf8mb4");
 $conn->query("
 CREATE TABLE IF NOT EXISTS `krista_exhibitors` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -181,7 +182,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_table_data') {
                 'country_flag' => getCountryFlagBadge($r['country']),
                 'booth_number' => $r['booth_number'] ?: '-',
                 'business_activity' => $r['business_activity'] ?: '-',
-                'products' => $r['products'] ?: '-',
+                'products' => mb_substr($r['products'] ?: '-', 0, 200),
                 'status_prospek' => $r['status_prospek'],
                 'customer_id' => $r['customer_id'],
                 'detail_url' => $r['detail_url'],
@@ -191,7 +192,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_table_data') {
         }
     }
 
-    echo json_encode([
+    $json_out = json_encode([
         'status' => true,
         'rows' => $formatted_rows,
         'pagination' => [
@@ -202,7 +203,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_table_data') {
             'from' => $total_rows > 0 ? $offset + 1 : 0,
             'to' => min($offset + $limit, $total_rows)
         ]
-    ]);
+    ], JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_UNICODE);
+
+    if ($json_out === false) {
+        echo json_encode(['status' => false, 'message' => 'JSON encode error: ' . json_last_error_msg()]);
+    } else {
+        echo $json_out;
+    }
     exit;
 }
 
@@ -1513,15 +1520,19 @@ async function loadTableData(page = 1) {
         });
 
         const res = await fetch(`scraping_exhibitor.php?${params.toString()}`);
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        const data = await res.json();
-
+        const text = await res.text();
         $('#tableLoadingOverlay').addClass('d-none');
 
-        if (!data.status) {
-            Swal.fire('Info', data.message || 'Gagal memuat data.', 'warning');
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('Failed to parse JSON response. Raw text:', text);
+            return;
+        }
+
+        if (!data || !data.status) {
+            console.warn('API returned non-status:', data);
             return;
         }
 
@@ -1531,14 +1542,6 @@ async function loadTableData(page = 1) {
     } catch (err) {
         console.error('Error fetching data:', err);
         $('#tableLoadingOverlay').addClass('d-none');
-        // Do not blank out the table if there is an error, just notify
-        Swal.fire({
-            title: 'Koneksi Terganggu',
-            text: 'Gagal memuat data dari server. Data saat ini tetap ditampilkan.',
-            icon: 'warning',
-            timer: 2500,
-            showConfirmButton: false
-        });
     }
 }
 
