@@ -2707,8 +2707,8 @@ $loewixPriceList = $tiptokMaster6;
                                                 <button type="button" class="btn-table-secondary" onclick="openModalDetailTiptok(<?php echo $idPen; ?>)" title="Lihat Riwayat Lengkap" style="width: 30px; height: 30px; padding: 0;">
                                                     <i class="fa-solid fa-eye" style="font-size: 12px;"></i>
                                                 </button>
-                                                <button type="button" class="btn-table-warning" onclick="openModalEditPenitipan(<?php echo $idPen; ?>)" title="Edit Data Penitipan" style="width: 30px; height: 30px; padding: 0;">
-                                                    <i class="fa-solid fa-pen-to-square" style="font-size: 12px;"></i>
+                                                <button type="button" class="btn-table-warning" onclick="openModalEditPenitipan(<?php echo $idPen; ?>)" title="Tambah Stok / Kelola Titipan" style="width: 30px; height: 30px; padding: 0;">
+                                                    <i class="fa-solid fa-boxes-stacked" style="font-size: 12px;"></i>
                                                 </button>
                                                 <button type="button" class="btn-table-danger" 
                                                         data-id="<?php echo $idPen; ?>" 
@@ -3083,22 +3083,24 @@ $loewixPriceList = $tiptokMaster6;
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL EDIT PENITIPAN                                                      -->
+    <!-- MODAL EDIT / TAMBAH STOK PENITIPAN                                          -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalEditPenitipan" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 980px;">
-            <div class="modal-content" style="border-radius: 18px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
-                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; border-radius: 18px 18px 0 0;">
+            <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #091124 0%, #0f1d3d 100%); color: #ffffff; padding: 20px 26px; border-radius: 20px 20px 0 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(37, 99, 235, 0.2); border: 1.5px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 20px;">
-                            <i class="fa-solid fa-pen-to-square"></i>
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.18); border: 1.5px solid rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 22px;">
+                            <i class="fa-solid fa-boxes-stacked"></i>
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2">
-                                <h5 class="modal-title font-weight-bold text-white mb-0">Edit Data Penitipan Barang</h5>
-                                <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); font-size: 11px; padding: 4px 8px; border-radius: 6px;">Update Data</span>
+                                <h5 class="modal-title font-weight-bold text-white mb-0" style="font-family: 'Outfit', sans-serif; font-size: 19px;">Tambah Stok &amp; Kelola Barang Titipan</h5>
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11px; padding: 4px 9px; border-radius: 6px;">
+                                    <i class="fa-solid fa-boxes-packing me-1"></i> Restock Toko
+                                </span>
                             </div>
-                            <div class="text-xs mt-0.5" style="color: #94a3b8;" id="editModalSubtitle">Perbarui data toko, tanggal, atau daftar barang titipan</div>
+                            <div class="text-xs mt-0.5" style="color: #94a3b8;" id="editModalSubtitle">Tambah kuota kamera konsinyasi, restock unit titip, atau sesuaikan data toko</div>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -3107,10 +3109,11 @@ $loewixPriceList = $tiptokMaster6;
                 <form id="formEditPenitipan" onsubmit="submitEditPenitipan(event)">
                     <input type="hidden" name="id_penitipan" id="editIdPenitipan">
                     <div class="modal-body p-4 bg-light">
-                        <div class="bg-white p-3.5 rounded-3 mb-3 border" style="border: 1.5px solid #e2e8f0 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                        <!-- 1. Toko & Sales Info Meta Card -->
+                        <div class="bg-white p-3.5 rounded-3 mb-3 border" style="border: 1.5px solid #cbd5e1 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                             <div class="row g-3">
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '4' : '5'; ?>">
-                                    <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
+                                    <label class="form-label-taste mb-1"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
                                     <select name="id_customer" id="editSelectDealer" class="form-control-taste w-100" required onchange="onEditDealerSelected()">
                                         <option value="">-- Ketik / Cari Nama Toko / Dealer --</option>
                                         <?php foreach ($dealerOptionList as $d) : 
@@ -3124,7 +3127,7 @@ $loewixPriceList = $tiptokMaster6;
                                 </div>
                                 <?php if ($role !== 'Sales') : ?>
                                 <div class="col-md-3">
-                                    <label class="form-label-taste"><i class="fa-solid fa-user-tie text-primary me-1.5"></i> SALES PIC <span class="text-danger">*</span></label>
+                                    <label class="form-label-taste mb-1"><i class="fa-solid fa-user-tie text-primary me-1.5"></i> SALES PIC <span class="text-danger">*</span></label>
                                     <select name="id_sales" id="editSelectSales" class="form-control-taste w-100" required>
                                         <option value="">-- Pilih Sales PIC --</option>
                                         <?php foreach ($salesOptionList as $s) : ?>
@@ -3136,11 +3139,11 @@ $loewixPriceList = $tiptokMaster6;
                                 </div>
                                 <?php endif; ?>
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '3' : '4'; ?>">
-                                    <label class="form-label-taste"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL TITIP <span class="text-danger">*</span></label>
+                                    <label class="form-label-taste mb-1"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL TITIP <span class="text-danger">*</span></label>
                                     <input type="date" name="tgl_titip" id="editTglTitip" class="form-control-taste w-100 font-weight-bold" required>
                                 </div>
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '2' : '3'; ?>">
-                                    <label class="form-label-taste"><i class="fa-solid fa-signal text-primary me-1.5"></i> STATUS <span class="text-danger">*</span></label>
+                                    <label class="form-label-taste mb-1"><i class="fa-solid fa-signal text-primary me-1.5"></i> STATUS <span class="text-danger">*</span></label>
                                     <select name="status" id="editStatusPenitipan" class="form-control-taste w-100 font-weight-bold" required>
                                         <option value="aktif">Aktif</option>
                                         <option value="selesai">Selesai</option>
@@ -3159,15 +3162,54 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <!-- Header Barang Dititipkan (Sticky Edit) -->
+                        <!-- 2. Panduan Tambah Stok & Restock Toko (Card Modern) -->
+                        <div class="p-3 mb-3 rounded-3 border bg-white" style="border: 1.5px solid #cbd5e1 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                            <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
+                                <div style="width: 26px; height: 26px; border-radius: 6px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 13px;">
+                                    <i class="fa-solid fa-lightbulb"></i>
+                                </div>
+                                <span class="font-weight-bold text-dark text-xs text-uppercase" style="letter-spacing: 0.05em;">Panduan Cara Tambah Stok &amp; Restock Toko:</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-4 col-12">
+                                    <div class="d-flex align-items-start gap-2 p-2 rounded-2" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 100%;">
+                                        <span class="badge bg-primary text-white rounded-circle p-1 flex-shrink-0" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">1</span>
+                                        <div class="text-xs text-secondary" style="line-height: 1.35;">
+                                            <strong class="text-dark d-block">Tambah Stok Model:</strong>
+                                            Tekan tombol <strong>[+]</strong> pada kolom Qty kamera yang ingin ditambah. Sisa fisik di toko akan otomatis bertambah.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-12">
+                                    <div class="d-flex align-items-start gap-2 p-2 rounded-2" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 100%;">
+                                        <span class="badge bg-warning text-dark rounded-circle p-1 flex-shrink-0" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">2</span>
+                                        <div class="text-xs text-secondary" style="line-height: 1.35;">
+                                            <strong class="text-dark d-block">Tambah Model Baru:</strong>
+                                            Klik tombol <strong>+ Tambah Barang</strong> di kanan jika toko ingin menambah tipe kamera lain yang belum pernah dititipkan.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-12">
+                                    <div class="d-flex align-items-start gap-2 p-2 rounded-2" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 100%;">
+                                        <span class="badge bg-secondary text-white rounded-circle p-1 flex-shrink-0" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">3</span>
+                                        <div class="text-xs text-secondary" style="line-height: 1.35;">
+                                            <strong class="text-dark d-block">Proteksi Terjual:</strong>
+                                            Model yang sudah pernah ada penjualan otomatis terkunci agar riwayat invoice &amp; komisi toko tidak bergeser.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Header Barang Dititipkan (Sticky Edit) -->
                         <div class="sticky-items-header">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <label class="form-label-taste mb-0 text-dark" style="font-size: 13.5px;"><i class="fa-solid fa-video text-primary me-1.5"></i> DAFTAR BARANG DITITIPKAN <span class="text-danger">*</span></label>
+                                        <label class="form-label-taste mb-0 text-dark" style="font-size: 13.5px;"><i class="fa-solid fa-boxes-stacked text-success me-1.5"></i> DAFTAR UNIT KAMERA DITITIPKAN <span class="text-danger">*</span></label>
                                         <span class="badge bg-dark text-white px-2 py-0.5" id="editBadgeJumlahBarang" style="font-size: 11px; border-radius: 6px;">0 Item</span>
                                     </div>
-                                    <div class="text-xs text-secondary font-weight-bold">Perbarui daftar kamera titipan toko</div>
+                                    <div class="text-xs text-secondary font-weight-bold">Atur jumlah stok yang dititipkan atau tambah unit restock toko</div>
                                 </div>
                                 <div class="d-flex gap-1.5 flex-wrap">
                                     <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px;" onclick="openKatalogPriceListModal('edit')">
@@ -3176,32 +3218,22 @@ $loewixPriceList = $tiptokMaster6;
                                     <button type="button" class="btn btn-sm btn-outline-warning text-dark font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px; background: #fffbeb; border-color: #fde68a;" onclick="pasangSemua6Produk('edit_')" title="Masukkan otomatis seluruh 6 kamera resmi">
                                         <i class="fa-solid fa-bolt text-warning me-1"></i> + 6 Kamera Sekaligus
                                     </button>
-                                    <button type="button" class="btn-taste-primary btn-sm py-1.5 px-3 mb-0" style="font-size: 12px; border-radius: 9px;" onclick="tambahBarisBarangEdit()">
+                                    <button type="button" class="btn-taste-primary btn-sm py-1.5 px-3 mb-0" style="font-size: 12px; border-radius: 9px; background: linear-gradient(135deg, #059669 0%, #047857 100%); border-color: #047857;" onclick="tambahBarisBarangEdit()">
                                         <i class="fa-solid fa-plus me-1"></i> Tambah Barang
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Panduan Tambah Stok / Total Titip Info -->
-                        <div class="alert alert-info py-2 px-3 mb-2.5 border-0 d-flex align-items-start gap-2" style="background: rgba(37, 99, 235, 0.08); border-left: 3.5px solid #2563eb !important; border-radius: 8px;">
-                            <i class="fa-solid fa-circle-info text-primary mt-0.5" style="font-size: 13px;"></i>
-                            <div class="text-xs text-dark" style="line-height: 1.45;">
-                                <strong>Panduan Stok & Tambah Barang:</strong>
-                                Angka <strong>Qty</strong> di bawah adalah <strong>Total Unit Dititipkan</strong>. Sisa fisik di toko terhitung otomatis: <code>Total Titip − Terjual</code>.
-                                <br>• <strong>Tambah Stok (Restock):</strong> Naikkan angka pada tombol <strong>+</strong> pada model yang ingin ditambah (atau klik <em>+ Tambah Model Kamera Lainnya</em>).
-                                <br>• <strong>Kirim Batch Baru (Disarankan):</strong> Jika toko sudah tuntas terjual dan ber-invoice, Anda dapat membuat titipan baru via tombol <strong>+ Titip Barang</strong> di dashboard utama.
-                            </div>
-                        </div>
-
+                        <!-- 4. Container Baris Barang -->
                         <div id="editContainerItemRows"></div>
 
                         <!-- Tombol Tambah Cepat di Bawah Item Edit -->
                         <button type="button" class="btn-add-item-dashed mt-1 mb-3 w-100" onclick="tambahBarisBarangEdit()">
-                            <i class="fa-solid fa-circle-plus me-1 text-primary"></i> + Tambah Model Kamera Lainnya
+                            <i class="fa-solid fa-circle-plus me-1 text-success"></i> + Tambah Model Kamera Lainnya
                         </button>
 
-                        <!-- Grand Total Summary Bar for Edit -->
+                        <!-- 5. Grand Total Summary Bar for Edit -->
                         <div class="summary-bar-tiptok my-3" id="editSummaryBar">
                             <div class="d-flex align-items-center gap-3">
                                 <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(59, 130, 246, 0.2); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 16px;">
@@ -3218,16 +3250,18 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <div class="bg-white p-3.5 rounded-3 border mt-3" style="border: 1.5px solid #e2e8f0 !important;">
-                            <label class="form-label-taste"><i class="fa-regular fa-note-sticky text-secondary me-1.5"></i> Catatan Penitipan (Opsional)</label>
-                            <textarea name="catatan" id="editCatatan" class="form-control-taste w-100" rows="2" placeholder="Catatan perjanjian penitipan stok..."></textarea>
+                        <!-- 6. Catatan -->
+                        <div class="bg-white p-3.5 rounded-3 border mt-3" style="border: 1.5px solid #cbd5e1 !important;">
+                            <label class="form-label-taste mb-1"><i class="fa-regular fa-note-sticky text-secondary me-1.5"></i> Catatan Penitipan / Restock (Opsional)</label>
+                            <textarea name="catatan" id="editCatatan" class="form-control-taste w-100" rows="2" placeholder="Catatan perjanjian penitipan atau keterangan restock barang..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer p-3 bg-white border-top">
                         <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" id="btnSimpanEditPenitipan" class="btn-taste-primary">
-                            <i class="fa-solid fa-check me-1"></i> Simpan Perubahan
+                        <button type="submit" id="btnSimpanEditPenitipan" class="btn-taste-primary" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border-color: #047857;">
+                            <i class="fa-solid fa-floppy-disk me-1.5"></i> Simpan Penambahan Stok &amp; Titipan
                         </button>
+                    </div>
                     </div>
                 </form>
             </div>
@@ -3594,8 +3628,8 @@ $loewixPriceList = $tiptokMaster6;
                                 <button type="button" class="btn btn-sm btn-warning text-white font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none;" onclick="openCekSisaFromDetail()">
                                     <i class="fa-solid fa-arrow-up-from-bracket me-1.5"></i> Catat Barang Keluar
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px;" onclick="openEditFromDetail()">
-                                    <i class="fa-solid fa-pen-to-square me-1.5"></i> Edit Titipan
+                                <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px;" onclick="openEditFromDetail()">
+                                    <i class="fa-solid fa-boxes-stacked me-1.5"></i> Tambah Stok / Edit Titipan
                                 </button>
                             </div>
                         </div>
@@ -4051,6 +4085,19 @@ $loewixPriceList = $tiptokMaster6;
                     const parentSpan = liveSisaEl.closest('.stock-sisa-indicator');
                     if (parentSpan) {
                         parentSpan.className = `stock-sisa-indicator ${sisa > 0 ? 'text-success font-weight-bold' : 'text-secondary'}`;
+                    }
+                }
+                // Indikator Restock / Tambah Stok dibanding stok sebelumnya
+                const origInp = document.getElementById(`origQty_${prefix}${rowIndex}`);
+                const restockBadge = document.getElementById(`badgeRestock_${prefix}${rowIndex}`);
+                if (origInp && restockBadge) {
+                    const origVal = parseInt(origInp.value) || 0;
+                    if (qty > origVal) {
+                        const diff = qty - origVal;
+                        restockBadge.innerHTML = `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35); font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 5px;"><i class="fa-solid fa-arrow-trend-up me-0.5"></i> +${diff} Restock</span>`;
+                        restockBadge.classList.remove('d-none');
+                    } else {
+                        restockBadge.classList.add('d-none');
                     }
                 }
                 // Jika stok ditambah pada penitipan yang tadinya selesai, otomatis beralih ke 'aktif'
@@ -5147,6 +5194,7 @@ $loewixPriceList = $tiptokMaster6;
                                 const rowHtml = `
                                     <div class="item-card-row item-row-compact" id="editItemRow_${editItemRowIndex}">
                                         <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="${it.id}">
+                                        <input type="hidden" id="origQty_edit_${editItemRowIndex}" value="${currentQty}">
                                         <input type="hidden" id="hiddenTerjual_edit_${editItemRowIndex}" value="${terjual}">
                                         <input type="hidden" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" value="${escapeHtml(prodName)}">
                                         <input type="hidden" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" value="${escapeHtml(prodCat)}">
@@ -5172,14 +5220,15 @@ $loewixPriceList = $tiptokMaster6;
                                             <div class="col-md-2 col-5">
                                                 <div class="d-flex flex-column align-items-center justify-content-center">
                                                     <div class="d-flex align-items-center gap-1.5">
-                                                        <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline" style="font-size: 11px;">Qty:</span>
+                                                        <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline" style="font-size: 11px;">Titip:</span>
                                                         <div class="taste-qty-stepper-compact">
                                                             <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
-                                                            <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, terjual || 1)}" class="stepper-input-compact" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
+                                                            <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, terjual || 1)}" class="stepper-input-compact font-weight-bold" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
                                                             <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah Stok">+</button>
                                                         </div>
                                                         <span class="text-xs text-muted font-weight-bold">Unit</span>
                                                     </div>
+                                                    <div id="badgeRestock_edit_${editItemRowIndex}" class="d-none mt-1"></div>
                                                     ${isSold ? `
                                                         <div class="mt-1 d-flex align-items-center gap-1 text-xs" style="font-size: 10px;">
                                                             <span class="text-danger font-weight-bold"><i class="fa-solid fa-cart-shopping me-0.5"></i>Terjual: ${terjual}</span>
@@ -5190,7 +5239,7 @@ $loewixPriceList = $tiptokMaster6;
                                                         </div>
                                                     ` : `
                                                         <div class="mt-1 text-muted text-xs font-weight-semibold" style="font-size: 10px;">
-                                                            <i class="fa-solid fa-box-open me-0.5"></i> Belum ada laku
+                                                            <i class="fa-solid fa-box-open me-0.5 text-primary"></i> Belum laku (Sisa: <strong id="liveSisa_edit_${editItemRowIndex}">${currentSisa}</strong> u)
                                                         </div>
                                                     `}
                                                 </div>
@@ -5270,6 +5319,8 @@ $loewixPriceList = $tiptokMaster6;
             const rowHtml = `
                 <div class="item-card-row item-row-compact" id="editItemRow_${editItemRowIndex}">
                     <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="0">
+                    <input type="hidden" id="origQty_edit_${editItemRowIndex}" value="0">
+                    <input type="hidden" id="hiddenTerjual_edit_${editItemRowIndex}" value="0">
                     <input type="hidden" name="items[${editItemRowIndex}][nama_barang]" id="inputNama_edit_${editItemRowIndex}" value="${escapeHtml(pNama)}">
                     <input type="hidden" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" value="${escapeHtml(pTipe)}">
                     <input type="hidden" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" value="${pInsentif}">
@@ -5278,8 +5329,8 @@ $loewixPriceList = $tiptokMaster6;
                         <!-- Index & Product Selector: Ruang lebih luas (col-md-6) agar nama barang terbaca penuh -->
                         <div class="col-md-6 col-12">
                             <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-primary text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
-                                    +${editItemRowIndex}
+                                <span class="badge bg-success text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
+                                    BARU
                                 </span>
                                 <div class="flex-grow-1 min-w-0">
                                     <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" title="Pilih Model Kamera">
@@ -5292,14 +5343,19 @@ $loewixPriceList = $tiptokMaster6;
 
                         <!-- Qty Stepper: col-md-2 col-5 -->
                         <div class="col-md-2 col-5">
-                            <div class="d-flex align-items-center justify-content-start justify-content-md-center gap-1.5">
-                                <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline">Qty:</span>
-                                <div class="taste-qty-stepper-compact">
-                                    <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
-                                    <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="1" class="stepper-input-compact" value="${pQty}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
-                                    <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
+                            <div class="d-flex flex-column align-items-center justify-content-center">
+                                <div class="d-flex align-items-center gap-1.5">
+                                    <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline">Titip:</span>
+                                    <div class="taste-qty-stepper-compact">
+                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
+                                        <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="1" class="stepper-input-compact font-weight-bold" value="${pQty}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
+                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
+                                    </div>
+                                    <span class="text-xs text-muted font-weight-bold">Unit</span>
                                 </div>
-                                <span class="text-xs text-muted font-weight-bold">Unit</span>
+                                <div class="mt-1">
+                                    <span class="badge bg-success-subtle text-success text-2xs py-0.5 px-1.5 rounded font-weight-bold"><i class="fa-solid fa-plus me-0.5"></i> Model Baru</span>
+                                </div>
                             </div>
                         </div>
 
@@ -5350,7 +5406,7 @@ $loewixPriceList = $tiptokMaster6;
             const btn = document.getElementById('btnSimpanEditPenitipan');
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan Perubahan...';
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1.5"></i> Menyimpan Stok...';
             }
 
             fetch('tiptok-ajax.php', { method: 'POST', body: formData })
@@ -5358,13 +5414,13 @@ $loewixPriceList = $tiptokMaster6;
                 .then(res => {
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Perubahan';
+                        btn.innerHTML = '<i class="fa-solid fa-floppy-disk me-1.5"></i> Simpan Penambahan Stok &amp; Titipan';
                     }
 
                     if (res && res.status === 'success') {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Berhasil Diperbarui!',
+                            title: 'Stok Berhasil Disimpan!',
                             text: res.message,
                             timer: 1800,
                             showConfirmButton: false
@@ -5377,7 +5433,7 @@ $loewixPriceList = $tiptokMaster6;
                     console.error(err);
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Simpan Perubahan';
+                        btn.innerHTML = '<i class="fa-solid fa-floppy-disk me-1.5"></i> Simpan Penambahan Stok &amp; Titipan';
                     }
                     Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan saat memperbarui data.' });
                 });
