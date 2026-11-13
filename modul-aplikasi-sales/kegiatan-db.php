@@ -678,7 +678,10 @@ if (empty($salesNames)) {
             <!-- 5. Aksi -->
             <div class="keg-cell keg-actions">
               <?php if ($kegStatus === 'waiting'): ?>
-              <button type="button" class="btn-action btn-approve" title="Setujui Reschedule" onclick="confirmApprove(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['nama_customer'] ?? '')); ?>')">
+              <button type="button" class="btn-action btn-approve" title="Setujui Reschedule"
+                      data-id="<?php echo $row['id']; ?>"
+                      data-customer="<?php echo htmlspecialchars($row['nama_customer'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                      onclick="confirmApprove(this)">
                 <span class="material-symbols-outlined">check_circle</span>
               </button>
               <?php endif; ?>
@@ -688,7 +691,11 @@ if (empty($salesNames)) {
               </a>
 
               <?php if ($kegStatus !== 'selesai'): ?>
-              <button type="button" class="btn-action btn-resched" title="Jadwalkan Ulang" onclick="openRescheduleModal(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['nama_customer'] ?? '')); ?>', '<?php echo date('Y-m-d\TH:i', strtotime($row['jadwal'])); ?>')">
+              <button type="button" class="btn-action btn-resched" title="Jadwalkan Ulang"
+                      data-id="<?php echo $row['id']; ?>"
+                      data-customer="<?php echo htmlspecialchars($row['nama_customer'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                      data-jadwal="<?php echo date('Y-m-d\TH:i', strtotime($row['jadwal'])); ?>"
+                      onclick="openRescheduleModal(this)">
                 <span class="material-symbols-outlined">event_repeat</span>
               </button>
               <?php endif; ?>
@@ -697,7 +704,10 @@ if (empty($salesNames)) {
                 <span class="material-symbols-outlined">edit</span>
               </a>
 
-              <button type="button" class="btn-action btn-delete" title="Hapus Kegiatan" onclick="confirmDelete(<?php echo $row['id']; ?>, '<?php echo addslashes(htmlspecialchars($row['nama_customer'] ?? '')); ?>')">
+              <button type="button" class="btn-action btn-delete" title="Hapus Kegiatan"
+                      data-id="<?php echo $row['id']; ?>"
+                      data-customer="<?php echo htmlspecialchars($row['nama_customer'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                      onclick="confirmDelete(this)">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             </div>
@@ -1737,8 +1747,13 @@ textarea.resched-input { resize: vertical; min-height: 70px; }
 <script>
 let deleteId = null;
 
-function confirmDelete(id, customerName) {
-  deleteId = id;
+function confirmDelete(idOrElem, customerName) {
+  if (idOrElem && typeof idOrElem === 'object') {
+    deleteId = idOrElem.getAttribute('data-id') || idOrElem.dataset.id;
+    customerName = idOrElem.getAttribute('data-customer') || idOrElem.dataset.customer;
+  } else {
+    deleteId = idOrElem;
+  }
   document.getElementById('deleteCustomerName').textContent = customerName || 'customer ini';
   document.getElementById('deleteModal').classList.add('active');
 }
@@ -1784,8 +1799,13 @@ function executeDelete() {
 
 let approveId = null;
 
-function confirmApprove(id, customerName) {
-  approveId = id;
+function confirmApprove(idOrElem, customerName) {
+  if (idOrElem && typeof idOrElem === 'object') {
+    approveId = idOrElem.getAttribute('data-id') || idOrElem.dataset.id;
+    customerName = idOrElem.getAttribute('data-customer') || idOrElem.dataset.customer;
+  } else {
+    approveId = idOrElem;
+  }
   document.getElementById('approveCustomerName').textContent = customerName || 'customer ini';
   document.getElementById('approveModal').classList.add('active');
 }
@@ -1811,10 +1831,19 @@ function executeApprove() {
 
 let reschedId = null;
 
-function openRescheduleModal(id, customerName, currentDate) {
-  reschedId = id;
+function openRescheduleModal(idOrElem, customerName, currentDate) {
+  if (idOrElem && typeof idOrElem === 'object') {
+    reschedId = idOrElem.getAttribute('data-id') || idOrElem.dataset.id;
+    customerName = idOrElem.getAttribute('data-customer') || idOrElem.dataset.customer;
+    currentDate = idOrElem.getAttribute('data-jadwal') || idOrElem.dataset.jadwal;
+  } else {
+    reschedId = idOrElem;
+  }
   document.getElementById('reschedCustomerBadge').textContent = '📍 ' + (customerName || 'Customer');
-  const dt = new Date(currentDate);
+  let dt = currentDate ? new Date(currentDate) : new Date();
+  if (isNaN(dt.getTime())) {
+    dt = new Date();
+  }
   dt.setDate(dt.getDate() + 1);
   const y = dt.getFullYear();
   const m = String(dt.getMonth() + 1).padStart(2, '0');
