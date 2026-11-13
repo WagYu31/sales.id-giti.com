@@ -1106,6 +1106,24 @@ if ($qDealersPreload) {
                             </div>
                         </div>
 
+                        <!-- Alert Banner: Pilihan Pecah SO Jika Customer Beli Beda Waktu -->
+                        <div id="singleSplitHint" class="p-2.5 mb-3 rounded-2 d-none" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #dcfce7; color: #166534; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
+                                        <i class="fa-solid fa-scissors"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px; line-height: 1.2;">Beli Beda Waktu (Pagi &amp; Sore)?</div>
+                                        <div class="text-xs text-muted mt-0.5" style="font-size: 10.5px;">Pecah transaksi jika butuh no. SO/Invoice terpisah.</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm mb-0 px-2.5 py-1" style="background: #16a34a; color: #ffffff; border-radius: 6px; font-weight: 700; font-size: 11px; white-space: nowrap;" onclick="triggerPecahFromModal()">
+                                    <i class="fa-solid fa-scissors me-1"></i> Pecah SO
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Form Input Groups (Clean & Modern) -->
                         <div class="mb-3">
                             <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1.5 d-flex align-items-center justify-content-between">
@@ -1713,9 +1731,19 @@ if ($qDealersPreload) {
                         <span class="badge-pending-inv" style="font-size: 11px; padding: 3px 8px; white-space: nowrap;">
                             <i class="fa-solid fa-clock"></i> Belum Diinput
                         </span>
+                        ${it.split_group ? `
+                            <button type="button" class="btn btn-sm mb-0" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; font-weight: 700; font-size: 10.5px; height: 28px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 0 7px;" title="Gabungkan kembali dengan transaksi pasangannya" onclick="gabungTransaksiPrompt('${it.group_id}')">
+                                <i class="fa-solid fa-link"></i> Gabung
+                            </button>
+                        ` : ''}
                         <button type="button" class="btn btn-sm mb-0" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); border-radius: 6px; font-weight: 600; font-size: 11px; height: 28px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 0 8px;" title="Batalkan Seluruh Penjualan Toko Ini &amp; Kembalikan Stok" onclick="batalkanPenjualanGroup('${it.group_id}')">
                             <i class="fa-solid fa-trash-can"></i> Batal
                         </button>
+                        ${(totalQty > 1 || productCount > 1) ? `
+                            <button type="button" class="btn btn-sm mb-0" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; border-radius: 6px; font-weight: 700; font-size: 11px; height: 28px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 0 8px;" title="Pisahkan nomor SO / Invoice (misal beli pagi &amp; sore)" onclick="pecahTransaksiPrompt('${it.group_id}')">
+                                <i class="fa-solid fa-scissors"></i> Pecah SO
+                            </button>
+                        ` : ''}
                         <button type="button" class="btn-brand-amber" onclick="openSingleInvoiceModal('${it.group_id}')">
                             <i class="fa-solid fa-plus"></i> Input SO / Inv
                         </button>
@@ -1755,12 +1783,16 @@ if ($qDealersPreload) {
 
                 // Products list formatting
                 let productsHtml = '';
+                const isSplit = Boolean(it.split_group || (it.items && it.items.some(p => p.split_group)));
                 if (!it.items || it.items.length <= 1) {
                     const singleItem = (it.items && it.items.length > 0) ? it.items[0] : it;
                     const itemQty = singleItem.qty_terjual_kunjungan || totalQty;
                     const insUnit = singleItem.insentif_per_unit || 0;
                     productsHtml = `
-                        <div class="font-weight-bold text-dark" style="font-size: 13px; line-height: 1.3;">${escapeHtml(singleItem.nama_barang || '-')}</div>
+                        <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                            <span class="font-weight-bold text-dark" style="font-size: 13px; line-height: 1.3;">${escapeHtml(singleItem.nama_barang || '-')}</span>
+                            ${isSplit ? `<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;"><i class="fa-solid fa-scissors me-1"></i>Pecahan SO</span>` : ''}
+                        </div>
                         <div class="d-flex align-items-center gap-1.5 mt-1">
                             <span class="badge px-2 py-0.5" style="background: var(--pastel-red-bg); color: var(--pastel-red-text); border: 1px solid var(--pastel-red-border); font-size: 11px; font-weight: 700; border-radius: 4px;">
                                 Laku: ${itemQty} Unit
@@ -1901,9 +1933,11 @@ if ($qDealersPreload) {
         // =========================================================================
         // MODAL SINGLE / GROUP INVOICE & SO
         // =========================================================================
+        let activeModalGroupId = null;
         function openSingleInvoiceModal(groupId) {
             const it = invoicesData.find(x => x.group_id === groupId || (x.kunjungan_ids && x.kunjungan_ids.includes(parseInt(groupId))));
             if (!it) return;
+            activeModalGroupId = it.group_id;
 
             const kunjIds = it.kunjungan_ids || [it.id_kunjungan];
             document.getElementById('singleIdKunjungan').value = kunjIds[0] || 0;
@@ -1937,7 +1971,29 @@ if ($qDealersPreload) {
                 ? `Perbarui nomor SO atau faktur penjualan untuk toko ini` 
                 : `Tetapkan nomor SO atau faktur penjualan untuk seluruh barang pada transaksi ini`;
 
+            // Tampilkan banner opsi pecah SO jika belum ada invoice dan total unit > 1 atau item > 1
+            const isPending = (!it.no_inv || it.no_inv.trim() === '') && (!it.no_so || it.no_so.trim() === '');
+            const canSplit = isPending && ((parseInt(it.total_qty) || 0) > 1 || (it.items && it.items.length > 1));
+            const splitHint = document.getElementById('singleSplitHint');
+            if (splitHint) {
+                if (canSplit) {
+                    splitHint.classList.remove('d-none');
+                } else {
+                    splitHint.classList.add('d-none');
+                }
+            }
+
             showModalSafe('modalSingleInvoice');
+        }
+
+        function triggerPecahFromModal() {
+            const gId = activeModalGroupId;
+            hideModalSafe('modalSingleInvoice');
+            if (gId) {
+                setTimeout(() => {
+                    pecahTransaksiPrompt(gId);
+                }, 350);
+            }
         }
 
         function submitSingleInvoice(e) {
@@ -2318,6 +2374,298 @@ if ($qDealersPreload) {
                             console.error(err);
                             Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan.' });
                             loadInvoicesData();
+                        });
+                }
+            });
+        }
+
+        // =========================================================================
+        // PECAH TRANSAKSI SO & INVOICE (UNTUK PEMBELIAN DI WAKTU BERBEDA / BEDA SO)
+        // =========================================================================
+        function pecahTransaksiPrompt(groupId) {
+            const it = invoicesData.find(x => x.group_id === groupId);
+            if (!it) {
+                Swal.fire({ icon: 'error', title: 'Data Tidak Ditemukan', text: 'Data transaksi tidak ditemukan.' });
+                return;
+            }
+
+            const items = it.items || [];
+            const namaToko = it.nama_toko || 'Toko Mitra';
+            const totalQty = parseInt(it.total_qty) || 0;
+
+            // Jika hanya 1 macam barang
+            if (items.length <= 1) {
+                const singleItem = (items.length > 0) ? items[0] : it;
+                const totalUnit = parseInt(singleItem.qty_terjual_kunjungan || totalQty || 0);
+                const namaBarang = singleItem.nama_barang || 'Barang TIP TOK';
+                const idKunjungan = singleItem.id_kunjungan || (it.kunjungan_ids ? it.kunjungan_ids[0] : 0);
+
+                if (totalUnit <= 1) {
+                    Swal.fire({ 
+                        icon: 'info', 
+                        title: 'Tidak Dapat Dipecah', 
+                        text: 'Jumlah barang pada transaksi ini hanya 1 unit, tidak dapat dipecah lagi.' 
+                    });
+                    return;
+                }
+
+                const maxPecah = totalUnit - 1;
+
+                Swal.fire({
+                    title: '<div class="d-flex align-items-center justify-content-center gap-2" style="font-size: 18px; color: #0f172a;"><i class="fa-solid fa-scissors text-success"></i> Pecah Transaksi SO &amp; Invoice</div>',
+                    html: `
+                        <div class="text-start" style="font-size: 13px;">
+                            <div class="p-3 mb-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="font-weight-bold text-dark fs-6">${escapeHtml(namaToko)}</span>
+                                    <span class="badge bg-dark text-white px-2 py-0.5" style="font-size: 11px;">Total Laku: ${totalUnit} Unit</span>
+                                </div>
+                                <div class="text-secondary font-weight-bold" style="font-size: 12px;">${escapeHtml(namaBarang)}</div>
+                            </div>
+
+                            <div class="p-2.5 mb-3 rounded-2" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-size: 12px; line-height: 1.4;">
+                                <i class="fa-solid fa-circle-info me-1"></i> <strong>Pemisahan Nomor SO / Invoice:</strong><br>
+                                Gunakan fitur ini jika customer beli di waktu berbeda (misal: <strong>1 unit pagi</strong> dan <strong>1 unit sore</strong>). Transaksi akan dipecah menjadi 2 baris terpisah agar masing-masing dapat diinput nomor SO/Invoice berbeda.
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1">
+                                    Jumlah Unit yang Dipisah ke SO Baru:
+                                </label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="number" id="inputQtyPecah" class="form-control form-control-taste text-center font-weight-bold" style="font-size: 17px; width: 110px;" min="1" max="${maxPecah}" value="1">
+                                    <span class="text-xs text-muted font-weight-bold">Unit (Maksimal: ${maxPecah} Unit)</span>
+                                </div>
+                                <div class="text-xs text-secondary mt-1.5 p-2 rounded" style="background: #f1f5f9; border: 1px solid #e2e8f0;">
+                                    • Transaksi 1 (Tetap): <strong id="lblSisaPecah" class="text-primary">${totalUnit - 1}</strong> Unit<br>
+                                    • Transaksi 2 (Baru): <strong id="lblBaruPecah" class="text-success">1</strong> Unit
+                                </div>
+                            </div>
+
+                            <div class="mb-1">
+                                <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1">
+                                    Catatan / Keterangan (Opsional):
+                                </label>
+                                <input type="text" id="inputCatatanPecah" class="form-control form-control-taste" placeholder="Contoh: Beli sore hari / beda SO">
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fa-solid fa-scissors me-1"></i> Ya, Pecah Transaksi',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#16a34a',
+                    cancelButtonColor: '#94a3b8',
+                    didOpen: () => {
+                        const inp = document.getElementById('inputQtyPecah');
+                        const lblSisa = document.getElementById('lblSisaPecah');
+                        const lblBaru = document.getElementById('lblBaruPecah');
+                        if (inp) {
+                            inp.addEventListener('input', () => {
+                                let v = parseInt(inp.value) || 1;
+                                if (v < 1) v = 1;
+                                if (v > maxPecah) v = maxPecah;
+                                inp.value = v;
+                                if (lblSisa) lblSisa.textContent = (totalUnit - v);
+                                if (lblBaru) lblBaru.textContent = v;
+                            });
+                        }
+                    },
+                    preConfirm: () => {
+                        const qtyVal = parseInt(document.getElementById('inputQtyPecah').value) || 1;
+                        const catatanVal = document.getElementById('inputCatatanPecah').value.trim();
+                        if (qtyVal < 1 || qtyVal > maxPecah) {
+                            Swal.showValidationMessage(`Jumlah unit yang dipisah harus antara 1 dan ${maxPecah}`);
+                            return false;
+                        }
+                        return { qty: qtyVal, catatan: catatanVal, id_kunjungan: idKunjungan };
+                    }
+                }).then(result => {
+                    if (result.isConfirmed && result.value) {
+                        doPecahTransaksi(result.value.id_kunjungan, result.value.qty, result.value.catatan);
+                    }
+                });
+            } else {
+                // Multi items dalam 1 transaksi
+                let itemsListHtml = items.map((p, idx) => `
+                    <div class="form-check p-2.5 mb-2 rounded border" style="background: #ffffff; cursor: pointer;">
+                        <input class="form-check-input ms-0 me-2 radio-item-pecah" type="radio" name="itemPecahRadio" id="itemPecah_${p.id_kunjungan}" value="${p.id_kunjungan}" data-qty="${p.qty_terjual_kunjungan}" data-name="${escapeHtml(p.nama_barang)}" ${idx === 0 ? 'checked' : ''} style="cursor: pointer;">
+                        <label class="form-check-label w-100 font-weight-bold text-dark" for="itemPecah_${p.id_kunjungan}" style="cursor: pointer; font-size: 12.5px;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>${escapeHtml(p.nama_barang)}</span>
+                                <span class="badge bg-secondary text-white">${p.qty_terjual_kunjungan} Unit</span>
+                            </div>
+                        </label>
+                    </div>
+                `).join('');
+
+                Swal.fire({
+                    title: '<div class="d-flex align-items-center justify-content-center gap-2" style="font-size: 18px; color: #0f172a;"><i class="fa-solid fa-scissors text-success"></i> Pecah Transaksi Multi-Barang</div>',
+                    html: `
+                        <div class="text-start" style="font-size: 13px;">
+                            <div class="p-3 mb-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                                <div class="font-weight-bold text-dark fs-6">${escapeHtml(namaToko)}</div>
+                                <div class="text-muted font-weight-bold text-xs">${totalQty} Unit (${items.length} Macam Barang)</div>
+                            </div>
+
+                            <div class="p-2.5 mb-3 rounded-2" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-size: 12px;">
+                                <i class="fa-solid fa-circle-info me-1"></i> Pilih barang yang ingin dipisahkan ke nomor SO / faktur berbeda:
+                            </div>
+
+                            <div class="mb-3">
+                                ${itemsListHtml}
+                            </div>
+
+                            <div id="wrapQtyPecahMulti" class="mb-3">
+                                <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1">
+                                    Jumlah Unit yang Dipisahkan:
+                                </label>
+                                <input type="number" id="inputQtyPecahMulti" class="form-control form-control-taste text-center font-weight-bold" style="font-size: 16px; width: 110px;" min="1" value="1">
+                                <div class="text-xs text-muted mt-1" id="lblMaxMulti">Unit yang dipisah</div>
+                            </div>
+
+                            <div class="mb-1">
+                                <label class="form-label font-weight-bold text-dark text-xs text-uppercase mb-1">Catatan (Opsional):</label>
+                                <input type="text" id="inputCatatanPecahMulti" class="form-control form-control-taste" placeholder="Contoh: Beli sore hari">
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fa-solid fa-scissors me-1"></i> Pisahkan Transaksi Ini',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#16a34a',
+                    cancelButtonColor: '#94a3b8',
+                    didOpen: () => {
+                        const radios = document.querySelectorAll('.radio-item-pecah');
+                        const inpQty = document.getElementById('inputQtyPecahMulti');
+                        const lblMax = document.getElementById('lblMaxMulti');
+
+                        function updateMultiInputs() {
+                            const checked = document.querySelector('.radio-item-pecah:checked');
+                            if (!checked) return;
+                            const curQty = parseInt(checked.dataset.qty) || 1;
+                            if (curQty > 1) {
+                                inpQty.max = curQty - 1;
+                                inpQty.value = 1;
+                                lblMax.textContent = `Bisa dipisah antara 1 s/d ${curQty - 1} Unit`;
+                            } else {
+                                inpQty.max = 1;
+                                inpQty.value = 1;
+                                lblMax.textContent = `Pisahkan item ini (1 Unit) ke baris SO terpisah`;
+                            }
+                        }
+                        radios.forEach(r => r.addEventListener('change', updateMultiInputs));
+                        updateMultiInputs();
+                    },
+                    preConfirm: () => {
+                        const checked = document.querySelector('.radio-item-pecah:checked');
+                        if (!checked) {
+                            Swal.showValidationMessage('Pilih salah satu barang yang ingin dipisah.');
+                            return false;
+                        }
+                        const idKunj = parseInt(checked.value);
+                        const qtyVal = parseInt(document.getElementById('inputQtyPecahMulti').value) || 1;
+                        const catVal = document.getElementById('inputCatatanPecahMulti').value.trim();
+
+                        return { id_kunjungan: idKunj, qty: qtyVal, catatan: catVal };
+                    }
+                }).then(result => {
+                    if (result.isConfirmed && result.value) {
+                        doPecahTransaksi(result.value.id_kunjungan, result.value.qty, result.value.catatan);
+                    }
+                });
+            }
+        }
+
+        function doPecahTransaksi(idKunjungan, qty, catatan) {
+            Swal.fire({
+                title: 'Memproses Pecah Transaksi...',
+                html: '<div class="text-xs text-muted mt-1">Membuat transaksi terpisah untuk nomor SO baru...</div>',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            const fd = new FormData();
+            fd.append('action', 'pecah_transaksi_tiptok');
+            fd.append('id_kunjungan', idKunjungan);
+            fd.append('qty_pecah', qty);
+            fd.append('catatan_pecah', catatan || '');
+
+            fetch('tiptok-ajax.php', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(res => {
+                    if (res && res.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Transaksi Berhasil Dipecah!',
+                            text: res.message || 'Transaksi telah terbagi menjadi 2 baris terpisah.',
+                            confirmButtonText: '<i class="fa-solid fa-check me-1"></i> Siap, Input SO Sekarang',
+                            confirmButtonColor: '#0f172a'
+                        }).then(() => {
+                            loadInvoicesData();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal Memecah Transaksi',
+                            text: (res && res.message) ? res.message : 'Terjadi kesalahan sistem.'
+                        });
+                    }
+                })
+                .catch(err => {
+                    Swal.fire({ icon: 'error', title: 'Error Jaringan', text: err.message });
+                });
+        }
+
+        function gabungTransaksiPrompt(groupId) {
+            const it = invoicesData.find(x => x.group_id === groupId);
+            if (!it) return;
+
+            const kunjIds = it.kunjungan_ids || [it.id_kunjungan];
+            const idKunjungan = kunjIds[0] || 0;
+
+            Swal.fire({
+                title: '<div class="d-flex align-items-center justify-content-center gap-2" style="font-size: 17px; color: #0f172a;"><i class="fa-solid fa-link text-primary"></i> Gabungkan Kembali Transaksi?</div>',
+                text: 'Transaksi pecahan ini akan disatukan kembali dengan pasangannya menjadi 1 transaksi utuh.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-solid fa-check me-1"></i> Ya, Satukan Kembali',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#94a3b8'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Menggabungkan...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    const fd = new FormData();
+                    fd.append('action', 'gabung_transaksi_tiptok');
+                    fd.append('id_kunjungan', idKunjungan);
+
+                    fetch('tiptok-ajax.php', { method: 'POST', body: fd })
+                        .then(r => r.json())
+                        .then(res => {
+                            if (res && res.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil Digabung!',
+                                    text: res.message || 'Transaksi telah disatukan kembali.',
+                                    timer: 1600,
+                                    showConfirmButton: false
+                                });
+                                loadInvoicesData();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal Menggabungkan',
+                                    text: (res && res.message) ? res.message : 'Terjadi kesalahan sistem.'
+                                });
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire({ icon: 'error', title: 'Error Jaringan', text: err.message });
                         });
                 }
             });
