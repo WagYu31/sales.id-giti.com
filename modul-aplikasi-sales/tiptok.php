@@ -1612,14 +1612,17 @@ $loewixPriceList = $tiptokMaster6;
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
         }
         .product-select-compact {
-            font-size: 13px !important;
+            font-size: 13.5px !important;
             font-weight: 700 !important;
             border-radius: 10px !important;
             border: 1.5px solid #cbd5e1 !important;
-            padding: 8px 12px !important;
+            padding: 8px 38px 8px 12px !important;
             color: #0f172a !important;
             background-color: #ffffff !important;
             transition: all 0.2s ease !important;
+            cursor: pointer !important;
+            letter-spacing: -0.01em !important;
+            min-height: 40px !important;
         }
         .product-select-compact:focus {
             border-color: #2563eb !important;
@@ -2917,7 +2920,7 @@ $loewixPriceList = $tiptokMaster6;
     <!-- MODAL 1: TAMBAH PENITIPAN BARU                                           -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalTambahPenitipan" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 980px;">
             <div class="modal-content" style="border-radius: 18px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
                 <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; border-radius: 18px 18px 0 0;">
                     <div class="d-flex align-items-center gap-3">
@@ -3054,7 +3057,7 @@ $loewixPriceList = $tiptokMaster6;
     <!-- MODAL EDIT PENITIPAN                                                      -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalEditPenitipan" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 980px;">
             <div class="modal-content" style="border-radius: 18px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
                 <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; border-radius: 18px 18px 0 0;">
                     <div class="d-flex align-items-center gap-3">
@@ -3943,9 +3946,7 @@ $loewixPriceList = $tiptokMaster6;
                 html += `<optgroup label="📹 ${escapeHtml(cat)}">`;
                 groups[cat].forEach(p => {
                     const isSel = (targetProd && (p.id === targetProd.id || p.type === targetProd.type)) ? 'selected' : '';
-                    const priceStr = p.msrp > 0 ? ` (MSRP: Rp ${new Intl.NumberFormat('id-ID').format(p.msrp)})` : '';
-                    const insentifStr = p.insentif > 0 ? ` • Insentif: Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)}/Unit` : '';
-                    html += `<option value="${escapeHtml(p.type)}" ${isSel}>${escapeHtml(p.type)}${insentifStr}${priceStr}</option>`;
+                    html += `<option value="${escapeHtml(p.type)}" ${isSel} data-insentif="${p.insentif}" data-msrp="${p.msrp}">${escapeHtml(p.type)}</option>`;
                 });
                 html += `</optgroup>`;
             }
@@ -3955,6 +3956,7 @@ $loewixPriceList = $tiptokMaster6;
         function onSelectRowProduct(selectEl, rowIndex, prefix = '') {
             const selectedVal = selectEl.value;
             const p = findLoewixProduct(selectedVal);
+            selectEl.title = p ? p.type : '';
             const inputNama = document.getElementById(`inputNama_${prefix}${rowIndex}`);
             const inputTipe = document.getElementById(`inputTipe_${prefix}${rowIndex}`);
             const inputInsentif = document.getElementById(`inputInsentif_${prefix}${rowIndex}`);
@@ -4891,14 +4893,14 @@ $loewixPriceList = $tiptokMaster6;
                     <input type="hidden" name="items[${itemRowIndex}][insentif_per_unit]" id="inputInsentif_${itemRowIndex}" value="${pInsentif}">
 
                     <div class="row g-2 align-items-center">
-                        <!-- Index & Product Selector -->
-                        <div class="col-md-5 col-12">
+                        <!-- Index & Product Selector: Ruang lebih luas (col-md-6) agar nama barang terbaca penuh -->
+                        <div class="col-md-6 col-12">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="badge bg-dark text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
                                     #${itemRowIndex}
                                 </span>
                                 <div class="flex-grow-1 min-w-0">
-                                    <select id="selectProduct_${itemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${itemRowIndex}, '')">
+                                    <select id="selectProduct_${itemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${itemRowIndex}, '')" title="Pilih Model Kamera">
                                         <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
                                         ${renderPriceListOptions(pNama)}
                                     </select>
@@ -4906,10 +4908,10 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <!-- Qty Stepper -->
-                        <div class="col-md-3 col-6">
+                        <!-- Qty Stepper: col-md-2 col-5 -->
+                        <div class="col-md-2 col-5">
                             <div class="d-flex align-items-center justify-content-start justify-content-md-center gap-1.5">
-                                <span class="text-xs text-secondary font-weight-bold d-none d-sm-inline">Qty:</span>
+                                <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline">Qty:</span>
                                 <div class="taste-qty-stepper-compact">
                                     <button type="button" class="stepper-btn-compact" onclick="stepQty(${itemRowIndex}, -1, '')" title="Kurangi">−</button>
                                     <input type="number" name="items[${itemRowIndex}][qty_titip]" id="inputQty_${itemRowIndex}" min="1" class="stepper-input-compact" value="${pQty}" required oninput="recalcRowSubtotal(${itemRowIndex}, '')">
@@ -4919,10 +4921,10 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <!-- Insentif & Subtotal Badge -->
-                        <div class="col-md-3 col-4 text-end">
+                        <!-- Insentif & Subtotal Badge: col-md-3 col-5 text-end -->
+                        <div class="col-md-3 col-5 text-end">
                             <div class="d-inline-flex flex-column align-items-end">
-                                <div class="text-xs font-weight-bold text-muted" style="font-size: 10px;" id="labelInsentif_${itemRowIndex}">
+                                <div class="text-xs font-weight-bold text-muted" style="font-size: 10.5px;" id="labelInsentif_${itemRowIndex}">
                                     ${pInsentif ? 'Insentif: Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + '/u' : 'Insentif: -'}
                                 </div>
                                 <div class="fw-bold text-success fs-6" id="subtotalInsentif_${itemRowIndex}" style="line-height: 1.2;">
@@ -4931,7 +4933,7 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <!-- Delete Action -->
+                        <!-- Delete Action: col-md-1 col-2 text-end -->
                         <div class="col-md-1 col-2 text-end">
                             <button type="button" class="btn btn-sm btn-outline-danger p-0 d-flex align-items-center justify-content-center ms-auto" style="width: 32px; height: 32px; border-radius: 8px;" onclick="hapusBarisBarang(${itemRowIndex})" title="Hapus Barang Ini">
                                 <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
@@ -5120,14 +5122,14 @@ $loewixPriceList = $tiptokMaster6;
                                         <input type="hidden" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" value="${pInsentif}">
 
                                         <div class="row g-2 align-items-center">
-                                            <!-- Index & Product Selector -->
-                                            <div class="col-md-5 col-12">
+                                            <!-- Index & Product Selector: Ruang lebih luas (col-md-6) agar nama barang terbaca penuh -->
+                                            <div class="col-md-6 col-12">
                                                 <div class="d-flex align-items-center gap-2">
                                                     <span class="badge bg-dark text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
                                                         #${editItemRowIndex}
                                                     </span>
                                                     <div class="flex-grow-1 min-w-0">
-                                                        <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" ${isSold ? 'disabled' : ''}>
+                                                        <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" ${isSold ? 'disabled' : ''} title="Pilih Model Kamera">
                                                             <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
                                                             ${renderPriceListOptions(prodName)}
                                                         </select>
@@ -5135,11 +5137,11 @@ $loewixPriceList = $tiptokMaster6;
                                                 </div>
                                             </div>
 
-                                            <!-- Qty Stepper & Live Stock Breakdown -->
-                                            <div class="col-md-3 col-6">
+                                            <!-- Qty Stepper & Live Stock Breakdown: col-md-2 col-5 -->
+                                            <div class="col-md-2 col-5">
                                                 <div class="d-flex flex-column align-items-center justify-content-center">
                                                     <div class="d-flex align-items-center gap-1.5">
-                                                        <span class="text-xs text-secondary font-weight-bold d-none d-sm-inline" style="font-size: 11px;">Total Titip:</span>
+                                                        <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline" style="font-size: 11px;">Qty:</span>
                                                         <div class="taste-qty-stepper-compact">
                                                             <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
                                                             <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, terjual || 1)}" class="stepper-input-compact" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
@@ -5152,7 +5154,7 @@ $loewixPriceList = $tiptokMaster6;
                                                             <span class="text-danger font-weight-bold"><i class="fa-solid fa-cart-shopping me-0.5"></i>Terjual: ${terjual}</span>
                                                             <span class="text-muted">•</span>
                                                             <span class="stock-sisa-indicator ${currentSisa > 0 ? 'text-success font-weight-bold' : 'text-secondary'}">
-                                                                Sisa Fisik: <strong id="liveSisa_edit_${editItemRowIndex}">${currentSisa}</strong> u
+                                                                Sisa: <strong id="liveSisa_edit_${editItemRowIndex}">${currentSisa}</strong> u
                                                             </span>
                                                         </div>
                                                     ` : `
@@ -5163,10 +5165,10 @@ $loewixPriceList = $tiptokMaster6;
                                                 </div>
                                             </div>
 
-                                            <!-- Insentif & Subtotal Badge -->
-                                            <div class="col-md-3 col-4 text-end">
+                                            <!-- Insentif & Subtotal Badge: col-md-3 col-5 text-end -->
+                                            <div class="col-md-3 col-5 text-end">
                                                 <div class="d-inline-flex flex-column align-items-end">
-                                                    <div class="text-xs font-weight-bold text-muted" style="font-size: 10px;" id="labelInsentif_edit_${editItemRowIndex}">
+                                                    <div class="text-xs font-weight-bold text-muted" style="font-size: 10.5px;" id="labelInsentif_edit_${editItemRowIndex}">
                                                         ${pInsentif ? 'Insentif: Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + '/u' : 'Insentif: -'}
                                                     </div>
                                                     <div class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}" style="line-height: 1.2;">
@@ -5175,7 +5177,7 @@ $loewixPriceList = $tiptokMaster6;
                                                 </div>
                                             </div>
 
-                                            <!-- Delete Action / Sold Lock -->
+                                            <!-- Delete Action / Sold Lock: col-md-1 col-2 text-end -->
                                             <div class="col-md-1 col-2 text-end">
                                                 ${deleteBtn}
                                             </div>
@@ -5242,14 +5244,14 @@ $loewixPriceList = $tiptokMaster6;
                     <input type="hidden" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" value="${pInsentif}">
 
                     <div class="row g-2 align-items-center">
-                        <!-- Index & Product Selector -->
-                        <div class="col-md-5 col-12">
+                        <!-- Index & Product Selector: Ruang lebih luas (col-md-6) agar nama barang terbaca penuh -->
+                        <div class="col-md-6 col-12">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="badge bg-primary text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
                                     +${editItemRowIndex}
                                 </span>
                                 <div class="flex-grow-1 min-w-0">
-                                    <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')">
+                                    <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" title="Pilih Model Kamera">
                                         <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
                                         ${renderPriceListOptions(pNama)}
                                     </select>
@@ -5257,10 +5259,10 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <!-- Qty Stepper -->
-                        <div class="col-md-3 col-6">
+                        <!-- Qty Stepper: col-md-2 col-5 -->
+                        <div class="col-md-2 col-5">
                             <div class="d-flex align-items-center justify-content-start justify-content-md-center gap-1.5">
-                                <span class="text-xs text-secondary font-weight-bold d-none d-sm-inline">Qty:</span>
+                                <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline">Qty:</span>
                                 <div class="taste-qty-stepper-compact">
                                     <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
                                     <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="1" class="stepper-input-compact" value="${pQty}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
@@ -5270,10 +5272,10 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <!-- Insentif & Subtotal Badge -->
-                        <div class="col-md-3 col-4 text-end">
+                        <!-- Insentif & Subtotal Badge: col-md-3 col-5 text-end -->
+                        <div class="col-md-3 col-5 text-end">
                             <div class="d-inline-flex flex-column align-items-end">
-                                <div class="text-xs font-weight-bold text-muted" style="font-size: 10px;" id="labelInsentif_edit_${editItemRowIndex}">
+                                <div class="text-xs font-weight-bold text-muted" style="font-size: 10.5px;" id="labelInsentif_edit_${editItemRowIndex}">
                                     ${pInsentif ? 'Insentif: Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + '/u' : 'Insentif: -'}
                                 </div>
                                 <div class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}" style="line-height: 1.2;">
@@ -5282,7 +5284,7 @@ $loewixPriceList = $tiptokMaster6;
                             </div>
                         </div>
 
-                        <!-- Delete Action -->
+                        <!-- Delete Action: col-md-1 col-2 text-end -->
                         <div class="col-md-1 col-2 text-end">
                             <button type="button" class="btn btn-sm btn-outline-danger p-0 d-flex align-items-center justify-content-center ms-auto" style="width: 32px; height: 32px; border-radius: 8px;" onclick="hapusBarisBarangEdit(${editItemRowIndex})" title="Hapus Barang Ini">
                                 <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
