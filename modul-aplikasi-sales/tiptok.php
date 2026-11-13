@@ -2108,12 +2108,25 @@ $loewixPriceList = $tiptokMaster6;
             transition: all 0.15s ease !important;
         }
         .audit-qty-stepper:focus-within {
-            border-color: #2563eb !important;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18) !important;
         }
         .audit-qty-stepper.is-sold-state {
-            border-color: #059669 !important;
-            background: #f0fdf4 !important;
+            border-color: #f59e0b !important;
+            background: #fffbeb !important;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22) !important;
+        }
+        .audit-qty-stepper.is-sold-state input.audit-stepper-input {
+            color: #b45309 !important;
+            font-weight: 900 !important;
+        }
+        .audit-qty-stepper.is-sold-state .audit-stepper-btn {
+            background: #fef3c7 !important;
+            color: #92400e !important;
+        }
+        .audit-qty-stepper.is-sold-state .audit-stepper-btn:hover {
+            background: #fde68a !important;
+            color: #78350f !important;
         }
         .audit-qty-stepper .audit-stepper-btn {
             width: 36px !important;
@@ -2175,6 +2188,12 @@ $loewixPriceList = $tiptokMaster6;
             border-radius: 10px;
             padding: 10px 12px;
             border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.2s ease;
+        }
+        .audit-summary-box.audit-summary-hero {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.28) 100%);
+            border: 1.5px solid rgba(245, 158, 11, 0.45);
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.15);
         }
         .audit-summary-label {
             font-size: 10.5px;
@@ -2195,7 +2214,7 @@ $loewixPriceList = $tiptokMaster6;
             color: #334155;
             border: 1.5px solid #cbd5e1;
             border-radius: 8px;
-            padding: 4px 10px;
+            padding: 5px 12px;
             font-size: 11.5px;
             font-weight: 800;
             display: inline-flex;
@@ -2208,6 +2227,16 @@ $loewixPriceList = $tiptokMaster6;
             background: #f1f5f9;
             color: #0f172a;
             border-color: #94a3b8;
+        }
+        .btn-quick-fill-danger {
+            border-color: #fecdd3 !important;
+            color: #e11d48 !important;
+            background: #fff1f2 !important;
+        }
+        .btn-quick-fill-danger:hover {
+            background: #ffe4e6 !important;
+            color: #be123c !important;
+            border-color: #fda4af !important;
         }
     </style>
 </head>
@@ -2671,8 +2700,8 @@ $loewixPriceList = $tiptokMaster6;
                                         <td style="text-align: right; white-space: nowrap; vertical-align: top; padding-top: 14px;">
                                             <div class="d-inline-flex gap-1 align-items-center justify-content-end">
                                                 <?php if ($statusPen === 'aktif' && $sumSisa > 0) : ?>
-                                                    <button type="button" class="btn-table-primary" onclick="openModalLaporKunjungan(<?php echo $idPen; ?>)" title="Lapor Kunjungan &amp; Cek Sisa Fisik" style="height: 30px; font-size: 11.5px; padding: 0 10px;">
-                                                        <i class="fa-solid fa-clipboard-check"></i> Cek Sisa
+                                                    <button type="button" class="btn-table-primary" onclick="openModalLaporKunjungan(<?php echo $idPen; ?>)" title="Catat Barang Keluar / Terjual" style="height: 30px; font-size: 11.5px; padding: 0 10px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-color: #d97706; color: #ffffff;">
+                                                        <i class="fa-solid fa-arrow-up-from-bracket me-1"></i> Barang Keluar
                                                     </button>
                                                 <?php endif; ?>
                                                 <button type="button" class="btn-table-secondary" onclick="openModalDetailTiptok(<?php echo $idPen; ?>)" title="Lihat Riwayat Lengkap" style="width: 30px; height: 30px; padding: 0;">
@@ -3280,22 +3309,22 @@ $loewixPriceList = $tiptokMaster6;
     </datalist>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 2: LAPORAN KUNJUNGAN & CEK STOK SISA                                -->
+    <!-- MODAL 2: LAPORAN BARANG KELUAR & TERJUAL TOKO (FORM PENCATATAN BARANG KELUAR) -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalLaporKunjungan" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
                 <div class="modal-header" style="background: linear-gradient(135deg, #091124 0%, #0f1d3d 100%); color: #ffffff; padding: 20px 26px; border-radius: 20px 20px 0 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); border: 1.5px solid rgba(56, 189, 248, 0.35); display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 22px;">
-                            <i class="fa-solid fa-clipboard-check"></i>
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245, 158, 11, 0.15); border: 1.5px solid rgba(245, 158, 11, 0.35); display: flex; align-items: center; justify-content: center; color: #fbbf24; font-size: 22px;">
+                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2">
-                                <h5 class="modal-title font-weight-bold text-white mb-0" style="font-family: 'Outfit', sans-serif; font-size: 19px;">Laporan Kunjungan &amp; Audit Sisa Fisik</h5>
-                                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11px; padding: 4px 8px; border-radius: 6px;">Audit Lapangan</span>
+                                <h5 class="modal-title font-weight-bold text-white mb-0" style="font-family: 'Outfit', sans-serif; font-size: 19px;">Laporan Barang Keluar &amp; Terjual Toko</h5>
+                                <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 11px; padding: 4px 9px; border-radius: 6px;">Pencatatan Barang Keluar</span>
                             </div>
-                            <div class="text-xs mt-0.5" style="color: #94a3b8;">Catat kondisi fisik sisa unit barang konsinyasi TIP TOK di toko</div>
+                            <div class="text-xs mt-0.5" style="color: #94a3b8;">Catat unit konsinyasi yang laku / keluar toko untuk klaim reward &amp; update sisa fisik otomatis</div>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -3335,43 +3364,44 @@ $loewixPriceList = $tiptokMaster6;
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <div class="bg-white p-3 rounded-3 border h-100" style="border: 1.5px solid #cbd5e1 !important;">
-                                    <label class="form-label-taste mb-1"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL KUNJUNGAN <span class="text-danger">*</span></label>
+                                    <label class="form-label-taste mb-1"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL PENCATATAN / KUNJUNGAN <span class="text-danger">*</span></label>
                                     <input type="date" name="tgl_kunjungan" class="form-control-taste w-100 font-weight-bold" value="<?php echo date('Y-m-d'); ?>" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="bg-white p-3 rounded-3 border h-100" style="border: 1.5px solid #cbd5e1 !important;">
-                                    <label class="form-label-taste mb-1"><i class="fa-solid fa-camera text-primary me-1.5"></i> FOTO BUKTI DISPLAY / STOK (OPSIONAL)</label>
+                                    <label class="form-label-taste mb-1"><i class="fa-solid fa-camera text-primary me-1.5"></i> FOTO BUKTI DISPLAY / NOTA (OPSIONAL)</label>
                                     <input type="file" name="foto_kunjungan" class="form-control-taste w-100" accept="image/*">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. Audit Section Header & Quick Fill Buttons -->
+                        <!-- 3. Section Header & Quick Fill Buttons -->
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 mt-3 gap-2">
                             <div>
-                                <label class="form-label-taste mb-0"><i class="fa-solid fa-list-check text-primary me-1.5"></i> AUDIT SISA FISIK &amp; PERHITUNGAN PENJUALAN</label>
-                                <div class="text-xs text-muted font-weight-bold">Sesuaikan jumlah sisa fisik di etalase toko saat audit</div>
+                                <label class="form-label-taste mb-0"><i class="fa-solid fa-boxes-stacked text-warning me-1.5"></i> INPUT BARANG KELUAR &amp; CEK SISA STOK</label>
+                                <div class="text-xs text-muted font-weight-bold">Tentukan berapa unit yang keluar/terjual. Sisa stok di toko &amp; estimasi insentif terhitung otomatis.</div>
                             </div>
                             <div class="d-flex align-items-center gap-1.5">
-                                <button type="button" class="btn-quick-fill" onclick="setSemuaStokUtuh()" title="Semua sisa = stok lalu (0 terjual)">
-                                    <i class="fa-solid fa-shield-check text-primary"></i> Set Semua Utuh
+                                <button type="button" class="btn-quick-fill" onclick="setSemuaStokUtuh()" title="Semua barang masih utuh di toko (0 barang keluar)">
+                                    <i class="fa-solid fa-shield-halved text-primary"></i> Semua Masih Utuh (0 Keluar)
                                 </button>
-                                <button type="button" class="btn-quick-fill" onclick="setSemuaStokHabis()" title="Semua sisa = 0 (Semua laku)">
-                                    <i class="fa-solid fa-fire text-danger"></i> Set Semua Habis
+                                <button type="button" class="btn-quick-fill btn-quick-fill-danger" onclick="setSemuaStokHabis()" title="Semua unit laku / keluar toko (Sisa 0)">
+                                    <i class="fa-solid fa-fire text-danger"></i> Semua Laku / Keluar Habis
                                 </button>
                             </div>
                         </div>
 
-                        <!-- 4. Table Audit Items -->
+                        <!-- 4. Table Audit Items (5 Clear Columns) -->
                         <div class="table-responsive border rounded-3 mb-3 bg-white" style="border: 1.5px solid #cbd5e1 !important; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
                             <table class="table taste-table mb-0 align-middle">
                                 <thead>
                                     <tr style="background: #f8fafc;">
-                                        <th style="width: 38%; padding: 12px 16px;">PRODUK KAMERA RESMI TIP TOK</th>
-                                        <th style="width: 16%; text-align: center; padding: 12px 12px;">STOK AWAL / LALU</th>
-                                        <th style="width: 24%; text-align: center; padding: 12px 12px;">SISA FISIK AKTUAL <span class="text-danger">*</span></th>
-                                        <th style="width: 22%; text-align: right; padding: 12px 16px;">STATUS TERJUAL &amp; REWARD</th>
+                                        <th style="width: 35%; padding: 12px 16px;">PRODUK KAMERA RESMI TIP TOK</th>
+                                        <th style="width: 13%; text-align: center; padding: 12px 10px;">STOK DI TOKO</th>
+                                        <th style="width: 22%; text-align: center; padding: 12px 10px;">BARANG KELUAR / LAKU <span class="text-danger">*</span></th>
+                                        <th style="width: 14%; text-align: center; padding: 12px 10px;">SISA AKHIR</th>
+                                        <th style="width: 16%; text-align: right; padding: 12px 16px;">STATUS &amp; INSENTIF</th>
                                     </tr>
                                 </thead>
                                 <tbody id="kunjunganItemsBody"></tbody>
@@ -3381,16 +3411,16 @@ $loewixPriceList = $tiptokMaster6;
                         <!-- 5. Real-time Live Summary Bar -->
                         <div class="audit-summary-widget" id="kunjunganSummaryWidget">
                             <div class="audit-summary-box">
-                                <div class="audit-summary-label">Stok Sebelum Audit</div>
+                                <div class="audit-summary-label">Stok Awal di Toko</div>
                                 <div class="audit-summary-val text-white" id="summaryTotalStokAwal">0 Unit</div>
                             </div>
-                            <div class="audit-summary-box">
-                                <div class="audit-summary-label">Sisa Fisik di Toko</div>
-                                <div class="audit-summary-val text-info" id="summaryTotalSisaFisik">0 Unit</div>
+                            <div class="audit-summary-box audit-summary-hero">
+                                <div class="audit-summary-label" style="color: #fbbf24;"><i class="fa-solid fa-fire me-1"></i> Total Barang Keluar</div>
+                                <div class="audit-summary-val" style="color: #fbbf24; font-size: 20px;" id="summaryTotalTerjual">0 Unit</div>
                             </div>
                             <div class="audit-summary-box">
-                                <div class="audit-summary-label">Terjual Audit Ini</div>
-                                <div class="audit-summary-val text-warning" id="summaryTotalTerjual">0 Unit</div>
+                                <div class="audit-summary-label">Sisa Stok Fisik</div>
+                                <div class="audit-summary-val text-info" id="summaryTotalSisaFisik">0 Unit</div>
                             </div>
                             <div class="audit-summary-box">
                                 <div class="audit-summary-label">Estimasi Reward Insentif</div>
@@ -3400,25 +3430,26 @@ $loewixPriceList = $tiptokMaster6;
 
                         <!-- 6. Info Callout Banner -->
                         <div class="p-3 rounded-3 bg-white border text-xs font-weight-bold text-secondary mb-3 d-flex align-items-center gap-2.5" style="border: 1.5px solid #cbd5e1 !important;">
-                            <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(37,99,235,0.1); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;">
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(245, 158, 11, 0.12); color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;">
                                 <i class="fa-solid fa-file-invoice-dollar"></i>
                             </div>
                             <div>
-                                Barang terjual akan otomatis tercatat ke sistem. Nomor Faktur/Invoice dikelola secara terpusat di menu khusus <strong><a href="tiptok-invoice.php" class="text-primary text-decoration-underline font-weight-bold">No. Invoice TIP TOK</a></strong>.
+                                Unit barang yang keluar/terjual otomatis tercatat di sistem konsinyasi. Invoice penagihan dan pencairan insentif dikelola di menu <strong><a href="tiptok-invoice.php" class="text-primary text-decoration-underline font-weight-bold">No. Invoice TIP TOK</a></strong>.
                             </div>
                         </div>
 
-                        <!-- 7. Catatan Hasil Audit -->
+                        <!-- 7. Catatan Hasil Audit / Kunjungan -->
                         <div class="bg-white p-3.5 rounded-3 border" style="border: 1.5px solid #cbd5e1 !important;">
-                            <label class="form-label-taste mb-1"><i class="fa-regular fa-note-sticky text-secondary me-1.5"></i> CATATAN HASIL AUDIT KUNJUNGAN</label>
-                            <textarea name="catatan_kunjungan" class="form-control-taste w-100" rows="2" placeholder="Tuliskan catatan kondisi display toko, rak pajang, respon kasir, atau feedback dealer..."></textarea>
+                            <label class="form-label-taste mb-1"><i class="fa-regular fa-note-sticky text-secondary me-1.5"></i> CATATAN BARANG KELUAR / KUNJUNGAN (OPSIONAL)</label>
+                            <textarea name="catatan_kunjungan" class="form-control-taste w-100" rows="2" placeholder="Tuliskan catatan transaksi, respon pemilik toko, kondisi etalase display, atau informasi barang keluar..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer p-3 bg-light border-top">
                         <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" id="btnSimpanKunjungan" class="btn-taste-primary">
-                            <i class="fa-solid fa-check me-1"></i> Simpan Laporan Audit
+                        <button type="submit" id="btnSimpanKunjungan" class="btn-taste-primary" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-color: #d97706;">
+                            <i class="fa-solid fa-floppy-disk me-1.5"></i> Simpan Laporan Barang Keluar
                         </button>
+                    </div>
                     </div>
                 </form>
             </div>
@@ -3560,8 +3591,8 @@ $loewixPriceList = $tiptokMaster6;
                                 </button>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <button type="button" class="btn btn-sm btn-primary font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px;" onclick="openCekSisaFromDetail()">
-                                    <i class="fa-solid fa-clipboard-check me-1.5"></i> Input Cek Sisa Fisik
+                                <button type="button" class="btn btn-sm btn-warning text-white font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none;" onclick="openCekSisaFromDetail()">
+                                    <i class="fa-solid fa-arrow-up-from-bracket me-1.5"></i> Catat Barang Keluar
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-secondary font-weight-bold px-3 py-1.5 mb-0" style="border-radius: 9px; font-size: 12px;" onclick="openEditFromDetail()">
                                     <i class="fa-solid fa-pen-to-square me-1.5"></i> Edit Titipan
@@ -5412,14 +5443,14 @@ $loewixPriceList = $tiptokMaster6;
         }
 
         // =========================================================================
-        // CEK SISA / LAPOR KUNJUNGAN (TOUCH-FRIENDLY STEPPERS & LIVE METRICS)
+        // PENCATATAN BARANG KELUAR & LAPOR KUNJUNGAN (STEPPERS & LIVE METRICS)
         // =========================================================================
         let kunjunganItemsCache = [];
 
         function openModalLaporKunjungan(idPenitipan) {
             document.getElementById('kunjunganIdPenitipan').value = idPenitipan;
             const tbody = document.getElementById('kunjunganItemsBody');
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div> Memuat daftar barang & sisa fisik...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-warning me-2"></div> Memuat daftar barang titipan &amp; stok toko...</td></tr>';
 
             showModalSafe('modalLaporKunjungan');
 
@@ -5445,7 +5476,7 @@ $loewixPriceList = $tiptokMaster6;
                         kunjunganItemsCache = res.data.items || [];
 
                         if (kunjunganItemsCache.length === 0) {
-                            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted font-weight-bold">Tidak ada barang titipan aktif terdaftar pada toko ini.</td></tr>';
+                            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted font-weight-bold">Tidak ada barang titipan aktif terdaftar pada toko ini.</td></tr>';
                             recalcKunjunganSummary();
                             return;
                         }
@@ -5468,10 +5499,13 @@ $loewixPriceList = $tiptokMaster6;
 
                             tbody.innerHTML += `
                                 <tr id="kunjunganRow_${idx}">
+                                    <!-- 1. Produk -->
                                     <td style="padding: 12px 16px;">
                                         <input type="hidden" name="items[${idx}][id_item]" value="${it.id}">
                                         <input type="hidden" id="insentifUnit_${idx}" value="${insUnit}">
                                         <input type="hidden" id="stokAwal_${idx}" value="${sisaCur}">
+                                        <!-- Hidden input disinkronkan ke backend: stok_sisa = stokAwal - qtyKeluar -->
+                                        <input type="hidden" name="items[${idx}][stok_sisa]" id="stokSisa_${idx}" value="${sisaCur}">
                                         
                                         <div class="d-flex align-items-center gap-2.5">
                                             <div style="width: 36px; height: 36px; border-radius: 9px; background: rgba(37,99,235,0.08); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;">
@@ -5488,35 +5522,47 @@ $loewixPriceList = $tiptokMaster6;
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-center" style="padding: 12px 12px;">
-                                        <span class="taste-badge badge-neutral" style="font-size: 13px; padding: 6px 12px;">
+
+                                    <!-- 2. Stok di Toko -->
+                                    <td class="text-center" style="padding: 12px 10px;">
+                                        <span class="taste-badge badge-neutral" style="font-size: 13px; font-weight: 800; padding: 6px 12px;">
                                             ${sisaCur} unit
                                         </span>
                                     </td>
-                                    <td class="text-center" style="padding: 12px 12px;">
+
+                                    <!-- 3. Barang Keluar / Laku (Main Input Stepper) -->
+                                    <td class="text-center" style="padding: 12px 10px;">
                                         <div class="d-flex justify-content-center">
                                             <div class="audit-qty-stepper" id="stepperWrap_${idx}">
-                                                <button type="button" class="audit-stepper-btn" onclick="stepSisa(${idx}, -1, ${sisaCur})" title="Kurangi 1">
+                                                <button type="button" class="audit-stepper-btn" onclick="stepKeluar(${idx}, -1, ${sisaCur})" title="Kurangi 1 unit keluar">
                                                     <i class="fa-solid fa-minus"></i>
                                                 </button>
                                                 <input type="number" 
-                                                       name="items[${idx}][stok_sisa]" 
-                                                       id="stokSisa_${idx}" 
+                                                       id="qtyKeluar_${idx}" 
                                                        min="0" 
                                                        max="${sisaCur}" 
                                                        class="audit-stepper-input font-weight-bold" 
-                                                       value="${sisaCur}" 
+                                                       value="0" 
                                                        required 
-                                                       oninput="hitungTerjualRow(${idx}, ${sisaCur})">
-                                                <button type="button" class="audit-stepper-btn" onclick="stepSisa(${idx}, 1, ${sisaCur})" title="Tambah 1">
+                                                       oninput="onInputKeluar(${idx}, ${sisaCur})">
+                                                <button type="button" class="audit-stepper-btn" onclick="stepKeluar(${idx}, 1, ${sisaCur})" title="Tambah 1 unit keluar">
                                                     <i class="fa-solid fa-plus"></i>
                                                 </button>
                                             </div>
                                         </div>
                                     </td>
+
+                                    <!-- 4. Sisa Stok Akhir (Live Badge) -->
+                                    <td class="text-center" style="padding: 12px 10px;" id="sisaDisplay_${idx}">
+                                        <span class="taste-badge badge-neutral" style="font-size: 12px; font-weight: 800;">
+                                            ${sisaCur} Unit
+                                        </span>
+                                    </td>
+
+                                    <!-- 5. Status & Insentif -->
                                     <td class="text-end" style="padding: 12px 16px;" id="terjualDisplay_${idx}">
-                                        <span class="taste-badge badge-neutral" style="font-size: 12px;">
-                                            <i class="fa-solid fa-box-check me-1"></i> Stok Utuh
+                                        <span class="taste-badge badge-neutral" style="font-size: 11.5px;">
+                                            <i class="fa-solid fa-shield-halved me-1"></i> Utuh (0 Keluar)
                                         </span>
                                     </td>
                                 </tr>
@@ -5525,67 +5571,95 @@ $loewixPriceList = $tiptokMaster6;
 
                         recalcKunjunganSummary();
                     } else {
-                        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-danger font-weight-bold">${(res && res.message) ? res.message : 'Gagal memuat data barang.'}</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger font-weight-bold">${(res && res.message) ? res.message : 'Gagal memuat data barang.'}</td></tr>`;
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat data barang.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger font-weight-bold">Terjadi kesalahan jaringan saat memuat data barang.</td></tr>';
                 });
         }
 
-        function stepSisa(idx, delta, maxStok) {
-            const inp = document.getElementById(`stokSisa_${idx}`);
+        function stepKeluar(idx, delta, maxStok) {
+            const inp = document.getElementById(`qtyKeluar_${idx}`);
             if (!inp) return;
             let val = parseInt(inp.value);
-            if (isNaN(val)) val = maxStok;
+            if (isNaN(val)) val = 0;
             val = Math.max(0, Math.min(maxStok, val + delta));
             inp.value = val;
-            hitungTerjualRow(idx, maxStok);
+            onInputKeluar(idx, maxStok);
         }
 
-        function hitungTerjualRow(idx, stokPrev) {
-            const inp = document.getElementById(`stokSisa_${idx}`);
-            if (!inp) return;
+        function onInputKeluar(idx, stokPrev) {
+            const inpKeluar = document.getElementById(`qtyKeluar_${idx}`);
+            const inpSisa = document.getElementById(`stokSisa_${idx}`);
+            if (!inpKeluar || !inpSisa) return;
             
-            let sisa = parseInt(inp.value);
-            if (isNaN(sisa)) sisa = 0;
-            if (sisa > stokPrev) {
-                sisa = stokPrev;
-                inp.value = stokPrev;
-            } else if (sisa < 0) {
-                sisa = 0;
-                inp.value = 0;
+            let keluar = parseInt(inpKeluar.value);
+            if (isNaN(keluar)) keluar = 0;
+            if (keluar > stokPrev) {
+                keluar = stokPrev;
+                inpKeluar.value = stokPrev;
+            } else if (keluar < 0) {
+                keluar = 0;
+                inpKeluar.value = 0;
             }
 
-            const terjual = Math.max(0, stokPrev - sisa);
+            const sisa = Math.max(0, stokPrev - keluar);
+            inpSisa.value = sisa; // Sinkronkan ke input hidden yang dikirim ke PHP backend
+
             const insUnit = parseFloat(document.getElementById(`insentifUnit_${idx}`)?.value) || 0;
-            const disp = document.getElementById(`terjualDisplay_${idx}`);
+            const sisaDisp = document.getElementById(`sisaDisplay_${idx}`);
+            const terjualDisp = document.getElementById(`terjualDisplay_${idx}`);
             const stepperWrap = document.getElementById(`stepperWrap_${idx}`);
 
             if (stepperWrap) {
-                if (terjual > 0) {
+                if (keluar > 0) {
                     stepperWrap.classList.add('is-sold-state');
                 } else {
                     stepperWrap.classList.remove('is-sold-state');
                 }
             }
 
-            if (disp) {
-                if (terjual > 0) {
-                    const estSubtotal = terjual * insUnit;
-                    disp.innerHTML = `
+            // Sisa Fisik Akhir Display Badge
+            if (sisaDisp) {
+                if (sisa === 0) {
+                    sisaDisp.innerHTML = `
+                        <span class="badge" style="background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25); font-size: 11.5px; font-weight: 800; padding: 5px 9px; border-radius: 7px;">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i> Habis (0)
+                        </span>
+                    `;
+                } else if (keluar > 0) {
+                    sisaDisp.innerHTML = `
+                        <span class="badge" style="background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.25); font-size: 11.5px; font-weight: 800; padding: 5px 9px; border-radius: 7px;">
+                            Sisa ${sisa} Unit
+                        </span>
+                    `;
+                } else {
+                    sisaDisp.innerHTML = `
+                        <span class="taste-badge badge-neutral" style="font-size: 12px; font-weight: 800;">
+                            ${sisa} Unit
+                        </span>
+                    `;
+                }
+            }
+
+            // Status & Insentif Display
+            if (terjualDisp) {
+                if (keluar > 0) {
+                    const estSubtotal = keluar * insUnit;
+                    terjualDisp.innerHTML = `
                         <div class="d-flex flex-column align-items-end">
-                            <span class="taste-badge badge-danger-tag mb-1" style="font-size: 12px; font-weight: 800;">
-                                <i class="fa-solid fa-fire me-1"></i> + ${terjual} Laku
+                            <span class="taste-badge badge-danger-tag mb-1" style="font-size: 11.5px; font-weight: 800;">
+                                <i class="fa-solid fa-fire me-1"></i> +${keluar} Keluar
                             </span>
                             <span class="text-xs font-weight-bold text-success">+ Rp ${new Intl.NumberFormat('id-ID').format(estSubtotal)}</span>
                         </div>
                     `;
                 } else {
-                    disp.innerHTML = `
-                        <span class="taste-badge badge-neutral" style="font-size: 12px;">
-                            <i class="fa-solid fa-box-check me-1"></i> Stok Utuh
+                    terjualDisp.innerHTML = `
+                        <span class="taste-badge badge-neutral" style="font-size: 11.5px;">
+                            <i class="fa-solid fa-shield-halved me-1"></i> Utuh (0 Keluar)
                         </span>
                     `;
                 }
@@ -5597,27 +5671,25 @@ $loewixPriceList = $tiptokMaster6;
         function setSemuaStokUtuh() {
             if (!kunjunganItemsCache || kunjunganItemsCache.length === 0) return;
             kunjunganItemsCache.forEach((it, idx) => {
-                const inp = document.getElementById(`stokSisa_${idx}`);
+                const inpKeluar = document.getElementById(`qtyKeluar_${idx}`);
                 const maxStok = parseInt(document.getElementById(`stokAwal_${idx}`)?.value) || (parseInt(it.qty_sisa) || 0);
-                if (inp) {
-                    inp.value = maxStok;
-                    hitungTerjualRow(idx, maxStok);
+                if (inpKeluar) {
+                    inpKeluar.value = 0;
+                    onInputKeluar(idx, maxStok);
                 }
             });
-            recalcKunjunganSummary();
         }
 
         function setSemuaStokHabis() {
             if (!kunjunganItemsCache || kunjunganItemsCache.length === 0) return;
             kunjunganItemsCache.forEach((it, idx) => {
-                const inp = document.getElementById(`stokSisa_${idx}`);
+                const inpKeluar = document.getElementById(`qtyKeluar_${idx}`);
                 const maxStok = parseInt(document.getElementById(`stokAwal_${idx}`)?.value) || (parseInt(it.qty_sisa) || 0);
-                if (inp) {
-                    inp.value = 0;
-                    hitungTerjualRow(idx, maxStok);
+                if (inpKeluar) {
+                    inpKeluar.value = maxStok;
+                    onInputKeluar(idx, maxStok);
                 }
             });
-            recalcKunjunganSummary();
         }
 
         function recalcKunjunganSummary() {
@@ -5629,15 +5701,15 @@ $loewixPriceList = $tiptokMaster6;
             if (kunjunganItemsCache && kunjunganItemsCache.length > 0) {
                 kunjunganItemsCache.forEach((it, idx) => {
                     const maxStok = parseInt(document.getElementById(`stokAwal_${idx}`)?.value) || 0;
-                    const inp = document.getElementById(`stokSisa_${idx}`);
-                    let sisa = inp ? (parseInt(inp.value) || 0) : maxStok;
+                    const inpKeluar = document.getElementById(`qtyKeluar_${idx}`);
+                    let keluar = inpKeluar ? (parseInt(inpKeluar.value) || 0) : 0;
                     const insUnit = parseFloat(document.getElementById(`insentifUnit_${idx}`)?.value) || 0;
-                    const terjual = Math.max(0, maxStok - sisa);
+                    const sisa = Math.max(0, maxStok - keluar);
 
                     totalAwal += maxStok;
                     totalSisa += sisa;
-                    totalTerjual += terjual;
-                    totalReward += (terjual * insUnit);
+                    totalTerjual += keluar;
+                    totalReward += (keluar * insUnit);
                 });
             }
 
@@ -5650,11 +5722,6 @@ $loewixPriceList = $tiptokMaster6;
             if (elSisa) elSisa.textContent = `${totalSisa} Unit`;
             if (elTerjual) {
                 elTerjual.textContent = (totalTerjual > 0 ? `+ ${totalTerjual}` : `${totalTerjual}`) + ` Unit`;
-                if (totalTerjual > 0) {
-                    elTerjual.className = 'audit-summary-val text-warning';
-                } else {
-                    elTerjual.className = 'audit-summary-val text-white-50';
-                }
             }
             if (elReward) {
                 elReward.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(totalReward)}`;
@@ -5900,10 +5967,10 @@ $loewixPriceList = $tiptokMaster6;
                                 <tr>
                                     <td colspan="9" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-clipboard-list mb-2" style="font-size: 32px; color: #94a3b8; display: block;"></i>
-                                        <div class="font-weight-bold text-dark text-base">Belum Ada Riwayat Kunjungan Audit</div>
-                                        <p class="text-xs mb-3 text-muted">Lakukan kunjungan ke toko untuk memeriksa sisa stok fisik dan mencatat penjualan.</p>
-                                        <button type="button" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" style="border-radius: 9px;" onclick="openCekSisaFromDetail()">
-                                            <i class="fa-solid fa-plus me-1.5"></i> Input Kunjungan Pertama
+                                        <div class="font-weight-bold text-dark text-base">Belum Ada Riwayat Barang Keluar / Kunjungan</div>
+                                        <p class="text-xs mb-3 text-muted">Catat barang yang laku / keluar toko untuk memperbarui sisa stok fisik dan mencairkan insentif.</p>
+                                        <button type="button" class="btn btn-sm btn-warning text-white fw-bold px-3 py-1.5" style="border-radius: 9px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none;" onclick="openCekSisaFromDetail()">
+                                            <i class="fa-solid fa-arrow-up-from-bracket me-1.5"></i> Catat Barang Keluar Pertama
                                         </button>
                                     </td>
                                 </tr>
