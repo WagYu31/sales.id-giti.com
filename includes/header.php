@@ -70,6 +70,9 @@ $total_notif_count = $notif_pending_fu + $notif_kandidat + $notif_maintenance;
         } else if (savedTheme === 'solar-yellow') {
             document.documentElement.setAttribute('data-sidebar', 'yellow');
         }
+        if (localStorage.getItem('loewix_sidebar_collapsed') === 'true') {
+            document.documentElement.classList.add('sidebar-collapsed');
+        }
     })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -110,151 +113,255 @@ h1, h2, h3, h4, h5, h6, .welcome-title, .section-title, .mc-title, .card-title, 
 table tr td { font-size: 0.85em; }
 .input-group-text { cursor: pointer; }
 
-/* ============ SIDEBAR PRO ============ */
+/* ============ FROSTED GLASS FLOATING SIDEBAR (MODEL GAMBAR 2) ============ */
 .sidebar {
-    width: 260px;
-    min-height: 100vh;
-    background: #091124;
+    width: 275px;
     position: fixed;
-    top: 0; left: 0; bottom: 0;
+    top: 14px;
+    left: 14px;
+    bottom: 14px;
+    height: calc(100vh - 28px);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(0, 0, 0, 0.03);
     z-index: 1040;
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 14px 12px;
+    overflow: hidden;
 }
 
-.sidebar-logo {
-    padding: 22px 18px 18px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    text-align: center;
+/* Collapsed state */
+.sidebar-collapsed .sidebar {
+    width: 76px;
+    padding: 14px 8px;
+}
+
+/* Mac Traffic Lights & Toggle Header */
+.sidebar-mac-header {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: space-between;
+    padding: 2px 6px 12px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+    margin-bottom: 8px;
+}
+.sidebar-mac-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.mac-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+.mac-dot:hover { transform: scale(1.15); }
+.mac-dot-red    { background: #ff5f56; border: 1px solid #e0443e; }
+.mac-dot-yellow { background: #ffbd2e; border: 1px solid #dea123; }
+.mac-dot-green  { background: #27c93f; border: 1px solid #1aab29; }
+
+.sidebar-collapse-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(148, 163, 184, 0.12);
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.sidebar-collapse-btn:hover {
+    background: rgba(37, 99, 235, 0.15);
+    color: #2563EB;
+}
+.sidebar-collapsed .sidebar-collapse-btn i {
+    transform: rotate(180deg);
+}
+.sidebar-collapsed .sidebar-mac-header {
+    justify-content: center;
+    padding-bottom: 10px;
+}
+.sidebar-collapsed .sidebar-mac-dots {
+    display: none;
+}
+
+/* User Profile Header (Top Area like Gambar 2) */
+.sidebar-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 8px 12px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+    transition: all 0.2s ease;
+}
+.sidebar-avatar-ring {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+    color: #FFFFFF;
+    font-weight: 800;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
     position: relative;
-    background: rgba(255, 255, 255, 0.015);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.9);
 }
-
-.sidebar-logo::after {
-    content: '';
+.sidebar-online-indicator {
     position: absolute;
-    bottom: -1px;
-    left: 10%;
-    width: 80%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), transparent);
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #10B981;
+    border: 2px solid #FFFFFF;
+}
+.sidebar-user-meta {
+    flex: 1;
+    min-width: 0;
+}
+.sidebar-greeting {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #94A3B8;
+    line-height: 1.2;
+}
+.sidebar-user-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1.25;
+    margin: 1px 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sidebar-role-pill {
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+    display: inline-block;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+.sidebar-collapsed .sidebar-profile-header {
+    justify-content: center;
+    padding: 4px 0 10px;
+}
+.sidebar-collapsed .sidebar-user-meta {
+    display: none !important;
 }
 
-.sidebar-logo img {
-    height: 72px;
-    max-width: 200px;
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
-    transition: transform 0.25s ease;
-}
-.sidebar-logo img:hover {
-    transform: scale(1.03);
-}
-
+/* Scrollable Nav Items */
 .sidebar-nav {
     flex: 1;
-    padding: 16px 12px;
+    padding: 6px 2px;
     overflow-y: auto;
     overflow-x: hidden;
 }
+.sidebar-nav::-webkit-scrollbar { width: 3px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 4px; }
 
-/* Scrollbar */
-.sidebar-nav::-webkit-scrollbar { width: 4px; }
-.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
-.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
-.sidebar-nav::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
-
-/* Section Titles with glowing dots */
+/* Section Header (e.g. Menu: 6, Canvas: 7) */
 .nav-section-title {
-    font-size: 10.5px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 700;
     color: #94A3B8;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    padding: 14px 10px 6px;
+    letter-spacing: 0.04em;
+    padding: 10px 10px 5px;
     display: flex;
     align-items: center;
-    gap: 7px;
-    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    justify-content: space-between;
 }
-.nav-section-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-    flex-shrink: 0;
+.sidebar-collapsed .nav-section-title {
+    display: none !important;
 }
-.dot-blue   { background: #38BDF8; box-shadow: 0 0 8px #38BDF8; }
-.dot-cyan   { background: #06B6D4; box-shadow: 0 0 8px #06B6D4; }
-.dot-purple { background: #A855F7; box-shadow: 0 0 8px #A855F7; }
-.dot-amber  { background: #F59E0B; box-shadow: 0 0 8px #F59E0B; }
-.dot-rose   { background: #F43F5E; box-shadow: 0 0 8px #F43F5E; }
 
-/* Links */
+/* Sidebar Links */
 .sidebar-link {
     display: flex;
     align-items: center;
     gap: 11px;
     padding: 8px 10px;
-    border-radius: 10px;
-    font-size: 13px;
+    border-radius: 12px;
+    font-size: 12.5px;
     font-weight: 600;
-    color: #94A3B8;
+    color: #475569;
     text-decoration: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     position: relative;
     border: 1px solid transparent;
 }
-
 .sidebar-link:hover {
-    color: #FFFFFF;
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.08);
-    transform: translateX(3px);
+    color: #0F172A;
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: translateX(2px);
+}
+.sidebar-collapsed .sidebar-link:hover {
+    transform: none;
 }
 
+/* ACTIVE ITEM (Solid Vivid Blue Capsule Pill - Persis Gambar 2) */
 .sidebar-link.active {
     color: #FFFFFF !important;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.35) 0%, rgba(29, 78, 216, 0.2) 100%) !important;
-    border-color: rgba(96, 165, 250, 0.35) !important;
-    font-weight: 700;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+    background: #2563EB !important;
+    font-weight: 700 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28) !important;
 }
-
-.sidebar-link.active::before {
+.sidebar-link.active .nav-icon-badge {
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #FFFFFF !important;
+}
+.sidebar-link.active::after {
     content: '';
-    position: absolute;
-    left: -2px; top: 6px; bottom: 6px;
-    width: 4px;
-    border-radius: 0 4px 4px 0;
-    background: linear-gradient(180deg, #38BDF8, #2563EB);
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    margin-left: auto;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
 }
 
 /* Icon Badges */
 .nav-icon-badge {
-    width: 32px; height: 32px;
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13.5px;
     flex-shrink: 0;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+    transition: all 0.2s ease;
 }
-
 .sidebar-link:hover .nav-icon-badge {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
-
 .sidebar-link.active .nav-icon-badge {
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+    transform: none;
 }
 
 .nav-link-text {
@@ -272,11 +379,11 @@ table tr td { font-size: 0.85em; }
     margin-left: auto;
     font-size: 11px;
     transition: transform 0.25s ease;
-    color: #64748B;
+    color: #94A3B8;
 }
 .sidebar-dropdown-btn.open .chevron {
     transform: rotate(180deg);
-    color: #38BDF8;
+    color: #2563EB;
 }
 .sidebar-submenu {
     display: none;
@@ -285,88 +392,142 @@ table tr td { font-size: 0.85em; }
 }
 .sidebar-submenu.show { display: block; }
 .sidebar-submenu .sidebar-link {
-    font-size: 12.5px;
+    font-size: 12px;
     padding: 6px 10px;
-    color: #94A3B8;
+    color: #64748B;
 }
 .sidebar-submenu .sidebar-link:hover {
-    color: #FFFFFF;
+    color: #0F172A;
 }
 
 /* Sidebar Link Logout */
 .sidebar-link-logout {
-    color: #F87171 !important;
+    color: #EF4444 !important;
 }
 .sidebar-link-logout:hover {
-    background: rgba(239, 68, 68, 0.12) !important;
-    border-color: rgba(239, 68, 68, 0.25) !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
 }
 
-/* Sidebar Profile Footer Card */
-.sidebar-profile-card {
-    padding: 12px 14px;
-    margin: 8px 10px 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    backdrop-filter: blur(10px);
-    transition: all 0.2s ease;
+/* Nested White Card (Like "Service: 3" in Gambar 2) */
+.sidebar-nested-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 18px;
+    padding: 7px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+    margin: 4px 0 10px;
 }
-.sidebar-profile-card:hover {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 255, 255, 0.14);
+.sidebar-collapsed .sidebar-nested-card {
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    margin: 2px 0;
 }
-.sidebar-avatar-ring {
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
-    color: #FFFFFF;
-    font-weight: 800;
-    font-size: 13px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    position: relative;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+
+/* Bottom Action Card (Gambar 2 style "Create new task") */
+.sidebar-action-card {
+    margin-top: 6px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
-.sidebar-online-indicator {
-    position: absolute;
-    bottom: 0; right: 0;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #10B981;
-    border: 2px solid #091124;
-    box-shadow: 0 0 6px #10B981;
-}
-.sidebar-user-meta { min-width: 0; }
-.sidebar-user-name {
+.sidebar-action-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: #2563EB;
     color: #FFFFFF;
     font-weight: 700;
-    font-size: 13px;
-    line-height: 1.2;
-    margin-bottom: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    transition: all 0.2s ease;
 }
-.sidebar-role-pill {
-    font-size: 9.5px;
-    font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 12px;
-    display: inline-block;
-    letter-spacing: 0.05em;
-    line-height: 1.2;
+.sidebar-action-btn:hover {
+    background: #1D4ED8;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+.action-btn-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+}
+.sidebar-action-sub {
+    font-size: 10.5px;
+    color: #94A3B8;
+    margin-top: 6px;
+}
+.sidebar-action-sub a {
+    color: #2563EB;
+    text-decoration: none;
+    font-weight: 600;
+}
+.sidebar-action-sub a:hover {
+    text-decoration: underline;
+}
+
+.sidebar-mini-plus {
+    display: none;
+    justify-content: center;
+    margin-top: 8px;
+}
+.btn-mini-circle-plus {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #2563EB;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+    transition: all 0.2s ease;
+}
+.btn-mini-circle-plus:hover {
+    background: #1D4ED8;
+    color: #FFFFFF;
+    transform: scale(1.08);
+}
+.sidebar-collapsed .sidebar-action-card {
+    display: none !important;
+}
+.sidebar-collapsed .sidebar-mini-plus {
+    display: flex !important;
 }
 
 /* ============ MAIN WRAPPER ============ */
 .main-wrapper {
-    margin-left: 260px;
+    margin-left: 305px !important;
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    max-width: calc(100vw - 260px);
+    max-width: calc(100vw - 305px) !important;
     overflow-x: hidden;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar-collapsed .main-wrapper {
+    margin-left: 106px !important;
+    max-width: calc(100vw - 106px) !important;
 }
 
 /* ============ TOP BAR ============ */
@@ -505,9 +666,29 @@ table tr td { font-size: 0.85em; }
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 991.98px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.open { transform: translateX(0); }
-    .main-wrapper { margin-left: 0 !important; max-width: 100vw !important; width: 100% !important; }
+    .sidebar {
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        height: 100vh !important;
+        border-radius: 0 28px 28px 0 !important;
+        transform: translateX(-105%) !important;
+        width: 275px !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+    }
+    .sidebar.open, .sidebar.show {
+        transform: translateX(0) !important;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.25) !important;
+    }
+    .main-wrapper {
+        margin-left: 0 !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+    }
+    .sidebar-collapsed .main-wrapper {
+        margin-left: 0 !important;
+        max-width: 100vw !important;
+    }
 }
 
 @media (max-width: 576px) {
@@ -518,13 +699,33 @@ table tr td { font-size: 0.85em; }
 </head>
 <body>
 
-<!-- ===== SIDEBAR PRO ===== -->
+<!-- ===== SIDEBAR FROSTED GLASS CAPSULE (MODEL GAMBAR 2) ===== -->
 <aside class="sidebar" id="sidebar">
-    <!-- Logo Header -->
-    <div class="sidebar-logo">
-        <a href="customer_management.php" class="d-inline-flex flex-column align-items-center text-decoration-none">
-            <img src="assets/images/loewix_sales_logo_white.png" alt="Loewix Sales" onerror="this.src='assets/images/logo.png'">
-        </a>
+    <!-- 1. Mac Window Traffic Lights & Collapse Toggle -->
+    <div class="sidebar-mac-header">
+        <div class="sidebar-mac-dots">
+            <span class="mac-dot mac-dot-red" onclick="window.location.href='logout.php'" title="Keluar"></span>
+            <span class="mac-dot mac-dot-yellow" onclick="toggleSidebarCollapse()" title="Minimize"></span>
+            <span class="mac-dot mac-dot-green" onclick="toggleSidebarCollapse()" title="Perluas"></span>
+        </div>
+        <button type="button" class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="Toggle Sidebar (Expand/Mini)">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+    </div>
+
+    <!-- 2. User Profile Header (Top Area like Gambar 2) -->
+    <div class="sidebar-profile-header">
+        <div class="sidebar-avatar-ring">
+            <?php echo $userInitials; ?>
+            <span class="sidebar-online-indicator"></span>
+        </div>
+        <div class="sidebar-user-meta">
+            <div class="sidebar-greeting">Good Day 👋</div>
+            <div class="sidebar-user-name" title="<?php echo $userName; ?>"><?php echo $userName; ?></div>
+            <span class="sidebar-role-pill" style="<?php echo $roleBadgeBg; ?>">
+                <?php echo htmlspecialchars($userRole); ?>
+            </span>
+        </div>
     </div>
 
     <!-- Navigation Scroll Area -->
@@ -535,8 +736,8 @@ table tr td { font-size: 0.85em; }
             <!-- ADMIN SALES NAVIGATION                                    -->
             <!-- ═════════════════════════════════════════════════════════ -->
             <div class="nav-section-title">
-                <span class="nav-section-dot dot-blue"></span>
-                <span>Menu Utama</span>
+                <span>Menu: 8</span>
+                <i class="bi bi-filter-right text-muted" style="font-size: 11px;"></i>
             </div>
 
             <a href="customer_management.php" class="sidebar-link <?php echo $currentPage=='customer_management.php'?'active':''; ?>">
@@ -601,70 +802,72 @@ table tr td { font-size: 0.85em; }
             </a>
 
             <!-- APLIKASI SALES (MOBILE) -->
-            <div class="nav-section-title" style="margin-top: 14px;">
-                <span class="nav-section-dot dot-cyan"></span>
-                <span>Aplikasi Sales Canvas (Mobile)</span>
+            <div class="nav-section-title" style="margin-top: 10px;">
+                <span>Canvas Mobile: 8</span>
+                <i class="bi bi-phone text-muted" style="font-size: 11px;"></i>
             </div>
 
-            <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php'])?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
-                    <i class="bi bi-grid-1x2-fill"></i>
-                </span>
-                <span class="nav-link-text">Dashboard Sales Canvas</span>
-            </a>
+            <div class="sidebar-nested-card">
+                <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php'])?'active':''; ?>" title="Dashboard Sales Canvas">
+                    <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                    </span>
+                    <span class="nav-link-text">Dashboard Sales Canvas</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/kegiatan-baru.php" class="sidebar-link <?php echo ($currentPage=='kegiatan-baru.php')?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
-                    <i class="bi bi-calendar-plus-fill"></i>
-                </span>
-                <span class="nav-link-text">Tambah Kegiatan Baru</span>
-            </a>
+                <a href="modul-aplikasi-sales/kegiatan-baru.php" class="sidebar-link <?php echo ($currentPage=='kegiatan-baru.php')?'active':''; ?>" title="Tambah Kegiatan Baru">
+                    <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
+                        <i class="bi bi-calendar-plus-fill"></i>
+                    </span>
+                    <span class="nav-link-text">Tambah Kegiatan Baru</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(20, 184, 166, 0.15); color: #14B8A6;">
-                    <i class="bi bi-geo-alt-fill"></i>
-                </span>
-                <span class="nav-link-text">Laporan Visit (GPS)</span>
-            </a>
+                <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>" title="Laporan Visit (GPS)">
+                    <span class="nav-icon-badge" style="background: rgba(20, 184, 166, 0.15); color: #14B8A6;">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </span>
+                    <span class="nav-link-text">Laporan Visit (GPS)</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/tiptok.php" class="sidebar-link <?php echo $currentPage=='tiptok.php'?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
-                    <i class="bi bi-box-seam-fill"></i>
-                </span>
-                <span class="nav-link-text">TIP TOK (Konsinyasi)</span>
-            </a>
+                <a href="modul-aplikasi-sales/tiptok.php" class="sidebar-link <?php echo $currentPage=='tiptok.php'?'active':''; ?>" title="TIP TOK (Konsinyasi)">
+                    <span class="nav-icon-badge" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
+                        <i class="bi bi-box-seam-fill"></i>
+                    </span>
+                    <span class="nav-link-text">TIP TOK (Konsinyasi)</span>
+                </a>
 
-            <?php if (isUserPermittedMenu($conn, 'tiptok_invoice', 'access')): ?>
-            <a href="modul-aplikasi-sales/tiptok-invoice.php" class="sidebar-link <?php echo $currentPage=='tiptok-invoice.php'?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
-                    <i class="bi bi-receipt-cutoff"></i>
-                </span>
-                <span class="nav-link-text">No. Invoice TIP TOK</span>
-            </a>
-            <?php endif; ?>
+                <?php if (isUserPermittedMenu($conn, 'tiptok_invoice', 'access')): ?>
+                <a href="modul-aplikasi-sales/tiptok-invoice.php" class="sidebar-link <?php echo $currentPage=='tiptok-invoice.php'?'active':''; ?>" title="No. Invoice TIP TOK">
+                    <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
+                        <i class="bi bi-receipt-cutoff"></i>
+                    </span>
+                    <span class="nav-link-text">No. Invoice TIP TOK</span>
+                </a>
+                <?php endif; ?>
 
-            <?php if (isUserPermittedMenu($conn, 'sales_orders', 'access')): ?>
-            <a href="sales_orders.php" class="sidebar-link <?php echo in_array($currentPage,['sales_orders.php','sales_order_form.php','sales_order_print.php'])?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
-                    <i class="bi bi-cart3"></i>
-                </span>
-                <span class="nav-link-text">Penawaran Penjualan (SO)</span>
-            </a>
-            <?php endif; ?>
+                <?php if (isUserPermittedMenu($conn, 'sales_orders', 'access')): ?>
+                <a href="sales_orders.php" class="sidebar-link <?php echo in_array($currentPage,['sales_orders.php','sales_order_form.php','sales_order_print.php'])?'active':''; ?>" title="Penawaran Penjualan (SO)">
+                    <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
+                        <i class="bi bi-cart3"></i>
+                    </span>
+                    <span class="nav-link-text">Penawaran Penjualan (SO)</span>
+                </a>
+                <?php endif; ?>
 
-            <a href="scraping_exhibitor.php" class="sidebar-link <?php echo $currentPage=='scraping_exhibitor.php'?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
-                    <i class="bi bi-buildings-fill"></i>
-                </span>
-                <span class="nav-link-text">Scraper Database Pameran</span>
-            </a>
+                <a href="scraping_exhibitor.php" class="sidebar-link <?php echo $currentPage=='scraping_exhibitor.php'?'active':''; ?>" title="Scraper Database Pameran">
+                    <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                        <i class="bi bi-buildings-fill"></i>
+                    </span>
+                    <span class="nav-link-text">Scraper Database Pameran</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
-                    <i class="bi bi-shop-window"></i>
-                </span>
-                <span class="nav-link-text">Customer Toko / Dealer</span>
-            </a>
+                <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>" title="Customer Toko / Dealer">
+                    <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                        <i class="bi bi-shop-window"></i>
+                    </span>
+                    <span class="nav-link-text">Customer Toko / Dealer</span>
+                </a>
+            </div>
 
         <?php else: ?>
 
@@ -672,8 +875,8 @@ table tr td { font-size: 0.85em; }
             <!-- 1. MENU UTAMA                                             -->
             <!-- ═════════════════════════════════════════════════════════ -->
             <div class="nav-section-title">
-                <span class="nav-section-dot dot-blue"></span>
-                <span>Menu Utama</span>
+                <span>Menu: 8</span>
+                <i class="bi bi-filter-right text-muted" style="font-size: 11px;"></i>
             </div>
 
             <a href="customer_management.php" class="sidebar-link <?php echo $currentPage=='customer_management.php'?'active':''; ?>">
@@ -732,87 +935,89 @@ table tr td { font-size: 0.85em; }
             <!-- ═════════════════════════════════════════════════════════ -->
             <!-- 2. APLIKASI SALES CANVAS (MOBILE)                         -->
             <!-- ═════════════════════════════════════════════════════════ -->
-            <div class="nav-section-title" style="margin-top: 14px;">
-                <span class="nav-section-dot dot-cyan"></span>
-                <span>Aplikasi Sales Canvas (Mobile)</span>
+            <div class="nav-section-title" style="margin-top: 10px;">
+                <span>Canvas Mobile: 9</span>
+                <i class="bi bi-phone text-muted" style="font-size: 11px;"></i>
             </div>
 
-            <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php'])?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
-                    <i class="bi bi-grid-1x2-fill"></i>
-                </span>
-                <span class="nav-link-text">Dashboard Sales Canvas</span>
-            </a>
+            <div class="sidebar-nested-card">
+                <a href="modul-aplikasi-sales/kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['kegiatan.php','kegiatan-selesai.php','kegiatan-db.php'])?'active':''; ?>" title="Dashboard Sales Canvas">
+                    <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                    </span>
+                    <span class="nav-link-text">Dashboard Sales Canvas</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/kegiatan-baru.php" class="sidebar-link <?php echo ($currentPage=='kegiatan-baru.php')?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
-                    <i class="bi bi-calendar-plus-fill"></i>
-                </span>
-                <span class="nav-link-text">Tambah Kegiatan Baru</span>
-            </a>
+                <a href="modul-aplikasi-sales/kegiatan-baru.php" class="sidebar-link <?php echo ($currentPage=='kegiatan-baru.php')?'active':''; ?>" title="Tambah Kegiatan Baru">
+                    <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
+                        <i class="bi bi-calendar-plus-fill"></i>
+                    </span>
+                    <span class="nav-link-text">Tambah Kegiatan Baru</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(20, 184, 166, 0.15); color: #14B8A6;">
-                    <i class="bi bi-geo-alt-fill"></i>
-                </span>
-                <span class="nav-link-text">Laporan Visit (GPS)</span>
-            </a>
+                <a href="modul-aplikasi-sales/laporan-kegiatan.php" class="sidebar-link <?php echo in_array($currentPage,['laporan-kegiatan.php','laporan-cust.php'])?'active':''; ?>" title="Laporan Visit (GPS)">
+                    <span class="nav-icon-badge" style="background: rgba(20, 184, 166, 0.15); color: #14B8A6;">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </span>
+                    <span class="nav-link-text">Laporan Visit (GPS)</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/tiptok.php" class="sidebar-link <?php echo $currentPage=='tiptok.php'?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
-                    <i class="bi bi-box-seam-fill"></i>
-                </span>
-                <span class="nav-link-text">TIP TOK (Konsinyasi)</span>
-            </a>
+                <a href="modul-aplikasi-sales/tiptok.php" class="sidebar-link <?php echo $currentPage=='tiptok.php'?'active':''; ?>" title="TIP TOK (Konsinyasi)">
+                    <span class="nav-icon-badge" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
+                        <i class="bi bi-box-seam-fill"></i>
+                    </span>
+                    <span class="nav-link-text">TIP TOK (Konsinyasi)</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/tiptok-invoice.php" class="sidebar-link <?php echo $currentPage=='tiptok-invoice.php'?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
-                    <i class="bi bi-receipt-cutoff"></i>
-                </span>
-                <span class="nav-link-text">No. Invoice TIP TOK</span>
-            </a>
+                <a href="modul-aplikasi-sales/tiptok-invoice.php" class="sidebar-link <?php echo $currentPage=='tiptok-invoice.php'?'active':''; ?>" title="No. Invoice TIP TOK">
+                    <span class="nav-icon-badge" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
+                        <i class="bi bi-receipt-cutoff"></i>
+                    </span>
+                    <span class="nav-link-text">No. Invoice TIP TOK</span>
+                </a>
 
-            <a href="sales_orders.php" class="sidebar-link <?php echo in_array($currentPage,['sales_orders.php','sales_order_form.php','sales_order_print.php'])?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
-                    <i class="bi bi-cart3"></i>
-                </span>
-                <span class="nav-link-text">Penawaran Penjualan (SO)</span>
-            </a>
+                <a href="sales_orders.php" class="sidebar-link <?php echo in_array($currentPage,['sales_orders.php','sales_order_form.php','sales_order_print.php'])?'active':''; ?>" title="Penawaran Penjualan (SO)">
+                    <span class="nav-icon-badge" style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
+                        <i class="bi bi-cart3"></i>
+                    </span>
+                    <span class="nav-link-text">Penawaran Penjualan (SO)</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
-                    <i class="bi bi-shop-window"></i>
-                </span>
-                <span class="nav-link-text">Customer Toko / Dealer</span>
-            </a>
+                <a href="modul-aplikasi-sales/customer.php" class="sidebar-link <?php echo in_array($currentPage,['customer.php','tambah-customer.php','edit-customer.php'])?'active':''; ?>" title="Customer Toko / Dealer">
+                    <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                        <i class="bi bi-shop-window"></i>
+                    </span>
+                    <span class="nav-link-text">Customer Toko / Dealer</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/sales.php" class="sidebar-link <?php echo in_array($currentPage,['sales.php','sales-detail.php'])?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(168, 85, 247, 0.15); color: #A855F7;">
-                    <i class="bi bi-person-badge-fill"></i>
-                </span>
-                <span class="nav-link-text">Akun &amp; Sales App</span>
-            </a>
+                <a href="modul-aplikasi-sales/sales.php" class="sidebar-link <?php echo in_array($currentPage,['sales.php','sales-detail.php'])?'active':''; ?>" title="Akun & Sales App">
+                    <span class="nav-icon-badge" style="background: rgba(168, 85, 247, 0.15); color: #A855F7;">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </span>
+                    <span class="nav-link-text">Akun &amp; Sales App</span>
+                </a>
 
-            <a href="modul-aplikasi-sales/scraping-gmaps.php" class="sidebar-link <?php echo $currentPage=='scraping-gmaps.php'?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(244, 63, 94, 0.15); color: #F43F5E;">
-                    <i class="bi bi-crosshair2"></i>
-                </span>
-                <span class="nav-link-text">Scraper Leads Maps</span>
-            </a>
+                <a href="modul-aplikasi-sales/scraping-gmaps.php" class="sidebar-link <?php echo $currentPage=='scraping-gmaps.php'?'active':''; ?>" title="Scraper Leads Maps">
+                    <span class="nav-icon-badge" style="background: rgba(244, 63, 94, 0.15); color: #F43F5E;">
+                        <i class="bi bi-crosshair2"></i>
+                    </span>
+                    <span class="nav-link-text">Scraper Leads Maps</span>
+                </a>
 
-            <a href="scraping_exhibitor.php" class="sidebar-link <?php echo $currentPage=='scraping_exhibitor.php'?'active':''; ?>">
-                <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
-                    <i class="bi bi-buildings-fill"></i>
-                </span>
-                <span class="nav-link-text">Scraper Database Pameran</span>
-            </a>
+                <a href="scraping_exhibitor.php" class="sidebar-link <?php echo $currentPage=='scraping_exhibitor.php'?'active':''; ?>" title="Scraper Database Pameran">
+                    <span class="nav-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                        <i class="bi bi-buildings-fill"></i>
+                    </span>
+                    <span class="nav-link-text">Scraper Database Pameran</span>
+                </a>
+            </div>
 
             <!-- ═════════════════════════════════════════════════════════ -->
             <!-- 3. TOOLS & UTILITIES                                      -->
             <!-- ═════════════════════════════════════════════════════════ -->
-            <div class="nav-section-title" style="margin-top: 14px;">
-                <span class="nav-section-dot dot-purple"></span>
-                <span>Tools &amp; Pendukung</span>
+            <div class="nav-section-title" style="margin-top: 10px;">
+                <span>Tools &amp; Pendukung: 6</span>
+                <i class="bi bi-tools text-muted" style="font-size: 11px;"></i>
             </div>
 
             <div>
@@ -881,9 +1086,9 @@ table tr td { font-size: 0.85em; }
             <!-- ═════════════════════════════════════════════════════════ -->
             <!-- 4. KHUSUS SUPER ADMIN                                     -->
             <!-- ═════════════════════════════════════════════════════════ -->
-            <div class="nav-section-title" style="margin-top: 14px;">
-                <span class="nav-section-dot dot-amber"></span>
-                <span style="color: #FBBF24;">Super Admin Area</span>
+            <div class="nav-section-title" style="margin-top: 10px;">
+                <span style="color: #D97706;">Super Admin</span>
+                <i class="bi bi-shield-lock-fill text-warning" style="font-size: 11px;"></i>
             </div>
             <a href="role_menu_access.php" class="sidebar-link <?php echo $currentPage=='role_menu_access.php'?'active':''; ?>">
                 <span class="nav-icon-badge" style="background: rgba(245, 158, 11, 0.22); color: #FBBF24;">
@@ -904,9 +1109,9 @@ table tr td { font-size: 0.85em; }
         <!-- ═════════════════════════════════════════════════════════ -->
         <!-- 5. AKUN & LOGOUT                                          -->
         <!-- ═════════════════════════════════════════════════════════ -->
-        <div class="nav-section-title" style="margin-top: 14px;">
-            <span class="nav-section-dot dot-rose"></span>
+        <div class="nav-section-title" style="margin-top: 10px;">
             <span>Akun</span>
+            <i class="bi bi-person-circle text-muted" style="font-size: 11px;"></i>
         </div>
         <a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
             <span class="nav-icon-badge" style="background: rgba(148, 163, 184, 0.15); color: #94A3B8;">
@@ -923,20 +1128,20 @@ table tr td { font-size: 0.85em; }
 
     </nav>
 
-    <!-- Sidebar Footer: Glassmorphism Profile Card -->
-    <div class="sidebar-profile-card">
-        <div class="d-flex align-items-center gap-2.5 overflow-hidden">
-            <div class="sidebar-avatar-ring">
-                <?php echo $userInitials; ?>
-                <span class="sidebar-online-indicator"></span>
-            </div>
-            <div class="sidebar-user-meta overflow-hidden">
-                <div class="sidebar-user-name text-truncate" title="<?php echo $userName; ?>"><?php echo $userName; ?></div>
-                <span class="sidebar-role-pill text-uppercase" style="<?php echo $roleBadgeBg; ?>">
-                    <?php echo htmlspecialchars($userRole); ?>
-                </span>
-            </div>
-        </div>
+    <!-- Bottom Action Card (Gambar 2 style "Create new task") -->
+    <div class="sidebar-action-card">
+        <a href="modul-aplikasi-sales/kegiatan-baru.php" class="sidebar-action-btn">
+            <span class="action-btn-circle">+</span>
+            <span class="action-btn-label">Tambah Kegiatan Baru</span>
+        </a>
+        <div class="sidebar-action-sub">Atau buat <a href="sales_orders.php">Penawaran SO</a></div>
+    </div>
+
+    <!-- Mini round plus button for collapsed mode -->
+    <div class="sidebar-mini-plus">
+        <a href="modul-aplikasi-sales/kegiatan-baru.php" class="btn-mini-circle-plus" title="Tambah Kegiatan Baru">
+            <i class="bi bi-plus-lg"></i>
+        </a>
     </div>
 </aside>
 
@@ -1275,12 +1480,35 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Mobile sidebar toggle
+    // Sidebar collapse & mobile toggle
     const toggler = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
     if (toggler) {
-        toggler.addEventListener('click', () => sidebar.classList.toggle('open'));
+        toggler.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.innerWidth <= 991) {
+                sidebar.classList.toggle('open');
+            } else {
+                toggleSidebarCollapse();
+            }
+        });
     }
+
+    window.toggleSidebarCollapse = function() {
+        const isCollapsed = document.documentElement.classList.toggle('sidebar-collapsed');
+        try {
+            localStorage.setItem('loewix_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+        } catch(e) {}
+    };
+
+    // Close sidebar on click outside in mobile
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 991 && sidebar && sidebar.classList.contains('open')) {
+            if (!sidebar.contains(e.target) && toggler && !toggler.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
 
     // Live Clock & Date
     function updateDateTime() {
