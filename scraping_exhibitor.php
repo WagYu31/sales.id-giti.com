@@ -321,6 +321,748 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_table_data') {
     exit;
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// HANDLE EXPORT EXCEL PROFESIONAL DENGAN PIVOT & MULTI-SHEET (.XLSX)
+// ════════════════════════════════════════════════════════════════════════════
+if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
+    @error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
+    @ini_set('display_errors', '0');
+
+    $event_filter = trim($_GET['event'] ?? '');
+    $country_filter = trim($_GET['country'] ?? '');
+    $status_filter = trim($_GET['status'] ?? '');
+    $search_query = trim($_GET['q'] ?? '');
+
+    $where = ["1=1"];
+
+    if (!empty($event_filter)) {
+        $where[] = "event_name = '" . $conn->real_escape_string($event_filter) . "'";
+    }
+    if (!empty($country_filter)) {
+        $where[] = "country = '" . $conn->real_escape_string($country_filter) . "'";
+    }
+    if (!empty($status_filter)) {
+        $where[] = "status_prospek = '" . $conn->real_escape_string($status_filter) . "'";
+    }
+    if (!empty($search_query)) {
+        $q_esc = $conn->real_escape_string($search_query);
+        $where[] = "(company_name LIKE '%$q_esc%' OR booth_number LIKE '%$q_esc%' OR business_activity LIKE '%$q_esc%' OR products LIKE '%$q_esc%' OR phone LIKE '%$q_esc%' OR email LIKE '%$q_esc%' OR website LIKE '%$q_esc%' OR address LIKE '%$q_esc%' OR city LIKE '%$q_esc%')";
+    }
+
+    $where_sql = implode(" AND ", $where);
+    $sql = "SELECT id, event_name, exhibitor_id, company_name, country, booth_number, phone, email, website, address, city, province, business_activity, products, detail_url, status_prospek, customer_id, created_at FROM krista_exhibitors WHERE $where_sql ORDER BY id ASC";
+    $result = $conn->query($sql);
+
+    $rows = [];
+    if ($result) {
+        while ($r = $result->fetch_assoc()) {
+            $rows[] = $r;
+        }
+    }
+
+    $vendor_autoload = __DIR__ . '/vendor/autoload.php';
+    if (file_exists($vendor_autoload)) {
+        require_once $vendor_autoload;
+    }
+
+    // Jika library PhpSpreadsheet tidak terpasang, redirect ke export CSV
+    if (!class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet')) {
+        header('Location: scraping_exhibitor.php?action=export_csv' . (!empty($_SERVER['QUERY_STRING']) ? '&' . preg_replace('/action=[^&]*&?/', '', $_SERVER['QUERY_STRING']) : ''));
+        exit;
+    }
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+    // -----------------------------------------------------------------
+    // 1. DATA AGGREGATION & PIVOT METRICS CALCULATION
+    // -----------------------------------------------------------------
+    $total_rows = count($rows);
+    $total_local = 0;
+    $total_intl = 0;
+    $total_with_phone = 0;
+    $total_with_email = 0;
+    $total_with_web = 0;
+    $total_complete_contact = 0;
+    $total_ready_contact = 0;
+    $total_crm = 0;
+
+    $by_country = [];
+    $by_sector = [
+        'Mesin & Teknologi Pengolahan (Food Processing Machinery)' => [
+            'name' => 'Mesin & Teknologi Pengolahan Makanan',
+            'keywords' => ['processing', 'machinery', 'technology', 'conveyor', 'equipment', 'mesin', 'pengolahan', 'fryer', 'separator', 'cooker', 'mixer', 'extruder', 'industrial'],
+            'total' => 0,
+            'with_contact' => 0,
+            'crm' => 0,
+            'loewix_solution' => 'CCTV Industri Tahan Debu & Panas, AI Monitoring Jalur Produksi, Camera Anti-Explosion'
+        ],
+        'Teknologi Pengemasan & Labelling (Packaging)' => [
+            'name' => 'Teknologi Pengemasan & Labelling',
+            'keywords' => ['packaging', 'packing', 'kemasan', 'sealing', 'label', 'printing', 'carton', 'wrapping', 'filler', 'capping', 'blister', 'pouch'],
+            'total' => 0,
+            'with_contact' => 0,
+            'crm' => 0,
+            'loewix_solution' => 'CCTV Gudang Logistik, AI Monitoring Packing Line, BAST Rekam Pengiriman Barang'
+        ],
+        'Bakery, Pastry, Cokelat & Manisan' => [
+            'name' => 'Bakery, Pastry, Cokelat & Manisan',
+            'keywords' => ['bakery', 'pastry', 'bread', 'cake', 'confectionery', 'chocolate', 'biscuit', 'roti', 'kue', 'sweet', 'candy', 'cookies', 'wafer'],
+            'total' => 0,
+            'with_contact' => 0,
+            'crm' => 0,
+            'loewix_solution' => 'CCTV Central Kitchen, Monitoring Display Etalase Toko, Integrasi POS Kasir Anti-Fraud'
+        ],
+        'Minuman, Kopi, Teh & Sirup (Beverage & Coffee)' => [
+            'name' => 'Minuman, Kopi, Teh & Sirup',
+            'keywords' => ['beverage', 'drink', 'coffee', 'tea', 'juice', 'syrup', 'kopi', 'teh', 'water', 'roaster', 'brewery', 'botol', 'soda'],
+            'total' => 0,
+            'with_contact' => 0,
+            'crm' => 0,
+            'loewix_solution' => 'CCTV Outlet Roastery & Cafe, Monitoring Penyimpanan Bahan Baku, Kasir POS CCTV'
+        ],
+        'Daging, Unggas, Seafood & Cold Storage' => [
+            'name' => 'Daging, Unggas, Seafood & Cold Storage',
+            'keywords' => ['meat', 'poultry', 'chicken', 'beef', 'seafood', 'fish', 'frozen', 'daging', 'ikan', 'shrimp', 'cold storage', 'chiller', 'freezer'],
+            'total' => 0,
+            'with_contact' => 0,
+            'crm' => 0,
+            'loewix_solution' => 'CCTV Cold Storage IP67/IP68 Anti-Kondensasi, Monitoring Suhu & Keamanan Freezer 24 Jam'
+        ],
+        'Bahan Baku, Bumbu & Food Ingredients' => [
+            'name' => 'Bahan Baku, Bumbu & Ingredients',
+            'keywords' => ['ingredient', 'flavor', 'flavour', 'spice', 'seasoning', 'additive', 'sauce', 'bumbu', 'flour', 'sugar', 'salt', 'oil', 'yeast', 'ekstrak'],
+            'total' => 0,
+            'with_contact' => 0,
+            'crm' => 0,
+            'loewix_solution' => 'CCTV Ruang Timbang & Mixing Bahan Baku, Warehouse CCTV Perimeter, Akses Kontrol Karyawan'
+        ],
+        'Peralatan Dapur, Hotel & Restoran (HORECA)' => [
+            'name' => 'Peralatan Dapur, Hotel & Restoran (HORECA)',
+            'keywords' => ['horeca', 'hotel', 'restaurant', 'catering', 'kitchen', 'oven', 'stainless', 'refrigerator', 'utensil', 'tableware', 'dishwasher'],
+            'total' => 0,
+            'with_contact' => 0,
+            'crm' => 0,
+            'loewix_solution' => 'CCTV Dapur Komersial Restoran, Smart AI Deteksi Asap/Api, Kamera Kasir & Tamu'
+        ],
+        'Distribusi, Logistik & Trading Retail' => [
+            'name' => 'Distribusi, Logistik & Trading Retail',
+            'keywords' => ['trading', 'distributor', 'import', 'export', 'logistics', 'retail', 'supplier', 'perdagangan', 'grosir', 'distribusi'],
+            'total' => 0,
+            'with_contact' => 0,
+            'crm' => 0,
+            'loewix_solution' => 'CCTV Gudang Transit Distribusi, ANPR Camera Gerbang Truk, PTZ Outdoor 360 Derajat'
+        ],
+        'Sektor Industri Lainnya (General Industry)' => [
+            'name' => 'Sektor Industri Lainnya / Multi-Produk',
+            'keywords' => [],
+            'total' => 0,
+            'with_contact' => 0,
+            'crm' => 0,
+            'loewix_solution' => 'CCTV Standar Industri, Perimeter Gedung Kantor, Smart AI Absensi Wajah & Keamanan 24 Jam'
+        ]
+    ];
+
+    $omnichannel_counts = [
+        'Lengkap (WhatsApp & Email)' => 0,
+        'Ada WhatsApp Saja (Tanpa Email)' => 0,
+        'Ada Email Saja (Tanpa WA)' => 0,
+        'Hanya Website / Alamat Fisik' => 0,
+        'Belum Ada Kontak Langsung' => 0
+    ];
+
+    foreach ($rows as $r) {
+        $c = trim($r['country'] ?? '');
+        if (empty($c)) $c = 'Tidak Diketahui';
+        $is_local = (strcasecmp($c, 'Indonesia') === 0);
+        if ($is_local) $total_local++; else $total_intl++;
+
+        $has_p = !empty(trim($r['phone'] ?? ''));
+        $has_e = !empty(trim($r['email'] ?? ''));
+        $has_w = !empty(trim($r['website'] ?? ''));
+
+        if ($has_p) $total_with_phone++;
+        if ($has_e) $total_with_email++;
+        if ($has_w) $total_with_web++;
+        if ($has_p && $has_e) $total_complete_contact++;
+        if ($has_p || $has_e) $total_ready_contact++;
+
+        $in_crm = (!empty($r['customer_id']) || stripos($r['status_prospek'] ?? '', 'CRM') !== false);
+        if ($in_crm) $total_crm++;
+
+        // Omnichannel category
+        if ($has_p && $has_e) {
+            $omnichannel_counts['Lengkap (WhatsApp & Email)']++;
+        } elseif ($has_p) {
+            $omnichannel_counts['Ada WhatsApp Saja (Tanpa Email)']++;
+        } elseif ($has_e) {
+            $omnichannel_counts['Ada Email Saja (Tanpa WA)']++;
+        } elseif ($has_w || !empty(trim($r['address'] ?? ''))) {
+            $omnichannel_counts['Hanya Website / Alamat Fisik']++;
+        } else {
+            $omnichannel_counts['Belum Ada Kontak Langsung']++;
+        }
+
+        // Country Pivot
+        if (!isset($by_country[$c])) {
+            $by_country[$c] = [
+                'country' => $c,
+                'is_local' => $is_local,
+                'total' => 0,
+                'with_phone' => 0,
+                'with_email' => 0,
+                'with_web' => 0,
+                'complete' => 0,
+                'crm' => 0
+            ];
+        }
+        $by_country[$c]['total']++;
+        if ($has_p) $by_country[$c]['with_phone']++;
+        if ($has_e) $by_country[$c]['with_email']++;
+        if ($has_w) $by_country[$c]['with_web']++;
+        if ($has_p && $has_e) $by_country[$c]['complete']++;
+        if ($in_crm) $by_country[$c]['crm']++;
+
+        // Industry Sector Matching
+        $text_search = strtolower(($r['business_activity'] ?? '') . ' ' . ($r['products'] ?? '') . ' ' . ($r['company_name'] ?? ''));
+        $matched_sector = false;
+        foreach ($by_sector as $skey => &$sdata) {
+            if ($skey === 'Sektor Industri Lainnya (General Industry)') continue;
+            foreach ($sdata['keywords'] as $kw) {
+                if (strpos($text_search, $kw) !== false) {
+                    $sdata['total']++;
+                    if ($has_p || $has_e) $sdata['with_contact']++;
+                    if ($in_crm) $sdata['crm']++;
+                    $matched_sector = true;
+                    break 2;
+                }
+            }
+        }
+        unset($sdata);
+        if (!$matched_sector) {
+            $by_sector['Sektor Industri Lainnya (General Industry)']['total']++;
+            if ($has_p || $has_e) $by_sector['Sektor Industri Lainnya (General Industry)']['with_contact']++;
+            if ($in_crm) $by_sector['Sektor Industri Lainnya (General Industry)']['crm']++;
+        }
+    }
+
+    // Sort countries by total descending
+    uasort($by_country, function($a, $b) {
+        if ($a['total'] === $b['total']) return strcmp($a['country'], $b['country']);
+        return $b['total'] - $a['total'];
+    });
+
+    // -----------------------------------------------------------------
+    // 2. BUILD SHEET 1: DASHBOARD & PIVOT EKSEKUTIF
+    // -----------------------------------------------------------------
+    $sheet1 = $spreadsheet->getActiveSheet();
+    $sheet1->setTitle('📊 Ringkasan & Pivot');
+    $sheet1->setShowGridLines(true);
+
+    // Title banner
+    $sheet1->mergeCells('A1:K1');
+    $sheet1->setCellValue('A1', 'PT. LOEWIX INDONESIA — EXECUTIVE EXHIBITION & LEADS ANALYTICS');
+    $sheet1->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
+    $sheet1->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet1->getStyle('A1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('0F172A');
+    $sheet1->getRowDimension(1)->setRowHeight(36);
+
+    $sheet1->mergeCells('A2:K2');
+    $sheet1->setCellValue('A2', 'Pusat Analisis & Database Direktori Pameran Industri — sales.id-giti.com');
+    $sheet1->getStyle('A2')->getFont()->setItalic(true)->setSize(9.5)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('94A3B8'));
+    $sheet1->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet1->getStyle('A2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('1E293B');
+    $sheet1->getRowDimension(2)->setRowHeight(20);
+
+    // Metadata Card
+    $label_ev = !empty($event_filter) ? $event_filter : 'Semua Event Pameran';
+    $label_co = !empty($country_filter) ? $country_filter : 'Semua Negara Asal';
+    $label_st = !empty($status_filter) ? $status_filter : 'Semua Status Prospek';
+    $user_name = $_SESSION['nama_lengkap'] ?? $_SESSION['nama'] ?? 'Admin Sales';
+
+    $sheet1->setCellValue('A4', 'Filter Event:');
+    $sheet1->mergeCells('B4:D4');
+    $sheet1->setCellValue('B4', $label_ev);
+    $sheet1->setCellValue('F4', 'Tanggal Export:');
+    $sheet1->mergeCells('G4:H4');
+    $sheet1->setCellValue('G4', date('d/m/Y H:i') . ' WIB');
+
+    $sheet1->setCellValue('A5', 'Filter Negara:');
+    $sheet1->mergeCells('B5:D5');
+    $sheet1->setCellValue('B5', $label_co);
+    $sheet1->setCellValue('F5', 'Total Data Terpilih:');
+    $sheet1->mergeCells('G5:H5');
+    $sheet1->setCellValue('G5', number_format($total_rows) . ' Perusahaan');
+
+    $sheet1->setCellValue('A6', 'Filter Status:');
+    $sheet1->mergeCells('B6:D6');
+    $sheet1->setCellValue('B6', $label_st);
+    $sheet1->setCellValue('F6', 'Di-export Oleh:');
+    $sheet1->mergeCells('G6:H6');
+    $sheet1->setCellValue('G6', $user_name);
+
+    $sheet1->getStyle('A4:A6')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('64748B'));
+    $sheet1->getStyle('A4:A6')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+    $sheet1->getStyle('F4:F6')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('64748B'));
+    $sheet1->getStyle('F4:F6')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+    $sheet1->getStyle('B4:D6')->getFont()->setBold(true)->setSize(9.5)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('0F172A'));
+    $sheet1->getStyle('G4:H6')->getFont()->setBold(true)->setSize(9.5)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('0F172A'));
+
+    // KPI Summary Tiles (Row 8-10)
+    // Tile 1: Total
+    $sheet1->mergeCells('B8:C8');
+    $sheet1->setCellValue('B8', 'TOTAL EXHIBITOR');
+    $sheet1->mergeCells('B9:C10');
+    $sheet1->setCellValue('B9', number_format($total_rows));
+    $sheet1->getStyle('B8:C8')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1E40AF'));
+    $sheet1->getStyle('B9:C10')->getFont()->setBold(true)->setSize(18)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1E3A8A'));
+    $sheet1->getStyle('B8:C10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet1->getStyle('B8:C10')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EFF6FF');
+    $sheet1->getStyle('B8:C10')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('BFDBFE'));
+
+    // Tile 2: Siap Hubungi
+    $sheet1->mergeCells('D8:E8');
+    $sheet1->setCellValue('D8', 'KONTAK SIAP HUBUNGI');
+    $sheet1->mergeCells('D9:E9');
+    $sheet1->setCellValue('D9', number_format($total_ready_contact));
+    $sheet1->mergeCells('D10:E10');
+    $pct_ready = round(($total_ready_contact / max(1, $total_rows)) * 100);
+    $sheet1->setCellValue('D10', "{$pct_ready}% Penetrasi");
+    $sheet1->getStyle('D8:E8')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('166534'));
+    $sheet1->getStyle('D9:E9')->getFont()->setBold(true)->setSize(16)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('15803D'));
+    $sheet1->getStyle('D10:E10')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('166534'));
+    $sheet1->getStyle('D8:E10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet1->getStyle('D8:E10')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F0FDF4');
+    $sheet1->getStyle('D8:E10')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('BBF7D0'));
+
+    // Tile 3: Lokal
+    $sheet1->mergeCells('F8:G8');
+    $sheet1->setCellValue('F8', 'EXHIBITOR LOKAL');
+    $sheet1->mergeCells('F9:G9');
+    $sheet1->setCellValue('F9', number_format($total_local));
+    $sheet1->mergeCells('F10:G10');
+    $sheet1->setCellValue('F10', '🇮🇩 Domestik');
+    $sheet1->getStyle('F8:G8')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('92400E'));
+    $sheet1->getStyle('F9:G9')->getFont()->setBold(true)->setSize(16)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('B45309'));
+    $sheet1->getStyle('F10:G10')->getFont()->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('92400E'));
+    $sheet1->getStyle('F8:G10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet1->getStyle('F8:G10')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FEF3C7');
+    $sheet1->getStyle('F8:G10')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FDE68A'));
+
+    // Tile 4: Internasional
+    $sheet1->mergeCells('H8:I8');
+    $sheet1->setCellValue('H8', 'INTERNASIONAL');
+    $sheet1->mergeCells('H9:I9');
+    $sheet1->setCellValue('H9', number_format($total_intl));
+    $sheet1->mergeCells('H10:I10');
+    $sheet1->setCellValue('H10', '🌐 Global');
+    $sheet1->getStyle('H8:I8')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('6B21A8'));
+    $sheet1->getStyle('H9:I9')->getFont()->setBold(true)->setSize(16)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('7E22CE'));
+    $sheet1->getStyle('H10:I10')->getFont()->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('6B21A8'));
+    $sheet1->getStyle('H8:I10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet1->getStyle('H8:I10')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3E8FF');
+    $sheet1->getStyle('H8:I10')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E9D5FF'));
+
+    // Tile 5: CRM
+    $sheet1->mergeCells('J8:K8');
+    $sheet1->setCellValue('J8', 'PROSPEK DI CRM');
+    $sheet1->mergeCells('J9:K9');
+    $sheet1->setCellValue('J9', number_format($total_crm));
+    $sheet1->mergeCells('J10:K10');
+    $sheet1->setCellValue('J10', 'Sales Pipeline');
+    $sheet1->getStyle('J8:K8')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('334155'));
+    $sheet1->getStyle('J9:K9')->getFont()->setBold(true)->setSize(16)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('0F172A'));
+    $sheet1->getStyle('J10:K10')->getFont()->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('64748B'));
+    $sheet1->getStyle('J8:K10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet1->getStyle('J8:K10')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F8FAFC');
+    $sheet1->getStyle('J8:K10')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('CBD5E1'));
+
+    // PIVOT TABLE 1: Persebaran Negara
+    $curRow = 13;
+    $sheet1->mergeCells("A12:K12");
+    $sheet1->setCellValue("A12", "1. PIVOT TABEL PERSEBARAN NEGARA ASAL & TINGKAT KESIAPAN KONTAK");
+    $sheet1->getStyle("A12")->getFont()->setBold(true)->setSize(11)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("0F172A"));
+    $sheet1->getStyle("A12")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("F1F5F9");
+    $sheet1->getRowDimension(12)->setRowHeight(24);
+
+    $headers1 = [
+        'A' => 'No',
+        'B' => 'Negara Asal',
+        'C' => 'Klasifikasi Wilayah',
+        'D' => 'Total Exhibitor',
+        'E' => 'Pangsa Pasar (%)',
+        'F' => 'Ada No HP / WA',
+        'G' => 'Ada Email',
+        'H' => 'Ada Website',
+        'I' => 'Kontak Lengkap (WA+Email)',
+        'J' => 'Tersimpan di CRM',
+        'K' => 'Kesiapan Kontak (%)'
+    ];
+    foreach ($headers1 as $col => $title) {
+        $sheet1->setCellValue($col . $curRow, $title);
+    }
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("FFFFFF"))->setSize(9.5);
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("1E3A8A");
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+    $sheet1->getRowDimension($curRow)->setRowHeight(28);
+
+    $curRow++;
+    $dataStartRow1 = $curRow;
+    $no1 = 1;
+    foreach ($by_country as $c) {
+        $sheet1->setCellValue('A' . $curRow, $no1++);
+        $sheet1->setCellValue('B' . $curRow, $c['country']);
+        $sheet1->setCellValue('C' . $curRow, $c['is_local'] ? '🇮🇩 Lokal' : '🌐 Internasional');
+        $sheet1->setCellValue('D' . $curRow, $c['total']);
+        $sheet1->setCellValue('E' . $curRow, "=D{$curRow}/" . max(1, $total_rows));
+        $sheet1->setCellValue('F' . $curRow, $c['with_phone']);
+        $sheet1->setCellValue('G' . $curRow, $c['with_email']);
+        $sheet1->setCellValue('H' . $curRow, $c['with_web']);
+        $sheet1->setCellValue('I' . $curRow, $c['complete']);
+        $sheet1->setCellValue('J' . $curRow, $c['crm']);
+        $sheet1->setCellValue('K' . $curRow, "=IF(D{$curRow}>0, (F{$curRow}+G{$curRow}-I{$curRow})/D{$curRow}, 0)");
+
+        $rowBg = ($no1 % 2 === 0) ? 'FFFFFF' : 'F8FAFC';
+        $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($rowBg);
+        $sheet1->getStyle("A{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet1->getStyle("C{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet1->getStyle("D{$curRow}:J{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet1->getStyle("D{$curRow}")->getNumberFormat()->setFormatCode('#,##0');
+        $sheet1->getStyle("E{$curRow}")->getNumberFormat()->setFormatCode('0.0%');
+        $sheet1->getStyle("F{$curRow}:J{$curRow}")->getNumberFormat()->setFormatCode('#,##0');
+        $sheet1->getStyle("K{$curRow}")->getNumberFormat()->setFormatCode('0.0%');
+        $sheet1->getRowDimension($curRow)->setRowHeight(21);
+        $curRow++;
+    }
+    $dataEndRow1 = $curRow - 1;
+
+    // Summary Row for Table 1
+    $sheet1->mergeCells("A{$curRow}:C{$curRow}");
+    $sheet1->setCellValue("A{$curRow}", "TOTAL KESELURUHAN");
+    $sheet1->setCellValue("D{$curRow}", "=SUM(D{$dataStartRow1}:D{$dataEndRow1})");
+    $sheet1->setCellValue("E{$curRow}", "=SUM(E{$dataStartRow1}:E{$dataEndRow1})");
+    $sheet1->setCellValue("F{$curRow}", "=SUM(F{$dataStartRow1}:F{$dataEndRow1})");
+    $sheet1->setCellValue("G{$curRow}", "=SUM(G{$dataStartRow1}:G{$dataEndRow1})");
+    $sheet1->setCellValue("H{$curRow}", "=SUM(H{$dataStartRow1}:H{$dataEndRow1})");
+    $sheet1->setCellValue("I{$curRow}", "=SUM(I{$dataStartRow1}:I{$dataEndRow1})");
+    $sheet1->setCellValue("J{$curRow}", "=SUM(J{$dataStartRow1}:J{$dataEndRow1})");
+    $sheet1->setCellValue("K{$curRow}", "=IF(D{$curRow}>0, (F{$curRow}+G{$curRow}-I{$curRow})/D{$curRow}, 0)");
+
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFont()->setBold(true)->setSize(10)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("0F172A"));
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("E2E8F0");
+    $sheet1->getStyle("A{$curRow}:C{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    $sheet1->getStyle("D{$curRow}:J{$curRow}")->getNumberFormat()->setFormatCode('#,##0');
+    $sheet1->getStyle("E{$curRow}")->getNumberFormat()->setFormatCode('0.0%');
+    $sheet1->getStyle("K{$curRow}")->getNumberFormat()->setFormatCode('0.0%');
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE);
+    $sheet1->getRowDimension($curRow)->setRowHeight(25);
+
+    // PIVOT TABLE 2: Sektor Industri & Rekomendasi Solusi Loewix
+    $curRow += 3;
+    $sheet1->mergeCells("A{$curRow}:K{$curRow}");
+    $sheet1->setCellValue("A{$curRow}", "2. PIVOT TABEL SEKTOR INDUSTRI & REKOMENDASI PENETRASI CCTV / AI SECURITY LOEWIX");
+    $sheet1->getStyle("A{$curRow}")->getFont()->setBold(true)->setSize(11)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("0F172A"));
+    $sheet1->getStyle("A{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("F1F5F9");
+    $sheet1->getRowDimension(12)->setRowHeight(24);
+
+    $curRow++;
+    $sheet1->setCellValue("A{$curRow}", "No");
+    $sheet1->mergeCells("B{$curRow}:C{$curRow}");
+    $sheet1->setCellValue("B{$curRow}", "Sektor / Bidang Industri");
+    $sheet1->setCellValue("D{$curRow}", "Total Exhibitor");
+    $sheet1->setCellValue("E{$curRow}", "Pangsa Pasar (%)");
+    $sheet1->setCellValue("F{$curRow}", "Siap Dihubungi");
+    $sheet1->setCellValue("G{$curRow}", "Tersimpan CRM");
+    $sheet1->mergeCells("H{$curRow}:K{$curRow}");
+    $sheet1->setCellValue("H{$curRow}", "Rekomendasi Penetrasi Solusi CCTV / AI Security Loewix");
+
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("FFFFFF"))->setSize(9.5);
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("065F46");
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet1->getRowDimension($curRow)->setRowHeight(28);
+
+    $curRow++;
+    $dataStartRow2 = $curRow;
+    $no2 = 1;
+    foreach ($by_sector as $s) {
+        $sheet1->setCellValue('A' . $curRow, $no2++);
+        $sheet1->mergeCells("B{$curRow}:C{$curRow}");
+        $sheet1->setCellValue('B' . $curRow, $s['name']);
+        $sheet1->setCellValue('D' . $curRow, $s['total']);
+        $sheet1->setCellValue('E' . $curRow, "=D{$curRow}/" . max(1, $total_rows));
+        $sheet1->setCellValue('F' . $curRow, $s['with_contact']);
+        $sheet1->setCellValue('G' . $curRow, $s['crm']);
+        $sheet1->mergeCells("H{$curRow}:K{$curRow}");
+        $sheet1->setCellValue('H' . $curRow, $s['loewix_solution']);
+
+        $rowBg = ($no2 % 2 === 0) ? 'FFFFFF' : 'F8FAFC';
+        $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($rowBg);
+        $sheet1->getStyle("A{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet1->getStyle("D{$curRow}:G{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet1->getStyle("D{$curRow}")->getNumberFormat()->setFormatCode('#,##0');
+        $sheet1->getStyle("E{$curRow}")->getNumberFormat()->setFormatCode('0.0%');
+        $sheet1->getStyle("F{$curRow}:G{$curRow}")->getNumberFormat()->setFormatCode('#,##0');
+        $sheet1->getStyle("H{$curRow}")->getFont()->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("0F172A"));
+        $sheet1->getRowDimension($curRow)->setRowHeight(22);
+        $curRow++;
+    }
+    $dataEndRow2 = $curRow - 1;
+
+    // Summary Row for Table 2
+    $sheet1->mergeCells("A{$curRow}:C{$curRow}");
+    $sheet1->setCellValue("A{$curRow}", "TOTAL INDUSTRI");
+    $sheet1->setCellValue("D{$curRow}", "=SUM(D{$dataStartRow2}:D{$dataEndRow2})");
+    $sheet1->setCellValue("E{$curRow}", "=SUM(E{$dataStartRow2}:E{$dataEndRow2})");
+    $sheet1->setCellValue("F{$curRow}", "=SUM(F{$dataStartRow2}:F{$dataEndRow2})");
+    $sheet1->setCellValue("G{$curRow}", "=SUM(G{$dataStartRow2}:G{$dataEndRow2})");
+    $sheet1->mergeCells("H{$curRow}:K{$curRow}");
+    $sheet1->setCellValue("H{$curRow}", "Target Penjualan B2B Seluruh Kluster Industri");
+
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFont()->setBold(true)->setSize(10)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("065F46"));
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("D1FAE5");
+    $sheet1->getStyle("A{$curRow}:C{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    $sheet1->getStyle("D{$curRow}")->getNumberFormat()->setFormatCode('#,##0');
+    $sheet1->getStyle("E{$curRow}")->getNumberFormat()->setFormatCode('0.0%');
+    $sheet1->getStyle("F{$curRow}:G{$curRow}")->getNumberFormat()->setFormatCode('#,##0');
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE);
+    $sheet1->getRowDimension($curRow)->setRowHeight(25);
+
+    // PIVOT TABLE 3: Matriks Saluran Komunikasi & Prioritas Sales
+    $curRow += 3;
+    $sheet1->mergeCells("A{$curRow}:K{$curRow}");
+    $sheet1->setCellValue("A{$curRow}", "3. MATRIKS KESIAPAN KOMUNIKASI & STRATEGI TINDAK LANJUT SALES");
+    $sheet1->getStyle("A{$curRow}")->getFont()->setBold(true)->setSize(11)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("0F172A"));
+    $sheet1->getStyle("A{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("F1F5F9");
+    $sheet1->getRowDimension($curRow)->setRowHeight(24);
+
+    $curRow++;
+    $sheet1->mergeCells("A{$curRow}:C{$curRow}");
+    $sheet1->setCellValue("A{$curRow}", "Saluran Kontak Tersedia");
+    $sheet1->setCellValue("D{$curRow}", "Jumlah Exhibitor");
+    $sheet1->setCellValue("E{$curRow}", "Persentase (%)");
+    $sheet1->mergeCells("F{$curRow}:K{$curRow}");
+    $sheet1->setCellValue("F{$curRow}", "Prioritas & Rekomendasi Tindak Lanjut Tim Sales Loewix");
+
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("FFFFFF"))->setSize(9.5);
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("334155");
+    $sheet1->getStyle("A{$curRow}:K{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet1->getRowDimension($curRow)->setRowHeight(26);
+
+    $curRow++;
+    $strategy_map = [
+        'Lengkap (WhatsApp & Email)' => 'Prioritas 1 (Tier-A Hot Lead): Hubungi via WhatsApp bisnis & kirim proposal resmi via Email pada hari yang sama.',
+        'Ada WhatsApp Saja (Tanpa Email)' => 'Prioritas 2 (Tier-B Direct Call): Hubungi via chat/telepon WA untuk perkenalan & minta alamat email PIC Purchasing.',
+        'Ada Email Saja (Tanpa WA)' => 'Prioritas 3 (Tier-C Proposal): Kirim company profile & katalog produk, ajukan jadwal presentasi demo.',
+        'Hanya Website / Alamat Fisik' => 'Prioritas 4 (Canvasing): Kunjungi booth saat hari H pameran atau jadwalkan canvasing visit ke lokasi.',
+        'Belum Ada Kontak Langsung' => 'Prioritas 5 (Research): Lakukan riset lanjutan melalui LinkedIn atau Google Search sebelum dihubungi.'
+    ];
+
+    $no3 = 1;
+    foreach ($omnichannel_counts as $ochannel => $ocnt) {
+        $sheet1->mergeCells("A{$curRow}:C{$curRow}");
+        $sheet1->setCellValue("A{$curRow}", $ochannel);
+        $sheet1->setCellValue("D{$curRow}", $ocnt);
+        $sheet1->setCellValue("E{$curRow}", "=D{$curRow}/" . max(1, $total_rows));
+        $sheet1->mergeCells("F{$curRow}:K{$curRow}");
+        $sheet1->setCellValue("F{$curRow}", $strategy_map[$ochannel] ?? '-');
+
+        $rowBg = ($no3 % 2 === 0) ? 'FFFFFF' : 'F8FAFC';
+        $sheet1->getStyle("A{$curRow}:K{$curRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($rowBg);
+        $sheet1->getStyle("A{$curRow}")->getFont()->setBold(true)->setSize(9.5);
+        $sheet1->getStyle("D{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet1->getStyle("D{$curRow}")->getNumberFormat()->setFormatCode('#,##0');
+        $sheet1->getStyle("E{$curRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet1->getStyle("E{$curRow}")->getNumberFormat()->setFormatCode('0.0%');
+        $sheet1->getStyle("F{$curRow}")->getFont()->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("475569"));
+        $sheet1->getRowDimension($curRow)->setRowHeight(22);
+        $curRow++;
+        $no3++;
+    }
+
+    // Set Column Widths for Sheet 1
+    $colWidths1 = [
+        'A' => 6,
+        'B' => 28,
+        'C' => 18,
+        'D' => 15,
+        'E' => 16,
+        'F' => 16,
+        'G' => 16,
+        'H' => 18,
+        'I' => 22,
+        'J' => 16,
+        'K' => 22
+    ];
+    foreach ($colWidths1 as $c => $w) {
+        $sheet1->getColumnDimension($c)->setWidth($w);
+    }
+
+    // -----------------------------------------------------------------
+    // 3. BUILD SHEET 2: DATABASE EXHIBITOR LENGKAP
+    // -----------------------------------------------------------------
+    $sheet2 = $spreadsheet->createSheet();
+    $sheet2->setTitle('📋 Database Exhibitor');
+    $sheet2->setShowGridLines(true);
+
+    $sheet2->mergeCells('A1:R1');
+    $sheet2->setCellValue('A1', 'PT. LOEWIX INDONESIA — DATABASE LENGKAP EXHIBITOR & LEAD PROSPEK');
+    $sheet2->getStyle('A1')->getFont()->setBold(true)->setSize(13)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
+    $sheet2->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet2->getStyle('A1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('0F172A');
+    $sheet2->getRowDimension(1)->setRowHeight(32);
+
+    $headers2 = [
+        'A' => 'No',
+        'B' => 'Nama Event / Pameran',
+        'C' => 'ID Exhibitor',
+        'D' => 'Nama Perusahaan',
+        'E' => 'Negara Asal',
+        'F' => 'Tipe Wilayah',
+        'G' => 'Nomor Booth',
+        'H' => 'Status Kontak',
+        'I' => 'No. Telepon / WhatsApp',
+        'J' => 'Link Chat WhatsApp',
+        'K' => 'Email Resmi',
+        'L' => 'Website Resmi',
+        'M' => 'Kota',
+        'N' => 'Alamat Lengkap',
+        'O' => 'Kategori Bisnis / Industri',
+        'P' => 'Daftar Produk & Layanan',
+        'Q' => 'Status Prospek CRM',
+        'R' => 'Link Profil Web'
+    ];
+
+    $headRow2 = 3;
+    foreach ($headers2 as $col => $title) {
+        $sheet2->setCellValue($col . $headRow2, $title);
+    }
+    $sheet2->getStyle("A{$headRow2}:R{$headRow2}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color("FFFFFF"))->setSize(9.5);
+    $sheet2->getStyle("A{$headRow2}:R{$headRow2}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("0F172A");
+    $sheet2->getStyle("A{$headRow2}:R{$headRow2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+    $sheet2->getRowDimension($headRow2)->setRowHeight(26);
+    $sheet2->setAutoFilter("A{$headRow2}:R{$headRow2}");
+    $sheet2->freezePane("A" . ($headRow2 + 1));
+
+    $r2 = $headRow2 + 1;
+    $no2 = 1;
+    foreach ($rows as $item) {
+        $sheet2->setCellValue('A' . $r2, $no2++);
+        $sheet2->setCellValue('B' . $r2, $item['event_name'] ?? '-');
+        $sheet2->setCellValue('C' . $r2, $item['id'] ?? '-');
+        $sheet2->setCellValue('D' . $r2, $item['company_name'] ?? '-');
+        $sheet2->setCellValue('E' . $r2, $item['country'] ?? '-');
+        $sheet2->setCellValue('F' . $r2, (strcasecmp($item['country'] ?? '', 'Indonesia') === 0) ? 'Lokal' : 'Internasional');
+        $sheet2->setCellValue('G' . $r2, $item['booth_number'] ?? '-');
+
+        $has_p = !empty(trim($item['phone'] ?? ''));
+        $has_e = !empty(trim($item['email'] ?? ''));
+        if ($has_p && $has_e) $status_k = 'Lengkap (WA & Email)';
+        elseif ($has_p) $status_k = 'Ada WhatsApp Saja';
+        elseif ($has_e) $status_k = 'Ada Email Saja';
+        else $status_k = 'Belum Ada Kontak';
+        $sheet2->setCellValue('H' . $r2, $status_k);
+
+        // Phone explicitly string
+        $sheet2->setCellValueExplicit('I' . $r2, $item['phone'] ?? '', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
+        // WA Link
+        $clean_phone = preg_replace('/[^0-9]/', '', $item['phone'] ?? '');
+        if (strpos($clean_phone, '0') === 0) {
+            $clean_phone = '62' . substr($clean_phone, 1);
+        }
+        if (!empty($clean_phone)) {
+            $sheet2->setCellValue('J' . $r2, "=HYPERLINK(\"https://wa.me/{$clean_phone}\", \"Chat WA\")");
+            $sheet2->getStyle('J' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('15803D'))->setUnderline(true)->setBold(true);
+        } else {
+            $sheet2->setCellValue('J' . $r2, '-');
+        }
+
+        // Email
+        $email = trim($item['email'] ?? '');
+        if (!empty($email)) {
+            $sheet2->setCellValue('K' . $r2, "=HYPERLINK(\"mailto:{$email}\", \"{$email}\")");
+            $sheet2->getStyle('K' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
+        } else {
+            $sheet2->setCellValue('K' . $r2, '-');
+        }
+
+        // Website
+        $web = trim($item['website'] ?? '');
+        if (!empty($web)) {
+            $web_url = (strpos($web, 'http') === 0) ? $web : 'http://' . $web;
+            $sheet2->setCellValue('L' . $r2, "=HYPERLINK(\"{$web_url}\", \"{$web}\")");
+            $sheet2->getStyle('L' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
+        } else {
+            $sheet2->setCellValue('L' . $r2, '-');
+        }
+
+        $sheet2->setCellValue('M' . $r2, $item['city'] ?? '-');
+        $sheet2->setCellValue('N' . $r2, $item['address'] ?? '-');
+        $sheet2->setCellValue('O' . $r2, $item['business_activity'] ?? '-');
+        $sheet2->setCellValue('P' . $r2, $item['products'] ?? '-');
+        $sheet2->setCellValue('Q' . $r2, $item['status_prospek'] ?? 'Belum Dihubungi');
+
+        $detail_url = trim($item['detail_url'] ?? '');
+        if (!empty($detail_url)) {
+            $sheet2->setCellValue('R' . $r2, "=HYPERLINK(\"{$detail_url}\", \"Buka Profil Web\")");
+            $sheet2->getStyle('R' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('4F46E5'))->setUnderline(true);
+        } else {
+            $sheet2->setCellValue('R' . $r2, '-');
+        }
+
+        $rowBg2 = ($no2 % 2 === 0) ? 'FFFFFF' : 'F8FAFC';
+        $sheet2->getStyle("A{$r2}:R{$r2}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($rowBg2);
+        $sheet2->getStyle("A{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getStyle("C{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getStyle("F{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getStyle("G{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getStyle("J{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getRowDimension($r2)->setRowHeight(20);
+        $r2++;
+    }
+
+    $colWidths2 = [
+        'A' => 6,
+        'B' => 20,
+        'C' => 12,
+        'D' => 38,
+        'E' => 16,
+        'F' => 14,
+        'G' => 12,
+        'H' => 20,
+        'I' => 18,
+        'J' => 14,
+        'K' => 26,
+        'L' => 24,
+        'M' => 18,
+        'N' => 36,
+        'O' => 36,
+        'P' => 36,
+        'Q' => 18,
+        'R' => 16
+    ];
+    foreach ($colWidths2 as $c => $w) {
+        $sheet2->getColumnDimension($c)->setWidth($w);
+    }
+
+    // Set active sheet ke Sheet 1 agar user pertama kali melihat Pivot & Dashboard
+    $spreadsheet->setActiveSheetIndex(0);
+
+    // Stream download
+    $fn_suffix = !empty($event_filter) ? preg_replace('/[^a-zA-Z0-9_\-]/', '_', $event_filter) : 'Semua_Event';
+    $filename = 'Loewix_Analytics_Exhibitor_' . $fn_suffix . '_' . date('Ymd_His') . '.xlsx';
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: max-age=0');
+    header('Pragma: public');
+
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit;
+}
+
 // Handle Export CSV
 if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
     $event_filter = trim($_GET['event'] ?? '');
@@ -1191,9 +1933,37 @@ include "includes/header.php";
                     <button class="btn btn-outline-light px-3 py-2 fw-semibold rounded-pill" id="btnStartScrape" onclick="startKristaScrape()" style="backdrop-filter: blur(8px); background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.25);">
                         <i class="bi bi-arrow-repeat me-1"></i> Sync Krista Interfood
                     </button>
-                    <a href="scraping_exhibitor.php?action=export_csv" id="btnExportCsv" class="btn btn-outline-light px-3 py-2 fw-semibold rounded-pill" style="backdrop-filter: blur(8px); background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.25);">
-                        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Download Excel (CSV)
-                    </a>
+                    <!-- Export Pro Button with Dropdown -->
+                    <div class="btn-group shadow-sm" role="group">
+                        <button type="button" class="btn btn-success px-4 py-2 fw-bold text-white d-flex align-items-center gap-2" onclick="triggerExport('excel')" id="btnExportExcel" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); border: none; border-top-left-radius: 50rem; border-bottom-left-radius: 50rem;">
+                            <i class="bi bi-file-earmark-excel-fill"></i>
+                            <span>Export Excel Pro (Pivot)</span>
+                        </button>
+                        <button type="button" class="btn btn-success px-2 py-2 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" style="background: #047857; border: none; border-top-right-radius: 50rem; border-bottom-right-radius: 50rem;">
+                            <span class="visually-hidden">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-2" style="font-size: 13px; min-width: 270px; z-index: 1050;">
+                            <li>
+                                <a class="dropdown-item py-2 px-3 rounded-3 d-flex align-items-center gap-2 fw-bold text-success" href="javascript:void(0)" onclick="triggerExport('excel')">
+                                    <i class="bi bi-file-earmark-excel-fill fs-5 text-success"></i>
+                                    <div>
+                                        <div>Microsoft Excel (.xlsx)</div>
+                                        <div class="small text-muted fw-normal">Multi-Sheet, Pivot Table, Rumus &amp; Warna</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item py-2 px-3 rounded-3 d-flex align-items-center gap-2 text-secondary" href="javascript:void(0)" onclick="triggerExport('csv')" id="btnExportCsv">
+                                    <i class="bi bi-file-earmark-text fs-5 text-secondary"></i>
+                                    <div>
+                                        <div>File CSV (.csv)</div>
+                                        <div class="small text-muted fw-normal">Data mentah tanpa format warna</div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
@@ -1490,9 +2260,15 @@ include "includes/header.php";
                     </ul>
                 </nav>
 
-                <a href="scraping_exhibitor.php?action=export_csv" id="btnFooterExport" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm">
-                    <i class="bi bi-file-earmark-arrow-down-fill me-1"></i> Download Excel
-                </a>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" onclick="triggerExport('excel')" id="btnFooterExport" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold d-flex align-items-center gap-1" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); border: none;">
+                        <i class="bi bi-file-earmark-excel-fill"></i>
+                        <span>Export Excel Pro (Pivot)</span>
+                    </button>
+                    <button type="button" onclick="triggerExport('csv')" id="btnFooterExportCsv" class="btn btn-sm btn-outline-secondary rounded-pill px-2" title="Download Format CSV">
+                        <i class="bi bi-file-earmark-text"></i> CSV
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1685,6 +2461,38 @@ function resetAllFilters() {
     loadTableData(1);
 }
 
+// Trigger Export Function (Excel Pro / CSV)
+function triggerExport(format = 'excel') {
+    const eventVal = $('#filterEvent').val() || '';
+    const countryVal = $('#filterCountry').val() || '';
+    const statusVal = $('#filterStatus').val() || '';
+    const queryVal = ($('#filterSearch').val() || '').trim();
+
+    const action = (format === 'excel') ? 'export_excel' : 'export_csv';
+    const params = new URLSearchParams({
+        action: action,
+        event: eventVal,
+        country: countryVal,
+        status: statusVal,
+        q: queryVal
+    });
+
+    const exportUrl = `scraping_exhibitor.php?${params.toString()}`;
+
+    if (format === 'excel') {
+        Swal.fire({
+            title: 'Menyiapkan Excel Pro (Pivot)...',
+            html: '<div class="py-2 text-center"><div class="spinner-border text-success mb-2" role="status"></div><div class="text-muted small">Sedang merangkum data multi-sheet, pivot persebaran negara, matriks CCTV Loewix &amp; formula otomatis...</div></div>',
+            timer: 2500,
+            showConfirmButton: false,
+            allowOutsideClick: false
+        });
+    }
+
+    // Trigger file download
+    window.location.href = exportUrl;
+}
+
 async function loadTableData(page = 1) {
     currentPage = page;
     const eventVal = $('#filterEvent').val() || '';
@@ -1693,9 +2501,9 @@ async function loadTableData(page = 1) {
     const queryVal = ($('#filterSearch').val() || '').trim();
 
     // Update export button URLs
-    const exportUrl = `scraping_exhibitor.php?action=export_csv&event=${encodeURIComponent(eventVal)}&country=${encodeURIComponent(countryVal)}&status=${encodeURIComponent(statusVal)}&q=${encodeURIComponent(queryVal)}`;
-    $('#btnExportCsv').attr('href', exportUrl);
-    $('#btnFooterExport').attr('href', exportUrl);
+    const exportExcelUrl = `scraping_exhibitor.php?action=export_excel&event=${encodeURIComponent(eventVal)}&country=${encodeURIComponent(countryVal)}&status=${encodeURIComponent(statusVal)}&q=${encodeURIComponent(queryVal)}`;
+    const exportCsvUrl = `scraping_exhibitor.php?action=export_csv&event=${encodeURIComponent(eventVal)}&country=${encodeURIComponent(countryVal)}&status=${encodeURIComponent(statusVal)}&q=${encodeURIComponent(queryVal)}`;
+    $('#btnExportCsv').attr('href', exportCsvUrl);
 
     // Show loading overlay
     $('#tableLoadingOverlay').removeClass('d-none');
