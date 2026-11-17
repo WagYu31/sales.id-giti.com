@@ -8,6 +8,13 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/role_permission_helper.php';
 
+// Force browser and server freshness
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+if (function_exists('opcache_reset')) {
+    @opcache_reset();
+}
+
 $currentPage = 'scraping_exhibitor.php';
 date_default_timezone_set('Asia/Jakarta');
 
