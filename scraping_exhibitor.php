@@ -977,7 +977,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
         if (strpos($clean_phone, '0') === 0) {
             $clean_phone = '62' . substr($clean_phone, 1);
         }
-        if (!empty($clean_phone)) {
+        if (!empty($clean_phone) && strlen($clean_phone) >= 8 && strlen($clean_phone) <= 16) {
             $sheet2->setCellValue('J' . $r2, 'Chat WA');
             $sheet2->getCell('J' . $r2)->getHyperlink()->setUrl('https://wa.me/' . $clean_phone);
             $sheet2->getStyle('J' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('15803D'))->setUnderline(true)->setBold(true);
@@ -987,23 +987,34 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
 
         // Email (native hyperlink)
         $email = trim($item['email'] ?? '');
-        if (!empty($email)) {
+        if (!empty($email) && $email !== '-') {
             $sheet2->setCellValue('K' . $r2, $email);
-            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL) && strpos($email, ' ') === false) {
                 $sheet2->getCell('K' . $r2)->getHyperlink()->setUrl('mailto:' . $email);
+                $sheet2->getStyle('K' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
             }
-            $sheet2->getStyle('K' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
         } else {
             $sheet2->setCellValue('K' . $r2, '-');
         }
 
         // Website (native hyperlink)
         $web = trim($item['website'] ?? '');
-        if (!empty($web)) {
-            $web_url = (strpos($web, 'http') === 0) ? $web : 'http://' . $web;
+        if (!empty($web) && $web !== '-') {
             $sheet2->setCellValue('L' . $r2, $web);
-            $sheet2->getCell('L' . $r2)->getHyperlink()->setUrl($web_url);
-            $sheet2->getStyle('L' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
+            // Clean & validate target URL to strictly comply with OpenXML Target URI specs
+            $clean_cand = preg_replace('/\s*\.\s*/', '.', $web);
+            $words = preg_split('/\s+/', $clean_cand);
+            $first_domain = $words[0] ?? '';
+            if (!empty($first_domain) && strpos($first_domain, '.') !== false) {
+                $candidate = (strpos($first_domain, 'http://') === 0 || strpos($first_domain, 'https://') === 0) ? $first_domain : 'http://' . $first_domain;
+                if (filter_var($candidate, FILTER_VALIDATE_URL) && strpos($candidate, ' ') === false) {
+                    $host = parse_url($candidate, PHP_URL_HOST);
+                    if (!empty($host) && strpos($host, '.') !== false && preg_match('/^[a-zA-Z0-9\-\.]+$/', $host)) {
+                        $sheet2->getCell('L' . $r2)->getHyperlink()->setUrl($candidate);
+                        $sheet2->getStyle('L' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
+                    }
+                }
+            }
         } else {
             $sheet2->setCellValue('L' . $r2, '-');
         }
@@ -1016,7 +1027,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
 
         // Detail Web Profile (native hyperlink)
         $detail_url = trim($item['detail_url'] ?? '');
-        if (!empty($detail_url)) {
+        if (!empty($detail_url) && filter_var($detail_url, FILTER_VALIDATE_URL) && strpos($detail_url, ' ') === false) {
             $sheet2->setCellValue('R' . $r2, 'Buka Profil Web');
             $sheet2->getCell('R' . $r2)->getHyperlink()->setUrl($detail_url);
             $sheet2->getStyle('R' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('4F46E5'))->setUnderline(true);
