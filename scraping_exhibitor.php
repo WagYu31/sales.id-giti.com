@@ -562,7 +562,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
     // 2. BUILD SHEET 1: DASHBOARD & PIVOT EKSEKUTIF
     // -----------------------------------------------------------------
     $sheet1 = $spreadsheet->getActiveSheet();
-    $sheet1->setTitle('📊 Ringkasan & Pivot');
+    $sheet1->setTitle('Ringkasan & Pivot');
     $sheet1->setShowGridLines(true);
 
     // Title banner
@@ -647,7 +647,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
     $sheet1->mergeCells('F9:G9');
     $sheet1->setCellValue('F9', number_format($total_local));
     $sheet1->mergeCells('F10:G10');
-    $sheet1->setCellValue('F10', '🇮🇩 Domestik');
+    $sheet1->setCellValue('F10', 'Domestik');
     $sheet1->getStyle('F8:G8')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('92400E'));
     $sheet1->getStyle('F9:G9')->getFont()->setBold(true)->setSize(16)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('B45309'));
     $sheet1->getStyle('F10:G10')->getFont()->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('92400E'));
@@ -661,7 +661,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
     $sheet1->mergeCells('H9:I9');
     $sheet1->setCellValue('H9', number_format($total_intl));
     $sheet1->mergeCells('H10:I10');
-    $sheet1->setCellValue('H10', '🌐 Global');
+    $sheet1->setCellValue('H10', 'Global');
     $sheet1->getStyle('H8:I8')->getFont()->setBold(true)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('6B21A8'));
     $sheet1->getStyle('H9:I9')->getFont()->setBold(true)->setSize(16)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('7E22CE'));
     $sheet1->getStyle('H10:I10')->getFont()->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('6B21A8'));
@@ -718,7 +718,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
     foreach ($by_country as $c) {
         $sheet1->setCellValue('A' . $curRow, $no1++);
         $sheet1->setCellValue('B' . $curRow, $c['country']);
-        $sheet1->setCellValue('C' . $curRow, $c['is_local'] ? '🇮🇩 Lokal' : '🌐 Internasional');
+        $sheet1->setCellValue('C' . $curRow, $c['is_local'] ? 'Lokal' : 'Internasional');
         $sheet1->setCellValue('D' . $curRow, $c['total']);
         $sheet1->setCellValue('E' . $curRow, "=D{$curRow}/" . max(1, $total_rows));
         $sheet1->setCellValue('F' . $curRow, $c['with_phone']);
@@ -909,7 +909,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
     // 3. BUILD SHEET 2: DATABASE EXHIBITOR LENGKAP
     // -----------------------------------------------------------------
     $sheet2 = $spreadsheet->createSheet();
-    $sheet2->setTitle('📋 Database Exhibitor');
+    $sheet2->setTitle('Database Exhibitor');
     $sheet2->setShowGridLines(true);
 
     $sheet2->mergeCells('A1:R1');
@@ -948,7 +948,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
     $sheet2->getStyle("A{$headRow2}:R{$headRow2}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB("0F172A");
     $sheet2->getStyle("A{$headRow2}:R{$headRow2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
     $sheet2->getRowDimension($headRow2)->setRowHeight(26);
-    $sheet2->setAutoFilter("A{$headRow2}:R{$headRow2}");
     $sheet2->freezePane("A" . ($headRow2 + 1));
 
     $r2 = $headRow2 + 1;
@@ -973,32 +972,37 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
         // Phone explicitly string
         $sheet2->setCellValueExplicit('I' . $r2, $item['phone'] ?? '', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
 
-        // WA Link
+        // WA Link (native hyperlink)
         $clean_phone = preg_replace('/[^0-9]/', '', $item['phone'] ?? '');
         if (strpos($clean_phone, '0') === 0) {
             $clean_phone = '62' . substr($clean_phone, 1);
         }
         if (!empty($clean_phone)) {
-            $sheet2->setCellValue('J' . $r2, "=HYPERLINK(\"https://wa.me/{$clean_phone}\", \"Chat WA\")");
+            $sheet2->setCellValue('J' . $r2, 'Chat WA');
+            $sheet2->getCell('J' . $r2)->getHyperlink()->setUrl('https://wa.me/' . $clean_phone);
             $sheet2->getStyle('J' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('15803D'))->setUnderline(true)->setBold(true);
         } else {
             $sheet2->setCellValue('J' . $r2, '-');
         }
 
-        // Email
+        // Email (native hyperlink)
         $email = trim($item['email'] ?? '');
         if (!empty($email)) {
-            $sheet2->setCellValue('K' . $r2, "=HYPERLINK(\"mailto:{$email}\", \"{$email}\")");
+            $sheet2->setCellValue('K' . $r2, $email);
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $sheet2->getCell('K' . $r2)->getHyperlink()->setUrl('mailto:' . $email);
+            }
             $sheet2->getStyle('K' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
         } else {
             $sheet2->setCellValue('K' . $r2, '-');
         }
 
-        // Website
+        // Website (native hyperlink)
         $web = trim($item['website'] ?? '');
         if (!empty($web)) {
             $web_url = (strpos($web, 'http') === 0) ? $web : 'http://' . $web;
-            $sheet2->setCellValue('L' . $r2, "=HYPERLINK(\"{$web_url}\", \"{$web}\")");
+            $sheet2->setCellValue('L' . $r2, $web);
+            $sheet2->getCell('L' . $r2)->getHyperlink()->setUrl($web_url);
             $sheet2->getStyle('L' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
         } else {
             $sheet2->setCellValue('L' . $r2, '-');
@@ -1010,9 +1014,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
         $sheet2->setCellValue('P' . $r2, $item['products'] ?? '-');
         $sheet2->setCellValue('Q' . $r2, $item['status_prospek'] ?? 'Belum Dihubungi');
 
+        // Detail Web Profile (native hyperlink)
         $detail_url = trim($item['detail_url'] ?? '');
         if (!empty($detail_url)) {
-            $sheet2->setCellValue('R' . $r2, "=HYPERLINK(\"{$detail_url}\", \"Buka Profil Web\")");
+            $sheet2->setCellValue('R' . $r2, 'Buka Profil Web');
+            $sheet2->getCell('R' . $r2)->getHyperlink()->setUrl($detail_url);
             $sheet2->getStyle('R' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('4F46E5'))->setUnderline(true);
         } else {
             $sheet2->setCellValue('R' . $r2, '-');
@@ -1028,6 +1034,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
         $sheet2->getRowDimension($r2)->setRowHeight(20);
         $r2++;
     }
+
+    // AutoFilter for Sheet 2 covering header and all data rows
+    $maxRow2 = max($headRow2 + 1, $r2 - 1);
+    $sheet2->setAutoFilter("A{$headRow2}:R{$maxRow2}");
 
     $colWidths2 = [
         'A' => 6,
@@ -1066,6 +1076,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
     header('Pragma: public');
 
     $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer->setPreCalculateFormulas(false);
     $writer->save('php://output');
     exit;
 }
