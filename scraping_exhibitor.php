@@ -246,6 +246,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_table_data') {
     $status_filter = trim($_GET['status'] ?? '');
     $search_query = trim($_GET['q'] ?? '');
 
+    @ini_set('memory_limit', '512M');
+    @set_time_limit(180);
+
     $where = ["1=1"];
 
     if (!empty($event_filter)) {
@@ -339,6 +342,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
     $country_filter = trim($_GET['country'] ?? '');
     $status_filter = trim($_GET['status'] ?? '');
     $search_query = trim($_GET['q'] ?? '');
+
+    @ini_set('memory_limit', '512M');
+    @set_time_limit(180);
 
     $where = ["1=1"];
 
@@ -949,17 +955,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
     $sheet2->getStyle("A{$headRow2}:R{$headRow2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
     $sheet2->getRowDimension($headRow2)->setRowHeight(26);
     $sheet2->freezePane("A" . ($headRow2 + 1));
+    $sheet2->getDefaultRowDimension()->setRowHeight(20);
 
-    $r2 = $headRow2 + 1;
+    $batch_data = [];
+    $hyperlinks2 = [];
     $no2 = 1;
     foreach ($rows as $item) {
-        $sheet2->setCellValue('A' . $r2, $no2++);
-        $sheet2->setCellValue('B' . $r2, $item['event_name'] ?? '-');
-        $sheet2->setCellValue('C' . $r2, $item['id'] ?? '-');
-        $sheet2->setCellValue('D' . $r2, $item['company_name'] ?? '-');
-        $sheet2->setCellValue('E' . $r2, $item['country'] ?? '-');
-        $sheet2->setCellValue('F' . $r2, (strcasecmp($item['country'] ?? '', 'Indonesia') === 0) ? 'Lokal' : 'Internasional');
-        $sheet2->setCellValue('G' . $r2, $item['booth_number'] ?? '-');
+        $currRowIdx = count($batch_data) + $headRow2 + 1;
 
         $has_p = !empty(trim($item['phone'] ?? ''));
         $has_e = !empty(trim($item['email'] ?? ''));
@@ -967,41 +969,33 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
         elseif ($has_p) $status_k = 'Ada WhatsApp Saja';
         elseif ($has_e) $status_k = 'Ada Email Saja';
         else $status_k = 'Belum Ada Kontak';
-        $sheet2->setCellValue('H' . $r2, $status_k);
 
-        // Phone explicitly string
-        $sheet2->setCellValueExplicit('I' . $r2, $item['phone'] ?? '', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+        $phone_str = (string)($item['phone'] ?? '');
 
-        // WA Link (native hyperlink)
-        $clean_phone = preg_replace('/[^0-9]/', '', $item['phone'] ?? '');
+        // WA Link
+        $clean_phone = preg_replace('/[^0-9]/', '', $phone_str);
         if (strpos($clean_phone, '0') === 0) {
             $clean_phone = '62' . substr($clean_phone, 1);
         }
+        $wa_label = '-';
         if (!empty($clean_phone) && strlen($clean_phone) >= 8 && strlen($clean_phone) <= 16) {
-            $sheet2->setCellValue('J' . $r2, 'Chat WA');
-            $sheet2->getCell('J' . $r2)->getHyperlink()->setUrl('https://wa.me/' . $clean_phone);
-            $sheet2->getStyle('J' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('15803D'))->setUnderline(true)->setBold(true);
-        } else {
-            $sheet2->setCellValue('J' . $r2, '-');
+            $wa_label = 'Chat WA';
+            $hyperlinks2['J' . $currRowIdx] = 'https://wa.me/' . $clean_phone;
         }
 
-        // Email (native hyperlink)
+        // Email
         $email = trim($item['email'] ?? '');
         if (!empty($email) && $email !== '-') {
-            $sheet2->setCellValue('K' . $r2, $email);
             if (filter_var($email, FILTER_VALIDATE_EMAIL) && strpos($email, ' ') === false) {
-                $sheet2->getCell('K' . $r2)->getHyperlink()->setUrl('mailto:' . $email);
-                $sheet2->getStyle('K' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
+                $hyperlinks2['K' . $currRowIdx] = 'mailto:' . $email;
             }
         } else {
-            $sheet2->setCellValue('K' . $r2, '-');
+            $email = '-';
         }
 
-        // Website (native hyperlink)
+        // Website
         $web = trim($item['website'] ?? '');
         if (!empty($web) && $web !== '-') {
-            $sheet2->setCellValue('L' . $r2, $web);
-            // Clean & validate target URL to strictly comply with OpenXML Target URI specs
             $clean_cand = preg_replace('/\s*\.\s*/', '.', $web);
             $words = preg_split('/\s+/', $clean_cand);
             $first_domain = $words[0] ?? '';
@@ -1010,45 +1004,71 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel') {
                 if (filter_var($candidate, FILTER_VALIDATE_URL) && strpos($candidate, ' ') === false) {
                     $host = parse_url($candidate, PHP_URL_HOST);
                     if (!empty($host) && strpos($host, '.') !== false && preg_match('/^[a-zA-Z0-9\-\.]+$/', $host)) {
-                        $sheet2->getCell('L' . $r2)->getHyperlink()->setUrl($candidate);
-                        $sheet2->getStyle('L' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
+                        $hyperlinks2['L' . $currRowIdx] = $candidate;
                     }
                 }
             }
         } else {
-            $sheet2->setCellValue('L' . $r2, '-');
+            $web = '-';
         }
 
-        $sheet2->setCellValue('M' . $r2, $item['city'] ?? '-');
-        $sheet2->setCellValue('N' . $r2, $item['address'] ?? '-');
-        $sheet2->setCellValue('O' . $r2, $item['business_activity'] ?? '-');
-        $sheet2->setCellValue('P' . $r2, $item['products'] ?? '-');
-        $sheet2->setCellValue('Q' . $r2, $item['status_prospek'] ?? 'Belum Dihubungi');
-
-        // Detail Web Profile (native hyperlink)
+        // Detail Web Profile
         $detail_url = trim($item['detail_url'] ?? '');
+        $detail_label = '-';
         if (!empty($detail_url) && filter_var($detail_url, FILTER_VALIDATE_URL) && strpos($detail_url, ' ') === false) {
-            $sheet2->setCellValue('R' . $r2, 'Buka Profil Web');
-            $sheet2->getCell('R' . $r2)->getHyperlink()->setUrl($detail_url);
-            $sheet2->getStyle('R' . $r2)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('4F46E5'))->setUnderline(true);
-        } else {
-            $sheet2->setCellValue('R' . $r2, '-');
+            $detail_label = 'Buka Profil Web';
+            $hyperlinks2['R' . $currRowIdx] = $detail_url;
         }
 
-        $rowBg2 = ($no2 % 2 === 0) ? 'FFFFFF' : 'F8FAFC';
-        $sheet2->getStyle("A{$r2}:R{$r2}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($rowBg2);
-        $sheet2->getStyle("A{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $sheet2->getStyle("C{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $sheet2->getStyle("F{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $sheet2->getStyle("G{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $sheet2->getStyle("J{$r2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $sheet2->getRowDimension($r2)->setRowHeight(20);
-        $r2++;
+        $batch_data[] = [
+            $no2++,
+            $item['event_name'] ?? '-',
+            $item['id'] ?? '-',
+            $item['company_name'] ?? '-',
+            $item['country'] ?? '-',
+            (strcasecmp($item['country'] ?? '', 'Indonesia') === 0) ? 'Lokal' : 'Internasional',
+            $item['booth_number'] ?? '-',
+            $status_k,
+            $phone_str,
+            $wa_label,
+            $email,
+            $web,
+            $item['city'] ?? '-',
+            $item['address'] ?? '-',
+            $item['business_activity'] ?? '-',
+            $item['products'] ?? '-',
+            $item['status_prospek'] ?? 'Belum Dihubungi',
+            $detail_label
+        ];
     }
 
-    // AutoFilter for Sheet 2 covering header and all data rows
-    $maxRow2 = max($headRow2 + 1, $r2 - 1);
-    $sheet2->setAutoFilter("A{$headRow2}:R{$maxRow2}");
+    // High performance bulk insertion
+    if (!empty($batch_data)) {
+        $sheet2->fromArray($batch_data, null, 'A' . ($headRow2 + 1), true);
+        $maxRow2 = $headRow2 + count($batch_data);
+        $startDataRow = $headRow2 + 1;
+
+        // Bulk apply column alignments and text formatting (fast range operations)
+        $sheet2->getStyle("A{$startDataRow}:A{$maxRow2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getStyle("C{$startDataRow}:C{$maxRow2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getStyle("F{$startDataRow}:F{$maxRow2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getStyle("G{$startDataRow}:G{$maxRow2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getStyle("J{$startDataRow}:J{$maxRow2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet2->getStyle("I{$startDataRow}:I{$maxRow2}")->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+
+        // Bulk apply hyperlinks
+        foreach ($hyperlinks2 as $cellRef => $url) {
+            $sheet2->getCell($cellRef)->getHyperlink()->setUrl($url);
+        }
+
+        // Bulk color hyperlink columns
+        $sheet2->getStyle("J{$startDataRow}:J{$maxRow2}")->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('15803D'))->setUnderline(true)->setBold(true);
+        $sheet2->getStyle("K{$startDataRow}:K{$maxRow2}")->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
+        $sheet2->getStyle("L{$startDataRow}:L{$maxRow2}")->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1D4ED8'))->setUnderline(true);
+        $sheet2->getStyle("R{$startDataRow}:R{$maxRow2}")->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('4F46E5'))->setUnderline(true);
+
+        $sheet2->setAutoFilter("A{$headRow2}:R{$maxRow2}");
+    }
 
     $colWidths2 = [
         'A' => 6,
@@ -1098,6 +1118,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
     $country_filter = trim($_GET['country'] ?? '');
     $status_filter = trim($_GET['status'] ?? '');
     $search_query = trim($_GET['q'] ?? '');
+
+    @ini_set('memory_limit', '512M');
+    @set_time_limit(180);
 
     $where = ["1=1"];
 
