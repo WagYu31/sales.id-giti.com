@@ -910,6 +910,117 @@ if ($active_sales_id > 0) {
     border-radius: 10px !important;
     background: #F8FAFC;
 }
+
+/* WhatsApp Broadcast Styles */
+.taste-btn-whatsapp {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: #FFFFFF !important;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: 1px solid #059669;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+    cursor: pointer;
+    white-space: nowrap;
+}
+.taste-btn-whatsapp:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+.floating-broadcast-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1040;
+    background: #0F172A;
+    color: #FFFFFF;
+    border-radius: 50px;
+    padding: 8px 18px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: slideUpFloating 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideUpFloating {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+.wa-preview-screen {
+    background: #EFEAE2;
+    background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+    background-size: 16px 16px;
+    border-radius: 14px;
+    padding: 16px;
+    min-height: 250px;
+    max-height: 380px;
+    overflow-y: auto;
+    position: relative;
+    border: 1px solid #D1D5DB;
+}
+.wa-bubble-sent {
+    background: #E7FFDB;
+    color: #111B21;
+    border-radius: 10px 10px 2px 10px;
+    padding: 10px 14px;
+    max-width: 92%;
+    margin-left: auto;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    font-size: 13px;
+    line-height: 1.45;
+    position: relative;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.wa-bubble-time {
+    text-align: right;
+    font-size: 10.5px;
+    color: #667781;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3px;
+}
+.tag-var-pill {
+    background: #F1F5F9;
+    color: #0F172A;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+.tag-var-pill:hover {
+    background: #E2E8F0;
+    border-color: #94A3B8;
+    transform: translateY(-1px);
+}
+.tag-var-pill:active {
+    transform: scale(0.96);
+}
+.broadcast-log-console {
+    background: #0F172A;
+    color: #F8FAFC;
+    font-family: monospace;
+    font-size: 11.5px;
+    border-radius: 10px;
+    padding: 12px;
+    max-height: 180px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
 </style>
 
 <!-- TASTE-SKILL WORKSPACE HEADER -->
@@ -928,6 +1039,11 @@ if ($active_sales_id > 0) {
             <p class="taste-subtitle">Direktori pelanggan, riwayat PIC & kontak WhatsApp, koordinasi follow-up tim sales, dan status closing.</p>
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2">
+            <button type="button" class="taste-btn-whatsapp" onclick="openBroadcastModal()" title="Kirim Pesan WhatsApp Massal ke Customer">
+                <i class="bi bi-whatsapp"></i>
+                <span>Broadcast WA</span>
+                <span class="badge bg-white text-success rounded-pill fw-bold" id="badgeSelectedCount" style="display:none; font-size:11px;">0</span>
+            </button>
             <a href="customer_add.php" class="taste-btn-primary">
                 <i class="bi bi-plus-lg"></i>
                 <span>Tambah Customer</span>
@@ -1239,6 +1355,9 @@ if ($active_sales_id > 0) {
             <table class="table align-middle taste-table mb-0">
                 <thead>
                     <tr>
+                        <th style="width: 42px; text-align: center; padding-left: 14px !important;">
+                            <input type="checkbox" class="form-check-input" id="checkAllBroadcast" title="Pilih Semua di Halaman Ini" style="cursor: pointer; width: 17px; height: 17px;">
+                        </th>
                         <th style="min-width: 190px;">NAMA TOKO</th>
                         <th style="min-width: 190px;">PIC & KONTAK</th>
                         <th style="min-width: 100px;">KATEGORI</th>
@@ -1254,7 +1373,38 @@ if ($active_sales_id > 0) {
                 <tbody>
                     <?php if (!empty($customers)): ?>
                         <?php foreach ($customers as $customer): ?>
+                        <?php
+                        $pics = !empty($customer['all_pics']) ? explode('||', $customer['all_pics']) : [];
+                        $phones = !empty($customer['all_phones']) ? explode('||', $customer['all_phones']) : [];
+                        $primary_phone = '';
+                        $primary_pic = '';
+                        if (!empty($phones)) {
+                            foreach ($phones as $k => $ph) {
+                                $cleanPh = preg_replace('/[^0-9]/', '', $ph);
+                                if (strlen($cleanPh) >= 9) {
+                                    $primary_phone = $cleanPh;
+                                    $primary_pic = $pics[$k] ?? '';
+                                    break;
+                                }
+                            }
+                        }
+                        if (empty($primary_pic) && !empty($pics)) $primary_pic = $pics[0];
+                        if (empty($primary_phone) && !empty($phones)) $primary_phone = preg_replace('/[^0-9]/', '', $phones[0]);
+                        $city_val = trim($customer['all_cities'] ?? '-');
+                        ?>
                         <tr id="customer-row-<?php echo $customer['id']; ?>">
+                            <td class="text-center" style="width: 42px; padding-left: 14px !important;">
+                                <input type="checkbox" class="form-check-input row-broadcast-check"
+                                       value="<?php echo $customer['id']; ?>"
+                                       data-id="<?php echo $customer['id']; ?>"
+                                       data-toko="<?php echo htmlspecialchars($customer['nama_toko']); ?>"
+                                       data-pic="<?php echo htmlspecialchars($primary_pic); ?>"
+                                       data-phone="<?php echo htmlspecialchars($primary_phone); ?>"
+                                       data-city="<?php echo htmlspecialchars($city_val); ?>"
+                                       data-sales="<?php echo htmlspecialchars($customer['nama_sales'] ?? 'Sales Loewix'); ?>"
+                                       style="cursor: pointer; width: 17px; height: 17px;"
+                                       <?php echo empty($primary_phone) ? 'disabled title="Customer ini tidak memiliki nomor WhatsApp"' : 'title="Pilih untuk WhatsApp Broadcast"'; ?>>
+                            </td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="taste-shop-icon">
@@ -1468,6 +1618,241 @@ if ($active_sales_id > 0) {
   </div>
 </div>
 
+<!-- Floating Action Bar for Selected Broadcast -->
+<div id="floatingBroadcastBar" class="floating-broadcast-bar" style="display:none;">
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-success rounded-pill px-3 py-1.5 fw-bold" id="floatingSelectedBadge" style="font-size: 12px;">0 Toko Terpilih</span>
+        <span class="text-white-50 small d-none d-md-inline" style="font-size: 12px;">Siap untuk WhatsApp broadcast</span>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3 fw-semibold" style="font-size: 12px;" onclick="clearSelectedBroadcast()">
+            Batal
+        </button>
+        <button type="button" class="btn btn-sm btn-success rounded-pill px-3.5 py-1.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 12.5px;" onclick="openBroadcastModal('selected')">
+            <i class="bi bi-whatsapp"></i> Broadcast WA Terpilih
+        </button>
+    </div>
+</div>
+
+<!-- Modal WhatsApp Broadcast & Mass Follow-Up -->
+<div class="modal fade" id="modalWaBroadcast" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);">
+        <div class="d-flex align-items-center gap-2.5">
+          <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(16, 185, 129, 0.2); color: #10B981; font-size: 18px;">
+            <i class="bi bi-whatsapp"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold mb-0" style="font-size: 16px;">WhatsApp Broadcast &amp; Mass Follow-Up</h5>
+            <small class="text-white-50" style="font-size: 11.5px;">Kirim pesan promosi &amp; follow-up massal langsung ke nomor WhatsApp toko</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" id="btnCloseBroadcastModal"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-4" style="background: #F8FAFC;">
+        
+        <!-- Screen 1: Konfigurasi & Draft Pesan -->
+        <div id="broadcastSetupScreen">
+          <div class="row g-4">
+            
+            <!-- Kolom Kiri: Form Target & Pesan -->
+            <div class="col-lg-7 col-12">
+              
+              <!-- 1. Pilihan Sasaran Target -->
+              <div class="card border-0 shadow-sm rounded-4 p-3.5 mb-3 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-2.5">
+                  <span class="fw-bold text-dark" style="font-size: 13px;">
+                    <i class="bi bi-people-fill text-primary me-1"></i> 1. Sasaran Target Penerima
+                  </span>
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fw-bold" id="badgeTargetSummary">
+                    0 Target
+                  </span>
+                </div>
+                
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <div class="form-check form-check-inline m-0">
+                    <input class="form-check-input" type="radio" name="target_mode" id="targetModeSelected" value="selected" checked onchange="handleTargetModeChange()">
+                    <label class="form-check-label fw-semibold small" for="targetModeSelected">
+                      Toko Terpilih (<span id="txtCountSelected">0</span> toko dicentang)
+                    </label>
+                  </div>
+                  <div class="form-check form-check-inline m-0">
+                    <input class="form-check-input" type="radio" name="target_mode" id="targetModeFilter" value="filter" onchange="handleTargetModeChange()">
+                    <label class="form-check-label fw-semibold small" for="targetModeFilter">
+                      Semua Sesuai Filter Halaman Ini (Maks. 100 per batch)
+                    </label>
+                  </div>
+                </div>
+
+                <div id="targetWarningNoPhone" class="alert alert-warning py-1.5 px-2.5 rounded-3 mb-0 small d-none" style="font-size: 11.5px;">
+                  <i class="bi bi-exclamation-triangle-fill me-1"></i> Beberapa customer yang tidak memiliki nomor WA akan dilewati secara otomatis.
+                </div>
+              </div>
+
+              <!-- 2. Template Cepat & Tag Variabel -->
+              <div class="card border-0 shadow-sm rounded-4 p-3.5 mb-3 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="fw-bold text-dark" style="font-size: 13px;">
+                    <i class="bi bi-chat-quote-fill text-success me-1"></i> 2. Template Cepat &amp; Variabel
+                  </span>
+                  <select class="form-select form-select-sm fw-semibold w-auto" id="selectQuickTemplate" onchange="applyQuickTemplate()" style="font-size: 12px; border-radius: 8px;">
+                    <option value="">-- Pilih Template Cepat --</option>
+                    <option value="1">Template 1: Sapaan Ramah &amp; Katalog Baru</option>
+                    <option value="2">Template 2: Follow Up Penawaran &amp; Stok</option>
+                    <option value="3">Template 3: Program Spesial Mitra Installer</option>
+                  </select>
+                </div>
+
+                <div class="mb-2">
+                  <small class="text-muted d-block mb-1" style="font-size: 11px;">Klik tombol variabel di bawah untuk menyisipkan ke pesan:</small>
+                  <div class="d-flex flex-wrap gap-1.5">
+                    <button type="button" class="tag-var-pill" onclick="insertVariableTag('{nama_toko}')" title="Nama Toko Customer">+ {nama_toko}</button>
+                    <button type="button" class="tag-var-pill" onclick="insertVariableTag('{nama_pic}')" title="Nama PIC / Kontak">+ {nama_pic}</button>
+                    <button type="button" class="tag-var-pill" onclick="insertVariableTag('{kota}')" title="Kota / Wilayah Toko">+ {kota}</button>
+                    <button type="button" class="tag-var-pill" onclick="insertVariableTag('{nama_sales}')" title="Nama Sales Pengirim">+ {nama_sales}</button>
+                  </div>
+                </div>
+
+                <!-- Textarea Pesan Broadcast -->
+                <div>
+                  <textarea id="broadcastMessageText" class="form-control" rows="8" placeholder="Tulis pesan broadcast WhatsApp Anda di sini... Gunakan variabel seperti {nama_toko} dan {nama_pic} agar pesan terasa personal." style="border-radius: 10px; font-size: 13px; line-height: 1.5;"></textarea>
+                  <div class="d-flex justify-content-between align-items-center mt-1.5 px-1">
+                    <small class="text-muted" style="font-size: 11px;">Gunakan <code>*tebal*</code>, <code>_miring_</code> untuk format teks WhatsApp.</small>
+                    <small class="text-muted fw-semibold" id="txtCharCount" style="font-size: 11px;">0 karakter</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Pengaturan Anti-Banned & Follow-Up -->
+              <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+                <div class="row g-2 align-items-center">
+                  <div class="col-md-6 col-12">
+                    <label class="fw-bold small text-dark mb-1 d-block" style="font-size: 12px;">
+                      <i class="bi bi-shield-check text-success me-1"></i> Jeda Aman Antar Pesan:
+                    </label>
+                    <select id="broadcastDelaySelect" class="form-select form-select-sm fw-semibold" style="border-radius: 8px;">
+                      <option value="3">3 Detik (Cepat)</option>
+                      <option value="5" selected>5 Detik (Disarankan - Aman)</option>
+                      <option value="8">8 Detik (Extra Aman)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <div class="form-check mt-3 mt-md-3">
+                      <input class="form-check-input" type="checkbox" id="checkAutoLogFu" checked>
+                      <label class="form-check-label small fw-semibold text-dark" for="checkAutoLogFu" style="font-size: 12px;">
+                        Otomatis catat ke Riwayat Follow-Up CRM
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Kolom Kanan: Live Preview Balon Chat WhatsApp -->
+            <div class="col-lg-5 col-12">
+              <div class="card border-0 shadow-sm rounded-4 p-3.5 bg-white h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-2.5">
+                  <span class="fw-bold text-dark" style="font-size: 13px;">
+                    <i class="bi bi-phone text-primary me-1"></i> Pratinjau Balon Chat WhatsApp
+                  </span>
+                  <span class="badge bg-light text-muted border fw-normal" style="font-size: 10px;" id="lblPreviewCustomerName">
+                    Sample: Toko
+                  </span>
+                </div>
+
+                <!-- Chat Screen Wrapper -->
+                <div class="wa-preview-screen flex-grow-1 d-flex flex-column justify-content-end">
+                  <div class="wa-bubble-sent shadow-sm">
+                    <div id="waBubbleContent">
+                      Halo! Ini adalah contoh pesan broadcast.
+                    </div>
+                    <div class="wa-bubble-time">
+                      <span id="waBubbleClock">12:00</span>
+                      <i class="bi bi-check2-all text-primary" style="font-size: 13px;"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 rounded-3 bg-light mt-3 border small text-muted" style="font-size: 11px;">
+                  <i class="bi bi-info-circle-fill text-primary me-1"></i>
+                  Pesan di atas akan dipersonalisasi secara otomatis untuk setiap toko penerima.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Screen 2: Real-Time Sending Progress -->
+        <div id="broadcastProgressScreen" class="d-none">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center mb-3">
+            <div class="mb-3">
+              <div class="spinner-border text-success" role="status" id="spinnerBroadcasting" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <div class="rounded-circle bg-success text-white d-none align-items-center justify-content-center mx-auto" id="iconBroadcastDone" style="width: 60px; height: 60px; font-size: 28px;">
+                <i class="bi bi-check-lg"></i>
+              </div>
+            </div>
+
+            <h5 class="fw-bold text-dark mb-1" id="txtProgressHeading">Sedang Mengirim Pesan WhatsApp Broadcast...</h5>
+            <p class="text-muted small mb-3" id="txtProgressSub">Mohon jangan menutup jendela browser ini sampai seluruh antrean selesai dikirim.</p>
+
+            <!-- Progress Bar -->
+            <div class="progress mb-2" style="height: 16px; border-radius: 50px; background: #E2E8F0;">
+              <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="progressBarBroadcast" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center text-muted small fw-semibold px-1 mb-3">
+              <span>Progress: <strong class="text-dark" id="txtProgressCount">0 / 0</strong></span>
+              <span>Berhasil: <strong class="text-success" id="txtSuccessCount">0</strong> | Gagal: <strong class="text-danger" id="txtFailCount">0</strong></span>
+            </div>
+
+            <!-- Terminal / Console Log -->
+            <div class="text-start mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <small class="fw-bold text-dark" style="font-size: 11.5px;">Log Aktivitas Pengiriman:</small>
+                <small class="text-muted" style="font-size: 11px;" id="txtLiveStatus">Menyiapkan antrean...</small>
+              </div>
+              <div class="broadcast-log-console" id="broadcastConsoleLog">
+                [Sistem] Menyiapkan modul pengiriman WhatsApp Gateway...
+              </div>
+            </div>
+
+            <!-- Action Buttons during sending -->
+            <div class="d-flex justify-content-center gap-2">
+              <button type="button" class="btn btn-outline-danger rounded-pill px-4 fw-bold btn-sm" id="btnCancelBroadcast" onclick="cancelBroadcastQueue()">
+                <i class="bi bi-stop-circle-fill me-1"></i> Hentikan Broadcast
+              </button>
+              <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold btn-sm d-none" id="btnFinishBroadcast" data-bs-dismiss="modal" onclick="finishBroadcastReload()">
+                <i class="bi bi-check2-circle me-1"></i> Selesai &amp; Muat Ulang
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer px-4 py-3 bg-white border-top d-flex justify-content-between align-items-center" id="broadcastModalFooter">
+        <button type="button" class="btn btn-light rounded-pill px-3.5 fw-semibold text-secondary" data-bs-dismiss="modal">
+          Tutup
+        </button>
+        <button type="button" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2" id="btnStartBroadcast" onclick="startBroadcastQueue()">
+          <i class="bi bi-send-fill"></i> Mulai Kirim Broadcast (<span id="txtBtnTargetCount">0</span>)
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <?php require_once 'includes/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -1651,5 +2036,401 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdownAutoWidth: true
         });
     }
+
+    // =========================================================================
+    // WHATSAPP BROADCAST SYSTEM FOR CRM & LEADS
+    // =========================================================================
+    const msgTextarea = document.getElementById('broadcastMessageText');
+    if (msgTextarea) {
+        msgTextarea.addEventListener('input', updateLivePreview);
+    }
 });
+
+// Broadcast Global State
+let selectedBroadcastMap = new Map();
+let currentBroadcastTargets = [];
+let isBroadcastRunning = false;
+let shouldStopBroadcast = false;
+
+// Quick Templates
+const QUICK_TEMPLATES = {
+    '1': "Halo {nama_pic} dari *{nama_toko}* 👋\n\nPerkenalkan, saya *{nama_sales}* dari *Loewix CCTV Official*.\n\nKami ingin membagikan katalog & pricelist promo terbaru khusus untuk mitra/toko CCTV di area {kota}. Produk CCTV berkualitas tinggi dengan garansi resmi dan harga grosir terbaik.\n\nBoleh kami kirimkan katalog dan pricelist terbarunya ke nomor ini? Terima kasih 🙏",
+    '2': "Selamat siang {nama_pic} (*{nama_toko}*),\n\nSemoga bisnis & usahanya di {kota} semakin maju dan lancar selalu ya 🙏\n\nSaya *{nama_sales}* dari Loewix CCTV. Mau mengabarkan bahwa saat ini sedang ada promo diskon khusus untuk pembelian paket unit CCTV & DVR bulan ini.\n\nApakah saat ini ada kebutuhan unit atau proyek CCTV yang sedang berjalan yang bisa kami bantu support?",
+    '3': "Salam hangat dari Loewix CCTV untuk {nama_pic} & tim *{nama_toko}*! 🚀\n\nKami memiliki program kemitraan spesial untuk rekan toko & installer di {kota}, termasuk:\n✅ Harga khusus mitra/grosir\n✅ Garansi resmi & klaim unit pengganti cepat\n✅ Brosur & materi promosi toko\n\nJika berminat bergabung atau butuh info lebih lanjut, silakan balas pesan ini ya. Salam sukses, *{nama_sales}*."
+};
+
+// Update Checkbox State
+function updateBroadcastSelectionUI() {
+    const checkboxes = document.querySelectorAll('.row-broadcast-check:checked');
+    selectedBroadcastMap.clear();
+    checkboxes.forEach(cb => {
+        selectedBroadcastMap.set(cb.dataset.id, {
+            id: cb.dataset.id,
+            nama_toko: cb.dataset.toko || 'Toko',
+            pic: cb.dataset.pic || 'Bpk/Ibu',
+            phone: cb.dataset.phone || '',
+            city: cb.dataset.city || '-',
+            sales: cb.dataset.sales || 'Sales Loewix'
+        });
+    });
+
+    const count = selectedBroadcastMap.size;
+    const badgeSelected = document.getElementById('badgeSelectedCount');
+    const floatingBar = document.getElementById('floatingBroadcastBar');
+    const floatingBadge = document.getElementById('floatingSelectedBadge');
+
+    if (badgeSelected) {
+        if (count > 0) {
+            badgeSelected.textContent = count;
+            badgeSelected.style.display = 'inline-block';
+        } else {
+            badgeSelected.style.display = 'none';
+        }
+    }
+
+    if (floatingBar) {
+        if (count > 0) {
+            floatingBar.style.display = 'flex';
+            if (floatingBadge) floatingBadge.textContent = count + ' Toko Terpilih';
+        } else {
+            floatingBar.style.display = 'none';
+        }
+    }
+
+    const txtCountSelected = document.getElementById('txtCountSelected');
+    if (txtCountSelected) txtCountSelected.textContent = count;
+}
+
+// Check All Checkbox Listener
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'checkAllBroadcast') {
+        const checked = e.target.checked;
+        document.querySelectorAll('.row-broadcast-check:not(:disabled)').forEach(cb => {
+            cb.checked = checked;
+        });
+        updateBroadcastSelectionUI();
+    } else if (e.target && e.target.classList.contains('row-broadcast-check')) {
+        updateBroadcastSelectionUI();
+        const total = document.querySelectorAll('.row-broadcast-check:not(:disabled)').length;
+        const checkedTotal = document.querySelectorAll('.row-broadcast-check:checked').length;
+        const checkAll = document.getElementById('checkAllBroadcast');
+        if (checkAll) {
+            checkAll.checked = (total > 0 && total === checkedTotal);
+        }
+    }
+});
+
+function clearSelectedBroadcast() {
+    document.querySelectorAll('.row-broadcast-check').forEach(cb => cb.checked = false);
+    const checkAll = document.getElementById('checkAllBroadcast');
+    if (checkAll) checkAll.checked = false;
+    updateBroadcastSelectionUI();
+}
+
+// Buka Modal Broadcast
+function openBroadcastModal(mode) {
+    const modalEl = document.getElementById('modalWaBroadcast');
+    if (!modalEl) return;
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+    // Reset screen
+    document.getElementById('broadcastSetupScreen').classList.remove('d-none');
+    document.getElementById('broadcastProgressScreen').classList.add('d-none');
+    document.getElementById('broadcastModalFooter').classList.remove('d-none');
+
+    // Default template jika textarea kosong
+    const msgInput = document.getElementById('broadcastMessageText');
+    if (!msgInput.value.trim()) {
+        msgInput.value = QUICK_TEMPLATES['1'];
+    }
+
+    // Tentukan mode
+    const countSelected = selectedBroadcastMap.size;
+    if (mode === 'selected' || countSelected > 0) {
+        const radioSel = document.getElementById('targetModeSelected');
+        if (radioSel) radioSel.checked = true;
+    } else {
+        const radioFilt = document.getElementById('targetModeFilter');
+        if (radioFilt) radioFilt.checked = true;
+    }
+
+    handleTargetModeChange();
+    updateLivePreview();
+    modal.show();
+}
+
+// Pergantian Mode Target (Terpilih vs Filter)
+async function handleTargetModeChange() {
+    const mode = document.querySelector('input[name="target_mode"]:checked')?.value || 'selected';
+    const badgeSummary = document.getElementById('badgeTargetSummary');
+    const btnCount = document.getElementById('txtBtnTargetCount');
+    const warningNoPhone = document.getElementById('targetWarningNoPhone');
+
+    if (mode === 'selected') {
+        currentBroadcastTargets = Array.from(selectedBroadcastMap.values()).filter(t => t.phone && t.phone.length >= 9);
+        const totalSelected = selectedBroadcastMap.size;
+        const validCount = currentBroadcastTargets.length;
+        
+        if (badgeSummary) badgeSummary.textContent = `${validCount} Target Siap`;
+        if (btnCount) btnCount.textContent = validCount;
+
+        if (warningNoPhone) {
+            if (totalSelected > validCount) {
+                warningNoPhone.classList.remove('d-none');
+            } else {
+                warningNoPhone.classList.add('d-none');
+            }
+        }
+    } else {
+        // Mode Filter: Ambil dari backend sesuai URL filter saat ini
+        if (badgeSummary) badgeSummary.textContent = 'Memuat target filter...';
+        if (btnCount) btnCount.textContent = '...';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const postData = new URLSearchParams();
+        postData.append('action', 'get_filter_targets');
+        postData.append('filter_kota', urlParams.get('filter_kota') || '');
+        postData.append('filter_kategori', urlParams.get('filter_kategori') || '');
+        postData.append('filter_sales', urlParams.get('filter_sales') || '');
+        postData.append('filter_fu', urlParams.get('filter_fu') || '');
+        postData.append('search', urlParams.get('search') || '');
+        postData.append('max_limit', '100'); // Batch maks 100
+
+        try {
+            const resp = await fetch('ajax_wa_broadcast.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: postData.toString()
+            });
+            const data = await resp.json();
+            if (data.success) {
+                currentBroadcastTargets = data.targets;
+                if (badgeSummary) badgeSummary.textContent = `${data.total} Target (Sesuai Filter)`;
+                if (btnCount) btnCount.textContent = data.total;
+                if (warningNoPhone) warningNoPhone.classList.add('d-none');
+            } else {
+                if (badgeSummary) badgeSummary.textContent = '0 Target';
+                if (btnCount) btnCount.textContent = '0';
+            }
+        } catch (err) {
+            if (badgeSummary) badgeSummary.textContent = 'Gagal memuat target';
+            if (btnCount) btnCount.textContent = '0';
+        }
+    }
+    updateLivePreview();
+}
+
+// Live WhatsApp Preview
+function updateLivePreview() {
+    const text = document.getElementById('broadcastMessageText')?.value || '';
+    const charCountEl = document.getElementById('txtCharCount');
+    if (charCountEl) charCountEl.textContent = text.length + ' karakter';
+
+    const sample = currentBroadcastTargets.length > 0 ? currentBroadcastTargets[0] : {
+        nama_toko: 'Toko CCTV Jaya',
+        pic: 'Bpk. Hendra',
+        city: 'Depok',
+        sales: 'Edi Suprianto'
+    };
+
+    const previewCustomerLabel = document.getElementById('lblPreviewCustomerName');
+    if (previewCustomerLabel) {
+        previewCustomerLabel.textContent = `Contoh: ${sample.nama_toko}`;
+    }
+
+    let parsed = text
+        .replace(/\{nama_toko\}/g, sample.nama_toko || 'Toko')
+        .replace(/\{nama_pic\}/g, sample.pic || 'Bpk/Ibu')
+        .replace(/\{kota\}/g, sample.city || 'Kota Anda')
+        .replace(/\{nama_sales\}/g, sample.sales || 'Sales Loewix');
+
+    let htmlParsed = escapeBroadcastHtml(parsed)
+        .replace(/\*([^\*]+)\*/g, '<strong>$1</strong>')
+        .replace(/_([^_]+)_/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+
+    const bubble = document.getElementById('waBubbleContent');
+    if (bubble) bubble.innerHTML = htmlParsed;
+
+    const clock = document.getElementById('waBubbleClock');
+    if (clock) {
+        const now = new Date();
+        clock.textContent = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    }
+}
+
+function escapeBroadcastHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Sisipkan Tag Variabel
+function insertVariableTag(tag) {
+    const textarea = document.getElementById('broadcastMessageText');
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = textarea.value.substring(0, start);
+    const after = textarea.value.substring(end, textarea.value.length);
+    textarea.value = before + tag + after;
+    textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+    textarea.focus();
+    updateLivePreview();
+}
+
+// Pilih Template Cepat
+function applyQuickTemplate() {
+    const sel = document.getElementById('selectQuickTemplate');
+    const val = sel.value;
+    if (QUICK_TEMPLATES[val]) {
+        document.getElementById('broadcastMessageText').value = QUICK_TEMPLATES[val];
+        updateLivePreview();
+    }
+}
+
+// Start Broadcast Queue Execution
+async function startBroadcastQueue() {
+    if (currentBroadcastTargets.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Tidak Ada Target',
+            text: 'Silakan pilih toko yang ingin dikirimi broadcast atau gunakan mode filter.',
+            confirmButtonColor: '#059669'
+        });
+        return;
+    }
+
+    const templateText = document.getElementById('broadcastMessageText').value.trim();
+    if (!templateText) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Pesan Kosong',
+            text: 'Tuliskan pesan broadcast terlebih dahulu.',
+            confirmButtonColor: '#059669'
+        });
+        return;
+    }
+
+    const delaySec = parseInt(document.getElementById('broadcastDelaySelect').value) || 5;
+    const logFu = document.getElementById('checkAutoLogFu').checked ? 1 : 0;
+
+    const confirmRes = await Swal.fire({
+        title: 'Mulai Kirim Broadcast?',
+        html: `Akan mengirim pesan ke <b>${currentBroadcastTargets.length} toko</b> dengan jeda aman <b>${delaySec} detik</b> antar pesan.<br><small class='text-muted'>Pesan akan otomatis dicatat ke follow up CRM.</small>`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Kirim Sekarang!',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#6B7280'
+    });
+
+    if (!confirmRes.isConfirmed) return;
+
+    // Switch view ke progress screen
+    document.getElementById('broadcastSetupScreen').classList.add('d-none');
+    document.getElementById('broadcastProgressScreen').classList.remove('d-none');
+    document.getElementById('broadcastModalFooter').classList.add('d-none');
+    document.getElementById('spinnerBroadcasting').classList.remove('d-none');
+    document.getElementById('iconBroadcastDone').classList.add('d-none');
+    document.getElementById('iconBroadcastDone').classList.remove('d-flex');
+    document.getElementById('btnFinishBroadcast').classList.add('d-none');
+    document.getElementById('btnCancelBroadcast').classList.remove('d-none');
+
+    isBroadcastRunning = true;
+    shouldStopBroadcast = false;
+
+    const consoleLog = document.getElementById('broadcastConsoleLog');
+    consoleLog.innerHTML = `[${new Date().toLocaleTimeString()}] 🚀 Memulai pengiriman antrean ${currentBroadcastTargets.length} pesan...\n`;
+
+    let successCount = 0;
+    let failCount = 0;
+    const total = currentBroadcastTargets.length;
+
+    for (let i = 0; i < total; i++) {
+        if (shouldStopBroadcast) {
+            consoleLog.innerHTML += `\n[${new Date().toLocaleTimeString()}] ⚠️ Pengiriman dihentikan oleh pengguna.\n`;
+            break;
+        }
+
+        const target = currentBroadcastTargets[i];
+        const currentNum = i + 1;
+
+        // Update progress bar
+        const pct = Math.round((currentNum / total) * 100);
+        const pBar = document.getElementById('progressBarBroadcast');
+        pBar.style.width = pct + '%';
+        pBar.textContent = pct + '%';
+        pBar.setAttribute('aria-valuenow', pct);
+
+        document.getElementById('txtProgressCount').textContent = `${currentNum} / ${total}`;
+        document.getElementById('txtLiveStatus').textContent = `Mengirim ke: ${target.nama_toko}...`;
+
+        // Render personalized message
+        const personalizedMsg = templateText
+            .replace(/\{nama_toko\}/g, target.nama_toko || 'Toko')
+            .replace(/\{nama_pic\}/g, target.pic || 'Bpk/Ibu')
+            .replace(/\{kota\}/g, target.city || 'Kota Anda')
+            .replace(/\{nama_sales\}/g, target.sales || 'Sales Loewix');
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append('action', 'send_single');
+            formData.append('phone', target.phone);
+            formData.append('message', personalizedMsg);
+            formData.append('customer_id', target.id);
+            formData.append('customer_name', target.nama_toko);
+            formData.append('log_fu', logFu);
+
+            const sendResp = await fetch('ajax_wa_broadcast.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            });
+            const sendResult = await sendResp.json();
+
+            if (sendResult.success) {
+                successCount++;
+                consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ✅ (${currentNum}/${total}) Sukses ke ${target.nama_toko} (${target.phone})\n`;
+            } else {
+                failCount++;
+                consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ (${currentNum}/${total}) Gagal ke ${target.nama_toko}: ${sendResult.message}\n`;
+            }
+        } catch (err) {
+            failCount++;
+            consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ (${currentNum}/${total}) Error jaringan ke ${target.nama_toko}\n`;
+        }
+
+        document.getElementById('txtSuccessCount').textContent = successCount;
+        document.getElementById('txtFailCount').textContent = failCount;
+        consoleLog.scrollTop = consoleLog.scrollHeight;
+
+        // Jeda / Delay aman antar pesan
+        if (i < total - 1 && !shouldStopBroadcast) {
+            document.getElementById('txtLiveStatus').textContent = `Menunggu jeda aman ${delaySec} detik...`;
+            await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
+        }
+    }
+
+    // Selesai
+    isBroadcastRunning = false;
+    document.getElementById('spinnerBroadcasting').classList.add('d-none');
+    document.getElementById('iconBroadcastDone').classList.remove('d-none');
+    document.getElementById('iconBroadcastDone').classList.add('d-flex');
+    document.getElementById('txtProgressHeading').textContent = 'Pengiriman Broadcast Selesai!';
+    document.getElementById('txtProgressSub').textContent = `Total: ${successCount} pesan berhasil dikirim, ${failCount} gagal.`;
+    document.getElementById('txtLiveStatus').textContent = 'Selesai';
+    document.getElementById('btnCancelBroadcast').classList.add('d-none');
+    document.getElementById('btnFinishBroadcast').classList.remove('d-none');
+}
+
+function cancelBroadcastQueue() {
+    shouldStopBroadcast = true;
+    document.getElementById('txtLiveStatus').textContent = 'Menghentikan pengiriman...';
+}
+
+function finishBroadcastReload() {
+    window.location.reload();
+}
 </script>
