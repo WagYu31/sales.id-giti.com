@@ -726,20 +726,26 @@ if ($active_sales_id > 0) {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    position: relative;
 }
 .taste-table-responsive::-webkit-scrollbar {
     height: 7px;
 }
 .taste-table-responsive::-webkit-scrollbar-track {
-    background: #F8FAFC;
+    background: #F1F5F9;
+    border-radius: 4px;
 }
 .taste-table-responsive::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: #94A3B8;
     border-radius: 10px;
+}
+.taste-table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #64748B;
 }
 .taste-table {
     width: 100%;
-    min-width: 1100px;
+    min-width: 1060px;
     border-collapse: separate;
     border-spacing: 0;
     margin-bottom: 0;
@@ -751,12 +757,12 @@ if ($active_sales_id > 0) {
     font-weight: 800 !important;
     letter-spacing: 0.06em !important;
     text-transform: uppercase !important;
-    padding: 14px 14px !important;
+    padding: 12px 10px !important;
     border: none !important;
     white-space: nowrap !important;
 }
 .taste-table tbody td {
-    padding: 12px 14px !important;
+    padding: 10px 10px !important;
     border-bottom: 1px solid #F1F5F9 !important;
     vertical-align: middle !important;
     background: #FFFFFF;
@@ -764,6 +770,46 @@ if ($active_sales_id > 0) {
     color: #1E293B;
 }
 .taste-table tbody tr:hover td {
+    background: #F8FAFC !important;
+}
+
+/* Sticky Freeze Columns for Checkbox & Nama Toko */
+.taste-table .th-col-check,
+.taste-table .td-col-check {
+    position: sticky;
+    left: 0;
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    text-align: center;
+}
+.taste-table .th-col-check {
+    z-index: 10;
+    background: #0F172A !important;
+}
+.taste-table .td-col-check {
+    z-index: 4;
+    background: #FFFFFF !important;
+}
+
+.taste-table .th-col-toko,
+.taste-table .td-col-toko {
+    position: sticky;
+    left: 40px;
+    min-width: 200px;
+    box-shadow: 3px 0 6px -2px rgba(15, 23, 42, 0.07);
+}
+.taste-table .th-col-toko {
+    z-index: 10;
+    background: #0F172A !important;
+}
+.taste-table .td-col-toko {
+    z-index: 4;
+    background: #FFFFFF !important;
+}
+
+.taste-table tbody tr:hover td.td-col-check,
+.taste-table tbody tr:hover td.td-col-toko {
     background: #F8FAFC !important;
 }
 
@@ -1355,19 +1401,19 @@ if ($active_sales_id > 0) {
             <table class="table align-middle taste-table mb-0">
                 <thead>
                     <tr>
-                        <th style="width: 42px; text-align: center; padding-left: 14px !important;">
+                        <th class="th-col-check">
                             <input type="checkbox" class="form-check-input" id="checkAllBroadcast" title="Pilih Semua di Halaman Ini" style="cursor: pointer; width: 17px; height: 17px;">
                         </th>
-                        <th style="min-width: 190px;">NAMA TOKO</th>
-                        <th style="min-width: 190px;">PIC & KONTAK</th>
-                        <th style="min-width: 100px;">KATEGORI</th>
-                        <th style="min-width: 120px;">KOTA</th>
-                        <th style="min-width: 130px;">SALES</th>
-                        <th class="text-center" style="min-width: 60px;">FU</th>
-                        <th class="text-center" style="min-width: 75px;">KANDIDAT</th>
-                        <th class="text-center" style="min-width: 65px;">DEAL</th>
-                        <th class="text-center" style="min-width: 55px;">MAPS</th>
-                        <th class="text-center" style="min-width: 150px;">AKSI</th>
+                        <th class="th-col-toko">NAMA TOKO</th>
+                        <th style="min-width: 170px;">PIC & KONTAK</th>
+                        <th style="min-width: 90px;">KATEGORI</th>
+                        <th style="min-width: 95px;">KOTA</th>
+                        <th style="min-width: 120px;">SALES</th>
+                        <th class="text-center" style="min-width: 50px;">FU</th>
+                        <th class="text-center" style="min-width: 70px;">KANDIDAT</th>
+                        <th class="text-center" style="min-width: 60px;">DEAL</th>
+                        <th class="text-center" style="min-width: 50px;">MAPS</th>
+                        <th class="text-center" style="min-width: 135px;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1393,7 +1439,7 @@ if ($active_sales_id > 0) {
                         $city_val = trim($customer['all_cities'] ?? '-');
                         ?>
                         <tr id="customer-row-<?php echo $customer['id']; ?>">
-                            <td class="text-center" style="width: 42px; padding-left: 14px !important;">
+                            <td class="td-col-check text-center">
                                 <input type="checkbox" class="form-check-input row-broadcast-check"
                                        value="<?php echo $customer['id']; ?>"
                                        data-id="<?php echo $customer['id']; ?>"
@@ -1405,7 +1451,7 @@ if ($active_sales_id > 0) {
                                        style="cursor: pointer; width: 17px; height: 17px;"
                                        <?php echo empty($primary_phone) ? 'disabled title="Customer ini tidak memiliki nomor WhatsApp"' : 'title="Pilih untuk WhatsApp Broadcast"'; ?>>
                             </td>
-                            <td>
+                            <td class="td-col-toko">
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="taste-shop-icon">
                                         <i class="bi bi-shop"></i>
@@ -1504,7 +1550,7 @@ if ($active_sales_id > 0) {
                         </tr>
                         <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="10" class="text-center p-5 text-muted">Belum ada data customer yang sesuai dengan filter ini.</td></tr>
+                            <tr><td colspan="11" class="text-center p-5 text-muted">Belum ada data customer yang sesuai dengan filter ini.</td></tr>
                         <?php endif; ?>
                 </tbody>
             </table>
@@ -2041,6 +2087,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const questionsTable = document.getElementById('questionsTable');
     const tableBody = document.querySelector('.taste-table tbody') || document.querySelector('.brandkit-table tbody') || document.querySelector('table tbody');
     const notification = document.getElementById('notification');
+
+    // Pastikan posisi scroll tabel customer selalu berada di paling kiri (Nama Toko terlihat) pada load/reload
+    const resetTableScroll = function() {
+        const tableContainer = document.getElementById('customer-table-container');
+        if (tableContainer) {
+            tableContainer.scrollLeft = 0;
+        }
+    };
+    resetTableScroll();
+    window.addEventListener('pageshow', resetTableScroll);
 
     // Q&A Live Search
     const liveSearchInput = document.getElementById('liveSearchInput');
