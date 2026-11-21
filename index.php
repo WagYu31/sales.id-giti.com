@@ -773,44 +773,15 @@ if ($active_sales_id > 0) {
     background: #F8FAFC !important;
 }
 
-/* Sticky Freeze Columns for Checkbox & Nama Toko */
+/* Compact Checkbox Column */
 .taste-table .th-col-check,
 .taste-table .td-col-check {
-    position: sticky;
-    left: 0;
-    width: 40px;
-    min-width: 40px;
-    max-width: 40px;
+    width: 38px;
+    min-width: 38px;
+    max-width: 42px;
     text-align: center;
-}
-.taste-table .th-col-check {
-    z-index: 10;
-    background: #0F172A !important;
-}
-.taste-table .td-col-check {
-    z-index: 4;
-    background: #FFFFFF !important;
-}
-
-.taste-table .th-col-toko,
-.taste-table .td-col-toko {
-    position: sticky;
-    left: 40px;
-    min-width: 200px;
-    box-shadow: 3px 0 6px -2px rgba(15, 23, 42, 0.07);
-}
-.taste-table .th-col-toko {
-    z-index: 10;
-    background: #0F172A !important;
-}
-.taste-table .td-col-toko {
-    z-index: 4;
-    background: #FFFFFF !important;
-}
-
-.taste-table tbody tr:hover td.td-col-check,
-.taste-table tbody tr:hover td.td-col-toko {
-    background: #F8FAFC !important;
+    padding-left: 10px !important;
+    padding-right: 6px !important;
 }
 
 /* Shop Avatar & Badges */
@@ -1404,8 +1375,8 @@ if ($active_sales_id > 0) {
                         <th class="th-col-check">
                             <input type="checkbox" class="form-check-input" id="checkAllBroadcast" title="Pilih Semua di Halaman Ini" style="cursor: pointer; width: 17px; height: 17px;">
                         </th>
-                        <th class="th-col-toko">NAMA TOKO</th>
-                        <th style="min-width: 170px;">PIC & KONTAK</th>
+                        <th style="min-width: 180px;">NAMA TOKO</th>
+                        <th style="min-width: 180px;">PIC & KONTAK</th>
                         <th style="min-width: 90px;">KATEGORI</th>
                         <th style="min-width: 95px;">KOTA</th>
                         <th style="min-width: 120px;">SALES</th>
@@ -1451,7 +1422,7 @@ if ($active_sales_id > 0) {
                                        style="cursor: pointer; width: 17px; height: 17px;"
                                        <?php echo empty($primary_phone) ? 'disabled title="Customer ini tidak memiliki nomor WhatsApp"' : 'title="Pilih untuk WhatsApp Broadcast"'; ?>>
                             </td>
-                            <td class="td-col-toko">
+                            <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="taste-shop-icon">
                                         <i class="bi bi-shop"></i>
@@ -2054,22 +2025,6 @@ if ($active_sales_id > 0) {
         </button>
         <button type="button" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2" id="btnStartBroadcast" onclick="startBroadcastQueue()">
           <i class="bi bi-send-fill"></i> Mulai Broadcast (<span id="txtBtnTargetCount">0</span>)
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="modal-footer px-4 py-3 bg-white border-top d-flex justify-content-between align-items-center" id="broadcastModalFooter">
-        <button type="button" class="btn btn-light rounded-pill px-3.5 fw-semibold text-secondary" data-bs-dismiss="modal">
-          Tutup
-        </button>
-        <button type="button" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2" id="btnStartBroadcast" onclick="startBroadcastQueue()">
-          <i class="bi bi-send-fill"></i> Mulai Kirim Broadcast (<span id="txtBtnTargetCount">0</span>)
         </button>
       </div>
 
