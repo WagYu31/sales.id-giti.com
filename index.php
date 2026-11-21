@@ -971,27 +971,93 @@ if ($active_sales_id > 0) {
     from { opacity: 0; transform: translate(-50%, 20px); }
     to { opacity: 1; transform: translate(-50%, 0); }
 }
-.wa-preview-screen {
+/* WhatsApp Realistic Phone Mockup */
+.wa-mockup-phone {
+    border: 1px solid #CBD5E1;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #FFFFFF;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+}
+.wa-mockup-header {
+    background: #008069;
+    color: #FFFFFF;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.wa-mockup-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    color: #008069;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.wa-mockup-body {
     background: #EFEAE2;
-    background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+    background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
     background-size: 16px 16px;
-    border-radius: 14px;
-    padding: 16px;
-    min-height: 250px;
-    max-height: 380px;
+    padding: 14px;
+    min-height: 280px;
+    max-height: 370px;
     overflow-y: auto;
-    position: relative;
-    border: 1px solid #D1D5DB;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.wa-mockup-footer {
+    background: #F0F2F5;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #E2E8F0;
+}
+.wa-mockup-input-dummy {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 11.5px;
+    color: #94A3B8;
+    flex-grow: 1;
+    border: 1px solid #E2E8F0;
+}
+.target-option-card {
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 9px 11px;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    height: 100%;
+}
+.target-option-card:hover {
+    border-color: #93C5FD;
+    background: #F8FAFC;
+}
+.target-option-card.active {
+    border-color: #10B981;
+    background: #ECFDF5;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.12);
 }
 .wa-bubble-sent {
-    background: #E7FFDB;
+    background: #D9FDD3;
     color: #111B21;
     border-radius: 10px 10px 2px 10px;
     padding: 10px 14px;
     max-width: 92%;
     margin-left: auto;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-    font-size: 13px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+    font-size: 12.5px;
     line-height: 1.45;
     position: relative;
     white-space: pre-wrap;
@@ -1013,7 +1079,7 @@ if ($active_sales_id > 0) {
     border: 1px solid #CBD5E1;
     border-radius: 6px;
     padding: 3px 8px;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -1029,12 +1095,13 @@ if ($active_sales_id > 0) {
 }
 .broadcast-log-console {
     background: #0F172A;
-    color: #F8FAFC;
-    font-family: monospace;
-    font-size: 11.5px;
-    border-radius: 10px;
+    color: #E2E8F0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.55;
+    border-radius: 12px;
     padding: 12px;
-    max-height: 180px;
+    max-height: 210px;
     overflow-y: auto;
     white-space: pre-wrap;
 }
@@ -1651,7 +1718,7 @@ if ($active_sales_id > 0) {
     </div>
 </div>
 
-<!-- Modal WhatsApp Broadcast & Mass Follow-Up -->
+<!-- Modal WhatsApp Broadcast & Mass Follow-Up (OpenWA 8-Layer Anti-Ban Pro) -->
 <div class="modal fade" id="modalWaBroadcast" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
@@ -1663,8 +1730,8 @@ if ($active_sales_id > 0) {
             <i class="bi bi-whatsapp"></i>
           </div>
           <div>
-            <h5 class="modal-title fw-bold mb-0" style="font-size: 16px;">WhatsApp Broadcast &amp; Mass Follow-Up</h5>
-            <small class="text-white-50" style="font-size: 11.5px;">Kirim pesan promosi &amp; follow-up massal langsung ke nomor WhatsApp toko</small>
+            <h5 class="modal-title fw-bold mb-0" style="font-size: 16px;">WhatsApp Broadcast &amp; Smart Anti-Ban Engine</h5>
+            <small class="text-white-50" style="font-size: 11.5px;">OpenWA Self-Hosted (8 Lapis Anti-Ban &amp; Rotasi 4 Nomor Sales) + Asisten 1-Klik</small>
           </div>
         </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" id="btnCloseBroadcastModal"></button>
@@ -1717,15 +1784,15 @@ if ($active_sales_id > 0) {
                 </div>
               </div>
 
-              <!-- 2. Template Cepat & Tag Variabel -->
+              <!-- 2. Template Cepat, Tag Variabel & Spintax Anti-Ban -->
               <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                   <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 13px;">
-                    <i class="bi bi-chat-quote-fill text-success"></i> 2. Template &amp; Isi Pesan
+                    <i class="bi bi-chat-quote-fill text-success"></i> 2. Template &amp; Spintax Anti-Duplikat
                   </span>
-                  <select class="form-select form-select-sm fw-semibold w-auto" id="selectQuickTemplate" onchange="applyQuickTemplate()" style="font-size: 11.5px; border-radius: 8px; max-width: 240px; background-color: #F8FAFC;">
+                  <select class="form-select form-select-sm fw-semibold w-auto" id="selectQuickTemplate" onchange="applyQuickTemplate()" style="font-size: 11.5px; border-radius: 8px; max-width: 250px; background-color: #F8FAFC;">
                     <option value="">-- Pilih Template Cepat --</option>
-                    <option value="1">Template 1: Sapaan &amp; Katalog Baru</option>
+                    <option value="1">Template 1: Sapaan Singkat &amp; Katalog (Anti-Ban)</option>
                     <option value="2">Template 2: Follow Up Promo &amp; Stok</option>
                     <option value="3">Template 3: Program Mitra Installer</option>
                   </select>
@@ -1733,80 +1800,177 @@ if ($active_sales_id > 0) {
 
                 <div class="mb-2">
                   <small class="text-muted d-block mb-1 fw-semibold" style="font-size: 11px;">
-                    <i class="bi bi-cursor-fill text-primary me-0.5"></i> Klik tag variabel di bawah untuk menyisipkan ke pesan:
+                    <i class="bi bi-cursor-fill text-primary me-0.5"></i> Sisipkan variabel &amp; variasi acak Spintax <code>{A|B|C}</code> agar tiap pesan unik:
                   </small>
                   <div class="d-flex flex-wrap gap-1.5">
-                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{nama_toko}')" title="Nama Toko Customer">
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{nama_toko}')">
                       <i class="bi bi-shop text-primary" style="font-size: 11px;"></i> {nama_toko}
                     </button>
-                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{nama_pic}')" title="Nama PIC / Kontak">
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{nama_pic}')">
                       <i class="bi bi-person-fill text-success" style="font-size: 11px;"></i> {nama_pic}
                     </button>
-                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{kota}')" title="Kota / Wilayah Toko">
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{kota}')">
                       <i class="bi bi-geo-alt-fill text-danger" style="font-size: 11px;"></i> {kota}
                     </button>
-                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{nama_sales}')" title="Nama Sales Pengirim">
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{nama_sales}')">
                       <i class="bi bi-briefcase-fill text-warning" style="font-size: 11px;"></i> {nama_sales}
+                    </button>
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{salam_waktu}')">
+                      <i class="bi bi-clock-fill text-info" style="font-size: 11px;"></i> {salam_waktu}
+                    </button>
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" style="background:#ECFDF5; border-color:#A7F3D0; color:#065F46;" onclick="insertVariableTag('{Halo|Selamat {salam_waktu}|Permisi|Salam kenal}')" title="Sisipkan variasi sapaan acak otomatis">
+                      <i class="bi bi-shuffle" style="font-size: 11px;"></i> + Spintax Sapaan
                     </button>
                   </div>
                 </div>
 
-                <!-- Textarea Pesan Broadcast -->
                 <div>
-                  <textarea id="broadcastMessageText" class="form-control" rows="6" placeholder="Tulis pesan broadcast WhatsApp Anda di sini... Gunakan variabel seperti {nama_toko} dan {nama_pic} agar pesan terasa personal." style="border-radius: 10px; font-size: 12.5px; line-height: 1.5; min-height: 150px; height: 150px; resize: vertical;"></textarea>
+                  <textarea id="broadcastMessageText" class="form-control" rows="6" placeholder="Tulis pesan broadcast Anda... Gunakan {Halo|Selamat siang|Permisi} dan {nama_toko} agar setiap pesan unik & aman dari filter spam WhatsApp." style="border-radius: 10px; font-size: 12.5px; line-height: 1.5; min-height: 145px; height: 145px; resize: vertical;"></textarea>
                   <div class="d-flex justify-content-between align-items-center mt-1 px-1">
                     <small class="text-muted" style="font-size: 10.5px;">
-                      Format: <code>*tebal*</code> &bull; <code>_miring_</code>
+                      Format: <code>*tebal*</code> &bull; <code>_miring_</code> &bull; Spintax: <code>{opsi1|opsi2}</code>
                     </small>
                     <small class="text-muted fw-semibold" id="txtCharCount" style="font-size: 10.5px;">0 karakter</small>
                   </div>
                 </div>
               </div>
 
-              <!-- 3. Metode Pengiriman (Mode Asisten 1-Klik vs Bot Fonnte) -->
+              <!-- 3. Metode Pengiriman: OpenWA Anti-Ban Pro vs Asisten 1-Klik vs Fonnte -->
               <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white">
-                <div class="fw-bold text-dark mb-2 d-flex align-items-center gap-1.5" style="font-size: 13px;">
-                  <i class="bi bi-gear-fill text-secondary"></i> 3. Metode Pengiriman
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                  <div class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 13px;">
+                    <i class="bi bi-shield-fill-check text-success"></i> 3. Mesin Pengirim &amp; Proteksi Anti-Ban
+                  </div>
+                  <span class="badge rounded-pill bg-light text-secondary border px-2.5 py-1" id="openwaModalHealthPill" style="font-size: 10.5px;">
+                    <span class="spinner-border spinner-border-sm me-1" style="width:9px;height:9px;"></span> Cek OpenWA...
+                  </span>
                 </div>
 
                 <div class="row g-2 mb-2">
-                  <div class="col-md-7 col-12">
-                    <div class="target-option-card active d-flex align-items-start gap-2" id="cardMethodDirect" onclick="setBroadcastSendMethod('direct')">
-                      <input class="form-check-input mt-1" type="radio" name="send_method" id="sendMethodDirect" value="direct" checked onchange="handleSendMethodChange()" style="cursor: pointer; width: 16px; height: 16px;">
+                  <div class="col-md-5 col-12">
+                    <div class="target-option-card active d-flex align-items-start gap-2" id="cardMethodOpenwa" onclick="setBroadcastSendMethod('openwa')">
+                      <input class="form-check-input mt-1" type="radio" name="send_method" id="sendMethodOpenwa" value="openwa" checked onchange="handleSendMethodChange()" style="cursor: pointer; width: 16px; height: 16px;">
                       <div>
                         <div class="fw-bold text-success" style="font-size: 12px;">
-                          <i class="bi bi-shield-check-fill"></i> Mode Asisten 1-Klik (Rekomendasi Utama)
+                          <i class="bi bi-shield-lock-fill"></i> OpenWA Anti-Ban Pro
                         </div>
-                        <div class="text-muted" style="font-size: 10.5px; line-height: 1.35;">
-                          Kirim via WhatsApp resmi di Laptop/HP sales. <strong>100% Bebas Logout &amp; Anti-Banned</strong>.
+                        <div class="text-muted" style="font-size: 10px; line-height: 1.35;">
+                          Otomatis, rotasi 4 nomor sales, pre-check WA, typing &amp; jeda acak.
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div class="col-md-5 col-12">
+                  <div class="col-md-4 col-12">
+                    <div class="target-option-card d-flex align-items-start gap-2" id="cardMethodDirect" onclick="setBroadcastSendMethod('direct')">
+                      <input class="form-check-input mt-1" type="radio" name="send_method" id="sendMethodDirect" value="direct" onchange="handleSendMethodChange()" style="cursor: pointer; width: 16px; height: 16px;">
+                      <div>
+                        <div class="fw-bold text-primary" style="font-size: 12px;">
+                          <i class="bi bi-whatsapp"></i> Asisten 1-Klik
+                        </div>
+                        <div class="text-muted" style="font-size: 10px; line-height: 1.35;">
+                          Manual via WA resmi laptop/HP. 0% risiko.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-12">
                     <div class="target-option-card d-flex align-items-start gap-2" id="cardMethodGateway" onclick="setBroadcastSendMethod('gateway')">
                       <input class="form-check-input mt-1" type="radio" name="send_method" id="sendMethodGateway" value="gateway" onchange="handleSendMethodChange()" style="cursor: pointer; width: 16px; height: 16px;">
                       <div>
-                        <div class="fw-bold text-dark" style="font-size: 12px;">
-                          <i class="bi bi-robot"></i> Bot Gateway (Fonnte)
+                        <div class="fw-bold text-secondary" style="font-size: 12px;">
+                          <i class="bi bi-robot"></i> Fonnte
                         </div>
-                        <div class="text-muted" style="font-size: 10.5px; line-height: 1.35;">
-                          Kirim otomatis server (perlu device Fonnte terhubung).
+                        <div class="text-muted" style="font-size: 10px; line-height: 1.35;">
+                          Gateway lama.
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Opsi Tambahan untuk Bot Gateway (Hanya muncul jika mode gateway dipilih) -->
+                <!-- Panel 8 Lapis Anti-Ban OpenWA -->
+                <div id="boxOpenwaSettings" class="pt-2.5 border-top mt-1">
+                  <div id="openwaSetupAlertModal" class="alert alert-warning py-2 px-2.5 rounded-3 small mb-2.5 d-none" style="font-size: 11px;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    <span id="openwaSetupAlertText">OpenWA belum siap.</span>
+                    <?php if (strtolower(trim($_SESSION['role'] ?? '')) === 'superadmin'): ?>
+                      <a href="wa_support_settings.php" class="fw-bold text-dark ms-1">Buka Pengaturan OpenWA &rarr;</a>
+                    <?php endif; ?>
+                  </div>
+
+                  <div class="row g-2 mb-2">
+                    <div class="col-sm-6 col-12">
+                      <label class="fw-bold text-dark mb-1 d-block" style="font-size: 11px;">
+                        <i class="bi bi-arrow-repeat text-success"></i> Nomor Pengirim (Multi-Session):
+                      </label>
+                      <select id="openwaSessionSelect" class="form-select form-select-sm fw-semibold" style="border-radius: 8px; font-size: 11.5px;">
+                        <option value="auto_rotate" selected>🔄 Rotasi Otomatis Semua Nomor Ready (Paling Aman)</option>
+                        <option value="my_sales">👤 Khusus Nomor Sales Saya Saja</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <label class="fw-bold text-dark mb-1 d-block" style="font-size: 11px;">
+                        <i class="bi bi-stopwatch-fill text-primary"></i> Profil Jeda Acak &amp; Istirahat Batch:
+                      </label>
+                      <select id="openwaPacingProfile" class="form-select form-select-sm fw-semibold" style="border-radius: 8px; font-size: 11.5px;">
+                        <option value="ultra" selected>🛡️ Ultra Aman (Acak 25–50 dtk • Istirahat 3 mnt / 10 pesan)</option>
+                        <option value="normal">⚖️ Normal Aman (Acak 15–30 dtk • Istirahat 2 mnt / 15 pesan)</option>
+                        <option value="fast">⚡ Cepat (Acak 8–18 dtk • Istirahat 1 mnt / 20 pesan)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="p-2.5 rounded-3 bg-light border" style="font-size: 11px;">
+                    <div class="row g-1.5">
+                      <div class="col-sm-6 col-12">
+                        <div class="form-check mb-0">
+                          <input class="form-check-input" type="checkbox" id="chkOpenwaPrecheck" checked>
+                          <label class="form-check-label fw-semibold text-dark" for="chkOpenwaPrecheck">Pre-Check Nomor WA (Skip nomor mati)</label>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 col-12">
+                        <div class="form-check mb-0">
+                          <input class="form-check-input" type="checkbox" id="chkOpenwaDedup" checked>
+                          <label class="form-check-label fw-semibold text-dark" for="chkOpenwaDedup">Anti-Spam Ganda (<span id="txtDedupDaysLabel">7</span> hari)</label>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 col-12">
+                        <div class="form-check mb-0">
+                          <input class="form-check-input" type="checkbox" id="chkOpenwaTyping" checked>
+                          <label class="form-check-label fw-semibold text-dark" for="chkOpenwaTyping">Simulasi Mengetik (<code>typing...</code>)</label>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 col-12">
+                        <div class="form-check mb-0">
+                          <input class="form-check-input" type="checkbox" id="chkOpenwaSpintax" checked>
+                          <label class="form-check-label fw-semibold text-dark" for="chkOpenwaSpintax">Spintax + Hash Unik Tiap Pesan</label>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 col-12">
+                        <div class="form-check mb-0">
+                          <input class="form-check-input" type="checkbox" id="chkOpenwaLogFu" checked>
+                          <label class="form-check-label fw-semibold text-dark" for="chkOpenwaLogFu">Catat Otomatis ke Follow-Up CRM</label>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 col-12">
+                        <div class="form-check mb-0">
+                          <input class="form-check-input" type="checkbox" id="chkOpenwaWorkHours">
+                          <label class="form-check-label fw-semibold text-dark" for="chkOpenwaWorkHours">Kunci Jam Kerja (08:00–20:00 WIB)</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Opsi Tambahan untuk Bot Gateway Fonnte (Legacy) -->
                 <div id="boxGatewaySettings" class="d-none pt-2 border-top mt-2">
                   <div class="row g-2 align-items-center">
                     <div class="col-sm-6 col-12">
-                      <label class="fw-semibold small text-dark mb-1 d-block" style="font-size: 11.5px;">Jeda Aman Antar Pesan:</label>
+                      <label class="fw-semibold small text-dark mb-1 d-block" style="font-size: 11.5px;">Jeda Aman Antar Pesan (Fonnte):</label>
                       <select id="broadcastDelaySelect" class="form-select form-select-sm fw-semibold" style="border-radius: 8px;">
-                        <option value="5">5 Detik</option>
-                        <option value="10" selected>10 Detik (Lebih Aman)</option>
-                        <option value="20">20 Detik (Disarankan)</option>
+                        <option value="10">10 Detik</option>
+                        <option value="20" selected>20 Detik (Disarankan)</option>
+                        <option value="35">35 Detik (Extra Aman)</option>
                       </select>
                     </div>
                     <div class="col-sm-6 col-12">
@@ -1829,12 +1993,17 @@ if ($active_sales_id > 0) {
               <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white h-100 d-flex flex-column">
                 
                 <!-- Header Preview -->
-                <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-1.5 border-bottom gap-1">
                   <div class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 12.5px; white-space: nowrap;">
                     <i class="bi bi-phone-fill text-success"></i> Pratinjau Balon Chat
                   </div>
-                  <div class="badge bg-light text-secondary border fw-normal text-truncate" style="max-width: 170px; font-size: 10.5px;" id="lblPreviewCustomerName" title="Contoh Toko">
-                    Contoh: Toko CCTV
+                  <div class="d-flex align-items-center gap-1">
+                    <button type="button" class="btn btn-outline-success btn-sm py-0 px-2 rounded-pill fw-bold" style="font-size: 10px;" onclick="updateLivePreview()" title="Acak ulang contoh hasil Spintax">
+                      <i class="bi bi-shuffle"></i> Acak Spintax
+                    </button>
+                    <div class="badge bg-light text-secondary border fw-normal text-truncate" style="max-width: 130px; font-size: 10px;" id="lblPreviewCustomerName" title="Contoh Toko">
+                      Contoh: Toko CCTV
+                    </div>
                   </div>
                 </div>
 
@@ -1852,7 +2021,7 @@ if ($active_sales_id > 0) {
                         <div class="fw-bold text-white text-truncate" style="font-size: 12px; line-height: 1.2;" id="waPhoneHeaderName">
                           Pamungkas CCTV
                         </div>
-                        <div class="text-white-50" style="font-size: 9.5px; line-height: 1;">online</div>
+                        <div class="text-white-50" style="font-size: 9.5px; line-height: 1;">mengetik... (simulasi anti-ban)</div>
                       </div>
                     </div>
                     <div class="d-flex align-items-center gap-2 text-white-50" style="font-size: 13px;">
@@ -1862,7 +2031,7 @@ if ($active_sales_id > 0) {
                   </div>
 
                   <!-- WhatsApp Chat Scroll Body -->
-                  <div class="wa-mockup-body flex-grow-1" style="min-height: 250px;">
+                  <div class="wa-mockup-body flex-grow-1">
                     <div class="wa-bubble-sent shadow-sm">
                       <div id="waBubbleContent">
                         Halo! Ini adalah contoh pesan broadcast.
@@ -1887,8 +2056,8 @@ if ($active_sales_id > 0) {
                 </div>
 
                 <div class="p-2 rounded-3 bg-light mt-2 border small text-muted d-flex align-items-center gap-1.5" style="font-size: 10.5px;">
-                  <i class="bi bi-info-circle-fill text-success fs-6 flex-shrink-0"></i>
-                  <span>Pesan di atas otomatis dipersonalisasi nama toko &amp; kontak untuk setiap penerima.</span>
+                  <i class="bi bi-shield-check text-success fs-6 flex-shrink-0"></i>
+                  <span>Setiap penerima mendapat <strong>variasi Spintax &amp; fingerprint pesan berbeda</strong> agar aman dari deteksi spam WhatsApp.</span>
                 </div>
 
               </div>
@@ -1912,12 +2081,10 @@ if ($active_sales_id > 0) {
               </div>
             </div>
 
-            <!-- Progress Bar Asisten -->
             <div class="progress mb-3" style="height: 10px; border-radius: 50px; background: #E2E8F0;">
               <div class="progress-bar bg-success" id="directProgressBar" role="progressbar" style="width: 0%;"></div>
             </div>
 
-            <!-- Kartu Info Toko Aktif -->
             <div class="card border border-2 border-success-subtle rounded-4 p-3.5 mb-3 bg-success-subtle bg-opacity-10 text-start shadow-sm">
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <div>
@@ -1938,13 +2105,11 @@ if ($active_sales_id > 0) {
                 <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> Kota: <strong class="text-dark" id="directTargetCity">-</strong></span>
               </div>
 
-              <!-- Preview Pesan Toko Ini -->
               <div class="p-2.5 rounded-3 bg-white border text-dark small" style="font-size: 12px; max-height: 120px; overflow-y: auto; white-space: pre-wrap;" id="directTargetMessagePreview">
                 Pratinjau pesan yang siap dikirim...
               </div>
             </div>
 
-            <!-- Action Button Raksasa -->
             <div class="mb-3">
               <button type="button" class="btn btn-success btn-lg rounded-pill px-5 py-3 fw-bold shadow d-inline-flex align-items-center gap-2.5" id="btnDirectSendCurrent" onclick="dispatchDirectCurrentTarget()" style="font-size: 16px;">
                 <i class="bi bi-whatsapp fs-4"></i>
@@ -1955,7 +2120,6 @@ if ($active_sales_id > 0) {
               </div>
             </div>
 
-            <!-- Secondary Actions -->
             <div class="d-flex justify-content-center gap-2 pt-2 border-top">
               <button type="button" class="btn btn-light rounded-pill px-3.5 fw-semibold text-secondary btn-sm" onclick="skipDirectCurrentTarget()">
                 <i class="bi bi-skip-forward-fill me-1"></i> Lewati Toko Ini
@@ -1968,44 +2132,58 @@ if ($active_sales_id > 0) {
           </div>
         </div>
 
-        <!-- Screen 2B: Real-Time Sending Progress (Bot Gateway) -->
+        <!-- Screen 2B: Real-Time Anti-Ban Sending Progress (OpenWA & Fonnte) -->
         <div id="broadcastProgressScreen" class="d-none">
-          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center mb-3">
-            <div class="mb-3">
-              <div class="spinner-border text-success" role="status" id="spinnerBroadcasting" style="width: 3rem; height: 3rem;">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center mb-2">
+            <div class="mb-2">
+              <div class="spinner-border text-success" role="status" id="spinnerBroadcasting" style="width: 2.8rem; height: 2.8rem;">
                 <span class="visually-hidden">Loading...</span>
               </div>
-              <div class="rounded-circle bg-success text-white d-none align-items-center justify-content-center mx-auto" id="iconBroadcastDone" style="width: 60px; height: 60px; font-size: 28px;">
+              <div class="rounded-circle bg-success text-white d-none align-items-center justify-content-center mx-auto" id="iconBroadcastDone" style="width: 56px; height: 56px; font-size: 26px;">
                 <i class="bi bi-check-lg"></i>
               </div>
             </div>
 
-            <h5 class="fw-bold text-dark mb-1" id="txtProgressHeading">Sedang Mengirim Pesan WhatsApp Broadcast...</h5>
-            <p class="text-muted small mb-3" id="txtProgressSub">Mohon jangan menutup jendela browser ini sampai seluruh antrean selesai dikirim.</p>
+            <h5 class="fw-bold text-dark mb-1" id="txtProgressHeading">Menjalankan OpenWA Anti-Ban Engine...</h5>
+            <p class="text-muted small mb-2" id="txtProgressSub">Mohon jangan menutup tab ini sampai seluruh antrean selesai dikirim dengan aman.</p>
+
+            <!-- Active Sender & Anti-Ban Live Pill -->
+            <div class="mb-3">
+              <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-1.5 fw-bold" id="txtActiveSenderBadge" style="font-size: 11.5px;">
+                <i class="bi bi-shield-check me-1"></i> Menyiapkan sesi pengirim...
+              </span>
+            </div>
 
             <!-- Progress Bar -->
             <div class="progress mb-2" style="height: 16px; border-radius: 50px; background: #E2E8F0;">
               <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="progressBarBroadcast" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center text-muted small fw-semibold px-1 mb-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center text-muted small fw-semibold px-1 mb-3 gap-2">
               <span>Progress: <strong class="text-dark" id="txtProgressCount">0 / 0</strong></span>
-              <span>Berhasil: <strong class="text-success" id="txtSuccessCount">0</strong> | Gagal: <strong class="text-danger" id="txtFailCount">0</strong></span>
+              <span>
+                Terkirim: <strong class="text-success" id="txtSuccessCount">0</strong>
+                &bull; Di-skip Aman: <strong class="text-primary" id="txtSkipCount">0</strong>
+                &bull; Gagal: <strong class="text-danger" id="txtFailCount">0</strong>
+              </span>
             </div>
 
             <!-- Terminal / Console Log -->
             <div class="text-start mb-3">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <small class="fw-bold text-dark" style="font-size: 11.5px;">Log Aktivitas Pengiriman:</small>
-                <small class="text-muted" style="font-size: 11px;" id="txtLiveStatus">Menyiapkan antrean...</small>
+                <small class="fw-bold text-dark" style="font-size: 11.5px;">Log Aktivitas Anti-Ban Real-Time:</small>
+                <small class="fw-bold text-primary" style="font-size: 11.5px;" id="txtLiveStatus">Menyiapkan antrean...</small>
               </div>
               <div class="broadcast-log-console" id="broadcastConsoleLog">
-                [Sistem] Menyiapkan modul pengiriman WhatsApp Gateway...
+                [Sistem] Menyiapkan OpenWA 8-Layer Anti-Ban Engine...
               </div>
             </div>
 
             <!-- Action Buttons during sending -->
-            <div class="d-flex justify-content-center gap-2">
+            <div class="d-flex justify-content-center flex-wrap gap-2">
+              <button type="button" class="btn btn-outline-warning rounded-pill px-4 fw-bold btn-sm" id="btnPauseBroadcast" onclick="togglePauseBroadcastQueue()">
+                <i class="bi bi-pause-circle-fill me-1"></i> Jeda Sementara
+              </button>
               <button type="button" class="btn btn-outline-danger rounded-pill px-4 fw-bold btn-sm" id="btnCancelBroadcast" onclick="cancelBroadcastQueue()">
                 <i class="bi bi-stop-circle-fill me-1"></i> Hentikan Broadcast
               </button>
@@ -2024,7 +2202,7 @@ if ($active_sales_id > 0) {
           Tutup
         </button>
         <button type="button" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2" id="btnStartBroadcast" onclick="startBroadcastQueue()">
-          <i class="bi bi-send-fill"></i> Mulai Broadcast (<span id="txtBtnTargetCount">0</span>)
+          <i class="bi bi-shield-fill-check"></i> Mulai OpenWA Anti-Ban (<span id="txtBtnTargetCount">0</span>)
         </button>
       </div>
 
@@ -2239,14 +2417,40 @@ document.addEventListener('DOMContentLoaded', function() {
 let selectedBroadcastMap = new Map();
 let currentBroadcastTargets = [];
 let isBroadcastRunning = false;
+let isBroadcastPaused = false;
 let shouldStopBroadcast = false;
+let openwaHealthCache = null;
 
-// Quick Templates
+// Quick Templates (Sudah memakai Spintax alami & sopan — Anti-Ban friendly!)
 const QUICK_TEMPLATES = {
-    '1': "Halo {nama_pic} dari *{nama_toko}* 👋\n\nPerkenalkan, saya *{nama_sales}* dari *Loewix CCTV Official*.\n\nKami ingin membagikan katalog & pricelist promo terbaru khusus untuk mitra/toko CCTV di area {kota}. Produk CCTV berkualitas tinggi dengan garansi resmi dan harga grosir terbaik.\n\nBoleh kami kirimkan katalog dan pricelist terbarunya ke nomor ini? Terima kasih 🙏",
-    '2': "Selamat siang {nama_pic} (*{nama_toko}*),\n\nSemoga bisnis & usahanya di {kota} semakin maju dan lancar selalu ya 🙏\n\nSaya *{nama_sales}* dari Loewix CCTV. Mau mengabarkan bahwa saat ini sedang ada promo diskon khusus untuk pembelian paket unit CCTV & DVR bulan ini.\n\nApakah saat ini ada kebutuhan unit atau proyek CCTV yang sedang berjalan yang bisa kami bantu support?",
-    '3': "Salam hangat dari Loewix CCTV untuk {nama_pic} & tim *{nama_toko}*! 🚀\n\nKami memiliki program kemitraan spesial untuk rekan toko & installer di {kota}, termasuk:\n✅ Harga khusus mitra/grosir\n✅ Garansi resmi & klaim unit pengganti cepat\n✅ Brosur & materi promosi toko\n\nJika berminat bergabung atau butuh info lebih lanjut, silakan balas pesan ini ya. Salam sukses, *{nama_sales}*."
+    '1': "{Halo|Selamat {salam_waktu}|Permisi} {nama_pic} dari *{nama_toko}* 👋\n\n{Perkenalkan, saya|Saya} *{nama_sales}* dari *Loewix CCTV Official*.\n\nKami {ingin berbagi|mau info} katalog & pricelist grosir terbaru untuk rekan toko/installer CCTV di area {kota} (garansi resmi & stok ready).\n\n{Boleh kami kirimkan|Apakah berkenan jika saya kirimkan} katalog terbarunya ke nomor ini? {Terima kasih|Makasih banyak} 🙏",
+    '2': "{Selamat {salam_waktu}|Halo|Permisi} {nama_pic} (*{nama_toko}*),\n\nSemoga usaha di {kota} makin ramai dan lancar ya 🙏\n\nSaya *{nama_sales}* dari *Loewix CCTV*. {Mau mengabarkan|Sekadar info}, bulan ini ada harga spesial mitra untuk paket CCTV & IP Cam 2MP Full Color.\n\n{Apakah saat ini sedang ada kebutuhan|Lagi ada proyek atau kebutuhan} unit CCTV yang bisa kami bantu support?",
+    '3': "{Salam hangat|Selamat {salam_waktu}|Halo} {nama_pic} & tim *{nama_toko}*! 🚀\n\nKami dari *Loewix CCTV* sedang buka program kemitraan khusus toko & installer area {kota}:\n✅ Harga khusus reseller/grosir\n✅ Garansi resmi & klaim unit cepat\n✅ Free desain materi promo toko\n\nJika {berminat|ingin cek pricelist}, silakan balas pesan ini ya. Salam sukses, *{nama_sales}*."
 };
+
+// Render Spintax + Variabel di browser (untuk Pratinjau & Asisten 1-Klik)
+function renderSpintaxClient(template, sample, enableSpintax = true) {
+    const h = new Date().getHours();
+    const salamWaktu = (h >= 4 && h < 11) ? 'pagi' : ((h >= 11 && h < 15) ? 'siang' : ((h >= 15 && h < 18) ? 'sore' : 'malam'));
+    let txt = String(template || '')
+        .replace(/\{nama_toko\}/g, sample.nama_toko || 'Toko')
+        .replace(/\{nama_pic\}/g, sample.pic || 'Bpk/Ibu')
+        .replace(/\{kota\}/g, sample.city || 'Kota Anda')
+        .replace(/\{nama_sales\}/g, sample.sales || 'Sales Loewix')
+        .replace(/\{salam_waktu\}/g, salamWaktu);
+
+    if (enableSpintax) {
+        for (let d = 0; d < 5; d++) {
+            const next = txt.replace(/\{([^{}|]+\|[^{}]+)\}/g, (_, group) => {
+                const opts = group.split('|');
+                return opts[Math.floor(Math.random() * opts.length)];
+            });
+            if (next === txt) break;
+            txt = next;
+        }
+    }
+    return txt;
+}
 
 // Update Checkbox State
 function updateBroadcastSelectionUI() {
@@ -2316,78 +2520,167 @@ function clearSelectedBroadcast() {
     updateBroadcastSelectionUI();
 }
 
+// Memuat Status Live OpenWA & Daftar Nomor Sales ke Modal Broadcast
+async function loadOpenwaHealthForModal() {
+    const pill = document.getElementById('openwaModalHealthPill');
+    const alertBox = document.getElementById('openwaSetupAlertModal');
+    const alertTxt = document.getElementById('openwaSetupAlertText');
+    const sessSelect = document.getElementById('openwaSessionSelect');
+
+    if (pill) {
+        pill.className = 'badge rounded-pill bg-light text-secondary border px-2.5 py-1';
+        pill.innerHTML = '<span class="spinner-border spinner-border-sm me-1" style="width:9px;height:9px;"></span> Cek OpenWA...';
+    }
+
+    try {
+        const data = await fetch('ajax_wa_broadcast.php?action=openwa_health').then(r => r.json());
+        openwaHealthCache = data;
+
+        const dedupLbl = document.getElementById('txtDedupDaysLabel');
+        if (dedupLbl && data.dedup_days != null) dedupLbl.textContent = data.dedup_days;
+
+        // Smart default: centang Kunci Jam Kerja jika sedang di jam kerja (08-20 WIB); di luar jam kerja biarkan unchecked agar mudah dites
+        const chkWork = document.getElementById('chkOpenwaWorkHours');
+        if (chkWork) chkWork.checked = !!data.is_work_hours;
+
+        if (sessSelect) {
+            const prevVal = sessSelect.value || 'auto_rotate';
+            let opts = `
+                <option value="auto_rotate">🔄 Rotasi Otomatis Semua Nomor Ready (${data.healthy_senders || 0} nomor • sisa ${data.total_remaining || 0} kuota)</option>
+                <option value="my_sales">👤 Khusus Nomor Sales Saya Saja</option>
+            `;
+            (data.sessions || []).forEach(s => {
+                const icon = s.can_send ? '🟢' : (s.status === 'ready' ? '🟠' : '⚪');
+                const note = s.can_send ? `sisa ${s.remaining_today}/${s.daily_limit}` : (s.is_paused ? 'Circuit Breaker' : s.status.toUpperCase());
+                opts += `<option value="${escapeBroadcastHtml(s.session_id)}">${icon} ${escapeBroadcastHtml(s.label)} (${note})</option>`;
+            });
+            sessSelect.innerHTML = opts;
+            if (Array.from(sessSelect.options).some(o => o.value === prevVal)) {
+                sessSelect.value = prevVal;
+            }
+        }
+
+        if (data.online && data.healthy_senders > 0) {
+            if (pill) {
+                pill.className = 'badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2.5 py-1 fw-bold';
+                pill.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> OpenWA Ready (${data.healthy_senders} nomor • sisa ${data.total_remaining} kuota hari ini)`;
+            }
+            alertBox?.classList.add('d-none');
+        } else if (data.online) {
+            if (pill) {
+                pill.className = 'badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1 fw-bold';
+                pill.innerHTML = `<i class="bi bi-qr-code me-1"></i> OpenWA Online — ${data.ready_sessions}/${data.total_sessions} Ready`;
+            }
+            if (alertBox && alertTxt) {
+                alertBox.classList.remove('d-none');
+                alertTxt.textContent = data.ready_sessions > 0
+                    ? 'Semua nomor yang terhubung sudah mencapai kuota aman hari ini atau sedang cooldown.'
+                    : 'OpenWA sudah online, tapi belum ada nomor WA sales yang Scan QR (status READY).';
+            }
+        } else {
+            if (pill) {
+                pill.className = 'badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 fw-bold';
+                pill.innerHTML = `<i class="bi bi-wifi-off me-1"></i> OpenWA Belum Aktif`;
+            }
+            if (alertBox && alertTxt) {
+                alertBox.classList.remove('d-none');
+                alertTxt.textContent = 'Server OpenWA Docker belum menyala di VPS (port 2785). Jalankan install_openwa.sh atau gunakan Asisten 1-Klik.';
+            }
+        }
+    } catch (err) {
+        if (pill) {
+            pill.className = 'badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1';
+            pill.textContent = 'Gagal cek OpenWA';
+        }
+    }
+}
+
 // Buka Modal Broadcast
 function openBroadcastModal(mode) {
     const modalEl = document.getElementById('modalWaBroadcast');
     if (!modalEl) return;
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
 
-    // Reset screen
     document.getElementById('broadcastSetupScreen').classList.remove('d-none');
     document.getElementById('broadcastDirectAssistantScreen')?.classList.add('d-none');
     document.getElementById('broadcastProgressScreen').classList.add('d-none');
     document.getElementById('broadcastModalFooter').classList.remove('d-none');
 
-    // Default template jika textarea kosong
     const msgInput = document.getElementById('broadcastMessageText');
     if (!msgInput.value.trim()) {
         msgInput.value = QUICK_TEMPLATES['1'];
     }
 
-    // Tentukan mode
     const countSelected = selectedBroadcastMap.size;
     if (mode === 'selected' || countSelected > 0) {
-        const radioSel = document.getElementById('targetModeSelected');
-        if (radioSel) radioSel.checked = true;
+        setBroadcastTargetMode('selected');
     } else {
-        const radioFilt = document.getElementById('targetModeFilter');
-        if (radioFilt) radioFilt.checked = true;
+        setBroadcastTargetMode('filter');
     }
 
-    // Default ke Mode Asisten 1-Klik
-    const rDirect = document.getElementById('sendMethodDirect');
-    if (rDirect) rDirect.checked = true;
-    handleSendMethodChange();
-
-    handleTargetModeChange();
+    // Default ke OpenWA Anti-Ban Pro
+    setBroadcastSendMethod('openwa');
+    loadOpenwaHealthForModal();
     updateLivePreview();
     modal.show();
 }
 
-function setBroadcastSendMethod(method) {
-    if (method === 'direct') {
-        const r1 = document.getElementById('sendMethodDirect');
-        if (r1) r1.checked = true;
+function setBroadcastTargetMode(mode) {
+    const rSel = document.getElementById('targetModeSelected');
+    const rFil = document.getElementById('targetModeFilter');
+    const cSel = document.getElementById('cardTargetSelected');
+    const cFil = document.getElementById('cardTargetFilter');
+    if (mode === 'selected') {
+        if (rSel) rSel.checked = true;
+        cSel?.classList.add('active');
+        cFil?.classList.remove('active');
     } else {
-        const r2 = document.getElementById('sendMethodGateway');
-        if (r2) r2.checked = true;
+        if (rFil) rFil.checked = true;
+        cFil?.classList.add('active');
+        cSel?.classList.remove('active');
     }
+    handleTargetModeChange();
+}
+
+function setBroadcastSendMethod(method) {
+    const rOpenwa  = document.getElementById('sendMethodOpenwa');
+    const rDirect  = document.getElementById('sendMethodDirect');
+    const rGateway = document.getElementById('sendMethodGateway');
+    if (method === 'openwa' && rOpenwa) rOpenwa.checked = true;
+    else if (method === 'direct' && rDirect) rDirect.checked = true;
+    else if (method === 'gateway' && rGateway) rGateway.checked = true;
     handleSendMethodChange();
 }
 
 function handleSendMethodChange() {
-    const method = document.querySelector('input[name="send_method"]:checked')?.value || 'direct';
-    const cardDirect = document.getElementById('cardMethodDirect');
+    const method = document.querySelector('input[name="send_method"]:checked')?.value || 'openwa';
+    const cardOpenwa  = document.getElementById('cardMethodOpenwa');
+    const cardDirect  = document.getElementById('cardMethodDirect');
     const cardGateway = document.getElementById('cardMethodGateway');
-    const boxGatewaySettings = document.getElementById('boxGatewaySettings');
-    const btnStart = document.getElementById('btnStartBroadcast');
-    const count = currentBroadcastTargets ? currentBroadcastTargets.length : 0;
+    const boxOpenwa   = document.getElementById('boxOpenwaSettings');
+    const boxGateway  = document.getElementById('boxGatewaySettings');
+    const btnStart    = document.getElementById('btnStartBroadcast');
+    const count       = currentBroadcastTargets ? currentBroadcastTargets.length : 0;
 
-    if (method === 'direct') {
-        cardDirect?.classList.add('active');
-        cardGateway?.classList.remove('active');
-        boxGatewaySettings?.classList.add('d-none');
-        if (btnStart) btnStart.innerHTML = `<i class="bi bi-whatsapp"></i> Mulai Asisten 1-Klik (<span id="txtBtnTargetCount">${count}</span>)`;
-    } else {
-        cardGateway?.classList.add('active');
-        cardDirect?.classList.remove('active');
-        boxGatewaySettings?.classList.remove('d-none');
-        if (btnStart) btnStart.innerHTML = `<i class="bi bi-robot"></i> Mulai Bot Gateway (<span id="txtBtnTargetCount">${count}</span>)`;
+    cardOpenwa?.classList.toggle('active', method === 'openwa');
+    cardDirect?.classList.toggle('active', method === 'direct');
+    cardGateway?.classList.toggle('active', method === 'gateway');
+    boxOpenwa?.classList.toggle('d-none', method !== 'openwa');
+    boxGateway?.classList.toggle('d-none', method !== 'gateway');
+
+    if (btnStart) {
+        if (method === 'openwa') {
+            btnStart.innerHTML = `<i class="bi bi-shield-fill-check"></i> Mulai OpenWA Anti-Ban (<span id="txtBtnTargetCount">${count}</span>)`;
+        } else if (method === 'direct') {
+            btnStart.innerHTML = `<i class="bi bi-whatsapp"></i> Mulai Asisten 1-Klik (<span id="txtBtnTargetCount">${count}</span>)`;
+        } else {
+            btnStart.innerHTML = `<i class="bi bi-robot"></i> Mulai Bot Fonnte (<span id="txtBtnTargetCount">${count}</span>)`;
+        }
     }
 }
 
 // =========================================================================
-// ASISTEN 1-KLIK WHATSAPP DIRECT DISPATCHER (100% AMAN & TANPA FONNTE)
+// ASISTEN 1-KLIK WHATSAPP DIRECT DISPATCHER (100% WA RESMI)
 // =========================================================================
 let directTargetIndex = 0;
 
@@ -2400,9 +2693,7 @@ function renderDirectCurrentTarget() {
             html: `Semua <b>${total} toko</b> telah selesai diproses dan tercatat ke Follow-Up CRM.`,
             confirmButtonText: 'Selesai & Refresh',
             confirmButtonColor: '#10B981'
-        }).then(() => {
-            window.location.reload();
-        });
+        }).then(() => window.location.reload());
         return;
     }
 
@@ -2410,7 +2701,6 @@ function renderDirectCurrentTarget() {
     const target = currentBroadcastTargets[directTargetIndex];
     const templateText = document.getElementById('broadcastMessageText').value.trim();
 
-    // Progress bar
     const pct = Math.round((currentNum / total) * 100);
     const pBar = document.getElementById('directProgressBar');
     if (pBar) pBar.style.width = pct + '%';
@@ -2422,13 +2712,7 @@ function renderDirectCurrentTarget() {
     document.getElementById('directTargetPic').textContent = target.pic || 'Bpk/Ibu';
     document.getElementById('directTargetCity').textContent = target.city || '-';
 
-    // Personalized message
-    const personalizedMsg = templateText
-        .replace(/\{nama_toko\}/g, target.nama_toko || 'Toko')
-        .replace(/\{nama_pic\}/g, target.pic || 'Bpk/Ibu')
-        .replace(/\{kota\}/g, target.city || 'Kota Anda')
-        .replace(/\{nama_sales\}/g, target.sales || 'Sales Loewix');
-
+    const personalizedMsg = renderSpintaxClient(templateText, target, true);
     document.getElementById('directTargetMessagePreview').textContent = personalizedMsg;
 }
 
@@ -2436,33 +2720,21 @@ async function dispatchDirectCurrentTarget() {
     const target = currentBroadcastTargets[directTargetIndex];
     if (!target) return;
 
-    const templateText = document.getElementById('broadcastMessageText').value.trim();
-    const personalizedMsg = templateText
-        .replace(/\{nama_toko\}/g, target.nama_toko || 'Toko')
-        .replace(/\{nama_pic\}/g, target.pic || 'Bpk/Ibu')
-        .replace(/\{kota\}/g, target.city || 'Kota Anda')
-        .replace(/\{nama_sales\}/g, target.sales || 'Sales Loewix');
-
+    const personalizedMsg = document.getElementById('directTargetMessagePreview').textContent.trim();
     let cleanPhone = (target.phone || '').replace(/[^0-9]/g, '');
-    if (cleanPhone.startsWith('0')) {
-        cleanPhone = '62' + cleanPhone.substring(1);
-    } else if (!cleanPhone.startsWith('62')) {
-        cleanPhone = '62' + cleanPhone;
-    }
+    if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.substring(1);
+    else if (!cleanPhone.startsWith('62')) cleanPhone = '62' + cleanPhone;
 
-    // Buka WhatsApp Click-to-Chat di tab baru
-    const waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(personalizedMsg)}`;
-    window.open(waUrl, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(personalizedMsg)}`, '_blank');
 
-    // Catat ke follow up CRM via AJAX
     try {
-        const formData = new URLSearchParams();
-        formData.append('action', 'log_click_followup');
-        formData.append('customer_id', target.id);
-        formData.append('phone', cleanPhone);
-        formData.append('message', personalizedMsg);
-        formData.append('customer_name', target.nama_toko);
-
+        const formData = new URLSearchParams({
+            action: 'log_click_followup',
+            customer_id: target.id,
+            phone: cleanPhone,
+            message: personalizedMsg,
+            customer_name: target.nama_toko
+        });
         fetch('ajax_wa_broadcast.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -2470,7 +2742,6 @@ async function dispatchDirectCurrentTarget() {
         });
     } catch (e) {}
 
-    // Pindah otomatis ke toko berikutnya
     directTargetIndex++;
     renderDirectCurrentTarget();
 }
@@ -2480,7 +2751,49 @@ function skipDirectCurrentTarget() {
     renderDirectCurrentTarget();
 }
 
-// Start Broadcast Execution (Asisten 1-Klik vs Gateway)
+// =========================================================================
+// HELPER COUNTDOWN JEDA ACAK & ISTIRAHAT BATCH (SUPPORT PAUSE & STOP)
+// =========================================================================
+async function waitSmartCountdown(seconds, labelPrefix) {
+    for (let rem = seconds; rem > 0; rem--) {
+        if (shouldStopBroadcast) return;
+        while (isBroadcastPaused && !shouldStopBroadcast) {
+            document.getElementById('txtLiveStatus').textContent = '⏸️ Dijeda sementara — klik Lanjutkan untuk meneruskan...';
+            await new Promise(r => setTimeout(r, 400));
+        }
+        if (shouldStopBroadcast) return;
+        const mm = Math.floor(rem / 60);
+        const ss = String(rem % 60).padStart(2, '0');
+        const fmt = mm > 0 ? `${mm}m ${ss}d` : `${rem} detik`;
+        document.getElementById('txtLiveStatus').textContent = `${labelPrefix} ${fmt}...`;
+        await new Promise(r => setTimeout(r, 1000));
+    }
+}
+
+function togglePauseBroadcastQueue() {
+    isBroadcastPaused = !isBroadcastPaused;
+    const btn = document.getElementById('btnPauseBroadcast');
+    if (btn) {
+        if (isBroadcastPaused) {
+            btn.className = 'btn btn-success rounded-pill px-4 fw-bold btn-sm';
+            btn.innerHTML = '<i class="bi bi-play-circle-fill me-1"></i> Lanjutkan Antrean';
+        } else {
+            btn.className = 'btn btn-outline-warning rounded-pill px-4 fw-bold btn-sm';
+            btn.innerHTML = '<i class="bi bi-pause-circle-fill me-1"></i> Jeda Sementara';
+        }
+    }
+}
+
+function appendBroadcastLog(line) {
+    const consoleLog = document.getElementById('broadcastConsoleLog');
+    if (!consoleLog) return;
+    consoleLog.textContent += `[${new Date().toLocaleTimeString('id-ID')}] ${line}\n`;
+    consoleLog.scrollTop = consoleLog.scrollHeight;
+}
+
+// =========================================================================
+// MASTER QUEUE RUNNER: OPENWA 8-LAYER ANTI-BAN / ASISTEN 1-KLIK / FONNTE
+// =========================================================================
 async function startBroadcastQueue() {
     if (currentBroadcastTargets.length === 0) {
         Swal.fire({
@@ -2503,42 +2816,221 @@ async function startBroadcastQueue() {
         return;
     }
 
-    const sendMethod = document.querySelector('input[name="send_method"]:checked')?.value || 'direct';
+    const sendMethod = document.querySelector('input[name="send_method"]:checked')?.value || 'openwa';
 
-    // ----------------------------------------------------
-    // JIKA MODE ASISTEN 1-KLIK (SANGAT AMAN & TANPA FONNTE)
-    // ----------------------------------------------------
+    // 1. MODE ASISTEN 1-KLIK
     if (sendMethod === 'direct') {
         document.getElementById('broadcastSetupScreen').classList.add('d-none');
         document.getElementById('broadcastDirectAssistantScreen').classList.remove('d-none');
         document.getElementById('broadcastProgressScreen').classList.add('d-none');
         document.getElementById('broadcastModalFooter').classList.add('d-none');
-
         directTargetIndex = 0;
         renderDirectCurrentTarget();
         return;
     }
 
-    // ----------------------------------------------------
-    // JIKA MODE BOT GATEWAY FONNTE
-    // ----------------------------------------------------
-    const delaySec = parseInt(document.getElementById('broadcastDelaySelect').value) || 10;
+    // 2. MODE OPENWA 8-LAPIS ANTI-BAN PRO
+    if (sendMethod === 'openwa') {
+        const profileKey = document.getElementById('openwaPacingProfile')?.value || 'ultra';
+        const PACING = {
+            ultra:  { label: 'Ultra Aman (25–50 dtk + istirahat 3 mnt / 10 pesan)', minSec: 25, maxSec: 50, batchSize: 10, cooldownSec: 180 },
+            normal: { label: 'Normal Aman (15–30 dtk + istirahat 2 mnt / 15 pesan)', minSec: 15, maxSec: 30, batchSize: 15, cooldownSec: 120 },
+            fast:   { label: 'Cepat (8–18 dtk + istirahat 1 mnt / 20 pesan)',       minSec: 8,  maxSec: 18, batchSize: 20, cooldownSec: 60  }
+        };
+        const pace = PACING[profileKey] || PACING.ultra;
+
+        const sessionMode      = document.getElementById('openwaSessionSelect')?.value || 'auto_rotate';
+        const precheckWa       = document.getElementById('chkOpenwaPrecheck')?.checked ? 1 : 0;
+        const skipRecent       = document.getElementById('chkOpenwaDedup')?.checked ? 1 : 0;
+        const simulateTyping   = document.getElementById('chkOpenwaTyping')?.checked ? 1 : 0;
+        const enableSpintax    = document.getElementById('chkOpenwaSpintax')?.checked ? 1 : 0;
+        const logFu            = document.getElementById('chkOpenwaLogFu')?.checked ? 1 : 0;
+        const enforceWorkHours = document.getElementById('chkOpenwaWorkHours')?.checked ? 1 : 0;
+
+        const confirmRes = await Swal.fire({
+            title: 'Jalankan OpenWA Anti-Ban Pro?',
+            html: `Target: <b>${currentBroadcastTargets.length} toko</b><br>Profil: <b>${pace.label}</b><br><small class="text-muted">Nomor mati &amp; toko duplikat akan dilewati otomatis demi keamanan akun WA sales.</small>`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '🚀 Ya, Mulai Aman',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#10B981'
+        });
+        if (!confirmRes.isConfirmed) return;
+
+        prepareProgressScreen('Menjalankan OpenWA 8-Layer Anti-Ban Engine...');
+        appendBroadcastLog(`🛡️ OpenWA Anti-Ban dimulai (${currentBroadcastTargets.length} target | Profil: ${profileKey.toUpperCase()})`);
+
+        let successCount = 0;
+        let skipCount    = 0;
+        let failCount    = 0;
+        let sentInBatch  = 0;
+        const total      = currentBroadcastTargets.length;
+
+        for (let i = 0; i < total; i++) {
+            while (isBroadcastPaused && !shouldStopBroadcast) {
+                document.getElementById('txtLiveStatus').textContent = '⏸️ Dijeda sementara...';
+                await new Promise(r => setTimeout(r, 400));
+            }
+            if (shouldStopBroadcast) {
+                appendBroadcastLog('⚠️ Pengiriman dihentikan oleh pengguna.');
+                break;
+            }
+
+            const target = currentBroadcastTargets[i];
+            const currentNum = i + 1;
+            updateProgressBarUI(currentNum, total, `Memproses (${currentNum}/${total}): ${target.nama_toko}...`);
+
+            let wasActuallySent = false;
+
+            try {
+                const fd = new URLSearchParams({
+                    action: 'send_single_openwa',
+                    phone: target.phone,
+                    message: templateText,
+                    customer_id: target.id,
+                    customer_name: target.nama_toko,
+                    customer_pic: target.pic || 'Bpk/Ibu',
+                    customer_city: target.city || '-',
+                    customer_sales: target.sales || 'Sales Loewix',
+                    session_mode: sessionMode,
+                    precheck_wa: precheckWa,
+                    skip_recent: skipRecent,
+                    simulate_typing: simulateTyping,
+                    enable_spintax: enableSpintax,
+                    log_fu: logFu,
+                    enforce_work_hours: enforceWorkHours
+                });
+
+                const res = await fetch('ajax_wa_broadcast.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: fd.toString()
+                }).then(r => r.json());
+
+                if (res.success && res.skipped) {
+                    skipCount++;
+                    const icon = res.skip_reason === 'not_wa' ? '📵' : '⏭️';
+                    appendBroadcastLog(`${icon} (${currentNum}/${total}) SKIP ${target.nama_toko} — ${res.message}`);
+                } else if (res.success) {
+                    successCount++;
+                    sentInBatch++;
+                    wasActuallySent = true;
+                    const senderBadge = document.getElementById('txtActiveSenderBadge');
+                    if (senderBadge) {
+                        senderBadge.innerHTML = `<i class="bi bi-whatsapp me-1"></i> Aktif: ${escapeBroadcastHtml(res.session_label)} • Terpakai ${res.sent_today}/${res.daily_limit} hari ini`;
+                    }
+                    appendBroadcastLog(`✅ (${currentNum}/${total}) TERKIRIM ke ${target.nama_toko} (${res.phone}) via [${res.session_label}] (typing ${res.typing_sec}d • kuota ${res.sent_today}/${res.daily_limit})`);
+                } else {
+                    failCount++;
+                    appendBroadcastLog(`❌ (${currentNum}/${total}) GAGAL ${target.nama_toko}: ${res.message}`);
+                    if (res.stop_queue) {
+                        appendBroadcastLog(`🛑 ANTREAN DIHENTIKAN OTOMATIS DEMI KEAMANAN: ${res.message}`);
+                        break;
+                    }
+                }
+            } catch (err) {
+                failCount++;
+                appendBroadcastLog(`❌ (${currentNum}/${total}) Error jaringan saat menghubungi server CRM.`);
+            }
+
+            document.getElementById('txtSuccessCount').textContent = successCount;
+            document.getElementById('txtSkipCount').textContent    = skipCount;
+            document.getElementById('txtFailCount').textContent    = failCount;
+
+            if (i < total - 1 && !shouldStopBroadcast) {
+                if (!wasActuallySent) {
+                    // Nomor di-skip (bukan WA / duplikat) -> lanjut cepat 1 detik
+                    await waitSmartCountdown(1, '⏭️ Melanjutkan target berikutnya dalam');
+                } else if (sentInBatch >= pace.batchSize) {
+                    // Layer 4B: Batch Cooldown / Coffee Break Anti-Ban
+                    sentInBatch = 0;
+                    appendBroadcastLog(`☕ Istirahat Batch Anti-Ban (${pace.batchSize} pesan terkirim) — jeda aman ${pace.cooldownSec} detik agar akun tetap sehat...`);
+                    await waitSmartCountdown(pace.cooldownSec, '☕ Istirahat Batch Anti-Ban:');
+                } else {
+                    // Layer 4A: Randomized Human Jitter Delay
+                    const jitterSec = Math.floor(Math.random() * (pace.maxSec - pace.minSec + 1)) + pace.minSec;
+                    await waitSmartCountdown(jitterSec, '⏳ Jeda acak manusiawi:');
+                }
+            }
+        }
+
+        finishProgressScreen(successCount, skipCount, failCount);
+        return;
+    }
+
+    // 3. MODE FONNTE LEGACY
+    const delaySec = parseInt(document.getElementById('broadcastDelaySelect').value) || 20;
     const logFu = document.getElementById('checkAutoLogFu').checked ? 1 : 0;
 
     const confirmRes = await Swal.fire({
-        title: 'Mulai Bot Gateway?',
-        html: `Akan mengirim otomatis ke <b>${currentBroadcastTargets.length} toko</b> dengan jeda <b>${delaySec} detik</b> antar pesan.<br><small class='text-muted'>Pesan otomatis dicatat ke CRM.</small>`,
+        title: 'Mulai Bot Gateway Fonnte?',
+        html: `Akan mengirim otomatis ke <b>${currentBroadcastTargets.length} toko</b> dengan jeda acak <b>${delaySec}–${delaySec + 10} detik</b>.`,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Ya, Jalankan Bot',
+        confirmButtonText: 'Ya, Jalankan Fonnte',
         cancelButtonText: 'Batal',
-        confirmButtonColor: '#10B981',
-        cancelButtonColor: '#6B7280'
+        confirmButtonColor: '#10B981'
     });
-
     if (!confirmRes.isConfirmed) return;
 
-    // Switch view ke progress screen
+    prepareProgressScreen('Sedang Mengirim via Gateway Fonnte...');
+    appendBroadcastLog(`🚀 Memulai antrean Fonnte (${currentBroadcastTargets.length} target)...`);
+
+    let successCount = 0;
+    let failCount    = 0;
+    const total      = currentBroadcastTargets.length;
+
+    for (let i = 0; i < total; i++) {
+        if (shouldStopBroadcast) {
+            appendBroadcastLog('⚠️ Pengiriman dihentikan oleh pengguna.');
+            break;
+        }
+        const target = currentBroadcastTargets[i];
+        const currentNum = i + 1;
+        updateProgressBarUI(currentNum, total, `Mengirim ke: ${target.nama_toko}...`);
+
+        const personalizedMsg = renderSpintaxClient(templateText, target, true);
+        try {
+            const fd = new URLSearchParams({
+                action: 'send_single',
+                phone: target.phone,
+                message: personalizedMsg,
+                customer_id: target.id,
+                customer_name: target.nama_toko,
+                log_fu: logFu
+            });
+            const sendResult = await fetch('ajax_wa_broadcast.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: fd.toString()
+            }).then(r => r.json());
+
+            if (sendResult.success) {
+                successCount++;
+                appendBroadcastLog(`✅ (${currentNum}/${total}) Sukses ke ${target.nama_toko} (${target.phone})`);
+            } else {
+                failCount++;
+                appendBroadcastLog(`❌ (${currentNum}/${total}) Gagal ke ${target.nama_toko}: ${sendResult.message}`);
+            }
+        } catch (err) {
+            failCount++;
+            appendBroadcastLog(`❌ (${currentNum}/${total}) Error jaringan ke ${target.nama_toko}`);
+        }
+
+        document.getElementById('txtSuccessCount').textContent = successCount;
+        document.getElementById('txtFailCount').textContent    = failCount;
+
+        if (i < total - 1 && !shouldStopBroadcast) {
+            const randWait = delaySec + Math.floor(Math.random() * 11);
+            await waitSmartCountdown(randWait, '⏳ Jeda aman Fonnte:');
+        }
+    }
+
+    finishProgressScreen(successCount, 0, failCount);
+}
+
+function prepareProgressScreen(headingText) {
     document.getElementById('broadcastSetupScreen').classList.add('d-none');
     document.getElementById('broadcastDirectAssistantScreen')?.classList.add('d-none');
     document.getElementById('broadcastProgressScreen').classList.remove('d-none');
@@ -2548,91 +3040,41 @@ async function startBroadcastQueue() {
     document.getElementById('iconBroadcastDone').classList.remove('d-flex');
     document.getElementById('btnFinishBroadcast').classList.add('d-none');
     document.getElementById('btnCancelBroadcast').classList.remove('d-none');
+    document.getElementById('btnPauseBroadcast').classList.remove('d-none');
+    document.getElementById('txtProgressHeading').textContent = headingText;
+    document.getElementById('txtSuccessCount').textContent = '0';
+    document.getElementById('txtSkipCount').textContent = '0';
+    document.getElementById('txtFailCount').textContent = '0';
+    document.getElementById('broadcastConsoleLog').textContent = '';
 
     isBroadcastRunning = true;
+    isBroadcastPaused  = false;
     shouldStopBroadcast = false;
+}
 
-    const consoleLog = document.getElementById('broadcastConsoleLog');
-    consoleLog.innerHTML = `[${new Date().toLocaleTimeString()}] 🚀 Memulai pengiriman antrean ${currentBroadcastTargets.length} pesan...\n`;
-
-    let successCount = 0;
-    let failCount = 0;
-    const total = currentBroadcastTargets.length;
-
-    for (let i = 0; i < total; i++) {
-        if (shouldStopBroadcast) {
-            consoleLog.innerHTML += `\n[${new Date().toLocaleTimeString()}] ⚠️ Pengiriman dihentikan oleh pengguna.\n`;
-            break;
-        }
-
-        const target = currentBroadcastTargets[i];
-        const currentNum = i + 1;
-
-        // Update progress bar
-        const pct = Math.round((currentNum / total) * 100);
-        const pBar = document.getElementById('progressBarBroadcast');
+function updateProgressBarUI(currentNum, total, liveText) {
+    const pct = Math.round((currentNum / Math.max(1, total)) * 100);
+    const pBar = document.getElementById('progressBarBroadcast');
+    if (pBar) {
         pBar.style.width = pct + '%';
         pBar.textContent = pct + '%';
         pBar.setAttribute('aria-valuenow', pct);
-
-        document.getElementById('txtProgressCount').textContent = `${currentNum} / ${total}`;
-        document.getElementById('txtLiveStatus').textContent = `Mengirim ke: ${target.nama_toko}...`;
-
-        // Render personalized message
-        const personalizedMsg = templateText
-            .replace(/\{nama_toko\}/g, target.nama_toko || 'Toko')
-            .replace(/\{nama_pic\}/g, target.pic || 'Bpk/Ibu')
-            .replace(/\{kota\}/g, target.city || 'Kota Anda')
-            .replace(/\{nama_sales\}/g, target.sales || 'Sales Loewix');
-
-        try {
-            const formData = new URLSearchParams();
-            formData.append('action', 'send_single');
-            formData.append('phone', target.phone);
-            formData.append('message', personalizedMsg);
-            formData.append('customer_id', target.id);
-            formData.append('customer_name', target.nama_toko);
-            formData.append('log_fu', logFu);
-
-            const sendResp = await fetch('ajax_wa_broadcast.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: formData.toString()
-            });
-            const sendResult = await sendResp.json();
-
-            if (sendResult.success) {
-                successCount++;
-                consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ✅ (${currentNum}/${total}) Sukses ke ${target.nama_toko} (${target.phone})\n`;
-            } else {
-                failCount++;
-                consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ (${currentNum}/${total}) Gagal ke ${target.nama_toko}: ${sendResult.message}\n`;
-            }
-        } catch (err) {
-            failCount++;
-            consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ (${currentNum}/${total}) Error jaringan ke ${target.nama_toko}\n`;
-        }
-
-        document.getElementById('txtSuccessCount').textContent = successCount;
-        document.getElementById('txtFailCount').textContent = failCount;
-        consoleLog.scrollTop = consoleLog.scrollHeight;
-
-        // Jeda / Delay aman antar pesan
-        if (i < total - 1 && !shouldStopBroadcast) {
-            document.getElementById('txtLiveStatus').textContent = `Menunggu jeda aman ${delaySec} detik...`;
-            await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
-        }
     }
+    document.getElementById('txtProgressCount').textContent = `${currentNum} / ${total}`;
+    document.getElementById('txtLiveStatus').textContent = liveText;
+}
 
-    // Selesai
+function finishProgressScreen(successCount, skipCount, failCount) {
     isBroadcastRunning = false;
+    isBroadcastPaused  = false;
     document.getElementById('spinnerBroadcasting').classList.add('d-none');
     document.getElementById('iconBroadcastDone').classList.remove('d-none');
     document.getElementById('iconBroadcastDone').classList.add('d-flex');
     document.getElementById('txtProgressHeading').textContent = 'Pengiriman Broadcast Selesai!';
-    document.getElementById('txtProgressSub').textContent = `Total: ${successCount} pesan berhasil dikirim, ${failCount} gagal.`;
+    document.getElementById('txtProgressSub').textContent = `Terkirim: ${successCount} | Di-skip Aman: ${skipCount} | Gagal: ${failCount}`;
     document.getElementById('txtLiveStatus').textContent = 'Selesai';
     document.getElementById('btnCancelBroadcast').classList.add('d-none');
+    document.getElementById('btnPauseBroadcast').classList.add('d-none');
     document.getElementById('btnFinishBroadcast').classList.remove('d-none');
 }
 
@@ -2652,39 +3094,35 @@ async function handleTargetModeChange() {
         if (btnCount) btnCount.textContent = validCount;
 
         if (warningNoPhone) {
-            if (totalSelected > validCount) {
-                warningNoPhone.classList.remove('d-none');
-            } else {
-                warningNoPhone.classList.add('d-none');
-            }
+            warningNoPhone.classList.toggle('d-none', totalSelected <= validCount);
         }
     } else {
-        // Mode Filter: Ambil dari backend sesuai URL filter saat ini
         if (badgeSummary) badgeSummary.textContent = 'Memuat target filter...';
         if (btnCount) btnCount.textContent = '...';
 
         const urlParams = new URLSearchParams(window.location.search);
-        const postData = new URLSearchParams();
-        postData.append('action', 'get_filter_targets');
-        postData.append('filter_kota', urlParams.get('filter_kota') || '');
-        postData.append('filter_kategori', urlParams.get('filter_kategori') || '');
-        postData.append('filter_sales', urlParams.get('filter_sales') || '');
-        postData.append('filter_fu', urlParams.get('filter_fu') || '');
-        postData.append('search', urlParams.get('search') || '');
-        postData.append('max_limit', '100'); // Batch maks 100
+        const postData = new URLSearchParams({
+            action: 'get_filter_targets',
+            filter_kota: urlParams.get('filter_kota') || '',
+            filter_kategori: urlParams.get('filter_kategori') || '',
+            filter_sales: urlParams.get('filter_sales') || '',
+            filter_fu: urlParams.get('filter_fu') || '',
+            search: urlParams.get('search') || '',
+            max_limit: '100'
+        });
 
         try {
-            const resp = await fetch('ajax_wa_broadcast.php', {
+            const data = await fetch('ajax_wa_broadcast.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: postData.toString()
-            });
-            const data = await resp.json();
+            }).then(r => r.json());
+
             if (data.success) {
                 currentBroadcastTargets = data.targets;
                 if (badgeSummary) badgeSummary.textContent = `${data.total} Target (Sesuai Filter)`;
                 if (btnCount) btnCount.textContent = data.total;
-                if (warningNoPhone) warningNoPhone.classList.add('d-none');
+                warningNoPhone?.classList.add('d-none');
             } else {
                 if (badgeSummary) badgeSummary.textContent = '0 Target';
                 if (btnCount) btnCount.textContent = '0';
@@ -2697,7 +3135,7 @@ async function handleTargetModeChange() {
     updateLivePreview();
 }
 
-// Live WhatsApp Preview
+// Live WhatsApp Preview (Support Spintax + Variabel)
 function updateLivePreview() {
     const text = document.getElementById('broadcastMessageText')?.value || '';
     const charCountEl = document.getElementById('txtCharCount');
@@ -2711,17 +3149,15 @@ function updateLivePreview() {
     };
 
     const previewCustomerLabel = document.getElementById('lblPreviewCustomerName');
-    if (previewCustomerLabel) {
-        previewCustomerLabel.textContent = `Contoh: ${sample.nama_toko}`;
-    }
+    if (previewCustomerLabel) previewCustomerLabel.textContent = `Contoh: ${sample.nama_toko}`;
 
-    let parsed = text
-        .replace(/\{nama_toko\}/g, sample.nama_toko || 'Toko')
-        .replace(/\{nama_pic\}/g, sample.pic || 'Bpk/Ibu')
-        .replace(/\{kota\}/g, sample.city || 'Kota Anda')
-        .replace(/\{nama_sales\}/g, sample.sales || 'Sales Loewix');
+    const phoneHeaderName = document.getElementById('waPhoneHeaderName');
+    if (phoneHeaderName) phoneHeaderName.textContent = sample.nama_toko || 'Toko CCTV';
 
-    let htmlParsed = escapeBroadcastHtml(parsed)
+    const useSpintax = document.getElementById('chkOpenwaSpintax')?.checked !== false;
+    const parsed = renderSpintaxClient(text, sample, useSpintax);
+
+    const htmlParsed = escapeBroadcastHtml(parsed)
         .replace(/\*([^\*]+)\*/g, '<strong>$1</strong>')
         .replace(/_([^_]+)_/g, '<em>$1</em>')
         .replace(/\n/g, '<br>');
@@ -2738,11 +3174,10 @@ function updateLivePreview() {
 
 function escapeBroadcastHtml(text) {
     const div = document.createElement('div');
-    div.textContent = text;
+    div.textContent = text == null ? '' : String(text);
     return div.innerHTML;
 }
 
-// Sisipkan Tag Variabel
 function insertVariableTag(tag) {
     const textarea = document.getElementById('broadcastMessageText');
     if (!textarea) return;
@@ -2756,7 +3191,6 @@ function insertVariableTag(tag) {
     updateLivePreview();
 }
 
-// Pilih Template Cepat
 function applyQuickTemplate() {
     const sel = document.getElementById('selectQuickTemplate');
     const val = sel.value;
@@ -2766,144 +3200,9 @@ function applyQuickTemplate() {
     }
 }
 
-// Start Broadcast Queue Execution
-async function startBroadcastQueue() {
-    if (currentBroadcastTargets.length === 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Tidak Ada Target',
-            text: 'Silakan pilih toko yang ingin dikirimi broadcast atau gunakan mode filter.',
-            confirmButtonColor: '#059669'
-        });
-        return;
-    }
-
-    const templateText = document.getElementById('broadcastMessageText').value.trim();
-    if (!templateText) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Pesan Kosong',
-            text: 'Tuliskan pesan broadcast terlebih dahulu.',
-            confirmButtonColor: '#059669'
-        });
-        return;
-    }
-
-    const delaySec = parseInt(document.getElementById('broadcastDelaySelect').value) || 5;
-    const logFu = document.getElementById('checkAutoLogFu').checked ? 1 : 0;
-
-    const confirmRes = await Swal.fire({
-        title: 'Mulai Kirim Broadcast?',
-        html: `Akan mengirim pesan ke <b>${currentBroadcastTargets.length} toko</b> dengan jeda aman <b>${delaySec} detik</b> antar pesan.<br><small class='text-muted'>Pesan akan otomatis dicatat ke follow up CRM.</small>`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, Kirim Sekarang!',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: '#10B981',
-        cancelButtonColor: '#6B7280'
-    });
-
-    if (!confirmRes.isConfirmed) return;
-
-    // Switch view ke progress screen
-    document.getElementById('broadcastSetupScreen').classList.add('d-none');
-    document.getElementById('broadcastProgressScreen').classList.remove('d-none');
-    document.getElementById('broadcastModalFooter').classList.add('d-none');
-    document.getElementById('spinnerBroadcasting').classList.remove('d-none');
-    document.getElementById('iconBroadcastDone').classList.add('d-none');
-    document.getElementById('iconBroadcastDone').classList.remove('d-flex');
-    document.getElementById('btnFinishBroadcast').classList.add('d-none');
-    document.getElementById('btnCancelBroadcast').classList.remove('d-none');
-
-    isBroadcastRunning = true;
-    shouldStopBroadcast = false;
-
-    const consoleLog = document.getElementById('broadcastConsoleLog');
-    consoleLog.innerHTML = `[${new Date().toLocaleTimeString()}] 🚀 Memulai pengiriman antrean ${currentBroadcastTargets.length} pesan...\n`;
-
-    let successCount = 0;
-    let failCount = 0;
-    const total = currentBroadcastTargets.length;
-
-    for (let i = 0; i < total; i++) {
-        if (shouldStopBroadcast) {
-            consoleLog.innerHTML += `\n[${new Date().toLocaleTimeString()}] ⚠️ Pengiriman dihentikan oleh pengguna.\n`;
-            break;
-        }
-
-        const target = currentBroadcastTargets[i];
-        const currentNum = i + 1;
-
-        // Update progress bar
-        const pct = Math.round((currentNum / total) * 100);
-        const pBar = document.getElementById('progressBarBroadcast');
-        pBar.style.width = pct + '%';
-        pBar.textContent = pct + '%';
-        pBar.setAttribute('aria-valuenow', pct);
-
-        document.getElementById('txtProgressCount').textContent = `${currentNum} / ${total}`;
-        document.getElementById('txtLiveStatus').textContent = `Mengirim ke: ${target.nama_toko}...`;
-
-        // Render personalized message
-        const personalizedMsg = templateText
-            .replace(/\{nama_toko\}/g, target.nama_toko || 'Toko')
-            .replace(/\{nama_pic\}/g, target.pic || 'Bpk/Ibu')
-            .replace(/\{kota\}/g, target.city || 'Kota Anda')
-            .replace(/\{nama_sales\}/g, target.sales || 'Sales Loewix');
-
-        try {
-            const formData = new URLSearchParams();
-            formData.append('action', 'send_single');
-            formData.append('phone', target.phone);
-            formData.append('message', personalizedMsg);
-            formData.append('customer_id', target.id);
-            formData.append('customer_name', target.nama_toko);
-            formData.append('log_fu', logFu);
-
-            const sendResp = await fetch('ajax_wa_broadcast.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: formData.toString()
-            });
-            const sendResult = await sendResp.json();
-
-            if (sendResult.success) {
-                successCount++;
-                consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ✅ (${currentNum}/${total}) Sukses ke ${target.nama_toko} (${target.phone})\n`;
-            } else {
-                failCount++;
-                consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ (${currentNum}/${total}) Gagal ke ${target.nama_toko}: ${sendResult.message}\n`;
-            }
-        } catch (err) {
-            failCount++;
-            consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ (${currentNum}/${total}) Error jaringan ke ${target.nama_toko}\n`;
-        }
-
-        document.getElementById('txtSuccessCount').textContent = successCount;
-        document.getElementById('txtFailCount').textContent = failCount;
-        consoleLog.scrollTop = consoleLog.scrollHeight;
-
-        // Jeda / Delay aman antar pesan
-        if (i < total - 1 && !shouldStopBroadcast) {
-            document.getElementById('txtLiveStatus').textContent = `Menunggu jeda aman ${delaySec} detik...`;
-            await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
-        }
-    }
-
-    // Selesai
-    isBroadcastRunning = false;
-    document.getElementById('spinnerBroadcasting').classList.add('d-none');
-    document.getElementById('iconBroadcastDone').classList.remove('d-none');
-    document.getElementById('iconBroadcastDone').classList.add('d-flex');
-    document.getElementById('txtProgressHeading').textContent = 'Pengiriman Broadcast Selesai!';
-    document.getElementById('txtProgressSub').textContent = `Total: ${successCount} pesan berhasil dikirim, ${failCount} gagal.`;
-    document.getElementById('txtLiveStatus').textContent = 'Selesai';
-    document.getElementById('btnCancelBroadcast').classList.add('d-none');
-    document.getElementById('btnFinishBroadcast').classList.remove('d-none');
-}
-
 function cancelBroadcastQueue() {
     shouldStopBroadcast = true;
+    isBroadcastPaused = false;
     document.getElementById('txtLiveStatus').textContent = 'Menghentikan pengiriman...';
 }
 

@@ -1,0 +1,28 @@
+services:
+  openwa:
+    image: ghcr.io/rmyndharis/openwa:latest
+    container_name: openwa-api
+    restart: unless-stopped
+    stop_grace_period: 75s
+    ports:
+      # Hanya bind ke localhost (aman, tidak terekspos langsung ke internet publik)
+      - "127.0.0.1:2785:2785"
+    environment:
+      - NODE_ENV=production
+      - PORT=2785
+      - TZ=Asia/Jakarta
+      # Baileys jauh lebih stabil, hemat RAM (~150-300MB), tanpa Chromium berat
+      - ENGINE_TYPE=baileys
+      # Otomatis hidupkan ulang semua sesi WA sales setelah server restart
+      - AUTO_START_SESSIONS=true
+      # Simulasi indikator "sedang mengetik..." bawaan OpenWA untuk anti-ban
+      - SIMULATE_TYPING=true
+      # Aktifkan Swagger docs lokal untuk troubleshooting jika perlu
+      - ENABLE_SWAGGER=true
+    volumes:
+      # Named volume agar tidak pernah kena masalah permission folder host
+      - openwa_data:/app/data
+
+volumes:
+  openwa_data:
+    name: loewix_openwa_data

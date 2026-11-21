@@ -6,9 +6,10 @@
  * Proteksi Keamanan Sandi Superadmin: Wagyu31
  */
 
-$page_title = 'Pusat Pesan Bantuan WhatsApp';
+$page_title = 'Pusat Pesan Bantuan & OpenWA Gateway';
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
+require_once 'includes/openwa_helper.php';
 
 if (strtolower(trim($_SESSION['role'] ?? '')) !== 'superadmin') {
     $_SESSION['flash_message_error'] = "Akses ditolak. Halaman ini hanya untuk Super Admin.";
@@ -16,6 +17,7 @@ if (strtolower(trim($_SESSION['role'] ?? '')) !== 'superadmin') {
     exit();
 }
 
+ensureOpenWATables($conn);
 define('GATEWAY_AUTH_KEY', 'Wagyu31');
 
 // Pastikan tabel support_messages sudah ada
@@ -37,19 +39,30 @@ $conn->query("
 $msg_success = '';
 $msg_error = '';
 
-// Proses Simpan Pengaturan (Superadmin)
+// Proses Simpan Pengaturan OpenWA Self-Hosted (Superadmin)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_openwa_settings'])) {
+    saveOpenWAConfig($conn, [
+        'base_url'        => $_POST['openwa_base_url'] ?? 'http://127.0.0.1:2785',
+        'api_key'         => $_POST['openwa_api_key'] ?? '',
+        'dedup_days'      => $_POST['openwa_dedup_days'] ?? 7,
+        'work_hours_only' => isset($_POST['openwa_work_hours_only']) ? 1 : 0,
+    ]);
+    $msg_success = "Konfigurasi OpenWA Self-Hosted & Anti-Ban berhasil disimpan!";
+}
+
+// Proses Simpan Pengaturan Fonnte (Superadmin) — merge agar konfigurasi OpenWA tidak tertimpa
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
     $wa_target = trim($_POST['wa_support_number'] ?? '085771593522');
     $fonnte_token = trim($_POST['fonnte_token'] ?? '');
 
-    // 1. Simpan ke JSON file (terproteksi di .gitignore, tidak pernah terpush)
+    // 1. Simpan ke JSON file (merge dengan data lama agar openwa_* tetap aman)
     $configFile = __DIR__ . '/includes/wa_gateway_config.json';
-    $configData = [
-        'wa_support_number' => $wa_target,
-        'fonnte_token' => $fonnte_token,
-        'updated_at' => date('Y-m-d H:i:s')
-    ];
-    @file_put_contents($configFile, json_encode($configData, JSON_PRETTY_PRINT));
+    $configData = file_exists($configFile) ? json_decode(@file_get_contents($configFile), true) : [];
+    if (!is_array($configData)) $configData = [];
+    $configData['wa_support_number'] = $wa_target;
+    $configData['fonnte_token']      = $fonnte_token;
+    $configData['updated_at']        = date('Y-m-d H:i:s');
+    @file_put_contents($configFile, json_encode($configData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
     // 2. Pastikan kolom setting_value di DB support TEXT panjang
     @$conn->query("ALTER TABLE settings MODIFY COLUMN setting_value TEXT NULL");
@@ -144,6 +157,11 @@ if (empty($current_token)) {
 // Ambil Daftar Pesan Masuk
 $resMessages = $conn->query("SELECT * FROM support_messages ORDER BY id DESC LIMIT 100");
 $messages = $resMessages ? $resMessages->fetch_all(MYSQLI_ASSOC) : [];
+
+// Ambil Konfigurasi OpenWA & Daftar Sales untuk Mapping Nomor
+$openwa_cfg = getOpenWAConfig($conn);
+$resSalesList = $conn->query("SELECT id, nama_lengkap, role FROM sales WHERE deleted_at IS NULL ORDER BY nama_lengkap ASC");
+$salesList = $resSalesList ? $resSalesList->fetch_all(MYSQLI_ASSOC) : [];
 
 $totalMessages = count($messages);
 $sentMessages = 0;
@@ -471,6 +489,150 @@ require_once 'includes/header.php';
             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
+
+    <!-- =======================================================================
+         OPENWA SELF-HOSTED MULTI-SESSION & 8-LAYER ANTI-BAN COMMAND CENTER
+         ======================================================================= -->
+    <div class="premium-card p-4 mb-4" style="border-top: 4px solid #10b981;">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3 pb-3 border-bottom">
+            <div class="d-flex align-items-center gap-2.5">
+                <div class="card-title-icon" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff;">
+                    <i class="bi bi-shield-fill-check"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h5 class="fw-bold text-dark mb-0">OpenWA Self-Hosted Gateway — 8 Lapis Anti-Ban</h5>
+                        <span class="status-pill" id="openwaLiveBadge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
+                            <span class="spinner-border spinner-border-sm" style="width:10px;height:10px;"></span> Mengecek server...
+                        </span>
+                    </div>
+                    <span class="text-muted small">Multi-Nomor Sales (Rotasi Otomatis), Pre-Check WA, Typing Manusiawi, Spintax, Daily Cap &amp; Circuit Breaker.</span>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold" onclick="loadOpenwaDashboard()">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh Live
+                </button>
+                <button type="button" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="quickSetup4Sales()">
+                    <i class="bi bi-lightning-charge-fill me-1"></i> Setup Cepat 4 Nomor Sales
+                </button>
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="openAddSessionModal()">
+                    <i class="bi bi-plus-circle-fill me-1"></i> Tambah Nomor WA
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Kiri: Koneksi Server OpenWA & Guardrail Global -->
+            <div class="col-lg-4 col-12">
+                <div class="p-3.5 rounded-4 h-100" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-1.5">
+                        <i class="bi bi-hdd-network-fill text-success"></i> Koneksi Server OpenWA (Docker)
+                    </h6>
+                    <form method="POST" action="wa_support_settings.php">
+                        <input type="hidden" name="save_openwa_settings" value="1">
+                        <div class="mb-2.5">
+                            <label class="form-label-custom"><span>URL API OpenWA</span></label>
+                            <input type="text" name="openwa_base_url" class="form-control form-control-sm font-monospace" value="<?= htmlspecialchars($openwa_cfg['base_url']) ?>" placeholder="http://127.0.0.1:2785" required>
+                            <small class="text-muted" style="font-size:10.5px;">Default lokal Docker: <code>http://127.0.0.1:2785</code></small>
+                        </div>
+                        <div class="mb-2.5">
+                            <label class="form-label-custom"><span>API Key OpenWA (X-API-Key)</span></label>
+                            <div class="input-group input-group-sm">
+                                <input type="password" name="openwa_api_key" id="openwaApiKeyInput" class="form-control font-monospace" value="<?= htmlspecialchars($openwa_cfg['api_key']) ?>" placeholder="owa_k1_...">
+                                <button class="btn btn-outline-secondary" type="button" onclick="toggleOpenwaKeyEye()" title="Lihat/Sembunyikan">
+                                    <i class="bi bi-eye-slash-fill" id="iconOpenwaKeyEye"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted" style="font-size:10.5px;">Otomatis terisi jika menjalankan <code>install_openwa.sh</code></small>
+                        </div>
+                        <div class="row g-2 mb-2.5">
+                            <div class="col-6">
+                                <label class="form-label-custom"><span>Anti-Spam Ganda</span></label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" name="openwa_dedup_days" class="form-control fw-bold" min="0" max="90" value="<?= (int)$openwa_cfg['dedup_days'] ?>">
+                                    <span class="input-group-text">Hari</span>
+                                </div>
+                            </div>
+                            <div class="col-6 d-flex align-items-end">
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input" type="checkbox" name="openwa_work_hours_only" id="chkWorkHours" value="1" <?= !empty($openwa_cfg['work_hours_only']) ? 'checked' : '' ?>>
+                                    <label class="form-check-label small fw-bold text-dark" for="chkWorkHours" style="font-size:11px;">Jam Kerja 08–20</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-sm w-100 rounded-3 fw-bold py-2 shadow-sm">
+                            <i class="bi bi-save2-fill me-1"></i> Simpan Konfigurasi OpenWA
+                        </button>
+                    </form>
+
+                    <!-- Panduan Ringkas Install Server -->
+                    <div class="mt-3 p-2.5 rounded-3 bg-white border" style="font-size: 11px;">
+                        <div class="fw-bold text-dark mb-1"><i class="bi bi-terminal-fill text-primary me-1"></i> Pasang OpenWA di Server (1 Perintah):</div>
+                        <code class="d-block p-1.5 rounded bg-dark text-light user-select-all" style="font-size: 10px; word-break: break-all;">sudo bash /www/wwwroot/sales.id-giti.com/openwa-docker/install_openwa.sh</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kanan: Statistik Anti-Ban Hari Ini + Daftar Multi-Session Sales -->
+            <div class="col-lg-8 col-12">
+                <!-- Strip Statistik Anti-Ban Hari Ini -->
+                <div class="row g-2.5 mb-3">
+                    <div class="col-6 col-md-3">
+                        <div class="kpi-card py-2.5 px-3">
+                            <div class="text-muted fw-semibold" style="font-size:11px;">Terkirim Hari Ini</div>
+                            <div class="fw-bold text-success fs-5" id="statOpenwaSent">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="kpi-card py-2.5 px-3">
+                            <div class="text-muted fw-semibold" style="font-size:11px;">Skip Bukan WA</div>
+                            <div class="fw-bold text-warning fs-5" id="statOpenwaNotWa">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="kpi-card py-2.5 px-3">
+                            <div class="text-muted fw-semibold" style="font-size:11px;">Skip Anti-Duplikat</div>
+                            <div class="fw-bold text-primary fs-5" id="statOpenwaRecent">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="kpi-card py-2.5 px-3">
+                            <div class="text-muted fw-semibold" style="font-size:11px;">Gagal / Breaker</div>
+                            <div class="fw-bold text-danger fs-5" id="statOpenwaFailed">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Offline jika Docker belum menyala -->
+                <div id="openwaOfflineNotice" class="alert alert-warning rounded-4 small py-2.5 px-3 mb-3 d-none">
+                    <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Server OpenWA Belum Terhubung</div>
+                    <div id="openwaOfflineDetail">Pastikan container Docker <code>openwa-api</code> sudah dijalankan di server VPS Anda.</div>
+                </div>
+
+                <!-- Tabel Multi-Session Nomor WA Sales -->
+                <div class="table-responsive rounded-3 border">
+                    <table class="table modern-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nomor &amp; Sales PIC</th>
+                                <th>Status Koneksi</th>
+                                <th style="min-width:170px;">Kuota Aman Harian</th>
+                                <th class="text-end" style="min-width:190px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="openwaSessionsTbody">
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted small">
+                                    <span class="spinner-border spinner-border-sm me-1"></span> Memuat daftar nomor WhatsApp OpenWA...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row g-4 mb-4">
         <!-- ===================================================================
@@ -835,6 +997,498 @@ function filterMessagesTable() {
         row.style.display = text.includes(query) ? '' : 'none';
     });
 }
+</script>
+
+<!-- Modal 1: Live Scan QR Code OpenWA -->
+<div class="modal fade" id="modalOpenwaQr" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #0F172A, #1E293B);">
+                <div>
+                    <h6 class="modal-title fw-bold mb-0"><i class="bi bi-qr-code-scan text-success me-1.5"></i> Tautkan WhatsApp Sales</h6>
+                    <small class="text-white-50" id="qrModalSessionLabel">Memuat sesi...</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div id="qrImageWrapper" class="d-flex align-items-center justify-content-center rounded-4 border bg-light mx-auto mb-3" style="width: 260px; height: 260px;">
+                    <div class="text-muted small">
+                        <div class="spinner-border text-success mb-2" role="status"></div>
+                        <div>Menyiapkan QR Code...</div>
+                    </div>
+                </div>
+                <div class="badge rounded-pill bg-light text-dark border px-3 py-1.5 mb-2" id="qrStatusBadge">Status: initializing</div>
+                <p class="small text-muted mb-0" id="qrHelpText">
+                    Buka WhatsApp di HP sales &rarr; <strong>Perangkat Tertaut</strong> &rarr; <strong>Tautkan Perangkat</strong> lalu arahkan kamera ke QR di atas.
+                </p>
+            </div>
+            <div class="modal-footer border-top py-2.5 px-4 justify-content-between">
+                <small class="text-muted"><i class="bi bi-arrow-repeat"></i> Auto-refresh tiap 3 detik</small>
+                <button type="button" class="btn btn-light btn-sm rounded-pill px-3 fw-bold" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: Tambah Sesi Nomor WA Baru -->
+<div class="modal fade" id="modalAddOpenwaSession" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #0F172A, #1E293B);">
+                <h6 class="modal-title fw-bold mb-0"><i class="bi bi-plus-circle-fill text-success me-1.5"></i> Tambah Nomor WA Sales (OpenWA)</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formAddOpenwaSession" onsubmit="submitAddOpenwaSession(event)">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Nama / Label Sesi</label>
+                        <input type="text" id="addSessLabel" class="form-control" placeholder="Contoh: Sales Edi (0877-0019-1818)" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Nomor WhatsApp Sales</label>
+                        <input type="text" id="addSessPhone" class="form-control" placeholder="087700191818 / +62 877-0019-1818" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Mapping ke Akun Sales CRM (Opsional)</label>
+                        <select id="addSessSalesId" class="form-select">
+                            <option value="0">-- Pool Rotasi Bersama (Semua Sales) --</option>
+                            <?php foreach ($salesList as $sl): ?>
+                                <option value="<?= (int)$sl['id'] ?>"><?= htmlspecialchars($sl['nama_lengkap']) ?> (<?= htmlspecialchars($sl['role']) ?>)</option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-7">
+                            <label class="form-label small fw-bold">Mode Keamanan Anti-Ban</label>
+                            <select id="addSessMode" class="form-select" onchange="syncLimitByMode('addSessMode','addSessLimit')">
+                                <option value="warmup" selected>🛡️ Warmup (20 pesan/hari — Paling Aman)</option>
+                                <option value="normal">⚖️ Normal (45 pesan/hari — Nomor Lama)</option>
+                                <option value="boost">⚡ Boost (75 pesan/hari — Nomor Terlatih)</option>
+                            </select>
+                        </div>
+                        <div class="col-5">
+                            <label class="form-label small fw-bold">Limit Harian</label>
+                            <input type="number" id="addSessLimit" class="form-control fw-bold" min="5" max="150" value="20" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top px-4 py-3">
+                    <button type="button" class="btn btn-light rounded-pill px-3 fw-semibold" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" id="btnSubmitAddSess">
+                        <i class="bi bi-check2-circle me-1"></i> Buat Sesi &amp; Siapkan QR
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 3: Edit Konfigurasi Anti-Ban Sesi -->
+<div class="modal fade" id="modalEditOpenwaSession" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #0F172A, #1E293B);">
+                <h6 class="modal-title fw-bold mb-0"><i class="bi bi-sliders text-info me-1.5"></i> Pengaturan Kuota &amp; Anti-Ban Sesi</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditOpenwaSession" onsubmit="submitEditOpenwaSession(event)">
+                <input type="hidden" id="editSessId">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Label Sesi</label>
+                        <input type="text" id="editSessLabel" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Nomor WhatsApp</label>
+                        <input type="text" id="editSessPhone" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Akun Sales PIC</label>
+                        <select id="editSessSalesId" class="form-select">
+                            <option value="0">-- Pool Rotasi Bersama (Semua Sales) --</option>
+                            <?php foreach ($salesList as $sl): ?>
+                                <option value="<?= (int)$sl['id'] ?>"><?= htmlspecialchars($sl['nama_lengkap']) ?> (<?= htmlspecialchars($sl['role']) ?>)</option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-7">
+                            <label class="form-label small fw-bold">Mode Keamanan</label>
+                            <select id="editSessMode" class="form-select" onchange="syncLimitByMode('editSessMode','editSessLimit')">
+                                <option value="warmup">🛡️ Warmup (20/hari)</option>
+                                <option value="normal">⚖️ Normal (45/hari)</option>
+                                <option value="boost">⚡ Boost (75/hari)</option>
+                            </select>
+                        </div>
+                        <div class="col-5">
+                            <label class="form-label small fw-bold">Limit Harian</label>
+                            <input type="number" id="editSessLimit" class="form-control fw-bold" min="5" max="150" required>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="editSessActive" checked>
+                        <label class="form-check-label small fw-bold" for="editSessActive">Aktifkan nomor ini dalam rotasi broadcast</label>
+                    </div>
+                </div>
+                <div class="modal-footer border-top px-4 py-3">
+                    <button type="button" class="btn btn-light rounded-pill px-3 fw-semibold" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+let openwaSessionsCache = [];
+let openwaQrPollTimer = null;
+let openwaQrActiveSessionId = '';
+
+function toggleOpenwaKeyEye() {
+    const inp = document.getElementById('openwaApiKeyInput');
+    const ic  = document.getElementById('iconOpenwaKeyEye');
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        ic.className = 'bi bi-eye-fill text-primary';
+    } else {
+        inp.type = 'password';
+        ic.className = 'bi bi-eye-slash-fill';
+    }
+}
+
+function syncLimitByMode(selectId, limitId) {
+    const mode = document.getElementById(selectId)?.value;
+    const limEl = document.getElementById(limitId);
+    if (!limEl) return;
+    if (mode === 'warmup') limEl.value = 20;
+    else if (mode === 'normal') limEl.value = 45;
+    else if (mode === 'boost') limEl.value = 75;
+}
+
+function escapeOpenwaHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+}
+
+async function loadOpenwaDashboard() {
+    const badge = document.getElementById('openwaLiveBadge');
+    const notice = document.getElementById('openwaOfflineNotice');
+    const noticeDetail = document.getElementById('openwaOfflineDetail');
+    const tbody = document.getElementById('openwaSessionsTbody');
+
+    try {
+        const [hResp, lResp] = await Promise.all([
+            fetch('ajax_wa_broadcast.php?action=openwa_health').then(r => r.json()),
+            fetch('ajax_wa_broadcast.php?action=openwa_list_sessions').then(r => r.json())
+        ]);
+
+        if (hResp.online) {
+            const verTxt = hResp.version ? ('v' + hResp.version) : 'Key Belum Valid';
+            badge.style.background = hResp.auth_valid ? '#ecfdf5' : '#fffbeb';
+            badge.style.color      = hResp.auth_valid ? '#065f46' : '#92400e';
+            badge.style.border     = hResp.auth_valid ? '1px solid #a7f3d0' : '1px solid #fde68a';
+            badge.innerHTML        = `<span class="pulse-dot ${hResp.auth_valid ? 'emerald' : 'amber'}"></span> Online (${escapeOpenwaHtml(verTxt)}) • ${hResp.ready_sessions}/${hResp.total_sessions} Ready`;
+            notice.classList.add('d-none');
+        } else {
+            badge.style.background = '#fff1f2';
+            badge.style.color      = '#9f1239';
+            badge.style.border     = '1px solid #fecdd3';
+            badge.innerHTML        = '<i class="bi bi-x-circle-fill"></i> Offline';
+            notice.classList.remove('d-none');
+            noticeDetail.textContent = hResp.error || 'Server OpenWA belum berjalan di port 2785.';
+        }
+
+        if (lResp.today_stats) {
+            document.getElementById('statOpenwaSent').textContent   = lResp.today_stats.sent || 0;
+            document.getElementById('statOpenwaNotWa').textContent  = lResp.today_stats.skipped_not_wa || 0;
+            document.getElementById('statOpenwaRecent').textContent = lResp.today_stats.skipped_recent || 0;
+            document.getElementById('statOpenwaFailed').textContent = lResp.today_stats.failed || 0;
+        }
+
+        openwaSessionsCache = lResp.sessions || [];
+        renderOpenwaSessionsTable(openwaSessionsCache);
+    } catch (e) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger py-3 small">Gagal memuat status OpenWA.</td></tr>';
+    }
+}
+
+function renderOpenwaSessionsTable(sessions) {
+    const tbody = document.getElementById('openwaSessionsTbody');
+    if (!tbody) return;
+
+    if (!sessions.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center py-4 text-muted small">
+                    <i class="bi bi-phone-vibrate fs-3 d-block mb-1 text-secondary"></i>
+                    Belum ada sesi nomor WA di OpenWA. Klik <strong>"Setup Cepat 4 Nomor Sales"</strong> di kanan atas!
+                </td>
+            </tr>`;
+        return;
+    }
+
+    tbody.innerHTML = sessions.map(s => {
+        const pct = Math.min(100, Math.round((s.sent_today / Math.max(1, s.daily_limit)) * 100));
+        const barColor = pct >= 90 ? 'bg-danger' : (pct >= 65 ? 'bg-warning' : 'bg-success');
+
+        let statusHtml = '';
+        if (s.status === 'ready') {
+            statusHtml = `<span class="status-pill" style="background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;"><span class="pulse-dot emerald"></span> READY</span>`;
+        } else if (s.status === 'qr_ready') {
+            statusHtml = `<span class="status-pill" style="background:#fffbeb;color:#92400e;border:1px solid #fde68a;"><i class="bi bi-qr-code"></i> SIAP SCAN QR</span>`;
+        } else if (s.status === 'initializing' || s.status === 'authenticating') {
+            statusHtml = `<span class="status-pill" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;"><span class="spinner-border spinner-border-sm" style="width:9px;height:9px;"></span> ${escapeOpenwaHtml(s.status)}</span>`;
+        } else {
+            statusHtml = `<span class="status-pill" style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;">${escapeOpenwaHtml(s.status.toUpperCase())}</span>`;
+        }
+
+        let extraWarn = '';
+        if (s.has_restriction) {
+            extraWarn += `<div class="text-danger fw-bold mt-1" style="font-size:10.5px;"><i class="bi bi-shield-exclamation"></i> Pembatasan WA terdeteksi!</div>`;
+        }
+        if (s.is_paused) {
+            const mins = Math.ceil((s.paused_remaining_sec || 60) / 60);
+            extraWarn += `<div class="text-warning-emphasis fw-bold mt-1" style="font-size:10.5px;">
+                <i class="bi bi-pause-circle-fill"></i> Circuit Breaker (${mins} mnt)
+                <a href="javascript:void(0)" class="text-primary ms-1" onclick="doOpenwaSessionAction('${escapeOpenwaHtml(s.session_id)}','reset_breaker')">Reset</a>
+            </div>`;
+        }
+        if (!s.is_active) {
+            extraWarn += `<div class="text-muted mt-1" style="font-size:10.5px;"><i class="bi bi-slash-circle"></i> Nonaktif di rotasi</div>`;
+        }
+
+        const modeBadge = s.mode === 'warmup'
+            ? '<span class="badge bg-info-subtle text-info-emphasis border">Warmup</span>'
+            : (s.mode === 'normal' ? '<span class="badge bg-success-subtle text-success border">Normal</span>' : '<span class="badge bg-warning-subtle text-warning-emphasis border">Boost</span>');
+
+        const scanOrTestBtn = s.status === 'ready'
+            ? `<button type="button" class="btn btn-outline-success btn-sm rounded-pill px-2.5 fw-bold" style="font-size:11px;" onclick="testOpenwaSend('${escapeOpenwaHtml(s.session_id)}','${escapeOpenwaHtml(s.label)}')" title="Tes Kirim 1 Pesan"><i class="bi bi-send-check"></i> Tes</button>`
+            : `<button type="button" class="btn btn-success btn-sm rounded-pill px-2.5 fw-bold" style="font-size:11px;" onclick="openOpenwaQrModal('${escapeOpenwaHtml(s.session_id)}','${escapeOpenwaHtml(s.label)}')"><i class="bi bi-qr-code-scan"></i> Scan QR</button>`;
+
+        return `
+            <tr>
+                <td>
+                    <div class="fw-bold text-dark" style="font-size:12.5px;">${escapeOpenwaHtml(s.label)}</div>
+                    <div class="text-muted" style="font-size:11px;">
+                        <i class="bi bi-whatsapp text-success"></i> ${escapeOpenwaHtml(s.phone_number || 'Belum terdeteksi')}
+                        &bull; <i class="bi bi-person-badge text-primary"></i> ${escapeOpenwaHtml(s.sales_name)}
+                    </div>
+                </td>
+                <td>
+                    ${statusHtml}
+                    ${extraWarn}
+                </td>
+                <td>
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:11px;">
+                        <span>${modeBadge}</span>
+                        <span class="fw-bold text-dark">${s.sent_today} / ${s.daily_limit}</span>
+                    </div>
+                    <div class="progress" style="height:6px; border-radius:10px;">
+                        <div class="progress-bar ${barColor}" style="width:${pct}%"></div>
+                    </div>
+                </td>
+                <td class="text-end text-nowrap">
+                    <div class="d-inline-flex gap-1 align-items-center">
+                        ${scanOrTestBtn}
+                        <button type="button" class="btn btn-light border btn-sm rounded-circle" style="width:28px;height:28px;padding:0;" onclick="openEditSessionModal('${escapeOpenwaHtml(s.session_id)}')" title="Atur Kuota & Sales"><i class="bi bi-sliders"></i></button>
+                        ${s.status === 'ready'
+                            ? `<button type="button" class="btn btn-light border btn-sm rounded-circle text-warning" style="width:28px;height:28px;padding:0;" onclick="doOpenwaSessionAction('${escapeOpenwaHtml(s.session_id)}','stop')" title="Hentikan Sesi"><i class="bi bi-stop-fill"></i></button>`
+                            : `<button type="button" class="btn btn-light border btn-sm rounded-circle text-primary" style="width:28px;height:28px;padding:0;" onclick="doOpenwaSessionAction('${escapeOpenwaHtml(s.session_id)}','start')" title="Jalankan Sesi"><i class="bi bi-play-fill"></i></button>`
+                        }
+                        <button type="button" class="btn btn-light border btn-sm rounded-circle text-danger" style="width:28px;height:28px;padding:0;" onclick="confirmDeleteSession('${escapeOpenwaHtml(s.session_id)}','${escapeOpenwaHtml(s.label)}')" title="Hapus Sesi"><i class="bi bi-trash-fill"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+async function quickSetup4Sales() {
+    const res = await Swal.fire({
+        title: 'Setup Cepat 4 Nomor Sales Loewix?',
+        html: 'Akan membuat 4 sesi OpenWA dalam <b>Mode Warmup Aman (20/hari)</b>:<br><small class="text-muted">0877-0019-1818 &bull; 0819-9699-1818 &bull; 0819-5899-1818 &bull; 0819-5299-1818</small>',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Buat 4 Sesi',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#10b981'
+    });
+    if (!res.isConfirmed) return;
+
+    Swal.fire({ title: 'Membuat 4 sesi di OpenWA...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    const fd = new URLSearchParams({ action: 'openwa_quick_setup_sales' });
+    const data = await fetch('ajax_wa_broadcast.php', { method: 'POST', body: fd }).then(r => r.json());
+    Swal.fire({ icon: data.success ? 'success' : 'error', title: data.success ? 'Berhasil!' : 'Gagal', text: data.message });
+    loadOpenwaDashboard();
+}
+
+function openAddSessionModal() {
+    document.getElementById('formAddOpenwaSession').reset();
+    document.getElementById('addSessLimit').value = 20;
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAddOpenwaSession')).show();
+}
+
+async function submitAddOpenwaSession(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmitAddSess');
+    btn.disabled = true;
+    const fd = new URLSearchParams({
+        action: 'openwa_create_session',
+        label: document.getElementById('addSessLabel').value,
+        phone_number: document.getElementById('addSessPhone').value,
+        sales_id: document.getElementById('addSessSalesId').value,
+        mode: document.getElementById('addSessMode').value,
+        daily_limit: document.getElementById('addSessLimit').value
+    });
+    try {
+        const data = await fetch('ajax_wa_broadcast.php', { method: 'POST', body: fd }).then(r => r.json());
+        bootstrap.Modal.getInstance(document.getElementById('modalAddOpenwaSession'))?.hide();
+        await loadOpenwaDashboard();
+        if (data.success && data.session_id) {
+            openOpenwaQrModal(data.session_id, document.getElementById('addSessLabel').value);
+        } else {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
+        }
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+function openEditSessionModal(sessionId) {
+    const s = openwaSessionsCache.find(x => x.session_id === sessionId);
+    if (!s) return;
+    document.getElementById('editSessId').value = s.session_id;
+    document.getElementById('editSessLabel').value = s.label;
+    document.getElementById('editSessPhone').value = s.phone_number || '';
+    document.getElementById('editSessSalesId').value = s.sales_id || 0;
+    document.getElementById('editSessMode').value = s.mode || 'warmup';
+    document.getElementById('editSessLimit').value = s.daily_limit || 20;
+    document.getElementById('editSessActive').checked = !!s.is_active;
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditOpenwaSession')).show();
+}
+
+async function submitEditOpenwaSession(e) {
+    e.preventDefault();
+    const fd = new URLSearchParams({
+        action: 'openwa_session_action',
+        op: 'update_config',
+        session_id: document.getElementById('editSessId').value,
+        label: document.getElementById('editSessLabel').value,
+        phone_number: document.getElementById('editSessPhone').value,
+        sales_id: document.getElementById('editSessSalesId').value,
+        mode: document.getElementById('editSessMode').value,
+        daily_limit: document.getElementById('editSessLimit').value,
+        is_active: document.getElementById('editSessActive').checked ? '1' : '0'
+    });
+    const data = await fetch('ajax_wa_broadcast.php', { method: 'POST', body: fd }).then(r => r.json());
+    bootstrap.Modal.getInstance(document.getElementById('modalEditOpenwaSession'))?.hide();
+    Swal.fire({ icon: data.success ? 'success' : 'error', title: data.success ? 'Tersimpan' : 'Gagal', text: data.message, timer: 1600, showConfirmButton: false });
+    loadOpenwaDashboard();
+}
+
+async function doOpenwaSessionAction(sessionId, op) {
+    const fd = new URLSearchParams({ action: 'openwa_session_action', session_id: sessionId, op: op });
+    const data = await fetch('ajax_wa_broadcast.php', { method: 'POST', body: fd }).then(r => r.json());
+    if (!data.success) {
+        Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
+    }
+    loadOpenwaDashboard();
+}
+
+async function confirmDeleteSession(sessionId, label) {
+    const r = await Swal.fire({
+        title: 'Hapus Sesi?',
+        text: `Sesi "${label}" akan dihapus dari OpenWA & CRM.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal'
+    });
+    if (r.isConfirmed) {
+        await doOpenwaSessionAction(sessionId, 'delete');
+    }
+}
+
+async function testOpenwaSend(sessionId, label) {
+    const { value: phone } = await Swal.fire({
+        title: `Tes Kirim via ${label}`,
+        input: 'text',
+        inputLabel: 'Masukkan Nomor WA Tujuan Tes (misal nomor HP Anda):',
+        inputValue: '<?= htmlspecialchars($current_wa) ?>',
+        showCancelButton: true,
+        confirmButtonText: 'Kirim Tes',
+        confirmButtonColor: '#10b981'
+    });
+    if (!phone) return;
+    Swal.fire({ title: 'Mengirim tes (simulasi mengetik)...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    const fd = new URLSearchParams({ action: 'openwa_test_send', session_id: sessionId, phone: phone });
+    const data = await fetch('ajax_wa_broadcast.php', { method: 'POST', body: fd }).then(r => r.json());
+    Swal.fire({ icon: data.success ? 'success' : 'error', title: data.success ? 'Terkirim!' : 'Gagal', text: data.message });
+}
+
+function openOpenwaQrModal(sessionId, label) {
+    openwaQrActiveSessionId = sessionId;
+    document.getElementById('qrModalSessionLabel').textContent = label;
+    document.getElementById('qrStatusBadge').textContent = 'Menyiapkan sesi...';
+    document.getElementById('qrImageWrapper').innerHTML = '<div class="text-muted small"><div class="spinner-border text-success mb-2"></div><div>Meminta QR Code...</div></div>';
+
+    const modalEl = document.getElementById('modalOpenwaQr');
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+
+    pollOpenwaQr();
+    if (openwaQrPollTimer) clearInterval(openwaQrPollTimer);
+    openwaQrPollTimer = setInterval(pollOpenwaQr, 3000);
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+        if (openwaQrPollTimer) {
+            clearInterval(openwaQrPollTimer);
+            openwaQrPollTimer = null;
+        }
+        loadOpenwaDashboard();
+    }, { once: true });
+}
+
+async function pollOpenwaQr() {
+    if (!openwaQrActiveSessionId) return;
+    try {
+        const data = await fetch('ajax_wa_broadcast.php?action=openwa_get_qr&session_id=' + encodeURIComponent(openwaQrActiveSessionId)).then(r => r.json());
+        const badge = document.getElementById('qrStatusBadge');
+        const wrap  = document.getElementById('qrImageWrapper');
+
+        if (!data.success) {
+            badge.textContent = 'Error';
+            wrap.innerHTML = `<div class="p-3 text-danger small">${escapeOpenwaHtml(data.message)}</div>`;
+            return;
+        }
+
+        badge.textContent = 'Status: ' + (data.status || 'waiting').toUpperCase();
+
+        if (data.status === 'ready') {
+            if (openwaQrPollTimer) clearInterval(openwaQrPollTimer);
+            wrap.innerHTML = `<div class="text-success p-3"><i class="bi bi-check-circle-fill" style="font-size:64px;"></i><div class="fw-bold mt-2">WhatsApp Terhubung!</div><div class="small text-muted">${escapeOpenwaHtml(data.phone || '')}</div></div>`;
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById('modalOpenwaQr'))?.hide();
+                loadOpenwaDashboard();
+            }, 1400);
+            return;
+        }
+
+        if (data.qr) {
+            const qrStr = String(data.qr);
+            if (qrStr.startsWith('data:image')) {
+                wrap.innerHTML = `<img src="${qrStr}" alt="QR WhatsApp" style="width:240px;height:240px;object-fit:contain;border-radius:10px;">`;
+            } else {
+                // Fallback jika OpenWA mengembalikan raw string QR (render via QR image API aman)
+                wrap.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrStr)}" alt="QR WhatsApp" style="width:240px;height:240px;object-fit:contain;border-radius:10px;">`;
+            }
+        }
+    } catch (e) {}
+}
+
+document.addEventListener('DOMContentLoaded', loadOpenwaDashboard);
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
