@@ -37,60 +37,51 @@ $conn->query("
 $msg_success = '';
 $msg_error = '';
 
-// Proses Simpan Pengaturan (Wajib sandi Wagyu31)
+// Proses Simpan Pengaturan (Superadmin)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
-    $auth_pass = trim($_POST['admin_auth_pass'] ?? '');
-    if ($auth_pass !== GATEWAY_AUTH_KEY) {
-        $msg_error = "Akses Ditolak: Sandi otorisasi ('Wagyu31') salah atau belum dimasukkan untuk Simpan Konfigurasi!";
-    } else {
-        $wa_target = trim($_POST['wa_support_number'] ?? '085771593522');
-        $fonnte_token = trim($_POST['fonnte_token'] ?? '');
+    $wa_target = trim($_POST['wa_support_number'] ?? '085771593522');
+    $fonnte_token = trim($_POST['fonnte_token'] ?? '');
 
-        // 1. Simpan ke JSON file (terproteksi di .gitignore, tidak pernah terpush)
-        $configFile = __DIR__ . '/includes/wa_gateway_config.json';
-        $configData = [
-            'wa_support_number' => $wa_target,
-            'fonnte_token' => $fonnte_token,
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-        @file_put_contents($configFile, json_encode($configData, JSON_PRETTY_PRINT));
+    // 1. Simpan ke JSON file (terproteksi di .gitignore, tidak pernah terpush)
+    $configFile = __DIR__ . '/includes/wa_gateway_config.json';
+    $configData = [
+        'wa_support_number' => $wa_target,
+        'fonnte_token' => $fonnte_token,
+        'updated_at' => date('Y-m-d H:i:s')
+    ];
+    @file_put_contents($configFile, json_encode($configData, JSON_PRETTY_PRINT));
 
-        // 2. Pastikan kolom setting_value di DB support TEXT panjang
-        @$conn->query("ALTER TABLE settings MODIFY COLUMN setting_value TEXT NULL");
+    // 2. Pastikan kolom setting_value di DB support TEXT panjang
+    @$conn->query("ALTER TABLE settings MODIFY COLUMN setting_value TEXT NULL");
 
-        // 3. Simpan ke database settings
-        @$conn->query("DELETE FROM settings WHERE setting_key IN ('wa_support_number', 'fonnte_token')");
+    // 3. Simpan ke database settings
+    @$conn->query("DELETE FROM settings WHERE setting_key IN ('wa_support_number', 'fonnte_token')");
 
-        $stmt1 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('wa_support_number', ?)");
-        if ($stmt1) {
-            $stmt1->bind_param("s", $wa_target);
-            $stmt1->execute();
-            $stmt1->close();
-        }
-
-        $stmt2 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('fonnte_token', ?)");
-        if ($stmt2) {
-            $stmt2->bind_param("s", $fonnte_token);
-            $stmt2->execute();
-            $stmt2->close();
-        }
-
-        $msg_success = "Pengaturan WhatsApp Gateway & Token Fonnte berhasil diperbarui!";
+    $stmt1 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('wa_support_number', ?)");
+    if ($stmt1) {
+        $stmt1->bind_param("s", $wa_target);
+        $stmt1->execute();
+        $stmt1->close();
     }
+
+    $stmt2 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('fonnte_token', ?)");
+    if ($stmt2) {
+        $stmt2->bind_param("s", $fonnte_token);
+        $stmt2->execute();
+        $stmt2->close();
+    }
+
+    $msg_success = "Pengaturan WhatsApp Gateway & Token Fonnte berhasil diperbarui!";
 }
 
-// Proses Tes Kirim WA (Wajib sandi Wagyu31)
+// Proses Tes Kirim WA (Superadmin)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['test_send_wa'])) {
-    $auth_pass = trim($_POST['admin_auth_pass'] ?? '');
-    if ($auth_pass !== GATEWAY_AUTH_KEY) {
-        $msg_error = "Akses Ditolak: Sandi otorisasi ('Wagyu31') salah untuk melakukan tes pengiriman WhatsApp!";
-    } else {
-        $test_target = trim($_POST['test_target'] ?? '085771593522');
-        $test_token = trim($_POST['test_token'] ?? '');
+    $test_target = trim($_POST['test_target'] ?? '085771593522');
+    $test_token = trim($_POST['test_token'] ?? '');
 
-        if (empty($test_token)) {
-            $msg_error = "Token Fonnte belum diisi. Masukkan token terlebih dahulu untuk melakukan tes pengiriman!";
-        } else {
+    if (empty($test_token)) {
+        $msg_error = "Token Fonnte belum diisi. Masukkan token terlebih dahulu untuk melakukan tes pengiriman!";
+    } else {
             $testMsg = "*TES KONEKSI WHATSAPP GATEWAY*\n\nHalo Admin Loewix! Ini adalah pesan tes dari sistem *sales.id-giti.com*.\nWhatsApp Gateway Fonnte Anda telah *BERHASIL TERHUBUNG* dan siap menerima laporan kendala sales!";
 
             $curl = curl_init();
@@ -126,7 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['test_send_wa'])) {
             }
         }
     }
-}
 
 // Ambil Pengaturan Saat Ini
 $current_wa = '085771593522';
@@ -514,18 +504,18 @@ require_once 'includes/header.php';
                     </div>
                 </div>
 
-                <!-- Security Access Banner (Wagyu31 Protection) -->
-                <div id="securityBanner" class="security-banner locked mb-3 d-flex align-items-center justify-content-between gap-2">
+                <!-- Security Access Banner (Superadmin Direct Access) -->
+                <div id="securityBanner" class="security-banner unlocked mb-3 d-flex align-items-center justify-content-between gap-2">
                     <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-shield-lock-fill fs-5" id="securityBannerIcon"></i>
+                        <i class="bi bi-shield-check-fill fs-5 text-success" id="securityBannerIcon"></i>
                         <div>
-                            <div class="fw-bold" style="font-size: 12px;" id="securityBannerTitle">Konfigurasi Terproteksi</div>
-                            <div style="font-size: 11px; opacity: 0.85;" id="securityBannerSub">Perlu sandi <code>Wagyu31</code> untuk akses &amp; tes.</div>
+                            <div class="fw-bold text-dark" style="font-size: 12px;" id="securityBannerTitle">Akses Terbuka (Superadmin)</div>
+                            <div class="text-muted" style="font-size: 11px;" id="securityBannerSub">Anda memiliki izin penuh mengubah &amp; menguji konfigurasi.</div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-sm btn-dark rounded-pill px-2.5 py-1 text-nowrap fw-bold" style="font-size: 11px;" id="btnToggleAuth" onclick="handleAuthToggle()">
-                        <i class="bi bi-key-fill me-1"></i> Buka Akses
-                    </button>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-bold" style="font-size: 11px;">
+                        <i class="bi bi-unlock-fill me-1"></i> Aktif
+                    </span>
                 </div>
 
                 <!-- Info Box Token -->
@@ -541,34 +531,31 @@ require_once 'includes/header.php';
                     <div class="p-2.5 rounded-3 mb-3 small d-flex align-items-start gap-2" style="background: #fffbeb; border: 1px solid #fde68a; color: #92400e;">
                         <i class="bi bi-info-circle-fill text-warning fs-6 mt-0.5"></i>
                         <div style="font-size: 11px;">
-                            <strong>Token Fonnte belum tersimpan.</strong> Buka akses lalu tempelkan token dari Fonnte agar pesan diteruskan langsung ke HP.
+                            <strong>Token Fonnte belum tersimpan.</strong> Silakan tempelkan token dari Fonnte agar pesan diteruskan langsung ke HP.
                         </div>
                     </div>
                 <?php endif; ?>
 
-                <!-- Form Konfigurasi (Wajib Sandi Wagyu31) -->
-                <form method="POST" action="wa_support_settings.php" id="formSaveGateway" onsubmit="return handleFormSaveSubmit(event)">
+                <!-- Form Konfigurasi (Akses Langsung Superadmin) -->
+                <form method="POST" action="wa_support_settings.php" id="formSaveGateway">
                     <input type="hidden" name="save_settings" value="1">
-                    <input type="hidden" name="admin_auth_pass" id="saveAdminAuthPass" value="">
 
                     <!-- Poin 1: Ubah Nomor WA -->
                     <div class="mb-3">
                         <label class="form-label-custom">
                             <span>1. Nomor WA Tujuan</span>
-                            <span class="badge bg-light text-secondary border fw-normal" id="labelLockPhone" style="font-size: 10px;">
-                                <i class="bi bi-lock-fill text-danger me-0.5"></i> Terkunci
+                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal" id="labelLockPhone" style="font-size: 10px;">
+                                <i class="bi bi-unlock-fill me-0.5"></i> Terbuka
                             </span>
                         </label>
-                        <div class="input-group custom-input-group is-locked" id="groupPhone">
+                        <div class="input-group custom-input-group" id="groupPhone">
                             <span class="input-group-text"><i class="bi bi-telephone text-success"></i></span>
                             <input type="text" name="wa_support_number" id="inputWaNumber" class="form-control" 
-                                   value="<?= htmlspecialchars($current_wa) ?>" required readonly 
-                                   placeholder="085771593522" 
-                                   onclick="handleInputAccess('edit_phone', 'mengubah Nomor WhatsApp Tujuan')">
-                            <button class="btn btn-outline-secondary" type="button" id="btnLockPhone" 
-                                    onclick="handleInputAccess('edit_phone', 'mengubah Nomor WhatsApp Tujuan')">
-                                <i class="bi bi-lock-fill text-danger" id="iconLockPhone"></i>
-                            </button>
+                                   value="<?= htmlspecialchars($current_wa) ?>" required 
+                                   placeholder="085771593522">
+                            <span class="input-group-text bg-white">
+                                <i class="bi bi-pencil-fill text-primary" style="font-size: 12px;"></i>
+                            </span>
                         </div>
                         <small class="text-muted d-block mt-1" style="font-size: 11px;">Semua laporan kendala dari bot web akan diteruskan ke nomor ini.</small>
                     </div>
@@ -577,18 +564,17 @@ require_once 'includes/header.php';
                     <div class="mb-3">
                         <label class="form-label-custom">
                             <span>2. Token API Fonnte</span>
-                            <span class="badge bg-light text-secondary border fw-normal" id="labelLockToken" style="font-size: 10px;">
-                                <i class="bi bi-lock-fill text-danger me-0.5"></i> Terkunci
+                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal" id="labelLockToken" style="font-size: 10px;">
+                                <i class="bi bi-unlock-fill me-0.5"></i> Terbuka
                             </span>
                         </label>
-                        <div class="input-group custom-input-group is-locked" id="groupToken">
+                        <div class="input-group custom-input-group" id="groupToken">
                             <span class="input-group-text"><i class="bi bi-key text-warning"></i></span>
                             <input type="password" name="fonnte_token" id="fonnteTokenInput" class="form-control font-monospace" 
-                                   value="<?= htmlspecialchars($current_token) ?>" readonly
-                                   placeholder="Tempel token di sini (contoh: a1b2c3d...)" 
-                                   onclick="handleInputAccess('edit_token', 'mengedit Token API Fonnte')">
+                                   value="<?= htmlspecialchars($current_token) ?>"
+                                   placeholder="Tempel token di sini (contoh: a1b2c3d...)">
                             <button class="btn btn-outline-secondary" type="button" id="btnToggleTokenEye" 
-                                    onclick="handleTokenEyeClick()" title="Lihat / Sembunyikan Token (Perlu Sandi Wagyu31)">
+                                    onclick="handleTokenEyeClick()" title="Lihat / Sembunyikan Token">
                                 <i class="bi bi-eye-slash-fill text-muted" id="iconTokenEye"></i>
                             </button>
                         </div>
@@ -599,22 +585,21 @@ require_once 'includes/header.php';
 
                     <!-- Poin 3: Simpan Konfigurasi -->
                     <button type="submit" class="btn btn-save-glow w-100 d-inline-flex align-items-center justify-content-center gap-2 mb-3" id="btnSubmitSave">
-                        <i class="bi bi-lock-fill text-white-50" id="iconLockSave"></i>
+                        <i class="bi bi-check2-circle text-white"></i>
                         <span>Simpan Konfigurasi</span>
                     </button>
                 </form>
 
-                <!-- Poin 4: Tes Kirim Pesan WA (Wajib Sandi Wagyu31) -->
+                <!-- Poin 4: Tes Kirim Pesan WA -->
                 <?php if (!empty($current_token)): ?>
                     <hr class="my-3" style="border-color: #e2e8f0;">
-                    <form method="POST" action="wa_support_settings.php" id="formTestSendWa" onsubmit="return handleFormTestSubmit(event)">
+                    <form method="POST" action="wa_support_settings.php" id="formTestSendWa">
                         <input type="hidden" name="test_send_wa" value="1">
                         <input type="hidden" name="test_target" value="<?= htmlspecialchars($current_wa) ?>">
                         <input type="hidden" name="test_token" value="<?= htmlspecialchars($current_token) ?>">
-                        <input type="hidden" name="admin_auth_pass" id="testAdminAuthPass" value="">
 
                         <button type="submit" class="btn btn-test-wa w-100 d-inline-flex align-items-center justify-content-center gap-2" id="btnSubmitTest">
-                            <i class="bi bi-lock-fill" id="iconLockTest"></i>
+                            <i class="bi bi-whatsapp"></i>
                             <span>Tes Kirim Pesan WA Sekarang</span>
                         </button>
                     </form>
@@ -806,253 +791,38 @@ require_once 'includes/header.php';
 
 <script>
 /**
- * Logika Keamanan Client-Side Superadmin (Sandi: Wagyu31)
- * Memproteksi 4 poin:
- * 1. Ubah nomor WA
- * 2. Ubah Token API Fonnte atau klik icon mata
- * 3. Simpan Konfigurasi
- * 4. Tes Kirim Pesan WA
+ * Akses Langsung Superadmin WhatsApp Gateway
+ * Akses dibuka penuh untuk Superadmin tanpa perlu sandi berulang
  */
-const REQUIRED_AUTH_KEY = "Wagyu31";
-let isGatewayUnlocked = false;
-let pendingAuthAction = null; // 'edit_phone', 'edit_token', 'toggle_token_eye', 'submit_save', 'submit_test', 'general'
-let authModalInstance = null;
+let isGatewayUnlocked = true;
 
-document.addEventListener('DOMContentLoaded', function () {
-    const modalEl = document.getElementById('authSecurityModal');
-    if (modalEl) {
-        authModalInstance = new bootstrap.Modal(modalEl);
-    }
-});
-
-// Trigger Modal Otorisasi
-function requestAccess(actionType, actionDescription) {
-    if (isGatewayUnlocked) {
-        executeAction(actionType);
-        return;
-    }
-
-    pendingAuthAction = actionType;
-    document.getElementById('authActionText').textContent = actionDescription || 'Otorisasi Akses';
-    document.getElementById('authPasswordInput').value = '';
-    document.getElementById('authErrorMessage').classList.add('d-none');
-    document.getElementById('modalCardContainer').classList.remove('shake-it');
-
-    if (authModalInstance) {
-        authModalInstance.show();
-        setTimeout(() => {
-            const inp = document.getElementById('authPasswordInput');
-            if (inp) inp.focus();
-        }, 300);
-    }
-}
-
-// Buka Akses Tombol Header Banner
-function handleAuthToggle() {
-    if (isGatewayUnlocked) {
-        // Kunci Kembali
-        lockGateway();
-    } else {
-        requestAccess('general', 'Membuka Akses Konfigurasi WA Gateway');
-    }
-}
-
-// Handler Klik Input yang Terkunci (Poin 1 & Poin 2)
-function handleInputAccess(type, desc) {
-    if (!isGatewayUnlocked) {
-        requestAccess(type, desc);
-    }
-}
-
-// Handler Klik Icon Mata Token (Poin 2)
+// Toggle Lihat/Sembunyikan Token API Fonnte
 function handleTokenEyeClick() {
-    if (!isGatewayUnlocked) {
-        requestAccess('toggle_token_eye', 'Melihat Token API Fonnte');
-    } else {
-        // Toggle view
-        const inp = document.getElementById('fonnteTokenInput');
-        const icon = document.getElementById('iconTokenEye');
-        if (inp.type === 'password') {
-            inp.type = 'text';
-            icon.className = 'bi bi-eye-fill text-primary';
-        } else {
-            inp.type = 'password';
-            icon.className = 'bi bi-eye-slash-fill text-muted';
-        }
-    }
-}
-
-// Handler Submit Form Simpan (Poin 3)
-function handleFormSaveSubmit(e) {
-    if (!isGatewayUnlocked) {
-        e.preventDefault();
-        requestAccess('submit_save', 'Menyimpan Konfigurasi Gateway');
-        return false;
-    }
-    document.getElementById('saveAdminAuthPass').value = REQUIRED_AUTH_KEY;
-    return true;
-}
-
-// Handler Submit Form Tes Kirim (Poin 4)
-function handleFormTestSubmit(e) {
-    if (!isGatewayUnlocked) {
-        e.preventDefault();
-        requestAccess('submit_test', 'Melakukan Tes Kirim WhatsApp');
-        return false;
-    }
-    document.getElementById('testAdminAuthPass').value = REQUIRED_AUTH_KEY;
-    return true;
-}
-
-// Verifikasi Sandi di Modal
-function handleAuthSubmit(e) {
-    e.preventDefault();
-    const enteredPass = document.getElementById('authPasswordInput').value.trim();
-
-    if (enteredPass === REQUIRED_AUTH_KEY) {
-        // SUKSES
-        document.getElementById('authErrorMessage').classList.add('d-none');
-        if (authModalInstance) authModalInstance.hide();
-        
-        unlockGateway();
-        executeAction(pendingAuthAction);
-        pendingAuthAction = null;
-    } else {
-        // SALAH
-        const errMsg = document.getElementById('authErrorMessage');
-        errMsg.classList.remove('d-none');
-        const card = document.getElementById('modalCardContainer');
-        card.classList.remove('shake-it');
-        void card.offsetWidth; // trigger reflow
-        card.classList.add('shake-it');
-        document.getElementById('authPasswordInput').focus();
-    }
-}
-
-// Buka Kunci Panel (Unlock)
-function unlockGateway() {
-    isGatewayUnlocked = true;
-
-    // Update Banner
-    const banner = document.getElementById('securityBanner');
-    banner.className = 'security-banner unlocked mb-3 d-flex align-items-center justify-content-between gap-2';
-    document.getElementById('securityBannerIcon').className = 'bi bi-shield-check-fill fs-5 text-success';
-    document.getElementById('securityBannerTitle').textContent = 'Akses Terbuka (Superadmin)';
-    document.getElementById('securityBannerSub').textContent = 'Anda memiliki izin penuh mengubah & menguji konfigurasi.';
-    
-    const btnToggle = document.getElementById('btnToggleAuth');
-    btnToggle.className = 'btn btn-sm btn-outline-success rounded-pill px-2.5 py-1 text-nowrap fw-bold';
-    btnToggle.innerHTML = '<i class="bi bi-lock-fill me-1"></i> Kunci Kembali';
-
-    // Buka Poin 1 (Nomor WA)
-    const inputPhone = document.getElementById('inputWaNumber');
-    inputPhone.removeAttribute('readonly');
-    document.getElementById('groupPhone').classList.remove('is-locked');
-    document.getElementById('labelLockPhone').className = 'badge bg-success-subtle text-success border border-success-subtle fw-normal';
-    document.getElementById('labelLockPhone').innerHTML = '<i class="bi bi-unlock-fill me-0.5"></i> Terbuka';
-    document.getElementById('iconLockPhone').className = 'bi bi-pencil-fill text-primary';
-
-    // Buka Poin 2 (Token Fonnte)
-    const inputToken = document.getElementById('fonnteTokenInput');
-    inputToken.removeAttribute('readonly');
-    document.getElementById('groupToken').classList.remove('is-locked');
-    document.getElementById('labelLockToken').className = 'badge bg-success-subtle text-success border border-success-subtle fw-normal';
-    document.getElementById('labelLockToken').innerHTML = '<i class="bi bi-unlock-fill me-0.5"></i> Terbuka';
-    document.getElementById('iconTokenEye').className = 'bi bi-eye-slash text-muted';
-
-    // Buka Poin 3 (Simpan)
-    const iconSave = document.getElementById('iconLockSave');
-    if (iconSave) iconSave.className = 'bi bi-check2-circle text-white';
-    document.getElementById('saveAdminAuthPass').value = REQUIRED_AUTH_KEY;
-
-    // Buka Poin 4 (Tes Kirim)
-    const iconTest = document.getElementById('iconLockTest');
-    if (iconTest) iconTest.className = 'bi bi-whatsapp';
-    const testAuthInp = document.getElementById('testAdminAuthPass');
-    if (testAuthInp) testAuthInp.value = REQUIRED_AUTH_KEY;
-}
-
-// Kunci Kembali Panel (Lock)
-function lockGateway() {
-    isGatewayUnlocked = false;
-
-    // Update Banner
-    const banner = document.getElementById('securityBanner');
-    banner.className = 'security-banner locked mb-3 d-flex align-items-center justify-content-between gap-2';
-    document.getElementById('securityBannerIcon').className = 'bi bi-shield-lock-fill fs-5 text-danger';
-    document.getElementById('securityBannerTitle').textContent = 'Konfigurasi Terproteksi';
-    document.getElementById('securityBannerSub').innerHTML = 'Perlu sandi <code>Wagyu31</code> untuk akses &amp; tes.';
-
-    const btnToggle = document.getElementById('btnToggleAuth');
-    btnToggle.className = 'btn btn-sm btn-dark rounded-pill px-2.5 py-1 text-nowrap fw-bold';
-    btnToggle.innerHTML = '<i class="bi bi-key-fill me-1"></i> Buka Akses';
-
-    // Kunci Poin 1 (Nomor WA)
-    const inputPhone = document.getElementById('inputWaNumber');
-    inputPhone.setAttribute('readonly', 'true');
-    document.getElementById('groupPhone').classList.add('is-locked');
-    document.getElementById('labelLockPhone').className = 'badge bg-light text-secondary border fw-normal';
-    document.getElementById('labelLockPhone').innerHTML = '<i class="bi bi-lock-fill text-danger me-0.5"></i> Terkunci';
-    document.getElementById('iconLockPhone').className = 'bi bi-lock-fill text-danger';
-
-    // Kunci Poin 2 (Token Fonnte)
-    const inputToken = document.getElementById('fonnteTokenInput');
-    inputToken.setAttribute('readonly', 'true');
-    inputToken.type = 'password';
-    document.getElementById('groupToken').classList.add('is-locked');
-    document.getElementById('labelLockToken').className = 'badge bg-light text-secondary border fw-normal';
-    document.getElementById('labelLockToken').innerHTML = '<i class="bi bi-lock-fill text-danger me-0.5"></i> Terkunci';
-    document.getElementById('iconTokenEye').className = 'bi bi-eye-slash-fill text-muted';
-
-    // Kunci Poin 3 (Simpan)
-    const iconSave = document.getElementById('iconLockSave');
-    if (iconSave) iconSave.className = 'bi bi-lock-fill text-white-50';
-    document.getElementById('saveAdminAuthPass').value = '';
-
-    // Kunci Poin 4 (Tes Kirim)
-    const iconTest = document.getElementById('iconLockTest');
-    if (iconTest) iconTest.className = 'bi bi-lock-fill';
-    const testAuthInp = document.getElementById('testAdminAuthPass');
-    if (testAuthInp) testAuthInp.value = '';
-}
-
-// Eksekusi Aksi yang Tertunda Setelah Sukses Auth
-function executeAction(actionType) {
-    if (!actionType) return;
-
-    if (actionType === 'edit_phone') {
-        const phoneInp = document.getElementById('inputWaNumber');
-        phoneInp.focus();
-        phoneInp.select();
-    } else if (actionType === 'edit_token') {
-        const tokenInp = document.getElementById('fonnteTokenInput');
-        tokenInp.focus();
-        tokenInp.select();
-    } else if (actionType === 'toggle_token_eye') {
-        const inp = document.getElementById('fonnteTokenInput');
-        const icon = document.getElementById('iconTokenEye');
-        inp.type = 'text'; // Tampilkan setelah diautentikasi
-        icon.className = 'bi bi-eye-fill text-primary';
-    } else if (actionType === 'submit_save') {
-        document.getElementById('saveAdminAuthPass').value = REQUIRED_AUTH_KEY;
-        document.getElementById('formSaveGateway').submit();
-    } else if (actionType === 'submit_test') {
-        document.getElementById('testAdminAuthPass').value = REQUIRED_AUTH_KEY;
-        document.getElementById('formTestSendWa').submit();
-    }
-}
-
-// Toggle Eye di dalam Modal
-function toggleModalPasswordEye() {
-    const inp = document.getElementById('authPasswordInput');
-    const icon = document.getElementById('modalEyeIcon');
+    const inp = document.getElementById('fonnteTokenInput');
+    const icon = document.getElementById('iconTokenEye');
     if (inp.type === 'password') {
         inp.type = 'text';
-        icon.className = 'bi bi-eye-slash-fill';
+        icon.className = 'bi bi-eye-fill text-primary';
     } else {
         inp.type = 'password';
-        icon.className = 'bi bi-eye-fill';
+        icon.className = 'bi bi-eye-slash-fill text-muted';
     }
+}
+
+function handleInputAccess(type, desc) {
+    // Akses sudah terbuka
+}
+
+function handleAuthToggle() {
+    // Akses sudah terbuka
+}
+
+function unlockGateway() {
+    isGatewayUnlocked = true;
+}
+
+function lockGateway() {
+    // Akses tetap terbuka untuk Superadmin
 }
 
 // Filter Pencarian Pesan Kendala
