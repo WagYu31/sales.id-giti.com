@@ -318,5 +318,31 @@ if ($action === 'get_filter_targets') {
     exit();
 }
 
+// -----------------------------------------------------------------------------
+// 4. ACTION: LOG CLICK FOLLOW-UP (Untuk Mode Asisten 1-Klik / Direct WhatsApp)
+// -----------------------------------------------------------------------------
+if ($action === 'log_click_followup') {
+    $customerId  = (int)($_POST['customer_id'] ?? 0);
+    $rawPhone    = trim($_POST['phone'] ?? '');
+    $message     = trim($_POST['message'] ?? '');
+    $customerName= trim($_POST['customer_name'] ?? '');
+
+    if ($customerId > 0) {
+        $activeSalesId = (int)($_SESSION['user_id'] ?? 1);
+        $tglFu = date('Y-m-d H:i:s');
+        $respon = 'Broadcast WhatsApp (1-Klik)';
+        $keterangan = "Pesan Broadcast Terkirim ke {$rawPhone} ({$customerName}):\n" . $message;
+
+        $stmtFu = $conn->prepare("INSERT INTO follow_ups (customer_id, sales_id, tgl_follow_up, respon, keterangan) VALUES (?, ?, ?, ?, ?)");
+        if ($stmtFu) {
+            $stmtFu->bind_param("iisss", $customerId, $activeSalesId, $tglFu, $respon, $keterangan);
+            $stmtFu->execute();
+            $stmtFu->close();
+        }
+    }
+    echo json_encode(['success' => true, 'message' => 'Follow up tercatat']);
+    exit();
+}
+
 echo json_encode(['success' => false, 'message' => 'Aksi tidak dikenali.']);
 

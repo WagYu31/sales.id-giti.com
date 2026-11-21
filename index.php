@@ -939,7 +939,7 @@ if ($active_sales_id > 0) {
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1030;
+    z-index: 1040;
     background: #0F172A;
     color: #FFFFFF;
     border-radius: 50px;
@@ -954,76 +954,27 @@ if ($active_sales_id > 0) {
     from { opacity: 0; transform: translate(-50%, 20px); }
     to { opacity: 1; transform: translate(-50%, 0); }
 }
-
-/* WhatsApp Realistic Phone Container */
-.wa-mockup-phone {
-    border: 1px solid #CBD5E1;
-    border-radius: 16px;
-    overflow: hidden;
-    background: #FFFFFF;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    display: flex;
-    flex-direction: column;
-}
-.wa-mockup-header {
-    background: #008069;
-    color: #FFFFFF;
-    padding: 9px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-.wa-mockup-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #FFFFFF;
-    color: #008069;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-}
-.wa-mockup-body {
+.wa-preview-screen {
     background: #EFEAE2;
-    background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+    background-image: radial-gradient(#d1d5db 1px, transparent 1px);
     background-size: 16px 16px;
-    padding: 14px;
-    min-height: 290px;
-    max-height: 350px;
+    border-radius: 14px;
+    padding: 16px;
+    min-height: 250px;
+    max-height: 380px;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-}
-.wa-mockup-footer {
-    background: #F0F2F5;
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-top: 1px solid #E2E8F0;
-}
-.wa-mockup-input-dummy {
-    background: #FFFFFF;
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 11.5px;
-    color: #94A3B8;
-    flex-grow: 1;
-    border: 1px solid #E2E8F0;
+    position: relative;
+    border: 1px solid #D1D5DB;
 }
 .wa-bubble-sent {
-    background: #D9FDD3;
+    background: #E7FFDB;
     color: #111B21;
-    border-radius: 8px 8px 1px 8px;
-    padding: 9px 12px;
+    border-radius: 10px 10px 2px 10px;
+    padding: 10px 14px;
     max-width: 92%;
     margin-left: auto;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.13);
-    font-size: 12.5px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    font-size: 13px;
     line-height: 1.45;
     position: relative;
     white-space: pre-wrap;
@@ -1031,31 +982,13 @@ if ($active_sales_id > 0) {
 }
 .wa-bubble-time {
     text-align: right;
-    font-size: 10px;
+    font-size: 10.5px;
     color: #667781;
-    margin-top: 3px;
+    margin-top: 4px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 3px;
-}
-/* Modern Target Radio Cards */
-.target-option-card {
-    border: 1.5px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 10px 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: #FFFFFF;
-}
-.target-option-card:hover {
-    border-color: #CBD5E1;
-    background: #F8FAFC;
-}
-.target-option-card.active {
-    border-color: #10B981;
-    background: #F0FDF4;
-    box-shadow: 0 0 0 1px #10B981;
 }
 .tag-var-pill {
     background: #F1F5F9;
@@ -1725,66 +1658,64 @@ if ($active_sales_id > 0) {
         
         <!-- Screen 1: Konfigurasi & Draft Pesan -->
         <div id="broadcastSetupScreen">
-          <div class="row g-3.5">
+          <div class="row g-3">
             
-            <!-- Kolom Kiri: Form Target & Pesan -->
-            <div class="col-lg-7 col-12 d-flex flex-column gap-3">
+            <!-- Kolom Kiri: Form Target, Pesan & Metode -->
+            <div class="col-lg-7 col-12 d-flex flex-column gap-2.5">
               
               <!-- 1. Pilihan Sasaran Target -->
               <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-2.5">
+                <div class="d-flex justify-content-between align-items-center mb-2">
                   <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 13px;">
                     <i class="bi bi-people-fill text-primary"></i> 1. Sasaran Target Penerima
                   </span>
-                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fw-bold" id="badgeTargetSummary" style="font-size: 11.5px;">
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fw-bold" id="badgeTargetSummary" style="font-size: 11px;">
                     0 Target Siap
                   </span>
                 </div>
                 
                 <div class="row g-2 mb-1">
                   <div class="col-sm-6 col-12">
-                    <div class="target-option-card active d-flex align-items-center gap-2.5" id="cardTargetSelected" onclick="setBroadcastTargetMode('selected')">
-                      <input class="form-check-input mt-0" type="radio" name="target_mode" id="targetModeSelected" value="selected" checked onchange="handleTargetModeChange()" style="cursor: pointer; width: 17px; height: 17px;">
+                    <div class="target-option-card active d-flex align-items-center gap-2" id="cardTargetSelected" onclick="setBroadcastTargetMode('selected')">
+                      <input class="form-check-input mt-0" type="radio" name="target_mode" id="targetModeSelected" value="selected" checked onchange="handleTargetModeChange()" style="cursor: pointer; width: 16px; height: 16px;">
                       <div class="overflow-hidden">
-                        <div class="fw-bold text-dark text-truncate" style="font-size: 12.5px;">Toko Terpilih</div>
+                        <div class="fw-bold text-dark text-truncate" style="font-size: 12px;">Toko Terpilih</div>
                         <div class="text-muted" style="font-size: 11px;"><span id="txtCountSelected" class="fw-bold text-primary">0</span> toko dicentang di tabel</div>
                       </div>
                     </div>
                   </div>
                   <div class="col-sm-6 col-12">
-                    <div class="target-option-card d-flex align-items-center gap-2.5" id="cardTargetFilter" onclick="setBroadcastTargetMode('filter')">
-                      <input class="form-check-input mt-0" type="radio" name="target_mode" id="targetModeFilter" value="filter" onchange="handleTargetModeChange()" style="cursor: pointer; width: 17px; height: 17px;">
+                    <div class="target-option-card d-flex align-items-center gap-2" id="cardTargetFilter" onclick="setBroadcastTargetMode('filter')">
+                      <input class="form-check-input mt-0" type="radio" name="target_mode" id="targetModeFilter" value="filter" onchange="handleTargetModeChange()" style="cursor: pointer; width: 16px; height: 16px;">
                       <div class="overflow-hidden">
-                        <div class="fw-bold text-dark text-truncate" style="font-size: 12.5px;">Sesuai Filter Halaman</div>
+                        <div class="fw-bold text-dark text-truncate" style="font-size: 12px;">Sesuai Filter Halaman</div>
                         <div class="text-muted" style="font-size: 11px;">Maks. 100 toko per antrean</div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div id="targetWarningNoPhone" class="alert alert-warning py-1 px-2 rounded-3 mb-0 mt-2 small d-none" style="font-size: 11px;">
+                <div id="targetWarningNoPhone" class="alert alert-warning py-1 px-2 rounded-3 mb-0 mt-1 small d-none" style="font-size: 11px;">
                   <i class="bi bi-exclamation-triangle-fill me-1"></i> Beberapa toko yang belum memiliki nomor WA akan dilewati secara otomatis.
                 </div>
               </div>
 
               <!-- 2. Template Cepat & Tag Variabel -->
               <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white">
-                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2.5">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                   <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 13px;">
                     <i class="bi bi-chat-quote-fill text-success"></i> 2. Template &amp; Isi Pesan
                   </span>
-                  <div class="d-flex align-items-center gap-1.5">
-                    <select class="form-select form-select-sm fw-semibold" id="selectQuickTemplate" onchange="applyQuickTemplate()" style="font-size: 12px; border-radius: 8px; max-width: 240px; background-color: #F8FAFC;">
-                      <option value="">-- Pilih Template Cepat --</option>
-                      <option value="1">Template 1: Sapaan &amp; Katalog Baru</option>
-                      <option value="2">Template 2: Follow Up Promo &amp; Stok</option>
-                      <option value="3">Template 3: Program Mitra Installer</option>
-                    </select>
-                  </div>
+                  <select class="form-select form-select-sm fw-semibold w-auto" id="selectQuickTemplate" onchange="applyQuickTemplate()" style="font-size: 11.5px; border-radius: 8px; max-width: 240px; background-color: #F8FAFC;">
+                    <option value="">-- Pilih Template Cepat --</option>
+                    <option value="1">Template 1: Sapaan &amp; Katalog Baru</option>
+                    <option value="2">Template 2: Follow Up Promo &amp; Stok</option>
+                    <option value="3">Template 3: Program Mitra Installer</option>
+                  </select>
                 </div>
 
                 <div class="mb-2">
-                  <small class="text-muted d-block mb-1.5 fw-semibold" style="font-size: 11px;">
+                  <small class="text-muted d-block mb-1 fw-semibold" style="font-size: 11px;">
                     <i class="bi bi-cursor-fill text-primary me-0.5"></i> Klik tag variabel di bawah untuk menyisipkan ke pesan:
                   </small>
                   <div class="d-flex flex-wrap gap-1.5">
@@ -1805,38 +1736,73 @@ if ($active_sales_id > 0) {
 
                 <!-- Textarea Pesan Broadcast -->
                 <div>
-                  <textarea id="broadcastMessageText" class="form-control" rows="8" placeholder="Tulis pesan broadcast WhatsApp Anda di sini... Gunakan variabel seperti {nama_toko} dan {nama_pic} agar pesan terasa personal." style="border-radius: 10px; font-size: 13px; line-height: 1.5; min-height: 190px; height: 190px; resize: vertical;"></textarea>
-                  <div class="d-flex justify-content-between align-items-center mt-1.5 px-1">
-                    <small class="text-muted" style="font-size: 11px;">
-                      Format WhatsApp: <code>*tebal*</code> &bull; <code>_miring_</code>
+                  <textarea id="broadcastMessageText" class="form-control" rows="6" placeholder="Tulis pesan broadcast WhatsApp Anda di sini... Gunakan variabel seperti {nama_toko} dan {nama_pic} agar pesan terasa personal." style="border-radius: 10px; font-size: 12.5px; line-height: 1.5; min-height: 150px; height: 150px; resize: vertical;"></textarea>
+                  <div class="d-flex justify-content-between align-items-center mt-1 px-1">
+                    <small class="text-muted" style="font-size: 10.5px;">
+                      Format: <code>*tebal*</code> &bull; <code>_miring_</code>
                     </small>
-                    <small class="text-muted fw-semibold" id="txtCharCount" style="font-size: 11px;">0 karakter</small>
+                    <small class="text-muted fw-semibold" id="txtCharCount" style="font-size: 10.5px;">0 karakter</small>
                   </div>
                 </div>
               </div>
 
-              <!-- 3. Pengaturan Anti-Banned & Follow-Up -->
+              <!-- 3. Metode Pengiriman (Mode Asisten 1-Klik vs Bot Fonnte) -->
               <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white">
-                <div class="row g-2 align-items-center">
-                  <div class="col-sm-6 col-12">
-                    <label class="fw-bold small text-dark mb-1 d-flex align-items-center gap-1" style="font-size: 12px;">
-                      <i class="bi bi-shield-check text-success"></i> Jeda Aman Antar Pesan:
-                    </label>
-                    <select id="broadcastDelaySelect" class="form-select form-select-sm fw-semibold" style="border-radius: 8px;">
-                      <option value="3">3 Detik (Cepat)</option>
-                      <option value="5" selected>5 Detik (Disarankan - Aman)</option>
-                      <option value="8">8 Detik (Extra Aman)</option>
-                    </select>
+                <div class="fw-bold text-dark mb-2 d-flex align-items-center gap-1.5" style="font-size: 13px;">
+                  <i class="bi bi-gear-fill text-secondary"></i> 3. Metode Pengiriman
+                </div>
+
+                <div class="row g-2 mb-2">
+                  <div class="col-md-7 col-12">
+                    <div class="target-option-card active d-flex align-items-start gap-2" id="cardMethodDirect" onclick="setBroadcastSendMethod('direct')">
+                      <input class="form-check-input mt-1" type="radio" name="send_method" id="sendMethodDirect" value="direct" checked onchange="handleSendMethodChange()" style="cursor: pointer; width: 16px; height: 16px;">
+                      <div>
+                        <div class="fw-bold text-success" style="font-size: 12px;">
+                          <i class="bi bi-shield-check-fill"></i> Mode Asisten 1-Klik (Rekomendasi Utama)
+                        </div>
+                        <div class="text-muted" style="font-size: 10.5px; line-height: 1.35;">
+                          Kirim via WhatsApp resmi di Laptop/HP sales. <strong>100% Bebas Logout &amp; Anti-Banned</strong>.
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="col-sm-6 col-12">
-                    <div class="form-check mt-sm-3 pt-sm-1">
-                      <input class="form-check-input" type="checkbox" id="checkAutoLogFu" checked style="cursor: pointer; width: 16px; height: 16px;">
-                      <label class="form-check-label small fw-semibold text-dark ms-1" for="checkAutoLogFu" style="font-size: 12px; cursor: pointer;">
-                        Otomatis catat ke Riwayat Follow-Up CRM
-                      </label>
+                  <div class="col-md-5 col-12">
+                    <div class="target-option-card d-flex align-items-start gap-2" id="cardMethodGateway" onclick="setBroadcastSendMethod('gateway')">
+                      <input class="form-check-input mt-1" type="radio" name="send_method" id="sendMethodGateway" value="gateway" onchange="handleSendMethodChange()" style="cursor: pointer; width: 16px; height: 16px;">
+                      <div>
+                        <div class="fw-bold text-dark" style="font-size: 12px;">
+                          <i class="bi bi-robot"></i> Bot Gateway (Fonnte)
+                        </div>
+                        <div class="text-muted" style="font-size: 10.5px; line-height: 1.35;">
+                          Kirim otomatis server (perlu device Fonnte terhubung).
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <!-- Opsi Tambahan untuk Bot Gateway (Hanya muncul jika mode gateway dipilih) -->
+                <div id="boxGatewaySettings" class="d-none pt-2 border-top mt-2">
+                  <div class="row g-2 align-items-center">
+                    <div class="col-sm-6 col-12">
+                      <label class="fw-semibold small text-dark mb-1 d-block" style="font-size: 11.5px;">Jeda Aman Antar Pesan:</label>
+                      <select id="broadcastDelaySelect" class="form-select form-select-sm fw-semibold" style="border-radius: 8px;">
+                        <option value="5">5 Detik</option>
+                        <option value="10" selected>10 Detik (Lebih Aman)</option>
+                        <option value="20">20 Detik (Disarankan)</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6 col-12">
+                      <div class="form-check mt-sm-3 pt-sm-1">
+                        <input class="form-check-input" type="checkbox" id="checkAutoLogFu" checked style="cursor: pointer; width: 15px; height: 15px;">
+                        <label class="form-check-label small fw-semibold text-dark ms-1" for="checkAutoLogFu" style="font-size: 11.5px; cursor: pointer;">
+                          Catat ke Follow-Up CRM
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
             </div>
@@ -1846,11 +1812,11 @@ if ($active_sales_id > 0) {
               <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white h-100 d-flex flex-column">
                 
                 <!-- Header Preview -->
-                <div class="d-flex justify-content-between align-items-center mb-2.5 pb-1 border-bottom">
-                  <div class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 13px; white-space: nowrap;">
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+                  <div class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 12.5px; white-space: nowrap;">
                     <i class="bi bi-phone-fill text-success"></i> Pratinjau Balon Chat
                   </div>
-                  <div class="badge bg-light text-secondary border fw-normal text-truncate" style="max-width: 180px; font-size: 11px;" id="lblPreviewCustomerName" title="Contoh Toko">
+                  <div class="badge bg-light text-secondary border fw-normal text-truncate" style="max-width: 170px; font-size: 10.5px;" id="lblPreviewCustomerName" title="Contoh Toko">
                     Contoh: Toko CCTV
                   </div>
                 </div>
@@ -1872,14 +1838,14 @@ if ($active_sales_id > 0) {
                         <div class="text-white-50" style="font-size: 9.5px; line-height: 1;">online</div>
                       </div>
                     </div>
-                    <div class="d-flex align-items-center gap-2.5 text-white-50" style="font-size: 13px;">
+                    <div class="d-flex align-items-center gap-2 text-white-50" style="font-size: 13px;">
                       <i class="bi bi-telephone-fill"></i>
                       <i class="bi bi-three-dots-vertical"></i>
                     </div>
                   </div>
 
                   <!-- WhatsApp Chat Scroll Body -->
-                  <div class="wa-mockup-body flex-grow-1">
+                  <div class="wa-mockup-body flex-grow-1" style="min-height: 250px;">
                     <div class="wa-bubble-sent shadow-sm">
                       <div id="waBubbleContent">
                         Halo! Ini adalah contoh pesan broadcast.
@@ -1896,16 +1862,16 @@ if ($active_sales_id > 0) {
                     <i class="bi bi-emoji-smile text-muted" style="font-size: 15px;"></i>
                     <div class="wa-mockup-input-dummy">Ketik pesan...</div>
                     <i class="bi bi-paperclip text-muted" style="font-size: 15px;"></i>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 28px; height: 28px; background: #008069; font-size: 12px;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 26px; height: 26px; background: #008069; font-size: 11px;">
                       <i class="bi bi-mic-fill"></i>
                     </div>
                   </div>
 
                 </div>
 
-                <div class="p-2 rounded-3 bg-light mt-2.5 border small text-muted d-flex align-items-center gap-2" style="font-size: 11px;">
+                <div class="p-2 rounded-3 bg-light mt-2 border small text-muted d-flex align-items-center gap-1.5" style="font-size: 10.5px;">
                   <i class="bi bi-info-circle-fill text-success fs-6 flex-shrink-0"></i>
-                  <span>Pesan di atas otomatis dipersonalisasi dengan data nyata toko setiap penerima.</span>
+                  <span>Pesan di atas otomatis dipersonalisasi nama toko &amp; kontak untuk setiap penerima.</span>
                 </div>
 
               </div>
@@ -1914,7 +1880,78 @@ if ($active_sales_id > 0) {
           </div>
         </div>
 
-        <!-- Screen 2: Real-Time Sending Progress -->
+        <!-- Screen 2A: Mode Asisten 1-Klik WhatsApp Dispatcher -->
+        <div id="broadcastDirectAssistantScreen" class="d-none">
+          <div class="card border border-light-subtle shadow-sm rounded-4 p-4 bg-white text-center mb-3">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+              <div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold" style="font-size: 12px;">
+                  <i class="bi bi-shield-check-fill me-1"></i> Asisten 1-Klik Aktif
+                </span>
+              </div>
+              <div class="text-muted small fw-bold">
+                Target: <span id="directCurrentIndexText" class="text-dark fs-6">1</span> dari <span id="directTotalCountText" class="text-dark fs-6">0</span> Toko
+              </div>
+            </div>
+
+            <!-- Progress Bar Asisten -->
+            <div class="progress mb-3" style="height: 10px; border-radius: 50px; background: #E2E8F0;">
+              <div class="progress-bar bg-success" id="directProgressBar" role="progressbar" style="width: 0%;"></div>
+            </div>
+
+            <!-- Kartu Info Toko Aktif -->
+            <div class="card border border-2 border-success-subtle rounded-4 p-3.5 mb-3 bg-success-subtle bg-opacity-10 text-start shadow-sm">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <div class="badge bg-success text-white rounded-pill px-2.5 py-1 mb-1 fw-bold" style="font-size: 10.5px;">
+                    🎯 TOKO YANG SEDANG DIPROSES
+                  </div>
+                  <h5 class="fw-bold text-dark mb-0" id="directTargetStoreName">Nama Toko Customer</h5>
+                </div>
+                <div class="text-end">
+                  <span class="taste-wa-pill fs-6 px-3 py-1">
+                    <i class="bi bi-whatsapp"></i> <span id="directTargetPhone">0812xxxx</span>
+                  </span>
+                </div>
+              </div>
+              
+              <div class="d-flex flex-wrap gap-3 small text-muted mb-2.5 pt-1">
+                <span><i class="bi bi-person-fill text-primary me-1"></i> PIC: <strong class="text-dark" id="directTargetPic">Bpk/Ibu</strong></span>
+                <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> Kota: <strong class="text-dark" id="directTargetCity">-</strong></span>
+              </div>
+
+              <!-- Preview Pesan Toko Ini -->
+              <div class="p-2.5 rounded-3 bg-white border text-dark small" style="font-size: 12px; max-height: 120px; overflow-y: auto; white-space: pre-wrap;" id="directTargetMessagePreview">
+                Pratinjau pesan yang siap dikirim...
+              </div>
+            </div>
+
+            <!-- Action Button Raksasa -->
+            <div class="mb-3">
+              <button type="button" class="btn btn-success btn-lg rounded-pill px-5 py-3 fw-bold shadow d-inline-flex align-items-center gap-2.5" id="btnDirectSendCurrent" onclick="dispatchDirectCurrentTarget()" style="font-size: 16px;">
+                <i class="bi bi-whatsapp fs-4"></i>
+                <span>BUKA WHATSAPP &amp; KIRIM KE TOKO INI</span>
+              </button>
+              <div class="small text-muted mt-2">
+                <i class="bi bi-info-circle me-1"></i> WhatsApp akan terbuka otomatis dengan chat toko &amp; pesan terketik rapi. Tekan <strong>Enter/Kirim</strong> di WA Anda!
+              </div>
+            </div>
+
+            <!-- Secondary Actions -->
+            <div class="d-flex justify-content-center gap-2 pt-2 border-top">
+              <button type="button" class="btn btn-light rounded-pill px-3.5 fw-semibold text-secondary btn-sm" onclick="skipDirectCurrentTarget()">
+                <i class="bi bi-skip-forward-fill me-1"></i> Lewati Toko Ini
+              </button>
+              <button type="button" class="btn btn-outline-secondary rounded-pill px-3.5 fw-semibold btn-sm" onclick="finishBroadcastReload()">
+                <i class="bi bi-stop-circle me-1"></i> Selesai / Tutup
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Screen 2B: Real-Time Sending Progress (Bot Gateway) -->
         <div id="broadcastProgressScreen" class="d-none">
           <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center mb-3">
             <div class="mb-3">
@@ -1961,6 +1998,22 @@ if ($active_sales_id > 0) {
             </div>
           </div>
         </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer px-4 py-3 bg-white border-top d-flex justify-content-between align-items-center" id="broadcastModalFooter">
+        <button type="button" class="btn btn-light rounded-pill px-3.5 fw-semibold text-secondary" data-bs-dismiss="modal">
+          Tutup
+        </button>
+        <button type="button" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2" id="btnStartBroadcast" onclick="startBroadcastQueue()">
+          <i class="bi bi-send-fill"></i> Mulai Broadcast (<span id="txtBtnTargetCount">0</span>)
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
 
       </div>
 
@@ -2260,6 +2313,7 @@ function openBroadcastModal(mode) {
 
     // Reset screen
     document.getElementById('broadcastSetupScreen').classList.remove('d-none');
+    document.getElementById('broadcastDirectAssistantScreen')?.classList.add('d-none');
     document.getElementById('broadcastProgressScreen').classList.add('d-none');
     document.getElementById('broadcastModalFooter').classList.remove('d-none');
 
@@ -2279,36 +2333,301 @@ function openBroadcastModal(mode) {
         if (radioFilt) radioFilt.checked = true;
     }
 
+    // Default ke Mode Asisten 1-Klik
+    const rDirect = document.getElementById('sendMethodDirect');
+    if (rDirect) rDirect.checked = true;
+    handleSendMethodChange();
+
     handleTargetModeChange();
     updateLivePreview();
     modal.show();
 }
 
-function setBroadcastTargetMode(mode) {
-    if (mode === 'selected') {
-        const r1 = document.getElementById('targetModeSelected');
+function setBroadcastSendMethod(method) {
+    if (method === 'direct') {
+        const r1 = document.getElementById('sendMethodDirect');
         if (r1) r1.checked = true;
     } else {
-        const r2 = document.getElementById('targetModeFilter');
+        const r2 = document.getElementById('sendMethodGateway');
         if (r2) r2.checked = true;
     }
-    handleTargetModeChange();
+    handleSendMethodChange();
+}
+
+function handleSendMethodChange() {
+    const method = document.querySelector('input[name="send_method"]:checked')?.value || 'direct';
+    const cardDirect = document.getElementById('cardMethodDirect');
+    const cardGateway = document.getElementById('cardMethodGateway');
+    const boxGatewaySettings = document.getElementById('boxGatewaySettings');
+    const btnStart = document.getElementById('btnStartBroadcast');
+    const count = currentBroadcastTargets ? currentBroadcastTargets.length : 0;
+
+    if (method === 'direct') {
+        cardDirect?.classList.add('active');
+        cardGateway?.classList.remove('active');
+        boxGatewaySettings?.classList.add('d-none');
+        if (btnStart) btnStart.innerHTML = `<i class="bi bi-whatsapp"></i> Mulai Asisten 1-Klik (<span id="txtBtnTargetCount">${count}</span>)`;
+    } else {
+        cardGateway?.classList.add('active');
+        cardDirect?.classList.remove('active');
+        boxGatewaySettings?.classList.remove('d-none');
+        if (btnStart) btnStart.innerHTML = `<i class="bi bi-robot"></i> Mulai Bot Gateway (<span id="txtBtnTargetCount">${count}</span>)`;
+    }
+}
+
+// =========================================================================
+// ASISTEN 1-KLIK WHATSAPP DIRECT DISPATCHER (100% AMAN & TANPA FONNTE)
+// =========================================================================
+let directTargetIndex = 0;
+
+function renderDirectCurrentTarget() {
+    const total = currentBroadcastTargets.length;
+    if (directTargetIndex >= total) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Selesai!',
+            html: `Semua <b>${total} toko</b> telah selesai diproses dan tercatat ke Follow-Up CRM.`,
+            confirmButtonText: 'Selesai & Refresh',
+            confirmButtonColor: '#10B981'
+        }).then(() => {
+            window.location.reload();
+        });
+        return;
+    }
+
+    const currentNum = directTargetIndex + 1;
+    const target = currentBroadcastTargets[directTargetIndex];
+    const templateText = document.getElementById('broadcastMessageText').value.trim();
+
+    // Progress bar
+    const pct = Math.round((currentNum / total) * 100);
+    const pBar = document.getElementById('directProgressBar');
+    if (pBar) pBar.style.width = pct + '%';
+
+    document.getElementById('directCurrentIndexText').textContent = currentNum;
+    document.getElementById('directTotalCountText').textContent = total;
+    document.getElementById('directTargetStoreName').textContent = target.nama_toko;
+    document.getElementById('directTargetPhone').textContent = target.phone;
+    document.getElementById('directTargetPic').textContent = target.pic || 'Bpk/Ibu';
+    document.getElementById('directTargetCity').textContent = target.city || '-';
+
+    // Personalized message
+    const personalizedMsg = templateText
+        .replace(/\{nama_toko\}/g, target.nama_toko || 'Toko')
+        .replace(/\{nama_pic\}/g, target.pic || 'Bpk/Ibu')
+        .replace(/\{kota\}/g, target.city || 'Kota Anda')
+        .replace(/\{nama_sales\}/g, target.sales || 'Sales Loewix');
+
+    document.getElementById('directTargetMessagePreview').textContent = personalizedMsg;
+}
+
+async function dispatchDirectCurrentTarget() {
+    const target = currentBroadcastTargets[directTargetIndex];
+    if (!target) return;
+
+    const templateText = document.getElementById('broadcastMessageText').value.trim();
+    const personalizedMsg = templateText
+        .replace(/\{nama_toko\}/g, target.nama_toko || 'Toko')
+        .replace(/\{nama_pic\}/g, target.pic || 'Bpk/Ibu')
+        .replace(/\{kota\}/g, target.city || 'Kota Anda')
+        .replace(/\{nama_sales\}/g, target.sales || 'Sales Loewix');
+
+    let cleanPhone = (target.phone || '').replace(/[^0-9]/g, '');
+    if (cleanPhone.startsWith('0')) {
+        cleanPhone = '62' + cleanPhone.substring(1);
+    } else if (!cleanPhone.startsWith('62')) {
+        cleanPhone = '62' + cleanPhone;
+    }
+
+    // Buka WhatsApp Click-to-Chat di tab baru
+    const waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(personalizedMsg)}`;
+    window.open(waUrl, '_blank');
+
+    // Catat ke follow up CRM via AJAX
+    try {
+        const formData = new URLSearchParams();
+        formData.append('action', 'log_click_followup');
+        formData.append('customer_id', target.id);
+        formData.append('phone', cleanPhone);
+        formData.append('message', personalizedMsg);
+        formData.append('customer_name', target.nama_toko);
+
+        fetch('ajax_wa_broadcast.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        });
+    } catch (e) {}
+
+    // Pindah otomatis ke toko berikutnya
+    directTargetIndex++;
+    renderDirectCurrentTarget();
+}
+
+function skipDirectCurrentTarget() {
+    directTargetIndex++;
+    renderDirectCurrentTarget();
+}
+
+// Start Broadcast Execution (Asisten 1-Klik vs Gateway)
+async function startBroadcastQueue() {
+    if (currentBroadcastTargets.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Tidak Ada Target',
+            text: 'Silakan pilih toko yang ingin dikirimi broadcast atau gunakan mode filter.',
+            confirmButtonColor: '#059669'
+        });
+        return;
+    }
+
+    const templateText = document.getElementById('broadcastMessageText').value.trim();
+    if (!templateText) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Pesan Kosong',
+            text: 'Tuliskan pesan broadcast terlebih dahulu.',
+            confirmButtonColor: '#059669'
+        });
+        return;
+    }
+
+    const sendMethod = document.querySelector('input[name="send_method"]:checked')?.value || 'direct';
+
+    // ----------------------------------------------------
+    // JIKA MODE ASISTEN 1-KLIK (SANGAT AMAN & TANPA FONNTE)
+    // ----------------------------------------------------
+    if (sendMethod === 'direct') {
+        document.getElementById('broadcastSetupScreen').classList.add('d-none');
+        document.getElementById('broadcastDirectAssistantScreen').classList.remove('d-none');
+        document.getElementById('broadcastProgressScreen').classList.add('d-none');
+        document.getElementById('broadcastModalFooter').classList.add('d-none');
+
+        directTargetIndex = 0;
+        renderDirectCurrentTarget();
+        return;
+    }
+
+    // ----------------------------------------------------
+    // JIKA MODE BOT GATEWAY FONNTE
+    // ----------------------------------------------------
+    const delaySec = parseInt(document.getElementById('broadcastDelaySelect').value) || 10;
+    const logFu = document.getElementById('checkAutoLogFu').checked ? 1 : 0;
+
+    const confirmRes = await Swal.fire({
+        title: 'Mulai Bot Gateway?',
+        html: `Akan mengirim otomatis ke <b>${currentBroadcastTargets.length} toko</b> dengan jeda <b>${delaySec} detik</b> antar pesan.<br><small class='text-muted'>Pesan otomatis dicatat ke CRM.</small>`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Jalankan Bot',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#6B7280'
+    });
+
+    if (!confirmRes.isConfirmed) return;
+
+    // Switch view ke progress screen
+    document.getElementById('broadcastSetupScreen').classList.add('d-none');
+    document.getElementById('broadcastDirectAssistantScreen')?.classList.add('d-none');
+    document.getElementById('broadcastProgressScreen').classList.remove('d-none');
+    document.getElementById('broadcastModalFooter').classList.add('d-none');
+    document.getElementById('spinnerBroadcasting').classList.remove('d-none');
+    document.getElementById('iconBroadcastDone').classList.add('d-none');
+    document.getElementById('iconBroadcastDone').classList.remove('d-flex');
+    document.getElementById('btnFinishBroadcast').classList.add('d-none');
+    document.getElementById('btnCancelBroadcast').classList.remove('d-none');
+
+    isBroadcastRunning = true;
+    shouldStopBroadcast = false;
+
+    const consoleLog = document.getElementById('broadcastConsoleLog');
+    consoleLog.innerHTML = `[${new Date().toLocaleTimeString()}] 🚀 Memulai pengiriman antrean ${currentBroadcastTargets.length} pesan...\n`;
+
+    let successCount = 0;
+    let failCount = 0;
+    const total = currentBroadcastTargets.length;
+
+    for (let i = 0; i < total; i++) {
+        if (shouldStopBroadcast) {
+            consoleLog.innerHTML += `\n[${new Date().toLocaleTimeString()}] ⚠️ Pengiriman dihentikan oleh pengguna.\n`;
+            break;
+        }
+
+        const target = currentBroadcastTargets[i];
+        const currentNum = i + 1;
+
+        // Update progress bar
+        const pct = Math.round((currentNum / total) * 100);
+        const pBar = document.getElementById('progressBarBroadcast');
+        pBar.style.width = pct + '%';
+        pBar.textContent = pct + '%';
+        pBar.setAttribute('aria-valuenow', pct);
+
+        document.getElementById('txtProgressCount').textContent = `${currentNum} / ${total}`;
+        document.getElementById('txtLiveStatus').textContent = `Mengirim ke: ${target.nama_toko}...`;
+
+        // Render personalized message
+        const personalizedMsg = templateText
+            .replace(/\{nama_toko\}/g, target.nama_toko || 'Toko')
+            .replace(/\{nama_pic\}/g, target.pic || 'Bpk/Ibu')
+            .replace(/\{kota\}/g, target.city || 'Kota Anda')
+            .replace(/\{nama_sales\}/g, target.sales || 'Sales Loewix');
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append('action', 'send_single');
+            formData.append('phone', target.phone);
+            formData.append('message', personalizedMsg);
+            formData.append('customer_id', target.id);
+            formData.append('customer_name', target.nama_toko);
+            formData.append('log_fu', logFu);
+
+            const sendResp = await fetch('ajax_wa_broadcast.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            });
+            const sendResult = await sendResp.json();
+
+            if (sendResult.success) {
+                successCount++;
+                consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ✅ (${currentNum}/${total}) Sukses ke ${target.nama_toko} (${target.phone})\n`;
+            } else {
+                failCount++;
+                consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ (${currentNum}/${total}) Gagal ke ${target.nama_toko}: ${sendResult.message}\n`;
+            }
+        } catch (err) {
+            failCount++;
+            consoleLog.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ (${currentNum}/${total}) Error jaringan ke ${target.nama_toko}\n`;
+        }
+
+        document.getElementById('txtSuccessCount').textContent = successCount;
+        document.getElementById('txtFailCount').textContent = failCount;
+        consoleLog.scrollTop = consoleLog.scrollHeight;
+
+        // Jeda / Delay aman antar pesan
+        if (i < total - 1 && !shouldStopBroadcast) {
+            document.getElementById('txtLiveStatus').textContent = `Menunggu jeda aman ${delaySec} detik...`;
+            await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
+        }
+    }
+
+    // Selesai
+    isBroadcastRunning = false;
+    document.getElementById('spinnerBroadcasting').classList.add('d-none');
+    document.getElementById('iconBroadcastDone').classList.remove('d-none');
+    document.getElementById('iconBroadcastDone').classList.add('d-flex');
+    document.getElementById('txtProgressHeading').textContent = 'Pengiriman Broadcast Selesai!';
+    document.getElementById('txtProgressSub').textContent = `Total: ${successCount} pesan berhasil dikirim, ${failCount} gagal.`;
+    document.getElementById('txtLiveStatus').textContent = 'Selesai';
+    document.getElementById('btnCancelBroadcast').classList.add('d-none');
+    document.getElementById('btnFinishBroadcast').classList.remove('d-none');
 }
 
 // Pergantian Mode Target (Terpilih vs Filter)
 async function handleTargetModeChange() {
     const mode = document.querySelector('input[name="target_mode"]:checked')?.value || 'selected';
-    const cardSel = document.getElementById('cardTargetSelected');
-    const cardFilt = document.getElementById('cardTargetFilter');
-
-    if (mode === 'selected') {
-        cardSel?.classList.add('active');
-        cardFilt?.classList.remove('active');
-    } else {
-        cardFilt?.classList.add('active');
-        cardSel?.classList.remove('active');
-    }
-
     const badgeSummary = document.getElementById('badgeTargetSummary');
     const btnCount = document.getElementById('txtBtnTargetCount');
     const warningNoPhone = document.getElementById('targetWarningNoPhone');
@@ -2383,11 +2702,6 @@ function updateLivePreview() {
     const previewCustomerLabel = document.getElementById('lblPreviewCustomerName');
     if (previewCustomerLabel) {
         previewCustomerLabel.textContent = `Contoh: ${sample.nama_toko}`;
-        previewCustomerLabel.title = sample.nama_toko;
-    }
-    const phoneHeaderName = document.getElementById('waPhoneHeaderName');
-    if (phoneHeaderName) {
-        phoneHeaderName.textContent = sample.nama_toko;
     }
 
     let parsed = text
