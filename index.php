@@ -939,7 +939,7 @@ if ($active_sales_id > 0) {
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1040;
+    z-index: 1030;
     background: #0F172A;
     color: #FFFFFF;
     border-radius: 50px;
@@ -954,27 +954,76 @@ if ($active_sales_id > 0) {
     from { opacity: 0; transform: translate(-50%, 20px); }
     to { opacity: 1; transform: translate(-50%, 0); }
 }
-.wa-preview-screen {
+
+/* WhatsApp Realistic Phone Container */
+.wa-mockup-phone {
+    border: 1px solid #CBD5E1;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #FFFFFF;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+}
+.wa-mockup-header {
+    background: #008069;
+    color: #FFFFFF;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.wa-mockup-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    color: #008069;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.wa-mockup-body {
     background: #EFEAE2;
-    background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+    background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
     background-size: 16px 16px;
-    border-radius: 14px;
-    padding: 16px;
-    min-height: 250px;
-    max-height: 380px;
+    padding: 14px;
+    min-height: 290px;
+    max-height: 350px;
     overflow-y: auto;
-    position: relative;
-    border: 1px solid #D1D5DB;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.wa-mockup-footer {
+    background: #F0F2F5;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #E2E8F0;
+}
+.wa-mockup-input-dummy {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 11.5px;
+    color: #94A3B8;
+    flex-grow: 1;
+    border: 1px solid #E2E8F0;
 }
 .wa-bubble-sent {
-    background: #E7FFDB;
+    background: #D9FDD3;
     color: #111B21;
-    border-radius: 10px 10px 2px 10px;
-    padding: 10px 14px;
+    border-radius: 8px 8px 1px 8px;
+    padding: 9px 12px;
     max-width: 92%;
     margin-left: auto;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-    font-size: 13px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.13);
+    font-size: 12.5px;
     line-height: 1.45;
     position: relative;
     white-space: pre-wrap;
@@ -982,13 +1031,31 @@ if ($active_sales_id > 0) {
 }
 .wa-bubble-time {
     text-align: right;
-    font-size: 10.5px;
+    font-size: 10px;
     color: #667781;
-    margin-top: 4px;
+    margin-top: 3px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 3px;
+}
+/* Modern Target Radio Cards */
+.target-option-card {
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #FFFFFF;
+}
+.target-option-card:hover {
+    border-color: #CBD5E1;
+    background: #F8FAFC;
+}
+.target-option-card.active {
+    border-color: #10B981;
+    background: #F0FDF4;
+    box-shadow: 0 0 0 1px #10B981;
 }
 .tag-var-pill {
     background: #F1F5F9;
@@ -1658,82 +1725,102 @@ if ($active_sales_id > 0) {
         
         <!-- Screen 1: Konfigurasi & Draft Pesan -->
         <div id="broadcastSetupScreen">
-          <div class="row g-4">
+          <div class="row g-3.5">
             
             <!-- Kolom Kiri: Form Target & Pesan -->
-            <div class="col-lg-7 col-12">
+            <div class="col-lg-7 col-12 d-flex flex-column gap-3">
               
               <!-- 1. Pilihan Sasaran Target -->
-              <div class="card border-0 shadow-sm rounded-4 p-3.5 mb-3 bg-white">
+              <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white">
                 <div class="d-flex justify-content-between align-items-center mb-2.5">
-                  <span class="fw-bold text-dark" style="font-size: 13px;">
-                    <i class="bi bi-people-fill text-primary me-1"></i> 1. Sasaran Target Penerima
+                  <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 13px;">
+                    <i class="bi bi-people-fill text-primary"></i> 1. Sasaran Target Penerima
                   </span>
-                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fw-bold" id="badgeTargetSummary">
-                    0 Target
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fw-bold" id="badgeTargetSummary" style="font-size: 11.5px;">
+                    0 Target Siap
                   </span>
                 </div>
                 
-                <div class="d-flex flex-wrap gap-2 mb-2">
-                  <div class="form-check form-check-inline m-0">
-                    <input class="form-check-input" type="radio" name="target_mode" id="targetModeSelected" value="selected" checked onchange="handleTargetModeChange()">
-                    <label class="form-check-label fw-semibold small" for="targetModeSelected">
-                      Toko Terpilih (<span id="txtCountSelected">0</span> toko dicentang)
-                    </label>
+                <div class="row g-2 mb-1">
+                  <div class="col-sm-6 col-12">
+                    <div class="target-option-card active d-flex align-items-center gap-2.5" id="cardTargetSelected" onclick="setBroadcastTargetMode('selected')">
+                      <input class="form-check-input mt-0" type="radio" name="target_mode" id="targetModeSelected" value="selected" checked onchange="handleTargetModeChange()" style="cursor: pointer; width: 17px; height: 17px;">
+                      <div class="overflow-hidden">
+                        <div class="fw-bold text-dark text-truncate" style="font-size: 12.5px;">Toko Terpilih</div>
+                        <div class="text-muted" style="font-size: 11px;"><span id="txtCountSelected" class="fw-bold text-primary">0</span> toko dicentang di tabel</div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="form-check form-check-inline m-0">
-                    <input class="form-check-input" type="radio" name="target_mode" id="targetModeFilter" value="filter" onchange="handleTargetModeChange()">
-                    <label class="form-check-label fw-semibold small" for="targetModeFilter">
-                      Semua Sesuai Filter Halaman Ini (Maks. 100 per batch)
-                    </label>
+                  <div class="col-sm-6 col-12">
+                    <div class="target-option-card d-flex align-items-center gap-2.5" id="cardTargetFilter" onclick="setBroadcastTargetMode('filter')">
+                      <input class="form-check-input mt-0" type="radio" name="target_mode" id="targetModeFilter" value="filter" onchange="handleTargetModeChange()" style="cursor: pointer; width: 17px; height: 17px;">
+                      <div class="overflow-hidden">
+                        <div class="fw-bold text-dark text-truncate" style="font-size: 12.5px;">Sesuai Filter Halaman</div>
+                        <div class="text-muted" style="font-size: 11px;">Maks. 100 toko per antrean</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div id="targetWarningNoPhone" class="alert alert-warning py-1.5 px-2.5 rounded-3 mb-0 small d-none" style="font-size: 11.5px;">
-                  <i class="bi bi-exclamation-triangle-fill me-1"></i> Beberapa customer yang tidak memiliki nomor WA akan dilewati secara otomatis.
+                <div id="targetWarningNoPhone" class="alert alert-warning py-1 px-2 rounded-3 mb-0 mt-2 small d-none" style="font-size: 11px;">
+                  <i class="bi bi-exclamation-triangle-fill me-1"></i> Beberapa toko yang belum memiliki nomor WA akan dilewati secara otomatis.
                 </div>
               </div>
 
               <!-- 2. Template Cepat & Tag Variabel -->
-              <div class="card border-0 shadow-sm rounded-4 p-3.5 mb-3 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <span class="fw-bold text-dark" style="font-size: 13px;">
-                    <i class="bi bi-chat-quote-fill text-success me-1"></i> 2. Template Cepat &amp; Variabel
+              <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2.5">
+                  <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 13px;">
+                    <i class="bi bi-chat-quote-fill text-success"></i> 2. Template &amp; Isi Pesan
                   </span>
-                  <select class="form-select form-select-sm fw-semibold w-auto" id="selectQuickTemplate" onchange="applyQuickTemplate()" style="font-size: 12px; border-radius: 8px;">
-                    <option value="">-- Pilih Template Cepat --</option>
-                    <option value="1">Template 1: Sapaan Ramah &amp; Katalog Baru</option>
-                    <option value="2">Template 2: Follow Up Penawaran &amp; Stok</option>
-                    <option value="3">Template 3: Program Spesial Mitra Installer</option>
-                  </select>
+                  <div class="d-flex align-items-center gap-1.5">
+                    <select class="form-select form-select-sm fw-semibold" id="selectQuickTemplate" onchange="applyQuickTemplate()" style="font-size: 12px; border-radius: 8px; max-width: 240px; background-color: #F8FAFC;">
+                      <option value="">-- Pilih Template Cepat --</option>
+                      <option value="1">Template 1: Sapaan &amp; Katalog Baru</option>
+                      <option value="2">Template 2: Follow Up Promo &amp; Stok</option>
+                      <option value="3">Template 3: Program Mitra Installer</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div class="mb-2">
-                  <small class="text-muted d-block mb-1" style="font-size: 11px;">Klik tombol variabel di bawah untuk menyisipkan ke pesan:</small>
+                  <small class="text-muted d-block mb-1.5 fw-semibold" style="font-size: 11px;">
+                    <i class="bi bi-cursor-fill text-primary me-0.5"></i> Klik tag variabel di bawah untuk menyisipkan ke pesan:
+                  </small>
                   <div class="d-flex flex-wrap gap-1.5">
-                    <button type="button" class="tag-var-pill" onclick="insertVariableTag('{nama_toko}')" title="Nama Toko Customer">+ {nama_toko}</button>
-                    <button type="button" class="tag-var-pill" onclick="insertVariableTag('{nama_pic}')" title="Nama PIC / Kontak">+ {nama_pic}</button>
-                    <button type="button" class="tag-var-pill" onclick="insertVariableTag('{kota}')" title="Kota / Wilayah Toko">+ {kota}</button>
-                    <button type="button" class="tag-var-pill" onclick="insertVariableTag('{nama_sales}')" title="Nama Sales Pengirim">+ {nama_sales}</button>
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{nama_toko}')" title="Nama Toko Customer">
+                      <i class="bi bi-shop text-primary" style="font-size: 11px;"></i> {nama_toko}
+                    </button>
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{nama_pic}')" title="Nama PIC / Kontak">
+                      <i class="bi bi-person-fill text-success" style="font-size: 11px;"></i> {nama_pic}
+                    </button>
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{kota}')" title="Kota / Wilayah Toko">
+                      <i class="bi bi-geo-alt-fill text-danger" style="font-size: 11px;"></i> {kota}
+                    </button>
+                    <button type="button" class="tag-var-pill d-inline-flex align-items-center gap-1" onclick="insertVariableTag('{nama_sales}')" title="Nama Sales Pengirim">
+                      <i class="bi bi-briefcase-fill text-warning" style="font-size: 11px;"></i> {nama_sales}
+                    </button>
                   </div>
                 </div>
 
                 <!-- Textarea Pesan Broadcast -->
                 <div>
-                  <textarea id="broadcastMessageText" class="form-control" rows="8" placeholder="Tulis pesan broadcast WhatsApp Anda di sini... Gunakan variabel seperti {nama_toko} dan {nama_pic} agar pesan terasa personal." style="border-radius: 10px; font-size: 13px; line-height: 1.5;"></textarea>
+                  <textarea id="broadcastMessageText" class="form-control" rows="8" placeholder="Tulis pesan broadcast WhatsApp Anda di sini... Gunakan variabel seperti {nama_toko} dan {nama_pic} agar pesan terasa personal." style="border-radius: 10px; font-size: 13px; line-height: 1.5; min-height: 190px; height: 190px; resize: vertical;"></textarea>
                   <div class="d-flex justify-content-between align-items-center mt-1.5 px-1">
-                    <small class="text-muted" style="font-size: 11px;">Gunakan <code>*tebal*</code>, <code>_miring_</code> untuk format teks WhatsApp.</small>
+                    <small class="text-muted" style="font-size: 11px;">
+                      Format WhatsApp: <code>*tebal*</code> &bull; <code>_miring_</code>
+                    </small>
                     <small class="text-muted fw-semibold" id="txtCharCount" style="font-size: 11px;">0 karakter</small>
                   </div>
                 </div>
               </div>
 
               <!-- 3. Pengaturan Anti-Banned & Follow-Up -->
-              <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+              <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white">
                 <div class="row g-2 align-items-center">
-                  <div class="col-md-6 col-12">
-                    <label class="fw-bold small text-dark mb-1 d-block" style="font-size: 12px;">
-                      <i class="bi bi-shield-check text-success me-1"></i> Jeda Aman Antar Pesan:
+                  <div class="col-sm-6 col-12">
+                    <label class="fw-bold small text-dark mb-1 d-flex align-items-center gap-1" style="font-size: 12px;">
+                      <i class="bi bi-shield-check text-success"></i> Jeda Aman Antar Pesan:
                     </label>
                     <select id="broadcastDelaySelect" class="form-select form-select-sm fw-semibold" style="border-radius: 8px;">
                       <option value="3">3 Detik (Cepat)</option>
@@ -1741,10 +1828,10 @@ if ($active_sales_id > 0) {
                       <option value="8">8 Detik (Extra Aman)</option>
                     </select>
                   </div>
-                  <div class="col-md-6 col-12">
-                    <div class="form-check mt-3 mt-md-3">
-                      <input class="form-check-input" type="checkbox" id="checkAutoLogFu" checked>
-                      <label class="form-check-label small fw-semibold text-dark" for="checkAutoLogFu" style="font-size: 12px;">
+                  <div class="col-sm-6 col-12">
+                    <div class="form-check mt-sm-3 pt-sm-1">
+                      <input class="form-check-input" type="checkbox" id="checkAutoLogFu" checked style="cursor: pointer; width: 16px; height: 16px;">
+                      <label class="form-check-label small fw-semibold text-dark ms-1" for="checkAutoLogFu" style="font-size: 12px; cursor: pointer;">
                         Otomatis catat ke Riwayat Follow-Up CRM
                       </label>
                     </div>
@@ -1754,35 +1841,73 @@ if ($active_sales_id > 0) {
 
             </div>
 
-            <!-- Kolom Kanan: Live Preview Balon Chat WhatsApp -->
+            <!-- Kolom Kanan: Live Preview Smartphone WhatsApp -->
             <div class="col-lg-5 col-12">
-              <div class="card border-0 shadow-sm rounded-4 p-3.5 bg-white h-100 d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-center mb-2.5">
-                  <span class="fw-bold text-dark" style="font-size: 13px;">
-                    <i class="bi bi-phone text-primary me-1"></i> Pratinjau Balon Chat WhatsApp
-                  </span>
-                  <span class="badge bg-light text-muted border fw-normal" style="font-size: 10px;" id="lblPreviewCustomerName">
-                    Sample: Toko
-                  </span>
-                </div>
-
-                <!-- Chat Screen Wrapper -->
-                <div class="wa-preview-screen flex-grow-1 d-flex flex-column justify-content-end">
-                  <div class="wa-bubble-sent shadow-sm">
-                    <div id="waBubbleContent">
-                      Halo! Ini adalah contoh pesan broadcast.
-                    </div>
-                    <div class="wa-bubble-time">
-                      <span id="waBubbleClock">12:00</span>
-                      <i class="bi bi-check2-all text-primary" style="font-size: 13px;"></i>
-                    </div>
+              <div class="card border border-light-subtle shadow-sm rounded-4 p-3 bg-white h-100 d-flex flex-column">
+                
+                <!-- Header Preview -->
+                <div class="d-flex justify-content-between align-items-center mb-2.5 pb-1 border-bottom">
+                  <div class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 13px; white-space: nowrap;">
+                    <i class="bi bi-phone-fill text-success"></i> Pratinjau Balon Chat
+                  </div>
+                  <div class="badge bg-light text-secondary border fw-normal text-truncate" style="max-width: 180px; font-size: 11px;" id="lblPreviewCustomerName" title="Contoh Toko">
+                    Contoh: Toko CCTV
                   </div>
                 </div>
 
-                <div class="p-2.5 rounded-3 bg-light mt-3 border small text-muted" style="font-size: 11px;">
-                  <i class="bi bi-info-circle-fill text-primary me-1"></i>
-                  Pesan di atas akan dipersonalisasi secara otomatis untuk setiap toko penerima.
+                <!-- Realistic WhatsApp Phone Mockup -->
+                <div class="wa-mockup-phone flex-grow-1">
+                  
+                  <!-- WhatsApp Top Header -->
+                  <div class="wa-mockup-header">
+                    <div class="d-flex align-items-center gap-2 overflow-hidden">
+                      <i class="bi bi-arrow-left text-white" style="font-size: 13px;"></i>
+                      <div class="wa-mockup-avatar shadow-sm">
+                        <i class="bi bi-shop"></i>
+                      </div>
+                      <div class="overflow-hidden">
+                        <div class="fw-bold text-white text-truncate" style="font-size: 12px; line-height: 1.2;" id="waPhoneHeaderName">
+                          Pamungkas CCTV
+                        </div>
+                        <div class="text-white-50" style="font-size: 9.5px; line-height: 1;">online</div>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2.5 text-white-50" style="font-size: 13px;">
+                      <i class="bi bi-telephone-fill"></i>
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </div>
+                  </div>
+
+                  <!-- WhatsApp Chat Scroll Body -->
+                  <div class="wa-mockup-body flex-grow-1">
+                    <div class="wa-bubble-sent shadow-sm">
+                      <div id="waBubbleContent">
+                        Halo! Ini adalah contoh pesan broadcast.
+                      </div>
+                      <div class="wa-bubble-time">
+                        <span id="waBubbleClock">12:00</span>
+                        <i class="bi bi-check2-all text-primary" style="font-size: 13px;"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- WhatsApp Input Bottom Bar -->
+                  <div class="wa-mockup-footer">
+                    <i class="bi bi-emoji-smile text-muted" style="font-size: 15px;"></i>
+                    <div class="wa-mockup-input-dummy">Ketik pesan...</div>
+                    <i class="bi bi-paperclip text-muted" style="font-size: 15px;"></i>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 28px; height: 28px; background: #008069; font-size: 12px;">
+                      <i class="bi bi-mic-fill"></i>
+                    </div>
+                  </div>
+
                 </div>
+
+                <div class="p-2 rounded-3 bg-light mt-2.5 border small text-muted d-flex align-items-center gap-2" style="font-size: 11px;">
+                  <i class="bi bi-info-circle-fill text-success fs-6 flex-shrink-0"></i>
+                  <span>Pesan di atas otomatis dipersonalisasi dengan data nyata toko setiap penerima.</span>
+                </div>
+
               </div>
             </div>
 
@@ -2159,9 +2284,31 @@ function openBroadcastModal(mode) {
     modal.show();
 }
 
+function setBroadcastTargetMode(mode) {
+    if (mode === 'selected') {
+        const r1 = document.getElementById('targetModeSelected');
+        if (r1) r1.checked = true;
+    } else {
+        const r2 = document.getElementById('targetModeFilter');
+        if (r2) r2.checked = true;
+    }
+    handleTargetModeChange();
+}
+
 // Pergantian Mode Target (Terpilih vs Filter)
 async function handleTargetModeChange() {
     const mode = document.querySelector('input[name="target_mode"]:checked')?.value || 'selected';
+    const cardSel = document.getElementById('cardTargetSelected');
+    const cardFilt = document.getElementById('cardTargetFilter');
+
+    if (mode === 'selected') {
+        cardSel?.classList.add('active');
+        cardFilt?.classList.remove('active');
+    } else {
+        cardFilt?.classList.add('active');
+        cardSel?.classList.remove('active');
+    }
+
     const badgeSummary = document.getElementById('badgeTargetSummary');
     const btnCount = document.getElementById('txtBtnTargetCount');
     const warningNoPhone = document.getElementById('targetWarningNoPhone');
@@ -2236,6 +2383,11 @@ function updateLivePreview() {
     const previewCustomerLabel = document.getElementById('lblPreviewCustomerName');
     if (previewCustomerLabel) {
         previewCustomerLabel.textContent = `Contoh: ${sample.nama_toko}`;
+        previewCustomerLabel.title = sample.nama_toko;
+    }
+    const phoneHeaderName = document.getElementById('waPhoneHeaderName');
+    if (phoneHeaderName) {
+        phoneHeaderName.textContent = sample.nama_toko;
     }
 
     let parsed = text
