@@ -270,7 +270,8 @@ if ($action === 'openwa_get_qr') {
         exit();
     }
 
-    $sessionId = trim($_POST['session_id'] ?? ($_GET['session_id'] ?? ''));
+    $sessionId    = trim($_POST['session_id'] ?? ($_GET['session_id'] ?? ''));
+    $forceRefresh = (int)($_POST['force_refresh'] ?? ($_GET['force_refresh'] ?? 0));
     if ($sessionId === '') {
         echo json_encode(['success' => false, 'message' => 'Session ID kosong.']);
         exit();
@@ -286,6 +287,22 @@ if ($action === 'openwa_get_qr') {
     $info = is_array($infoRes['data']) ? $infoRes['data'] : [];
     if (isset($info['data']) && is_array($info['data'])) $info = $info['data'];
     $status = strtolower(trim((string)($info['status'] ?? 'unknown')));
+
+    // Jika user klik Refresh QR paksa (dan sesi belum ready), restart sesi agar WhatsApp menerbitkan QR baru yang 100% segar
+    if ($forceRefresh === 1 && $status !== 'ready') {
+        @openwaRequest($config, 'POST', 'sessions/' . rawurlencode($sessionId) . '/stop', null, 10);
+        usleep(500000);
+        @openwaRequest($config, 'POST', 'sessions/' . rawurlencode($sessionId) . '/start', null, 12);
+        usleep(700000);
+        echo json_encode([
+            'success' => true,
+            'status'  => 'initializing',
+            'qr'      => null,
+            'qr_hash' => null,
+            'message' => 'Membuat QR Code baru yang segar dari WhatsApp...',
+        ]);
+        exit();
+    }
 
     // Jika sesi belum start, otomatis start agar QR muncul
     if (in_array($status, ['created', 'stopped', 'disconnected', 'failed'], true)) {

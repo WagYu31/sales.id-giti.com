@@ -534,6 +534,37 @@ require_once 'includes/header.php';
     from { opacity: 0.25; transform: scale(0.97); }
     to   { opacity: 1; transform: scale(1); }
 }
+.qr-expired-overlay {
+    position: absolute;
+    inset: 12px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 5;
+    animation: qrFadeIn 0.2s ease-out;
+}
+.qr-fresh-bar-wrap {
+    width: 280px;
+    margin: 0 auto 14px;
+}
+.qr-fresh-bar {
+    height: 6px;
+    border-radius: 99px;
+    background: #e2e8f0;
+    overflow: hidden;
+}
+.qr-fresh-bar-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #10b981, #059669);
+    transition: width 0.8s linear, background-color 0.3s ease;
+}
 .qr-steps-box {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
@@ -1349,7 +1380,7 @@ function filterMessagesTable() {
                 </div>
 
                 <!-- Crisp White Viewfinder QR Stage -->
-                <div class="qr-stage-outer mb-3" id="qrStageOuter">
+                <div class="qr-stage-outer mb-2.5" id="qrStageOuter">
                     <span class="qr-corner tl"></span>
                     <span class="qr-corner tr"></span>
                     <span class="qr-corner bl"></span>
@@ -1360,12 +1391,30 @@ function filterMessagesTable() {
                             <div class="fw-semibold">Meminta QR Code...</div>
                         </div>
                     </div>
+                    <!-- Overlay Kedaluwarsa (Muncul otomatis jika QR tidak berotasi >45 dtk) -->
+                    <div id="qrExpiredOverlay" class="qr-expired-overlay d-none">
+                        <div class="rounded-circle bg-warning-subtle text-warning-emphasis d-inline-flex align-items-center justify-content-center mb-2" style="width:52px;height:52px;font-size:24px;">
+                            <i class="bi bi-hourglass-bottom"></i>
+                        </div>
+                        <div class="fw-bold text-dark small mb-1">QR Code Kedaluwarsa</div>
+                        <div class="text-muted mb-2.5" style="font-size:11px;">Klik tombol di bawah untuk membuat QR baru yang segar dari WhatsApp.</div>
+                        <button type="button" class="btn btn-success btn-sm rounded-pill px-3.5 fw-bold shadow-sm" onclick="forceRefreshOpenwaQr()">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Buat QR Baru
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Info Masa Aktif QR (Jelas & Tidak Bikin Panik) -->
-                <div class="d-inline-flex align-items-center gap-1.5 px-3 py-1 rounded-pill mb-3" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-size: 11px; font-weight: 600;">
-                    <i class="bi bi-clock-history"></i>
-                    <span id="qrValidityText">QR aktif ~20–40 detik &amp; otomatis diperbarui jika kedaluwarsa</span>
+                <!-- Live Freshness Countdown & Progress Bar -->
+                <div class="qr-fresh-bar-wrap">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 11px;">
+                        <span class="fw-bold text-success" id="qrValidityText">
+                            <i class="bi bi-shield-check me-0.5"></i> Menunggu QR segar...
+                        </span>
+                        <span class="fw-bold font-monospace text-muted" id="qrCountdownClock">-- dtk</span>
+                    </div>
+                    <div class="qr-fresh-bar">
+                        <div class="qr-fresh-bar-fill" id="qrFreshBarFill" style="width: 100%;"></div>
+                    </div>
                 </div>
 
                 <!-- Panduan 3 Langkah Visual -->
@@ -1806,6 +1855,9 @@ async function testOpenwaSend(sessionId, label) {
 }
 
 let openwaLastQrValue = '';
+let openwaQrIssuedAt = 0;
+let openwaQrAgeTimer = null;
+const OPENWA_QR_MAX_TTL = 45; // Estimasi masa aktif aman 1 token QR WhatsApp (detik)
 
 function setQrStatusPill(type, htmlContent) {
     const badge = document.getElementById('qrStatusBadge');
@@ -1824,12 +1876,73 @@ function setQrStatusPill(type, htmlContent) {
     badge.innerHTML        = htmlContent;
 }
 
+function updateQrFreshnessUI() {
+    const valTxt  = document.getElementById('qrValidityText');
+    const clockEl = document.getElementById('qrCountdownClock');
+    const barFill = document.getElementById('qrFreshBarFill');
+    const overlay = document.getElementById('qrExpiredOverlay');
+    if (!openwaQrIssuedAt) return;
+
+    const elapsed = Math.floor((Date.now() - openwaQrIssuedAt) / 1000);
+    const remaining = Math.max(0, OPENWA_QR_MAX_TTL - elapsed);
+    const pct = Math.max(0, Math.min(100, Math.round((remaining / OPENWA_QR_MAX_TTL) * 100)));
+
+    if (barFill) {
+        barFill.style.width = pct + '%';
+        if (remaining <= 0) {
+            barFill.style.background = '#ef4444';
+        } else if (remaining <= 12) {
+            barFill.style.background = '#f59e0b';
+        } else {
+            barFill.style.background = 'linear-gradient(90deg, #10b981, #059669)';
+        }
+    }
+
+    if (remaining <= 0) {
+        if (valTxt) {
+            valTxt.className = 'fw-bold text-danger';
+            valTxt.innerHTML = '<i class="bi bi-exclamation-circle-fill me-0.5"></i> QR Kedaluwarsa — klik Buat QR Baru';
+        }
+        if (clockEl) clockEl.textContent = '0 dtk';
+        overlay?.classList.remove('d-none');
+        setQrStatusPill('error', '<i class="bi bi-hourglass-bottom"></i> QR KEDALUWARSA');
+    } else if (remaining <= 12) {
+        if (valTxt) {
+            valTxt.className = 'fw-bold text-warning-emphasis';
+            valTxt.innerHTML = '<i class="bi bi-clock-history me-0.5"></i> Segera berganti otomatis...';
+        }
+        if (clockEl) clockEl.textContent = remaining + ' dtk';
+        overlay?.classList.add('d-none');
+    } else {
+        if (valTxt) {
+            valTxt.className = 'fw-bold text-success';
+            valTxt.innerHTML = '<i class="bi bi-shield-check me-0.5"></i> QR Aktif &amp; Segar';
+        }
+        if (clockEl) clockEl.textContent = remaining + ' dtk';
+        overlay?.classList.add('d-none');
+    }
+}
+
+function stopQrTimers() {
+    if (openwaQrPollTimer) { clearInterval(openwaQrPollTimer); openwaQrPollTimer = null; }
+    if (openwaQrAgeTimer)  { clearInterval(openwaQrAgeTimer);  openwaQrAgeTimer  = null; }
+}
+
 function openOpenwaQrModal(sessionId, label) {
     openwaQrActiveSessionId = sessionId;
     openwaLastQrValue = '';
+    openwaQrIssuedAt = 0;
     document.getElementById('qrModalSessionLabel').textContent = label;
     document.getElementById('qrStageOuter')?.classList.remove('is-ready-scan');
+    document.getElementById('qrExpiredOverlay')?.classList.add('d-none');
     document.getElementById('qrFooterLiveText').textContent = 'Mendeteksi scan otomatis...';
+    const valTxt = document.getElementById('qrValidityText');
+    if (valTxt) { valTxt.className = 'fw-bold text-muted'; valTxt.innerHTML = '<i class="bi bi-clock me-0.5"></i> Menyiapkan QR segar...'; }
+    const clockEl = document.getElementById('qrCountdownClock');
+    if (clockEl) clockEl.textContent = '-- dtk';
+    const barFill = document.getElementById('qrFreshBarFill');
+    if (barFill) { barFill.style.width = '100%'; barFill.style.background = '#cbd5e1'; }
+
     setQrStatusPill('wait', '<span class="spinner-border spinner-border-sm" style="width:10px;height:10px;"></span> Menyiapkan QR Code...');
     document.getElementById('qrImageWrapper').innerHTML = '<div class="text-muted small"><div class="spinner-border text-success mb-2"></div><div class="fw-semibold">Meminta QR Code...</div></div>';
 
@@ -1837,24 +1950,30 @@ function openOpenwaQrModal(sessionId, label) {
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 
     pollOpenwaQr();
-    if (openwaQrPollTimer) clearInterval(openwaQrPollTimer);
-    // Polling cepat di background hanya untuk mendeteksi status scan — QR tidak digambar ulang kecuali benar-benar berubah dari WhatsApp!
+    stopQrTimers();
+    // Polling cepat di background hanya untuk mendeteksi status scan & rotasi QR baru — QR tidak berkedip!
     openwaQrPollTimer = setInterval(pollOpenwaQr, 2500);
+    openwaQrAgeTimer  = setInterval(updateQrFreshnessUI, 1000);
 
     modalEl.addEventListener('hidden.bs.modal', () => {
-        if (openwaQrPollTimer) {
-            clearInterval(openwaQrPollTimer);
-            openwaQrPollTimer = null;
-        }
+        stopQrTimers();
         openwaLastQrValue = '';
+        openwaQrIssuedAt = 0;
         loadOpenwaDashboard();
     }, { once: true });
 }
 
-function forceRefreshOpenwaQr() {
+async function forceRefreshOpenwaQr() {
+    if (!openwaQrActiveSessionId) return;
     openwaLastQrValue = '';
-    document.getElementById('qrImageWrapper').innerHTML = '<div class="text-muted small"><div class="spinner-border text-success mb-2"></div><div class="fw-semibold">Memuat ulang QR...</div></div>';
-    pollOpenwaQr();
+    openwaQrIssuedAt = 0;
+    document.getElementById('qrExpiredOverlay')?.classList.add('d-none');
+    setQrStatusPill('wait', '<span class="spinner-border spinner-border-sm" style="width:10px;height:10px;"></span> Membuat QR Baru...');
+    document.getElementById('qrImageWrapper').innerHTML = '<div class="text-muted small"><div class="spinner-border text-success mb-2"></div><div class="fw-semibold">Menerbitkan QR baru dari WhatsApp...</div></div>';
+    try {
+        await fetch('ajax_wa_broadcast.php?action=openwa_get_qr&force_refresh=1&session_id=' + encodeURIComponent(openwaQrActiveSessionId));
+    } catch (e) {}
+    setTimeout(pollOpenwaQr, 1200);
 }
 
 async function pollOpenwaQr() {
@@ -1874,13 +1993,19 @@ async function pollOpenwaQr() {
         const st = (data.status || 'waiting').toLowerCase();
 
         if (st === 'ready') {
-            if (openwaQrPollTimer) {
-                clearInterval(openwaQrPollTimer);
-                openwaQrPollTimer = null;
-            }
+            stopQrTimers();
+            openwaQrIssuedAt = 0;
+            document.getElementById('qrExpiredOverlay')?.classList.add('d-none');
             stage?.classList.add('is-ready-scan');
             setQrStatusPill('ready', '<i class="bi bi-check-circle-fill"></i> TERHUBUNG (READY)');
             if (foot) foot.textContent = 'Perangkat berhasil ditautkan!';
+            const valTxt = document.getElementById('qrValidityText');
+            if (valTxt) { valTxt.className = 'fw-bold text-success'; valTxt.innerHTML = '<i class="bi bi-check-circle-fill me-0.5"></i> Terhubung ke WhatsApp!'; }
+            const clockEl = document.getElementById('qrCountdownClock');
+            if (clockEl) clockEl.textContent = 'OK';
+            const barFill = document.getElementById('qrFreshBarFill');
+            if (barFill) { barFill.style.width = '100%'; barFill.style.background = '#10b981'; }
+
             wrap.innerHTML = `
                 <div class="text-success p-3 qr-img-fade">
                     <div class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-2" style="width:76px;height:76px;">
@@ -1898,6 +2023,8 @@ async function pollOpenwaQr() {
 
         if (st === 'authenticating') {
             openwaLastQrValue = '';
+            openwaQrIssuedAt = 0;
+            document.getElementById('qrExpiredOverlay')?.classList.add('d-none');
             setQrStatusPill('auth', '<span class="spinner-border spinner-border-sm" style="width:10px;height:10px;"></span> QR Terbaca — Menghubungkan...');
             if (foot) foot.textContent = 'Sinkronisasi akun WhatsApp...';
             wrap.innerHTML = `
@@ -1912,16 +2039,23 @@ async function pollOpenwaQr() {
         if (data.qr) {
             const qrStr = String(data.qr);
             stage?.classList.add('is-ready-scan');
-            setQrStatusPill('qr', '<span class="pulse-dot emerald"></span> SIAP SCAN QR');
             if (foot) foot.textContent = 'Menunggu scan dari kamera HP...';
 
-            // ZERO-FLICKER: Hanya render ulang gambar jika token QR benar-benar berubah dari server WhatsApp (~20-40 dtk sekali)!
+            // ZERO-FLICKER: Render ulang & reset timer HANYA jika token QR benar-benar baru dari WhatsApp!
             if (qrStr !== openwaLastQrValue) {
+                const isRotation = openwaLastQrValue !== '';
                 openwaLastQrValue = qrStr;
+                openwaQrIssuedAt = Date.now();
+                document.getElementById('qrExpiredOverlay')?.classList.add('d-none');
+                setQrStatusPill('qr', isRotation
+                    ? '<i class="bi bi-stars"></i> QR BARU DIPERBARUI — SIAP SCAN'
+                    : '<span class="pulse-dot emerald"></span> SIAP SCAN QR');
+
                 const imgSrc = qrStr.startsWith('data:image')
                     ? qrStr
                     : ('https://api.qrserver.com/v1/create-qr-code/?size=244x244&margin=2&data=' + encodeURIComponent(qrStr));
                 wrap.innerHTML = `<img src="${imgSrc}" alt="QR WhatsApp" class="qr-img-fade" style="width:244px;height:244px;object-fit:contain;border-radius:10px;">`;
+                updateQrFreshnessUI();
             }
         } else {
             setQrStatusPill('wait', '<span class="spinner-border spinner-border-sm" style="width:10px;height:10px;"></span> ' + escapeOpenwaHtml(st.toUpperCase()));
