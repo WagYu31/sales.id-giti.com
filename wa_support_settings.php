@@ -3,7 +3,7 @@
  * wa_support_settings.php
  * Halaman Manajemen Pesan Bantuan Masuk & Pengaturan WhatsApp Gateway (Superadmin Only)
  * Desain UI Premium inspired by 21st.dev & tasteskill.dev
- * Proteksi Keamanan Sandi Superadmin: Wagyu31
+ * Proteksi Keamanan Sandi Konfigurasi Gateway (Server-Side)
  */
 
 $page_title = 'Pusat Pesan Bantuan & OpenWA Gateway';
@@ -18,7 +18,32 @@ if (strtolower(trim($_SESSION['role'] ?? '')) !== 'superadmin') {
 }
 
 ensureOpenWATables($conn);
-define('GATEWAY_AUTH_KEY', 'Wagyu31');
+define('GATEWAY_AUTH_KEY', '312226');
+
+// Endpoint AJAX Verifikasi / Kunci Ulang Sandi Konfigurasi Gateway (Server-Side)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gateway_auth_action'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    $authAction = trim($_POST['gateway_auth_action']);
+    if ($authAction === 'unlock') {
+        $submittedPass = trim((string)($_POST['auth_password'] ?? ''));
+        if (hash_equals(GATEWAY_AUTH_KEY, $submittedPass)) {
+            $_SESSION['wa_gateway_config_unlocked'] = true;
+            echo json_encode(['success' => true, 'message' => 'Akses konfigurasi berhasil dibuka!']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Sandi salah! Silakan coba lagi.']);
+        }
+        exit();
+    }
+    if ($authAction === 'lock') {
+        unset($_SESSION['wa_gateway_config_unlocked']);
+        echo json_encode(['success' => true, 'message' => 'Konfigurasi berhasil dikunci kembali.']);
+        exit();
+    }
+    echo json_encode(['success' => false, 'message' => 'Aksi tidak dikenali.']);
+    exit();
+}
+
+$is_gateway_unlocked = !empty($_SESSION['wa_gateway_config_unlocked']);
 
 // Pastikan tabel support_messages sudah ada
 $conn->query("
@@ -39,62 +64,73 @@ $conn->query("
 $msg_success = '';
 $msg_error = '';
 
-// Proses Simpan Pengaturan OpenWA Self-Hosted (Superadmin)
+// Proses Simpan Pengaturan OpenWA Self-Hosted (Wajib Terbuka dengan Sandi)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_openwa_settings'])) {
-    saveOpenWAConfig($conn, [
-        'base_url'        => $_POST['openwa_base_url'] ?? 'http://127.0.0.1:2785',
-        'api_key'         => $_POST['openwa_api_key'] ?? '',
-        'dedup_days'      => $_POST['openwa_dedup_days'] ?? 7,
-        'work_hours_only' => isset($_POST['openwa_work_hours_only']) ? 1 : 0,
-    ]);
-    $msg_success = "Konfigurasi OpenWA Self-Hosted & Anti-Ban berhasil disimpan!";
-}
-
-// Proses Simpan Pengaturan Fonnte (Superadmin) — merge agar konfigurasi OpenWA tidak tertimpa
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
-    $wa_target = trim($_POST['wa_support_number'] ?? '085771593522');
-    $fonnte_token = trim($_POST['fonnte_token'] ?? '');
-
-    // 1. Simpan ke JSON file (merge dengan data lama agar openwa_* tetap aman)
-    $configFile = __DIR__ . '/includes/wa_gateway_config.json';
-    $configData = file_exists($configFile) ? json_decode(@file_get_contents($configFile), true) : [];
-    if (!is_array($configData)) $configData = [];
-    $configData['wa_support_number'] = $wa_target;
-    $configData['fonnte_token']      = $fonnte_token;
-    $configData['updated_at']        = date('Y-m-d H:i:s');
-    @file_put_contents($configFile, json_encode($configData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-
-    // 2. Pastikan kolom setting_value di DB support TEXT panjang
-    @$conn->query("ALTER TABLE settings MODIFY COLUMN setting_value TEXT NULL");
-
-    // 3. Simpan ke database settings
-    @$conn->query("DELETE FROM settings WHERE setting_key IN ('wa_support_number', 'fonnte_token')");
-
-    $stmt1 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('wa_support_number', ?)");
-    if ($stmt1) {
-        $stmt1->bind_param("s", $wa_target);
-        $stmt1->execute();
-        $stmt1->close();
-    }
-
-    $stmt2 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('fonnte_token', ?)");
-    if ($stmt2) {
-        $stmt2->bind_param("s", $fonnte_token);
-        $stmt2->execute();
-        $stmt2->close();
-    }
-
-    $msg_success = "Pengaturan WhatsApp Gateway & Token Fonnte berhasil diperbarui!";
-}
-
-// Proses Tes Kirim WA (Superadmin)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['test_send_wa'])) {
-    $test_target = trim($_POST['test_target'] ?? '085771593522');
-    $test_token = trim($_POST['test_token'] ?? '');
-
-    if (empty($test_token)) {
-        $msg_error = "Token Fonnte belum diisi. Masukkan token terlebih dahulu untuk melakukan tes pengiriman!";
+    if (!$is_gateway_unlocked) {
+        $msg_error = "Akses terkunci! Silakan buka kunci konfigurasi terlebih dahulu menggunakan sandi keamanan.";
     } else {
+        saveOpenWAConfig($conn, [
+            'base_url'        => $_POST['openwa_base_url'] ?? 'http://127.0.0.1:2785',
+            'api_key'         => $_POST['openwa_api_key'] ?? '',
+            'dedup_days'      => $_POST['openwa_dedup_days'] ?? 7,
+            'work_hours_only' => isset($_POST['openwa_work_hours_only']) ? 1 : 0,
+        ]);
+        $msg_success = "Konfigurasi OpenWA Self-Hosted & Anti-Ban berhasil disimpan!";
+    }
+}
+
+// Proses Simpan Pengaturan Fonnte (Wajib Terbuka dengan Sandi) — merge agar konfigurasi OpenWA tidak tertimpa
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
+    if (!$is_gateway_unlocked) {
+        $msg_error = "Akses terkunci! Silakan buka kunci konfigurasi terlebih dahulu menggunakan sandi keamanan.";
+    } else {
+        $wa_target = trim($_POST['wa_support_number'] ?? '085771593522');
+        $fonnte_token = trim($_POST['fonnte_token'] ?? '');
+
+        // 1. Simpan ke JSON file (merge dengan data lama agar openwa_* tetap aman)
+        $configFile = __DIR__ . '/includes/wa_gateway_config.json';
+        $configData = file_exists($configFile) ? json_decode(@file_get_contents($configFile), true) : [];
+        if (!is_array($configData)) $configData = [];
+        $configData['wa_support_number'] = $wa_target;
+        $configData['fonnte_token']      = $fonnte_token;
+        $configData['updated_at']        = date('Y-m-d H:i:s');
+        @file_put_contents($configFile, json_encode($configData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        // 2. Pastikan kolom setting_value di DB support TEXT panjang
+        @$conn->query("ALTER TABLE settings MODIFY COLUMN setting_value TEXT NULL");
+
+        // 3. Simpan ke database settings
+        @$conn->query("DELETE FROM settings WHERE setting_key IN ('wa_support_number', 'fonnte_token')");
+
+        $stmt1 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('wa_support_number', ?)");
+        if ($stmt1) {
+            $stmt1->bind_param("s", $wa_target);
+            $stmt1->execute();
+            $stmt1->close();
+        }
+
+        $stmt2 = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('fonnte_token', ?)");
+        if ($stmt2) {
+            $stmt2->bind_param("s", $fonnte_token);
+            $stmt2->execute();
+            $stmt2->close();
+        }
+
+        $msg_success = "Pengaturan WhatsApp Gateway & Token Fonnte berhasil diperbarui!";
+    }
+}
+
+// Proses Tes Kirim WA Fonnte (Wajib Terbuka dengan Sandi)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['test_send_wa'])) {
+    if (!$is_gateway_unlocked) {
+        $msg_error = "Akses terkunci! Silakan buka kunci konfigurasi terlebih dahulu menggunakan sandi keamanan.";
+    } else {
+        $test_target = trim($_POST['test_target'] ?? '085771593522');
+        $test_token = trim($_POST['test_token'] ?? '');
+
+        if (empty($test_token)) {
+            $msg_error = "Token Fonnte belum diisi. Masukkan token terlebih dahulu untuk melakukan tes pengiriman!";
+        } else {
             $testMsg = "*TES KONEKSI WHATSAPP GATEWAY*\n\nHalo Admin Loewix! Ini adalah pesan tes dari sistem *sales.id-giti.com*.\nWhatsApp Gateway Fonnte Anda telah *BERHASIL TERHUBUNG* dan siap menerima laporan kendala sales!";
 
             $curl = curl_init();
@@ -130,6 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['test_send_wa'])) {
             }
         }
     }
+}
 
 // Ambil Pengaturan Saat Ini
 $current_wa = '085771593522';
@@ -523,25 +560,64 @@ require_once 'includes/header.php';
         </div>
 
         <div class="row g-4">
-            <!-- Kiri: Koneksi Server OpenWA & Guardrail Global -->
+            <!-- Kiri: Koneksi Server OpenWA & Guardrail Global (Terkunci Sandi Keamanan) -->
             <div class="col-lg-4 col-12">
                 <div class="p-3.5 rounded-4 h-100" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                    <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-1.5">
-                        <i class="bi bi-hdd-network-fill text-success"></i> Koneksi Server OpenWA (Docker)
-                    </h6>
-                    <form method="POST" action="wa_support_settings.php">
+                    <div class="d-flex justify-content-between align-items-center mb-2.5">
+                        <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-1.5">
+                            <i class="bi bi-hdd-network-fill text-success"></i> Koneksi Server OpenWA (Docker)
+                        </h6>
+                        <?php if ($is_gateway_unlocked): ?>
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2.5 py-0.5 fw-bold" style="font-size: 10.5px;" onclick="lockGateway()">
+                                <i class="bi bi-lock-fill me-0.5"></i> Kunci
+                            </button>
+                        <?php else: ?>
+                            <button type="button" class="btn btn-danger btn-sm rounded-pill px-2.5 py-0.5 fw-bold shadow-sm" style="font-size: 10.5px;" onclick="requireGatewayUnlock('Buka Konfigurasi OpenWA')">
+                                <i class="bi bi-unlock-fill me-0.5"></i> Buka Kunci
+                            </button>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if (!$is_gateway_unlocked): ?>
+                        <div class="security-banner locked mb-3 py-2 px-2.5 d-flex align-items-center gap-2" style="cursor:pointer;" onclick="requireGatewayUnlock('Buka Konfigurasi OpenWA')">
+                            <i class="bi bi-shield-lock-fill fs-5 text-danger flex-shrink-0"></i>
+                            <div style="line-height: 1.3;">
+                                <div class="fw-bold" style="font-size: 11.5px;">Konfigurasi Terkunci Sandi</div>
+                                <div style="font-size: 10.5px; opacity: 0.9;">Klik <strong>Buka Kunci</strong> untuk melihat API Key &amp; mengubah pengaturan.</div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <form method="POST" action="wa_support_settings.php" id="formSaveOpenwa" onsubmit="return guardLockedSubmit(event, 'Simpan Konfigurasi OpenWA')">
                         <input type="hidden" name="save_openwa_settings" value="1">
                         <div class="mb-2.5">
-                            <label class="form-label-custom"><span>URL API OpenWA</span></label>
-                            <input type="text" name="openwa_base_url" class="form-control form-control-sm font-monospace" value="<?= htmlspecialchars($openwa_cfg['base_url']) ?>" placeholder="http://127.0.0.1:2785" required>
+                            <label class="form-label-custom">
+                                <span>URL API OpenWA</span>
+                                <?php if (!$is_gateway_unlocked): ?>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal" style="font-size: 9.5px;"><i class="bi bi-lock-fill"></i> Terkunci</span>
+                                <?php endif; ?>
+                            </label>
+                            <input type="text" name="openwa_base_url" class="form-control form-control-sm font-monospace <?= !$is_gateway_unlocked ? 'bg-light text-muted' : '' ?>"
+                                   value="<?= htmlspecialchars($openwa_cfg['base_url']) ?>"
+                                   placeholder="http://127.0.0.1:2785"
+                                   <?= !$is_gateway_unlocked ? 'readonly onclick="requireGatewayUnlock(\'Ubah URL API OpenWA\')" style="cursor:pointer;"' : 'required' ?>>
                             <small class="text-muted" style="font-size:10.5px;">Default lokal Docker: <code>http://127.0.0.1:2785</code></small>
                         </div>
                         <div class="mb-2.5">
-                            <label class="form-label-custom"><span>API Key OpenWA (X-API-Key)</span></label>
+                            <label class="form-label-custom">
+                                <span>API Key OpenWA (X-API-Key)</span>
+                                <?php if (!$is_gateway_unlocked): ?>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal" style="font-size: 9.5px;"><i class="bi bi-lock-fill"></i> Terkunci</span>
+                                <?php endif; ?>
+                            </label>
                             <div class="input-group input-group-sm">
-                                <input type="password" name="openwa_api_key" id="openwaApiKeyInput" class="form-control font-monospace" value="<?= htmlspecialchars($openwa_cfg['api_key']) ?>" placeholder="owa_k1_...">
+                                <input type="password" name="openwa_api_key" id="openwaApiKeyInput"
+                                       class="form-control font-monospace <?= !$is_gateway_unlocked ? 'bg-light text-muted' : '' ?>"
+                                       value="<?= $is_gateway_unlocked ? htmlspecialchars($openwa_cfg['api_key']) : (!empty($openwa_cfg['api_key']) ? '••••••••••••••••••••••••' : '') ?>"
+                                       placeholder="owa_k1_..."
+                                       <?= !$is_gateway_unlocked ? 'readonly onclick="requireGatewayUnlock(\'Lihat / Ubah API Key OpenWA\')" style="cursor:pointer;"' : '' ?>>
                                 <button class="btn btn-outline-secondary" type="button" onclick="toggleOpenwaKeyEye()" title="Lihat/Sembunyikan">
-                                    <i class="bi bi-eye-slash-fill" id="iconOpenwaKeyEye"></i>
+                                    <i class="bi bi-<?= $is_gateway_unlocked ? 'eye-slash-fill' : 'lock-fill text-danger' ?>" id="iconOpenwaKeyEye"></i>
                                 </button>
                             </div>
                             <small class="text-muted" style="font-size:10.5px;">Otomatis terisi jika menjalankan <code>install_openwa.sh</code></small>
@@ -550,26 +626,37 @@ require_once 'includes/header.php';
                             <div class="col-6">
                                 <label class="form-label-custom"><span>Anti-Spam Ganda</span></label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" name="openwa_dedup_days" class="form-control fw-bold" min="0" max="90" value="<?= (int)$openwa_cfg['dedup_days'] ?>">
+                                    <input type="number" name="openwa_dedup_days" class="form-control fw-bold <?= !$is_gateway_unlocked ? 'bg-light text-muted' : '' ?>" min="0" max="90"
+                                           value="<?= (int)$openwa_cfg['dedup_days'] ?>"
+                                           <?= !$is_gateway_unlocked ? 'readonly onclick="requireGatewayUnlock(\'Ubah Anti-Spam Ganda\')" style="cursor:pointer;"' : '' ?>>
                                     <span class="input-group-text">Hari</span>
                                 </div>
                             </div>
                             <div class="col-6 d-flex align-items-end">
-                                <div class="form-check mb-1">
-                                    <input class="form-check-input" type="checkbox" name="openwa_work_hours_only" id="chkWorkHours" value="1" <?= !empty($openwa_cfg['work_hours_only']) ? 'checked' : '' ?>>
+                                <div class="form-check mb-1" <?= !$is_gateway_unlocked ? 'onclick="requireGatewayUnlock(\'Ubah Jam Kerja\'); return false;" style="cursor:pointer;"' : '' ?>>
+                                    <input class="form-check-input" type="checkbox" name="openwa_work_hours_only" id="chkWorkHours" value="1"
+                                           <?= !empty($openwa_cfg['work_hours_only']) ? 'checked' : '' ?>
+                                           <?= !$is_gateway_unlocked ? 'onclick="return false;"' : '' ?>>
                                     <label class="form-check-label small fw-bold text-dark" for="chkWorkHours" style="font-size:11px;">Jam Kerja 08–20</label>
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success btn-sm w-100 rounded-3 fw-bold py-2 shadow-sm">
-                            <i class="bi bi-save2-fill me-1"></i> Simpan Konfigurasi OpenWA
+                        <button type="submit" class="btn <?= $is_gateway_unlocked ? 'btn-success' : 'btn-secondary' ?> btn-sm w-100 rounded-3 fw-bold py-2 shadow-sm">
+                            <i class="bi bi-<?= $is_gateway_unlocked ? 'save2-fill' : 'lock-fill' ?> me-1"></i>
+                            <?= $is_gateway_unlocked ? 'Simpan Konfigurasi OpenWA' : 'Terkunci — Masukkan Sandi untuk Ubah' ?>
                         </button>
                     </form>
 
                     <!-- Panduan Ringkas Install Server -->
                     <div class="mt-3 p-2.5 rounded-3 bg-white border" style="font-size: 11px;">
                         <div class="fw-bold text-dark mb-1"><i class="bi bi-terminal-fill text-primary me-1"></i> Pasang OpenWA di Server (1 Perintah):</div>
-                        <code class="d-block p-1.5 rounded bg-dark text-light user-select-all" style="font-size: 10px; word-break: break-all;">sudo bash /www/wwwroot/sales.id-giti.com/openwa-docker/install_openwa.sh</code>
+                        <?php if ($is_gateway_unlocked): ?>
+                            <code class="d-block p-1.5 rounded bg-dark text-light user-select-all" style="font-size: 10px; word-break: break-all;">sudo bash /www/wwwroot/sales.id-giti.com/openwa-docker/install_openwa.sh</code>
+                        <?php else: ?>
+                            <div class="p-1.5 rounded bg-light text-muted text-center border" style="font-size: 10.5px; cursor:pointer;" onclick="requireGatewayUnlock('Lihat Perintah Server OpenWA')">
+                                <i class="bi bi-lock-fill text-danger me-1"></i> Perintah server disembunyikan (Klik untuk buka sandi)
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -636,7 +723,7 @@ require_once 'includes/header.php';
 
     <div class="row g-4 mb-4">
         <!-- ===================================================================
-             CARD KONFIGURASI WA GATEWAY (GAMBAR 3) - TERPROTEKSI SANDI Wagyu31
+             CARD KONFIGURASI WA GATEWAY (FONNTE) - TERPROTEKSI SANDI KEAMANAN
              =================================================================== -->
         <div class="col-lg-4 col-12">
             <div class="premium-card p-4 h-100" id="cardGatewayConfig">
@@ -666,19 +753,34 @@ require_once 'includes/header.php';
                     </div>
                 </div>
 
-                <!-- Security Access Banner (Superadmin Direct Access) -->
-                <div id="securityBanner" class="security-banner unlocked mb-3 d-flex align-items-center justify-content-between gap-2">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-shield-check-fill fs-5 text-success" id="securityBannerIcon"></i>
-                        <div>
-                            <div class="fw-bold text-dark" style="font-size: 12px;" id="securityBannerTitle">Akses Terbuka (Superadmin)</div>
-                            <div class="text-muted" style="font-size: 11px;" id="securityBannerSub">Anda memiliki izin penuh mengubah &amp; menguji konfigurasi.</div>
+                <!-- Security Access Banner (Terkunci dengan Sandi Keamanan) -->
+                <?php if ($is_gateway_unlocked): ?>
+                    <div id="securityBanner" class="security-banner unlocked mb-3 d-flex align-items-center justify-content-between gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-check-fill fs-5 text-success" id="securityBannerIcon"></i>
+                            <div>
+                                <div class="fw-bold text-dark" style="font-size: 12px;" id="securityBannerTitle">Akses Terbuka</div>
+                                <div class="text-muted" style="font-size: 11px;" id="securityBannerSub">Sandi terverifikasi. Klik Kunci jika sudah selesai mengubah.</div>
+                            </div>
                         </div>
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2.5 py-1 fw-bold" style="font-size: 11px;" onclick="lockGateway()">
+                            <i class="bi bi-lock-fill me-1"></i> Kunci
+                        </button>
                     </div>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-bold" style="font-size: 11px;">
-                        <i class="bi bi-unlock-fill me-1"></i> Aktif
-                    </span>
-                </div>
+                <?php else: ?>
+                    <div id="securityBanner" class="security-banner locked mb-3 d-flex align-items-center justify-content-between gap-2" style="cursor:pointer;" onclick="requireGatewayUnlock('Buka Konfigurasi WA Gateway')">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-lock-fill fs-5 text-danger" id="securityBannerIcon"></i>
+                            <div>
+                                <div class="fw-bold" style="font-size: 12px;" id="securityBannerTitle">Konfigurasi Terkunci</div>
+                                <div style="font-size: 11px; opacity: 0.9;" id="securityBannerSub">Masukkan sandi keamanan untuk melihat atau mengubah token.</div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-2.5 py-1 fw-bold shadow-sm flex-shrink-0" style="font-size: 11px;" onclick="event.stopPropagation(); requireGatewayUnlock('Buka Konfigurasi WA Gateway');">
+                            <i class="bi bi-unlock-fill me-1"></i> Buka
+                        </button>
+                    </div>
+                <?php endif; ?>
 
                 <!-- Info Box Token -->
                 <?php if (!empty($current_token)): ?>
@@ -698,25 +800,32 @@ require_once 'includes/header.php';
                     </div>
                 <?php endif; ?>
 
-                <!-- Form Konfigurasi (Akses Langsung Superadmin) -->
-                <form method="POST" action="wa_support_settings.php" id="formSaveGateway">
+                <!-- Form Konfigurasi (Terproteksi Sandi) -->
+                <form method="POST" action="wa_support_settings.php" id="formSaveGateway" onsubmit="return guardLockedSubmit(event, 'Simpan Konfigurasi WA Gateway')">
                     <input type="hidden" name="save_settings" value="1">
 
                     <!-- Poin 1: Ubah Nomor WA -->
                     <div class="mb-3">
                         <label class="form-label-custom">
                             <span>1. Nomor WA Tujuan</span>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal" id="labelLockPhone" style="font-size: 10px;">
-                                <i class="bi bi-unlock-fill me-0.5"></i> Terbuka
-                            </span>
+                            <?php if ($is_gateway_unlocked): ?>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal" id="labelLockPhone" style="font-size: 10px;">
+                                    <i class="bi bi-unlock-fill me-0.5"></i> Terbuka
+                                </span>
+                            <?php else: ?>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal" id="labelLockPhone" style="font-size: 10px;">
+                                    <i class="bi bi-lock-fill me-0.5"></i> Terkunci
+                                </span>
+                            <?php endif; ?>
                         </label>
-                        <div class="input-group custom-input-group" id="groupPhone">
+                        <div class="input-group custom-input-group <?= !$is_gateway_unlocked ? 'is-locked' : '' ?>" id="groupPhone">
                             <span class="input-group-text"><i class="bi bi-telephone text-success"></i></span>
                             <input type="text" name="wa_support_number" id="inputWaNumber" class="form-control" 
                                    value="<?= htmlspecialchars($current_wa) ?>" required 
-                                   placeholder="085771593522">
-                            <span class="input-group-text bg-white">
-                                <i class="bi bi-pencil-fill text-primary" style="font-size: 12px;"></i>
+                                   placeholder="085771593522"
+                                   <?= !$is_gateway_unlocked ? 'readonly onclick="requireGatewayUnlock(\'Ubah Nomor WA Tujuan\')"' : '' ?>>
+                            <span class="input-group-text bg-white" <?= !$is_gateway_unlocked ? 'onclick="requireGatewayUnlock(\'Ubah Nomor WA Tujuan\')"' : '' ?>>
+                                <i class="bi bi-<?= $is_gateway_unlocked ? 'pencil-fill text-primary' : 'lock-fill text-danger' ?>" style="font-size: 12px;"></i>
                             </span>
                         </div>
                         <small class="text-muted d-block mt-1" style="font-size: 11px;">Semua laporan kendala dari bot web akan diteruskan ke nomor ini.</small>
@@ -726,18 +835,25 @@ require_once 'includes/header.php';
                     <div class="mb-3">
                         <label class="form-label-custom">
                             <span>2. Token API Fonnte</span>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal" id="labelLockToken" style="font-size: 10px;">
-                                <i class="bi bi-unlock-fill me-0.5"></i> Terbuka
-                            </span>
+                            <?php if ($is_gateway_unlocked): ?>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal" id="labelLockToken" style="font-size: 10px;">
+                                    <i class="bi bi-unlock-fill me-0.5"></i> Terbuka
+                                </span>
+                            <?php else: ?>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal" id="labelLockToken" style="font-size: 10px;">
+                                    <i class="bi bi-lock-fill me-0.5"></i> Terkunci
+                                </span>
+                            <?php endif; ?>
                         </label>
-                        <div class="input-group custom-input-group" id="groupToken">
+                        <div class="input-group custom-input-group <?= !$is_gateway_unlocked ? 'is-locked' : '' ?>" id="groupToken">
                             <span class="input-group-text"><i class="bi bi-key text-warning"></i></span>
                             <input type="password" name="fonnte_token" id="fonnteTokenInput" class="form-control font-monospace" 
-                                   value="<?= htmlspecialchars($current_token) ?>"
-                                   placeholder="Tempel token di sini (contoh: a1b2c3d...)">
+                                   value="<?= $is_gateway_unlocked ? htmlspecialchars($current_token) : (!empty($current_token) ? '••••••••••••••••••••' : '') ?>"
+                                   placeholder="Tempel token di sini (contoh: a1b2c3d...)"
+                                   <?= !$is_gateway_unlocked ? 'readonly onclick="requireGatewayUnlock(\'Lihat / Ubah Token Fonnte\')"' : '' ?>>
                             <button class="btn btn-outline-secondary" type="button" id="btnToggleTokenEye" 
                                     onclick="handleTokenEyeClick()" title="Lihat / Sembunyikan Token">
-                                <i class="bi bi-eye-slash-fill text-muted" id="iconTokenEye"></i>
+                                <i class="bi bi-<?= $is_gateway_unlocked ? 'eye-slash-fill text-muted' : 'lock-fill text-danger' ?>" id="iconTokenEye"></i>
                             </button>
                         </div>
                         <small class="text-muted d-block mt-1" style="font-size: 11px;">
@@ -746,23 +862,25 @@ require_once 'includes/header.php';
                     </div>
 
                     <!-- Poin 3: Simpan Konfigurasi -->
-                    <button type="submit" class="btn btn-save-glow w-100 d-inline-flex align-items-center justify-content-center gap-2 mb-3" id="btnSubmitSave">
-                        <i class="bi bi-check2-circle text-white"></i>
-                        <span>Simpan Konfigurasi</span>
+                    <button type="submit" class="btn <?= $is_gateway_unlocked ? 'btn-save-glow' : 'btn-secondary' ?> w-100 d-inline-flex align-items-center justify-content-center gap-2 mb-3 rounded-3 py-2.5 fw-bold" id="btnSubmitSave">
+                        <i class="bi bi-<?= $is_gateway_unlocked ? 'check2-circle' : 'lock-fill' ?> text-white"></i>
+                        <span><?= $is_gateway_unlocked ? 'Simpan Konfigurasi' : 'Terkunci — Buka Sandi untuk Ubah' ?></span>
                     </button>
                 </form>
 
                 <!-- Poin 4: Tes Kirim Pesan WA -->
                 <?php if (!empty($current_token)): ?>
                     <hr class="my-3" style="border-color: #e2e8f0;">
-                    <form method="POST" action="wa_support_settings.php" id="formTestSendWa">
+                    <form method="POST" action="wa_support_settings.php" id="formTestSendWa" onsubmit="return guardLockedSubmit(event, 'Tes Kirim Pesan WA Fonnte')">
                         <input type="hidden" name="test_send_wa" value="1">
                         <input type="hidden" name="test_target" value="<?= htmlspecialchars($current_wa) ?>">
-                        <input type="hidden" name="test_token" value="<?= htmlspecialchars($current_token) ?>">
+                        <?php if ($is_gateway_unlocked): ?>
+                            <input type="hidden" name="test_token" value="<?= htmlspecialchars($current_token) ?>">
+                        <?php endif; ?>
 
                         <button type="submit" class="btn btn-test-wa w-100 d-inline-flex align-items-center justify-content-center gap-2" id="btnSubmitTest">
-                            <i class="bi bi-whatsapp"></i>
-                            <span>Tes Kirim Pesan WA Sekarang</span>
+                            <i class="bi bi-<?= $is_gateway_unlocked ? 'whatsapp' : 'lock-fill' ?>"></i>
+                            <span><?= $is_gateway_unlocked ? 'Tes Kirim Pesan WA Sekarang' : 'Terkunci — Buka Sandi untuk Tes WA' ?></span>
                         </button>
                     </form>
                 <?php endif; ?>
@@ -898,7 +1016,7 @@ require_once 'includes/header.php';
 </div>
 
 <!-- =======================================================================
-     MODAL OTORISASI KEAMANAN SUPERADMIN (Sandi: Wagyu31) - 21st.dev Style
+     MODAL OTORISASI KEAMANAN KONFIGURASI GATEWAY - 21st.dev Style
      ======================================================================= -->
 <div class="modal fade modal-glass" id="authSecurityModal" tabindex="-1" aria-labelledby="authSecurityModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
@@ -953,13 +1071,129 @@ require_once 'includes/header.php';
 
 <script>
 /**
- * Akses Langsung Superadmin WhatsApp Gateway
- * Akses dibuka penuh untuk Superadmin tanpa perlu sandi berulang
+ * Proteksi Sandi Konfigurasi OpenWA & WA Gateway (Terverifikasi Server-Side PHP)
  */
-let isGatewayUnlocked = true;
+const isGatewayUnlocked = <?= $is_gateway_unlocked ? 'true' : 'false' ?>;
+
+function requireGatewayUnlock(actionLabel) {
+    const modalEl = document.getElementById('authSecurityModal');
+    if (!modalEl) return;
+    const actionText = document.getElementById('authActionText');
+    const errBox     = document.getElementById('authErrorMessage');
+    const passInput  = document.getElementById('authPasswordInput');
+
+    if (actionText) actionText.textContent = actionLabel || 'Buka Konfigurasi Gateway';
+    if (errBox) errBox.classList.add('d-none');
+    if (passInput) {
+        passInput.value = '';
+        passInput.type = 'password';
+    }
+    const eyeIcon = document.getElementById('modalEyeIcon');
+    if (eyeIcon) eyeIcon.className = 'bi bi-eye-fill';
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+    setTimeout(() => passInput && passInput.focus(), 250);
+}
+
+function guardLockedSubmit(event, actionLabel) {
+    if (!isGatewayUnlocked) {
+        if (event) event.preventDefault();
+        requireGatewayUnlock(actionLabel);
+        return false;
+    }
+    return true;
+}
+
+function toggleModalPasswordEye() {
+    const inp = document.getElementById('authPasswordInput');
+    const icon = document.getElementById('modalEyeIcon');
+    if (!inp || !icon) return;
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'bi bi-eye-slash-fill text-primary';
+    } else {
+        inp.type = 'password';
+        icon.className = 'bi bi-eye-fill';
+    }
+}
+
+async function handleAuthSubmit(event) {
+    event.preventDefault();
+    const passInput = document.getElementById('authPasswordInput');
+    const errBox    = document.getElementById('authErrorMessage');
+    const card      = document.getElementById('modalCardContainer');
+    const btn       = document.getElementById('btnVerifySubmit');
+    const password  = passInput ? passInput.value.trim() : '';
+
+    if (!password) return;
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Memeriksa...';
+    }
+
+    try {
+        const fd = new URLSearchParams({
+            gateway_auth_action: 'unlock',
+            auth_password: password
+        });
+        const resp = await fetch('wa_support_settings.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: fd.toString()
+        });
+        const data = await resp.json();
+
+        if (data.success) {
+            window.location.reload();
+            return;
+        }
+
+        if (errBox) {
+            errBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> ' + (data.message || 'Sandi salah! Silakan coba lagi.');
+            errBox.classList.remove('d-none');
+        }
+        if (card) {
+            card.classList.remove('shake-it');
+            void card.offsetWidth;
+            card.classList.add('shake-it');
+        }
+        if (passInput) {
+            passInput.value = '';
+            passInput.focus();
+        }
+    } catch (e) {
+        if (errBox) {
+            errBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Terjadi gangguan jaringan saat verifikasi.';
+            errBox.classList.remove('d-none');
+        }
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-unlock-fill me-1"></i> Buka Akses';
+        }
+    }
+}
+
+async function lockGateway() {
+    try {
+        const fd = new URLSearchParams({ gateway_auth_action: 'lock' });
+        await fetch('wa_support_settings.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: fd.toString()
+        });
+    } finally {
+        window.location.reload();
+    }
+}
 
 // Toggle Lihat/Sembunyikan Token API Fonnte
 function handleTokenEyeClick() {
+    if (!isGatewayUnlocked) {
+        requireGatewayUnlock('Lihat Token API Fonnte');
+        return;
+    }
     const inp = document.getElementById('fonnteTokenInput');
     const icon = document.getElementById('iconTokenEye');
     if (inp.type === 'password') {
@@ -969,22 +1203,6 @@ function handleTokenEyeClick() {
         inp.type = 'password';
         icon.className = 'bi bi-eye-slash-fill text-muted';
     }
-}
-
-function handleInputAccess(type, desc) {
-    // Akses sudah terbuka
-}
-
-function handleAuthToggle() {
-    // Akses sudah terbuka
-}
-
-function unlockGateway() {
-    isGatewayUnlocked = true;
-}
-
-function lockGateway() {
-    // Akses tetap terbuka untuk Superadmin
 }
 
 // Filter Pencarian Pesan Kendala
@@ -1146,6 +1364,10 @@ let openwaQrPollTimer = null;
 let openwaQrActiveSessionId = '';
 
 function toggleOpenwaKeyEye() {
+    if (!isGatewayUnlocked) {
+        requireGatewayUnlock('Lihat API Key OpenWA');
+        return;
+    }
     const inp = document.getElementById('openwaApiKeyInput');
     const ic  = document.getElementById('iconOpenwaKeyEye');
     if (inp.type === 'password') {
