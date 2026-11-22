@@ -1595,15 +1595,236 @@ $loewixPriceList = $tiptokMaster6;
             justify-content: space-between !important;
         }
 
-        /* Ultra Sleek Compact Item Row for TIP TOK */
+        /* =========================================================================
+           EXECUTIVE REDESIGN: MODAL TITIP BARANG & RESTOCK (LINEAR / STRIPE GRADE)
+           ========================================================================= */
+        .modal-taste .modal-dialog {
+            max-height: calc(100vh - 36px);
+            margin: 18px auto;
+        }
+        .modal-taste .modal-body.tt-modal-canvas {
+            background: #f1f5f9 !important;
+            padding: 20px 24px !important;
+        }
+        .tt-section-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+        .tt-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .tt-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        .tt-field-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+        .tt-input {
+            width: 100%;
+            height: 44px;
+            padding: 0 14px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #0f172a;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease;
+        }
+        .tt-input:hover {
+            border-color: #94a3b8;
+        }
+        .tt-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+            outline: none;
+        }
+        textarea.tt-input {
+            height: auto;
+            min-height: 78px;
+            padding: 11px 14px;
+            line-height: 1.5;
+            font-weight: 500;
+            resize: vertical;
+        }
+
+        /* Unifikasi Select2 di dalam Modal agar 100% sejajar dengan input lain (44px) */
+        .modal-taste .select2-container {
+            width: 100% !important;
+            display: block !important;
+        }
+        .modal-taste .select2-container--default .select2-selection--single,
+        .modal-taste .select2-container--bootstrap-5 .select2-selection--single {
+            height: 44px !important;
+            min-height: 44px !important;
+            border: 1.5px solid #cbd5e1 !important;
+            border-radius: 10px !important;
+            background-color: #ffffff !important;
+            display: flex !important;
+            align-items: center !important;
+            padding: 0 34px 0 14px !important;
+            box-shadow: none !important;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease !important;
+        }
+        .modal-taste .select2-container--default .select2-selection--single:hover,
+        .modal-taste .select2-container--bootstrap-5 .select2-selection--single:hover {
+            border-color: #94a3b8 !important;
+        }
+        .modal-taste .select2-container--default.select2-container--focus .select2-selection--single,
+        .modal-taste .select2-container--default.select2-container--open .select2-selection--single,
+        .modal-taste .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+        .modal-taste .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+            outline: none !important;
+        }
+        .modal-taste .select2-container--default .select2-selection--single .select2-selection__rendered,
+        .modal-taste .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+            color: #0f172a !important;
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
+            line-height: normal !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+        }
+        .modal-taste .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #94a3b8 !important;
+            font-weight: 500 !important;
+        }
+        .modal-taste .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px !important;
+            right: 10px !important;
+            top: 1px !important;
+        }
+        .modal-taste .select2-container--default .select2-selection--single .select2-selection__clear {
+            position: absolute !important;
+            right: 28px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            font-size: 16px !important;
+            color: #94a3b8 !important;
+            margin: 0 !important;
+            height: auto !important;
+            line-height: 1 !important;
+        }
+        .modal-taste .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+            color: #dc2626 !important;
+        }
+
+        /* Toolbar Buttons dengan Jarak Lega */
+        .tt-toolbar-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .tt-btn-tool {
+            height: 36px;
+            padding: 0 13px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.16s ease;
+            white-space: nowrap;
+            border: 1.5px solid transparent;
+        }
+        .tt-btn-tool.katalog {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+        }
+        .tt-btn-tool.katalog:hover {
+            background: #dbeafe;
+            border-color: #93c5fd;
+        }
+        .tt-btn-tool.all6 {
+            background: #fffbeb;
+            color: #92400e;
+            border-color: #fcd34d;
+        }
+        .tt-btn-tool.all6:hover {
+            background: #fef3c7;
+            border-color: #f59e0b;
+        }
+        .tt-btn-tool.add-row {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.16);
+        }
+        .tt-btn-tool.add-row:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
+        }
+        .tt-btn-tool.add-row-green {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: #ffffff;
+            border-color: #047857;
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.22);
+        }
+        .tt-btn-tool.add-row-green:hover {
+            filter: brightness(1.06);
+            transform: translateY(-1px);
+        }
+
+        /* Header Kolom Daftar Produk (Sejajar 1:1 dengan Baris Produk) */
+        .tt-items-col-head {
+            display: grid;
+            grid-template-columns: 36px minmax(0, 1fr) 160px 152px 38px;
+            gap: 12px;
+            align-items: center;
+            padding: 8px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+
+        /* Baris Item Produk Presisi Grid */
         .item-row-compact {
             background: #ffffff;
             border: 1.5px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 10px 14px;
-            margin-bottom: 9px;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
             position: relative;
         }
         .item-row-compact:hover {
@@ -1611,79 +1832,249 @@ $loewixPriceList = $tiptokMaster6;
             background: #fafcff;
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
         }
+        .tt-item-grid {
+            display: grid;
+            grid-template-columns: 36px minmax(0, 1fr) 160px 152px 38px;
+            gap: 12px;
+            align-items: center;
+        }
+        .tt-row-index {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            font-size: 12px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tt-row-index.is-new {
+            background: #ecfdf5;
+            color: #047857;
+            border-color: #a7f3d0;
+            font-size: 10px;
+        }
         .product-select-compact {
-            font-size: 13.5px !important;
+            width: 100%;
+            height: 40px !important;
+            min-height: 40px !important;
+            font-size: 13px !important;
             font-weight: 700 !important;
-            border-radius: 10px !important;
+            border-radius: 9px !important;
             border: 1.5px solid #cbd5e1 !important;
-            padding: 8px 38px 8px 12px !important;
+            padding: 0 34px 0 12px !important;
             color: #0f172a !important;
             background-color: #ffffff !important;
-            transition: all 0.2s ease !important;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease !important;
             cursor: pointer !important;
-            letter-spacing: -0.01em !important;
-            min-height: 40px !important;
+            letter-spacing: -0.005em !important;
+        }
+        .product-select-compact:hover {
+            border-color: #94a3b8 !important;
         }
         .product-select-compact:focus {
             border-color: #2563eb !important;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
             outline: none !important;
+        }
+        .tt-prod-meta-strip {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 5px;
+            min-height: 18px;
+        }
+        .tt-spec-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 1px 8px;
+            border-radius: 99px;
+            line-height: 1.5;
+        }
+        .tt-spec-pill.mp2 {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+        .tt-spec-pill.mp4 {
+            background: #f5f3ff;
+            color: #6d28d9;
+            border: 1px solid #ddd6fe;
+        }
+        .tt-spec-pill.empty {
+            background: #f8fafc;
+            color: #94a3b8;
+            border: 1px dashed #cbd5e1;
+        }
+
+        /* Qty Stepper Presisi — Nol Overlap & Nol Spinner Browser */
+        .tt-qty-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .tt-qty-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         .taste-qty-stepper-compact {
             display: inline-flex !important;
-            align-items: center !important;
-            background: #f1f5f9 !important;
+            align-items: stretch !important;
+            width: 112px !important;
+            height: 38px !important;
+            background: #ffffff !important;
             border: 1.5px solid #cbd5e1 !important;
             border-radius: 9px !important;
             overflow: hidden !important;
-            height: 36px !important;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease !important;
+        }
+        .taste-qty-stepper-compact:focus-within {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
         }
         .stepper-btn-compact {
-            width: 32px !important;
+            width: 34px !important;
+            min-width: 34px !important;
             height: 100% !important;
-            background: #ffffff !important;
+            background: #f8fafc !important;
             border: none !important;
-            font-weight: 900 !important;
-            font-size: 15px !important;
+            font-weight: 800 !important;
+            font-size: 16px !important;
+            line-height: 1 !important;
             color: #334155 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             cursor: pointer !important;
             user-select: none !important;
-            transition: background 0.15s ease !important;
+            padding: 0 !important;
+            transition: background 0.15s ease, color 0.15s ease !important;
+        }
+        .stepper-btn-compact:first-child {
+            border-right: 1px solid #e2e8f0 !important;
+        }
+        .stepper-btn-compact:last-child {
+            border-left: 1px solid #e2e8f0 !important;
         }
         .stepper-btn-compact:hover {
             background: #e2e8f0 !important;
             color: #0f172a !important;
         }
+        .stepper-btn-compact:active {
+            background: #cbd5e1 !important;
+        }
         .stepper-input-compact {
             width: 44px !important;
+            min-width: 0 !important;
+            flex: 1 1 auto !important;
             height: 100% !important;
             border: none !important;
             text-align: center !important;
             font-size: 14px !important;
             font-weight: 800 !important;
-            background: transparent !important;
+            font-variant-numeric: tabular-nums !important;
+            background: #ffffff !important;
             color: #0f172a !important;
             padding: 0 !important;
             outline: none !important;
+            -moz-appearance: textfield !important;
         }
+        .stepper-input-compact::-webkit-outer-spin-button,
+        .stepper-input-compact::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .tt-unit-tag {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            white-space: nowrap;
+        }
+
+        /* Kolom Insentif Tabular */
+        .tt-incentive-col {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        .tt-incentive-rate {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            line-height: 1.3;
+        }
+        .tt-incentive-total {
+            font-size: 15.5px;
+            font-weight: 800;
+            color: #059669;
+            line-height: 1.25;
+            letter-spacing: -0.01em;
+        }
+
+        /* Tombol Hapus Baris Ghost */
+        .tt-btn-del-row {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #94a3b8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.16s ease;
+        }
+        .tt-btn-del-row:hover {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+        /* Responsive Mobile Stacking untuk Item Row */
+        @media (max-width: 767.98px) {
+            .tt-items-col-head {
+                display: none;
+            }
+            .tt-item-grid {
+                grid-template-columns: 34px minmax(0, 1fr) 36px;
+                row-gap: 10px;
+            }
+            .tt-item-grid .tt-col-qty {
+                grid-column: 1 / 3;
+                align-items: flex-start;
+            }
+            .tt-item-grid .tt-col-insentif {
+                grid-column: 1 / 4;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 8px;
+                border-top: 1px dashed #e2e8f0;
+                text-align: left;
+            }
+        }
+
         .sticky-items-header {
-            position: sticky;
-            top: -1.5rem;
-            z-index: 10;
-            background: #f8fafc;
-            padding: 10px 4px;
-            margin-top: 6px;
-            margin-bottom: 12px;
-            border-bottom: 1.5px solid #e2e8f0;
-            backdrop-filter: blur(8px);
+            position: static;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            border: none;
         }
         .btn-add-item-dashed {
-            background: #ffffff;
-            border: 2px dashed #93c5fd;
-            border-radius: 12px;
+            background: #f8fafc;
+            border: 1.5px dashed #93c5fd;
+            border-radius: 11px;
             padding: 11px 16px;
             color: #2563eb;
             font-weight: 700;
@@ -1693,15 +2084,32 @@ $loewixPriceList = $tiptokMaster6;
             justify-content: center;
             gap: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.18s ease;
         }
         .btn-add-item-dashed:hover {
             background: #eff6ff;
             border-color: #2563eb;
             color: #1d4ed8;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+        }
+
+        /* Executive Dark Summary Bar */
+        .summary-bar-tiptok {
+            background: linear-gradient(135deg, #0b1324 0%, #162238 60%, #0f2922 100%);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            border: 1px solid rgba(52, 211, 153, 0.22);
+            box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.28);
+        }
+        .tt-summary-val {
+            font-family: 'Outfit', sans-serif;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
         }
 
         /* =========================================================================
@@ -2946,35 +3354,35 @@ $loewixPriceList = $tiptokMaster6;
     </main>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 1: TAMBAH PENITIPAN BARU                                           -->
+    <!-- MODAL 1: TAMBAH PENITIPAN BARU (EXECUTIVE REDESIGN)                       -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalTambahPenitipan" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 980px;">
-            <div class="modal-content" style="border-radius: 18px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
-                <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; border-radius: 18px 18px 0 0;">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 960px;">
+            <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 28px 60px -15px rgba(15, 23, 42, 0.38);">
+                <div class="modal-header" style="background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.24), transparent 55%), linear-gradient(135deg, #0b1324 0%, #172540 100%); color: #ffffff; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.08);">
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(37, 99, 235, 0.2); border: 1.5px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 20px;">
+                        <div style="width: 44px; height: 44px; border-radius: 13px; background: rgba(59, 130, 246, 0.18); border: 1.5px solid rgba(96, 165, 250, 0.35); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 19px; flex-shrink: 0;">
                             <i class="fa-solid fa-boxes-packing"></i>
                         </div>
                         <div>
-                            <div class="d-flex align-items-center gap-2">
-                                <h5 class="modal-title font-weight-bold text-white mb-0">Titip Barang Baru di Toko</h5>
-                                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11px; padding: 4px 8px; border-radius: 6px;">Program TIP TOK</span>
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                <h5 class="modal-title fw-bold text-white mb-0" style="font-size: 18px; letter-spacing: -0.015em;">Titip Barang Baru di Toko</h5>
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); font-size: 11px; padding: 4px 10px; border-radius: 99px; font-weight: 700;">Program TIP TOK</span>
                             </div>
-                            <div class="text-xs mt-0.5" style="color: #94a3b8;">Pilih toko mitra dan input daftar produk resmi konsinyasi Loewix</div>
+                            <div class="mt-1" style="color: #94a3b8; font-size: 12.5px;">Pilih toko mitra dan input daftar produk resmi konsinyasi Loewix</div>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 
                 <form id="formTambahPenitipan" onsubmit="submitTambahPenitipan(event)">
-                    <div class="modal-body p-4 bg-light">
-                        <!-- Toko & Tanggal Card -->
-                        <div class="bg-white p-3.5 rounded-3 mb-3 border" style="border: 1.5px solid #e2e8f0 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
-                            <div class="row g-3">
+                    <div class="modal-body tt-modal-canvas">
+                        <!-- Section 1: Informasi Toko, Sales & Tanggal -->
+                        <div class="tt-section-card mb-3">
+                            <div class="row g-3 align-items-end">
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '5' : '8'; ?>">
-                                    <label class="form-label-taste"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
-                                    <select name="id_customer" id="selectDealer" class="form-control-taste w-100" required onchange="onDealerSelected()">
+                                    <label class="tt-field-label" for="selectDealer"><i class="fa-solid fa-store text-primary"></i> Toko / Dealer Tujuan <span class="text-danger">*</span></label>
+                                    <select name="id_customer" id="selectDealer" class="tt-input" required onchange="onDealerSelected()">
                                         <option value="">-- Ketik / Cari Nama Toko / Dealer --</option>
                                         <?php if (empty($dealerOptionList)) : ?>
                                             <option value="" disabled>(Belum ada toko yang ditandai TIP TOK. Tandai toko di menu Customer)</option>
@@ -2991,8 +3399,8 @@ $loewixPriceList = $tiptokMaster6;
                                 </div>
                                 <?php if ($role !== 'Sales') : ?>
                                 <div class="col-md-4">
-                                    <label class="form-label-taste"><i class="fa-solid fa-user-tie text-primary me-1.5"></i> SALES PIC <span class="text-danger">*</span></label>
-                                    <select name="id_sales" id="selectSalesTambah" class="form-control-taste w-100" required>
+                                    <label class="tt-field-label" for="selectSalesTambah"><i class="fa-solid fa-user-tie text-primary"></i> Sales PIC <span class="text-danger">*</span></label>
+                                    <select name="id_sales" id="selectSalesTambah" class="form-select tt-input" required>
                                         <option value="">-- Pilih Sales PIC --</option>
                                         <?php foreach ($salesOptionList as $s) : ?>
                                             <option value="<?php echo $s['id']; ?>" <?php echo ($s['id'] == $idSesi) ? 'selected' : ''; ?>>
@@ -3003,79 +3411,95 @@ $loewixPriceList = $tiptokMaster6;
                                 </div>
                                 <?php endif; ?>
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '3' : '4'; ?>">
-                                    <label class="form-label-taste"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL TITIP <span class="text-danger">*</span></label>
-                                    <input type="date" name="tgl_titip" class="form-control-taste w-100 font-weight-bold" value="<?php echo date('Y-m-d'); ?>" required>
+                                    <label class="tt-field-label"><i class="fa-regular fa-calendar-days text-primary"></i> Tanggal Titip <span class="text-danger">*</span></label>
+                                    <input type="date" name="tgl_titip" class="tt-input" value="<?php echo date('Y-m-d'); ?>" required>
                                 </div>
                             </div>
 
-                            <div id="dealerPreview" class="p-3 mt-3 rounded-3 border d-none" style="background: #f8fafc; border: 1.5px dashed #93c5fd !important;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="font-weight-bold text-dark fs-6" id="prevNamaToko">-</span>
+                            <div id="dealerPreview" class="p-3 mt-3 rounded-3 d-none" style="background: #f0f9ff; border: 1px solid #bae6fd;">
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                    <span class="fw-bold text-dark" style="font-size: 14px;" id="prevNamaToko">-</span>
                                     <span class="taste-badge badge-dealer-tag" id="prevKategoriToko">Dealer</span>
                                 </div>
-                                <div class="text-xs text-secondary font-weight-bold mt-1" id="prevAlamatToko">-</div>
-                                <div class="text-xs text-success font-weight-bold mt-1" id="prevTelpToko">-</div>
+                                <div class="text-secondary mt-1" style="font-size: 12px; font-weight: 500;" id="prevAlamatToko">-</div>
+                                <div class="text-success fw-bold mt-1" style="font-size: 12px;" id="prevTelpToko">-</div>
                             </div>
                         </div>
 
-                        <!-- Header Barang Dititipkan (Sticky) -->
-                        <div class="sticky-items-header">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <!-- Section 2: Daftar Barang Dititipkan -->
+                        <div class="tt-section-card mb-3">
+                            <div class="tt-section-head">
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <label class="form-label-taste mb-0 text-dark" style="font-size: 13.5px;"><i class="fa-solid fa-video text-primary me-1.5"></i> DAFTAR BARANG DITITIPKAN <span class="text-danger">*</span></label>
-                                        <span class="badge bg-dark text-white px-2 py-0.5" id="badgeJumlahBarang" style="font-size: 11px; border-radius: 6px;">0 Item</span>
+                                        <h6 class="tt-section-title"><i class="fa-solid fa-video text-primary"></i> Daftar Barang Dititipkan <span class="text-danger">*</span></h6>
+                                        <span class="badge rounded-pill px-2.5 py-1" id="badgeJumlahBarang" style="background: #0f172a; color: #ffffff; font-size: 11px; font-weight: 700;">0 Item</span>
                                     </div>
-                                    <div class="text-xs text-secondary font-weight-bold">Pilih model kamera resmi berinsentif (2MP / 4MP)</div>
+                                    <div class="text-muted mt-1" style="font-size: 12px;">Pilih model kamera resmi berinsentif (2MP AHD / 4MP IPCAM)</div>
                                 </div>
-                                <div class="d-flex gap-1.5 flex-wrap">
-                                    <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px;" onclick="openKatalogPriceListModal('tambah')">
-                                        <i class="fa-solid fa-eye me-1"></i> Katalog
+                                <div class="tt-toolbar-actions">
+                                    <button type="button" class="tt-btn-tool katalog" onclick="openKatalogPriceListModal('tambah')">
+                                        <i class="fa-solid fa-eye"></i> Katalog
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-warning text-dark font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px; background: #fffbeb; border-color: #fde68a;" onclick="pasangSemua6Produk('')" title="Masukkan otomatis seluruh 6 kamera resmi">
-                                        <i class="fa-solid fa-bolt text-warning me-1"></i> + 6 Kamera Sekaligus
+                                    <button type="button" class="tt-btn-tool all6" onclick="pasangSemua6Produk('')" title="Masukkan otomatis seluruh 6 kamera resmi">
+                                        <i class="fa-solid fa-bolt"></i> + 6 Kamera Sekaligus
                                     </button>
-                                    <button type="button" class="btn-taste-primary btn-sm py-1.5 px-3 mb-0" style="font-size: 12px; border-radius: 9px;" onclick="tambahBarisBarang()">
-                                        <i class="fa-solid fa-plus me-1"></i> Tambah Barang
+                                    <button type="button" class="tt-btn-tool add-row" onclick="tambahBarisBarang()">
+                                        <i class="fa-solid fa-plus"></i> Tambah Barang
                                     </button>
                                 </div>
                             </div>
+
+                            <!-- Header Kolom Presisi -->
+                            <div class="tt-items-col-head">
+                                <div class="text-center">No</div>
+                                <div>Model Kamera Resmi</div>
+                                <div class="text-center">Jumlah Titip</div>
+                                <div class="text-end">Estimasi Insentif</div>
+                                <div></div>
+                            </div>
+
+                            <div id="containerItemRows"></div>
+
+                            <!-- Tombol Tambah Cepat di Bawah Item -->
+                            <button type="button" class="btn-add-item-dashed mt-2 w-100" onclick="tambahBarisBarang()">
+                                <i class="fa-solid fa-circle-plus"></i> Tambah Model Kamera Lainnya
+                            </button>
                         </div>
 
-                        <div id="containerItemRows"></div>
-
-                        <!-- Tombol Tambah Cepat di Bawah Item -->
-                        <button type="button" class="btn-add-item-dashed mt-1 mb-3 w-100" onclick="tambahBarisBarang()">
-                            <i class="fa-solid fa-circle-plus me-1 text-primary"></i> + Tambah Model Kamera Lainnya
-                        </button>
-
-                        <!-- Grand Total Summary Bar -->
-                        <div class="summary-bar-tiptok my-3" id="tambahSummaryBar">
+                        <!-- Section 3: Grand Total Summary Bar -->
+                        <div class="summary-bar-tiptok mb-3" id="tambahSummaryBar">
                             <div class="d-flex align-items-center gap-3">
-                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(59, 130, 246, 0.2); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 16px;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59, 130, 246, 0.18); border: 1px solid rgba(96, 165, 250, 0.3); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 18px; flex-shrink: 0;">
                                     <i class="fa-solid fa-calculator"></i>
                                 </div>
                                 <div>
-                                    <div class="text-xs" style="color: #94a3b8; font-weight: 700;">TOTAL TITIP FISIK</div>
-                                    <div class="fw-bold text-white fs-6" id="totalQtyTitipPreview">0 Unit (0 Model)</div>
+                                    <div style="color: #94a3b8; font-size: 11px; font-weight: 800; letter-spacing: 0.06em;">TOTAL TITIP FISIK</div>
+                                    <div class="fw-bold text-white tt-summary-val" style="font-size: 19px; line-height: 1.25;" id="totalQtyTitipPreview">0 Unit (0 Model)</div>
                                 </div>
                             </div>
                             <div class="text-end">
-                                <div class="text-xs" style="color: #34d399; font-weight: 800;"><i class="fa-solid fa-coins me-1"></i> ESTIMASI REWARD INSENTIF</div>
-                                <div class="fw-bold text-success fs-5" id="totalInsentifTitipPreview" style="color: #34d399 !important;">Rp 0</div>
+                                <div style="color: #6ee7b7; font-size: 11px; font-weight: 800; letter-spacing: 0.06em;"><i class="fa-solid fa-coins me-1"></i> ESTIMASI REWARD INSENTIF</div>
+                                <div class="fw-bold tt-summary-val" id="totalInsentifTitipPreview" style="color: #34d399; font-size: 24px; line-height: 1.2;">Rp 0</div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-3.5 rounded-3 border mt-3" style="border: 1.5px solid #e2e8f0 !important;">
-                            <label class="form-label-taste"><i class="fa-regular fa-note-sticky text-secondary me-1.5"></i> Catatan Penitipan (Opsional)</label>
-                            <textarea name="catatan" class="form-control-taste w-100" rows="2" placeholder="Tuliskan catatan perjanjian penitipan barang toko di sini..."></textarea>
+                        <!-- Section 4: Catatan Penitipan -->
+                        <div class="tt-section-card">
+                            <label class="tt-field-label"><i class="fa-solid fa-pen-to-square text-secondary"></i> Catatan Penitipan <span class="text-muted fw-semibold text-lowercase" style="font-size: 11px;">(opsional)</span></label>
+                            <textarea name="catatan" class="tt-input" rows="2" placeholder="Tuliskan catatan perjanjian penitipan barang toko di sini..."></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer p-3 bg-white border-top">
-                        <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" id="btnSimpanPenitipan" class="btn-taste-primary">
-                            <i class="fa-solid fa-check me-1"></i> Simpan Penitipan
-                        </button>
+                    <div class="modal-footer bg-white border-top px-4 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted d-none d-sm-flex align-items-center gap-2" style="font-size: 12px;">
+                            <i class="fa-solid fa-circle-info text-primary"></i>
+                            <span>Periksa toko tujuan dan jumlah unit kamera sebelum menyimpan.</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 ms-auto">
+                            <button type="button" class="btn-taste-secondary" style="border-width: 1.5px; padding: 9px 18px; font-size: 13.5px;" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" id="btnSimpanPenitipan" class="btn-taste-primary" style="padding: 9px 22px; font-size: 13.5px;">
+                                <i class="fa-solid fa-check"></i> Simpan Penitipan
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -3083,24 +3507,24 @@ $loewixPriceList = $tiptokMaster6;
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL EDIT / TAMBAH STOK PENITIPAN                                          -->
+    <!-- MODAL EDIT / TAMBAH STOK PENITIPAN (EXECUTIVE REDESIGN)                   -->
     <!-- ========================================================================= -->
     <div class="modal fade modal-taste" id="modalEditPenitipan" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 980px;">
-            <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);">
-                <div class="modal-header" style="background: linear-gradient(135deg, #091124 0%, #0f1d3d 100%); color: #ffffff; padding: 20px 26px; border-radius: 20px 20px 0 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 960px;">
+            <div class="modal-content" style="border-radius: 20px; border:none; box-shadow: 0 28px 60px -15px rgba(15, 23, 42, 0.38);">
+                <div class="modal-header" style="background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.24), transparent 55%), linear-gradient(135deg, #0b1324 0%, #12233d 100%); color: #ffffff; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.08);">
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.18); border: 1.5px solid rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 22px;">
+                        <div style="width: 44px; height: 44px; border-radius: 13px; background: rgba(16, 185, 129, 0.18); border: 1.5px solid rgba(52, 211, 153, 0.35); display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 20px; flex-shrink: 0;">
                             <i class="fa-solid fa-boxes-stacked"></i>
                         </div>
                         <div>
-                            <div class="d-flex align-items-center gap-2">
-                                <h5 class="modal-title font-weight-bold text-white mb-0" style="font-family: 'Outfit', sans-serif; font-size: 19px;">Tambah Stok &amp; Kelola Barang Titipan</h5>
-                                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11px; padding: 4px 9px; border-radius: 6px;">
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                <h5 class="modal-title fw-bold text-white mb-0" style="font-family: 'Outfit', sans-serif; font-size: 18px; letter-spacing: -0.015em;">Tambah Stok &amp; Kelola Barang Titipan</h5>
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); font-size: 11px; padding: 4px 10px; border-radius: 99px; font-weight: 700;">
                                     <i class="fa-solid fa-boxes-packing me-1"></i> Restock Toko
                                 </span>
                             </div>
-                            <div class="text-xs mt-0.5" style="color: #94a3b8;" id="editModalSubtitle">Tambah kuota kamera konsinyasi, restock unit titip, atau sesuaikan data toko</div>
+                            <div class="mt-1" style="color: #94a3b8; font-size: 12.5px;" id="editModalSubtitle">Tambah kuota kamera konsinyasi, restock unit titip, atau sesuaikan data toko</div>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -3108,13 +3532,13 @@ $loewixPriceList = $tiptokMaster6;
                 
                 <form id="formEditPenitipan" onsubmit="submitEditPenitipan(event)">
                     <input type="hidden" name="id_penitipan" id="editIdPenitipan">
-                    <div class="modal-body p-4 bg-light">
+                    <div class="modal-body tt-modal-canvas">
                         <!-- 1. Toko & Sales Info Meta Card -->
-                        <div class="bg-white p-3.5 rounded-3 mb-3 border" style="border: 1.5px solid #cbd5e1 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
-                            <div class="row g-3">
+                        <div class="tt-section-card mb-3">
+                            <div class="row g-3 align-items-end">
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '4' : '5'; ?>">
-                                    <label class="form-label-taste mb-1"><i class="fa-solid fa-store text-primary me-1.5"></i> TOKO / DEALER TUJUAN <span class="text-danger">*</span></label>
-                                    <select name="id_customer" id="editSelectDealer" class="form-control-taste w-100" required onchange="onEditDealerSelected()">
+                                    <label class="tt-field-label" for="editSelectDealer"><i class="fa-solid fa-store text-primary"></i> Toko / Dealer Tujuan <span class="text-danger">*</span></label>
+                                    <select name="id_customer" id="editSelectDealer" class="tt-input" required onchange="onEditDealerSelected()">
                                         <option value="">-- Ketik / Cari Nama Toko / Dealer --</option>
                                         <?php foreach ($dealerOptionList as $d) : 
                                             $codeBadge = !empty($d['kode_customer']) ? '[' . $d['kode_customer'] . '] ' : '';
@@ -3127,8 +3551,8 @@ $loewixPriceList = $tiptokMaster6;
                                 </div>
                                 <?php if ($role !== 'Sales') : ?>
                                 <div class="col-md-3">
-                                    <label class="form-label-taste mb-1"><i class="fa-solid fa-user-tie text-primary me-1.5"></i> SALES PIC <span class="text-danger">*</span></label>
-                                    <select name="id_sales" id="editSelectSales" class="form-control-taste w-100" required>
+                                    <label class="tt-field-label" for="editSelectSales"><i class="fa-solid fa-user-tie text-primary"></i> Sales PIC <span class="text-danger">*</span></label>
+                                    <select name="id_sales" id="editSelectSales" class="form-select tt-input" required>
                                         <option value="">-- Pilih Sales PIC --</option>
                                         <?php foreach ($salesOptionList as $s) : ?>
                                             <option value="<?php echo $s['id']; ?>">
@@ -3139,12 +3563,12 @@ $loewixPriceList = $tiptokMaster6;
                                 </div>
                                 <?php endif; ?>
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '3' : '4'; ?>">
-                                    <label class="form-label-taste mb-1"><i class="fa-regular fa-calendar-days text-primary me-1.5"></i> TANGGAL TITIP <span class="text-danger">*</span></label>
-                                    <input type="date" name="tgl_titip" id="editTglTitip" class="form-control-taste w-100 font-weight-bold" required>
+                                    <label class="tt-field-label"><i class="fa-regular fa-calendar-days text-primary"></i> Tanggal Titip <span class="text-danger">*</span></label>
+                                    <input type="date" name="tgl_titip" id="editTglTitip" class="tt-input" required>
                                 </div>
                                 <div class="col-md-<?php echo ($role !== 'Sales') ? '2' : '3'; ?>">
-                                    <label class="form-label-taste mb-1"><i class="fa-solid fa-signal text-primary me-1.5"></i> STATUS <span class="text-danger">*</span></label>
-                                    <select name="status" id="editStatusPenitipan" class="form-control-taste w-100 font-weight-bold" required>
+                                    <label class="tt-field-label"><i class="fa-solid fa-signal text-primary"></i> Status <span class="text-danger">*</span></label>
+                                    <select name="status" id="editStatusPenitipan" class="form-select tt-input" required>
                                         <option value="aktif">Aktif</option>
                                         <option value="selesai">Selesai</option>
                                         <option value="ditarik">Ditarik</option>
@@ -3152,116 +3576,129 @@ $loewixPriceList = $tiptokMaster6;
                                 </div>
                             </div>
 
-                            <div id="editDealerPreview" class="p-3 mt-3 rounded-3 border d-none" style="background: #f8fafc; border: 1.5px dashed #93c5fd !important;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="font-weight-bold text-dark fs-6" id="editPrevNamaToko">-</span>
+                            <div id="editDealerPreview" class="p-3 mt-3 rounded-3 d-none" style="background: #f0f9ff; border: 1px solid #bae6fd;">
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                    <span class="fw-bold text-dark" style="font-size: 14px;" id="editPrevNamaToko">-</span>
                                     <span class="taste-badge badge-dealer-tag" id="editPrevKategoriToko">Dealer</span>
                                 </div>
-                                <div class="text-xs text-secondary font-weight-bold mt-1" id="editPrevAlamatToko">-</div>
-                                <div class="text-xs text-success font-weight-bold mt-1" id="editPrevTelpToko">-</div>
+                                <div class="text-secondary mt-1" style="font-size: 12px; font-weight: 500;" id="editPrevAlamatToko">-</div>
+                                <div class="text-success fw-bold mt-1" style="font-size: 12px;" id="editPrevTelpToko">-</div>
                             </div>
                         </div>
 
-                        <!-- 2. Panduan Tambah Stok & Restock Toko (Card Modern) -->
-                        <div class="p-3 mb-3 rounded-3 border bg-white" style="border: 1.5px solid #cbd5e1 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                        <!-- 2. Panduan Tambah Stok & Restock Toko -->
+                        <div class="tt-section-card mb-3" style="padding: 14px 18px;">
                             <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
-                                <div style="width: 26px; height: 26px; border-radius: 6px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 13px;">
+                                <div style="width: 24px; height: 24px; border-radius: 7px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 12px;">
                                     <i class="fa-solid fa-lightbulb"></i>
                                 </div>
-                                <span class="font-weight-bold text-dark text-xs text-uppercase" style="letter-spacing: 0.05em;">Panduan Cara Tambah Stok &amp; Restock Toko:</span>
+                                <span class="fw-bold text-dark text-uppercase" style="font-size: 11.5px; letter-spacing: 0.04em;">Panduan Restock &amp; Tambah Stok</span>
                             </div>
                             <div class="row g-2">
                                 <div class="col-md-4 col-12">
-                                    <div class="d-flex align-items-start gap-2 p-2 rounded-2" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 100%;">
-                                        <span class="badge bg-primary text-white rounded-circle p-1 flex-shrink-0" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">1</span>
-                                        <div class="text-xs text-secondary" style="line-height: 1.35;">
+                                    <div class="d-flex align-items-start gap-2 p-2 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 100%;">
+                                        <span class="badge bg-primary text-white rounded-circle flex-shrink-0" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">1</span>
+                                        <div class="text-secondary" style="font-size: 11.5px; line-height: 1.4;">
                                             <strong class="text-dark d-block">Tambah Stok Model:</strong>
-                                            Tekan tombol <strong>[+]</strong> pada kolom Qty kamera yang ingin ditambah. Sisa fisik di toko akan otomatis bertambah.
+                                            Tekan <strong>[+]</strong> pada kolom Qty kamera. Sisa fisik otomatis bertambah.
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-12">
-                                    <div class="d-flex align-items-start gap-2 p-2 rounded-2" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 100%;">
-                                        <span class="badge bg-warning text-dark rounded-circle p-1 flex-shrink-0" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">2</span>
-                                        <div class="text-xs text-secondary" style="line-height: 1.35;">
+                                    <div class="d-flex align-items-start gap-2 p-2 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 100%;">
+                                        <span class="badge bg-warning text-dark rounded-circle flex-shrink-0" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">2</span>
+                                        <div class="text-secondary" style="font-size: 11.5px; line-height: 1.4;">
                                             <strong class="text-dark d-block">Tambah Model Baru:</strong>
-                                            Klik tombol <strong>+ Tambah Barang</strong> di kanan jika toko ingin menambah tipe kamera lain yang belum pernah dititipkan.
+                                            Klik <strong>+ Tambah Barang</strong> untuk menambah tipe kamera lain.
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-12">
-                                    <div class="d-flex align-items-start gap-2 p-2 rounded-2" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 100%;">
-                                        <span class="badge bg-secondary text-white rounded-circle p-1 flex-shrink-0" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">3</span>
-                                        <div class="text-xs text-secondary" style="line-height: 1.35;">
+                                    <div class="d-flex align-items-start gap-2 p-2 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 100%;">
+                                        <span class="badge bg-secondary text-white rounded-circle flex-shrink-0" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">3</span>
+                                        <div class="text-secondary" style="font-size: 11.5px; line-height: 1.4;">
                                             <strong class="text-dark d-block">Proteksi Terjual:</strong>
-                                            Model yang sudah pernah ada penjualan otomatis terkunci agar riwayat invoice &amp; komisi toko tidak bergeser.
+                                            Model yang sudah ada penjualan otomatis terkunci agar riwayat aman.
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. Header Barang Dititipkan (Sticky Edit) -->
-                        <div class="sticky-items-header">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <!-- 3. Daftar Unit Kamera Dititipkan -->
+                        <div class="tt-section-card mb-3">
+                            <div class="tt-section-head">
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <label class="form-label-taste mb-0 text-dark" style="font-size: 13.5px;"><i class="fa-solid fa-boxes-stacked text-success me-1.5"></i> DAFTAR UNIT KAMERA DITITIPKAN <span class="text-danger">*</span></label>
-                                        <span class="badge bg-dark text-white px-2 py-0.5" id="editBadgeJumlahBarang" style="font-size: 11px; border-radius: 6px;">0 Item</span>
+                                        <h6 class="tt-section-title"><i class="fa-solid fa-boxes-stacked text-success"></i> Daftar Unit Kamera Dititipkan <span class="text-danger">*</span></h6>
+                                        <span class="badge rounded-pill px-2.5 py-1" id="editBadgeJumlahBarang" style="background: #0f172a; color: #ffffff; font-size: 11px; font-weight: 700;">0 Item</span>
                                     </div>
-                                    <div class="text-xs text-secondary font-weight-bold">Atur jumlah stok yang dititipkan atau tambah unit restock toko</div>
+                                    <div class="text-muted mt-1" style="font-size: 12px;">Atur jumlah stok yang dititipkan atau tambah unit restock toko</div>
                                 </div>
-                                <div class="d-flex gap-1.5 flex-wrap">
-                                    <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px;" onclick="openKatalogPriceListModal('edit')">
-                                        <i class="fa-solid fa-eye me-1"></i> Katalog
+                                <div class="tt-toolbar-actions">
+                                    <button type="button" class="tt-btn-tool katalog" onclick="openKatalogPriceListModal('edit')">
+                                        <i class="fa-solid fa-eye"></i> Katalog
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-warning text-dark font-weight-bold px-2.5 py-1.5 mb-0" style="border-radius: 9px; font-size: 11.5px; background: #fffbeb; border-color: #fde68a;" onclick="pasangSemua6Produk('edit_')" title="Masukkan otomatis seluruh 6 kamera resmi">
-                                        <i class="fa-solid fa-bolt text-warning me-1"></i> + 6 Kamera Sekaligus
+                                    <button type="button" class="tt-btn-tool all6" onclick="pasangSemua6Produk('edit_')" title="Masukkan otomatis seluruh 6 kamera resmi">
+                                        <i class="fa-solid fa-bolt"></i> + 6 Kamera Sekaligus
                                     </button>
-                                    <button type="button" class="btn-taste-primary btn-sm py-1.5 px-3 mb-0" style="font-size: 12px; border-radius: 9px; background: linear-gradient(135deg, #059669 0%, #047857 100%); border-color: #047857;" onclick="tambahBarisBarangEdit()">
-                                        <i class="fa-solid fa-plus me-1"></i> Tambah Barang
+                                    <button type="button" class="tt-btn-tool add-row-green" onclick="tambahBarisBarangEdit()">
+                                        <i class="fa-solid fa-plus"></i> Tambah Barang
                                     </button>
                                 </div>
                             </div>
+
+                            <div class="tt-items-col-head">
+                                <div class="text-center">No</div>
+                                <div>Model Kamera Resmi</div>
+                                <div class="text-center">Jumlah Titip</div>
+                                <div class="text-end">Estimasi Insentif</div>
+                                <div></div>
+                            </div>
+
+                            <!-- 4. Container Baris Barang -->
+                            <div id="editContainerItemRows"></div>
+
+                            <!-- Tombol Tambah Cepat di Bawah Item Edit -->
+                            <button type="button" class="btn-add-item-dashed mt-2 w-100" onclick="tambahBarisBarangEdit()">
+                                <i class="fa-solid fa-circle-plus text-success"></i> Tambah Model Kamera Lainnya
+                            </button>
                         </div>
 
-                        <!-- 4. Container Baris Barang -->
-                        <div id="editContainerItemRows"></div>
-
-                        <!-- Tombol Tambah Cepat di Bawah Item Edit -->
-                        <button type="button" class="btn-add-item-dashed mt-1 mb-3 w-100" onclick="tambahBarisBarangEdit()">
-                            <i class="fa-solid fa-circle-plus me-1 text-success"></i> + Tambah Model Kamera Lainnya
-                        </button>
-
                         <!-- 5. Grand Total Summary Bar for Edit -->
-                        <div class="summary-bar-tiptok my-3" id="editSummaryBar">
+                        <div class="summary-bar-tiptok mb-3" id="editSummaryBar">
                             <div class="d-flex align-items-center gap-3">
-                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(59, 130, 246, 0.2); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 16px;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59, 130, 246, 0.18); border: 1px solid rgba(96, 165, 250, 0.3); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 18px; flex-shrink: 0;">
                                     <i class="fa-solid fa-calculator"></i>
                                 </div>
                                 <div>
-                                    <div class="text-xs" style="color: #94a3b8; font-weight: 700;">TOTAL TITIP FISIK</div>
-                                    <div class="fw-bold text-white fs-6" id="editTotalQtyTitipPreview">0 Unit (0 Model)</div>
+                                    <div style="color: #94a3b8; font-size: 11px; font-weight: 800; letter-spacing: 0.06em;">TOTAL TITIP FISIK</div>
+                                    <div class="fw-bold text-white tt-summary-val" style="font-size: 19px; line-height: 1.25;" id="editTotalQtyTitipPreview">0 Unit (0 Model)</div>
                                 </div>
                             </div>
                             <div class="text-end">
-                                <div class="text-xs" style="color: #34d399; font-weight: 800;"><i class="fa-solid fa-coins me-1"></i> ESTIMASI REWARD INSENTIF</div>
-                                <div class="fw-bold text-success fs-5" id="editTotalInsentifTitipPreview" style="color: #34d399 !important;">Rp 0</div>
+                                <div style="color: #6ee7b7; font-size: 11px; font-weight: 800; letter-spacing: 0.06em;"><i class="fa-solid fa-coins me-1"></i> ESTIMASI REWARD INSENTIF</div>
+                                <div class="fw-bold tt-summary-val" id="editTotalInsentifTitipPreview" style="color: #34d399; font-size: 24px; line-height: 1.2;">Rp 0</div>
                             </div>
                         </div>
 
                         <!-- 6. Catatan -->
-                        <div class="bg-white p-3.5 rounded-3 border mt-3" style="border: 1.5px solid #cbd5e1 !important;">
-                            <label class="form-label-taste mb-1"><i class="fa-regular fa-note-sticky text-secondary me-1.5"></i> Catatan Penitipan / Restock (Opsional)</label>
-                            <textarea name="catatan" id="editCatatan" class="form-control-taste w-100" rows="2" placeholder="Catatan perjanjian penitipan atau keterangan restock barang..."></textarea>
+                        <div class="tt-section-card">
+                            <label class="tt-field-label"><i class="fa-solid fa-pen-to-square text-secondary"></i> Catatan Penitipan / Restock <span class="text-muted fw-semibold text-lowercase" style="font-size: 11px;">(opsional)</span></label>
+                            <textarea name="catatan" id="editCatatan" class="tt-input" rows="2" placeholder="Catatan perjanjian penitipan atau keterangan restock barang..."></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer p-3 bg-white border-top">
-                        <button type="button" class="btn-taste-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" id="btnSimpanEditPenitipan" class="btn-taste-primary" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border-color: #047857;">
-                            <i class="fa-solid fa-floppy-disk me-1.5"></i> Simpan Penambahan Stok &amp; Titipan
-                        </button>
-                    </div>
+                    <div class="modal-footer bg-white border-top px-4 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted d-none d-sm-flex align-items-center gap-2" style="font-size: 12px;">
+                            <i class="fa-solid fa-shield-halved text-success"></i>
+                            <span>Perubahan jumlah stok akan otomatis memperbarui sisa fisik toko.</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 ms-auto">
+                            <button type="button" class="btn-taste-secondary" style="border-width: 1.5px; padding: 9px 18px; font-size: 13.5px;" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" id="btnSimpanEditPenitipan" class="btn-taste-primary" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border-color: #047857; padding: 9px 22px; font-size: 13.5px;">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Penambahan Stok &amp; Titipan
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -4018,6 +4455,17 @@ $loewixPriceList = $tiptokMaster6;
             return html;
         }
 
+        function buildSpecPillHtml(prod) {
+            if (!prod) {
+                return '<span class="tt-spec-pill empty"><i class="fa-solid fa-circle-info"></i> Pilih model kamera untuk melihat tier insentif</span>';
+            }
+            const is4mp = (prod.category || prod.type || '').toUpperCase().includes('4MP');
+            const tierCls = is4mp ? 'mp4' : 'mp2';
+            const tierLbl = is4mp ? '4MP IPCAM' : '2MP AHD';
+            const rateFmt = new Intl.NumberFormat('id-ID').format(prod.insentif || (is4mp ? 30000 : 15000));
+            return `<span class="tt-spec-pill ${tierCls}"><i class="fa-solid fa-video"></i> ${tierLbl}</span><span class="text-muted" style="font-size:11px; font-weight:600;">Insentif Rp ${rateFmt} / unit</span>`;
+        }
+
         function onSelectRowProduct(selectEl, rowIndex, prefix = '') {
             const selectedVal = selectEl.value;
             const p = findLoewixProduct(selectedVal);
@@ -4027,6 +4475,7 @@ $loewixPriceList = $tiptokMaster6;
             const inputInsentif = document.getElementById(`inputInsentif_${prefix}${rowIndex}`);
             const inputQty = document.getElementById(`inputQty_${prefix}${rowIndex}`);
             const labelIns = document.getElementById(`labelInsentif_${prefix}${rowIndex}`);
+            const specMeta = document.getElementById(`specMeta_${prefix}${rowIndex}`);
 
             if (p) {
                 if (inputNama) inputNama.value = p.type;
@@ -4036,14 +4485,20 @@ $loewixPriceList = $tiptokMaster6;
                     inputQty.value = 1;
                 }
                 if (labelIns) {
-                    labelIns.textContent = `Insentif: Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)}/u`;
+                    labelIns.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(p.insentif)} / unit`;
+                }
+                if (specMeta) {
+                    specMeta.innerHTML = buildSpecPillHtml(p);
                 }
             } else {
                 if (inputNama) inputNama.value = '';
                 if (inputTipe) inputTipe.value = '';
                 if (inputInsentif) inputInsentif.value = '';
                 if (labelIns) {
-                    labelIns.textContent = 'Insentif: -';
+                    labelIns.textContent = 'Belum dipilih';
+                }
+                if (specMeta) {
+                    specMeta.innerHTML = buildSpecPillHtml(null);
                 }
             }
             recalcRowSubtotal(rowIndex, prefix);
@@ -4964,57 +5419,57 @@ $loewixPriceList = $tiptokMaster6;
             }
             const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : 1;
 
+            const rowNumStr = String(itemRowIndex).padStart(2, '0');
+            const matchedInit = findLoewixProduct(pNama);
             const rowHtml = `
                 <div class="item-card-row item-row-compact" id="itemRow_${itemRowIndex}">
                     <input type="hidden" name="items[${itemRowIndex}][nama_barang]" id="inputNama_${itemRowIndex}" value="${escapeHtml(pNama)}">
                     <input type="hidden" name="items[${itemRowIndex}][tipe_barang]" id="inputTipe_${itemRowIndex}" value="${escapeHtml(pTipe)}">
                     <input type="hidden" name="items[${itemRowIndex}][insentif_per_unit]" id="inputInsentif_${itemRowIndex}" value="${pInsentif}">
 
-                    <div class="row g-2 align-items-center">
-                        <!-- Index & Product Selector: Ruang lebih luas (col-md-6) agar nama barang terbaca penuh -->
-                        <div class="col-md-6 col-12">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-dark text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
-                                    #${itemRowIndex}
-                                </span>
-                                <div class="flex-grow-1 min-w-0">
-                                    <select id="selectProduct_${itemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${itemRowIndex}, '')" title="Pilih Model Kamera">
-                                        <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
-                                        ${renderPriceListOptions(pNama)}
-                                    </select>
-                                </div>
+                    <div class="tt-item-grid">
+                        <!-- Col 1: Nomor Urut -->
+                        <div class="text-center">
+                            <span class="tt-row-index">${rowNumStr}</span>
+                        </div>
+
+                        <!-- Col 2: Model Kamera + Spec Badge -->
+                        <div class="min-w-0">
+                            <select id="selectProduct_${itemRowIndex}" class="form-select product-select-compact" onchange="onSelectRowProduct(this, ${itemRowIndex}, '')" title="Pilih Model Kamera">
+                                <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
+                                ${renderPriceListOptions(pNama)}
+                            </select>
+                            <div class="tt-prod-meta-strip" id="specMeta_${itemRowIndex}">
+                                ${buildSpecPillHtml(matchedInit)}
                             </div>
                         </div>
 
-                        <!-- Qty Stepper: col-md-2 col-5 -->
-                        <div class="col-md-2 col-5">
-                            <div class="d-flex align-items-center justify-content-start justify-content-md-center gap-1.5">
-                                <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline">Qty:</span>
+                        <!-- Col 3: Qty Stepper Presisi -->
+                        <div class="tt-qty-wrap tt-col-qty">
+                            <div class="tt-qty-inline">
                                 <div class="taste-qty-stepper-compact">
                                     <button type="button" class="stepper-btn-compact" onclick="stepQty(${itemRowIndex}, -1, '')" title="Kurangi">−</button>
                                     <input type="number" name="items[${itemRowIndex}][qty_titip]" id="inputQty_${itemRowIndex}" min="1" class="stepper-input-compact" value="${pQty}" required oninput="recalcRowSubtotal(${itemRowIndex}, '')">
                                     <button type="button" class="stepper-btn-compact" onclick="stepQty(${itemRowIndex}, 1, '')" title="Tambah">+</button>
                                 </div>
-                                <span class="text-xs text-muted font-weight-bold">Unit</span>
+                                <span class="tt-unit-tag">Unit</span>
                             </div>
                         </div>
 
-                        <!-- Insentif & Subtotal Badge: col-md-3 col-5 text-end -->
-                        <div class="col-md-3 col-5 text-end">
-                            <div class="d-inline-flex flex-column align-items-end">
-                                <div class="text-xs font-weight-bold text-muted" style="font-size: 10.5px;" id="labelInsentif_${itemRowIndex}">
-                                    ${pInsentif ? 'Insentif: Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + '/u' : 'Insentif: -'}
-                                </div>
-                                <div class="fw-bold text-success fs-6" id="subtotalInsentif_${itemRowIndex}" style="line-height: 1.2;">
-                                    Rp 0
-                                </div>
+                        <!-- Col 4: Estimasi Insentif Tabular -->
+                        <div class="tt-incentive-col tt-col-insentif">
+                            <div class="tt-incentive-rate" id="labelInsentif_${itemRowIndex}">
+                                ${pInsentif ? 'Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + ' / unit' : 'Belum dipilih'}
+                            </div>
+                            <div class="tt-incentive-total" id="subtotalInsentif_${itemRowIndex}">
+                                Rp 0
                             </div>
                         </div>
 
-                        <!-- Delete Action: col-md-1 col-2 text-end -->
-                        <div class="col-md-1 col-2 text-end">
-                            <button type="button" class="btn btn-sm btn-outline-danger p-0 d-flex align-items-center justify-content-center ms-auto" style="width: 32px; height: 32px; border-radius: 8px;" onclick="hapusBarisBarang(${itemRowIndex})" title="Hapus Barang Ini">
-                                <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
+                        <!-- Col 5: Aksi Hapus -->
+                        <div class="text-end">
+                            <button type="button" class="tt-btn-del-row" onclick="hapusBarisBarang(${itemRowIndex})" title="Hapus Barang Ini">
+                                <i class="fa-solid fa-trash-can" style="font-size: 13px;"></i>
                             </button>
                         </div>
                     </div>
@@ -5181,15 +5636,16 @@ $loewixPriceList = $tiptokMaster6;
                                 const currentSisa = Math.max(0, currentQty - terjual);
 
                                 const deleteBtn = isSold ? 
-                                    `<span class="taste-badge badge-danger-tag" style="font-size:11px;" title="Barang tidak dapat dihapus karena sudah ada penjualan"><i class="fa-solid fa-lock me-1"></i>Terjual ${terjual} u</span>` : 
-                                    `<button type="button" class="btn btn-sm btn-outline-danger py-1 px-2.5 mb-0 font-weight-bold" style="border-radius: 8px; font-size: 12px;" onclick="hapusBarisBarangEdit(${editItemRowIndex})">
-                                        <i class="fa-solid fa-trash-can me-1"></i> Hapus
+                                    `<span class="d-inline-flex align-items-center justify-content-center rounded-2" style="width:36px;height:36px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;" title="Barang terkunci karena sudah terjual ${terjual} unit"><i class="fa-solid fa-lock" style="font-size:12px;"></i></span>` : 
+                                    `<button type="button" class="tt-btn-del-row" onclick="hapusBarisBarangEdit(${editItemRowIndex})" title="Hapus Barang Ini">
+                                        <i class="fa-solid fa-trash-can" style="font-size: 13px;"></i>
                                      </button>`;
 
                                 const matchedProd = findLoewixProduct(it.nama_barang);
                                 const prodName = matchedProd ? matchedProd.type : (it.nama_barang || '');
                                 const prodCat = matchedProd ? matchedProd.category : (it.tipe_barang || '');
                                 const pInsentif = (matchedProd ? matchedProd.insentif : it.insentif_per_unit) || (prodName.includes('4MP') ? 30000 : 15000);
+                                const editRowNumStr = String(editItemRowIndex).padStart(2, '0');
 
                                 const rowHtml = `
                                     <div class="item-card-row item-row-compact" id="editItemRow_${editItemRowIndex}">
@@ -5200,65 +5656,62 @@ $loewixPriceList = $tiptokMaster6;
                                         <input type="hidden" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" value="${escapeHtml(prodCat)}">
                                         <input type="hidden" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" value="${pInsentif}">
 
-                                        <div class="row g-2 align-items-center">
-                                            <!-- Index & Product Selector: Ruang lebih luas (col-md-6) agar nama barang terbaca penuh -->
-                                            <div class="col-md-6 col-12">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <span class="badge bg-dark text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
-                                                        #${editItemRowIndex}
-                                                    </span>
-                                                    <div class="flex-grow-1 min-w-0">
-                                                        <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" ${isSold ? 'disabled' : ''} title="Pilih Model Kamera">
-                                                            <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
-                                                            ${renderPriceListOptions(prodName)}
-                                                        </select>
-                                                    </div>
+                                        <div class="tt-item-grid">
+                                            <!-- Col 1: Index -->
+                                            <div class="text-center">
+                                                <span class="tt-row-index">${editRowNumStr}</span>
+                                            </div>
+
+                                            <!-- Col 2: Model Kamera + Spec & Status -->
+                                            <div class="min-w-0">
+                                                <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" ${isSold ? 'disabled' : ''} title="Pilih Model Kamera">
+                                                    <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
+                                                    ${renderPriceListOptions(prodName)}
+                                                </select>
+                                                <div class="tt-prod-meta-strip" id="specMeta_edit_${editItemRowIndex}">
+                                                    ${buildSpecPillHtml(matchedProd)}
+                                                    ${isSold ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:10px;"><i class="fa-solid fa-lock me-1"></i>Terjual ${terjual} u</span>` : ''}
                                                 </div>
                                             </div>
 
-                                            <!-- Qty Stepper & Live Stock Breakdown: col-md-2 col-5 -->
-                                            <div class="col-md-2 col-5">
-                                                <div class="d-flex flex-column align-items-center justify-content-center">
-                                                    <div class="d-flex align-items-center gap-1.5">
-                                                        <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline" style="font-size: 11px;">Titip:</span>
-                                                        <div class="taste-qty-stepper-compact">
-                                                            <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
-                                                            <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, terjual || 1)}" class="stepper-input-compact font-weight-bold" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
-                                                            <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah Stok">+</button>
-                                                        </div>
-                                                        <span class="text-xs text-muted font-weight-bold">Unit</span>
+                                            <!-- Col 3: Qty Stepper & Live Stock -->
+                                            <div class="tt-qty-wrap tt-col-qty">
+                                                <div class="tt-qty-inline">
+                                                    <div class="taste-qty-stepper-compact">
+                                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
+                                                        <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="${Math.max(1, terjual || 1)}" class="stepper-input-compact" value="${it.qty_titip}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
+                                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah Stok">+</button>
                                                     </div>
-                                                    <div id="badgeRestock_edit_${editItemRowIndex}" class="d-none mt-1"></div>
-                                                    ${isSold ? `
-                                                        <div class="mt-1 d-flex align-items-center gap-1 text-xs" style="font-size: 10px;">
-                                                            <span class="text-danger font-weight-bold"><i class="fa-solid fa-cart-shopping me-0.5"></i>Terjual: ${terjual}</span>
-                                                            <span class="text-muted">•</span>
-                                                            <span class="stock-sisa-indicator ${currentSisa > 0 ? 'text-success font-weight-bold' : 'text-secondary'}">
-                                                                Sisa: <strong id="liveSisa_edit_${editItemRowIndex}">${currentSisa}</strong> u
-                                                            </span>
-                                                        </div>
-                                                    ` : `
-                                                        <div class="mt-1 text-muted text-xs font-weight-semibold" style="font-size: 10px;">
-                                                            <i class="fa-solid fa-box-open me-0.5 text-primary"></i> Belum laku (Sisa: <strong id="liveSisa_edit_${editItemRowIndex}">${currentSisa}</strong> u)
-                                                        </div>
-                                                    `}
+                                                    <span class="tt-unit-tag">Unit</span>
+                                                </div>
+                                                <div id="badgeRestock_edit_${editItemRowIndex}" class="d-none mt-1"></div>
+                                                ${isSold ? `
+                                                    <div class="mt-1 d-flex align-items-center gap-1" style="font-size: 10.5px;">
+                                                        <span class="text-danger fw-bold">Laku: ${terjual}</span>
+                                                        <span class="text-muted">&bull;</span>
+                                                        <span class="stock-sisa-indicator ${currentSisa > 0 ? 'text-success fw-bold' : 'text-secondary'}">
+                                                            Sisa: <strong id="liveSisa_edit_${editItemRowIndex}">${currentSisa}</strong> u
+                                                        </span>
+                                                    </div>
+                                                ` : `
+                                                    <div class="mt-1 text-muted" style="font-size: 10.5px; font-weight: 600;">
+                                                        Sisa fisik: <strong class="text-primary" id="liveSisa_edit_${editItemRowIndex}">${currentSisa}</strong> unit
+                                                    </div>
+                                                `}
+                                            </div>
+
+                                            <!-- Col 4: Estimasi Insentif -->
+                                            <div class="tt-incentive-col tt-col-insentif">
+                                                <div class="tt-incentive-rate" id="labelInsentif_edit_${editItemRowIndex}">
+                                                    ${pInsentif ? 'Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + ' / unit' : 'Belum dipilih'}
+                                                </div>
+                                                <div class="tt-incentive-total" id="subtotalInsentif_edit_${editItemRowIndex}">
+                                                    Rp 0
                                                 </div>
                                             </div>
 
-                                            <!-- Insentif & Subtotal Badge: col-md-3 col-5 text-end -->
-                                            <div class="col-md-3 col-5 text-end">
-                                                <div class="d-inline-flex flex-column align-items-end">
-                                                    <div class="text-xs font-weight-bold text-muted" style="font-size: 10.5px;" id="labelInsentif_edit_${editItemRowIndex}">
-                                                        ${pInsentif ? 'Insentif: Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + '/u' : 'Insentif: -'}
-                                                    </div>
-                                                    <div class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}" style="line-height: 1.2;">
-                                                        Rp 0
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Delete Action / Sold Lock: col-md-1 col-2 text-end -->
-                                            <div class="col-md-1 col-2 text-end">
+                                            <!-- Col 5: Hapus / Terkunci -->
+                                            <div class="text-end">
                                                 ${deleteBtn}
                                             </div>
                                         </div>
@@ -5316,6 +5769,7 @@ $loewixPriceList = $tiptokMaster6;
             }
             const pQty = (prefill && prefill.qty_titip) ? prefill.qty_titip : 1;
 
+            const matchedEditInit = findLoewixProduct(pNama);
             const rowHtml = `
                 <div class="item-card-row item-row-compact" id="editItemRow_${editItemRowIndex}">
                     <input type="hidden" name="items[${editItemRowIndex}][id_item]" value="0">
@@ -5325,56 +5779,52 @@ $loewixPriceList = $tiptokMaster6;
                     <input type="hidden" name="items[${editItemRowIndex}][tipe_barang]" id="inputTipe_edit_${editItemRowIndex}" value="${escapeHtml(pTipe)}">
                     <input type="hidden" name="items[${editItemRowIndex}][insentif_per_unit]" id="inputInsentif_edit_${editItemRowIndex}" value="${pInsentif}">
 
-                    <div class="row g-2 align-items-center">
-                        <!-- Index & Product Selector: Ruang lebih luas (col-md-6) agar nama barang terbaca penuh -->
-                        <div class="col-md-6 col-12">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-success text-white px-2 py-1 flex-shrink-0" style="font-size: 11px; border-radius: 6px; font-weight: 800;">
-                                    BARU
-                                </span>
-                                <div class="flex-grow-1 min-w-0">
-                                    <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact w-100" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" title="Pilih Model Kamera">
-                                        <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
-                                        ${renderPriceListOptions(pNama)}
-                                    </select>
-                                </div>
+                    <div class="tt-item-grid">
+                        <!-- Col 1: Badge Baru -->
+                        <div class="text-center">
+                            <span class="tt-row-index is-new">NEW</span>
+                        </div>
+
+                        <!-- Col 2: Model Kamera + Spec -->
+                        <div class="min-w-0">
+                            <select id="selectProduct_edit_${editItemRowIndex}" class="form-select product-select-compact" onchange="onSelectRowProduct(this, ${editItemRowIndex}, 'edit_')" title="Pilih Model Kamera">
+                                <option value="">-- Pilih Model Kamera Resmi TIP TOK --</option>
+                                ${renderPriceListOptions(pNama)}
+                            </select>
+                            <div class="tt-prod-meta-strip" id="specMeta_edit_${editItemRowIndex}">
+                                ${buildSpecPillHtml(matchedEditInit)}
                             </div>
                         </div>
 
-                        <!-- Qty Stepper: col-md-2 col-5 -->
-                        <div class="col-md-2 col-5">
-                            <div class="d-flex flex-column align-items-center justify-content-center">
-                                <div class="d-flex align-items-center gap-1.5">
-                                    <span class="text-xs text-secondary font-weight-bold d-none d-lg-inline">Titip:</span>
-                                    <div class="taste-qty-stepper-compact">
-                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
-                                        <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="1" class="stepper-input-compact font-weight-bold" value="${pQty}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
-                                        <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
-                                    </div>
-                                    <span class="text-xs text-muted font-weight-bold">Unit</span>
+                        <!-- Col 3: Qty Stepper -->
+                        <div class="tt-qty-wrap tt-col-qty">
+                            <div class="tt-qty-inline">
+                                <div class="taste-qty-stepper-compact">
+                                    <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, -1, 'edit_')" title="Kurangi">−</button>
+                                    <input type="number" name="items[${editItemRowIndex}][qty_titip]" id="inputQty_edit_${editItemRowIndex}" min="1" class="stepper-input-compact" value="${pQty}" required oninput="recalcRowSubtotal(${editItemRowIndex}, 'edit_')">
+                                    <button type="button" class="stepper-btn-compact" onclick="stepQty(${editItemRowIndex}, 1, 'edit_')" title="Tambah">+</button>
                                 </div>
-                                <div class="mt-1">
-                                    <span class="badge bg-success-subtle text-success text-2xs py-0.5 px-1.5 rounded font-weight-bold"><i class="fa-solid fa-plus me-0.5"></i> Model Baru</span>
-                                </div>
+                                <span class="tt-unit-tag">Unit</span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 10px; font-weight: 700;">+ Model Baru</span>
                             </div>
                         </div>
 
-                        <!-- Insentif & Subtotal Badge: col-md-3 col-5 text-end -->
-                        <div class="col-md-3 col-5 text-end">
-                            <div class="d-inline-flex flex-column align-items-end">
-                                <div class="text-xs font-weight-bold text-muted" style="font-size: 10.5px;" id="labelInsentif_edit_${editItemRowIndex}">
-                                    ${pInsentif ? 'Insentif: Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + '/u' : 'Insentif: -'}
-                                </div>
-                                <div class="fw-bold text-success fs-6" id="subtotalInsentif_edit_${editItemRowIndex}" style="line-height: 1.2;">
-                                    Rp 0
-                                </div>
+                        <!-- Col 4: Estimasi Insentif -->
+                        <div class="tt-incentive-col tt-col-insentif">
+                            <div class="tt-incentive-rate" id="labelInsentif_edit_${editItemRowIndex}">
+                                ${pInsentif ? 'Rp ' + new Intl.NumberFormat('id-ID').format(pInsentif) + ' / unit' : 'Belum dipilih'}
+                            </div>
+                            <div class="tt-incentive-total" id="subtotalInsentif_edit_${editItemRowIndex}">
+                                Rp 0
                             </div>
                         </div>
 
-                        <!-- Delete Action: col-md-1 col-2 text-end -->
-                        <div class="col-md-1 col-2 text-end">
-                            <button type="button" class="btn btn-sm btn-outline-danger p-0 d-flex align-items-center justify-content-center ms-auto" style="width: 32px; height: 32px; border-radius: 8px;" onclick="hapusBarisBarangEdit(${editItemRowIndex})" title="Hapus Barang Ini">
-                                <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
+                        <!-- Col 5: Aksi Hapus -->
+                        <div class="text-end">
+                            <button type="button" class="tt-btn-del-row" onclick="hapusBarisBarangEdit(${editItemRowIndex})" title="Hapus Barang Ini">
+                                <i class="fa-solid fa-trash-can" style="font-size: 13px;"></i>
                             </button>
                         </div>
                     </div>
