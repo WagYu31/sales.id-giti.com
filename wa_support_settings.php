@@ -468,6 +468,106 @@ require_once 'includes/header.php';
     animation: shakeError 0.4s ease-in-out;
 }
 
+/* ==========================================================================
+   Premium OpenWA QR Scanner Modal UI
+   ========================================================================== */
+.qr-modal-content {
+    border: 0;
+    border-radius: 26px !important;
+    overflow: hidden;
+    box-shadow: 0 28px 60px -15px rgba(15, 23, 42, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+.qr-modal-hero {
+    background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.28), transparent 55%),
+                linear-gradient(135deg, #0b1324 0%, #0f172a 55%, #064e3b 100%);
+    padding: 20px 24px;
+    color: #ffffff;
+    position: relative;
+}
+.qr-hero-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+    flex-shrink: 0;
+}
+.qr-stage-outer {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto;
+    padding: 14px;
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: 0 14px 36px -8px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(16, 185, 129, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.qr-stage-outer.is-ready-scan {
+    box-shadow: 0 16px 40px -8px rgba(16, 185, 129, 0.22), 0 0 0 1.5px rgba(16, 185, 129, 0.35);
+}
+/* Viewfinder Corner Brackets */
+.qr-corner {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-color: #10b981;
+    border-style: solid;
+    pointer-events: none;
+}
+.qr-corner.tl { top: 8px; left: 8px; border-width: 3px 0 0 3px; border-radius: 10px 0 0 0; }
+.qr-corner.tr { top: 8px; right: 8px; border-width: 3px 3px 0 0; border-radius: 0 10px 0 0; }
+.qr-corner.bl { bottom: 8px; left: 8px; border-width: 0 0 3px 3px; border-radius: 0 0 0 10px; }
+.qr-corner.br { bottom: 8px; right: 8px; border-width: 0 3px 3px 0; border-radius: 0 0 10px 0; }
+
+.qr-img-fade {
+    animation: qrFadeIn 0.28s ease-out;
+}
+@keyframes qrFadeIn {
+    from { opacity: 0.25; transform: scale(0.97); }
+    to   { opacity: 1; transform: scale(1); }
+}
+.qr-steps-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 14px 16px;
+    text-align: left;
+}
+.qr-step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+    color: #334155;
+    line-height: 1.45;
+}
+.qr-step-item + .qr-step-item {
+    margin-top: 9px;
+}
+.qr-step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+    font-size: 11px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
 /* Table Design */
 .modern-table thead th {
     background: #f8fafc;
@@ -1217,32 +1317,86 @@ function filterMessagesTable() {
 }
 </script>
 
-<!-- Modal 1: Live Scan QR Code OpenWA -->
-<div class="modal fade" id="modalOpenwaQr" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-            <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #0F172A, #1E293B);">
-                <div>
-                    <h6 class="modal-title fw-bold mb-0"><i class="bi bi-qr-code-scan text-success me-1.5"></i> Tautkan WhatsApp Sales</h6>
-                    <small class="text-white-50" id="qrModalSessionLabel">Memuat sesi...</small>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4 text-center">
-                <div id="qrImageWrapper" class="d-flex align-items-center justify-content-center rounded-4 border bg-light mx-auto mb-3" style="width: 260px; height: 260px;">
-                    <div class="text-muted small">
-                        <div class="spinner-border text-success mb-2" role="status"></div>
-                        <div>Menyiapkan QR Code...</div>
+<!-- Modal 1: Live Scan QR Code OpenWA (Premium Zero-Flicker Scanner UI) -->
+<div class="modal fade modal-glass" id="modalOpenwaQr" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 470px;">
+        <div class="modal-content qr-modal-content">
+            <!-- Hero Header -->
+            <div class="qr-modal-hero d-flex align-items-center justify-content-between gap-2">
+                <div class="d-flex align-items-center gap-3 overflow-hidden">
+                    <div class="qr-hero-icon">
+                        <i class="bi bi-whatsapp"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h6 class="fw-bold mb-0.5 text-white" style="font-size: 15.5px;">Tautkan WhatsApp Sales</h6>
+                        <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                            <span class="badge rounded-pill px-2.5 py-0.5 fw-semibold" style="background: rgba(255,255,255,0.12); color: #e2e8f0; font-size: 11px;" id="qrModalSessionLabel">
+                                Memuat sesi...
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <div class="badge rounded-pill bg-light text-dark border px-3 py-1.5 mb-2" id="qrStatusBadge">Status: initializing</div>
-                <p class="small text-muted mb-0" id="qrHelpText">
-                    Buka WhatsApp di HP sales &rarr; <strong>Perangkat Tertaut</strong> &rarr; <strong>Tautkan Perangkat</strong> lalu arahkan kamera ke QR di atas.
-                </p>
+                <button type="button" class="btn-close btn-close-white flex-shrink-0" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
-            <div class="modal-footer border-top py-2.5 px-4 justify-content-between">
-                <small class="text-muted"><i class="bi bi-arrow-repeat"></i> Auto-refresh tiap 3 detik</small>
-                <button type="button" class="btn btn-light btn-sm rounded-pill px-3 fw-bold" data-bs-dismiss="modal">Tutup</button>
+
+            <!-- Body -->
+            <div class="modal-body p-4 text-center bg-white">
+                <!-- Live Status Pill -->
+                <div class="mb-3">
+                    <span class="status-pill" id="qrStatusBadge" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;">
+                        <span class="spinner-border spinner-border-sm" style="width:10px;height:10px;"></span> Menyiapkan sesi...
+                    </span>
+                </div>
+
+                <!-- Crisp White Viewfinder QR Stage -->
+                <div class="qr-stage-outer mb-3" id="qrStageOuter">
+                    <span class="qr-corner tl"></span>
+                    <span class="qr-corner tr"></span>
+                    <span class="qr-corner bl"></span>
+                    <span class="qr-corner br"></span>
+                    <div id="qrImageWrapper" class="d-flex align-items-center justify-content-center w-100 h-100">
+                        <div class="text-muted small">
+                            <div class="spinner-border text-success mb-2" role="status"></div>
+                            <div class="fw-semibold">Meminta QR Code...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Masa Aktif QR (Jelas & Tidak Bikin Panik) -->
+                <div class="d-inline-flex align-items-center gap-1.5 px-3 py-1 rounded-pill mb-3" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-size: 11px; font-weight: 600;">
+                    <i class="bi bi-clock-history"></i>
+                    <span id="qrValidityText">QR aktif ~20–40 detik &amp; otomatis diperbarui jika kedaluwarsa</span>
+                </div>
+
+                <!-- Panduan 3 Langkah Visual -->
+                <div class="qr-steps-box">
+                    <div class="qr-step-item">
+                        <span class="qr-step-num">1</span>
+                        <div>Buka aplikasi <strong>WhatsApp</strong> di HP sales yang sesuai nomor di atas.</div>
+                    </div>
+                    <div class="qr-step-item">
+                        <span class="qr-step-num">2</span>
+                        <div>Ketuk menu <strong>&#8942;</strong> (Android) atau <strong>Pengaturan</strong> (iPhone) &rarr; pilih <strong>Perangkat Tertaut</strong>.</div>
+                    </div>
+                    <div class="qr-step-item">
+                        <span class="qr-step-num">3</span>
+                        <div>Ketuk <strong>Tautkan Perangkat</strong> lalu arahkan kamera ke QR Code (tanpa perlu klik apa pun, otomatis terhubung).</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-top py-2.5 px-4 bg-light justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-1.5 text-muted" style="font-size: 11.5px;">
+                    <span class="pulse-dot emerald" style="width: 7px; height: 7px;"></span>
+                    <span id="qrFooterLiveText">Mendeteksi scan otomatis...</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold" onclick="forceRefreshOpenwaQr()" title="Muat ulang QR Code sekarang">
+                        <i class="bi bi-arrow-clockwise me-0.5"></i> Refresh QR
+                    </button>
+                    <button type="button" class="btn btn-dark btn-sm rounded-pill px-3.5 fw-bold" data-bs-dismiss="modal">Tutup</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1651,61 +1805,126 @@ async function testOpenwaSend(sessionId, label) {
     Swal.fire({ icon: data.success ? 'success' : 'error', title: data.success ? 'Terkirim!' : 'Gagal', text: data.message });
 }
 
+let openwaLastQrValue = '';
+
+function setQrStatusPill(type, htmlContent) {
+    const badge = document.getElementById('qrStatusBadge');
+    if (!badge) return;
+    const styles = {
+        ready:  { bg: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0' },
+        qr:     { bg: '#ecfdf5', color: '#047857', border: '1px solid #6ee7b7' },
+        auth:   { bg: '#eff6ff', color: '#1d4ed8', border: '1px solid #93c5fd' },
+        wait:   { bg: '#fffbeb', color: '#92400e', border: '1px solid #fde68a' },
+        error:  { bg: '#fff1f2', color: '#9f1239', border: '1px solid #fecdd3' }
+    };
+    const st = styles[type] || styles.wait;
+    badge.style.background = st.bg;
+    badge.style.color      = st.color;
+    badge.style.border     = st.border;
+    badge.innerHTML        = htmlContent;
+}
+
 function openOpenwaQrModal(sessionId, label) {
     openwaQrActiveSessionId = sessionId;
+    openwaLastQrValue = '';
     document.getElementById('qrModalSessionLabel').textContent = label;
-    document.getElementById('qrStatusBadge').textContent = 'Menyiapkan sesi...';
-    document.getElementById('qrImageWrapper').innerHTML = '<div class="text-muted small"><div class="spinner-border text-success mb-2"></div><div>Meminta QR Code...</div></div>';
+    document.getElementById('qrStageOuter')?.classList.remove('is-ready-scan');
+    document.getElementById('qrFooterLiveText').textContent = 'Mendeteksi scan otomatis...';
+    setQrStatusPill('wait', '<span class="spinner-border spinner-border-sm" style="width:10px;height:10px;"></span> Menyiapkan QR Code...');
+    document.getElementById('qrImageWrapper').innerHTML = '<div class="text-muted small"><div class="spinner-border text-success mb-2"></div><div class="fw-semibold">Meminta QR Code...</div></div>';
 
     const modalEl = document.getElementById('modalOpenwaQr');
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 
     pollOpenwaQr();
     if (openwaQrPollTimer) clearInterval(openwaQrPollTimer);
-    openwaQrPollTimer = setInterval(pollOpenwaQr, 3000);
+    // Polling cepat di background hanya untuk mendeteksi status scan — QR tidak digambar ulang kecuali benar-benar berubah dari WhatsApp!
+    openwaQrPollTimer = setInterval(pollOpenwaQr, 2500);
 
     modalEl.addEventListener('hidden.bs.modal', () => {
         if (openwaQrPollTimer) {
             clearInterval(openwaQrPollTimer);
             openwaQrPollTimer = null;
         }
+        openwaLastQrValue = '';
         loadOpenwaDashboard();
     }, { once: true });
+}
+
+function forceRefreshOpenwaQr() {
+    openwaLastQrValue = '';
+    document.getElementById('qrImageWrapper').innerHTML = '<div class="text-muted small"><div class="spinner-border text-success mb-2"></div><div class="fw-semibold">Memuat ulang QR...</div></div>';
+    pollOpenwaQr();
 }
 
 async function pollOpenwaQr() {
     if (!openwaQrActiveSessionId) return;
     try {
         const data = await fetch('ajax_wa_broadcast.php?action=openwa_get_qr&session_id=' + encodeURIComponent(openwaQrActiveSessionId)).then(r => r.json());
-        const badge = document.getElementById('qrStatusBadge');
         const wrap  = document.getElementById('qrImageWrapper');
+        const stage = document.getElementById('qrStageOuter');
+        const foot  = document.getElementById('qrFooterLiveText');
 
         if (!data.success) {
-            badge.textContent = 'Error';
-            wrap.innerHTML = `<div class="p-3 text-danger small">${escapeOpenwaHtml(data.message)}</div>`;
+            setQrStatusPill('error', '<i class="bi bi-exclamation-triangle-fill"></i> Gagal Memuat');
+            wrap.innerHTML = `<div class="p-3 text-danger small fw-semibold">${escapeOpenwaHtml(data.message)}</div>`;
             return;
         }
 
-        badge.textContent = 'Status: ' + (data.status || 'waiting').toUpperCase();
+        const st = (data.status || 'waiting').toLowerCase();
 
-        if (data.status === 'ready') {
-            if (openwaQrPollTimer) clearInterval(openwaQrPollTimer);
-            wrap.innerHTML = `<div class="text-success p-3"><i class="bi bi-check-circle-fill" style="font-size:64px;"></i><div class="fw-bold mt-2">WhatsApp Terhubung!</div><div class="small text-muted">${escapeOpenwaHtml(data.phone || '')}</div></div>`;
+        if (st === 'ready') {
+            if (openwaQrPollTimer) {
+                clearInterval(openwaQrPollTimer);
+                openwaQrPollTimer = null;
+            }
+            stage?.classList.add('is-ready-scan');
+            setQrStatusPill('ready', '<i class="bi bi-check-circle-fill"></i> TERHUBUNG (READY)');
+            if (foot) foot.textContent = 'Perangkat berhasil ditautkan!';
+            wrap.innerHTML = `
+                <div class="text-success p-3 qr-img-fade">
+                    <div class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-2" style="width:76px;height:76px;">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size:46px;"></i>
+                    </div>
+                    <div class="fw-bold text-dark fs-6">WhatsApp Terhubung!</div>
+                    <div class="small text-muted mt-0.5">${escapeOpenwaHtml(data.phone || '')}</div>
+                </div>`;
             setTimeout(() => {
                 bootstrap.Modal.getInstance(document.getElementById('modalOpenwaQr'))?.hide();
                 loadOpenwaDashboard();
-            }, 1400);
+            }, 1500);
+            return;
+        }
+
+        if (st === 'authenticating') {
+            openwaLastQrValue = '';
+            setQrStatusPill('auth', '<span class="spinner-border spinner-border-sm" style="width:10px;height:10px;"></span> QR Terbaca — Menghubungkan...');
+            if (foot) foot.textContent = 'Sinkronisasi akun WhatsApp...';
+            wrap.innerHTML = `
+                <div class="text-primary p-3 qr-img-fade">
+                    <div class="spinner-border text-primary mb-2" style="width:42px;height:42px;"></div>
+                    <div class="fw-bold text-dark small">QR Berhasil Discan!</div>
+                    <div class="text-muted" style="font-size:11.5px;">Mohon tunggu beberapa detik...</div>
+                </div>`;
             return;
         }
 
         if (data.qr) {
             const qrStr = String(data.qr);
-            if (qrStr.startsWith('data:image')) {
-                wrap.innerHTML = `<img src="${qrStr}" alt="QR WhatsApp" style="width:240px;height:240px;object-fit:contain;border-radius:10px;">`;
-            } else {
-                // Fallback jika OpenWA mengembalikan raw string QR (render via QR image API aman)
-                wrap.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrStr)}" alt="QR WhatsApp" style="width:240px;height:240px;object-fit:contain;border-radius:10px;">`;
+            stage?.classList.add('is-ready-scan');
+            setQrStatusPill('qr', '<span class="pulse-dot emerald"></span> SIAP SCAN QR');
+            if (foot) foot.textContent = 'Menunggu scan dari kamera HP...';
+
+            // ZERO-FLICKER: Hanya render ulang gambar jika token QR benar-benar berubah dari server WhatsApp (~20-40 dtk sekali)!
+            if (qrStr !== openwaLastQrValue) {
+                openwaLastQrValue = qrStr;
+                const imgSrc = qrStr.startsWith('data:image')
+                    ? qrStr
+                    : ('https://api.qrserver.com/v1/create-qr-code/?size=244x244&margin=2&data=' + encodeURIComponent(qrStr));
+                wrap.innerHTML = `<img src="${imgSrc}" alt="QR WhatsApp" class="qr-img-fade" style="width:244px;height:244px;object-fit:contain;border-radius:10px;">`;
             }
+        } else {
+            setQrStatusPill('wait', '<span class="spinner-border spinner-border-sm" style="width:10px;height:10px;"></span> ' + escapeOpenwaHtml(st.toUpperCase()));
         }
     } catch (e) {}
 }
