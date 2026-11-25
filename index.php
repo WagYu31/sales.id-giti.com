@@ -1132,6 +1132,10 @@ if ($active_sales_id > 0) {
                 <i class="bi bi-plus-lg"></i>
                 <span>Tambah Customer</span>
             </a>
+            <a href="<?php echo (strtolower($_SESSION['role'] ?? '') === 'sales') ? 'customer_io_sales.php' : 'customer_io.php'; ?>" class="taste-btn-secondary" title="Import massal dari file Excel (.xlsx/.csv) atau Link Google Sheets">
+                <i class="bi bi-file-earmark-spreadsheet-fill text-success"></i>
+                <span>Import Excel / Sheets</span>
+            </a>
             <button class="taste-btn-secondary" data-bs-toggle="collapse" data-bs-target="#forumCollapseContent">
                 <i class="bi bi-chat-left-text-fill text-primary"></i>
                 <span>Forum Q&A (<?php echo count($questions); ?>)</span>

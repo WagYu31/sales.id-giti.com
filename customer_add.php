@@ -391,7 +391,11 @@ require_once 'includes/header.php';
                 Tambahkan data master customer toko, PIC kontak, serta detail alamat lokasi ke dalam sistem database.
             </p>
         </div>
-        <div class="mt-3 mt-md-0">
+        <div class="mt-3 mt-md-0 d-flex flex-wrap gap-2">
+            <?php $importPageUrl = (strtolower($_SESSION['role'] ?? '') === 'sales') ? 'customer_io_sales.php' : 'customer_io.php'; ?>
+            <a href="<?php echo $importPageUrl; ?>" class="btn fw-bold text-white shadow-sm d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, #059669, #10B981); border:none; padding:9px 18px; border-radius:12px; font-size:13px;">
+                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Import Excel / Google Sheets
+            </a>
             <a href="customer_management.php" class="btn-cust-back">
                 <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
             </a>

@@ -729,10 +729,10 @@ $firstName = explode(' ', $_SESSION['nama_lengkap'] ?? 'User')[0];
                 <div>
                     <div class="exec-card-top">
                         <div class="exec-card-icon-wrap"><i class="bi bi-cloud-arrow-up"></i></div>
-                        <span class="exec-card-badge">Format .XLSX</span>
+                        <span class="exec-card-badge">Excel &amp; Google Sheets</span>
                     </div>
                     <h5 class="exec-card-title">Import Massal Toko</h5>
-                    <p class="exec-card-desc">Unggah file spreadsheet Excel untuk update atau penambahan database massal.</p>
+                    <p class="exec-card-desc">Unggah file Excel (.xlsx/.csv) atau tarik langsung dari link Google Sheets.</p>
                 </div>
                 <div class="exec-card-action">Mulai Import <i class="bi bi-arrow-right"></i></div>
             </div>

@@ -1,123 +1,62 @@
 <?php
 // customer_bulk_upload_process_sales.php
-require '../vendor/autoload.php';
-require_once 'includes/db.php';
+// Endpoint Import Massal Customer (Excel .xlsx/.xls/.csv & Link Google Sheets) khusus akun Sales
+require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/customer_import_helper.php';
 
-use PhpOffice\PhpSpreadsheet\IOFactory;
+$role = strtolower(trim($_SESSION['role'] ?? ''));
+$isAjax = (isset($_POST['ajax']) && $_POST['ajax'] === '1') ||
+          (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'sales' || !isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || $role !== 'sales') {
+    if ($isAjax) {
+        header('Content-Type: application/json; charset=utf-8');
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Akses ditolak. Halaman ini khusus akun Sales.']);
+        exit;
+    }
     die("Akses ditolak.");
 }
 
-if (isset($_FILES['customer_file']) && $_FILES['customer_file']['error'] == 0) {
-    
-    $file_tmp_path = $_FILES['customer_file']['tmp_name'];
-    
-    $imported_count = 0;
-    $skipped_rows = [];
-    $uploader_sales_id = $_SESSION['user_id']; // Langsung ambil ID sales dari sesi
+$options = [
+    'mode' => ($_POST['mode'] ?? 'import') === 'preview' ? 'preview' : 'import',
+    'source_type' => ($_POST['source_type'] ?? 'file') === 'gsheet' ? 'gsheet' : 'file',
+    'file' => $_FILES['customer_file'] ?? null,
+    'gsheet_url' => trim((string)($_POST['gsheet_url'] ?? '')),
+    'force_sales_id' => (int)$_SESSION['user_id'],
+    'default_sales_id' => (int)$_SESSION['user_id'],
+    'default_kategori' => trim((string)($_POST['default_kategori'] ?? 'DEALER')),
+    'skip_duplicate_phone' => isset($_POST['skip_duplicate_phone']) ? ($_POST['skip_duplicate_phone'] === '1') : true,
+    'skip_duplicate_store' => isset($_POST['skip_duplicate_store']) ? ($_POST['skip_duplicate_store'] === '1') : true,
+];
 
-    try {
-        $spreadsheet = IOFactory::load($file_tmp_path);
-        $worksheet = $spreadsheet->getActiveSheet();
-        $rows = $worksheet->toArray();
-        
-        $conn->begin_transaction();
-        
-        array_shift($rows); // Lewati baris header
+$result = customerImportProcess($conn, $options);
 
-        foreach ($rows as $index => $row) {
-            $row_num = $index + 2;
+if ($isAjax) {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($result, JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
-            // Template untuk sales tidak punya kolom sales_name
-            $nama_toko = trim($row[0] ?? '');
-            $kategori = trim($row[1] ?? '');
-            $nama_pic = trim($row[2] ?? 'unknown');
-            $tlp_pic = trim($row[3] ?? '');
-            $alamat = trim($row[4] ?? '');
-            $kota = trim($row[5] ?? '');
-            $provinsi = trim($row[6] ?? '');
-
-            if (empty($nama_toko)) {
-                continue;
-            }
-            
-            if (empty($nama_pic) || empty($tlp_pic) || empty($alamat)) {
-                $skipped_rows[] = "Baris {$row_num} ({$nama_toko}) dilewati: Data PIC, telepon, atau alamat tidak lengkap.";
-                continue;
-            }
-
-            // Proses validasi nomor telepon yang lebih baik
-            $cleaned_tlp = preg_replace('/[^0-9]/', '', $tlp_pic);
-            if (substr($cleaned_tlp, 0, 2) === '62') {
-                $processed_tlp = '0' . substr($cleaned_tlp, 2);
-            } elseif (substr($cleaned_tlp, 0, 1) !== '0') {
-                $processed_tlp = '0' . $cleaned_tlp;
-            } else {
-                $processed_tlp = $cleaned_tlp;
-            }
-
-            if (empty($processed_tlp)) {
-                $skipped_rows[] = "Baris {$row_num} ({$nama_toko}) dilewati: Format nomor telepon tidak valid.";
-                continue;
-            }
-
-            $stmt_check_phone = $conn->prepare("SELECT id FROM customer_pics WHERE tlp_pic = ? AND deleted_at IS NULL");
-            $stmt_check_phone->bind_param("s", $processed_tlp);
-            $stmt_check_phone->execute();
-            if ($stmt_check_phone->get_result()->num_rows > 0) {
-                $skipped_rows[] = "Baris {$row_num} ({$nama_toko}) dilewati: Nomor telepon '{$tlp_pic}' sudah terdaftar.";
-                $stmt_check_phone->close();
-                continue;
-            }
-            $stmt_check_phone->close();
-            
-            // Proses Insert dengan sales_id dari sesi
-            $stmt_customer = $conn->prepare("INSERT INTO customers (sales_id, tgl_input, nama_toko, kategori) VALUES (?, ?, ?, ?)");
-            $tgl_input = date('Y-m-d');
-            $stmt_customer->bind_param("isss", $uploader_sales_id, $tgl_input, $nama_toko, $kategori);
-            $stmt_customer->execute();
-            $customer_id = $conn->insert_id;
-            $stmt_customer->close();
-
-            $stmt_pic = $conn->prepare("INSERT INTO customer_pics (customer_id, nama_pic, tlp_pic) VALUES (?, ?, ?)");
-            $stmt_pic->bind_param("iss", $customer_id, $nama_pic, $processed_tlp);
-            $stmt_pic->execute();
-            $stmt_pic->close();
-
-            if (!empty($alamat)) {
-                $stmt_address = $conn->prepare("INSERT INTO customer_addresses (customer_id, alamat, kota, provinsi) VALUES (?, ?, ?, ?)");
-                $stmt_address->bind_param("isss", $customer_id, $alamat, $kota, $provinsi);
-                $stmt_address->execute();
-                $stmt_address->close();
-            }
-            
-            $imported_count++;
+if (!empty($result['ok'])) {
+    $sum = $result['summary'] ?? [];
+    $_SESSION['upload_status'] = 'success';
+    $_SESSION['flash_message'] = $result['message'] ?? ("Proses Selesai: " . ($sum['imported_count'] ?? 0) . " data customer berhasil diimpor.");
+    if (!empty($result['issues'])) {
+        $infoHtml = "<strong>Ringkasan baris dilewati (" . count($result['issues']) . "):</strong><br><ul class=\"text-start small mt-2\">";
+        foreach (array_slice($result['issues'], 0, 25) as $msg) {
+            $infoHtml .= "<li>" . htmlspecialchars($msg) . "</li>";
         }
-
-        $conn->commit();
-
-        $_SESSION['upload_status'] = 'success';
-        $_SESSION['flash_message'] = "Proses Selesai: {$imported_count} data customer berhasil diimpor.";
-        
-        if (!empty($skipped_rows)) {
-            $skipped_message = "<strong>Data berikut dilewati dan tidak diimpor:</strong><br><ul class=\"text-start\">";
-            foreach ($skipped_rows as $msg) {
-                $skipped_message .= "<li>" . htmlspecialchars($msg) . "</li>";
-            }
-            $skipped_message .= "</ul>";
-            $_SESSION['flash_message_info'] = $skipped_message;
+        if (count($result['issues']) > 25) {
+            $infoHtml .= "<li><em>...dan " . (count($result['issues']) - 25) . " baris lainnya.</em></li>";
         }
-
-    } catch (Exception $e) {
-        $conn->rollback();
-        $_SESSION['upload_status'] = 'error';
-        $_SESSION['flash_message_error'] = "Gagal mengimpor: " . $e->getMessage();
+        $infoHtml .= "</ul>";
+        $_SESSION['flash_message_info'] = $infoHtml;
     }
 } else {
     $_SESSION['upload_status'] = 'error';
-    $_SESSION['flash_message_error'] = "Gagal mengunggah file. Silakan coba lagi.";
+    $_SESSION['flash_message_error'] = $result['error'] ?? 'Gagal memproses import data.';
 }
 
 header("Location: customer_io_sales.php");
-exit();
+exit;
